@@ -20066,5 +20066,238 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a subject read through a field of each item without an id",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"d": {"from": "every xs.meta", "identified_by": "id"}}, "requirements": {"r": {"subject": "d", "checks": {"c": "ok exists"}}}},
+    "cases": [
+      {
+        "description": "is named by its item, and its item is the entry",
+        "rules": ["unique_ids", "row.parts"],
+        "input": {"xs": [{"meta": {"ok": true}}, {"meta": {"id": 1, "ok": true}}]},
+        "requirements": {"r": {"status": "not_met"}},
+        "results": [
+          {
+            "cause": "absent",
+            "check": "$unique_ids",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/xs/0/meta"
+                    ],
+                    "name": "xs[0].meta.id",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "item",
+                "locations": [
+                  "/xs/0"
+                ],
+                "message": "meta.id is missing",
+                "name": "item 1 of xs",
+                "value": {
+                  "meta": {
+                    "ok": true
+                  }
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated d ids",
+                "value": []
+              }
+            ],
+            "message": "item 1 of xs: meta.id is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "d"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/xs/0/meta/ok"
+                ],
+                "name": "ok",
+                "value": true
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "d"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/xs/1/meta/ok"
+                ],
+                "name": "ok",
+                "value": true
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": 1,
+              "type": "d"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a subject that is the whole input without an id",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"d": {"from": "$input", "identified_by": "id"}}, "requirements": {"r": {"subject": "d", "checks": {"c": "ok exists"}}}},
+    "cases": [
+      {
+        "description": "is named from $input, where it was read",
+        "rules": ["unique_ids"],
+        "input": {"ok": true},
+        "requirements": {"r": {"status": "not_met"}},
+        "results": [
+          {
+            "cause": "absent",
+            "check": "$unique_ids",
+            "failures": [],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated d ids",
+                "value": []
+              },
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "$input.id",
+                "outcome": "absent",
+                "value": null
+              }
+            ],
+            "message": "$input.id is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "d"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/ok"
+                ],
+                "name": "ok",
+                "value": true
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "d"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "an id that ends at a position",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"d": {"from": "ds", "identified_by": "meta[0]"}}, "requirements": {"r": {"subject": "d", "checks": {"c": "ok exists"}}}},
+    "cases": [
+      {
+        "description": "names the read of the id as a check names it",
+        "rules": ["unique_ids", "row.parts"],
+        "input": {"ds": [{"ok": true}]},
+        "requirements": {"r": {"status": "not_met"}},
+        "results": [
+          {
+            "cause": "absent",
+            "check": "$unique_ids",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ds/0"
+                    ],
+                    "name": "item 1 of ds[0].meta",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "item",
+                "locations": [
+                  "/ds/0"
+                ],
+                "message": "item 1 of meta is missing",
+                "name": "item 1 of ds",
+                "value": {
+                  "ok": true
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated d ids",
+                "value": []
+              }
+            ],
+            "message": "item 1 of ds: item 1 of meta is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "d"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/ds/0/ok"
+                ],
+                "name": "ok",
+                "value": true
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "d"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]

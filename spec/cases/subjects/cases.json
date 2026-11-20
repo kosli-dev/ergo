@@ -46562,5 +46562,49 @@
         ]
       }
     ]
+  },
+  {
+    "description": "an id that starts at $input",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"d": {"from": "ds", "identified_by": "$input.x"}}, "requirements": {"r": {"subject": "d", "checks": {"c": "ok exists"}}}},
+    "cases": [
+      {
+        "description": "is written wrong, because an id is a path inside each subject",
+        "rules": ["subjects.id"],
+        "input": {"ds": [{"ok": true}], "x": 1},
+        "requirements": {"r": {"status": "not_met"}},
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "locations": [],
+                "name": "subjects.d.identified_by",
+                "value": [
+                  "identified_by is a path, like \"id\" or \"build.number\""
+                ]
+              }
+            ],
+            "message": "subjects.d.identified_by: identified_by is a path, like \"id\" or \"build.number\"",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "d"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]
