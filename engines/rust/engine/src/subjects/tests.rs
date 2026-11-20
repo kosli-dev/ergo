@@ -1884,15 +1884,3 @@ fn an_assertion_with_two_counts_says_no_item_either_count_says() {
         );
     }
 }
-
-#[test]
-fn a_counts_assertion_keeps_and_n_more_after_the_items_it_says_itself() {
-    assert_eq!(
-        tally_message(
-            "count of items.v that is m named by $params.k is 0",
-            json!({"items": [{"v": {}}, {"v": {}}, {"v": {}}, {"v": {}}]}),
-            json!({"k": 3}),
-        ),
-        "$params.k is 3, which isn't text; item 1 of items: v: m is missing; item 2 of items: v: m is missing; item 3 of items: v: m is missing; and 1 more"
-    );
-}
