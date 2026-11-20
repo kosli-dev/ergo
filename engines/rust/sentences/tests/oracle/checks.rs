@@ -10442,6 +10442,78 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    (
+        "count of xs whose v is in $params.l ignoring case is 1",
+        "count of xs whose v is in $params.l ignoring case is 1",
+        &[],
+        &[],
+    ),
+    (
+        "every xs whose v is in $params.l ignoring case, if any, exists",
+        "every xs whose v is in $params.l ignoring case, if any, exists",
+        &[],
+        &[],
+    ),
+    (
+        "every xs.v is in $params.l ignoring case",
+        "every xs.v is in $params.l ignoring case",
+        &[],
+        &[],
+    ),
+    (
+        "some xs.v is in $params.l ignoring case",
+        "some xs.v is in $params.l ignoring case",
+        &[],
+        &[],
+    ),
+    (
+        "x is \"Q\" ignoring case",
+        "x is \"Q\" ignoring case",
+        &[],
+        &[],
+    ),
+    (
+        "x is \"a\" ignoring case",
+        "x is \"a\" ignoring case",
+        &[],
+        &[],
+    ),
+    (
+        "x is in $params.l ignoring surrounding spaces",
+        "x is in $params.l ignoring surrounding spaces",
+        &[],
+        &[],
+    ),
+    (
+        "x is in ys ignoring case",
+        "x is in ys ignoring case",
+        &[],
+        &[],
+    ),
+    (
+        "x is not in ys ignoring case",
+        "x is not in ys ignoring case",
+        &[],
+        &[],
+    ),
+    (
+        "x is not one of \"a\", \"b\" ignoring case",
+        "x is not one of \"a\", \"b\" ignoring case",
+        &[],
+        &[],
+    ),
+    (
+        "x is one of \"a\", \"b\" ignoring case",
+        "x is one of \"a\", \"b\" ignoring case",
+        &[],
+        &[],
+    ),
+    (
+        "x is one of ys ignoring case",
+        "x is in ys ignoring case",
+        &[],
+        &[],
+    ),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
