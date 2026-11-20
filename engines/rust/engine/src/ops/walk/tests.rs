@@ -1243,3 +1243,19 @@ fn an_item_whose_focus_cant_take_its_key_says_so_beside_a_map_it_cant_read() {
         }
     }
 }
+
+#[test]
+fn an_item_says_once_a_value_its_own_read_and_the_key_of_a_map_it_cant_read_both_stop_at() {
+    assert_eq!(
+        own_beside_broken_roots(
+            "every items whose v.w is $params.m named by v.k exists",
+            &json!([{"v": null}]),
+            json!({"m": {"a": {"k": 1}}}),
+            &[json!({}), json!({"m": null}), json!({"m": "s"})],
+        ),
+        [Some((
+            Cause::Null,
+            "item 1 of items: v is null".to_string()
+        ))]
+    );
+}
