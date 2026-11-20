@@ -169,6 +169,7 @@ pub fn of_path(path: &Path, tally: bool, ctx: &Ctx) -> Option<KeyBase> {
 
 /// The value before the first `named by` key of `path` when that key can't be
 /// read and the value can't take a key.
+#[allow(dead_code)]
 pub fn base_of(path: &Path, ctx: &Ctx) -> Option<(String, String, Cause)> {
     let at = path
         .steps

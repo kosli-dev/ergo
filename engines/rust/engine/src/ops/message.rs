@@ -2088,6 +2088,7 @@ fn root_reads_with(
     Some((worst, reads))
 }
 
+#[allow(dead_code)]
 pub fn root_clauses(checks: &[&Check], ctx: &Ctx) -> Vec<Clause> {
     let reads = root_reads_with(checks, ctx, &[], &[], true)
         .map(|(_, reads)| reads)

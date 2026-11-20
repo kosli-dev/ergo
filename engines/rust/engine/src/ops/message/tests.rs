@@ -57,6 +57,29 @@ fn root_clauses_say_a_key_and_the_value_before_it() {
 }
 
 #[test]
+fn a_root_whose_value_holds_a_semicolon_is_one_clause() {
+    let subject = json!({"id": "t", "n": 1});
+    let input = json!({});
+    let params = json!({"q": "a; b"});
+    let said = root_clauses_of(
+        "n is $params.q named by $input.k",
+        &subject,
+        &input,
+        Some(&params),
+    );
+    assert_eq!(
+        said,
+        vec![
+            (
+                "$params.q".to_string(),
+                r#"$params.q is "a; b", which isn't an object"#.to_string()
+            ),
+            ("$input.k".to_string(), "$input.k is missing".to_string()),
+        ]
+    );
+}
+
+#[test]
 fn root_clauses_say_every_key_that_cant_be_read_worst_first_then_by_name() {
     let subject = json!({"id": "t", "zz": "a", "m": {"a": "a"}, "v": "a"});
     let input = json!({"j": 3});
