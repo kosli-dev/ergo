@@ -1270,60 +1270,35 @@ pub(super) fn counted_fault_clauses(
     faults
 }
 
-/// The message of a `count of` or `sum of` row with every item it can't
-/// read said after the rest, in list order.
+/// The message of a `count of` or `sum of` row. When the check's own
+/// pieces say no count, every list and item its counts can't read follows
+/// them, in list order.
 pub fn with_all_items(check: &Tally, ctx: &Ctx, cause: Cause, said: Vec<Piece>) -> String {
-    let items: Vec<Clause> = if check.counts() && cause.is_failure() {
-        check
-            .counted_clauses(ctx, cause)
-            .into_iter()
-            .filter(|clause| clause.kind != clause::Kind::Root)
-            .collect()
-    } else {
-        Vec::new()
-    };
+    let text = super::message::pieces_text(&said);
+    if !check.counts()
+        || !cause.is_failure()
+        || said.iter().any(|piece| matches!(piece, Piece::Counted(_)))
+    {
+        return text;
+    }
+    let items: Vec<Clause> = check
+        .counted_clauses(ctx, cause)
+        .into_iter()
+        .filter(|clause| clause.kind != clause::Kind::Root)
+        .collect();
     if items.is_empty() {
-        return super::message::pieces_text(&said);
+        return text;
     }
-    let mut own: Vec<String> = Vec::new();
-    let mut counted: Vec<Clause> = Vec::new();
-    let mut at: Option<usize> = None;
-    for piece in said {
-        match piece {
-            Piece::Said(text) => own.push(text),
-            Piece::Counted(clauses) => {
-                at.get_or_insert(own.len());
-                counted.extend(
-                    clauses
-                        .into_iter()
-                        .filter(|clause| clause.kind == clause::Kind::Root),
-                );
-            }
-        }
-    }
+    let text = format!("{text}; {}", clause::text(&clause::shown(&items)));
     let from_params = check
         .counted_paths()
         .iter()
         .any(|path| path.start == path::Start::Params && path.steps.is_empty());
-    let params = from_params
-        .then(|| super::message::params_that_arent_an_object(&Check::Tally(check.clone()), ctx))
-        .flatten()
-        .filter(|params| {
-            !own.contains(params) && !counted.iter().any(|clause| clause.text == *params)
-        });
-    counted.extend(items);
-    let listed = clause::text(&clause::shown(&counted));
-    let text = match at {
-        Some(at) => {
-            own.insert(at, listed);
-            own.join(", and ")
+    match super::message::params_that_arent_an_object(&Check::Tally(check.clone()), ctx) {
+        Some(params) if from_params && !said.contains(&Piece::Said(params.clone())) => {
+            format!("{params}; {text}")
         }
-        None if own.is_empty() => listed,
-        None => format!("{}; {listed}", own.join(", and ")),
-    };
-    match params {
-        Some(params) => format!("{params}; {text}"),
-        None => text,
+        _ => text,
     }
 }
 
