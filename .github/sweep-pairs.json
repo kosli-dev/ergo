@@ -6608,5 +6608,233 @@
   },
   "params": {},
   "want": "$input.r is \"s\", which isn't a number; item 1 of xs: f is \"s\", which isn't a number"
+ },
+ {
+  "name": "key base text/count whose key and base hold a semicolon",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of o.v named by $params.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "o": "a; b"
+    }
+   ]
+  },
+  "params": {
+   "k": [
+    "x; y"
+   ]
+  },
+  "want": "$params.k is [\"x; y\"], which isn't text; o is \"a; b\", which isn't an object"
+ },
+ {
+  "name": "key base text/count whose key and list hold a semicolon",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of o named by $params.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "o": "a; b"
+    }
+   ]
+  },
+  "params": {
+   "k": [
+    "x; y"
+   ]
+  },
+  "want": "$params.k is [\"x; y\"], which isn't text; o is \"a; b\", which isn't a list or an object"
+ },
+ {
+  "name": "key base text/count whose key holds a semicolon and whose list is missing",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of o named by $params.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t"
+    }
+   ]
+  },
+  "params": {
+   "k": [
+    "a; b"
+   ]
+  },
+  "want": "$params.k is [\"a; b\"], which isn't text; o is missing"
+ },
+ {
+  "name": "key base text/sum whose key and base hold a comma and",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "sum of o.v named by $params.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "o": "a, and b"
+    }
+   ]
+  },
+  "params": {
+   "k": [
+    "x, and y"
+   ]
+  },
+  "want": "$params.k is [\"x, and y\"], which isn't text; o is \"a, and b\", which isn't an object"
+ },
+ {
+  "name": "key base text/plain check whose key and base hold a semicolon",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "o.v named by $params.k is \"a\""
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "o": "a; b"
+    }
+   ]
+  },
+  "params": {
+   "k": [
+    "x; y"
+   ]
+  },
+  "want": "$params.k is [\"x; y\"], which isn't text; o is \"a; b\", which isn't an object"
+ },
+ {
+  "name": "key base text/count of two lists whose keys are joined with and",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of o named by $params.k plus count of p named by $params.j is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "o": "s"
+    }
+   ]
+  },
+  "params": {
+   "k": 3,
+   "j": 4
+  },
+  "want": "$params.j is 4, which isn't text; $params.k is 3, which isn't text; o is \"s\", which isn't a list or an object; p is missing"
+ },
+ {
+  "name": "key base text/plain check of two paths whose keys are joined with and",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "o.v named by $params.k plus p.w named by $params.j is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "o": "s"
+    }
+   ]
+  },
+  "params": {
+   "k": 3,
+   "j": 4
+  },
+  "want": "$params.j is 4, which isn't text; $params.k is 3, which isn't text; o is \"s\", which isn't an object; p.w is missing"
  }
 ]
