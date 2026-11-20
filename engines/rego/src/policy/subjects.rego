@@ -43,19 +43,10 @@ _resolved_def(members) := {"def": def, "filter_owners": owners} if {
 	root := _raw_subject(r)
 	owners := {n: _filter_owner_in(members, n) | some m in members; some n, _ in _object_or_empty(_filters_of(m))}
 	def := object.union(
-		{f: _root_field(f, root[f], r, members) | some f in _subject_field_keys; f in object.keys(root)},
+		{f: root[f] | some f in _subject_field_keys; f in object.keys(root)},
 		{"applies_to": _merged_filters(members, owners)},
 	)
 } else := {}
-
-_root_field("from", _, r, members) := "<built on a subject read from another subject>" if {
-	count(members) > 1
-	r in object.keys(object.get(data.ergo_subject_sentences, "chains", {}))
-} else := v if {
-	v := _raw_subject(r).from
-}
-
-_root_field("identified_by", v, _, _) := v
 
 _merged_filters(members, owners) := {n: _filters_of(owner)[n] | some n, owner in owners} if {
 	every m in members {

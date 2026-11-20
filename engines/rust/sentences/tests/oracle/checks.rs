@@ -4004,6 +4004,14 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("x equals y within 0.5", "x equals y within 0.5", &[], &[]),
     ("x equals y[1]", "x equals item 2 of y", &[], &[]),
     ("x exists", "x exists", &[], &[]),
+    ("owner exists", "owner exists", &[], &[]),
+    (
+        "owner is \"ana\" and record.id exists",
+        "owner is \"ana\" and record.id exists",
+        &[],
+        &[],
+    ),
+    ("done is true", "done is true", &[], &[]),
     (
         "x exists and x is one of 1, \"a\"",
         "x exists and x is one of 1, \"a\"",

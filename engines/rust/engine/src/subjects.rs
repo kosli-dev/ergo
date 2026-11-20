@@ -7,7 +7,7 @@ use crate::ops::{self, Check, Input, Verdict};
 use crate::parts::{self, Failure, Part};
 use crate::path::{self, Ctx, Located, Location, Outcome, Path, Start, Step};
 use crate::policy::{Policy, Requirement, SubjectName};
-use crate::reading::{Filter, Lowered, Reading, Relation, Source};
+use crate::reading::{Filter, Lowered, Reading, Source};
 use crate::report::{
     Evaluation, IdFault, Row, min_subjects_row, no_subjects, row_of, unique_ancestor_ids_row,
     unique_ids_row, unreadable_params, with_id_faults,
@@ -3536,7 +3536,7 @@ fn merge(evaluations: Vec<Evaluation>) -> Evaluation {
 fn chain_of(reading: &Reading, subject: &str) -> Vec<String> {
     let mut chain = Vec::new();
     let mut at = subject.to_string();
-    while let Some(Relation::Child(parent)) = reading.infos.get(&at).map(|i| i.relation.clone()) {
+    while let Some(parent) = reading.parent_of(&at) {
         if chain.contains(&parent) {
             break;
         }

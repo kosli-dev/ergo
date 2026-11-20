@@ -46885,7 +46885,7 @@
         "r": {
           "causes": [
             {
-              "cause": "value",
+              "cause": "unusable",
               "rows": 1
             }
           ],
@@ -46897,12 +46897,17 @@
             },
             "$min_subjects": {
               "description": "The in-scope d count is at least 1",
-              "expression": "count(matching(<invalid from>)) >= 1",
+              "expression": "count(matching(g.items)) >= 1",
+              "meta": {}
+            },
+            "$unique_ancestor_ids": {
+              "description": "Every g has a unique id",
+              "expression": "count(missing(ids(g))) + count(repeated(ids(g))) == 0",
               "meta": {}
             },
             "$unique_ids": {
               "description": "Every d has a unique id",
-              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
+              "expression": "count(missing(ids(g.items))) + count(repeated(ids(g.items))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -46929,7 +46934,7 @@
       },
       "results": [
         {
-          "cause": "value",
+          "cause": "satisfied",
           "check": "$well_formed",
           "inputs": [
             {
@@ -46941,27 +46946,79 @@
               "locations": [],
               "name": "require",
               "value": "every"
+            }
+          ],
+          "passed": true,
+          "requirement": "r",
+          "subject": {
+            "id": null,
+            "type": "d"
+          }
+        },
+        {
+          "cause": "unusable",
+          "check": "$min_subjects",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "in-scope d count",
+              "value": 0
             },
             {
               "locations": [],
-              "name": "subjects.d.from",
+              "name": "$params",
               "value": [
-                "can't build on a subject read from another subject yet"
+                "not an object"
               ]
             }
           ],
+          "message": "in-scope d count is 0",
           "passed": false,
           "requirement": "r",
           "subject": {
             "id": null,
             "type": "d"
           }
+        },
+        {
+          "cause": "satisfied",
+          "check": "$unique_ids",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "repeated d ids",
+              "value": []
+            }
+          ],
+          "passed": true,
+          "requirement": "r",
+          "subject": {
+            "id": null,
+            "type": "d"
+          }
+        },
+        {
+          "cause": "satisfied",
+          "check": "$unique_ancestor_ids",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "repeated g ids",
+              "value": []
+            }
+          ],
+          "passed": true,
+          "requirement": "r",
+          "subject": {
+            "id": null,
+            "type": "g"
+          }
         }
       ],
       "subjects": {
         "d": {
           "description": "",
-          "from": "<invalid from>",
+          "from": "h whose x is 1",
           "identified_by": null,
           "parts": {}
         },
@@ -50353,12 +50410,17 @@
             },
             "$min_subjects": {
               "description": "The in-scope n count is at least 1",
-              "expression": "count(matching(<invalid from>)) >= 1",
+              "expression": "count(matching(p.c)) >= 1",
+              "meta": {}
+            },
+            "$unique_ancestor_ids": {
+              "description": "Every p has a unique id",
+              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$unique_ids": {
               "description": "Every n has a unique id",
-              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
+              "expression": "count(missing(ids(p.c))) + count(repeated(ids(p.c))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -50400,12 +50462,13 @@
             },
             {
               "locations": [],
-              "name": "subjects.n.from",
+              "name": "subjects.p.from",
               "value": [
-                "can't build on a subject read from another subject yet"
+                "doesn't parse"
               ]
             }
           ],
+          "message": "subjects.p.from: doesn't parse",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -50423,7 +50486,7 @@
         },
         "n": {
           "description": "",
-          "from": "<invalid from>",
+          "from": "c whose x is 1",
           "identified_by": "x",
           "parts": {}
         },
@@ -50522,12 +50585,17 @@
             },
             "$min_subjects": {
               "description": "The in-scope n count is at least 1",
-              "expression": "count(matching(<invalid from>)) >= 1",
+              "expression": "count(matching(p.c)) >= 1",
+              "meta": {}
+            },
+            "$unique_ancestor_ids": {
+              "description": "Every p has a unique id",
+              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$unique_ids": {
               "description": "Every n has a unique id",
-              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
+              "expression": "count(missing(ids(p.c))) + count(repeated(ids(p.c))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -50569,12 +50637,13 @@
             },
             {
               "locations": [],
-              "name": "subjects.n.from",
+              "name": "subjects.p.from",
               "value": [
-                "can't build on a subject read from another subject yet"
+                "doesn't parse"
               ]
             }
           ],
+          "message": "subjects.p.from: doesn't parse",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -50592,7 +50661,7 @@
         },
         "n": {
           "description": "",
-          "from": "<invalid from>",
+          "from": "c whose y is 2",
           "identified_by": "x",
           "parts": {}
         },
@@ -50692,12 +50761,17 @@
             },
             "$min_subjects": {
               "description": "The in-scope n count is at least 1",
-              "expression": "count(matching(<invalid from>)) >= 1",
+              "expression": "count(matching(p.c)) >= 1",
+              "meta": {}
+            },
+            "$unique_ancestor_ids": {
+              "description": "Every p has a unique id",
+              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$unique_ids": {
               "description": "Every n has a unique id",
-              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
+              "expression": "count(missing(ids(p.c))) + count(repeated(ids(p.c))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -50739,20 +50813,21 @@
             },
             {
               "locations": [],
-              "name": "subjects.n.from",
-              "value": [
-                "can't build on a subject read from another subject yet"
-              ]
-            },
-            {
-              "locations": [],
               "name": "subjects.n.identified_by",
               "value": [
                 "not a string",
                 "not allowed on a subject that narrows another"
               ]
+            },
+            {
+              "locations": [],
+              "name": "subjects.p.from",
+              "value": [
+                "doesn't parse"
+              ]
             }
           ],
+          "message": "subjects.n.identified_by: not a string; subjects.n.identified_by: not allowed on a subject that narrows another; subjects.p.from: doesn't parse",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -50770,7 +50845,7 @@
         },
         "n": {
           "description": "",
-          "from": "<invalid from>",
+          "from": "c whose y is 2",
           "identified_by": "x",
           "parts": {}
         },
@@ -50868,12 +50943,17 @@
             },
             "$min_subjects": {
               "description": "The in-scope n count is at least 1",
-              "expression": "count(matching(<invalid from>)) >= 1",
+              "expression": "count(matching(p.c)) >= 1",
+              "meta": {}
+            },
+            "$unique_ancestor_ids": {
+              "description": "Every p has a unique id",
+              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$unique_ids": {
               "description": "Every n has a unique id",
-              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
+              "expression": "count(missing(ids(p.c))) + count(repeated(ids(p.c))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -50915,19 +50995,20 @@
             },
             {
               "locations": [],
-              "name": "subjects.n.from",
-              "value": [
-                "can't build on a subject read from another subject yet"
-              ]
-            },
-            {
-              "locations": [],
               "name": "subjects.n.identified_by",
               "value": [
                 "not allowed on a subject that narrows another"
               ]
+            },
+            {
+              "locations": [],
+              "name": "subjects.p.from",
+              "value": [
+                "doesn't parse"
+              ]
             }
           ],
+          "message": "subjects.n.identified_by: not allowed on a subject that narrows another; subjects.p.from: doesn't parse",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -50945,7 +51026,7 @@
         },
         "n": {
           "description": "",
-          "from": "<invalid from>",
+          "from": "c whose x is 1",
           "identified_by": "x",
           "parts": {}
         },

@@ -26,7 +26,9 @@ Each release names the version of the spec it follows. The spec's own changes ar
 
 - A `named by` key that can't be read is said once before the items, with each item's own problem after it, and a count whose two sides fail in different ways takes an item with its missing end as the spec decides.
 
-- The Rust engine does not yet say every item on a `from` line without `every` (D8 of #688), and the shapes that `spec/OPEN.md` lists under "Left for a later PR" keep the old message. Their cases are in `known-failures.txt`.
+- The Rust engine does not yet say every item on a `from` line without `every` (D8 of #688), and the shapes that `spec/OPEN.md` lists under "Left for a later PR" keep the old message. Their cases are in `known-failures.txt`. The `$min_subjects` row that fails as `unusable` because the params aren't an object has no `failures` in the Rust engine, where [subjects.failed_items](../../spec/semantics.md#requirements) says `[]`, and the Rust regressions "params that aren't an object keep the subjects and fail every row as unusable" pin the gap, with or without narrowing.
+
+- A subject can narrow a child subject, and be narrowed in turn, as in `ergo.rego` 0.7.0 and spec 0.7 ([sentence.subject.narrow](../../spec/syntax.md#subjects), [subjects.chain](../../spec/semantics.md#requirements)), where it was written wrong with `can't build on a subject read from another subject yet`. Its rows keep the child's id and `in`, it is counted per parent, and narrowing doesn't count as a level of a chain. Changes the report of such policies, which now get real rows.
 
 ### Fixed
 
