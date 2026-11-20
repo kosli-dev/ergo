@@ -2122,9 +2122,30 @@ fn roots_with(checks: &[&Check], ctx: &Ctx, item_keys: bool) -> Vec<Clause> {
         .filter(|check| matches!(check, Check::Tally(_)))
         .flat_map(|check| off_item(check, ctx, Cause::Unusable))
         .map(|text| Clause::said(Cause::Unusable, text));
+    let aliased: Vec<Clause> = checks
+        .iter()
+        .flat_map(|check| {
+            check
+                .paths()
+                .into_iter()
+                .chain(super::walk::listed_refs(check))
+        })
+        .flat_map(|path| path.steps.iter())
+        .filter_map(|step| match step {
+            Step::Field(key) | Step::Ref(key)
+                if matches!(&key.start, Start::Alias(alias)
+                    if alias != path::OUTER && ctx.aliases.contains_key(alias)) =>
+            {
+                let (outcome, text, _) = super::key_base::key_flaw(key, ctx)?;
+                Some(Clause::root(&name::name(key), outcome.cause()?, text))
+            }
+            _ => None,
+        })
+        .collect();
     let mut said: Vec<Clause> = Vec::new();
     for clause in key_problems(checks, ctx)
         .into_iter()
+        .chain(aliased)
         .chain(bases)
         .chain(counted)
         .chain(reads.into_iter().flat_map(|(_, said)| said))
