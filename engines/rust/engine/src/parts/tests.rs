@@ -58,22 +58,33 @@ fn outcome_in(
 }
 
 #[test]
-fn a_missing_input_is_absent_and_a_null_one_is_null() {
+fn a_missing_input_is_absent_and_a_null_one_is_null_beside_a_value_the_row_cant_use() {
+    let check = ["x is at least 3", "w is at least 3"];
     assert_eq!(
-        outcome(&read("x", Value::Null, Outcome::Absent), true),
+        outcome_of(&check, &json!({"w": "a"}), None, "x"),
         Some("absent")
     );
     assert_eq!(
-        outcome(&read("x", Value::Null, Outcome::Null), true),
+        outcome_of(&check, &json!({"x": null, "w": "a"}), None, "x"),
         Some("null")
+    );
+    assert_eq!(
+        outcome_of(&check, &json!({"w": "a"}), None, "w"),
+        Some("unusable")
     );
 }
 
 #[test]
 fn a_found_value_is_unusable_only_when_the_check_cant_use_it() {
-    let x = read("x", json!("1"), Outcome::Found);
-    assert_eq!(outcome(&x, true), Some("unusable"));
-    assert_eq!(outcome(&x, false), Some("usable"));
+    let check = ["x is at least 3"];
+    assert_eq!(
+        outcome_of(&check, &json!({"x": "1"}), None, "x"),
+        Some("unusable")
+    );
+    assert_eq!(
+        outcome_of(&check, &json!({"x": 1}), None, "x"),
+        Some("usable")
+    );
 }
 
 #[test]
