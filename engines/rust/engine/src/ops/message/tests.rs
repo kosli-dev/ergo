@@ -146,6 +146,25 @@ fn root_clauses_say_every_key_that_cant_be_read_worst_first_then_by_name() {
 }
 
 #[test]
+fn root_clauses_say_a_root_key_and_the_value_before_it_once_and_not_the_ref_they_stop() {
+    let subject = json!({"id": "t", "rs": [{"zz": 1}]});
+    let input = json!({});
+    for sentence in [
+        "every rs whose zz is in $input.m named by $input.k, if any, exists",
+        "every rs whose zz is $input.m named by $input.k, if any, exists",
+    ] {
+        assert_eq!(
+            root_clauses_of(sentence, &subject, &input, None),
+            vec![
+                ("$input.k".to_string(), "$input.k is missing".to_string()),
+                ("$input.m".to_string(), "$input.m is missing".to_string()),
+            ],
+            "{sentence}"
+        );
+    }
+}
+
+#[test]
 fn root_clauses_say_the_value_before_an_item_key_that_cant_take_a_key() {
     let subject = json!({"id": "t", "xs": [{"tags": ["x"]}]});
     let input = json!({"m": null});
