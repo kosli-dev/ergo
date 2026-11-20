@@ -19438,29 +19438,29 @@
     ]
   },
   {
-    "description": "copies of a subject that is null",
-    "policy": {"ergo_spec": "{{spec}}", "subjects": {"d": {"from": "every distinct ds"}}, "requirements": {"r": {"subject": "d", "min_subjects": 0, "checks": {"c": "ok exists"}}}},
+    "description": "copies of a subject without an id",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"d": {"from": "every distinct ds", "identified_by": "id"}}, "requirements": {"r": {"subject": "d", "min_subjects": 0, "checks": {"c": "ok exists"}}}},
     "cases": [
       {
-        "description": "are one subject without an id, listed at every copy",
+        "description": "are one subject, listed at every copy",
         "rules": ["unique_ids", "subjects.distinct"],
-        "input": {"ds": [null, "a", null]},
+        "input": {"ds": [{"ok": 1}, {"ok": 2}, {"ok": 1}]},
         "requirements": {"r": {"status": "not_met"}},
         "results": [
           {
-            "cause": "null",
+            "cause": "absent",
             "check": "$unique_ids",
             "failures": [
               {
-                "cause": "null",
+                "cause": "absent",
                 "failures": [],
                 "inputs": [
                   {
                     "locations": [
                       "/ds/0"
                     ],
-                    "name": "ds[0]",
-                    "outcome": "null",
+                    "name": "ds[0].id",
+                    "outcome": "absent",
                     "value": null
                   }
                 ],
@@ -19469,9 +19469,34 @@
                   "/ds/0",
                   "/ds/2"
                 ],
-                "message": "item 1 of ds is null",
+                "message": "id is missing",
                 "name": "item 1 of ds",
-                "value": null
+                "value": {
+                  "ok": 1
+                }
+              },
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ds/1"
+                    ],
+                    "name": "ds[1].id",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "item",
+                "locations": [
+                  "/ds/1"
+                ],
+                "message": "id is missing",
+                "name": "item 2 of ds",
+                "value": {
+                  "ok": 2
+                }
               }
             ],
             "inputs": [
@@ -19481,7 +19506,7 @@
                 "value": []
               }
             ],
-            "message": "item 1 of ds is null",
+            "message": "item 1 of ds: id is missing; item 2 of ds: id is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -19490,44 +19515,19 @@
             }
           },
           {
-            "cause": "not_an_object",
+            "cause": "satisfied",
             "check": "c",
-            "failures": [
-              {
-                "cause": "not_an_object",
-                "failures": [],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/ds/0",
-                      "/ds/2"
-                    ],
-                    "name": "ok",
-                    "outcome": "not_an_object",
-                    "value": null
-                  }
-                ],
-                "kind": "assertion",
-                "locations": [
-                  "$policy:/requirements/r/checks/c"
-                ],
-                "message": "d is null, which isn't an object",
-                "name": "ok exists"
-              }
-            ],
             "inputs": [
               {
                 "locations": [
-                  "/ds/0",
-                  "/ds/2"
+                  "/ds/0/ok",
+                  "/ds/2/ok"
                 ],
                 "name": "ok",
-                "outcome": "not_an_object",
-                "value": null
+                "value": 1
               }
             ],
-            "message": "d is null, which isn't an object",
-            "passed": false,
+            "passed": true,
             "requirement": "r",
             "subject": {
               "id": null,
@@ -19535,45 +19535,21 @@
             }
           },
           {
-            "cause": "not_an_object",
+            "cause": "satisfied",
             "check": "c",
-            "failures": [
-              {
-                "cause": "not_an_object",
-                "failures": [],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/ds/1"
-                    ],
-                    "name": "ok",
-                    "outcome": "not_an_object",
-                    "value": null
-                  }
-                ],
-                "kind": "assertion",
-                "locations": [
-                  "$policy:/requirements/r/checks/c"
-                ],
-                "message": "d is \"a\", which isn't an object",
-                "name": "ok exists"
-              }
-            ],
             "inputs": [
               {
                 "locations": [
-                  "/ds/1"
+                  "/ds/1/ok"
                 ],
                 "name": "ok",
-                "outcome": "not_an_object",
-                "value": null
+                "value": 2
               }
             ],
-            "message": "d is \"a\", which isn't an object",
-            "passed": false,
+            "passed": true,
             "requirement": "r",
             "subject": {
-              "id": "a",
+              "id": null,
               "type": "d"
             }
           }
