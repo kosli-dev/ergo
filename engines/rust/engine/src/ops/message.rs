@@ -665,7 +665,14 @@ pub fn option_line_text(
         return said;
     }
     let mut verdict = verdict.clone();
-    if verdict.cause == Cause::Unusable && line.flawed(ctx) {
+    let text_list = matches!(
+        line,
+        Check::In(super::lists::In {
+            ignoring: Some(_),
+            ..
+        })
+    );
+    if verdict.cause == Cause::Unusable && line.flawed(ctx) && !text_list {
         verdict.cause = unflawed_cause(line, ctx);
     }
     message(line, ctx, &verdict)
