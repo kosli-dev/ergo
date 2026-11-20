@@ -2040,6 +2040,51 @@ fn a_subject_without_an_id_in_a_list_of_lists_sits_under_the_outer_item() {
 }
 
 #[test]
+fn a_subject_read_through_a_field_of_each_item_without_an_id_is_named_by_its_item() {
+    let row = unique_row(
+        json!({"thing": {"from": "every xs.meta", "identified_by": "id"}}),
+        json!({"xs": [{"meta": {}}, {"meta": {"id": 1}}, {"meta": {}}, {"meta": {"id": null}}, {"meta": {}}]}),
+    );
+    assert_eq!(
+        row["message"],
+        json!(
+            "item 1 of xs: meta.id is missing; item 3 of xs: meta.id is missing; item 4 of xs: meta.id is null; and 1 more"
+        )
+    );
+    assert_eq!(row["inputs"].as_array().map(Vec::len), Some(1));
+    assert_eq!(row["failures"].as_array().map(Vec::len), Some(4));
+    assert_eq!(
+        row["failures"][0],
+        json!({"kind": "item", "name": "item 1 of xs", "cause": "absent", "message": "meta.id is missing", "failures": [],
+               "inputs": [{"name": "xs[0].meta.id", "value": null, "locations": ["/xs/0/meta"], "outcome": "absent"}],
+               "value": {"meta": {}}, "locations": ["/xs/0"]})
+    );
+}
+
+#[test]
+fn copies_of_a_subject_read_through_a_field_of_each_item_list_every_item() {
+    let row = unique_row(
+        json!({"thing": {"from": "every distinct xs.meta", "identified_by": "id"}}),
+        json!({"xs": [{"meta": {}}, {"meta": {"id": 1}}, {"meta": {}}]}),
+    );
+    assert_eq!(row["message"], json!("item 1 of xs: meta.id is missing"));
+    assert_eq!(row["failures"][0]["locations"], json!(["/xs/0", "/xs/2"]));
+}
+
+#[test]
+fn a_subject_that_is_the_whole_input_without_an_id_is_named_from_the_input() {
+    let row = unique_row(
+        json!({"thing": {"from": "$input", "identified_by": "id"}}),
+        json!({"x": 1}),
+    );
+    assert_eq!(row["message"], json!("$input.id is missing"));
+    assert_eq!(
+        input_of(&row, 1),
+        json!({"name": "$input.id", "value": null, "locations": [""], "outcome": "absent"})
+    );
+}
+
+#[test]
 fn a_child_without_an_id_is_named_from_its_parent_without_the_parent_name() {
     let r = run(
         chain(),
