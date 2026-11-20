@@ -763,6 +763,37 @@ fn an_item_says_its_own_value_beside_a_list_root_before_its_key_it_cant_read() {
 }
 
 #[test]
+fn an_item_leaves_out_a_key_from_the_subject_it_cant_read() {
+    let tree =
+        ergo_policy_sentences::parse_check("every items whose v equals m named by pr.k exists")
+            .unwrap();
+    let scope = crate::lower::Scope::new().with_subject("pr");
+    let Check::Walk(walk_check) =
+        crate::lower::lower_assertion(&tree.assertions[0], &scope).unwrap()
+    else {
+        panic!("not a walk");
+    };
+    let subject = json!({"items": [{"v": 1, "m": {"z": 1}}, {"m": {"z": 1}}]});
+    let input = json!({});
+    let params = json!({});
+    let context = ctx(&subject, &input, Some(&params));
+    let outer = outer(&context);
+    let walked = walk(&walk_check.path, &outer, Options::default());
+    let said: Vec<Option<String>> = walked
+        .items
+        .iter()
+        .map(|item| {
+            item_own(&walk_check.whose[0], item, &walked, &outer)
+                .map(|said| crate::ops::clause::text(std::slice::from_ref(&said)))
+        })
+        .collect();
+    assert_eq!(
+        said,
+        [None, Some("item 2 of items: v is missing".to_string())]
+    );
+}
+
+#[test]
 fn an_item_whose_focus_cant_be_read_says_so_whatever_the_key() {
     let sentence = "every items.v that is m named by $params.k is 1";
     let items = json!([{}, {"w": 1}]);
