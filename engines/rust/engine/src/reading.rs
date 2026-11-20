@@ -11,8 +11,6 @@ use serde_json::{Map, Value, json};
 use std::collections::{BTreeMap, BTreeSet};
 
 pub const INVALID_FROM: &str = "<invalid from>";
-pub const NARROWING_A_CHILD_PROBLEM: &str =
-    "can't build on a subject read from another subject yet";
 
 pub const INVALID_IDENTIFIED_BY: &str = "<invalid identified_by>";
 pub const KEYED_ID_PROBLEM: &str = "not allowed with named by each of: the key is the id";
@@ -84,19 +82,10 @@ pub struct Lowered {
     pub from_text: String,
 }
 
-impl Info {
-    fn only_narrows_a_child(&self, name: &str) -> bool {
-        !self.unsupported
-            && self
-                .problems
-                .get(&field_name(&["subjects", name, "from"]))
-                .is_some_and(|texts| texts.iter().all(|t| t == NARROWING_A_CHILD_PROBLEM))
-    }
-}
-
 #[derive(Debug, Clone)]
 pub struct Info {
     pub relation: Relation,
+    pub parent: Option<String>,
     pub problems: Problems,
     pub lowered: Option<Lowered>,
     pub from_text: Option<String>,
@@ -390,9 +379,14 @@ impl Raws<'_, '_> {
     }
 
     fn child_parent(&self, name: &str) -> Option<String> {
-        match self.get(name).map(|r| &r.relation) {
-            Some(Relation::Child(parent)) => Some(parent.clone()),
-            _ => None,
+        let mut seen = BTreeSet::new();
+        let mut at = name.to_string();
+        loop {
+            match self.get(&at).map(|r| &r.relation) {
+                Some(Relation::Child(parent)) => return Some(parent.clone()),
+                Some(Relation::Narrows(base)) if seen.insert(at.clone()) => at = base.clone(),
+                _ => return None,
+            }
         }
     }
 
@@ -620,9 +614,6 @@ impl Raws<'_, '_> {
                 let base = self.flatten(parent, owns, visiting);
                 visiting.pop();
                 let mut base = base?;
-                if matches!(base.source, Source::Child { .. }) {
-                    return None;
-                }
                 base.filters.extend(own.filters.iter().cloned());
                 Some(base)
             }
@@ -1007,7 +998,6 @@ impl Reading {
         }
         let mut owns: BTreeMap<String, Own> = BTreeMap::new();
         let mut unsupported: BTreeSet<String> = BTreeSet::new();
-        let mut narrowing_a_child: BTreeMap<String, Vec<String>> = BTreeMap::new();
         let mut chain_problems: BTreeMap<String, Vec<String>> = BTreeMap::new();
         let mut problems_by_subject: BTreeMap<String, Problems> = BTreeMap::new();
         for (name, found) in &raw {
@@ -1131,20 +1121,6 @@ impl Reading {
                             },
                         }
                     }
-                    if let Relation::Narrows(parent) = &found.relation
-                        && matches!(
-                            raw.get(parent).map(|r| &r.relation),
-                            Some(Relation::Child(_))
-                        )
-                    {
-                        if found_problems.is_empty() {
-                            narrowing_a_child.insert(
-                                name.clone(),
-                                filters.iter().map(|f| f.text.clone()).collect(),
-                            );
-                        }
-                        found_problems.push(NARROWING_A_CHILD_PROBLEM.to_string());
-                    }
                     found_problems.sort();
                     found_problems.dedup();
                     let before = found_problems.len();
@@ -1255,6 +1231,7 @@ impl Reading {
                 name.clone(),
                 Info {
                     relation: found.relation.clone(),
+                    parent: raws.child_parent(name),
                     problems,
                     lowered,
                     from_text,
@@ -1266,14 +1243,18 @@ impl Reading {
                     own_filters: owns
                         .get(name)
                         .map(|own| own.filters.iter().map(|f| f.text.clone()).collect())
-                        .or_else(|| narrowing_a_child.get(name).cloned())
                         .unwrap_or_default(),
-                    filters_known: owns.contains_key(name) || narrowing_a_child.contains_key(name),
+                    filters_known: owns.contains_key(name),
                     entry,
                 },
             );
         }
         Reading { infos, names }
+    }
+
+    /// The subject that `name`'s subjects are read inside, if any.
+    pub fn parent_of(&self, name: &str) -> Option<String> {
+        self.infos.get(name).and_then(|info| info.parent.clone())
     }
 
     pub fn used(&self, name: &str) -> Vec<String> {
@@ -1313,18 +1294,7 @@ impl Reading {
             }
         }
         if let SubjectName::Named(name) = &requirement.subject {
-            let mut listed = self.used(name);
-            for used in listed.clone() {
-                if self.infos[&used].only_narrows_a_child(&used)
-                    && let Relation::Narrows(child) = &self.infos[&used].relation
-                    && self.infos.contains_key(child)
-                {
-                    listed.push(child.clone());
-                }
-            }
-            listed.sort();
-            listed.dedup();
-            for used in listed {
+            for used in self.used(name) {
                 merge_problems(&mut problems, &self.infos[&used].problems);
                 if let Some(subject) = policy.subject(&used) {
                     merge_problems(&mut problems, &subject.problems);
