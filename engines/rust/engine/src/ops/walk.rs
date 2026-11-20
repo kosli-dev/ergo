@@ -1194,6 +1194,19 @@ pub(super) fn item_own(
             let text = message::message(&alone, &focus, &verdict);
             item = super::tally::told(&name, verdict.cause, &text);
         }
+    } else if !focus.subject.value.is_object()
+        && check
+            .paths()
+            .into_iter()
+            .chain(listed_refs(check))
+            .any(|path| {
+                matches!(path.start, Start::Subject | Start::Own)
+                    && matches!(path.steps.first(), Some(Step::Key(_)))
+                    && !blocked(path)
+            })
+    {
+        let text = message::isnt(&name, focus.subject.value, "an object");
+        item = Clause::item(&name, Cause::NotAnObject, text, Vec::new());
     } else if let Some(text) = own_list_fault(check, &focus, blocked) {
         item = super::tally::told(&name, Cause::Unusable, &text);
     }
