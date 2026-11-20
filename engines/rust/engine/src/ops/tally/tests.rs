@@ -1770,10 +1770,14 @@ fn an_item_whose_end_a_sum_cant_add_is_recorded_at_that_end() {
 }
 
 fn tally_clauses(sentence: &str, items: Value, params: Value, cause: Cause) -> Vec<Clause> {
+    tally_clauses_on(sentence, json!({"items": items}), params, cause)
+}
+
+fn tally_clauses_on(sentence: &str, subject: Value, params: Value, cause: Cause) -> Vec<Clause> {
     let Check::Tally(tally) = lowered(sentence) else {
         panic!("{sentence} is not a count or a sum");
     };
-    let input = json!({"things": [{"items": items}]});
+    let input = json!({"things": [subject]});
     let ctx = Ctx {
         label: None,
         item_by_item: false,
@@ -1831,4 +1835,70 @@ fn a_count_in_a_whose_that_cant_be_read_says_its_items_once_with_one_and_n_more(
         clause::text(&clause::shown(&clauses)),
         "item 2 of $params.pos: name is missing; item 3 of $params.pos: name is missing; item 4 of $params.pos: name is missing; and 2 more"
     );
+}
+
+fn kinds_and_texts(clauses: &[Clause]) -> Vec<(clause::Kind, String)> {
+    clauses
+        .iter()
+        .map(|said| (said.kind, clause::text(std::slice::from_ref(said))))
+        .collect()
+}
+
+#[test]
+fn a_sum_says_an_item_it_cant_add_as_an_item() {
+    let clauses = tally_clauses(
+        "sum of items.v is 1",
+        json!([{"v": 1}, {"v": "a"}, {"v": null}]),
+        json!({}),
+        Cause::Unusable,
+    );
+    assert_eq!(
+        kinds_and_texts(&clauses),
+        [
+            (
+                clause::Kind::Item,
+                "item 2 of items: v is \"a\", which isn't a number".to_string()
+            ),
+            (clause::Kind::Item, "item 3 of items: v is null".to_string()),
+        ]
+    );
+}
+
+#[test]
+fn a_root_whose_value_holds_a_semicolon_is_one_clause() {
+    let clauses = tally_clauses(
+        "count of items whose v is at least $params.min is 1",
+        json!([{"v": 1}]),
+        json!({"min": "a; item 1 of items: b"}),
+        Cause::Unusable,
+    );
+    assert_eq!(
+        kinds_and_texts(&clauses),
+        [(
+            clause::Kind::Root,
+            "$params.min is \"a; item 1 of items: b\", which isn't a number".to_string()
+        )]
+    );
+}
+
+#[test]
+fn a_count_or_a_sum_whose_list_is_missing_null_or_not_a_list_says_it_as_a_list() {
+    for sentence in ["count of items is 1", "sum of items.v is 1"] {
+        for (subject, cause, said) in [
+            (json!({}), Cause::Absent, "items is missing"),
+            (json!({"items": null}), Cause::Null, "items is null"),
+            (
+                json!({"items": "s"}),
+                Cause::Unusable,
+                "items is \"s\", which isn't a list or an object",
+            ),
+        ] {
+            let clauses = tally_clauses_on(sentence, subject, json!({}), cause);
+            assert_eq!(
+                kinds_and_texts(&clauses),
+                [(clause::Kind::List, said.to_string())],
+                "{sentence}"
+            );
+        }
+    }
 }
