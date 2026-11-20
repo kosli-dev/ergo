@@ -930,3 +930,61 @@ fn an_item_says_its_own_list_beside_a_root_on_the_left_of_is_in_it_cant_read() {
         );
     }
 }
+
+#[test]
+fn an_item_says_its_own_list_of_mixed_kinds_beside_a_root_on_the_left_of_is_in_it_cant_read() {
+    let sentence = "every items whose $params.k is in tags exists";
+    let items = json!([{"tags": [1, "x"]}]);
+    let readable = judged(sentence, items.clone(), json!({"k": "x"}));
+    assert_eq!(
+        readable,
+        [Some((
+            Cause::Unusable,
+            "item 1 of items: tags is [1, \"x\"], which isn't a list of one kind of value"
+                .to_string()
+        ))]
+    );
+    for params in [json!({}), json!({"k": null})] {
+        assert_eq!(
+            own_said(sentence, items.clone(), params.clone(), json!({})),
+            readable,
+            "{params}"
+        );
+    }
+}
+
+#[test]
+fn an_item_that_isnt_an_object_says_so_beside_a_root_on_the_left_of_contains_or_matches_it_cant_read()
+ {
+    for (sentence, readable_params) in [
+        (
+            "every items whose $params.l contains v exists",
+            json!({"l": ["a"]}),
+        ),
+        ("every items whose $params.l matches v exists", json!({"l": "a"})),
+    ] {
+        let items = json!(["s", null]);
+        let readable = judged(sentence, items.clone(), readable_params);
+        assert_eq!(
+            readable,
+            [
+                Some((
+                    Cause::NotAnObject,
+                    "item 1 of items is \"s\", which isn't an object".to_string()
+                )),
+                Some((
+                    Cause::NotAnObject,
+                    "item 2 of items is null, which isn't an object".to_string()
+                )),
+            ],
+            "{sentence}"
+        );
+        for params in [json!({}), json!({"l": null})] {
+            assert_eq!(
+                own_said(sentence, items.clone(), params.clone(), json!({})),
+                readable,
+                "{sentence} {params}"
+            );
+        }
+    }
+}
