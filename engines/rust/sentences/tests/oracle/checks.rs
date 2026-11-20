@@ -10456,6 +10456,30 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    (
+        "v equals w ignoring case",
+        "v equals w ignoring case",
+        &[],
+        &[],
+    ),
+    (
+        "v does not equal w ignoring case",
+        "v does not equal w ignoring case",
+        &[],
+        &[],
+    ),
+    (
+        "v is $params.p ignoring surrounding spaces",
+        "v equals $params.p ignoring surrounding spaces",
+        &[],
+        &[],
+    ),
+    (
+        "some xs whose v is $input.r ignoring case exists",
+        "some xs whose v equals $input.r ignoring case exists",
+        &[],
+        &[],
+    ),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
