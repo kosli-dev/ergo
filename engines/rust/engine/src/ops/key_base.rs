@@ -355,10 +355,8 @@ pub fn entry_inputs(
     cause: Cause,
     inputs: &[serde_json::Value],
 ) -> Vec<serde_json::Value> {
-    if !matches!(
-        cause,
-        Cause::Absent | Cause::Null | Cause::Unusable | Cause::NotAnObject
-    )
+    let tallied = matches!(check, Check::Tally(_)) && cause == Cause::NotAnObject;
+    if !(tallied || matches!(cause, Cause::Absent | Cause::Null | Cause::Unusable))
         || matches!(check, Check::Walk(_) | Check::For(_) | Check::AnyOf(_))
     {
         return Vec::new();
