@@ -1398,3 +1398,107 @@ fn a_ref_through_a_list_of_params_points_at_where_the_read_stopped() {
         json!([{"name": "item 1 of $params", "value": [1], "locations": ["$params:/0"], "outcome": "usable"}])
     );
 }
+
+fn thing_requirement() -> Requirement {
+    let read = Policy::read(&policy(json!({"s": good()})));
+    read.requirements["s"].clone()
+}
+
+#[test]
+fn a_unique_ids_row_that_fails_on_a_repeated_id_alone_has_no_failures_to_list() {
+    let row = unique_ids_row("s", &thing_requirement(), vec![json!("a")], &[]);
+    assert_eq!(row.failures, Some(json!([])));
+    let passed = unique_ids_row("s", &thing_requirement(), Vec::new(), &[]);
+    assert_eq!(passed.failures, None);
+}
+
+fn id_fault(item: &str, path: &str, cause: Cause, text: &str, at: &str) -> IdFault {
+    IdFault {
+        record: json!({
+            "item": item,
+            "path": path,
+            "cause": cause.name(),
+            "value": null,
+            "locations": [at],
+            "ergo/text": text,
+            "ergo/item": {"value": {"ok": true}, "locations": [at]},
+        }),
+        clause: format!("{item}: {text}"),
+        cause,
+        listed: true,
+    }
+}
+
+#[test]
+fn ids_that_are_missing_or_null_fail_the_row_after_the_repeated_ids_with_the_worst_cause() {
+    let row = unique_ids_row("s", &thing_requirement(), vec![json!("a")], &[]);
+    let faults = [
+        id_fault("item 2 of ds", "ds[1].id", Cause::Absent, "id is missing", "/ds/1"),
+        id_fault("item 3 of ds", "ds[2].id", Cause::Null, "id is null", "/ds/2/id"),
+    ];
+    let row = with_id_faults(row, &faults, &json!({}));
+    assert_eq!(row.cause, Cause::Absent);
+    assert_eq!(
+        row.message.as_deref(),
+        Some("repeated thing ids is [\"a\"]; item 2 of ds: id is missing; item 3 of ds: id is null")
+    );
+    assert_eq!(
+        row.failures,
+        Some(json!([
+            {"kind": "item", "name": "item 2 of ds", "cause": "absent", "message": "id is missing", "failures": [],
+             "inputs": [{"name": "ds[1].id", "value": null, "locations": ["/ds/1"], "outcome": "absent"}],
+             "value": {"ok": true}, "locations": ["/ds/1"]},
+            {"kind": "item", "name": "item 3 of ds", "cause": "null", "message": "id is null", "failures": [],
+             "inputs": [{"name": "ds[2].id", "value": null, "locations": ["/ds/2/id"], "outcome": "null"}],
+             "value": {"ok": true}, "locations": ["/ds/2/id"]}
+        ]))
+    );
+}
+
+#[test]
+fn a_missing_id_alone_fails_a_row_that_had_passed() {
+    let row = unique_ids_row("s", &thing_requirement(), Vec::new(), &[]);
+    let faults = [id_fault("item 1 of ds", "ds[0].id", Cause::Null, "id is null", "/ds/0/id")];
+    let row = with_id_faults(row, &faults, &json!({}));
+    assert_eq!(row.cause, Cause::Null);
+    assert_eq!(row.message.as_deref(), Some("item 1 of ds: id is null"));
+    assert_eq!(row.failures.as_ref().map(|f| f[0]["name"].clone()), Some(json!("item 1 of ds")));
+}
+
+#[test]
+fn a_subject_outside_any_list_puts_its_id_read_on_the_row_and_has_no_entry() {
+    let row = unique_ids_row("s", &thing_requirement(), Vec::new(), &[]);
+    let mut fault = id_fault("thing.id", "thing.id", Cause::Absent, "thing.id is missing", "/thing");
+    fault.listed = false;
+    fault.clause = "thing.id is missing".to_string();
+    let row = with_id_faults(row, &[fault], &json!({}));
+    assert_eq!(row.cause, Cause::Absent);
+    assert_eq!(row.message.as_deref(), Some("thing.id is missing"));
+    assert_eq!(row.failures, Some(json!([])));
+    assert_eq!(
+        row.inputs[1],
+        json!({"name": "thing.id", "value": null, "locations": ["/thing"], "outcome": "absent"})
+    );
+}
+
+#[test]
+fn the_message_names_three_subjects_without_an_id_and_counts_the_rest() {
+    let row = unique_ids_row("s", &thing_requirement(), Vec::new(), &[]);
+    let faults: Vec<IdFault> = (0..5)
+        .map(|at| {
+            id_fault(
+                &format!("item {} of ds", at + 1),
+                &format!("ds[{at}].id"),
+                Cause::Absent,
+                "id is missing",
+                &format!("/ds/{at}"),
+            )
+        })
+        .collect();
+    let row = with_id_faults(row, &faults, &json!({}));
+    assert_eq!(
+        row.message.as_deref(),
+        Some("item 1 of ds: id is missing; item 2 of ds: id is missing; item 3 of ds: id is missing; and 2 more")
+    );
+    assert_eq!(row.failures.as_ref().and_then(Value::as_array).map(Vec::len), Some(5));
+}

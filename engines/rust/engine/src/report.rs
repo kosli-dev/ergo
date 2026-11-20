@@ -213,6 +213,23 @@ pub fn unique_ids_row(
     row
 }
 
+/// A subject whose id is missing or `null`: the record its entry in the
+/// row's `failures` is built from, what the row's message says about it, its
+/// cause, and whether it sits in a list, so that it has an entry at all.
+#[derive(Debug, Clone, PartialEq)]
+pub struct IdFault {
+    pub record: Value,
+    pub clause: String,
+    pub cause: Cause,
+    pub listed: bool,
+}
+
+/// Fails a `$unique_ids` or `$unique_ancestor_ids` row for every subject
+/// without an id, after the repeated ids, and lists each in its `failures`.
+pub fn with_id_faults(row: Row, _faults: &[IdFault], _input: &Value) -> Row {
+    row
+}
+
 pub fn unreadable_params(params: &Value) -> Vec<Value> {
     match params {
         Value::Null | Value::Object(_) => Vec::new(),
