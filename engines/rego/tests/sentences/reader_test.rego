@@ -152,9 +152,9 @@ test_brackets_in_a_for_item_that_starts_with_every_some_or_a_position_are_read i
 test_ignoring_words_read_after_is_and_is_one_of if {
 	_read(`x is "a" ignoring case`).assertions[0].phrase == {"op": "is", "value": "a", "ignoring": "case"}
 	_read(`x is  "a"  ignoring  case  and  surrounding  spaces`).assertions[0].phrase == {"op": "is", "value": "a", "ignoring": "case and surrounding spaces"}
-	_read(`x is not in $params.l ignoring surrounding spaces`).assertions[0].phrase == {"op": "is not one of", "path": {"start": "params", "steps": ["l"]}, "ignoring": "surrounding spaces"}
+	_read(`x is not one of "a", "b" ignoring surrounding spaces`).assertions[0].phrase == {"op": "is not one of", "values": ["a", "b"], "ignoring": "surrounding spaces"}
 	_printed(`x  is equal to y ignoring   case`) == `x equals y ignoring case`
-	_printed(`x is one of $params.l ignoring case and surrounding spaces`) == `x is in $params.l ignoring case and surrounding spaces`
+	_printed(`x is in "a", "b" ignoring case and surrounding spaces`) == `x is one of "a", "b" ignoring case and surrounding spaces`
 	_printed(`every xs whose k is not "a" ignoring case exists`) == `every xs whose k is not "a" ignoring case exists`
 	_printed(`x is "a" followed by y ignoring case`) == `x is "a" followed by y ignoring case`
 }
@@ -181,6 +181,26 @@ test_ignoring_words_after_another_phrase_or_in_another_order_are_written_wrong i
 		`"ignoring case" takes text` in _read(line).problems
 	}
 	ergo._s_self_problems(_read(`x equals x ignoring case`).assertions) == {"x is compared with itself"}
+}
+
+test_ignoring_words_after_a_list_read_from_a_path_are_written_wrong_for_now if {
+	every pair in [
+		[`x is in $params.l ignoring case`, `"is in" can't take ignoring case yet`],
+		[`x is one of $params.l ignoring case`, `"is in" can't take ignoring case yet`],
+		[`x is in ys ignoring surrounding spaces`, `"is in" can't take ignoring surrounding spaces yet`],
+		[`x is one of $input.ys ignoring case and surrounding spaces`, `"is in" can't take ignoring case and surrounding spaces yet`],
+		[`x is not in $params.l ignoring case`, `"is not in" can't take ignoring case yet`],
+		[`x is not one of ys ignoring case`, `"is not in" can't take ignoring case yet`],
+		[`every xs.v is in $params.l ignoring case`, `"is in" can't take ignoring case yet`],
+		[`count of xs whose v is in ys ignoring case is 1`, `"is in" can't take ignoring case yet`],
+	] {
+		_read(pair[0]) == {"problems": [pair[1]]}
+	}
+	ergo._for_line(`every xs whose v is not in $params.l ignoring case as x`) == {"problems": [`"is not in" can't take ignoring case yet`]}
+	_read(`x is in ys ignoring surrounding spaces and case`) == {"problems": [
+		`"ignoring surrounding spaces and case" is written "ignoring case and surrounding spaces"`,
+		`"is in" can't take ignoring surrounding spaces and case yet`,
+	]}
 }
 
 test_ignoring_words_dont_read_after_contains_starts_with_ends_with_or_alphabetically_yet if {
