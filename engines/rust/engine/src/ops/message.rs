@@ -2088,6 +2088,18 @@ fn root_reads_with(
     Some((worst, reads))
 }
 
+pub fn root_clauses(checks: &[&Check], ctx: &Ctx) -> Vec<Clause> {
+    let reads = root_reads_with(checks, ctx, &[], &[], true)
+        .map(|(_, reads)| reads)
+        .unwrap_or_default();
+    let said: Vec<Clause> = reads
+        .into_iter()
+        .flat_map(|(_, said)| said)
+        .chain(key_problems(checks, ctx))
+        .collect();
+    clause::shown(&said)
+}
+
 pub fn off_item(check: &Check, ctx: &Ctx, cause: Cause) -> Vec<String> {
     let want = match cause {
         Cause::Absent => Outcome::Absent,

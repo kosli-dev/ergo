@@ -11,7 +11,15 @@ fn root_clauses_of(
     input: &Value,
     params: Option<&Value>,
 ) -> Vec<(String, String)> {
-    let check = lowered(sentence);
+    let whole = lowered(sentence);
+    let inside: Vec<&super::Check> = match &whole {
+        super::Check::Walk(walk) => walk
+            .whose
+            .iter()
+            .chain(std::iter::once(&*walk.check))
+            .collect(),
+        other => vec![other],
+    };
     let ctx = crate::path::Ctx {
         label: None,
         item_by_item: false,
@@ -24,7 +32,7 @@ fn root_clauses_of(
         params,
         aliases: std::collections::BTreeMap::new(),
     };
-    super::root_clauses(&[&check], &ctx)
+    super::root_clauses(&inside, &ctx)
         .into_iter()
         .map(|clause| (clause.name, clause.text))
         .collect()
