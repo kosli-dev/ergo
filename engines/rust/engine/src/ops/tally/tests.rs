@@ -1755,6 +1755,30 @@ fn an_item_a_whose_with_a_root_on_the_left_cant_use_is_recorded_with_the_field_i
 }
 
 #[test]
+fn an_item_that_isnt_an_object_beside_a_root_on_the_left_of_is_in_is_recorded_with_its_list() {
+    for params in [json!({}), json!({"k": "x"})] {
+        let records = counted_records(
+            "count of items whose $params.k is in tags is 1",
+            json!(["a"]),
+            params.clone(),
+        );
+        assert_eq!(
+            records,
+            [json!({
+                "path": "items[0].tags",
+                "item": "item 1 of items",
+                "cause": "not_an_object",
+                "value": null,
+                "locations": ["/things/0/items/0"],
+                "ergo/text": "item 1 of items is \"a\", which isn't an object",
+                "ergo/item": {"value": "a", "locations": ["/things/0/items/0"]},
+            })],
+            "{params}"
+        );
+    }
+}
+
+#[test]
 fn an_item_whose_lost_end_a_whose_reads_is_recorded_at_that_end() {
     let records = counted_records(
         "count of items.v whose it is at least 3 is at least 1",
