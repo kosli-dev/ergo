@@ -31,6 +31,7 @@ else
     cp "$root/engines/rust/engine/tests/cases.rs" "$tree/engines/rust/engine/tests/cases.rs"
   fi
   dump() {
+    find "$1/engines/rust" -name '*.rs' -exec touch {} +
     (cd "$1/engines/rust" && ERGO_DUMP=$2 cargo test -j 4 -p ergo-policy-engine --test cases every_case > /dev/null)
   }
   dump "$tree" "$work/base-dump"
