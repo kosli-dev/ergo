@@ -5334,5 +5334,694 @@
    }
   ],
   "params": {}
+ },
+ {
+  "name": "root left of contains all of/tags mixed",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of xs whose $params.r contains all of f is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "f": [
+        1,
+        "x"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "want": "$params.r is missing; item 1 of xs: f is [1, \"x\"], which isn't a list of one kind of value"
+ },
+ {
+  "name": "root left of contains all of/tags mixed, five items",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of xs whose $params.r contains all of f is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "f": [
+        1,
+        "x"
+       ]
+      },
+      {
+       "f": [
+        "a",
+        "b"
+       ]
+      },
+      {
+       "f": [
+        1,
+        "x"
+       ]
+      },
+      {
+       "f": [
+        1,
+        "x"
+       ]
+      },
+      {
+       "f": [
+        1,
+        "x"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "params": {}
+ },
+ {
+  "name": "root left of matches/patterns of the wrong kind",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of xs whose $params.r matches f is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "f": [
+        1
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "want": "$params.r is missing; item 1 of xs: f is [1], which isn't a list of patterns"
+ },
+ {
+  "name": "root left of matches/not a list, missing",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of xs whose $params.r matches f is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "f": 3
+      },
+      {
+       "f": "["
+      },
+      {}
+     ]
+    }
+   ]
+  },
+  "params": {}
+ },
+ {
+  "name": "root left of contains/value before the key not an object",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of xs whose $params.r contains f.w is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "f": "s"
+      }
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "want": "$params.r is missing; item 1 of xs: f is \"s\", which isn't an object"
+ },
+ {
+  "name": "root right of is before/item missing",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of xs whose f is before $params.r is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {}
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "want": "$params.r is missing; item 1 of xs: f is missing"
+ },
+ {
+  "name": "root right of is on or after/item not a time",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of xs whose f is on or after $params.r is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "f": true
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "r": null
+  }
+ },
+ {
+  "name": "root left of is before/input null, items missing",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of xs whose $input.r is before f is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {},
+      {
+       "f": "2026-01-01T00:00:00Z"
+      },
+      {},
+      {},
+      {}
+     ]
+    }
+   ],
+   "r": null
+  },
+  "params": {},
+  "want": "$input.r is null; item 1 of xs: f is missing; item 3 of xs: f is missing; item 4 of xs: f is missing; and 1 more"
+ },
+ {
+  "name": "root right of contains all of/items missing",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of xs whose f contains all of $params.r is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {},
+      {
+       "f": [
+        "a",
+        "b"
+       ]
+      },
+      {},
+      {},
+      {}
+     ]
+    }
+   ]
+  },
+  "params": {}
+ },
+ {
+  "name": "root right of at least/null beside items not numbers",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of xs whose f is at least $params.r is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "f": "s"
+      },
+      {
+       "f": 3
+      },
+      {
+       "f": "s"
+      },
+      {
+       "f": "s"
+      },
+      {
+       "f": "s"
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "r": null
+  }
+ },
+ {
+  "name": "root right of is in/not a list beside an item not an object",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of xs whose f is in $params.r is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      "s"
+     ]
+    }
+   ]
+  },
+  "params": {
+   "r": "s"
+  }
+ },
+ {
+  "name": "root left of matches/patterns of mixed kinds",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of xs whose $input.r matches f is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "f": [
+        1,
+        "x"
+       ]
+      }
+     ]
+    }
+   ],
+   "r": null
+  },
+  "params": {},
+  "want": "$input.r is null; item 1 of xs: f is [1, \"x\"], which isn't a list of patterns"
+ },
+ {
+  "name": "root left of contains none of/not a list",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of xs whose $input.r contains none of f is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "f": "s"
+      }
+     ]
+    }
+   ],
+   "r": null
+  },
+  "params": {},
+  "want": "$input.r is null; item 1 of xs: f is \"s\", which isn't a list"
+ },
+ {
+  "name": "root left of contains/null beside an item missing",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of xs whose $params.r contains f is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {}
+     ]
+    }
+   ]
+  },
+  "params": {
+   "r": null
+  },
+  "want": "$params.r is null; item 1 of xs: f is missing"
+ },
+ {
+  "name": "root right of that contains/a focus that is a list is walked",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of xs.f that contains $params.r is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "f": null
+      },
+      {
+       "f": [
+        "a",
+        "b"
+       ]
+      },
+      {
+       "f": null
+      },
+      {
+       "f": null
+      },
+      {
+       "f": null
+      }
+     ]
+    }
+   ]
+  },
+  "params": {}
+ },
+ {
+  "name": "root left of is not in/list reached through a list",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of xs whose $input.r is not in f.w is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "f": "s"
+      },
+      {
+       "f": [
+        "a",
+        "b"
+       ]
+      },
+      {
+       "f": "s"
+      },
+      {
+       "f": "s"
+      },
+      {
+       "f": "s"
+      }
+     ]
+    }
+   ]
+  },
+  "params": {}
+ },
+ {
+  "name": "root left of contains/one item missing",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of xs whose $params.l contains v is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": "s"
+      },
+      {}
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "want": "$params.l is missing; item 2 of xs: v is missing"
+ },
+ {
+  "name": "root left of contains some of/null beside mixed kinds",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of xs whose $params.l contains some of v is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": [
+        1,
+        "x"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "l": null
+  },
+  "want": "$params.l is null; item 1 of xs: v is [1, \"x\"], which isn't a list of one kind of value"
  }
 ]
