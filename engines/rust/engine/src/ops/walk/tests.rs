@@ -1305,3 +1305,34 @@ fn an_item_value_that_holds_a_semicolon_or_an_and_stays_whole_in_its_clause() {
     assert_eq!(out.parts[0].said.len(), 1);
     assert_eq!(out.parts[0].said[0].text, "v is \"p; q, and r\"");
 }
+
+fn thing_row(sentence: &str, subject: Value, params: Value) -> Run {
+    let Check::Walk(walk_check) = lowered(sentence) else {
+        panic!("{sentence} is not every or some");
+    };
+    let input = json!({});
+    let mut context = ctx(&subject, &input, Some(&params));
+    context.label = Some("thing".to_string());
+    run(&walk_check, &context)
+}
+
+fn said_row(sentence: &str, subject: Value, params: Value) -> (Cause, String) {
+    let out = thing_row(sentence, subject, params);
+    (out.verdict.cause, out.message.unwrap_or_default())
+}
+
+#[test]
+fn an_every_keeps_its_items_beside_a_missing_key() {
+    assert_eq!(
+        said_row(
+            "every es.v that is m named by $params.k is 1",
+            json!({"es": [{"v": {}}, {"v": {"m": null}}]}),
+            json!({}),
+        ),
+        (
+            Cause::Absent,
+            "$params.k is missing; item 1 of es: v: m is missing; item 2 of es: v: m is null"
+                .to_string()
+        )
+    );
+}
