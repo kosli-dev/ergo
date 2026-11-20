@@ -216,8 +216,7 @@ pub fn unique_ids_row(
 
 /// A subject whose id is missing or `null`: the record its entry in the
 /// row's `failures` is built from, with what the row's message says about it
-/// under `ergo/text`, its cause, and whether it sits in a list, so that it
-/// has an entry at all.
+/// under `ergo/text`, its cause, and whether it sits in an item of a list.
 #[derive(Debug, Clone, PartialEq)]
 pub struct IdFault {
     pub record: Value,
