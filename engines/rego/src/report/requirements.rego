@@ -117,8 +117,8 @@ _subject_count_name(req) := concat(" ", ["in-scope", _text(_subject_type_of(req)
 
 _unique_ids_def(req) := {"$unique_ids": _with_refs(
 	{
-		"description": concat("", ["Every ", _text(_subject_type_of(req)), " id is unique"]),
-		"expression": concat("", ["count(repeated(ids(", _from_text(req), "))) == 0"]),
+		"description": _unique_ancestor_description(0, _subject_type_of(req)),
+		"expression": _ids_expression(_from_text(req)),
 	},
 	{"from": _listed_from(req), "id": _id_of(req)},
 )}
@@ -126,7 +126,7 @@ _unique_ids_def(req) := {"$unique_ids": _with_refs(
 _unique_ancestor_ids_def(req) := {"$unique_ancestor_ids": _with_refs(
 	{
 		"description": concat(" and ", [_unique_ancestor_description(i, a) | some i, a in levels]),
-		"expression": concat(" and ", [concat("", ["count(repeated(ids(", _from_text({"subject": a, "checks": {}}), "))) == 0"]) | some a in levels]),
+		"expression": concat(" and ", [_ids_expression(_from_text({"subject": a, "checks": {}})) | some a in levels]),
 	},
 	[{"from": _listed_from({"subject": a, "checks": {}}), "id": _id_of({"subject": a, "checks": {}})} | some a in levels],
 )} if {
@@ -137,6 +137,8 @@ _unique_ancestor_ids_def(req) := {"$unique_ancestor_ids": _with_refs(
 _unique_ancestor_description(0, a) := concat("", ["Every ", _text(a), " id is unique"])
 
 _unique_ancestor_description(i, a) := concat("", ["every ", _text(a), " id is unique"]) if i > 0
+
+_ids_expression(f) := concat("", ["count(repeated(ids(", f, "))) == 0"])
 
 _repeated_ids_name(req) := concat(" ", ["repeated", _text(_subject_type_of(req)), "ids"])
 
