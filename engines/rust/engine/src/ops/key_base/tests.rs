@@ -274,3 +274,34 @@ fn a_rewrite_says_each_key_once_when_the_keys_are_joined_with_and() {
         )
     );
 }
+
+fn rewritten_plain(sentence: &str, subject: &Value, params: &Value) -> Option<String> {
+    let tree = ergo_policy_sentences::parse_check(sentence).unwrap();
+    let check =
+        crate::lower::lower_assertion(&tree.assertions[0], &crate::lower::Scope::new()).unwrap();
+    let ctx = ctx(subject, params, &[]);
+    let mut verdict = crate::ops::run(&check, &ctx);
+    let said = crate::ops::message::said(&check, &ctx, &verdict);
+    rewrite(&check, &ctx, &mut verdict.cause, &mut verdict.inputs, said)
+        .map(|said| crate::ops::message::said_text(&said))
+}
+
+#[test]
+fn a_base_is_a_root_clause_in_root_order() {
+    assert_eq!(
+        rewritten_plain(
+            "o.v named by $params.k plus p.w named by $params.j is 1",
+            &json!({"o": "s"}),
+            &json!({"k": 3, "j": 4}),
+        )
+        .as_deref(),
+        Some(
+            "$params.j is 4, which isn't text; $params.k is 3, which isn't text; o is \"s\", which isn't an object; p.w is missing"
+        )
+    );
+    assert_eq!(
+        rewritten_plain("m.v named by $params.k is 1", &json!({"m": "s"}), &json!({}))
+            .as_deref(),
+        Some("m is \"s\", which isn't an object; $params.k is missing")
+    );
+}

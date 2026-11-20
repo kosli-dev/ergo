@@ -741,6 +741,13 @@ pub fn unsaid(text: &str, said: &mut Vec<String>) -> String {
     groups.join("; ")
 }
 
+/// `said` without the clauses `seen` held before it, adding the ones it keeps
+/// to `seen`.
+pub fn unsaid_clauses(said: &Said, seen: &mut Vec<Clause>) -> Said {
+    let _ = seen;
+    said.clone()
+}
+
 fn any_of_message(any: &super::any_of::AnyOf, ctx: &Ctx) -> String {
     let mut parts = Vec::new();
     for (at, option) in any.options.iter().enumerate() {

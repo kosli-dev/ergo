@@ -438,6 +438,23 @@ fn a_clause_an_earlier_sentence_gave_is_left_out_and_the_rest_is_kept() {
 }
 
 #[test]
+fn unsaid_keeps_a_value_that_holds_a_semicolon_whole() {
+    let mut seen = Vec::new();
+    let first = super::unsaid_clauses(&super::said_as_text("b is missing".to_string()), &mut seen);
+    assert_eq!(super::said_text(&first), "b is missing");
+    let second = super::unsaid_clauses(
+        &super::said_as_text("a; b is missing".to_string()),
+        &mut seen,
+    );
+    assert_eq!(super::said_text(&second), "a; b is missing");
+    let third = super::unsaid_clauses(
+        &super::said_as_text("a; b is missing".to_string()),
+        &mut seen,
+    );
+    assert_eq!(super::said_text(&third), "");
+}
+
+#[test]
 fn a_clause_said_twice_by_one_sentence_stays_twice() {
     let mut said: Vec<String> = Vec::new();
     assert_eq!(
