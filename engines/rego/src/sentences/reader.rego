@@ -470,7 +470,7 @@ _s_ref_of(text) := {"steps": [text]} if {
 
 _s_ref_of(text) := {"steps": [text], "bad_name": text} if _s_bad_name(text)
 
-_s_phrase_of(text, pat) := object.union(bare, {"ignoring": concat(" ", regex.split(` +`, m[2]))}) if {
+_s_phrase_of(text, pat) := object.union(bare, {"ignoring": concat(" ", [w | some w in split(m[2], " "); w != ""])}) if {
 	m := regex.find_all_string_submatch_n(pat.ignoring, text, 1)[0]
 	bare := _s_bare_phrase_of(m[1], pat)
 	not bare.op in _s_text_phrase_ops

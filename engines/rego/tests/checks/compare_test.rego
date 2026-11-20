@@ -312,13 +312,13 @@ test_for_lines_keep_and_sort_items_by_every_digit_in_any_order if {
 test_ignoring_case_lowers_and_surrounding_spaces_trims_as_opa_does if {
 	ergo._prepared("In Progress", "case") == "in progress"
 	ergo._prepared(" A ", "case") == " a "
-	ergo._prepared(hex.decode("c4b0"), "case") == "i"
-	ergo._prepared(hex.decode("e1ba9e"), "case") == hex.decode("c39f")
-	ergo._prepared(hex.decode("e284aa"), "case") == "k"
-	ergo._prepared("STRASSE", "case") != concat("", ["stra", hex.decode("c39f"), "e"])
-	ergo._prepared(concat("", [hex.decode("c2a0"), "A b", hex.decode("c285")]), "surrounding spaces") == "A b"
-	ergo._prepared(concat("", [hex.decode("e38080"), "a", hex.decode("e280a8")]), "surrounding spaces") == "a"
-	ergo._prepared(concat("", [hex.decode("e2808b"), "a", hex.decode("efbbbf")]), "surrounding spaces") == concat("", [hex.decode("e2808b"), "a", hex.decode("efbbbf")])
+	ergo._prepared("\u0130", "case") == "i"
+	ergo._prepared("\u1e9e", "case") == "\u00df"
+	ergo._prepared("\u212a", "case") == "k"
+	ergo._prepared("STRASSE", "case") != concat("", ["stra", "\u00df", "e"])
+	ergo._prepared(concat("", ["\u00a0", "A b", "\u0085"]), "surrounding spaces") == "A b"
+	ergo._prepared(concat("", ["\u3000", "a", "\u2028"]), "surrounding spaces") == "a"
+	ergo._prepared(concat("", ["\u200b", "a", "\ufeff"]), "surrounding spaces") == concat("", ["\u200b", "a", "\ufeff"])
 	ergo._prepared(" in  progress ", "surrounding spaces") == "in  progress"
 	ergo._prepared("  IN Progress ", "case and surrounding spaces") == "in progress"
 }
