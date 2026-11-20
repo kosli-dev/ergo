@@ -355,7 +355,10 @@ pub fn entry_inputs(
     cause: Cause,
     inputs: &[serde_json::Value],
 ) -> Vec<serde_json::Value> {
-    if !matches!(cause, Cause::Absent | Cause::Null | Cause::Unusable)
+    if !matches!(
+        cause,
+        Cause::Absent | Cause::Null | Cause::Unusable | Cause::NotAnObject
+    )
         || matches!(check, Check::Walk(_) | Check::For(_) | Check::AnyOf(_))
     {
         return Vec::new();
