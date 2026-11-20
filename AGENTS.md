@@ -48,6 +48,7 @@ python3 .github/rego-layers.py
 .github/no-inline-tests_test.sh
 .github/dump-diff_test.sh
 .github/pr-facts_test.sh
+.github/pairs-facts_test.sh
 .github/spec-placeholder.sh
 .github/spec-placeholder_test.sh
 python3 spec/check_rules.py
@@ -63,6 +64,8 @@ Run them from the repo root. The last three lines use a virtual environment that
 `.github/dump-diff_test.sh` tests `.github/dump-diff.sh`, which lists the files that differ between two folders.
 
 `.github/pr-facts_test.sh` tests `.github/pr-facts.sh`, which prints how many Rust case reports a change moved, which known failures it added or removed, and whether a case that passed now fails or is gone; put its output in the body of a pull request that changes Rust reports.
+
+`.github/pairs-facts_test.sh` tests `.github/pairs-facts.sh`, which runs the pairs in `spec/sweep-pairs.json` through both engines and prints how many the engines differ on, how many say their `want`, and which pairs the Rust output of a change moved, first and in capitals any that moved away from Rego or from their `want`; it only informs, and the `pairs-facts` job writes it in the summary of a pull request.
 
 `opa fmt --list` should print nothing. If it prints file names, run `opa fmt -w` on them.
 

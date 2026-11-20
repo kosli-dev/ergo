@@ -60,6 +60,8 @@ jobs:
         run: .github/dump-diff_test.sh
       - name: Check the script that lists what a change did to the Rust engine's reports
         run: .github/pr-facts_test.sh
+      - name: Check the script that lists what a change did to the policy and input pairs
+        run: .github/pairs-facts_test.sh
       - name: Check the script that runs the common checks
         run: .github/checks_test.sh
       - name: Check the release workflow's latest flag, release notes and tag checks
@@ -259,6 +261,32 @@ jobs:
         env:
           BASE: origin/${{ github.base_ref }}
         run: .github/pr-facts.sh "$BASE" >> "$GITHUB_STEP_SUMMARY"
+
+  pairs-facts:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: open-policy-agent/setup-opa@v2
+        with:
+          version: 1.22.0
+      - name: Install the Rust version in rust-toolchain.toml
+        run: |
+          cd engines/rust
+          rustup toolchain install
+      - name: Write what the change did to the policy and input pairs in the job summary
+        env:
+          BASE: origin/${{ github.base_ref }}
+        run: |
+          if git diff --quiet "$BASE...HEAD" -- engines/rust engines/rego spec .github/pairs-facts.sh; then
+            echo "No file under engines/rust, engines/rego or spec changed." >> "$GITHUB_STEP_SUMMARY"
+          else
+            .github/pairs-facts.sh "$BASE" >> "$GITHUB_STEP_SUMMARY"
+          fi
 
   playground:
     needs: tests-rust
