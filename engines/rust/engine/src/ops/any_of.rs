@@ -45,8 +45,15 @@ pub fn option_runs(check: &AnyOf, ctx: &Ctx) -> Vec<OptionRun> {
                 if ran.verdict.passed() {
                     continue;
                 }
-                let said =
-                    super::message::option_line_said(line, ctx, ran.message.clone(), &ran.verdict);
+                let said = match super::message::ran_said(&ran) {
+                    Some(said) if matches!(line, Check::Walk(_)) => said,
+                    _ => super::message::option_line_said(
+                        line,
+                        ctx,
+                        ran.message.clone(),
+                        &ran.verdict,
+                    ),
+                };
                 lines.push(LineRun {
                     check: line.clone(),
                     at: k,
