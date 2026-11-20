@@ -1122,7 +1122,18 @@ pub(super) fn item_own(
         let text = message::isnt(&name, focus.subject.value, "an object");
         return Some(Clause::item(&name, Cause::NotAnObject, text, Vec::new()));
     }
-    let outside = |path: &Path| reads_outside(path) || path.start == Start::Params;
+    let rooted = !message::root_clauses(&[check], outer).is_empty();
+    let unread = |path: &Path| {
+        let at = cut_at(path, &[], true).unwrap_or(path.steps.len());
+        let root = Path {
+            start: path.start.clone(),
+            steps: path.steps[..at].to_vec(),
+        };
+        path::read(&root, outer).outcome != Outcome::Found
+    };
+    let outside = |path: &Path| {
+        (reads_outside(path) || path.start == Start::Params) && (rooted || unread(path))
+    };
     let mut said: Vec<Clause> = Vec::new();
     let mut own_at = None;
     for (path, found) in paths.into_iter().zip(keyed) {
