@@ -87,6 +87,19 @@ test_ids_that_are_missing_or_null_fail_the_row_after_the_repeated_ids_with_the_w
 	]
 }
 
+ws_xs_meta_keys(req) := ["ws", "xs", "meta"] if is_object(req)
+
+test_distinct_copies_of_a_subject_without_an_id_inside_an_outer_item_keep_every_copy_location if {
+	row := {"check": "$unique_ids", "inputs": [{"name": "repeated d ids", "value": [], "locations": []}], "passed": true, "cause": "satisfied"}
+	place := object.union(id_fault_place(["ws", 0, "xs", 0, "meta", "id"], "/ws/0/xs/0/meta", "absent", "item 1 of ws: item 1 of xs: meta.id is missing"), {"item_at": "/ws/0/xs/0", "ats": ["/ws/0/xs/0", "/ws/0/xs/1"], "name": "ws[0].xs[0].meta.id"})
+	doc := {"ws": [{"xs": [{"meta": {"ok": true}}, {"meta": {"ok": true}}]}]}
+	r := ergo._with_id_faults(row, [place], doc, {"subject": "d"}) with ergo._id_keys as ws_xs_meta_keys
+	r.failures[0].name == "item 1 of ws"
+	r.failures[0].locations == ["/ws/0"]
+	r.failures[0].failures[0].name == "item 1 of xs"
+	r.failures[0].failures[0].locations == ["/ws/0/xs/0", "/ws/0/xs/1"]
+}
+
 test_a_unique_ids_row_that_fails_on_a_repeated_id_alone_has_no_failures_to_list if {
 	row := {"check": "$unique_ids", "inputs": [{"name": "repeated d ids", "value": ["a"], "locations": []}], "passed": false, "cause": "value"}
 	ergo._with_id_faults(row, [], {}, {"subject": "d"}) == object.union(row, {"failures": []})
