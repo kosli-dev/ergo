@@ -443,17 +443,17 @@ messages / does not exist on a for alias read by a position and a key from a fie
 messages / does not exist on a path whose key from a field can't be read fails, whether or not the path before it is there / the field is a list and x is null
 messages / does not exist on a path whose key from a field can't be read fails, whether or not the path before it is there / the field is missing and x is null
 messages / nothing hides a problem / the roots come first and then the list's own problem
-messages / the order of the roots a count of names / puts the missing or null $params and $input roots first, sorted, and the others in the order the sentence reads them
-messages / the order of the roots a count of names when $params holds null / names each null $params root first, sorted, then the others in the order the sentence reads them
+messages / the order of the roots a count of names / puts a root of the wrong type first, then the missing or null $params and $input roots sorted by name
+messages / the order of the roots a count of names when $params holds null / names a root of the wrong type first, then each null $params root sorted by name
 messages / the roots of one sentence, keys and sides alike, are said worst cause first and then by name / a missing key comes before a null value before it
 messages / the roots of one sentence, keys and sides alike, are said worst cause first and then by name / a value before the key that isn't an object comes before a missing key
 messages / the roots of one sentence, keys and sides alike, are said worst cause first and then by name / roots of one cause come by name, $params first
 messages / the roots of one sentence, with a key from $params that is null and nothing on the subject / says each missing root by name, then the null key
 messages / two roots after is in that aren't lists, in one relative clause / names both on an empty list too
-messages / two roots after is in that aren't lists, in one relative clause / names both, in the order the sentence reads them, on a list with items
+messages / two roots after is in that aren't lists, in one relative clause / names both, worst cause first and then by name, on a list with items
 messages / two roots in a whose that fail in different ways, beside a list that can be read, take the worst cause / a root that is null and one that is missing fail as absent
-messages / two roots in one relative clause that can't be read / names every root that failed, in the order the sentence reads them
-messages / two roots in one relative clause that fail in different ways / names every root that failed, whatever its cause, in the order the sentence reads them
+messages / two roots in one relative clause that can't be read / names every root that failed, worst cause first and then by name
+messages / two roots in one relative clause that fail in different ways / names every root that failed, whatever its cause, worst cause first and then by name
 messages / two roots in one relative clause that fail in different ways / names them in front of what the items say when an item fails in a worse way
 messages / two worked-out values that can't be used / the values are joined with a comma and and
 missing / does not exist with a ref step after a field, and the param is null / fails with the ref's cause when the parent field is missing
@@ -727,9 +727,9 @@ walks / a $params list that a phrase walks fails a check on an empty list when i
 walks / a count of or sum of whose list fails before any item is read / the list is missing
 walks / a count of or sum of whose list fails before any item is read / the list is null
 walks / a count of or sum of whose list fails before any item is read / the list isn't a list or an object
-walks / a count whose whose reads two named by keys that aren't text names both, in the order the sentence reads them, when the list is missing, null or text / the list is missing
-walks / a count whose whose reads two named by keys that aren't text names both, in the order the sentence reads them, when the list is missing, null or text / the list is null
-walks / a count whose whose reads two named by keys that aren't text names both, in the order the sentence reads them, when the list is missing, null or text / the list is text
+walks / a count whose whose reads two named by keys that aren't text names both, sorted by name, when the list is missing, null or text / the list is missing
+walks / a count whose whose reads two named by keys that aren't text names both, sorted by name, when the list is missing, null or text / the list is null
+walks / a count whose whose reads two named by keys that aren't text names both, sorted by name, when the list is missing, null or text / the list is text
 walks / a for line whose whose reads a named by key from $params that isn't text says only the items whose own value can't take the key, the last one fine / an item without m before an item whose m is an object
 walks / a for line with a walk next to a parent / lists the for line's list and the parent's value, and never the alias's value
 walks / a one-line every whose whose reads a named by key from $params that is missing / says the key once and then an item whose value before the key isn't an object, which makes the row worse
