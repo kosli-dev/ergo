@@ -593,3 +593,16 @@ fn an_item_whose_focus_isnt_an_object_says_so_whatever_the_key() {
         );
     }
 }
+
+#[test]
+fn an_item_whose_value_before_the_key_is_an_object_says_nothing() {
+    assert_eq!(
+        own_said(
+            "every items.v that is m named by $params.k is 1",
+            json!([{"v": {"m": {}}}]),
+            json!({}),
+            json!({}),
+        ),
+        [None]
+    );
+}
