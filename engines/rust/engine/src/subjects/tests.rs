@@ -2003,3 +2003,46 @@ fn a_walks_assertion_says_a_root_after_the_phrase_once_holds_it_as_an_input_and_
     );
     assert_eq!(part.failures.len(), 5);
 }
+
+fn entry_messages(part: &crate::parts::Part) -> Vec<(String, String)> {
+    part.failures
+        .iter()
+        .map(|entry| match entry {
+            crate::parts::Failure::Item { part, .. } | crate::parts::Failure::List(part) => {
+                (part.name.clone(), part.message.clone())
+            }
+            _ => panic!("an entry that is neither an item nor a list"),
+        })
+        .collect()
+}
+
+#[test]
+fn a_walks_assertion_keeps_an_item_value_that_holds_a_semicolon_whole() {
+    let part = walk_assertion(
+        "every xs.v is 1",
+        json!({"things": [{"xs": [{"v": "p; q"}]}]}),
+        json!({}),
+    );
+    assert_eq!(part.message, "");
+    assert_eq!(
+        entry_messages(&part),
+        [(
+            "item 1 of xs".to_string(),
+            "v is \"p; q\", which isn't a number".to_string()
+        )]
+    );
+}
+
+#[test]
+fn a_walks_assertion_keeps_a_root_that_holds_a_comma_and_whole() {
+    let part = walk_assertion(
+        "every xs.v is at least $params.min",
+        json!({"things": [{"xs": [{}, {}]}]}),
+        json!({"min": "a, and b; c"}),
+    );
+    assert_eq!(
+        part.message,
+        "$params.min is \"a, and b; c\", which isn't a number"
+    );
+    assert_eq!(part.failures.len(), 2);
+}
