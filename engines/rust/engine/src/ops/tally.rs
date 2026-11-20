@@ -1412,23 +1412,42 @@ fn rich_item(
     entry
 }
 
-enum ItemRead {
+enum ItemRead<'c> {
     End(Value),
+    Field(&'c Check),
+    Side(&'c Check),
 }
 
-fn item_record(
+fn item_record<'c>(
     walked: &walk::Walked,
     item: &walk::WalkItem,
-    read: ItemRead,
+    focus: &Ctx<'c>,
+    read: ItemRead<'c>,
     cause: Cause,
     text: &str,
 ) -> Option<Value> {
+    let anywhere = matches!(read, ItemRead::Side(_));
     let (path, value, location) = match read {
         ItemRead::End(value) => (
             walked.name_of(&item.end_segs, item.unaliased),
             value,
             Some(item.end_location.render()),
         ),
+        ItemRead::Field(check) | ItemRead::Side(check) => {
+            let (path, read) = walk::named_side(check, focus).filter(|(path, _)| {
+                anywhere || !walk::reads_outside(path) && path.start != path::Start::Params
+            })?;
+            let mut steps: Vec<path::Step> = walk::focus_segs(item, check)
+                .iter()
+                .map(walk::Seg::to_step)
+                .collect();
+            steps.extend(path.steps.iter().cloned());
+            (
+                walked.name_of_steps(steps, item.unaliased),
+                read.value.cloned().unwrap_or(Value::Null),
+                read.location.map(|l| l.render()),
+            )
+        }
     };
     Some(rich_item(
         &walked.name_of(&item.item_segs, item.unaliased),
@@ -1637,30 +1656,6 @@ pub fn counted_said(counted: &Counted, ctx: &Ctx, cause: Cause) -> (Option<Strin
                     if !item.rest.is_empty() && walk::reads_focus(check) {
                         always.insert(found.len());
                     }
-                    let read = if lost {
-                        Some((
-                            walked.name_of(&item.end_segs, item.unaliased),
-                            Value::Null,
-                            Some(item.end_location.render()),
-                        ))
-                    } else {
-                        walk::named_side(check, &focus)
-                            .filter(|(path, _)| {
-                                !walk::reads_outside(path) && path.start != path::Start::Params
-                            })
-                            .map(|(path, read)| {
-                                let mut steps: Vec<path::Step> = walk::focus_segs(item, check)
-                                    .iter()
-                                    .map(walk::Seg::to_step)
-                                    .collect();
-                                steps.extend(path.steps.iter().cloned());
-                                (
-                                    walked.name_of_steps(steps, item.unaliased),
-                                    read.value.cloned().unwrap_or(Value::Null),
-                                    read.location.map(|l| l.render()),
-                                )
-                            })
-                    };
                     if !lost
                         && rooted
                         && let Some(alone) = without_roots(check)
@@ -1703,20 +1698,17 @@ pub fn counted_said(counted: &Counted, ctx: &Ctx, cause: Cause) -> (Option<Strin
                         }
                         continue;
                     }
-                    if let Some((read_name, value, location)) = read.filter(|_| own(&said)) {
+                    let read = if lost {
+                        ItemRead::End(Value::Null)
+                    } else {
+                        ItemRead::Field(check)
+                    };
+                    if own(&said)
+                        && let Some(record) =
+                            item_record(&walked, item, &focus, read, verdict.cause, &said)
+                    {
                         items_at.insert(found.len(), item.item_segs.clone());
-                        records.push((
-                            found.len(),
-                            rich_item(
-                                &listed,
-                                read_name,
-                                verdict.cause,
-                                value,
-                                location,
-                                seen(),
-                                &said,
-                            ),
-                        ));
+                        records.push((found.len(), record));
                     }
                     found.push((verdict.cause, said));
                 }
@@ -1776,7 +1768,8 @@ pub fn counted_said(counted: &Counted, ctx: &Ctx, cause: Cause) -> (Option<Strin
                 }
             };
             if let Some((c, text, value)) = said
-                && let Some(record) = item_record(&walked, item, ItemRead::End(value), c, &text)
+                && let Some(record) =
+                    item_record(&walked, item, &focus, ItemRead::End(value), c, &text)
             {
                 items_at.insert(found.len(), item.item_segs.clone());
                 records.push((found.len(), record));
