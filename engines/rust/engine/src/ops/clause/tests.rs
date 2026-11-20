@@ -58,3 +58,20 @@ fn the_cap_counts_leaf_items_not_outer_items() {
         "item 1 of cs: item 1 of rs: ok is missing; item 1 of cs: item 2 of rs: ok is missing; item 2 of cs: item 1 of rs: ok is missing; and 1 more"
     );
 }
+
+#[test]
+fn two_clauses_of_one_item_join_with_and() {
+    let clauses: Vec<Clause> = (1..=5)
+        .map(|n| {
+            item(
+                &format!("item {n} of xs"),
+                Cause::Absent,
+                vec![missing("x.v"), missing("x.w")],
+            )
+        })
+        .collect();
+    assert_eq!(
+        text(&shown(&clauses)),
+        "item 1 of xs: x.v is missing, and x.w is missing; item 2 of xs: x.v is missing, and x.w is missing; item 3 of xs: x.v is missing, and x.w is missing; and 2 more"
+    );
+}
