@@ -126,6 +126,23 @@ fn root_clauses_say_every_key_that_cant_be_read_worst_first_then_by_name() {
             ("$input.k".to_string(), "$input.k is missing".to_string()),
         ]
     );
+    let input = json!({"k": 3});
+    let said = root_clauses_of(
+        "every es whose zz is m named by $input.k and whose v is m named by $input.j, if any, exists",
+        &subject,
+        &input,
+        None,
+    );
+    assert_eq!(
+        said,
+        vec![
+            (
+                "$input.k".to_string(),
+                "$input.k is 3, which isn't text".to_string()
+            ),
+            ("$input.j".to_string(), "$input.j is missing".to_string()),
+        ]
+    );
 }
 
 #[test]
