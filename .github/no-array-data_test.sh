@@ -44,3 +44,25 @@ echo "no-array-data.sh passes again once it is gone"
 git rm --quiet --cached examples/list.json
 /bin/rm -f examples/list.json
 sh "$script"
+
+echo "no-array-data.sh fails on a YAML list in spec and in examples, with either extension, and passes on a YAML mapping"
+echo 'a: 1' > spec/map.yaml
+git add .
+sh "$script"
+for file in spec/list.yaml spec/list.yml examples/list.yaml; do
+  printf -- '- a\n- b\n' > "$file"
+  git add .
+  if out=$(sh "$script" 2>&1); then
+    echo "no-array-data.sh should fail on $file, and passed" >&2
+    exit 1
+  fi
+  case $out in
+    *"$file"*) ;;
+    *)
+      echo "no-array-data.sh should name $file, and said: $out" >&2
+      exit 1
+      ;;
+  esac
+  git rm --quiet --cached "$file"
+  /bin/rm -f "$file"
+done
