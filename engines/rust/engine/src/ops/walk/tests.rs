@@ -991,3 +991,174 @@ fn an_item_that_isnt_an_object_says_so_beside_a_root_on_the_left_of_contains_or_
         }
     }
 }
+
+fn own_beside_broken_roots(
+    sentence: &str,
+    items: &Value,
+    readable: Value,
+    broken: &[Value],
+) -> Vec<Option<(Cause, String)>> {
+    let said = judged(sentence, items.clone(), readable);
+    for params in broken {
+        assert_eq!(
+            own_said(sentence, items.clone(), params.clone(), json!({})),
+            said,
+            "{sentence} {params}"
+        );
+    }
+    said
+}
+
+fn absent_null_and(rest: &[(Cause, &str)]) -> Vec<Option<(Cause, String)>> {
+    let mut said = vec![
+        Some((Cause::Absent, "item 1 of items: v is missing".to_string())),
+        Some((Cause::Null, "item 2 of items: v is null".to_string())),
+    ];
+    said.extend(rest.iter().enumerate().map(|(at, (cause, text))| {
+        (!text.is_empty()).then(|| (*cause, format!("item {} of items: {text}", at + 3)))
+    }));
+    said
+}
+
+#[test]
+fn an_item_says_its_own_time_beside_a_time_root_on_either_side_it_cant_read() {
+    for sentence in [
+        "every items whose v is before $params.t exists",
+        "every items whose $params.t is on or after v exists",
+    ] {
+        assert_eq!(
+            own_beside_broken_roots(
+                sentence,
+                &json!([{}, {"v": null}, {"v": true}, {"v": "2026-01-01T00:00:00Z"}]),
+                json!({"t": "2026-01-01T00:00:00Z"}),
+                &[json!({}), json!({"t": null}), json!({"t": true})],
+            ),
+            absent_null_and(&[
+                (Cause::Unusable, "v is true, which isn't a time"),
+                (Cause::Satisfied, ""),
+            ]),
+            "{sentence}"
+        );
+    }
+}
+
+#[test]
+fn an_item_says_its_own_value_beside_a_root_on_the_left_of_contains_it_cant_read() {
+    for (sentence, items, rest) in [
+        (
+            "every items whose $params.l contains v exists",
+            json!([{}, {"v": null}, {"v": "b"}]),
+            vec![(Cause::Satisfied, "")],
+        ),
+        (
+            "every items whose $params.l does not contain v exists",
+            json!([{}, {"v": null}, {"v": "a"}]),
+            vec![(Cause::Satisfied, "")],
+        ),
+        (
+            "every items whose $params.l contains v.w exists",
+            json!([{}, {"v": null}, {"v": "s"}, {"v": {"w": "b"}}]),
+            vec![
+                (Cause::Unusable, "v is \"s\", which isn't an object"),
+                (Cause::Satisfied, ""),
+            ],
+        ),
+    ] {
+        assert_eq!(
+            own_beside_broken_roots(
+                sentence,
+                &items,
+                json!({"l": ["a"]}),
+                &[json!({}), json!({"l": null})],
+            ),
+            absent_null_and(&rest),
+            "{sentence}"
+        );
+    }
+}
+
+#[test]
+fn an_item_says_its_own_list_beside_a_root_on_the_left_of_contains_all_some_or_none_of_it_cant_read()
+ {
+    for sentence in [
+        "every items whose $params.l contains all of v exists",
+        "every items whose $params.l contains some of v exists",
+        "every items whose $params.l contains none of v exists",
+        "every items whose $params.l does not contain all of v exists",
+    ] {
+        assert_eq!(
+            own_beside_broken_roots(
+                sentence,
+                &json!([{}, {"v": null}, {"v": "s"}, {"v": [1, "x"]}, {"v": []}, {"v": ["b"]}]),
+                json!({"l": ["a"]}),
+                &[json!({}), json!({"l": null})],
+            ),
+            absent_null_and(&[
+                (Cause::Unusable, "v is \"s\", which isn't a list"),
+                (
+                    Cause::Unusable,
+                    "v is [1, \"x\"], which isn't a list of one kind of value"
+                ),
+                (
+                    Cause::Unusable,
+                    "v is [], which isn't a list with at least one value"
+                ),
+                (Cause::Satisfied, ""),
+            ]),
+            "{sentence}"
+        );
+    }
+}
+
+#[test]
+fn an_item_says_its_own_patterns_beside_a_root_on_the_left_of_matches_it_cant_read() {
+    for sentence in [
+        "every items whose $params.s matches v exists",
+        "every items whose $params.s does not match v exists",
+    ] {
+        assert_eq!(
+            own_beside_broken_roots(
+                sentence,
+                &json!([{}, {"v": null}, {"v": "s"}, {"v": [1]}, {"v": ["["]}, {"v": ["^b"]}]),
+                json!({"s": "a"}),
+                &[json!({}), json!({"s": null})],
+            ),
+            absent_null_and(&[
+                (Cause::Unusable, "v is \"s\", which isn't a list"),
+                (Cause::Unusable, "v is [1], which isn't a list of patterns"),
+                (
+                    Cause::Unusable,
+                    "v is [\"[\"], which isn't a list of patterns"
+                ),
+                (Cause::Satisfied, ""),
+            ]),
+            "{sentence}"
+        );
+    }
+}
+
+#[test]
+fn an_item_says_the_value_before_its_own_list_beside_a_root_on_the_left_it_cant_read() {
+    for sentence in [
+        "every items whose $params.l contains all of v.w exists",
+        "every items whose $params.l contains some of v.w exists",
+        "every items whose $params.s matches v.w exists",
+    ] {
+        assert_eq!(
+            own_beside_broken_roots(
+                sentence,
+                &json!([{"v": "s"}, {"v": {"w": ["a"]}}]),
+                json!({"l": ["a"], "s": "a"}),
+                &[json!({})],
+            ),
+            [
+                Some((
+                    Cause::Unusable,
+                    "item 1 of items: v is \"s\", which isn't an object".to_string()
+                )),
+                None,
+            ],
+            "{sentence}"
+        );
+    }
+}
