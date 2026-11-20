@@ -26,3 +26,6 @@ pub fn text(clauses: &[Clause]) -> String {
     let _ = clauses;
     todo!()
 }
+
+#[cfg(test)]
+mod tests;
