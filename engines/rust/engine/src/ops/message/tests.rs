@@ -39,6 +39,24 @@ fn root_clauses_of(
 }
 
 #[test]
+fn root_clauses_say_a_key_and_the_value_before_it() {
+    let subject = json!({"id": "t", "n": 1});
+    let input = json!({});
+    let params = json!({"q": "s"});
+    let said = root_clauses_of(
+        "n is $params.q named by $input.k",
+        &subject,
+        &input,
+        Some(&params),
+    );
+    let text: Vec<&str> = said.iter().map(|(_, text)| text.as_str()).collect();
+    assert_eq!(
+        text.join("; "),
+        r#"$params.q is "s", which isn't an object; $input.k is missing"#
+    );
+}
+
+#[test]
 fn root_clauses_say_every_key_that_cant_be_read_worst_first_then_by_name() {
     let subject = json!({"id": "t", "es": [{"zz": "a", "m": "a", "v": "a"}]});
     let input = json!({"j": 3});
