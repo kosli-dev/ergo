@@ -1,5 +1,6 @@
 use super::*;
 use crate::SPEC;
+use crate::ops::clause::{self, Clause};
 use crate::path::{Located, Location, Start, Step};
 use serde_json::json;
 use std::collections::BTreeMap;
@@ -1652,4 +1653,404 @@ fn a_count_on_a_subject_that_is_not_an_object_lists_the_part_its_whose_reads() {
         .map(|input| input["name"].as_str().unwrap())
         .collect();
     assert_eq!(names, ["count of ys whose thing equals p", "ys", "p"]);
+}
+
+fn counted_records(sentence: &str, items: Value, params: Value, cause: Cause) -> Vec<Value> {
+    let Check::Tally(tally) = lowered(sentence) else {
+        panic!("{sentence} is not a count or a sum");
+    };
+    let Side::Derived(derived) = &tally.left else {
+        panic!("{sentence} has no count or sum on the left");
+    };
+    let Term::Counted(counted) = &derived.terms[0] else {
+        panic!("{sentence} starts with no count or sum");
+    };
+    let input = json!({"things": [{"items": items}]});
+    let ctx = Ctx {
+        label: None,
+        item_by_item: false,
+        in_option: false,
+        subject: Located {
+            value: &input["things"][0],
+            location: Location::input_root().key("things").index(0),
+        },
+        input: &input,
+        params: Some(&params),
+        aliases: BTreeMap::new(),
+    };
+    counted_said(counted, &ctx, cause).1
+}
+
+#[test]
+fn an_item_a_whose_cant_use_is_recorded_with_the_field_it_read() {
+    let records = counted_records(
+        "count of items whose v is at least 3 is at least 1",
+        json!([{"v": "a"}]),
+        json!({}),
+        Cause::Unusable,
+    );
+    assert_eq!(
+        records,
+        [json!({
+            "path": "items[0].v",
+            "item": "item 1 of items",
+            "cause": "unusable",
+            "value": "a",
+            "locations": ["/things/0/items/0/v"],
+            "ergo/text": "item 1 of items: v is \"a\", which isn't a number",
+            "ergo/item": {"value": {"v": "a"}, "locations": ["/things/0/items/0"]},
+        })]
+    );
+}
+
+#[test]
+fn an_item_a_whose_with_an_unreadable_root_cant_use_is_recorded_with_the_field_it_read() {
+    let records = counted_records(
+        "count of items whose v is at least $params.min is at least 1",
+        json!([{"v": "a"}]),
+        json!({}),
+        Cause::Unusable,
+    );
+    assert_eq!(
+        records,
+        [json!({
+            "path": "items[0].v",
+            "item": "item 1 of items",
+            "cause": "unusable",
+            "value": "a",
+            "locations": ["/things/0/items/0/v"],
+            "ergo/text": "item 1 of items: v is \"a\", which isn't a number",
+            "ergo/item": {"value": {"v": "a"}, "locations": ["/things/0/items/0"]},
+        })]
+    );
+}
+
+#[test]
+fn an_item_whose_lost_end_a_whose_reads_is_recorded_at_that_end() {
+    let records = counted_records(
+        "count of items.v whose it is at least 3 is at least 1",
+        json!([{"w": 1}]),
+        json!({}),
+        Cause::Absent,
+    );
+    assert_eq!(
+        records,
+        [json!({
+            "path": "items[0].v",
+            "item": "item 1 of items",
+            "cause": "absent",
+            "value": null,
+            "locations": ["/things/0/items/0"],
+            "ergo/text": "item 1 of items: v is missing",
+            "ergo/item": {"value": {"w": 1}, "locations": ["/things/0/items/0"]},
+        })]
+    );
+}
+
+#[test]
+fn an_item_whose_end_a_sum_cant_add_is_recorded_at_that_end() {
+    let records = counted_records(
+        "sum of items.v is at least 1",
+        json!([{"v": "a"}]),
+        json!({}),
+        Cause::Unusable,
+    );
+    assert_eq!(
+        records,
+        [json!({
+            "path": "items[0].v",
+            "item": "item 1 of items",
+            "cause": "unusable",
+            "value": "a",
+            "locations": ["/things/0/items/0/v"],
+            "ergo/text": "item 1 of items: v is \"a\", which isn't a number",
+            "ergo/item": {"value": {"v": "a"}, "locations": ["/things/0/items/0"]},
+        })]
+    );
+}
+
+fn cause_and_row(sentence: &str, items: Value, params: Value) -> (Cause, String) {
+    let check = lowered(sentence);
+    let Check::Tally(tally) = &check else {
+        panic!("{sentence} is not a count or a sum");
+    };
+    let input = json!({"things": [{"items": items}]});
+    let ctx = Ctx {
+        label: None,
+        item_by_item: false,
+        in_option: false,
+        subject: Located {
+            value: &input["things"][0],
+            location: Location::input_root().key("things").index(0),
+        },
+        input: &input,
+        params: Some(&params),
+        aliases: BTreeMap::new(),
+    };
+    let verdict = crate::ops::run(&check, &ctx);
+    let said = super::row_message(
+        tally,
+        &ctx,
+        verdict.cause,
+        super::super::message::pieces(&check, &ctx, &verdict),
+    );
+    (verdict.cause, said)
+}
+
+#[test]
+fn a_missing_input_key_after_params_that_cant_take_a_key_fails_a_count_or_sum_as_absent_and_says_only_the_key()
+ {
+    for sentence in [
+        "sum of items.n that is at least $params.q named by $input.k is 1",
+        "count of items.n that is at least $params.q named by $input.k is 1",
+    ] {
+        assert_eq!(
+            cause_and_row(sentence, json!([{"n": 1}, {"n": 2}]), json!({"q": "s"})),
+            (Cause::Absent, "$input.k is missing".to_string())
+        );
+    }
+}
+
+#[test]
+fn a_missing_input_key_keeps_the_items_a_count_or_sum_cant_read() {
+    for sentence in [
+        "sum of items.n that is at least $params.q named by $input.k is 1",
+        "count of items.n that is at least $params.q named by $input.k is 1",
+    ] {
+        assert_eq!(
+            cause_and_row(
+                sentence,
+                json!([{"n": "x"}, {"n": null}]),
+                json!({"q": {"a": 1}})
+            ),
+            (
+                Cause::Absent,
+                "$input.k is missing; item 1 of items: n is \"x\", which isn't a number; item 2 of items: n is null"
+                    .to_string()
+            )
+        );
+    }
+}
+
+#[test]
+fn a_count_keeps_each_item_beside_a_that_key_from_params_that_is_missing_or_null() {
+    let sentence = "count of items.v that is m named by $params.k is 0";
+    for (items, params, cause, said) in [
+        (
+            json!([{"v": null}]),
+            json!({"k": null}),
+            Cause::Null,
+            "$params.k is null; item 1 of items: v: $params.k is null",
+        ),
+        (
+            json!([{"v": "s"}, {"v": {}}]),
+            json!({}),
+            Cause::Absent,
+            "$params.k is missing; item 1 of items: v: $params.k is missing; item 2 of items: v: $params.k is missing",
+        ),
+    ] {
+        assert_eq!(
+            cause_and_row(sentence, items, params),
+            (cause, said.to_string())
+        );
+    }
+}
+
+fn tally_clauses(sentence: &str, items: Value, params: Value, cause: Cause) -> Vec<Clause> {
+    tally_clauses_on(sentence, json!({"items": items}), params, cause)
+}
+
+fn tally_clauses_on(sentence: &str, subject: Value, params: Value, cause: Cause) -> Vec<Clause> {
+    let Check::Tally(tally) = lowered(sentence) else {
+        panic!("{sentence} is not a count or a sum");
+    };
+    let input = json!({"things": [subject]});
+    let ctx = Ctx {
+        label: None,
+        item_by_item: false,
+        in_option: false,
+        subject: Located {
+            value: &input["things"][0],
+            location: Location::input_root().key("things").index(0),
+        },
+        input: &input,
+        params: Some(&params),
+        aliases: BTreeMap::new(),
+    };
+    tally.counted_clauses(&ctx, cause)
+}
+
+fn kinds_and_names(clauses: &[Clause]) -> Vec<(clause::Kind, &str)> {
+    clauses
+        .iter()
+        .map(|clause| (clause.kind, clause.name.as_str()))
+        .collect()
+}
+
+#[test]
+fn a_count_says_its_roots_then_its_items_then_and_n_more() {
+    let clauses = tally_clauses(
+        "count of items whose v is at least $params.min is 1",
+        json!([{}, {}, {}, {}, {}]),
+        json!({"min": "s"}),
+        Cause::Unusable,
+    );
+    let names: Vec<String> = (1..=5).map(|n| format!("item {n} of items")).collect();
+    let mut wanted = vec![(clause::Kind::Root, "$params.min")];
+    wanted.extend(names.iter().map(|name| (clause::Kind::Item, name.as_str())));
+    assert_eq!(kinds_and_names(&clauses), wanted);
+    let shown = clause::shown(&clauses);
+    assert_eq!(
+        shown.last().map(|clause| clause.kind),
+        Some(clause::Kind::More(2))
+    );
+    assert_eq!(
+        clause::text(&shown),
+        "$params.min is \"s\", which isn't a number; item 1 of items: v is missing; item 2 of items: v is missing; item 3 of items: v is missing; and 2 more"
+    );
+}
+
+#[test]
+fn a_count_in_a_whose_that_cant_be_read_says_its_items_once_with_one_and_n_more() {
+    let clauses = tally_clauses(
+        "count of items whose n is count of $params.pos.name is 2",
+        json!([{"n": 1}, {"n": 2}]),
+        json!({"pos": [{"name": "a"}, {}, {}, {}, {}, {}]}),
+        Cause::Absent,
+    );
+    assert_eq!(
+        clause::text(&clause::shown(&clauses)),
+        "item 2 of $params.pos: name is missing; item 3 of $params.pos: name is missing; item 4 of $params.pos: name is missing; and 2 more"
+    );
+}
+
+fn kinds_and_texts(clauses: &[Clause]) -> Vec<(clause::Kind, String)> {
+    clauses
+        .iter()
+        .map(|said| (said.kind, clause::text(std::slice::from_ref(said))))
+        .collect()
+}
+
+#[test]
+fn a_sum_says_an_item_it_cant_add_as_an_item() {
+    let clauses = tally_clauses(
+        "sum of items.v is 1",
+        json!([{"v": 1}, {"v": "a"}, {"v": null}]),
+        json!({}),
+        Cause::Unusable,
+    );
+    assert_eq!(
+        kinds_and_texts(&clauses),
+        [
+            (
+                clause::Kind::Item,
+                "item 2 of items: v is \"a\", which isn't a number".to_string()
+            ),
+            (clause::Kind::Item, "item 3 of items: v is null".to_string()),
+        ]
+    );
+}
+
+#[test]
+fn a_root_whose_value_holds_a_semicolon_is_one_clause() {
+    let clauses = tally_clauses(
+        "count of items whose v is at least $params.min is 1",
+        json!([{"v": 1}]),
+        json!({"min": "a; item 1 of items: b"}),
+        Cause::Unusable,
+    );
+    assert_eq!(
+        kinds_and_texts(&clauses),
+        [(
+            clause::Kind::Root,
+            "$params.min is \"a; item 1 of items: b\", which isn't a number".to_string()
+        )]
+    );
+}
+
+#[test]
+fn a_count_or_a_sum_whose_list_is_missing_null_or_not_a_list_says_it_as_a_list() {
+    for sentence in ["count of items is 1", "sum of items.v is 1"] {
+        for (subject, cause, said) in [
+            (json!({}), Cause::Absent, "items is missing"),
+            (json!({"items": null}), Cause::Null, "items is null"),
+            (
+                json!({"items": "s"}),
+                Cause::Unusable,
+                "items is \"s\", which isn't a list or an object",
+            ),
+        ] {
+            let clauses = tally_clauses_on(sentence, subject, json!({}), cause);
+            assert_eq!(
+                kinds_and_texts(&clauses),
+                [(clause::Kind::List, said.to_string())],
+                "{sentence}"
+            );
+        }
+    }
+}
+
+#[test]
+fn an_inner_list_a_count_cant_read_is_said_with_its_item_in_list_order() {
+    let clauses = tally_clauses(
+        "count of items.ys whose n is 1 is 9",
+        json!([{"ys": [{"n": 1}, {}]}, {}]),
+        json!({}),
+        Cause::Absent,
+    );
+    assert_eq!(
+        clause::text(&clause::shown(&clauses)),
+        "item 1 of items: item 2 of ys: n is missing; item 2 of items: ys is missing"
+    );
+}
+
+fn row_message(sentence: &str, items: Value, params: Value) -> String {
+    let check = lowered(sentence);
+    let Check::Tally(tally) = &check else {
+        panic!("{sentence} is not a count or a sum");
+    };
+    let input = json!({"things": [{"items": items}]});
+    let ctx = Ctx {
+        label: None,
+        item_by_item: false,
+        in_option: false,
+        subject: Located {
+            value: &input["things"][0],
+            location: Location::input_root().key("things").index(0),
+        },
+        input: &input,
+        params: Some(&params),
+        aliases: BTreeMap::new(),
+    };
+    let verdict = crate::ops::run(&check, &ctx);
+    with_all_items(
+        tally,
+        &ctx,
+        verdict.cause,
+        super::super::message::pieces(&check, &ctx, &verdict),
+    )
+}
+
+#[test]
+fn a_count_after_a_side_says_three_items_and_then_and_n_more() {
+    assert_eq!(
+        row_message(
+            "count of items whose v is 1 is $params.n",
+            json!([{}, {}, {}, {}]),
+            json!({}),
+        ),
+        "$params.n is missing, and item 1 of items: v is missing; item 2 of items: v is missing; item 3 of items: v is missing; and 1 more"
+    );
+}
+
+#[test]
+fn two_sums_in_a_row_each_say_their_own_items_joined_with_and() {
+    assert_eq!(
+        row_message(
+            "sum of items.n plus sum of items.m is 100",
+            json!([{"n": "y", "m": "z"}]),
+            json!({}),
+        ),
+        "item 1 of items: n is \"y\", which isn't a number, and item 1 of items: m is \"z\", which isn't a number"
+    );
 }

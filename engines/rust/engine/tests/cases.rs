@@ -8,6 +8,8 @@ mod common;
 
 struct Case {
     id: String,
+    topic: String,
+    number: usize,
     group: Value,
     case: Value,
 }
@@ -31,6 +33,7 @@ fn load_cases(dir: &Path) -> Vec<Case> {
             .unwrap_or_else(|e| panic!("can't read {}: {e}", file.display()));
         let groups: Value = serde_json::from_str(&common::fill_spec(&text))
             .unwrap_or_else(|e| panic!("can't parse {}: {e}", file.display()));
+        let mut number = 0;
         for group in groups
             .as_array()
             .expect("cases.json holds a list of groups")
@@ -45,8 +48,11 @@ fn load_cases(dir: &Path) -> Vec<Case> {
                         .as_str()
                         .expect("a case has a description"),
                 );
+                number += 1;
                 cases.push(Case {
                     id,
+                    topic: name.clone(),
+                    number,
                     group: group.clone(),
                     case: case.clone(),
                 });
@@ -231,6 +237,7 @@ fn every_case_passes_unless_known_to_fail() {
     for c in &cases {
         let report =
             ergo_policy_engine::report(&c.case["input"], &c.group["policy"], &params(&c.group));
+        dump(c, &report);
         if !passes(&c.case, &report, &ergo_policy_engine::violations) {
             failing.insert(c.id.clone());
             if !known.contains(&c.id) {
@@ -247,6 +254,18 @@ fn every_case_passes_unless_known_to_fail() {
         problems.join("\n"),
         details.join("\n\n")
     );
+}
+
+fn dump(c: &Case, report: &Value) {
+    let Some(root) = std::env::var_os("ERGO_DUMP") else {
+        return;
+    };
+    let folder = Path::new(&root).join(&c.topic);
+    fs::create_dir_all(&folder)
+        .unwrap_or_else(|e| panic!("can't create {}: {e}", folder.display()));
+    let file = folder.join(format!("{}.json", c.number));
+    let text = format!("{}\n", serde_json::to_string_pretty(report).unwrap());
+    fs::write(&file, text).unwrap_or_else(|e| panic!("can't write {}: {e}", file.display()));
 }
 
 fn describe(c: &Case, report: &Value) -> String {
@@ -517,6 +536,8 @@ fn params_are_passed_as_written_and_default_to_an_empty_object() {
 fn a_failure_is_described_with_its_id_and_both_reports() {
     let case = Case {
         id: "topic / group / case".to_string(),
+        topic: "topic".to_string(),
+        number: 1,
         group: json!({}),
         case: json!({"description": "case", "report": {"description": "nope"}}),
     };

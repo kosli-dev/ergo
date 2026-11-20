@@ -19737,7 +19737,7 @@
     ]
   },
   {
-    "description": "a count whose whose reads two named by keys that aren't text names both, in the order the sentence reads them, when the list is missing, null or text",
+    "description": "a count whose whose reads two named by keys that aren't text names both, sorted by name, when the list is missing, null or text",
     "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"count": "count of es whose zz is m named by $input.k and whose v is m named by $input.j is 0"}}}},
     "cases": [
       {

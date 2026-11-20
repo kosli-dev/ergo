@@ -730,6 +730,56 @@ fn a_position_past_the_end_fails_as_absent() {
     );
 }
 
+fn for_row_message(for_line: &str, assertion: &str, subject: Value, params: Value) -> String {
+    let line = ergo_policy_sentences::parse_for(for_line).unwrap();
+    let tree = ergo_policy_sentences::parse_check(assertion).unwrap();
+    let checked = super::lower_for(
+        &line,
+        &tree.assertions,
+        &["p".to_string()],
+        &crate::lower::Scope::new(),
+    )
+    .unwrap();
+    let crate::ops::Check::For(line) = checked else {
+        panic!("{for_line} is not a for line");
+    };
+    let input = json!({"things": [subject]});
+    let ctx = crate::path::Ctx {
+        label: None,
+        item_by_item: false,
+        in_option: false,
+        subject: crate::path::Located {
+            value: &input["things"][0],
+            location: crate::path::Location::input_root().key("things").index(0),
+        },
+        input: &input,
+        params: Some(&params),
+        aliases: std::collections::BTreeMap::new(),
+    };
+    line.run(&ctx).message.unwrap_or_default()
+}
+
+#[test]
+fn a_count_on_a_for_line_says_every_item_of_each_alias_or_counts_it_in_and_n_more_beside_a_missing_key()
+ {
+    let assertion = "count of g.es.v that is m named by $params.k is 0";
+    for (gs, said) in [
+        (
+            json!([{"es": [{"v": {}}, {"v": {}}, {"v": {}}, {"v": {}}, {"v": {}}]}]),
+            "item 1 of gs: $params.k is missing; item 1 of g.es: v: $params.k is missing; item 2 of g.es: v: $params.k is missing; item 3 of g.es: v: $params.k is missing; and 2 more",
+        ),
+        (
+            json!([{"es": [{"v": {}}, {"v": {}}]}, {"es": [{"v": {}}, {"v": {}}]}]),
+            "item 1 of gs: $params.k is missing; item 1 of g.es: v: $params.k is missing; item 2 of g.es: v: $params.k is missing; item 2 of gs: $params.k is missing; item 1 of g.es: v: $params.k is missing; item 2 of g.es: v: $params.k is missing",
+        ),
+    ] {
+        assert_eq!(
+            for_row_message("every gs as g", assertion, json!({"gs": gs}), json!({})),
+            said
+        );
+    }
+}
+
 #[test]
 fn an_items_whose_reads_the_value_its_path_ends_at() {
     let line = "every rs.m whose s is \"A\" as m";

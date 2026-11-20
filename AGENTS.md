@@ -46,6 +46,7 @@ python3 .github/rego-layers.py
 .github/rego-layers_test.sh
 .github/no-inline-tests.sh
 .github/no-inline-tests_test.sh
+.github/dump-diff_test.sh
 .github/spec-placeholder.sh
 .github/spec-placeholder_test.sh
 python3 spec/check_rules.py
@@ -56,6 +57,8 @@ python3 -m venv /tmp/ergo-venv && /tmp/ergo-venv/bin/pip install --quiet jsonsch
 ```
 
 Run them from the repo root. The last three lines use a virtual environment that holds `jsonschema` and `abnf`, and the last one the Docker image that [`engines/rust/README.md`](engines/rust/README.md) builds; it's outside the repo, because some Pythons, like Homebrew's, refuse `pip install` outside one.
+
+`.github/dump-diff_test.sh` tests `.github/dump-diff.sh`, which lists the files that differ between two folders.
 
 `opa fmt --list` should print nothing. If it prints file names, run `opa fmt -w` on them.
 
@@ -158,6 +161,8 @@ When there's no seam, because the decision is mixed with building text or with t
 - If that refactor is more than a few dozen lines, stop and say so in the round's report, with the rule you'd pull out. Don't start a large refactor in a round.
 
 A red test for a decision that a round won't build stays: `#[ignore = "<decision>"]` in Rust, and `todo_test_<name>` in Rego. OPA skips a `todo_` test and `opa test` exits 2, so a todo test can't land on `main`: turn it on or remove it before the pull request is ready.
+
+When an acceptance test is red, whether a spec case, a pin or a shape a review found, add a smaller unit test first that fails for the same reason, so there is a fast loop, then fix. A new spec case for a fixed shape is red on the old code before the fix is made.
 
 ## No comments
 

@@ -1,4 +1,5 @@
 pub mod any_of;
+pub mod clause;
 pub mod compare;
 pub mod equals;
 pub mod for_line;

@@ -16993,7 +16993,7 @@
     "policy": {"ergo_spec": "{{spec}}", "requirements": {"r": {"checks": {"count": "count of xs whose aa equals $params.q and whose b equals pr.z is 1", "every": "every xs whose aa equals $params.q and whose b equals pr.z, if any, exists", "for": {"assert": "m.b is 1", "for": "every xs whose aa equals $params.q and whose b equals pr.z as m"}}, "subject": "pr"}}, "subjects": {"pr": {"from": "prs", "identified_by": "id"}}},
     "cases": [
       {
-        "description": "names every root that failed, in the order the sentence reads them",
+        "description": "names every root that failed, worst cause first and then by name",
         "rules": ["message.items"],
         "input": {"prs": [{"id": "p0", "q": 3, "xs": [{"aa": 1, "b": "s"}, {}]}]},
         "results": [
@@ -19090,7 +19090,7 @@
     "params": {"l": "s"},
     "cases": [
       {
-        "description": "names both, in the order the sentence reads them, on a list with items",
+        "description": "names both, worst cause first and then by name, on a list with items",
         "rules": ["message.items", "tally.walk", "walk.flaws"],
         "input": {"prs": [{"id": "p0", "l": 3, "xs": [{"v": 1, "w": 1}, {}]}]},
         "results": [
@@ -19718,7 +19718,7 @@
     "params": {"l": null},
     "cases": [
       {
-        "description": "names every root that failed, whatever its cause, in the order the sentence reads them",
+        "description": "names every root that failed, whatever its cause, worst cause first and then by name",
         "rules": ["message.items", "tally.walk", "walk.flaws"],
         "input": {"prs": [{"id": "p0", "l": "s", "xs": []}]},
         "results": [
@@ -26779,7 +26779,7 @@
     "policy": {"ergo_spec": "{{spec}}", "requirements": {"r": {"checks": {"every": "every xs whose w is in pr.l and whose v is in $params.l, if any, exists", "refs": "count of xs whose w is in pr.m and whose v is in $params.b and whose v is in $params.a is 0", "some": "some xs whose v is in $params.b and whose w is in $params.a exists", "tally": "count of xs whose w is in pr.l and whose v is in $params.l is 0"}, "subject": "pr"}}, "subjects": {"pr": {"from": "prs", "identified_by": "id"}}},
     "cases": [
       {
-        "description": "puts the missing or null $params and $input roots first, sorted, and the others in the order the sentence reads them",
+        "description": "puts a root of the wrong type first, then the missing or null $params and $input roots sorted by name",
         "rules": ["tally.walk", "walk.flaws", "message.cause"],
         "input": {"prs": [{"id": "p0", "xs": []}, {"id": "p1", "l": "s", "m": 3, "xs": []}]},
         "results": [
@@ -27277,7 +27277,7 @@
     "params": {"a": null, "b": null, "l": null},
     "cases": [
       {
-        "description": "names each null $params root first, sorted, then the others in the order the sentence reads them",
+        "description": "names a root of the wrong type first, then each null $params root sorted by name",
         "rules": ["tally.walk", "walk.flaws", "message.cause"],
         "input": {"prs": [{"id": "p0", "l": null, "m": null, "xs": []}, {"id": "p1", "l": "s", "m": 3, "xs": []}]},
         "results": [

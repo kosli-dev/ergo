@@ -833,7 +833,7 @@ pub fn right_paths(check: &super::Check) -> Vec<&Path> {
 }
 
 pub fn ref_faults(check: &super::Check, ctx: &Ctx) -> Vec<String> {
-    match check {
+    let faults = match check {
         super::Check::In(c) => ref_fault(
             &c.values,
             ctx,
@@ -863,7 +863,8 @@ pub fn ref_faults(check: &super::Check, ctx: &Ctx) -> Vec<String> {
             _ => "a list".to_string(),
         }),
         _ => Vec::new(),
-    }
+    };
+    faults.into_iter().map(|(_, text)| text).collect()
 }
 
 fn kind_word(value: &Value) -> &'static str {
@@ -904,14 +905,14 @@ fn ref_fault(
     ctx: &Ctx,
     usable: impl Fn(&Value) -> bool,
     kind: impl Fn(&Value) -> String,
-) -> Vec<String> {
+) -> Vec<(String, String)> {
     let (Right::Ref(path) | Right::Field(path)) = right else {
         return Vec::new();
     };
     if let Some(walk) = walked(path, ctx) {
         let list = Value::Array(walk.value.clone());
         return if walk.cause.is_none() && !usable(&list) {
-            vec![super::message::isnt(&walk.name, &list, &kind(&list))]
+            vec![super::message::fault(&walk.name, &list, &kind(&list))]
         } else {
             Vec::new()
         };
@@ -919,7 +920,7 @@ fn ref_fault(
     let read = read_path(path, ctx);
     match (read.outcome, read.value, read.inputs.first()) {
         (Outcome::Found, Some(value), Some(first)) if !usable(&value) => {
-            vec![super::message::isnt(&first.name, &value, &kind(&value))]
+            vec![super::message::fault(&first.name, &value, &kind(&value))]
         }
         _ => Vec::new(),
     }
@@ -1088,7 +1089,7 @@ fn left_found(path: &Path, ctx: &Ctx) -> Option<(String, Value)> {
     }
 }
 
-pub fn in_faults(check: &In, ctx: &Ctx) -> Vec<String> {
+pub fn in_faults(check: &In, ctx: &Ctx) -> Vec<(String, String)> {
     let mut out = Vec::new();
     if let (Some((name, found)), Some(Value::Array(values))) = (
         left_found(&check.path, ctx),
@@ -1101,7 +1102,7 @@ pub fn in_faults(check: &In, ctx: &Ctx) -> Vec<String> {
             Err(()) => false,
         };
         if !fits && !(mixed && matches!(check.values, Right::Field(_))) {
-            out.push(super::message::isnt(&name, &found, &kinds_of(&values)));
+            out.push(super::message::fault(&name, &found, &kinds_of(&values)));
         }
     }
     out.extend(ref_fault(
@@ -1116,17 +1117,17 @@ pub fn in_faults(check: &In, ctx: &Ctx) -> Vec<String> {
     out
 }
 
-fn join_faults(check: &Contains, pieces: &[Right], ctx: &Ctx) -> Vec<String> {
+fn join_faults(check: &Contains, pieces: &[Right], ctx: &Ctx) -> Vec<(String, String)> {
     let mut out = Vec::new();
     if let Some((name, found)) = left_found(&check.path, ctx) {
         let text = [Value::String(String::new())];
         match &found {
             Value::Array(items) => {
                 if one_type(items.iter().chain(text.iter())).is_err() {
-                    out.push(super::message::isnt(&name, &found, &list_of(&text)));
+                    out.push(super::message::fault(&name, &found, &list_of(&text)));
                 }
             }
-            _ => out.push(super::message::isnt(&name, &found, "a list")),
+            _ => out.push(super::message::fault(&name, &found, "a list")),
         }
     }
     for piece in pieces {
@@ -1134,7 +1135,7 @@ fn join_faults(check: &Contains, pieces: &[Right], ctx: &Ctx) -> Vec<String> {
             && let Some((name, value)) = left_found(path, ctx)
             && !value.is_string()
         {
-            out.push(super::message::isnt(&name, &value, "text"));
+            out.push(super::message::fault(&name, &value, "text"));
         }
     }
     out
@@ -1156,7 +1157,7 @@ pub fn join_pieces(check: &super::Check) -> Vec<&Path> {
     }
 }
 
-pub fn contains_faults(check: &Contains, ctx: &Ctx) -> Vec<String> {
+pub fn contains_faults(check: &Contains, ctx: &Ctx) -> Vec<(String, String)> {
     if let Wanted::One(Right::Join(pieces)) = &check.wanted {
         return join_faults(check, pieces, ctx);
     }
@@ -1182,11 +1183,11 @@ pub fn contains_faults(check: &Contains, ctx: &Ctx) -> Vec<String> {
                     && all
                     && !usable_values(&Value::Array(wanted.clone()), true);
                 if !skipped && one_type(items.iter().chain(wanted.iter())).is_err() {
-                    out.push(super::message::isnt(&name, &found, &list_of(wanted)));
+                    out.push(super::message::fault(&name, &found, &list_of(wanted)));
                 }
             }
             (Value::Array(_), None) => {}
-            _ => out.push(super::message::isnt(&name, &found, "a list")),
+            _ => out.push(super::message::fault(&name, &found, "a list")),
         }
     }
     if all {
@@ -1206,12 +1207,12 @@ pub fn contains_faults(check: &Contains, ctx: &Ctx) -> Vec<String> {
     out
 }
 
-pub fn matches_faults(check: &Matches, ctx: &Ctx) -> Vec<String> {
+pub fn matches_faults(check: &Matches, ctx: &Ctx) -> Vec<(String, String)> {
     let mut out = Vec::new();
     if let Some((name, found)) = left_found(&check.path, ctx)
         && !found.is_string()
     {
-        out.push(super::message::isnt(&name, &found, "text"));
+        out.push(super::message::fault(&name, &found, "text"));
     }
     out.extend(ref_fault(
         &check.patterns,

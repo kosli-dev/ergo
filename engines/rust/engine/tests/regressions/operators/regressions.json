@@ -4019,7 +4019,7 @@
                 "/things/0/fa"
               ],
               "name": "fa",
-              "outcome": "usable",
+              "outcome": "unusable",
               "value": "2026-10-01T00:00:00Z"
             },
             {
@@ -4595,7 +4595,7 @@
                 "/things/0/fa"
               ],
               "name": "fa",
-              "outcome": "usable",
+              "outcome": "unusable",
               "value": "2026-10-01T00:00:00Z"
             },
             {

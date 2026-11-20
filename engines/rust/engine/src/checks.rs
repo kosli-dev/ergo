@@ -502,6 +502,60 @@ pub(crate) fn ref_unfit(checks: &[&Check], reference: &Path, value: &Value, ctx:
     })
 }
 
+/// Whether one of `checks` can't use the value `input` read: the check fails
+/// as `unusable` and says it can't use the input, like `v` holding `"a"` in
+/// `v is at least 3`, or the input is a walked root, like
+/// `$input.os[].name`, whose walk can't use an item.
+pub(crate) fn input_unfit(checks: &[&Check], input: &crate::ops::Input, ctx: &Ctx) -> bool {
+    checks.iter().any(|check| match check {
+        Check::For(line) => {
+            let inner: Vec<&Check> = line
+                .sentences
+                .iter()
+                .map(|s| &s.check)
+                .chain(line.items.iter().flat_map(|item| item.whose.iter()))
+                .collect();
+            input_unfit(&inner, input, ctx)
+                || line
+                    .items
+                    .iter()
+                    .any(|item| root_walk_unfit(&item.path, &[], input, ctx))
+        }
+        Check::AnyOf(any) => {
+            let inner: Vec<&Check> = any.options.iter().flatten().collect();
+            input_unfit(&inner, input, ctx)
+        }
+        _ => said_unfit(check, input, ctx) || walked_root_unfit(check, input, ctx),
+    })
+}
+
+fn said_unfit(check: &Check, input: &crate::ops::Input, ctx: &Ctx) -> bool {
+    crate::ops::message::unfit_names(check, ctx).contains(&input.name)
+        && crate::ops::run(check, ctx).cause == crate::cause::Cause::Unusable
+}
+
+fn walked_root_unfit(check: &Check, input: &crate::ops::Input, ctx: &Ctx) -> bool {
+    let inner = crate::ops::for_line::nested_checks(check);
+    inner.iter().any(|one| {
+        let mut paths: Vec<Path> = one.refs();
+        paths.extend(crate::ops::for_line::all_paths(one).into_iter().cloned());
+        paths
+            .iter()
+            .any(|path| root_walk_unfit(path, &inner, input, ctx))
+    })
+}
+
+fn root_walk_unfit(path: &Path, checks: &[&Check], input: &crate::ops::Input, ctx: &Ctx) -> bool {
+    matches!(path.start, path::Start::Params | path::Start::Input)
+        && crate::ops::lists::walked(path, ctx).is_some_and(|walk| {
+            walk.name == input.name
+                && (walk.cause == Some(crate::cause::Cause::Unusable)
+                    || checks.iter().any(|check| {
+                        crate::ops::message::unfit_names(check, ctx).contains(&walk.name)
+                    }))
+        })
+}
+
 pub fn refs_of_checks(checks: &[&Check], input: &Value, params: Option<&Value>) -> Vec<Value> {
     let paths: Vec<(Path, bool)> = checks
         .iter()

@@ -306,7 +306,7 @@ pub fn entry_inputs(
                 continue;
             }
             seen.push(input.name.clone());
-            keys.push(crate::parts::with_outcome(&input, "", &[]));
+            keys.push(crate::parts::with_outcome(&input, false));
         }
     }
     keys.sort_by_key(|a| named(a));
@@ -315,7 +315,7 @@ pub fn entry_inputs(
             && !seen.contains(&input.name)
         {
             seen.push(input.name.clone());
-            keys.push(crate::parts::with_outcome(input, "", &[]));
+            keys.push(crate::parts::with_outcome(input, false));
         }
     }
     keys
