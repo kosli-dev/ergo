@@ -193,6 +193,63 @@ fn walked_root_clauses_say_a_walked_root_that_holds_values_of_more_than_one_kind
 }
 
 #[test]
+fn walked_root_clauses_leave_out_a_list_the_item_holds() {
+    let super::Check::Walk(walk) = lowered("every items whose v is in os.name exists") else {
+        panic!("not a walk");
+    };
+    let subject = json!({"id": "t", "os": [{"name": "a"}, {}], "items": [{"v": "a"}]});
+    let input = json!({});
+    let ctx = crate::path::Ctx {
+        label: None,
+        item_by_item: false,
+        in_option: false,
+        subject: crate::path::Located {
+            value: &subject,
+            location: crate::path::Location::input_root().key("s"),
+        },
+        input: &input,
+        params: None,
+        aliases: std::collections::BTreeMap::new(),
+    };
+    let whose: Vec<&super::Check> = walk.whose.iter().collect();
+    assert_eq!(super::walked_root_clauses(&whose, &ctx), []);
+}
+
+#[test]
+fn root_clauses_say_a_list_from_the_subject_a_count_in_the_item_cant_walk() {
+    let tree =
+        ergo_policy_sentences::parse_check("every items whose n equals count of pr.z exists")
+            .unwrap();
+    let scope = crate::lower::Scope::new().with_subject("pr");
+    let super::Check::Walk(walk) =
+        crate::lower::lower_assertion(&tree.assertions[0], &scope).unwrap()
+    else {
+        panic!("not a walk");
+    };
+    let subject = json!({"id": "t", "z": "ab", "items": [{"n": 1}]});
+    let input = json!({});
+    let located = crate::path::Located {
+        value: &subject,
+        location: crate::path::Location::input_root().key("s"),
+    };
+    let ctx = crate::path::Ctx {
+        label: None,
+        item_by_item: false,
+        in_option: false,
+        subject: located.clone(),
+        input: &input,
+        params: None,
+        aliases: std::collections::BTreeMap::from([(crate::path::OUTER.to_string(), located)]),
+    };
+    let whose: Vec<&super::Check> = walk.whose.iter().collect();
+    let text: Vec<String> = super::root_clauses(&whose, &ctx)
+        .into_iter()
+        .map(|clause| clause.text)
+        .collect();
+    assert_eq!(text, ["pr.z is \"ab\", which isn't a list"]);
+}
+
+#[test]
 fn a_clause_an_earlier_sentence_gave_is_left_out_and_the_rest_is_kept() {
     let mut said: Vec<String> = Vec::new();
     assert_eq!(

@@ -794,6 +794,19 @@ fn an_item_says_its_own_text_beside_a_pattern_root_before_its_key_it_cant_read()
 }
 
 #[test]
+fn an_item_leaves_out_a_key_from_an_input_that_is_a_list() {
+    assert_eq!(
+        own_said(
+            "every items whose v equals m named by $input.k exists",
+            json!([{"v": "a", "m": {"x": "a"}}, {"m": {"x": "a"}}]),
+            json!({}),
+            json!([{"k": "x"}]),
+        ),
+        [None, Some((Cause::Absent, "item 2 of items: v is missing".to_string()))]
+    );
+}
+
+#[test]
 fn an_item_leaves_out_a_key_from_the_subject_it_cant_read() {
     let tree =
         ergo_policy_sentences::parse_check("every items whose v equals m named by pr.k exists")

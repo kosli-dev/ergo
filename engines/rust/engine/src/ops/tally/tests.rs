@@ -1947,6 +1947,18 @@ fn a_count_of_params_that_arent_an_object_says_them_as_its_list_and_no_item() {
 }
 
 #[test]
+fn a_sum_of_a_key_of_params_that_arent_an_object_says_them_as_its_list() {
+    let clauses = tally_clauses_on("sum of $params.v is 1", json!({}), json!([3]), Cause::Unusable);
+    assert_eq!(
+        kinds_and_texts(&clauses),
+        [(
+            clause::Kind::List,
+            "$params is [3], which isn't an object".to_string()
+        )]
+    );
+}
+
+#[test]
 fn a_sum_says_the_root_before_an_input_key_and_the_key() {
     let clauses = tally_clauses(
         "sum of items.n that is at least $params.q named by $input.k is 1",
