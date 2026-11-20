@@ -26303,6 +26303,1065 @@
     ]
   },
   {
+    "description": "a subject that narrows a child subject",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "record": {
+          "from": "records",
+          "identified_by": "id"
+        },
+        "job": {
+          "from": "every record.jobs",
+          "identified_by": "key"
+        },
+        "open job": {
+          "from": "job whose state is \"open\""
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "open job",
+          "checks": {
+            "c": "owner exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "keeps the id and the in of the child, and counts per parent, so a parent with no subject left fails $min_subjects on its own row",
+        "rules": ["sentence.subject.narrow", "subjects.chain", "subjects.chain.count"],
+        "input": {
+          "records": [
+            {
+              "id": "r1",
+              "jobs": [
+                {
+                  "key": "k1",
+                  "state": "open",
+                  "owner": "ana"
+                },
+                {
+                  "key": "k2",
+                  "state": "closed"
+                }
+              ]
+            },
+            {
+              "id": "r2",
+              "jobs": [
+                {
+                  "key": "k3",
+                  "state": "closed"
+                }
+              ]
+            }
+          ]
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "requirements": {
+          "s": {
+            "subjects": {
+              "matching": 1,
+              "total": 3
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "open job"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": ["/records/0/jobs/0"],
+                "name": "in-scope open job count",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "in": {
+                "record": "r1"
+              },
+              "type": "open job"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "$min_subjects",
+            "failures": [],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope open job count",
+                "value": 0
+              }
+            ],
+            "message": "in-scope open job count is 0",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "in": {
+                "record": "r2"
+              },
+              "type": "open job"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated open job ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "in": {
+                "record": "r1"
+              },
+              "type": "open job"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated open job ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "in": {
+                "record": "r2"
+              },
+              "type": "open job"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ancestor_ids",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated record ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "record"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$applies",
+            "inputs": [
+              {
+                "locations": ["/records/0/jobs/0/state"],
+                "name": "state",
+                "value": "open"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "k1",
+              "in": {
+                "record": "r1"
+              },
+              "type": "open job"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "$applies",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": ["/records/0/jobs/1/state"],
+                    "name": "state",
+                    "outcome": "usable",
+                    "value": "closed"
+                  }
+                ],
+                "kind": "assertion",
+                "locations": ["$policy:/subjects/open job/from"],
+                "message": "state is \"closed\"",
+                "name": "state is \"open\""
+              }
+            ],
+            "inputs": [
+              {
+                "locations": ["/records/0/jobs/1/state"],
+                "name": "state",
+                "outcome": "usable",
+                "value": "closed"
+              }
+            ],
+            "message": "state is \"closed\"",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "k2",
+              "in": {
+                "record": "r1"
+              },
+              "type": "open job"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "$applies",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": ["/records/1/jobs/0/state"],
+                    "name": "state",
+                    "outcome": "usable",
+                    "value": "closed"
+                  }
+                ],
+                "kind": "assertion",
+                "locations": ["$policy:/subjects/open job/from"],
+                "message": "state is \"closed\"",
+                "name": "state is \"open\""
+              }
+            ],
+            "inputs": [
+              {
+                "locations": ["/records/1/jobs/0/state"],
+                "name": "state",
+                "outcome": "usable",
+                "value": "closed"
+              }
+            ],
+            "message": "state is \"closed\"",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "k3",
+              "in": {
+                "record": "r2"
+              },
+              "type": "open job"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": ["/records/0/jobs/0/owner"],
+                "name": "owner",
+                "value": "ana"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "k1",
+              "in": {
+                "record": "r1"
+              },
+              "type": "open job"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a subject that narrows a subject that narrows a child subject",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "record": {
+          "from": "records",
+          "identified_by": "id"
+        },
+        "job": {
+          "from": "every record.jobs",
+          "identified_by": "key"
+        },
+        "open job": {
+          "from": "job whose state is \"open\""
+        },
+        "owned job": {
+          "from": "\"open job\" whose owner exists"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "owned job",
+          "min_subjects": 0,
+          "checks": {
+            "c": "owner is \"ana\" and record.id exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "keeps the conditions of both, outermost first, the id and the in of the child, and reads the child's parent by its name",
+        "rules": ["sentence.subject.narrow", "subjects.sentence", "subjects.chain"],
+        "input": {
+          "records": [
+            {
+              "id": "r1",
+              "jobs": [
+                {
+                  "key": "k1",
+                  "state": "open",
+                  "owner": "ana"
+                },
+                {
+                  "key": "k2",
+                  "state": "open"
+                },
+                {
+                  "key": "k3",
+                  "state": "closed",
+                  "owner": "bo"
+                }
+              ]
+            },
+            {
+              "id": "r2",
+              "jobs": [
+                {
+                  "key": "k4",
+                  "state": "open",
+                  "owner": "cy"
+                }
+              ]
+            }
+          ]
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "requirements": {
+          "s": {
+            "subjects": {
+              "matching": 2,
+              "total": 4
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "owned job"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": ["/records/0/jobs/0"],
+                "name": "in-scope owned job count",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "in": {
+                "record": "r1"
+              },
+              "type": "owned job"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": ["/records/1/jobs/0"],
+                "name": "in-scope owned job count",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "in": {
+                "record": "r2"
+              },
+              "type": "owned job"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated owned job ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "in": {
+                "record": "r1"
+              },
+              "type": "owned job"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated owned job ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "in": {
+                "record": "r2"
+              },
+              "type": "owned job"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ancestor_ids",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated record ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "record"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$applies",
+            "inputs": [
+              {
+                "locations": ["/records/0/jobs/0/owner"],
+                "name": "owner",
+                "value": "ana"
+              },
+              {
+                "locations": ["/records/0/jobs/0/state"],
+                "name": "state",
+                "value": "open"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "k1",
+              "in": {
+                "record": "r1"
+              },
+              "type": "owned job"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "$applies",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": ["/records/0/jobs/1"],
+                    "name": "owner",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": ["$policy:/subjects/owned job/from"],
+                "message": "owner is missing",
+                "name": "owner exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": ["/records/0/jobs/1"],
+                "name": "owner",
+                "outcome": "absent",
+                "value": null
+              },
+              {
+                "locations": ["/records/0/jobs/1/state"],
+                "name": "state",
+                "outcome": "usable",
+                "value": "open"
+              }
+            ],
+            "message": "owner is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "k2",
+              "in": {
+                "record": "r1"
+              },
+              "type": "owned job"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "$applies",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": ["/records/0/jobs/2/state"],
+                    "name": "state",
+                    "outcome": "usable",
+                    "value": "closed"
+                  }
+                ],
+                "kind": "assertion",
+                "locations": ["$policy:/subjects/open job/from"],
+                "message": "state is \"closed\"",
+                "name": "state is \"open\""
+              }
+            ],
+            "inputs": [
+              {
+                "locations": ["/records/0/jobs/2/owner"],
+                "name": "owner",
+                "outcome": "usable",
+                "value": "bo"
+              },
+              {
+                "locations": ["/records/0/jobs/2/state"],
+                "name": "state",
+                "outcome": "usable",
+                "value": "closed"
+              }
+            ],
+            "message": "state is \"closed\"",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "k3",
+              "in": {
+                "record": "r1"
+              },
+              "type": "owned job"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$applies",
+            "inputs": [
+              {
+                "locations": ["/records/1/jobs/0/owner"],
+                "name": "owner",
+                "value": "cy"
+              },
+              {
+                "locations": ["/records/1/jobs/0/state"],
+                "name": "state",
+                "value": "open"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "k4",
+              "in": {
+                "record": "r2"
+              },
+              "type": "owned job"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": ["/records/0/jobs/0/owner"],
+                "name": "owner",
+                "value": "ana"
+              },
+              {
+                "locations": ["/records/0/id"],
+                "name": "record.id",
+                "value": "r1"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "k1",
+              "in": {
+                "record": "r1"
+              },
+              "type": "owned job"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": ["/records/1/jobs/0/owner"],
+                    "name": "owner",
+                    "outcome": "usable",
+                    "value": "cy"
+                  }
+                ],
+                "kind": "assertion",
+                "locations": ["$policy:/requirements/s/checks/c#1"],
+                "message": "owner is \"cy\"",
+                "name": "owner is \"ana\""
+              }
+            ],
+            "inputs": [
+              {
+                "locations": ["/records/1/jobs/0/owner"],
+                "name": "owner",
+                "outcome": "usable",
+                "value": "cy"
+              },
+              {
+                "locations": ["/records/1/id"],
+                "name": "record.id",
+                "outcome": "usable",
+                "value": "r2"
+              }
+            ],
+            "message": "owner is \"cy\"",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "k4",
+              "in": {
+                "record": "r2"
+              },
+              "type": "owned job"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a child subject of a subject that narrows a child subject",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "record": {
+          "from": "records",
+          "identified_by": "id"
+        },
+        "job": {
+          "from": "every record.jobs",
+          "identified_by": "key"
+        },
+        "open job": {
+          "from": "job whose state is \"open\""
+        },
+        "task": {
+          "from": "every \"open job\".tasks",
+          "identified_by": "t"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "task",
+          "checks": {
+            "c": "done is true"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is the third level, with the id of every ancestor under in, and counts per open job",
+        "rules": ["subjects.chain.levels"],
+        "input": {
+          "records": [
+            {
+              "id": "r1",
+              "jobs": [
+                {
+                  "key": "k1",
+                  "state": "open",
+                  "tasks": [
+                    {
+                      "t": "t1",
+                      "done": true
+                    },
+                    {
+                      "t": "t2",
+                      "done": false
+                    }
+                  ]
+                },
+                {
+                  "key": "k2",
+                  "state": "closed",
+                  "tasks": [
+                    {
+                      "t": "t3",
+                      "done": false
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "requirements": {
+          "s": {
+            "subjects": {
+              "matching": 2,
+              "total": 2
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "task"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": ["/records/0/jobs/0/tasks/0", "/records/0/jobs/0/tasks/1"],
+                "name": "in-scope task count",
+                "value": 2
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "in": {
+                "open job": "k1",
+                "record": "r1"
+              },
+              "type": "task"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated task ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "in": {
+                "open job": "k1",
+                "record": "r1"
+              },
+              "type": "task"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ancestor_ids",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated record ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "record"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ancestor_ids",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated open job ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "in": {
+                "record": "r1"
+              },
+              "type": "open job"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": ["/records/0/jobs/0/tasks/0/done"],
+                "name": "done",
+                "value": true
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "in": {
+                "open job": "k1",
+                "record": "r1"
+              },
+              "type": "task"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": ["/records/0/jobs/0/tasks/1/done"],
+                    "name": "done",
+                    "outcome": "usable",
+                    "value": false
+                  }
+                ],
+                "kind": "assertion",
+                "locations": ["$policy:/requirements/s/checks/c"],
+                "message": "done is false",
+                "name": "done is true"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": ["/records/0/jobs/0/tasks/1/done"],
+                "name": "done",
+                "outcome": "usable",
+                "value": false
+              }
+            ],
+            "message": "done is false",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t2",
+              "in": {
+                "open job": "k1",
+                "record": "r1"
+              },
+              "type": "task"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a chain of four subjects through a subject that narrows a child subject",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "record": {
+          "from": "records",
+          "identified_by": "id"
+        },
+        "job": {
+          "from": "every record.jobs",
+          "identified_by": "key"
+        },
+        "open job": {
+          "from": "job whose state is \"open\""
+        },
+        "task": {
+          "from": "every \"open job\".tasks",
+          "identified_by": "t"
+        },
+        "step": {
+          "from": "task.steps"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "step",
+          "checks": {
+            "c": "x exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is written wrong, because narrowing doesn't count as a level but the child below it does",
+        "rules": ["subjects.chain.levels"],
+        "input": {
+          "records": []
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "requirements": {
+          "s": {
+            "subjects": {
+              "matching": 0,
+              "total": 0
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "locations": [],
+                "name": "subjects.step.from",
+                "value": ["a chain of more than three subjects isn't supported yet"]
+              }
+            ],
+            "message": "subjects.step.from: a chain of more than three subjects isn't supported yet",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "step"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
     "description": "a child subject of a from line with named by each of, which starts at its parent",
     "policy": {
       "ergo_spec": "{{spec}}",
