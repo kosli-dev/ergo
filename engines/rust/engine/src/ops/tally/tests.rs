@@ -1,5 +1,6 @@
 use super::*;
 use crate::SPEC;
+use crate::ops::clause::{self, Clause};
 use crate::path::{Located, Location, Start, Step};
 use serde_json::json;
 use std::collections::BTreeMap;
@@ -1765,5 +1766,55 @@ fn an_item_whose_end_a_sum_cant_add_is_recorded_at_that_end() {
             "ergo/text": "item 1 of items: v is \"a\", which isn't a number",
             "ergo/item": {"value": {"v": "a"}, "locations": ["/things/0/items/0"]},
         })]
+    );
+}
+
+fn tally_clauses(sentence: &str, items: Value, params: Value, cause: Cause) -> Vec<Clause> {
+    let Check::Tally(tally) = lowered(sentence) else {
+        panic!("{sentence} is not a count or a sum");
+    };
+    let input = json!({"things": [{"items": items}]});
+    let ctx = Ctx {
+        label: None,
+        item_by_item: false,
+        in_option: false,
+        subject: Located {
+            value: &input["things"][0],
+            location: Location::input_root().key("things").index(0),
+        },
+        input: &input,
+        params: Some(&params),
+        aliases: BTreeMap::new(),
+    };
+    tally.counted_clauses(&ctx, cause)
+}
+
+fn kinds_and_names(clauses: &[Clause]) -> Vec<(clause::Kind, &str)> {
+    clauses
+        .iter()
+        .map(|clause| (clause.kind, clause.name.as_str()))
+        .collect()
+}
+
+#[test]
+fn a_count_says_its_roots_then_its_items_then_and_n_more() {
+    let clauses = tally_clauses(
+        "count of items whose v is at least $params.min is 1",
+        json!([{}, {}, {}, {}, {}]),
+        json!({"min": "s"}),
+        Cause::Unusable,
+    );
+    let names: Vec<String> = (1..=5).map(|n| format!("item {n} of items")).collect();
+    let mut wanted = vec![(clause::Kind::Root, "$params.min")];
+    wanted.extend(names.iter().map(|name| (clause::Kind::Item, name.as_str())));
+    assert_eq!(kinds_and_names(&clauses), wanted);
+    let shown = clause::shown(&clauses);
+    assert_eq!(
+        shown.last().map(|clause| clause.kind),
+        Some(clause::Kind::More(2))
+    );
+    assert_eq!(
+        clause::text(&shown),
+        "$params.min is \"s\", which isn't a number; item 1 of items: v is missing; item 2 of items: v is missing; item 3 of items: v is missing; and 2 more"
     );
 }
