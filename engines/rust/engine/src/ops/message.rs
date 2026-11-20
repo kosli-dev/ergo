@@ -1768,7 +1768,7 @@ fn root_flaw_with(
 }
 
 pub fn key_cause(checks: &[&Check], ctx: &Ctx) -> Option<(Cause, String)> {
-    worst_texts(key_problems(checks, ctx))
+    worst_texts(key_problems(checks, ctx, false))
 }
 
 pub fn worse_key_cause(
@@ -1783,12 +1783,13 @@ pub fn worse_key_cause(
     }
 }
 
-fn key_problems(checks: &[&Check], ctx: &Ctx) -> Vec<Clause> {
+fn key_problems(checks: &[&Check], ctx: &Ctx, listed: bool) -> Vec<Clause> {
     let mut keys: Vec<Path> = Vec::new();
     for check in checks {
         let mut own: Vec<Path> = check
             .paths()
             .into_iter()
+            .chain(listed.then(|| super::walk::listed_refs(check)).into_iter().flatten())
             .flat_map(path::step_refs)
             .collect();
         own.sort_by_key(name::name);
@@ -2142,13 +2143,33 @@ fn roots_with(checks: &[&Check], ctx: &Ctx, item_keys: bool) -> Vec<Clause> {
             _ => None,
         })
         .collect();
+    let stopped: Vec<String> = checks
+        .iter()
+        .flat_map(|check| {
+            check
+                .paths()
+                .into_iter()
+                .chain(super::walk::listed_refs(check))
+        })
+        .filter(|path| {
+            path::step_refs(path)
+                .iter()
+                .any(|key| super::key_base::key_flaw(key, ctx).is_some())
+        })
+        .map(name::name)
+        .collect();
     let mut said: Vec<Clause> = Vec::new();
-    for clause in key_problems(checks, ctx)
+    for clause in key_problems(checks, ctx, true)
         .into_iter()
         .chain(aliased)
         .chain(bases)
         .chain(counted)
-        .chain(reads.into_iter().flat_map(|(_, said)| said))
+        .chain(
+            reads
+                .into_iter()
+                .flat_map(|(_, said)| said)
+                .filter(|clause| !stopped.contains(&clause.name)),
+        )
     {
         let root = clause.kind == clause::Kind::Root;
         if !said
