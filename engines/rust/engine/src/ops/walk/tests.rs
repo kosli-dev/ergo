@@ -661,3 +661,40 @@ fn an_item_says_its_own_value_beside_a_compare_root_it_cant_use() {
         ]
     );
 }
+
+fn judged(sentence: &str, items: Value, params: Value) -> Vec<Option<(Cause, String)>> {
+    let Check::Walk(walk_check) = lowered(sentence) else {
+        panic!("{sentence} is not every or some");
+    };
+    let subject = json!({"items": items});
+    let input = json!({});
+    let context = ctx(&subject, &input, Some(&params));
+    let outer = outer(&context);
+    let walked = walk(&walk_check.path, &outer, Options::default());
+    judge(&walk_check, &walked, &outer)
+        .into_iter()
+        .map(|said| said.failure.map(|failure| (failure.cause, failure.msg)))
+        .collect()
+}
+
+#[test]
+fn item_own_is_what_the_item_says_with_a_readable_key_minus_the_key() {
+    let sentence = "every items.v that is m named by $params.k is 1";
+    let items = json!([{"v": "s"}, {"v": {}}, {"v": {"m": null}}]);
+    let readable = judged(sentence, items.clone(), json!({"k": "a"}));
+    assert_eq!(
+        own_said(sentence, items.clone(), json!({"k": "a"}), json!({})),
+        readable
+    );
+    let cut: Vec<Option<(Cause, String)>> = readable
+        .into_iter()
+        .map(|said| said.map(|(cause, text)| (cause, text.replace(" named by $params.k", ""))))
+        .collect();
+    for params in [json!({}), json!({"k": null}), json!({"k": 3})] {
+        assert_eq!(
+            own_said(sentence, items.clone(), params.clone(), json!({})),
+            cut,
+            "{params}"
+        );
+    }
+}
