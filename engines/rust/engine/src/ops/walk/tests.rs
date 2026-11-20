@@ -1445,6 +1445,52 @@ fn an_every_says_a_key_that_isnt_text_once_beside_an_item_that_says_nothing_of_i
     );
 }
 
+fn records(sentence: &str, es: Value, params: Value) -> Vec<(Value, Value, Value)> {
+    thing_row(sentence, json!({"es": es}), params)
+        .rich
+        .iter()
+        .map(|record| {
+            (
+                record["path"].clone(),
+                record["value"].clone(),
+                record.get("ergo/outcome").cloned().unwrap_or(Value::Null),
+            )
+        })
+        .collect()
+}
+
+#[test]
+fn a_walk_item_beside_a_key_it_cant_read_holds_the_value_before_the_key_with_the_reads_outcome()
+{
+    let sentence = "every es.v that is m named by $params.k is 1";
+    assert_eq!(
+        records(
+            sentence,
+            json!([{"v": {}}, {"v": {"m": null}}]),
+            json!({})
+        ),
+        [
+            (json!("es[0].v.m"), json!(null), json!("absent")),
+            (json!("es[1].v.m"), json!(null), json!("absent")),
+        ]
+    );
+    assert_eq!(
+        records(
+            sentence,
+            json!([{"v": {}}, {"v": {"m": null}}]),
+            json!({"k": null})
+        ),
+        [
+            (json!("es[0].v.m"), json!(null), json!("absent")),
+            (json!("es[1].v.m"), json!(null), json!("null")),
+        ]
+    );
+    assert_eq!(
+        records(sentence, json!([{"v": {"m": "s"}}]), json!({"k": 3})),
+        [(json!("es[0].v.m"), json!("s"), json!("unusable"))]
+    );
+}
+
 #[test]
 fn a_walk_row_says_a_root_its_items_cant_read_before_them() {
     assert_eq!(
