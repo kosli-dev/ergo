@@ -19,7 +19,10 @@ test_a_null_id_is_not_an_id_so_it_never_repeats if {
 
 ds_keys(req) := ["ds"] if is_object(req)
 
-place_at(entry, req, _) := {"c": entry.c} if is_object(req)
+place_at(entry, req, doc) := {"c": entry.c} if {
+	is_object(req)
+	is_object(doc)
+}
 
 id_path(req) := ["id"] if is_object(req)
 
