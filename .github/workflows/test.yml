@@ -56,6 +56,10 @@ jobs:
         run: |
           .github/no-inline-tests.sh
           .github/no-inline-tests_test.sh
+      - name: Check no JSON file OPA loads as data is an array
+        run: |
+          .github/no-array-data.sh
+          .github/no-array-data_test.sh
       - name: Check the script that compares two dumps of the Rust engine's reports
         run: .github/dump-diff_test.sh
       - name: Check the script that lists what a change did to the Rust engine's reports
