@@ -524,3 +524,23 @@ fn followed_by_prints_with_one_space_and_double_quotes() {
         "x starts with $params.p followed by k"
     );
 }
+
+#[test]
+fn ignoring_words_print_after_the_phrase() {
+    assert_eq!(
+        printed_check("x  is   'a'  ignoring   case"),
+        "x is \"a\" ignoring case"
+    );
+    assert_eq!(
+        printed_check("x is equal to y ignoring surrounding spaces"),
+        "x equals y ignoring surrounding spaces"
+    );
+    assert_eq!(
+        printed_check("x is one of $params.l ignoring case and surrounding spaces"),
+        "x is in $params.l ignoring case and surrounding spaces"
+    );
+    assert_eq!(
+        printed_check("every xs whose k is not \"a\" ignoring case exists"),
+        "every xs whose k is not \"a\" ignoring case exists"
+    );
+}

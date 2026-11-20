@@ -611,3 +611,89 @@ fn followed_by_needs_a_piece_after_it_and_none_of_them_takes_a_plus() {
     assert!(parse_from("x whose y is k followed by count of z").is_err());
     assert!(parse_from("x whose y is followed by k").is_err());
 }
+
+fn ignoring(phrase: Phrase, ignoring: Ignoring) -> Phrase {
+    Phrase::Ignoring {
+        phrase: Box::new(phrase),
+        ignoring,
+    }
+}
+
+#[test]
+fn ignoring_words_follow_is_and_is_one_of() {
+    let is_a = Phrase::Is {
+        not: false,
+        operand: value(text("a")),
+        within: None,
+    };
+    assert_eq!(
+        phrase("is \"a\" ignoring case"),
+        ignoring(is_a.clone(), Ignoring::Case)
+    );
+    assert_eq!(
+        phrase("is \"a\" ignoring surrounding spaces"),
+        ignoring(is_a.clone(), Ignoring::SurroundingSpaces)
+    );
+    assert_eq!(
+        phrase("is \"a\"  ignoring  case  and  surrounding  spaces"),
+        ignoring(is_a, Ignoring::CaseAndSurroundingSpaces)
+    );
+    assert_eq!(
+        phrase("is not in $params.l ignoring case"),
+        ignoring(
+            Phrase::OneOf {
+                not: true,
+                list: List::Path(params("l"))
+            },
+            Ignoring::Case
+        )
+    );
+}
+
+#[test]
+fn ignoring_words_in_the_wrong_order_still_read() {
+    assert_eq!(
+        phrase("equals k ignoring surrounding spaces and case"),
+        ignoring(
+            Phrase::Is {
+                not: false,
+                operand: field("k"),
+                within: None
+            },
+            Ignoring::SurroundingSpacesAndCase
+        )
+    );
+}
+
+#[test]
+fn ignoring_words_read_after_phrases_that_cant_take_them() {
+    assert_eq!(
+        phrase("is at least 3 ignoring case"),
+        ignoring(
+            Phrase::Order {
+                order: Order::AtLeast,
+                operand: value(number("3"))
+            },
+            Ignoring::Case
+        )
+    );
+    assert!(matches!(
+        phrase("is 1 within 2 ignoring case"),
+        Phrase::Ignoring { .. }
+    ));
+}
+
+#[test]
+fn ignoring_words_dont_read_after_contains_starts_with_ends_with_or_alphabetically_yet() {
+    for line in [
+        "x whose y contains \"a\" ignoring case",
+        "x whose y contains all of \"a\" ignoring case",
+        "x whose y starts with \"a\" ignoring case",
+        "x whose y does not end with \"a\" ignoring case",
+        "x whose y is alphabetically before \"a\" ignoring case",
+    ] {
+        assert!(parse_from(line).is_err(), "{line}");
+    }
+    assert!(parse_check("x is \"a\" ignoring spaces").is_err());
+    assert!(parse_check("x is \"a\" ignoring").is_err());
+}

@@ -225,12 +225,20 @@ fn op_name(phrase: &Phrase) -> &'static str {
             TimeOrder::OnOrAfter => "is on or after",
             TimeOrder::OnOrBefore => "is on or before",
         },
+        Phrase::Ignoring { phrase, .. } => op_name(phrase),
     }
+}
+
+fn takes_ignoring(phrase: &Phrase) -> bool {
+    matches!(
+        phrase,
+        Phrase::Is { within: None, .. } | Phrase::OneOf { .. }
+    )
 }
 
 fn comparable(phrase: &Phrase) -> bool {
     matches!(
-        phrase,
+        phrase.bare(),
         Phrase::Is { .. } | Phrase::Order { .. } | Phrase::Between { .. }
     )
 }
@@ -242,6 +250,7 @@ fn in_range_number(value: &Value) -> bool {
 #[derive(Default)]
 struct Walk {
     out: BTreeSet<String>,
+    counted: bool,
 }
 
 impl Walk {
@@ -501,10 +510,68 @@ impl Walk {
             | Phrase::NotNonEmptyString
             | Phrase::Type(_)
             | Phrase::NotType(_) => {}
+            Phrase::Ignoring { phrase, ignoring } => {
+                let counted = std::mem::take(&mut self.counted);
+                self.phrase(phrase, quantified);
+                self.ignoring(phrase, *ignoring, counted);
+            }
+        }
+        self.counted = false;
+    }
+
+    fn ignoring(&mut self, phrase: &Phrase, ignoring: Ignoring, counted: bool) {
+        let words = ignoring.words();
+        if ignoring == Ignoring::SurroundingSpacesAndCase {
+            self.out.insert(format!(
+                "\"{words}\" is written \"{}\"",
+                Ignoring::CaseAndSurroundingSpaces.words()
+            ));
+        }
+        if !takes_ignoring(phrase) {
+            let op = match phrase {
+                Phrase::Is {
+                    within: Some(_), ..
+                } => "within",
+                other => op_name(other),
+            };
+            self.out.insert(format!("\"{op}\" can't take {words}"));
+            return;
+        }
+        if counted {
+            self.out.insert(format!(
+                "\"{words}\" can't follow a count of, a sum of or a plus"
+            ));
+            return;
+        }
+        let text = |value: &Value| matches!(value, Value::String(_));
+        let takes_text = match phrase {
+            Phrase::Is {
+                operand: Operand::Value(value),
+                ..
+            } => text(value),
+            Phrase::OneOf {
+                list: List::Values(values),
+                ..
+            } => values.iter().all(text),
+            _ => true,
+        };
+        if !takes_text {
+            self.out.insert(format!("\"{words}\" takes text"));
+        }
+        if let Phrase::Is {
+            operand: Operand::Field(terms),
+            ..
+        } = phrase
+            && !matches!(terms.as_slice(), [Term::Path(_)])
+        {
+            self.out.insert(format!(
+                "\"{words}\" can't take a count of, a sum of or a plus"
+            ));
         }
     }
 
     fn after_terms(&mut self, terms: &[Term], phrase: &Phrase) {
+        self.counted = true;
         if let Phrase::Is {
             operand: Operand::Joined(_),
             ..
@@ -528,7 +595,7 @@ impl Walk {
         | Phrase::Time {
             operand: Operand::Joined(_),
             ..
-        } = phrase
+        } = phrase.bare()
         {
             self.out
                 .insert("\"followed by\" can't follow a count of, a sum of or a plus".to_string());
@@ -735,7 +802,7 @@ fn same_path(left: &Path, right: &Path, aliases: &[&str], left_own: bool) -> boo
 }
 
 fn self_term(phrase: &Phrase) -> Option<&Path> {
-    let operand = match phrase {
+    let operand = match phrase.bare() {
         Phrase::Is { operand, .. }
         | Phrase::Order { operand, .. }
         | Phrase::Time { operand, .. }
@@ -759,7 +826,7 @@ fn self_term(phrase: &Phrase) -> Option<&Path> {
 pub const SUBJECT_MARK: char = '\u{1}';
 
 fn phrase_operand_terms(phrase: &Phrase) -> &[Term] {
-    match phrase {
+    match phrase.bare() {
         Phrase::Is { operand, .. }
         | Phrase::Order { operand, .. }
         | Phrase::Time { operand, .. }
@@ -777,7 +844,7 @@ fn phrase_operand_terms(phrase: &Phrase) -> &[Term] {
 }
 
 fn phrase_list_path(phrase: &Phrase) -> Option<&Path> {
-    match phrase {
+    match phrase.bare() {
         Phrase::OneOf { list, .. }
         | Phrase::Matches { list, .. }
         | Phrase::ContainsAll(list)
