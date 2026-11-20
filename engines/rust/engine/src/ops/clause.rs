@@ -26,7 +26,11 @@ pub fn shown(clauses: &[Clause]) -> Vec<Clause> {
             once.push(clause);
         }
     }
-    let of_kind = |kind: Kind| once.iter().copied().filter(move |clause| clause.kind == kind);
+    let of_kind = |kind: Kind| {
+        once.iter()
+            .copied()
+            .filter(move |clause| clause.kind == kind)
+    };
     let mut out: Vec<Clause> = of_kind(Kind::Root).cloned().collect();
     out.sort_by(|a, b| (a.cause, &a.name).cmp(&(b.cause, &b.name)));
     out.extend(of_kind(Kind::List).cloned());

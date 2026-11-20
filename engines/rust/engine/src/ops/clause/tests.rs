@@ -113,14 +113,26 @@ fn shown_and_text_give_what_joined_gives() {
                     Cause::Unusable,
                     "item 2 of $params.envs is null, which isn't an object",
                 ),
-                item("item 3 of $params.envs", Cause::Absent, vec![missing("name")]),
+                item(
+                    "item 3 of $params.envs",
+                    Cause::Absent,
+                    vec![missing("name")],
+                ),
                 unread(
                     "item 4 of $params.envs",
                     Cause::Unusable,
                     "item 4 of $params.envs is 3, which isn't an object",
                 ),
-                item("item 5 of $params.envs", Cause::Absent, vec![missing("name")]),
-                item("item 6 of $params.envs", Cause::Absent, vec![missing("name")]),
+                item(
+                    "item 5 of $params.envs",
+                    Cause::Absent,
+                    vec![missing("name")],
+                ),
+                item(
+                    "item 6 of $params.envs",
+                    Cause::Absent,
+                    vec![missing("name")],
+                ),
             ],
             vec![
                 "item 2 of $params.envs is null, which isn't an object",
@@ -301,7 +313,13 @@ fn shown_and_text_give_what_joined_gives() {
 #[test]
 fn and_n_more_comes_after_the_roots_and_the_lists_in_a_count() {
     let mut clauses: Vec<Clause> = (1..=5)
-        .map(|n| item(&format!("item {n} of xs"), Cause::Absent, vec![missing("v")]))
+        .map(|n| {
+            item(
+                &format!("item {n} of xs"),
+                Cause::Absent,
+                vec![missing("v")],
+            )
+        })
         .collect();
     clauses.push(root(
         "$params.min",
@@ -349,7 +367,11 @@ fn roots_come_worst_cause_first_then_by_name_and_before_the_list() {
 #[test]
 fn a_root_whose_value_holds_a_semicolon_stays_one_clause() {
     let clauses = vec![
-        root("w.z", Cause::Unusable, "w.z is \"p; q\", which isn't a number"),
+        root(
+            "w.z",
+            Cause::Unusable,
+            "w.z is \"p; q\", which isn't a number",
+        ),
         item("item 1 of ws", Cause::Absent, vec![missing("w.v")]),
     ];
     let shown = shown(&clauses);
