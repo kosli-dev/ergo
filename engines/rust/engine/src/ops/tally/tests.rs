@@ -1653,3 +1653,117 @@ fn a_count_on_a_subject_that_is_not_an_object_lists_the_part_its_whose_reads() {
         .collect();
     assert_eq!(names, ["count of ys whose thing equals p", "ys", "p"]);
 }
+
+fn counted_records(sentence: &str, items: Value, params: Value, cause: Cause) -> Vec<Value> {
+    let Check::Tally(tally) = lowered(sentence) else {
+        panic!("{sentence} is not a count or a sum");
+    };
+    let Side::Derived(derived) = &tally.left else {
+        panic!("{sentence} has no count or sum on the left");
+    };
+    let Term::Counted(counted) = &derived.terms[0] else {
+        panic!("{sentence} starts with no count or sum");
+    };
+    let input = json!({"things": [{"items": items}]});
+    let ctx = Ctx {
+        label: None,
+        item_by_item: false,
+        in_option: false,
+        subject: Located {
+            value: &input["things"][0],
+            location: Location::input_root().key("things").index(0),
+        },
+        input: &input,
+        params: Some(&params),
+        aliases: BTreeMap::new(),
+    };
+    counted_said(counted, &ctx, cause).1
+}
+
+#[test]
+fn an_item_a_whose_cant_use_is_recorded_with_the_field_it_read() {
+    let records = counted_records(
+        "count of items whose v is at least 3 is at least 1",
+        json!([{"v": "a"}]),
+        json!({}),
+        Cause::Unusable,
+    );
+    assert_eq!(
+        records,
+        [json!({
+            "path": "items[0].v",
+            "item": "item 1 of items",
+            "cause": "unusable",
+            "value": "a",
+            "locations": ["/things/0/items/0/v"],
+            "ergo/text": "item 1 of items: v is \"a\", which isn't a number",
+            "ergo/item": {"value": {"v": "a"}, "locations": ["/things/0/items/0"]},
+        })]
+    );
+}
+
+#[test]
+fn an_item_a_whose_with_an_unreadable_root_cant_use_is_recorded_with_the_field_it_read() {
+    let records = counted_records(
+        "count of items whose v is at least $params.min is at least 1",
+        json!([{"v": "a"}]),
+        json!({}),
+        Cause::Unusable,
+    );
+    assert_eq!(
+        records,
+        [json!({
+            "path": "items[0].v",
+            "item": "item 1 of items",
+            "cause": "unusable",
+            "value": "a",
+            "locations": ["/things/0/items/0/v"],
+            "ergo/text": "item 1 of items: v is \"a\", which isn't a number",
+            "ergo/item": {"value": {"v": "a"}, "locations": ["/things/0/items/0"]},
+        })]
+    );
+}
+
+#[test]
+fn an_item_whose_lost_end_a_whose_reads_is_recorded_at_that_end() {
+    let records = counted_records(
+        "count of items.v whose it is at least 3 is at least 1",
+        json!([{"w": 1}]),
+        json!({}),
+        Cause::Absent,
+    );
+    assert_eq!(
+        records,
+        [json!({
+            "path": "items[0].v",
+            "item": "item 1 of items",
+            "cause": "absent",
+            "value": null,
+            "locations": ["/things/0/items/0"],
+            "ergo/text": "item 1 of items: v is missing",
+            "ergo/item": {"value": {"w": 1}, "locations": ["/things/0/items/0"]},
+        })]
+    );
+}
+
+#[test]
+fn an_item_whose_end_a_sum_cant_add_is_recorded_at_that_end() {
+    let records = counted_records(
+        "sum of items.v is at least 1",
+        json!([{"v": "a"}]),
+        json!({}),
+        Cause::Unusable,
+    );
+    assert_eq!(
+        records,
+        [json!({
+            "path": "items[0].v",
+            "item": "item 1 of items",
+            "cause": "unusable",
+            "value": "a",
+            "locations": ["/things/0/items/0/v"],
+            "ergo/text": "item 1 of items: v is \"a\", which isn't a number",
+            "ergo/item": {"value": {"v": "a"}, "locations": ["/things/0/items/0"]},
+        })]
+    );
+}
