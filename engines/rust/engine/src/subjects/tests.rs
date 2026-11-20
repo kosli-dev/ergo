@@ -1818,14 +1818,14 @@ fn merge_runs_keeps_the_rows_of_the_first_run_whatever_the_length_of_the_others(
     assert!(super::merge_runs(Vec::new(), &[&long]).is_empty());
 }
 
-fn tally_message(sentence: &str, items: Value, params: Value, message: &str) -> String {
+fn tally_message(sentence: &str, subject: Value, params: Value) -> String {
     let tree = ergo_policy_sentences::parse_check(sentence).unwrap();
-    let crate::ops::Check::Tally(tally) =
-        crate::lower::lower_assertion(&tree.assertions[0], &crate::lower::Scope::new()).unwrap()
-    else {
+    let check =
+        crate::lower::lower_assertion(&tree.assertions[0], &crate::lower::Scope::new()).unwrap();
+    let crate::ops::Check::Tally(tally) = &check else {
         panic!("{sentence} is not a count or a sum");
     };
-    let input = json!({"things": [{"items": items}]});
+    let input = json!({"things": [subject]});
     let ctx = crate::path::Ctx {
         label: None,
         item_by_item: false,
@@ -1838,8 +1838,9 @@ fn tally_message(sentence: &str, items: Value, params: Value, message: &str) -> 
         params: Some(&params),
         aliases: std::collections::BTreeMap::new(),
     };
-    let cause = crate::ops::run(&crate::ops::Check::Tally(tally.clone()), &ctx).cause;
-    super::tally_part(sentence, cause, &[], message, &tally, &ctx).message
+    let verdict = crate::ops::run(&check, &ctx);
+    let row = super::default_message(&check, &ctx, &verdict);
+    super::tally_part(sentence, verdict.cause, &[], &row, tally, &ctx).message
 }
 
 #[test]
@@ -1847,24 +1848,40 @@ fn a_counts_assertion_message_has_no_item_clause() {
     assert_eq!(
         tally_message(
             "count of items whose v is at least $params.min is 1",
-            json!([{}, {}, {}, {}, {}]),
+            json!({"items": [{}, {}, {}, {}, {}]}),
             json!({"min": "s"}),
-            "$params.min is \"s\", which isn't a number; item 1 of items: v is missing; item 2 of items: v is missing; item 3 of items: v is missing; and 2 more",
         ),
         "$params.min is \"s\", which isn't a number"
     );
 }
 
 #[test]
-#[ignore = "#694: tally_part gets the row message as text, after key_base::rewrite, keyed_roots::rewritten and message::unsaid, which don't carry the count's clauses yet"]
 fn a_counts_assertion_message_has_no_item_clause_after_a_side_joined_with_and() {
     assert_eq!(
         tally_message(
             "count of items whose v is 1 is $params.n",
-            json!([{}, {}, {}, {}]),
+            json!({"items": [{}, {}, {}, {}]}),
             json!({}),
-            "$params.n is missing, and item 1 of items: v is missing; item 2 of items: v is missing; item 3 of items: v is missing; and 1 more",
         ),
         "$params.n is missing"
     );
 }
+
+#[test]
+fn an_assertion_with_two_counts_says_no_item_either_count_says() {
+    for sentence in [
+        "sum of xs.v is sum of ys.v",
+        "sum of xs.v plus count of ys whose w is 1 is 3",
+    ] {
+        assert_eq!(
+            tally_message(
+                sentence,
+                json!({"xs": [{}, {"v": "s"}], "ys": [{}, {}]}),
+                json!({}),
+            ),
+            "",
+            "{sentence}"
+        );
+    }
+}
+
