@@ -807,6 +807,38 @@ fn an_item_leaves_out_a_key_from_an_input_that_is_a_list() {
 }
 
 #[test]
+fn an_item_that_isnt_an_object_says_so_beside_a_root_from_the_subject_it_cant_read() {
+    let tree = ergo_policy_sentences::parse_check(
+        "every items whose tags contains pr.m named by key exists",
+    )
+    .unwrap();
+    let scope = crate::lower::Scope::new().with_subject("pr");
+    let Check::Walk(walk_check) =
+        crate::lower::lower_assertion(&tree.assertions[0], &scope).unwrap()
+    else {
+        panic!("not a walk");
+    };
+    let subject = json!({"m": null, "items": [null]});
+    let input = json!({});
+    let params = json!({});
+    let context = ctx(&subject, &input, Some(&params));
+    let outer = outer(&context);
+    let walked = walk(&walk_check.path, &outer, Options::default());
+    let said: Vec<Option<String>> = walked
+        .items
+        .iter()
+        .map(|item| {
+            item_own(&walk_check.whose[0], item, &walked, &outer)
+                .map(|said| crate::ops::clause::text(std::slice::from_ref(&said)))
+        })
+        .collect();
+    assert_eq!(
+        said,
+        [Some("item 1 of items is null, which isn't an object".to_string())]
+    );
+}
+
+#[test]
 fn an_item_leaves_out_a_key_from_the_subject_it_cant_read() {
     let tree =
         ergo_policy_sentences::parse_check("every items whose v equals m named by pr.k exists")
