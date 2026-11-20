@@ -26,6 +26,8 @@ Each release names the version of the spec it follows. The spec's own changes ar
 
 - The Rust engine does not yet say every item on a `from` line without `every` (D8 of #688), and the shapes that `spec/OPEN.md` lists under "Left for a later PR" keep the old message. Their cases are in `known-failures.txt`.
 
+- A subject can narrow a child subject, and be narrowed in turn, as in `ergo.rego` 0.7.0 and spec 0.7 ([sentence.subject.narrow](../../spec/syntax.md#subjects), [subjects.chain](../../spec/semantics.md#requirements)), where it was written wrong with `can't build on a subject read from another subject yet`. Its rows keep the child's id and `in`, it is counted per parent, and narrowing doesn't count as a level of a chain. Changes the report of such policies, which now get real rows.
+
 ### Fixed
 
 - A `count of` or a `sum of` says the roots its `whose` can't read worst cause first and then by name, as spec 0.7 says ([problems.item_order](../../spec/semantics.md#which-problems-a-message-says)), where Rust said them in the order the sentence reads them. With the params `{"l": null}` and a subject holding `{"l": "s", "xs": []}`, `count of xs whose v is in $params.l and whose w is in pr.l is 0` says `pr.l is "s", which isn't a list; $params.l is null`, where it said `$params.l is null; pr.l is "s", which isn't a list`. Two keys that fail the same way come by name, like `$input.j is 3, which isn't text; $input.k is 3, which isn't text` for `count of es whose zz equals m named by $input.k and whose v equals m named by $input.j is 0`.
