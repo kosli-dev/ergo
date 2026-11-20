@@ -459,11 +459,15 @@ fn identified_by_is_allowed_with_named_by_and_under_a_keyed_parent() {
 }
 
 #[test]
-fn a_subject_that_narrows_a_child_subject_is_written_wrong() {
+fn a_subject_that_narrows_a_child_subject_reads_the_childs_path_with_both_conditions() {
     let (_, r) = reading(
-        json!({"art": {"from": "arts"}, "k": {"from": "art.ks"}, "n": {"from": "k whose x exists"}}),
+        json!({"art": {"from": "arts"}, "k": {"from": "art.ks whose y exists"}, "n": {"from": "k whose x exists"}}),
     );
-    assert!(r.infos["n"].problems.contains_key("subjects.n.from"));
+    assert!(r.infos["n"].problems.is_empty());
+    let lowered = r.lowered("n").unwrap();
+    assert!(matches!(lowered.source, Source::Child { .. }));
+    assert_eq!(lowered.from_text, "art.ks");
+    assert_eq!(r.filters_text("n").unwrap(), "y exists and x exists");
 }
 
 #[test]
