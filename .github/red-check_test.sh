@@ -92,3 +92,33 @@ case $out in
     exit 1
     ;;
 esac
+
+if command -v opa > /dev/null 2>&1; then
+  echo "red-check.sh runs a Rego test with opa and lists it when it passes"
+  real=$dir/real
+  mkdir -p "$real/.github" "$real/engines/rego/tests"
+  cp "$here/red-check.sh" "$real/.github/red-check.sh"
+  git -C "$real" init --quiet
+  git -C "$real" config user.email t@example.com
+  git -C "$real" config user.name t
+  printf 'package ergo_test\n\nimport rego.v1\n\ntest_old if true\n' > "$real/engines/rego/tests/x_test.rego"
+  git -C "$real" add -A
+  git -C "$real" commit --quiet -m base
+  realbase=$(git -C "$real" rev-parse HEAD)
+  printf '\ntest_real_one if true\n' >> "$real/engines/rego/tests/x_test.rego"
+  git -C "$real" commit --quiet -am head
+  out=$(cd "$real" && RED_CHECK_BUILD_CMD='mkdir -p dist spec examples' env -u RED_CHECK_REGO_CMD -u RED_CHECK_RUST_CMD sh .github/red-check.sh "$realbase")
+  case $out in
+    *"Could not run"*)
+      echo "red-check.sh could not run a passing Rego test, and printed: $out" >&2
+      exit 1
+      ;;
+    *"- engines/rego/tests/x_test.rego test_real_one"*) ;;
+    *)
+      echo "red-check.sh should list test_real_one, and printed: $out" >&2
+      exit 1
+      ;;
+  esac
+else
+  echo "opa is not on PATH, skipping the real Rego test"
+fi
