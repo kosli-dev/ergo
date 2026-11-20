@@ -161,6 +161,24 @@ fn root_clauses_keep_each_item_of_a_count_a_root_reads() {
 }
 
 #[test]
+fn root_clauses_say_a_walked_root_that_holds_values_of_more_than_one_kind() {
+    let subject = json!({"id": "t", "items": [{"v": "bob"}]});
+    let input = json!({});
+    let params = json!({"os": [{"name": "bob"}, {"name": 3}]});
+    let said = root_clauses_of(
+        "every items whose v is in $params.os.name exists",
+        &subject,
+        &input,
+        Some(&params),
+    );
+    let text: Vec<&str> = said.iter().map(|(_, text)| text.as_str()).collect();
+    assert_eq!(
+        text,
+        ["$params.os[].name is [\"bob\", 3], which isn't a list of one kind of value"]
+    );
+}
+
+#[test]
 fn a_clause_an_earlier_sentence_gave_is_left_out_and_the_rest_is_kept() {
     let mut said: Vec<String> = Vec::new();
     assert_eq!(
