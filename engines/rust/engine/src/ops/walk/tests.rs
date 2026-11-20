@@ -1259,3 +1259,46 @@ fn an_item_says_once_a_value_its_own_read_and_the_key_of_a_map_it_cant_read_both
         ))]
     );
 }
+
+fn row_of(sentence: &str, subject: Value, params: Value) -> Run {
+    let Check::Walk(walk_check) = lowered(sentence) else {
+        panic!("{sentence} is not every or some");
+    };
+    let input = json!({});
+    let context = ctx(&subject, &input, Some(&params));
+    run(&walk_check, &context)
+}
+
+#[test]
+fn a_walk_row_keeps_roots_and_items_apart() {
+    use crate::ops::clause::Kind;
+    let out = row_of(
+        "every xs.v is at least $params.min",
+        json!({"xs": [{"v": 1}, {"v": 2}, {}]}),
+        json!({"min": "s"}),
+    );
+    let kinds: Vec<Kind> = out.parts.iter().map(|part| part.kind).collect();
+    assert_eq!(kinds, [Kind::Root, Kind::Root, Kind::Item]);
+    assert_eq!(out.parts[0].text, "$params.min is \"s\", which isn't a number");
+    assert_eq!(out.parts[2].name, "item 3 of xs");
+    assert_eq!(out.parts[2].said[0].text, "v is missing");
+    assert_eq!(
+        out.message.as_deref(),
+        Some("$params.min is \"s\", which isn't a number; item 3 of xs: v is missing")
+    );
+}
+
+#[test]
+fn an_item_value_that_holds_a_semicolon_or_an_and_stays_whole_in_its_clause() {
+    use crate::ops::clause::Kind;
+    let out = row_of(
+        "every xs.v is \"a\"",
+        json!({"xs": [{"v": "p; q, and r"}]}),
+        json!({}),
+    );
+    assert_eq!(out.parts.len(), 1);
+    assert_eq!(out.parts[0].kind, Kind::Item);
+    assert_eq!(out.parts[0].name, "item 1 of xs");
+    assert_eq!(out.parts[0].said.len(), 1);
+    assert_eq!(out.parts[0].said[0].text, "v is \"p; q, and r\"");
+}

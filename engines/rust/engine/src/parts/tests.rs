@@ -255,3 +255,49 @@ fn an_option_written_as_one_string_points_at_the_option() {
         vec!["$policy:/requirements/r/checks/c/any_of/o"]
     );
 }
+
+fn record(item: &str, path: &str, cause: &str, text: &str) -> Value {
+    json!({
+        "path": path,
+        "item": item,
+        "cause": cause,
+        "value": 1,
+        "locations": [],
+        "ergo/text": text,
+    })
+}
+
+#[test]
+fn an_item_entry_says_its_clauses_without_its_name() {
+    use crate::ops::clause::Kind;
+    let item = said_clause("item 1 of xs", Cause::Value, "item 1 of xs: w is 2");
+    assert_eq!((item.kind, item.said[0].text.as_str()), (Kind::Item, "w is 2"));
+    let root = said_clause("item 2 of xs", Cause::Value, "$params.min is \"s\"");
+    assert_eq!(root.kind, Kind::Root);
+    let list = said_clause("xs", Cause::Absent, "xs: is missing");
+    assert_eq!((list.kind, list.said[0].text.as_str()), (Kind::List, "is missing"));
+    let walked = walk_entries(&[
+        record("item 1 of xs", "xs[0].v", "value", "item 1 of xs: v is \"p; q\""),
+        record("item 1 of xs", "xs[0].w", "value", "item 1 of xs: w is 2"),
+        record("item 2 of xs", "xs[1].v", "unusable", "$params.min is \"s\""),
+        record("xs", "xs", "absent", "xs: is missing"),
+    ]);
+    assert_eq!(walked.roots, ["$params.min is \"s\""]);
+    let said: Vec<(&str, &str)> = walked
+        .entries
+        .iter()
+        .map(|entry| match entry {
+            Failure::Item { part, .. } | Failure::List(part) => {
+                (part.name.as_str(), part.message.as_str())
+            }
+            _ => panic!("an entry that is neither an item nor a list"),
+        })
+        .collect();
+    assert_eq!(
+        said,
+        [
+            ("item 1 of xs", "v is \"p; q\"; w is 2"),
+            ("xs", "is missing"),
+        ]
+    );
+}
