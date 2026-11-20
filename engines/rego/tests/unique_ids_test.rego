@@ -71,3 +71,13 @@ test_a_child_and_a_parent_without_an_id_are_named_from_where_they_were_read if {
 		["$unique_ancestor_ids", "item 2 of arts: id is missing", ["/arts/1"]],
 	]
 }
+
+test_an_id_read_through_a_null_field_fails_as_null if {
+	r := unique_of({"thing": {"from": "ds", "identified_by": "meta.id"}}, {"ds": [{"meta": null}]})
+	r.cause == "null"
+}
+
+test_a_subject_picked_by_position_without_an_id_is_an_item if {
+	r := unique_of({"thing": {"from": "first of ds", "identified_by": "id"}}, {"ds": [{}]})
+	[r.failures[0].kind, r.failures[0].name, r.failures[0].message] == ["item", "item 1 of ds", "id is missing"]
+}

@@ -1977,6 +1977,17 @@ fn an_id_read_through_a_field_says_what_stopped_it_as_a_check_would() {
         row["message"],
         json!("item 1 of ds: meta is 3, which isn't an object; item 2 of ds: meta is null; item 3 of ds: meta.id is missing")
     );
+    assert_eq!(row["failures"][1]["cause"], json!("null"));
+}
+
+#[test]
+fn a_subject_picked_by_position_without_an_id_is_an_item() {
+    let row = unique_row(
+        json!({"thing": {"from": "first of ds", "identified_by": "id"}}),
+        json!({"ds": [{}]}),
+    );
+    assert_eq!(row["failures"][0]["kind"], json!("item"));
+    assert_eq!(row["failures"][0]["name"], json!("item 1 of ds"));
 }
 
 #[test]

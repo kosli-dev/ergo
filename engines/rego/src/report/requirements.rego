@@ -632,7 +632,7 @@ _min_subjects_cause(doc, req, _) := _from_cause(doc, req) if {
 	_from_unreadable(req)
 }
 
-_unique_ids_row(doc, raw, refs, req, req_name) := _with_id_faults(_unique_ids_base(raw, refs, req, req_name), _id_fault_places(doc, raw, refs, req), doc, req, _id_keys(req))
+_unique_ids_row(doc, raw, refs, req, req_name) := _with_id_faults(_unique_ids_base(raw, refs, req, req_name), _id_fault_places(doc, raw, refs, req), doc, req, [k | some k in _id_keys(req); is_string(k)])
 
 _unique_ids_base(raw, refs, req, req_name) := {
 	"requirement": req_name,

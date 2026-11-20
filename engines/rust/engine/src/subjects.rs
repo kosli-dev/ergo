@@ -2229,7 +2229,21 @@ fn id_fault(env: &Env, lowered: &Lowered, judged: &Judged, anc: &[Anc]) -> Optio
             },
             &ctx,
         );
-        let cause = read.outcome.cause().unwrap_or(Cause::Null);
+        let cause = match read.outcome.cause() {
+            Some(Cause::Absent)
+                if ops::message::stops_at_a_null(
+                    &Path {
+                        start: Start::Subject,
+                        steps: steps.clone(),
+                    },
+                    &ctx,
+                ) =>
+            {
+                Cause::Null
+            }
+            Some(cause) => cause,
+            None => Cause::Null,
+        };
         let stop = read
             .location
             .as_ref()
