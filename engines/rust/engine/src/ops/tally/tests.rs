@@ -1955,3 +1955,15 @@ fn a_count_after_a_side_says_three_items_and_then_and_n_more() {
         "$params.n is missing, and item 1 of items: v is missing; item 2 of items: v is missing; item 3 of items: v is missing; and 1 more"
     );
 }
+
+#[test]
+fn two_sums_in_a_row_each_say_their_own_items_joined_with_and() {
+    assert_eq!(
+        row_message(
+            "sum of items.n plus sum of items.m is 100",
+            json!([{"n": "y", "m": "z"}]),
+            json!({}),
+        ),
+        "item 1 of items: n is \"y\", which isn't a number, and item 1 of items: m is \"z\", which isn't a number"
+    );
+}
