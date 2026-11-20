@@ -431,7 +431,9 @@ fn compare_unfit(check: &Check, reference: &Path, value: &Value) -> bool {
     use crate::ops::compare::Cmp;
     match check {
         Check::Compare(compare) => {
-            let kind = if compare.within.is_some() {
+            let kind = if compare.ignoring.is_some() {
+                Some("text")
+            } else if compare.within.is_some() {
                 Some("number")
             } else {
                 match compare.cmp {

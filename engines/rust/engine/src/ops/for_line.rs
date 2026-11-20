@@ -3700,6 +3700,15 @@ fn equals_kind_fault(check: &Check, root: &Path, read: &path::Read) -> Option<St
         Check::Equals(equals) => (&equals.path, &equals.value, false),
         Check::Compare(super::compare::Compare {
             left: super::compare::Side::Path(path),
+            cmp: super::compare::Cmp::Eq | super::compare::Cmp::Ne,
+            ignoring: Some(_),
+            ..
+        }) => {
+            return (path == root && !value.is_string())
+                .then(|| super::message::isnt(&crate::name::name(root), value, "text"));
+        }
+        Check::Compare(super::compare::Compare {
+            left: super::compare::Side::Path(path),
             right,
             cmp: super::compare::Cmp::Eq | super::compare::Cmp::Ne,
             within,
