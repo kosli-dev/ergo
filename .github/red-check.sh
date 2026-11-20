@@ -99,7 +99,7 @@ default_rust() {
 
 default_rego() {
   out=$work/opa.out
-  (cd "$1" && opa test engines/rego dist spec:spec examples:examples --ignore src --timeout 120s --run "^$2\$" > "$out" 2>&1) || return 1
+  (cd "$1" && opa test engines/rego dist spec:spec examples:examples --ignore src --timeout 120s --run "(^|\.)$2\$" > "$out" 2>&1) || return 1
   if grep -q 'PASS: [1-9]' "$out"; then return 0; fi
   return 3
 }
