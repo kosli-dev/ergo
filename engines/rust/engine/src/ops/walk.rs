@@ -1222,8 +1222,13 @@ pub(super) fn item_own(
         item = super::tally::told(&name, cause, &text);
     }
     let at = own_at.unwrap_or(said.len());
-    item.said.splice(0..0, said.drain(..at));
-    item.said.extend(said);
+    let after = said.split_off(at);
+    let own = std::mem::take(&mut item.said);
+    for clause in said.into_iter().chain(own).chain(after) {
+        if !item.said.contains(&clause) {
+            item.said.push(clause);
+        }
+    }
     item.cause = Cause::worst(
         item.said
             .iter()
