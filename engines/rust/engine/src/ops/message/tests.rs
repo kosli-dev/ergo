@@ -191,3 +191,46 @@ fn is_in_ignoring_case_says_each_null_value_of_the_list_when_it_fails_as_null() 
         )
     );
 }
+
+#[test]
+fn an_option_line_of_is_in_ignoring_case_says_the_list_that_isnt_text_as_the_sentence_alone_does() {
+    use crate::ops::compare::Ignoring;
+    use crate::ops::lists::{In, Right};
+    use crate::path::{Located, Location, Path, Start, Step};
+    let key = |start: Start, name: &str| Path {
+        start,
+        steps: vec![Step::Key(name.to_string())],
+    };
+    let check = crate::ops::Check::In(In {
+        path: key(Start::Subject, "x"),
+        values: Right::Ref(key(Start::Params, "l")),
+        not: false,
+        ignoring: Some(Ignoring {
+            case: false,
+            spaces: true,
+        }),
+    });
+    let params = json!({"l": ["a", null, 3, "Q"]});
+    for subject in [json!({"x": " A "}), json!({"x": 3}), json!({}), json!({"x": null})] {
+        let input = json!({"things": [subject]});
+        let ctx = crate::path::Ctx {
+            label: None,
+            item_by_item: false,
+            in_option: true,
+            subject: Located {
+                value: &input["things"][0],
+                location: Location::input_root().key("things").index(0),
+            },
+            input: &input,
+            params: Some(&params),
+            aliases: std::collections::BTreeMap::new(),
+        };
+        let verdict = crate::ops::run(&check, &ctx);
+        let line = super::option_line_text(&check, &ctx, None, &verdict);
+        assert_eq!(line, super::message(&check, &ctx, &verdict), "{subject}");
+        assert!(
+            line.contains("item 2 of $params.l is null, and item 3 of $params.l is 3, which isn't text"),
+            "{subject}: {line}"
+        );
+    }
+}
