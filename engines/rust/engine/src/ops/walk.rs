@@ -1111,6 +1111,15 @@ pub(super) fn item_own(
     walked: &Walked,
     outer: &Ctx,
 ) -> Option<Clause> {
+    if focus_lost(item, check) {
+        let mut at = outer.clone();
+        at.subject = item.item.clone();
+        at.label = None;
+        let verdict = lost_verdict(item, &at);
+        let text = message::message(&focus_check(item), &at, &verdict);
+        let name = walked.item_name(&item.item_segs);
+        return Some(super::tally::told(&name, verdict.cause, &text));
+    }
     let focus = focus_ctx(item, outer);
     let name = walked.item_name(focus_segs(item, check));
     let paths: Vec<&Path> = check.paths().into_iter().chain(listed_refs(check)).collect();
