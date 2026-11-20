@@ -5140,5 +5140,199 @@
    "q": "s"
   },
   "want": "$params.q is \"s\", which isn't a number; item 2 of xs: v is missing; item 3 of xs: v is \"x\", which isn't a number; item 4 of xs: v is null"
+ },
+ {
+  "name": "root left of is in/tags mixed",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of xs whose $params.k is in tags is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "tags": [
+        1,
+        "x"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "params": {}
+ },
+ {
+  "name": "root left of contains/items not objects",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of xs whose $params.l contains v is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      "s",
+      null
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "want": "$params.l is missing; item 1 of xs is \"s\", which isn't an object; item 2 of xs is null, which isn't an object"
+ },
+ {
+  "name": "root left of matches/items not objects",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of xs whose $params.s matches v is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      "s",
+      null
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "want": "$params.s is missing; item 1 of xs is \"s\", which isn't an object; item 2 of xs is null, which isn't an object"
+ },
+ {
+  "name": "root key right of is in/no k, no m",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of rs whose zz is in $input.m named by $input.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "rs": [
+      {
+       "zz": 1
+      }
+     ]
+    }
+   ]
+  },
+  "params": {}
+ },
+ {
+  "name": "root key and value before it/no k, no m",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of rs whose zz is $input.m named by $input.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "rs": [
+      {
+       "zz": 1
+      }
+     ]
+    }
+   ]
+  },
+  "params": {}
+ },
+ {
+  "name": "list input key/item not an object",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "$input",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of rs whose zz is m named by $input.k is 1"
+     }
+    }
+   }
+  },
+  "input": [
+   {
+    "id": "t",
+    "rs": [
+     {
+      "zz": 1
+     },
+     "s"
+    ]
+   }
+  ],
+  "params": {}
  }
 ]
