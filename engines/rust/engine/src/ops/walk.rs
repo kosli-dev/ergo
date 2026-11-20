@@ -1191,22 +1191,33 @@ pub(super) fn item_own(
     let alone = stood_in(check, &focus, blocked)
         .map(|alone| (run_check(&alone, &focus), alone))
         .filter(|(verdict, _)| verdict.cause.is_failure());
-    if let Some((verdict, alone)) = alone {
-        let text = message::message(&alone, &focus, &verdict);
-        item = super::tally::told(&name, verdict.cause, &text);
-    } else if !focus.subject.value.is_object()
-        && check
-            .paths()
-            .into_iter()
-            .chain(listed_refs(check))
-            .any(|path| {
-                matches!(path.start, Start::Subject | Start::Own)
-                    && matches!(path.steps.first(), Some(Step::Key(_)))
-                    && !blocked(path)
-            })
-    {
+    let on_item = |path: &Path| {
+        matches!(path.start, Start::Subject | Start::Own)
+            && matches!(path.steps.first(), Some(Step::Key(_)))
+    };
+    let off_focus = |key_of_root: bool| {
+        !focus.subject.value.is_object()
+            && check
+                .paths()
+                .into_iter()
+                .chain(listed_refs(check))
+                .any(|path| {
+                    let keyed = |step: &Step| {
+                        matches!(step, Step::Field(key) | Step::Ref(key) if on_item(key))
+                    };
+                    if key_of_root {
+                        blocked(path) && path.steps.iter().any(keyed)
+                    } else {
+                        on_item(path) && !blocked(path)
+                    }
+                })
+    };
+    if off_focus(true) || (alone.is_none() && off_focus(false)) {
         let text = message::isnt(&name, focus.subject.value, "an object");
         item = Clause::item(&name, Cause::NotAnObject, text, Vec::new());
+    } else if let Some((verdict, alone)) = alone {
+        let text = message::message(&alone, &focus, &verdict);
+        item = super::tally::told(&name, verdict.cause, &text);
     } else if let Some((cause, text)) = own_list_fault(check, &focus, blocked) {
         item = super::tally::told(&name, cause, &text);
     }
