@@ -16,6 +16,7 @@ fn check(cmp: Cmp, right: Side) -> Compare {
         right,
         cmp,
         within: None,
+        ignoring: None,
     }
 }
 
@@ -241,6 +242,7 @@ fn ne_with_within_passes_only_on_numbers_further_apart() {
         right: field("b"),
         cmp: Cmp::Ne,
         within: Some(number("1")),
+        ignoring: None,
     };
     assert_eq!(cause(json!({"a": 1, "b": 5}), &far), Cause::Satisfied);
     assert_eq!(cause(json!({"a": 1, "b": 2}), &far), Cause::Value);
@@ -356,6 +358,7 @@ fn within_passes_on_numbers_at_most_that_far_apart() {
             right: Side::Value(parsed(b)),
             cmp: Cmp::Eq,
             within: Some(number(w)),
+            ignoring: None,
         };
         cause(json!({"a": parsed(a)}), &c)
     };
@@ -377,6 +380,7 @@ fn within_fails_as_unusable_when_the_numbers_are_too_far_apart_to_work_out_exact
         right: Side::Value(parsed("1e-9000")),
         cmp: Cmp::Eq,
         within: Some(number("1")),
+        ignoring: None,
     };
     assert_eq!(cause(json!({"a": parsed("1e9000")}), &c), Cause::Unusable);
     assert_eq!(cause(json!({"a": parsed("0.5")}), &c), Cause::Unusable);
@@ -389,6 +393,7 @@ fn within_fails_as_unusable_on_anything_but_two_numbers() {
         right: field("b"),
         cmp: Cmp::Eq,
         within: Some(number("1")),
+        ignoring: None,
     };
     assert_eq!(cause(json!({"a": "1", "b": 1}), &c), Cause::Unusable);
     assert_eq!(cause(json!({"a": "1", "b": "1"}), &c), Cause::Unusable);
@@ -599,6 +604,7 @@ fn a_compare_or_tally_side_is_never_a_ref_itself_but_its_named_by_refs_are() {
             right: Side::Path(right),
             cmp: Cmp::Lte,
             within: None,
+            ignoring: None,
         })
     };
     assert!(compare(params_hi.clone()).refs().is_empty());
@@ -615,4 +621,98 @@ fn a_compare_or_tally_side_is_never_a_ref_itself_but_its_named_by_refs_are() {
         },
     });
     assert_eq!(tally.refs(), vec![i]);
+}
+
+const CASE: Ignoring = Ignoring {
+    case: true,
+    spaces: false,
+};
+const SPACES: Ignoring = Ignoring {
+    case: false,
+    spaces: true,
+};
+const BOTH: Ignoring = Ignoring {
+    case: true,
+    spaces: true,
+};
+
+#[test]
+fn ignoring_case_lowers_one_code_point_at_a_time_as_opa_lower_does() {
+    assert_eq!(CASE.prepare("In Progress"), "in progress");
+    assert_eq!(CASE.prepare("\u{130}"), "i");
+    assert_eq!(
+        CASE.prepare("\u{3a3}\u{391}\u{3a3}"),
+        "\u{3c3}\u{3b1}\u{3c3}"
+    );
+    assert_eq!(CASE.prepare("\u{1e9e}"), "\u{df}");
+    assert_eq!(CASE.prepare("\u{212a}"), "k");
+    assert_ne!(CASE.prepare("STRASSE"), "stra\u{df}e");
+    assert_eq!(CASE.prepare(" A "), " a ");
+}
+
+#[test]
+fn ignoring_surrounding_spaces_trims_unicode_white_space_only_at_the_ends() {
+    assert_eq!(SPACES.prepare("\u{a0}A b\u{85}"), "A b");
+    assert_eq!(SPACES.prepare("\u{3000}a\u{2028}"), "a");
+    assert_eq!(SPACES.prepare("\t\n a \r"), "a");
+    assert_eq!(SPACES.prepare("\u{200b}a\u{feff}"), "\u{200b}a\u{feff}");
+    assert_eq!(SPACES.prepare(" in  progress "), "in  progress");
+    assert_eq!(BOTH.prepare("  IN Progress\u{a0}"), "in progress");
+}
+
+fn ignoring(cmp: Cmp, right: Side, ignoring: Ignoring) -> Compare {
+    Compare {
+        ignoring: Some(ignoring),
+        ..check(cmp, right)
+    }
+}
+
+#[test]
+fn is_ignoring_case_compares_the_prepared_texts() {
+    let is = ignoring(Cmp::Eq, Side::Value(json!("in progress")), BOTH);
+    assert_eq!(cause(json!({"a": "  IN Progress "}), &is), Cause::Satisfied);
+    assert_eq!(cause(json!({"a": "done"}), &is), Cause::Value);
+    let not = ignoring(Cmp::Ne, Side::Value(json!("in progress")), BOTH);
+    assert_eq!(cause(json!({"a": "In Progress"}), &not), Cause::Value);
+    assert_eq!(cause(json!({"a": "done"}), &not), Cause::Satisfied);
+    let case_only = ignoring(Cmp::Eq, field("b"), CASE);
+    assert_eq!(
+        cause(json!({"a": "A", "b": "a"}), &case_only),
+        Cause::Satisfied
+    );
+    assert_eq!(
+        cause(json!({"a": " A", "b": "a"}), &case_only),
+        Cause::Value
+    );
+}
+
+#[test]
+fn is_ignoring_case_fails_as_unusable_on_a_value_that_isnt_text_on_either_side() {
+    for cmp in [Cmp::Eq, Cmp::Ne] {
+        let fields = ignoring(cmp, field("b"), CASE);
+        for subject in [
+            json!({"a": 3, "b": "3"}),
+            json!({"a": "3", "b": 3}),
+            json!({"a": true, "b": "true"}),
+            json!({"a": ["a"], "b": "a"}),
+            json!({"a": "a", "b": {"a": 1}}),
+        ] {
+            assert_eq!(
+                cause(subject.clone(), &fields),
+                Cause::Unusable,
+                "{subject}"
+            );
+        }
+    }
+}
+
+#[test]
+fn is_ignoring_case_fails_as_absent_or_null_on_either_side_and_never_passes_then() {
+    for cmp in [Cmp::Eq, Cmp::Ne] {
+        let fields = ignoring(cmp, field("b"), CASE);
+        assert_eq!(cause(json!({"b": "a"}), &fields), Cause::Absent);
+        assert_eq!(cause(json!({"a": null, "b": "a"}), &fields), Cause::Null);
+        assert_eq!(cause(json!({"a": "a"}), &fields), Cause::Absent);
+        assert_eq!(cause(json!({"a": "a", "b": null}), &fields), Cause::Null);
+    }
 }

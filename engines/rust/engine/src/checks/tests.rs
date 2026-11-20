@@ -70,6 +70,7 @@ fn compare_to(path: crate::path::Path) -> Check {
         right: Side::Path(path),
         cmp: Cmp::Eq,
         within: None,
+        ignoring: None,
     })
 }
 
@@ -82,6 +83,7 @@ fn in_list_at(path: crate::path::Path) -> Check {
         },
         values: Right::Ref(path),
         not: false,
+        ignoring: None,
     })
 }
 

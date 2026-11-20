@@ -36,6 +36,7 @@ fn is_in(subject: Value, values: Right, not: bool) -> Cause {
         path: x(),
         values,
         not,
+        ignoring: None,
     };
     on(subject, None, |ctx| run_in(&check, ctx)).cause
 }
@@ -123,6 +124,7 @@ fn a_field_and_a_ref_on_the_right_are_both_inputs() {
         path: x(),
         values: Right::Field(key_path(Start::Subject, &["ys"])),
         not: false,
+        ignoring: None,
     };
     let names = |v: Verdict| v.inputs.into_iter().map(|i| i.name).collect::<Vec<_>>();
     assert_eq!(
@@ -135,6 +137,7 @@ fn a_field_and_a_ref_on_the_right_are_both_inputs() {
         path: x(),
         values: Right::Ref(key_path(Start::Params, &["k"])),
         not: false,
+        ignoring: None,
     };
     let v = on(json!({"x": "a"}), Some(json!({"k": ["a"]})), |ctx| {
         run_in(&reference, ctx)
@@ -149,6 +152,7 @@ fn a_ref_that_is_missing_or_null_fails_with_its_outcome_whatever_the_field_holds
         path: x(),
         values: Right::Ref(key_path(Start::Params, &["k"])),
         not: false,
+        ignoring: None,
     };
     assert_eq!(
         on(json!({}), Some(json!({})), |ctx| run_in(&check, ctx)).cause,
@@ -180,6 +184,7 @@ fn a_ref_after_in_contains_and_matches_is_listed_after_the_field_whatever_the_ca
             path: x(),
             values: ref_k(),
             not: false,
+            ignoring: None,
         };
         let contains_check = Contains {
             path: x(),
@@ -842,6 +847,7 @@ fn a_ref_that_walks_a_list_of_objects_reads_the_params_the_same_way() {
         path: x(),
         values: params_deps_name(),
         not: false,
+        ignoring: None,
     };
     let params = Some(json!({"deps": [{"name": "click"}, {"name": "jinja2"}]}));
     assert_eq!(

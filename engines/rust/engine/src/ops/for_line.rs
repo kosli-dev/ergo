@@ -3703,6 +3703,7 @@ fn equals_kind_fault(check: &Check, root: &Path, read: &path::Read) -> Option<St
             right,
             cmp: super::compare::Cmp::Eq | super::compare::Cmp::Ne,
             within,
+            ignoring: None,
         }) => match (right, within) {
             (_, Some(_)) => (path, &Value::Null, true),
             (super::compare::Side::Value(wanted), None) => (path, wanted, false),

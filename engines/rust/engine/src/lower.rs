@@ -611,6 +611,7 @@ fn number(text: &str) -> Result<Value, Vec<String>> {
 const AFTER_QUANTIFIER: &str = "count of, sum of and plus after every or some aren't supported yet";
 
 fn phrase_terms(phrase: &s::Phrase) -> &[s::Term] {
+    let phrase = phrase.bare();
     match phrase {
         s::Phrase::Is { operand, .. }
         | s::Phrase::Order { operand, .. }
@@ -633,6 +634,7 @@ fn one_path(terms: &[s::Term]) -> bool {
 }
 
 fn phrase_words(phrase: &s::Phrase) -> &'static str {
+    let phrase = phrase.bare();
     match phrase {
         s::Phrase::Contains { not: false, .. } => "contains",
         s::Phrase::Contains { not: true, .. } => "does not contain",
@@ -679,6 +681,7 @@ fn phrase_words(phrase: &s::Phrase) -> &'static str {
 }
 
 fn argument_problems(phrase: &s::Phrase) -> Vec<String> {
+    let phrase = phrase.bare();
     let terms = phrase_terms(phrase);
     if terms.is_empty()
         || one_path(terms)
@@ -696,6 +699,7 @@ const JOINED_AFTER_QUANTIFIER: &str =
     "\"followed by\" isn't supported yet after every or some, or in a whose";
 
 fn joined_problems(phrase: &s::Phrase) -> Vec<String> {
+    let phrase = phrase.bare();
     let joined = matches!(
         phrase,
         s::Phrase::Is {

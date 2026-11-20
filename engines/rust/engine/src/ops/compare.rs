@@ -41,6 +41,38 @@ pub struct Compare {
     pub right: Side,
     pub cmp: Cmp,
     pub within: Option<Number>,
+    pub ignoring: Option<Ignoring>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Ignoring {
+    pub case: bool,
+    pub spaces: bool,
+}
+
+impl Ignoring {
+    pub fn of(words: tree::Ignoring) -> Ignoring {
+        match words {
+            tree::Ignoring::Case => Ignoring {
+                case: true,
+                spaces: false,
+            },
+            tree::Ignoring::SurroundingSpaces => Ignoring {
+                case: false,
+                spaces: true,
+            },
+            tree::Ignoring::CaseAndSurroundingSpaces | tree::Ignoring::SurroundingSpacesAndCase => {
+                Ignoring {
+                    case: true,
+                    spaces: true,
+                }
+            }
+        }
+    }
+
+    pub fn prepare(self, text: &str) -> String {
+        text.to_string()
+    }
 }
 
 impl Side {
@@ -387,24 +419,41 @@ pub fn lower_phrase(
     scope: &Scope,
 ) -> Option<Result<Check, Vec<String>>> {
     let compare =
-        |operand: &tree::Operand, cmp: Cmp, within: Option<&String>| {
+        |operand: &tree::Operand, cmp: Cmp, within: Option<&String>, ignoring: Option<Ignoring>| {
             let right = operand_side(operand, scope)?;
             let within = within.map(|w| number(w, scope)).transpose();
             Some(joined(joined(scope.left_path(path), right), within).map(
-                |((left, right), within)| match (cmp, right, within) {
-                    (Cmp::Eq, Side::Value(value), None) => {
+                |((left, right), within)| match (cmp, right, within, ignoring) {
+                    (Cmp::Eq, Side::Value(value), None, None) => {
                         Check::Equals(Equals { path: left, value })
                     }
-                    (cmp, right, within) => Check::Compare(Compare {
+                    (cmp, right, within, ignoring) => Check::Compare(Compare {
                         left: Side::Path(left),
                         right,
                         cmp,
                         within,
+                        ignoring,
                     }),
                 },
             ))
         };
     match phrase {
+        tree::Phrase::Ignoring {
+            phrase: inner,
+            ignoring,
+        } => match &**inner {
+            tree::Phrase::Is {
+                not,
+                operand,
+                within: None,
+            } => compare(
+                operand,
+                if *not { Cmp::Ne } else { Cmp::Eq },
+                None,
+                Some(Ignoring::of(*ignoring)),
+            ),
+            _ => None,
+        },
         tree::Phrase::Is {
             not,
             operand,
@@ -413,6 +462,7 @@ pub fn lower_phrase(
             operand,
             if *not { Cmp::Ne } else { Cmp::Eq },
             within.as_ref(),
+            None,
         ),
         tree::Phrase::Order { order, operand } => compare(
             operand,
@@ -423,11 +473,12 @@ pub fn lower_phrase(
                 tree::Order::LessThan => Cmp::Lt,
             },
             None,
+            None,
         ),
-        tree::Phrase::StartsWith(operand) => compare(operand, Cmp::StartsWith, None),
-        tree::Phrase::EndsWith(operand) => compare(operand, Cmp::EndsWith, None),
-        tree::Phrase::NotStartsWith(operand) => compare(operand, Cmp::NotStartsWith, None),
-        tree::Phrase::NotEndsWith(operand) => compare(operand, Cmp::NotEndsWith, None),
+        tree::Phrase::StartsWith(operand) => compare(operand, Cmp::StartsWith, None, None),
+        tree::Phrase::EndsWith(operand) => compare(operand, Cmp::EndsWith, None, None),
+        tree::Phrase::NotStartsWith(operand) => compare(operand, Cmp::NotStartsWith, None, None),
+        tree::Phrase::NotEndsWith(operand) => compare(operand, Cmp::NotEndsWith, None, None),
         tree::Phrase::Alphabetically {
             after,
             or_equal,
@@ -440,6 +491,7 @@ pub fn lower_phrase(
                 (false, true) => Cmp::AlphabeticallyOnOrBefore,
                 (true, true) => Cmp::AlphabeticallyOnOrAfter,
             },
+            None,
             None,
         ),
         tree::Phrase::Between { not, min, max } => Some(

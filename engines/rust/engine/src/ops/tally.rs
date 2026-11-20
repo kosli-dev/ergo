@@ -392,6 +392,7 @@ fn decide(test: &Test, left: &Value, right: Option<Value>, ctx: &Ctx) -> Cause {
                 right: compare::Side::Value(right),
                 cmp: *cmp,
                 within: within.clone(),
+                ignoring: None,
             };
             compare::run(&compare, ctx).cause
         }
@@ -1401,6 +1402,7 @@ pub fn without_roots(check: &Check) -> Option<Check> {
                 right: fill(&c.right, &value),
                 cmp: c.cmp,
                 within: c.within.clone(),
+                ignoring: c.ignoring,
             }))
         }
         Check::CompareTime(c) if root(&c.left) != root(&c.right) => {

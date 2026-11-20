@@ -37,6 +37,7 @@ pub struct In {
     pub path: Path,
     pub values: Right,
     pub not: bool,
+    pub ignoring: Option<super::compare::Ignoring>,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -716,8 +717,25 @@ pub fn lower_phrase(
                     path,
                     values,
                     not: *not,
+                    ignoring: None,
                 })
             }),
+        tree::Phrase::Ignoring {
+            phrase: inner,
+            ignoring,
+        } => match &**inner {
+            tree::Phrase::OneOf { not, list } => {
+                joined(left(), list_right(list, scope)).map(|(path, values)| {
+                    Check::In(In {
+                        path,
+                        values,
+                        not: *not,
+                        ignoring: Some(super::compare::Ignoring::of(*ignoring)),
+                    })
+                })
+            }
+            _ => return None,
+        },
         tree::Phrase::Contains { not, operand } => {
             contains(operand_right(operand, scope)?.map(Wanted::One), *not)
         }

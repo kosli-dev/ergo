@@ -1716,6 +1716,7 @@ pub(super) fn root_kind_fault(check: &Check, root: &Path, ctx: &Ctx) -> Option<S
             right: super::compare::Side::Path(right.clone()),
             cmp: *cmp,
             within: within.clone(),
+            ignoring: None,
         });
         return root_kind_fault(&compare, root, ctx);
     }
