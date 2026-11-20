@@ -1954,3 +1954,54 @@ fn a_counts_assertion_keeps_a_key_and_a_base_that_hold_a_semicolon_whole() {
     );
     assert_eq!(part.message, "$params.k is [\"x; y\"], which isn't text");
 }
+
+fn walk_assertion(sentence: &str, input: Value, params: Value) -> crate::parts::Part {
+    let tree = ergo_policy_sentences::parse_check(sentence).unwrap();
+    let check =
+        crate::lower::lower_assertion(&tree.assertions[0], &crate::lower::Scope::new()).unwrap();
+    let crate::ops::Check::Walk(walk) = &check else {
+        panic!("{sentence} is not every or some");
+    };
+    let ctx = crate::path::Ctx {
+        label: Some("thing".to_string()),
+        item_by_item: false,
+        in_option: false,
+        subject: crate::path::Located {
+            value: &input["things"][0],
+            location: crate::path::Location::input_root().key("things").index(0),
+        },
+        input: &input,
+        params: Some(&params),
+        aliases: std::collections::BTreeMap::new(),
+    };
+    let run = crate::ops::walk::run(walk, &ctx);
+    super::walk_part(
+        sentence,
+        run.verdict.cause,
+        &[],
+        run.message.as_deref().unwrap_or_default(),
+        &run.failed_items,
+        &run.rich,
+        Some(&run.parts),
+        walk,
+        &ctx,
+        true,
+    )
+}
+
+#[test]
+fn a_walks_assertion_says_a_root_after_the_phrase_once_holds_it_as_an_input_and_lists_each_item() {
+    let part = walk_assertion(
+        "every xs.v is at least $params.min",
+        json!({"things": [{"xs": [{}, {}, {}, {}, {}]}]}),
+        json!({"min": "s"}),
+    );
+    assert_eq!(part.message, "$params.min is \"s\", which isn't a number");
+    assert_eq!(part.cause, crate::cause::Cause::Unusable);
+    assert!(
+        part.inputs
+            .iter()
+            .any(|input| input["name"] == "$params.min")
+    );
+    assert_eq!(part.failures.len(), 5);
+}

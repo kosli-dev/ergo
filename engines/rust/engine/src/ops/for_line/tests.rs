@@ -1570,7 +1570,7 @@ fn two_roots_rows(pos: Value, os: Value) -> Vec<(String, Value)> {
 }
 
 #[test]
-fn two_roots_in_one_whose_are_each_named_in_the_order_the_sentence_reads_them() {
+fn two_roots_in_one_whose_are_named_worst_cause_first_and_then_by_name() {
     let kinds = "which isn't a list of one kind of value";
     let pos = format!("pos[].name is [\"bob\", 3], {kinds}");
     let params = format!("$params.os[].name is [\"bob\", 3], {kinds}");
@@ -1580,7 +1580,7 @@ fn two_roots_in_one_whose_are_each_named_in_the_order_the_sentence_reads_them() 
     assert_eq!(
         two_roots_rows(mixed.clone(), mixed.clone()),
         vec![
-            unusable(format!("{pos}; {params}")),
+            unusable(format!("{params}; {pos}")),
             unusable(format!("{params}; {pos}")),
             unusable(format!("{pos}; {params}")),
         ]
@@ -1588,7 +1588,7 @@ fn two_roots_in_one_whose_are_each_named_in_the_order_the_sentence_reads_them() 
     assert_eq!(
         two_roots_rows(json!([{"name": "bob"}, {}]), mixed),
         vec![
-            unusable(format!("{missing}; {params}")),
+            unusable(format!("{params}; {missing}")),
             unusable(format!("{params}; {missing}")),
             unusable(format!("{missing}; {params}")),
         ]

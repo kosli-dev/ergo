@@ -1361,12 +1361,12 @@ fn a_whose_root_that_cant_be_read_leaves_no_failed_item_when_the_item_reads_fine
     }
 }
 
-fn failed_items_with(
+fn ran_with(
     scope: &Scope,
     sentence: &str,
     input: Value,
     aliases: &[(&str, Located)],
-) -> Vec<Value> {
+) -> (Vec<Value>, Vec<(String, Value, Vec<String>)>) {
     let tree = s::parse_check(sentence).unwrap();
     let check = crate::lower::lower_assertion(&tree.assertions[0], scope).unwrap();
     let ctx = Ctx {
@@ -1384,11 +1384,19 @@ fn failed_items_with(
             .map(|(name, at)| (name.to_string(), at.clone()))
             .collect(),
     };
-    crate::ops::run_full(&check, &ctx).failed_items.unwrap()
+    let ran = crate::ops::run_full(&check, &ctx);
+    let inputs = ran
+        .verdict
+        .inputs
+        .into_iter()
+        .map(|input| (input.name, input.value, input.locations))
+        .collect();
+    (ran.failed_items.unwrap(), inputs)
 }
 
 #[test]
-fn a_whose_names_a_part_of_the_subject_by_its_alias_with_the_subjects_location() {
+fn a_whose_that_only_a_part_of_the_subject_stops_lists_no_item_and_reads_the_part_at_the_subjects_location()
+ {
     let scope = Scope::new().with_part(
         "w",
         crate::lower::PartDef {
@@ -1397,20 +1405,23 @@ fn a_whose_names_a_part_of_the_subject_by_its_alias_with_the_subjects_location()
         },
     );
     let input = json!({"things": [{"id": "t", "meta": {}, "items": [{"lo": 1, "s": "ok"}]}]});
-    let failed = failed_items_with(
+    let (failed, inputs) = ran_with(
         &scope,
         "every items whose lo is at least w exists",
         input,
         &[],
     );
-    assert_eq!(
-        named(&failed),
-        [("w", &json!(null), &json!("/things/0/meta"))]
-    );
+    assert!(failed.is_empty());
+    assert!(inputs.contains(&(
+        "w".to_string(),
+        json!(null),
+        vec!["/things/0/meta".to_string()]
+    )));
 }
 
 #[test]
-fn a_whose_names_a_parents_field_with_the_parents_location() {
+fn a_whose_that_only_a_parents_field_stops_lists_no_item_and_reads_the_field_at_the_parents_location()
+ {
     let scope = Scope::new().with_parent("art", BTreeMap::new());
     let input =
         json!({"arts": [{"id": "a"}], "things": [{"id": "t", "items": [{"lo": 1, "s": "ok"}]}]});
@@ -1418,13 +1429,18 @@ fn a_whose_names_a_parents_field_with_the_parents_location() {
         value: &input["arts"][0],
         location: Location::input_root().key("arts").index(0),
     };
-    let failed = failed_items_with(
+    let (failed, inputs) = ran_with(
         &scope,
         "every items whose lo is at least art.q exists",
         input.clone(),
         &[("art", parent)],
     );
-    assert_eq!(named(&failed), [("art.q", &json!(null), &json!("/arts/0"))]);
+    assert!(failed.is_empty());
+    assert!(inputs.contains(&(
+        "art.q".to_string(),
+        json!(null),
+        vec!["/arts/0".to_string()]
+    )));
 }
 
 fn verdict_in(

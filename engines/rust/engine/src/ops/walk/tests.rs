@@ -1278,13 +1278,13 @@ fn a_walk_row_keeps_roots_and_items_apart() {
         json!({"min": "s"}),
     );
     let kinds: Vec<Kind> = out.parts.iter().map(|part| part.kind).collect();
-    assert_eq!(kinds, [Kind::Root, Kind::Root, Kind::Item]);
+    assert_eq!(kinds, [Kind::Root, Kind::Item]);
     assert_eq!(
         out.parts[0].text,
         "$params.min is \"s\", which isn't a number"
     );
-    assert_eq!(out.parts[2].name, "item 3 of xs");
-    assert_eq!(out.parts[2].said[0].text, "v is missing");
+    assert_eq!(out.parts[1].name, "item 3 of xs");
+    assert_eq!(out.parts[1].said[0].text, "v is missing");
     assert_eq!(
         out.message.as_deref(),
         Some("$params.min is \"s\", which isn't a number; item 3 of xs: v is missing")
@@ -1382,7 +1382,6 @@ fn a_some_says_the_same_as_every() {
 }
 
 #[test]
-#[ignore = "#694 R4-5b: a walk row built from its root, list and item clauses"]
 fn an_every_says_a_root_after_the_phrase_and_then_its_items() {
     assert_eq!(
         said_row(
@@ -1399,7 +1398,6 @@ fn an_every_says_a_root_after_the_phrase_and_then_its_items() {
 }
 
 #[test]
-#[ignore = "#694 R4-5b: a walk row built from its root, list and item clauses"]
 fn a_value_that_holds_a_semicolon_stays_whole_in_a_walk_row() {
     use crate::ops::clause::Kind;
     let out = thing_row(
@@ -1514,5 +1512,29 @@ fn an_every_keeps_its_items_beside_a_missing_key() {
             "$params.k is missing; item 1 of es: v: m is missing; item 2 of es: v: m is null"
                 .to_string()
         )
+    );
+}
+
+#[test]
+fn a_root_value_that_holds_an_and_stays_one_clause_in_a_walk_row() {
+    let out = thing_row(
+        "every xs.v is at least $params.min",
+        json!({"xs": [{"v": 1}, {}]}),
+        json!({"min": "a, and b"}),
+    );
+    let parts: Vec<(Kind, String)> = out
+        .parts
+        .iter()
+        .map(|part| (part.kind, clause::text(std::slice::from_ref(part))))
+        .collect();
+    assert_eq!(
+        parts,
+        [
+            (
+                Kind::Root,
+                "$params.min is \"a, and b\", which isn't a number".to_string()
+            ),
+            (Kind::Item, "item 2 of xs: v is missing".to_string()),
+        ]
     );
 }
