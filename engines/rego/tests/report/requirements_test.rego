@@ -51,6 +51,13 @@ test_an_id_that_ends_at_a_position_is_named_as_a_check_names_it if {
 	p.name == "item 1 of ds[0].meta"
 }
 
+test_an_id_that_ends_at_a_position_on_a_subject_outside_a_list_is_named_from_where_the_subject_was_read if {
+	missing := ergo._id_fault_place({"subject": {"ok": true}, "at": "/art", "c": ["art"]}, {"subject": "d"}, {"art": {"ok": true}}) with ergo._id_of as meta_first
+	missing.text == "item 1 of art.meta is missing"
+	stopped := ergo._id_fault_place({"subject": {"meta": [null]}, "at": "/art/sub", "c": ["art", "sub"]}, {"subject": "d"}, {"art": {"sub": {"meta": [null]}}}) with ergo._id_of as meta_first
+	stopped.text == "item 1 of art.sub.meta is null"
+}
+
 test_subjects_without_an_id_are_named_in_the_order_of_the_subjects_whatever_order_their_ids_are_kept_in if {
 	raw := [{"subject": {}, "at": concat("", ["/ds/", format_int(i, 10)]), "c": ["ds", i]} | some i in numbers.range(0, 11)]
 	refs := {i: {"id": id} | some i, _ in raw; id := _id_or_null(i)}
