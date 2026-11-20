@@ -1457,10 +1457,21 @@ fn told(item: &str, cause: Cause, said: &str) -> Clause {
     }
 }
 
-fn walk_clause(failure: &walk::Failure) -> Clause {
+fn walk_clause(walked: &walk::Walked, failure: &walk::Failure) -> Clause {
+    let under = failure
+        .order
+        .iter()
+        .rposition(|seg| matches!(seg, walk::Seg::Index(_)));
     if crate::parts::is_item(&failure.item) {
         Clause::item(
             &failure.item,
+            failure.cause,
+            failure.msg.clone(),
+            Vec::new(),
+        )
+    } else if let Some(at) = under {
+        Clause::item(
+            &walked.item_name(&failure.order[..=at]),
             failure.cause,
             failure.msg.clone(),
             Vec::new(),
@@ -1652,7 +1663,7 @@ pub fn counted_said(counted: &Counted, ctx: &Ctx, cause: Cause) -> (Vec<Clause>,
             && walked.own_failures()
         {
             out = roots;
-            out.extend(walked.failures.iter().map(walk_clause));
+            out.extend(walked.failures.iter().map(|f| walk_clause(&walked, f)));
             rich.extend(walked.failures.iter().map(walk::Failure::to_rich_json));
             return (out, rich);
         }
@@ -1660,7 +1671,7 @@ pub fn counted_said(counted: &Counted, ctx: &Ctx, cause: Cause) -> (Vec<Clause>,
         let mut found: Vec<(Cause, Clause)> = walked
             .failures
             .iter()
-            .map(|f| (f.cause, walk_clause(f)))
+            .map(|f| (f.cause, walk_clause(&walked, f)))
             .collect();
         let mut records: Vec<(usize, Value)> = walked
             .failures
