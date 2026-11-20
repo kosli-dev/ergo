@@ -698,3 +698,13 @@ fn item_own_is_what_the_item_says_with_a_readable_key_minus_the_key() {
         );
     }
 }
+
+#[test]
+fn item_own_is_what_any_check_says_when_it_reads_no_root() {
+    let sentence = "every items whose tags contains \"x\" exists";
+    let items = json!([{}, {"tags": "x"}, {"tags": ["y"]}]);
+    assert_eq!(
+        own_said(sentence, items.clone(), json!({}), json!({})),
+        judged(sentence, items, json!({}))
+    );
+}
