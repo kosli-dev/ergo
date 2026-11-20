@@ -1,5 +1,7 @@
 use crate::cause::Cause;
 use crate::checks::{CheckRead, Plan, read_checks};
+use crate::ops::clause::{self, Clause};
+use crate::ops::message::Piece;
 use crate::ops::walk;
 use crate::ops::{self, Check, Input, Verdict};
 use crate::parts::{self, Failure, Part};
@@ -2732,12 +2734,24 @@ fn tally_part(
     let failed: Vec<Value> = lists.into_iter().flat_map(|(_, rich)| rich).collect();
     let walked = parts::walk_entries(&failed);
     let mut said: Vec<String> = Vec::new();
-    for piece in message.split("; ") {
-        if !piece.is_empty()
-            && !walked.texts.iter().any(|t| t == piece)
-            && ops::message::cap_note(piece).is_none()
-        {
-            ops::push_new(&mut said, piece.to_string());
+    let pieces = ops::message::pieces(&check, ctx, &ops::run(&check, ctx));
+    if pieces
+        .iter()
+        .any(|piece| matches!(piece, Piece::Counted(_)))
+        && ops::message::pieces_text(&pieces) == message
+    {
+        let own = unrecorded(&pieces, &walked.texts);
+        if !own.is_empty() {
+            said.push(own);
+        }
+    } else {
+        for piece in message.split("; ") {
+            if !piece.is_empty()
+                && !walked.texts.iter().any(|t| t == piece)
+                && ops::message::cap_note(piece).is_none()
+            {
+                ops::push_new(&mut said, piece.to_string());
+            }
         }
     }
     for root in &walked.roots {
@@ -2750,6 +2764,47 @@ fn tally_part(
         failures: parts::nest(walked.entries, ctx.input),
         message: said.join("; "),
     }
+}
+
+fn unrecorded(pieces: &[Piece], recorded: &[String]) -> String {
+    let mut seen: Vec<String> = recorded.to_vec();
+    let mut out: Vec<String> = Vec::new();
+    for piece in pieces {
+        let text = match piece {
+            Piece::Said(text) if seen.contains(text) => String::new(),
+            Piece::Said(text) => {
+                seen.push(text.clone());
+                text.clone()
+            }
+            Piece::Counted(clauses) => {
+                let items: Vec<&str> = clauses
+                    .iter()
+                    .filter(|said| {
+                        said.kind == clause::Kind::Item
+                            && recorded.contains(&clause::text(std::slice::from_ref(said)))
+                    })
+                    .map(|said| said.name.as_str())
+                    .collect();
+                let mut kept: Vec<Clause> = Vec::new();
+                for said in clause::shown(clauses) {
+                    let own = match said.kind {
+                        clause::Kind::More(_) => false,
+                        clause::Kind::Item => !items.contains(&said.name.as_str()),
+                        clause::Kind::Root | clause::Kind::List => !seen.contains(&said.text),
+                    };
+                    if own {
+                        seen.push(said.text.clone());
+                        kept.push(said);
+                    }
+                }
+                clause::text(&kept)
+            }
+        };
+        if !text.is_empty() {
+            out.push(text);
+        }
+    }
+    out.join(", and ")
 }
 
 fn unfit_names(checks: &[&Check], ctx: &Ctx) -> Vec<(String, Value)> {

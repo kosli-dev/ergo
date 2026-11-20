@@ -14,7 +14,6 @@ compare / a for line whose sentence can't be read in different ways, with a name
 contains / a followed by that reads a piece from $params / the row lists the piece and the check's $refs lists it too, and a piece that is missing, null or isn't text fails the check
 contains / excludes values read through a ref that holds values of mixed types / fails as unusable, whatever the list holds
 derived / a count in the whose of an every / fails as value when whose leaves no item
-derived / a count on the left and a field on the right / fails as the worse cause when both sides fail
 derived / a count or every whose whose reads a root outside the item through a key the item holds says the root and then the list's own problem / the root is null and the list is a number
 derived / a count or every whose whose reads a root outside the item through a key the item holds says the root and then the list's own problem / the root is null and the list is an object
 derived / a count or every whose whose reads a root outside the item through a key the item holds says the root and then the list's own problem / the root is null and the list is text
@@ -45,7 +44,6 @@ derived / a count with whose or that reads a named by key from $input that isn't
 derived / a count, a sum or an add whose sides can't be read in different ways, with a named by key from $input.k / the key is a number
 derived / a count, a sum or an add whose sides can't be read in different ways, with a named by key from $input.k / the key is missing
 derived / a count, a sum or an add whose sides can't be read in different ways, with a named by key from $input.k / the key is null
-derived / a path plus a count on the left / fails as unusable when the path is text and the list is null
 derived / an every or some whose whose reads a part of the subject with a named by key from the item says the part once, first / the part is null and the first item is null
 derived / an every whose whose reads a field of the subject through a key the item holds says the field once and first / the field is null and the first item is null
 derived / count of a list / fails as unusable when the list is a string
@@ -54,7 +52,6 @@ derived / count of a params value that is not a list / fails as unusable
 derived / days elapsed in the whose of a count / fails as absent when an item cannot be decided because its end is missing
 derived / days elapsed in the whose of an every / fails as value when whose leaves no item
 derived / days elapsed that cannot be read / fails as absent when one side is missing and the other null
-derived / sum within a distance of a field / the worse cause wins when both sides fail: absent before null
 derived / two paths on the left / fails as absent before null
 distinct / a child of a subject read with every distinct / the child's rows list the location under every copy of the parent
 distinct / a grandchild of a subject read with every distinct / its rows list the location under every copy of the grandparent
@@ -372,8 +369,6 @@ messages / a count of a path with a key from a field names the value once whatev
 messages / a count of a path with a key from a field names the value once whatever the field holds / the key field isn't text
 messages / a count of beside a plus names the list that isn't a list / a counted list that is an object says it isn't a list
 messages / a count of in a for line, and the order of its roots / names the $params root first and each root once
-messages / a count of or a sum of with more than three items it can't read says the first three and then and N more, last / five items without v
-messages / a count of or a sum of with more than three items it can't read says the first three and then and N more, last / four items without v
 messages / a for alias after is in that isn't a list, missing or null, on an empty list / names the alias's field, with the item of the for line in front
 messages / a for alias after is in that isn't a list, missing or null, on an empty list / says the alias's field is missing, then the list, in the item
 messages / a for alias after is in that isn't a list, missing or null, on an empty list / says the alias's field is null, then the list, in the item
@@ -455,7 +450,6 @@ messages / two roots in a whose that fail in different ways, beside a list that 
 messages / two roots in one relative clause that can't be read / names every root that failed, worst cause first and then by name
 messages / two roots in one relative clause that fail in different ways / names every root that failed, whatever its cause, worst cause first and then by name
 messages / two roots in one relative clause that fail in different ways / names them in front of what the items say when an item fails in a worse way
-messages / two worked-out values that can't be used / the values are joined with a comma and and
 missing / does not exist with a ref step after a field, and the param is null / fails with the ref's cause when the parent field is missing
 parts / a child subject that reads its own field named like its parent's part, with no part of its own / prints no dot, because a bare name in the child doesn't read the parent's part
 parts / a child subject with no part of its own, reading a field named like its parent's part / prints no dot, because a bare name in the child doesn't read the parent's part
