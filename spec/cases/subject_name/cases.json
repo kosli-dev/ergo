@@ -3121,6 +3121,7 @@
           {
             "cause": "value",
             "check": "$unique_ids",
+            "failures": [],
             "inputs": [
               {
                 "locations": [

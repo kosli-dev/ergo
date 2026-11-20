@@ -144,7 +144,7 @@
         "passed": {"type": "boolean"},
         "cause": {"$ref": "#/$defs/cause"},
         "message": {"type": "string", "minLength": 1, "description": "Only on failed rows: what Ergo found, in plain words, like approver is \"ana\", and author is \"ana\"."},
-        "failures": {"type": "array", "description": "On every failed row of a check, an $applies row or a $min_subjects row, and never on a passed row: every part that failed, at every level, as the rule row.parts says, [] when no part has an entry.", "items": {"$ref": "#/$defs/entry"}}
+        "failures": {"type": "array", "description": "On every failed row of a check, an $applies row, a $min_subjects row, a $unique_ids row or a $unique_ancestor_ids row, and never on a passed row: every part that failed, at every level, as the rule row.parts says, [] when no part has an entry.", "items": {"$ref": "#/$defs/entry"}}
       },
       "required": ["requirement", "subject", "check", "inputs", "passed", "cause"],
       "additionalProperties": false,

@@ -461,8 +461,8 @@ checks_for(subject) := ergo.report({"xs": [{"id": 1}]}, {"ergo_spec": ergo._spec
 
 test_a_subject_that_is_not_a_string_is_written_as_json_in_every_runtime if {
 	checks_for(["a", "b"])["$min_subjects"].description == `The in-scope ["a", "b"] count is at least 1`
-	checks_for(null)["$unique_ids"].description == "Every null id is unique"
-	checks_for(-1)["$unique_ids"].description == "Every -1 id is unique"
+	checks_for(null)["$unique_ids"].description == "Every null has a unique id"
+	checks_for(-1)["$unique_ids"].description == "Every -1 has a unique id"
 }
 
 test_any_rejects_an_object_collection if {
@@ -1064,7 +1064,7 @@ test_a_chained_subject_that_starts_at_its_parents_part_shows_its_from_as_written
 	rep := ergo.report(_parts_chain_doc, _parts_chain, {"art": "web"})
 	checks := rep.requirements.r.checks
 	checks["$min_subjects"].expression == "count(matching(every artifact.pra.pull_requests)) >= 1"
-	checks["$unique_ids"].expression == "count(repeated(ids(every artifact.pra.pull_requests))) == 0"
+	checks["$unique_ids"].expression == "count(missing(ids(every artifact.pra.pull_requests))) + count(repeated(ids(every artifact.pra.pull_requests))) == 0"
 	deeper := object.union(_parts_chain.subjects, {"pull request": {"from": "every artifact.pra.pull_requests", "identified_by": "url"}})
 	policy := {"ergo_spec": ergo._spec, "subjects": deeper, "requirements": {"r": {"subject": "pull request", "checks": {"c": "url exists"}}}}
 	ergo.report(_parts_chain_doc, policy, {"art": "web"}).requirements.r.checks["$min_subjects"].expression == "count(matching(every artifact.pra.pull_requests)) >= 1"
@@ -1306,7 +1306,7 @@ test_a_from_that_is_only_a_named_by_step_is_written_as_is_in_the_added_expressio
 	policy := {"ergo_spec": ergo._spec, "subjects": {"s": {"from": "every $input named by $params.k"}}, "requirements": {"r": {"subject": "s", "checks": {"c": "it exists"}}}}
 	rep := ergo.report({"a": [{"id": 1}]}, policy, {"k": "a"})
 	rep.requirements.r.checks["$min_subjects"].expression == "count(matching(every $input named by $params.k)) >= 1"
-	rep.requirements.r.checks["$unique_ids"].expression == "count(repeated(ids(every $input named by $params.k))) == 0"
+	rep.requirements.r.checks["$unique_ids"].expression == "count(missing(ids(every $input named by $params.k))) + count(repeated(ids(every $input named by $params.k))) == 0"
 }
 
 test_a_from_that_is_several_named_by_steps_or_a_named_by_with_a_position_is_written_as_it_was if {

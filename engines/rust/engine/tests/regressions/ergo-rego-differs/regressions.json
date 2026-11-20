@@ -48,8 +48,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {

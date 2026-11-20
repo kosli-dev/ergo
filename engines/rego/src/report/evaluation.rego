@@ -189,7 +189,7 @@ _reads_by_item(c) if {
 
 _evaluation_with(doc, written, name, fixed) := {
 	"min_subjects": [_min_subjects_row(doc, req, name, count(matching), _matching_ats(matching, req))],
-	"unique_ids": [_unique_ids_row(raw, refs, req, name)],
+	"unique_ids": [_unique_ids_row(doc, raw, refs, req, name)],
 	"applies": applies,
 	"subject_rows": groups,
 	"total": count(raw),

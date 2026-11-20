@@ -48,9 +48,9 @@ _copied_ancestor_row(row, g) := row if object.get(g, "ats", null) == null
 
 else := _copied_row(row, {"from": "~g", "to": g.ats})
 
-_ancestor_ids_row(pick, ancestor, name) := object.union(_unique_ids_row(pick.raw, pick.refs, {"subject": ancestor, "checks": {}}, name), {"check": "$unique_ancestor_ids"}) if "raw" in object.keys(pick)
+_ancestor_ids_row(pick, ancestor, name) := object.union(_unique_ids_row(pick.doc, pick.raw, pick.refs, {"subject": ancestor, "checks": {}}, name), {"check": "$unique_ancestor_ids"}) if "raw" in object.keys(pick)
 
-else := object.union(_unique_ids_row([], {}, {"subject": ancestor, "checks": {}}, name), {"check": "$unique_ancestor_ids"})
+else := object.union(_unique_ids_row(null, [], {}, {"subject": ancestor, "checks": {}}, name), {"check": "$unique_ancestor_ids"})
 
 _grand_children(req, name, _, grand, g, pick, fixed) := [_parent_evaluation(req, name, grand, {"id": g.id, "cause": pick.cause}, fixed)] if "cause" in object.keys(pick)
 
@@ -196,7 +196,7 @@ _parent_pick_of(doc, preq) := {"cause": c} if {
 		some i, _ in raw
 		matched := _subject_matches(evals[i], preq)
 	}
-	r := _parent_pick_from(raw, refs, applies, preq)
+	r := object.union(_parent_pick_from(raw, refs, applies, preq), {"doc": doc})
 }
 
 _parent_pick_from(raw, refs, applies, preq) := {"parent": preq.subject, "raw": raw, "refs": refs, "parents": [p |

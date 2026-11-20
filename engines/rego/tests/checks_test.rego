@@ -396,7 +396,7 @@ test_a_number_at_the_edge_of_a_float_still_works if {
 test_expression_for_non_empty_string if rendered({}, filled) == "fingerprint is a non-empty string"
 
 test_row_carries_exactly_the_documented_keys if {
-	every row in solo({"state": "MERGED"}, is_merged).results {
+	every row in solo({"id": 1, "state": "MERGED"}, is_merged).results {
 		object.keys(row) == {"requirement", "subject", "check", "inputs", "passed", "cause"}
 	}
 }

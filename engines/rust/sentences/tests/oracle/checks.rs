@@ -356,6 +356,7 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    ("ok exists", "ok exists", &[], &[]),
     ("some x.ys.n is 1", "some x.ys.n is 1", &[], &[]),
     ("some xs is more than r", "some xs is more than r", &[], &[]),
     (

@@ -209,7 +209,56 @@ pub fn unique_ids_row(
     );
     if cause != Cause::Satisfied {
         row.message = Some(crate::ops::message::is(&label, &shown));
+        row.failures = Some(Value::Array(Vec::new()));
     }
+    row
+}
+
+/// A subject whose id is missing or `null`: the record its entry in the
+/// row's `failures` is built from, with what the row's message says about it
+/// under `ergo/text`, its cause, and whether it sits in an item of a list.
+#[derive(Debug, Clone, PartialEq)]
+pub struct IdFault {
+    pub record: Value,
+    pub cause: Cause,
+    pub listed: bool,
+}
+
+/// Fails a `$unique_ids` or `$unique_ancestor_ids` row for every subject
+/// without an id, after the repeated ids, and lists each in its `failures`.
+pub fn with_id_faults(mut row: Row, faults: &[IdFault], input: &Value) -> Row {
+    if faults.is_empty() {
+        return row;
+    }
+    let mut causes: Vec<Cause> = faults.iter().map(|fault| fault.cause).collect();
+    let mut said: Vec<String> = Vec::new();
+    if row.cause != Cause::Satisfied {
+        causes.push(row.cause);
+        said.extend(row.message.clone());
+    }
+    said.extend(
+        faults
+            .iter()
+            .filter_map(|fault| fault.record["ergo/text"].as_str().map(str::to_string)),
+    );
+    row.cause = Cause::worst(causes).unwrap_or(Cause::Value);
+    row.message = Some(crate::ops::message::joined(said));
+    let records: Vec<Value> = faults
+        .iter()
+        .filter(|fault| fault.listed)
+        .map(|fault| fault.record.clone())
+        .collect();
+    for fault in faults.iter().filter(|fault| !fault.listed) {
+        let record = &fault.record;
+        row.inputs.push(json!({
+            "name": record["path"],
+            "value": record["value"],
+            "locations": record["locations"],
+            "outcome": fault.cause.name(),
+        }));
+    }
+    let entries = crate::parts::walk_entries(&records).entries;
+    row.failures = Some(crate::parts::to_json(&crate::parts::nest(entries, input)));
     row
 }
 
@@ -397,14 +446,16 @@ impl RequirementRead<'_> {
         let mut refs: Vec<Value> = Vec::new();
         for (at, level) in levels.iter().enumerate() {
             let every = if at == 0 { "Every" } else { "every" };
-            descriptions.push(format!("{every} {level} id is unique"));
+            descriptions.push(format!("{every} {level} has a unique id"));
             let from = if self.reads_from(level) {
                 refs.extend(source_refs_read(reading, level, input, params));
                 reading.infos[level].from_text.clone().unwrap_or_default()
             } else {
                 INVALID_FROM.to_string()
             };
-            expressions.push(format!("count(repeated(ids({from}))) == 0"));
+            expressions.push(format!(
+                "count(missing(ids({from}))) + count(repeated(ids({from}))) == 0"
+            ));
         }
         refs.sort_by(|a, b| a["name"].as_str().cmp(&b["name"].as_str()));
         refs.dedup();
@@ -506,8 +557,8 @@ pub fn check_defs(
     min_def.refs.clone_from(&from_refs);
     defs.insert("$min_subjects".to_string(), min_def);
     let mut unique_def = CheckDef::added(
-        format!("Every {kind} id is unique"),
-        format!("count(repeated(ids({from}))) == 0"),
+        format!("Every {kind} has a unique id"),
+        format!("count(missing(ids({from}))) + count(repeated(ids({from}))) == 0"),
     );
     unique_def.refs = from_refs;
     defs.insert("$unique_ids".to_string(), unique_def);

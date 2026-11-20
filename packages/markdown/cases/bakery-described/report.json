@@ -30,8 +30,8 @@
           "meta": {}
         },
         "$unique_ids": {
-          "description": "Every batch id is unique",
-          "expression": "count(repeated(ids(batches))) == 0",
+          "description": "Every batch has a unique id",
+          "expression": "count(missing(ids(batches))) + count(repeated(ids(batches))) == 0",
           "meta": {}
         },
         "$well_formed": {

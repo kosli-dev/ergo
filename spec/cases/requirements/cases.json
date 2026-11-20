@@ -922,7 +922,7 @@
         "description": "makes each item a subject, in list order, with itself as its id",
         "rules": ["subjects.from", "subjects.id", "order"],
         "input": [{"x": 1}, {"x": 2}],
-        "expressions": {"s": {"$min_subjects": "count(matching(every $input)) >= 1", "$unique_ids": "count(repeated(ids(every $input))) == 0"}},
+        "expressions": {"s": {"$min_subjects": "count(matching(every $input)) >= 1", "$unique_ids": "count(missing(ids(every $input))) + count(repeated(ids(every $input))) == 0"}},
         "results": [
           {
             "cause": "satisfied",
@@ -1339,7 +1339,7 @@
         "description": "names the line as written in both expressions",
         "rules": ["added.text", "subjects.from"],
         "input": {"a": [{"id": 1}]},
-        "expressions": {"r": {"$min_subjects": "count(matching(every $input named by $params.k)) >= 1", "$unique_ids": "count(repeated(ids(every $input named by $params.k))) == 0"}},
+        "expressions": {"r": {"$min_subjects": "count(matching(every $input named by $params.k)) >= 1", "$unique_ids": "count(missing(ids(every $input named by $params.k))) + count(repeated(ids(every $input named by $params.k))) == 0"}},
         "results": [
           {
             "cause": "satisfied",
@@ -1435,7 +1435,7 @@
         "description": "names the line as written in both expressions",
         "rules": ["added.text", "subjects.from"],
         "input": {"a": [{"id": 1}]},
-        "expressions": {"r": {"$min_subjects": "count(matching(every $input named by $params.k)) >= 1", "$unique_ids": "count(repeated(ids(every $input named by $params.k))) == 0"}},
+        "expressions": {"r": {"$min_subjects": "count(matching(every $input named by $params.k)) >= 1", "$unique_ids": "count(missing(ids(every $input named by $params.k))) + count(repeated(ids(every $input named by $params.k))) == 0"}},
         "results": [
           {
             "cause": "satisfied",
@@ -1531,7 +1531,7 @@
         "description": "names the whole line in both expressions",
         "rules": ["added.text", "subjects.from"],
         "input": {"a": {"b": [{"id": 1}]}},
-        "expressions": {"r": {"$min_subjects": "count(matching(every $input named by $params.k named by $params.j)) >= 1", "$unique_ids": "count(repeated(ids(every $input named by $params.k named by $params.j))) == 0"}},
+        "expressions": {"r": {"$min_subjects": "count(matching(every $input named by $params.k named by $params.j)) >= 1", "$unique_ids": "count(missing(ids(every $input named by $params.k named by $params.j))) + count(repeated(ids(every $input named by $params.k named by $params.j))) == 0"}},
         "results": [
           {
             "cause": "satisfied",
@@ -1627,7 +1627,7 @@
         "description": "names the whole line in both expressions",
         "rules": ["added.text", "subjects.from"],
         "input": {"a": [{"id": 1}]},
-        "expressions": {"r": {"$min_subjects": "count(matching(every $input named by $params.k.x)) >= 1", "$unique_ids": "count(repeated(ids(every $input named by $params.k.x))) == 0"}},
+        "expressions": {"r": {"$min_subjects": "count(matching(every $input named by $params.k.x)) >= 1", "$unique_ids": "count(missing(ids(every $input named by $params.k.x))) + count(repeated(ids(every $input named by $params.k.x))) == 0"}},
         "results": [
           {
             "cause": "satisfied",
@@ -1710,7 +1710,7 @@
         "description": "names the whole line in both expressions",
         "rules": ["added.text", "subjects.from"],
         "input": {"a": [{"id": 1}]},
-        "expressions": {"r": {"$min_subjects": "count(matching(item 1 of $input named by $params.k)) >= 1", "$unique_ids": "count(repeated(ids(item 1 of $input named by $params.k))) == 0"}},
+        "expressions": {"r": {"$min_subjects": "count(matching(item 1 of $input named by $params.k)) >= 1", "$unique_ids": "count(missing(ids(item 1 of $input named by $params.k))) + count(repeated(ids(item 1 of $input named by $params.k))) == 0"}},
         "results": [
           {
             "cause": "satisfied",
@@ -3897,6 +3897,7 @@
           {
             "cause": "value",
             "check": "$unique_ids",
+            "failures": [],
             "inputs": [
               {
                 "locations": [
@@ -4040,27 +4041,70 @@
         ]
       },
       {
-        "description": "treats null as an id, so two subjects with none clash",
+        "description": "fails for each subject without an id, and two of them don't repeat",
         "rules": ["unique_ids", "subjects.id"],
         "input": {"t": [{"x": 1}, {"x": 2}]},
         "requirements": {"s": {"status": "not_met"}},
         "results": [
           {
-            "cause": "value",
+            "cause": "absent",
             "check": "$unique_ids",
-            "inputs": [
+            "failures": [
               {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/t/0"
+                    ],
+                    "name": "t[0].id",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "item",
                 "locations": [
-                  "/t/0",
+                  "/t/0"
+                ],
+                "message": "id is missing",
+                "name": "item 1 of t",
+                "value": {
+                  "x": 1
+                }
+              },
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/t/1"
+                    ],
+                    "name": "t[1].id",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "item",
+                "locations": [
                   "/t/1"
                 ],
-                "name": "repeated subject ids",
-                "value": [
-                  null
-                ]
+                "message": "id is missing",
+                "name": "item 2 of t",
+                "value": {
+                  "x": 2
+                }
               }
             ],
-            "message": "repeated subject ids is [null]",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated subject ids",
+                "value": []
+              }
+            ],
+            "message": "item 1 of t: id is missing; item 2 of t: id is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -4123,6 +4167,7 @@
           {
             "cause": "value",
             "check": "$unique_ids",
+            "failures": [],
             "inputs": [
               {
                 "locations": [
@@ -4288,11 +4333,11 @@
         "expressions": {
           "r": {
             "$min_subjects": "count(matching(every \"x y\".items)) >= 1",
-            "$unique_ids": "count(repeated(ids(every \"x y\".items))) == 0"
+            "$unique_ids": "count(missing(ids(every \"x y\".items))) + count(repeated(ids(every \"x y\".items))) == 0"
           },
           "s": {
             "$min_subjects": "count(matching(\"y y\")) >= 1",
-            "$unique_ids": "count(repeated(ids(\"y y\"))) == 0"
+            "$unique_ids": "count(missing(ids(\"y y\"))) + count(repeated(ids(\"y y\"))) == 0"
           }
         },
         "report": {
@@ -4363,7 +4408,7 @@
       }
     ]
   },
-  {"description": "a subject name with a space is quoted through a part and with a null definition", "policy": {"ergo_spec": "{{spec}}", "subjects": {"x y": {"from": "things", "identified_by": "id", "has": {"pa": "meta"}}, "kid": {"from": "every \"x y\".pa.items", "identified_by": "n"}, "z z": null}, "requirements": {"r": {"subject": "kid", "checks": {"c": "n exists"}}, "s": {"subject": "z z", "checks": {"c": "n exists"}}}}, "cases": [{"description": "a child read through a part of a spaced subject, and a spaced subject defined as null, quote the name", "rules": ["name.keys", "added.text", "report.subjects"], "input": {"things": [{"id": "a", "meta": {"items": [{"n": 1}]}}], "z z": [{"n": 1}]}, "expressions": {"r": {"$min_subjects": "count(matching(every \"x y\".pa.items)) >= 1", "$unique_ids": "count(repeated(ids(every \"x y\".pa.items))) == 0"}, "s": {"$min_subjects": "count(matching(\"z z\")) >= 1", "$unique_ids": "count(repeated(ids(\"z z\"))) == 0"}}, "report": {"subjects": {"x y": {"description": "", "from": "things", "identified_by": "id", "parts": {"pa": {"from": "meta", "identified_by": null}}}, "z z": {"description": "", "from": "\"z z\"", "identified_by": null, "parts": {}}, "kid": {"description": "", "from": "every \"x y\".pa.items", "identified_by": "n", "parts": {}}}}, "results": [
+  {"description": "a subject name with a space is quoted through a part and with a null definition", "policy": {"ergo_spec": "{{spec}}", "subjects": {"x y": {"from": "things", "identified_by": "id", "has": {"pa": "meta"}}, "kid": {"from": "every \"x y\".pa.items", "identified_by": "n"}, "z z": null}, "requirements": {"r": {"subject": "kid", "checks": {"c": "n exists"}}, "s": {"subject": "z z", "checks": {"c": "n exists"}}}}, "cases": [{"description": "a child read through a part of a spaced subject, and a spaced subject defined as null, quote the name", "rules": ["name.keys", "added.text", "report.subjects"], "input": {"things": [{"id": "a", "meta": {"items": [{"n": 1}]}}], "z z": [{"n": 1}]}, "expressions": {"r": {"$min_subjects": "count(matching(every \"x y\".pa.items)) >= 1", "$unique_ids": "count(missing(ids(every \"x y\".pa.items))) + count(repeated(ids(every \"x y\".pa.items))) == 0"}, "s": {"$min_subjects": "count(matching(\"z z\")) >= 1", "$unique_ids": "count(missing(ids(\"z z\"))) + count(repeated(ids(\"z z\"))) == 0"}}, "report": {"subjects": {"x y": {"description": "", "from": "things", "identified_by": "id", "parts": {"pa": {"from": "meta", "identified_by": null}}}, "z z": {"description": "", "from": "\"z z\"", "identified_by": null, "parts": {}}, "kid": {"description": "", "from": "every \"x y\".pa.items", "identified_by": "n", "parts": {}}}}, "results": [
     {
       "cause": "satisfied",
       "check": "c",
@@ -5428,7 +5473,7 @@
             "checks": {
               "$applies": {"description": "The deployment is in scope", "expression": "e exists", "meta": {}},
               "$min_subjects": {"description": "The in-scope deployment count is at least 1", "expression": "count(matching(t)) >= 1", "meta": {}},
-              "$unique_ids": {"description": "Every deployment id is unique", "expression": "count(repeated(ids(t))) == 0", "meta": {}},
+              "$unique_ids": {"description": "Every deployment has a unique id", "expression": "count(missing(ids(t))) + count(repeated(ids(t))) == 0", "meta": {}},
               "$well_formed": {
                 "description": "The requirement is written correctly",
                 "expression": "count(problems) == 0",
@@ -5556,7 +5601,7 @@
           "s": {
             "checks": {
               "$min_subjects": {"description": "The subject list can be read", "expression": "t can be read", "meta": {}},
-              "$unique_ids": {"description": "Every subject id is unique", "expression": "count(repeated(ids(t))) == 0", "meta": {}},
+              "$unique_ids": {"description": "Every subject has a unique id", "expression": "count(missing(ids(t))) + count(repeated(ids(t))) == 0", "meta": {}},
               "$well_formed": {
                 "description": "The requirement is written correctly",
                 "expression": "count(problems) == 0",
@@ -8377,7 +8422,7 @@
         "rules": ["well_formed", "written_wrong"],
         "input": {"things": [{"id": "t1", "x": 1}]},
         "requirements": {"s": {"status": "not_met", "subjects": {"matching": 0, "total": 0}}},
-        "expressions": {"s": {"$applies": "x exists", "$min_subjects": "count(matching(things)) >= 1", "$unique_ids": "count(repeated(ids(things))) == 0", "$well_formed": "count(problems) == 0", "c": "x is \"a"}},
+        "expressions": {"s": {"$applies": "x exists", "$min_subjects": "count(matching(things)) >= 1", "$unique_ids": "count(missing(ids(things))) + count(repeated(ids(things))) == 0", "$well_formed": "count(problems) == 0", "c": "x is \"a"}},
         "results": [
           {
             "cause": "value",
@@ -12331,6 +12376,7 @@
           {
             "cause": "value",
             "check": "$unique_ancestor_ids",
+            "failures": [],
             "inputs": [
               {
                 "locations": [
@@ -12424,8 +12470,9 @@
           {
             "cause": "value",
             "check": "$unique_ancestor_ids",
-            "description": "Every commit id is unique",
-            "expression": "count(repeated(ids(commits))) == 0",
+            "description": "Every commit has a unique id",
+            "expression": "count(missing(ids(commits))) + count(repeated(ids(commits))) == 0",
+            "failures": [],
             "inputs": [
               {
                 "locations": [
@@ -16072,11 +16119,12 @@
         "description": "isn't met under some when two commits share an id, although one of their pull requests passes",
         "rules": ["unique_ids.ancestors", "require.some.parent"],
         "input": {"commits": [{"pull_requests": [{"approved_by": "bob", "number": 7}], "sha": "a"}, {"pull_requests": [{"number": 2}], "sha": "a"}]},
-        "requirements": {"reviewed": {"causes": [{"cause": "value", "rows": 1}], "checks": {"$unique_ancestor_ids": {"description": "Every commit id is unique", "expression": "count(repeated(ids(commits))) == 0"}, "$unique_ids": {"description": "Every pull request id is unique", "expression": "count(repeated(ids(every commit.pull_requests))) == 0"}}, "status": "not_met"}},
+        "requirements": {"reviewed": {"causes": [{"cause": "value", "rows": 1}], "checks": {"$unique_ancestor_ids": {"description": "Every commit has a unique id", "expression": "count(missing(ids(commits))) + count(repeated(ids(commits))) == 0"}, "$unique_ids": {"description": "Every pull request has a unique id", "expression": "count(missing(ids(every commit.pull_requests))) + count(repeated(ids(every commit.pull_requests))) == 0"}}, "status": "not_met"}},
         "results": [
           {
             "cause": "value",
             "check": "$unique_ancestor_ids",
+            "failures": [],
             "inputs": [
               {
                 "locations": [
@@ -16170,8 +16218,9 @@
           {
             "cause": "value",
             "check": "$unique_ancestor_ids",
-            "description": "Every commit id is unique",
-            "expression": "count(repeated(ids(commits))) == 0",
+            "description": "Every commit has a unique id",
+            "expression": "count(missing(ids(commits))) + count(repeated(ids(commits))) == 0",
+            "failures": [],
             "inputs": [
               {
                 "locations": [
@@ -16263,164 +16312,73 @@
         ]
       },
       {
-        "description": "counts two commits without an id, one missing and one null, as a repeat of null",
+        "description": "fails for each commit without an id, one missing and one null",
         "rules": ["unique_ids.ancestors", "unique_ids"],
         "input": {"commits": [{"pull_requests": [{"approved_by": "bob", "number": 7}]}, {"pull_requests": [{"approved_by": "ann", "number": 8}], "sha": null}]},
-        "requirements": {"reviewed": {"causes": [{"cause": "value", "rows": 1}], "status": "not_met"}},
+        "requirements": {"reviewed": {"causes": [{"cause": "absent", "rows": 1}], "status": "not_met"}},
         "results": [
           {
-            "cause": "value",
+            "cause": "absent",
             "check": "$unique_ancestor_ids",
-            "inputs": [
+            "failures": [
               {
-                "locations": [
-                  "/commits/0",
-                  "/commits/1/sha"
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/commits/0"
+                    ],
+                    "name": "commits[0].sha",
+                    "outcome": "absent",
+                    "value": null
+                  }
                 ],
-                "name": "repeated commit ids",
-                "value": [
-                  null
-                ]
-              }
-            ],
-            "message": "repeated commit ids is [null]",
-            "passed": false,
-            "requirement": "reviewed",
-            "subject": {
-              "id": null,
-              "type": "commit"
-            }
-          },
-          {
-            "cause": "satisfied",
-            "check": "approved",
-            "inputs": [
-              {
+                "kind": "item",
                 "locations": [
-                  "/commits/0/pull_requests/0/approved_by"
+                  "/commits/0"
                 ],
-                "name": "approved_by",
-                "value": "bob"
-              }
-            ],
-            "passed": true,
-            "requirement": "reviewed",
-            "subject": {
-              "id": 7,
-              "in": {
-                "commit": null
+                "message": "sha is missing",
+                "name": "item 1 of commits",
+                "value": {
+                  "pull_requests": [
+                    {
+                      "approved_by": "bob",
+                      "number": 7
+                    }
+                  ]
+                }
               },
-              "type": "pull request"
-            }
-          },
-          {
-            "cause": "satisfied",
-            "check": "approved",
-            "inputs": [
               {
-                "locations": [
-                  "/commits/1/pull_requests/0/approved_by"
+                "cause": "null",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/commits/1/sha"
+                    ],
+                    "name": "commits[1].sha",
+                    "outcome": "null",
+                    "value": null
+                  }
                 ],
-                "name": "approved_by",
-                "value": "ann"
-              }
-            ],
-            "passed": true,
-            "requirement": "reviewed",
-            "subject": {
-              "id": 8,
-              "in": {
-                "commit": null
-              },
-              "type": "pull request"
-            }
-          }
-        ]
-      },
-      {
-        "description": "counts two commits with a missing id as a repeat of null",
-        "rules": ["unique_ids.ancestors", "unique_ids"],
-        "input": {"commits": [{"pull_requests": [{"approved_by": "bob", "number": 7}]}, {"pull_requests": [{"approved_by": "ann", "number": 8}]}]},
-        "requirements": {"reviewed": {"causes": [{"cause": "value", "rows": 1}], "status": "not_met"}},
-        "results": [
-          {
-            "cause": "value",
-            "check": "$unique_ancestor_ids",
-            "inputs": [
-              {
+                "kind": "item",
                 "locations": [
-                  "/commits/0",
                   "/commits/1"
                 ],
-                "name": "repeated commit ids",
-                "value": [
-                  null
-                ]
+                "message": "sha is null",
+                "name": "item 2 of commits",
+                "value": {
+                  "pull_requests": [
+                    {
+                      "approved_by": "ann",
+                      "number": 8
+                    }
+                  ],
+                  "sha": null
+                }
               }
             ],
-            "message": "repeated commit ids is [null]",
-            "passed": false,
-            "requirement": "reviewed",
-            "subject": {
-              "id": null,
-              "type": "commit"
-            }
-          },
-          {
-            "cause": "satisfied",
-            "check": "approved",
-            "inputs": [
-              {
-                "locations": [
-                  "/commits/0/pull_requests/0/approved_by"
-                ],
-                "name": "approved_by",
-                "value": "bob"
-              }
-            ],
-            "passed": true,
-            "requirement": "reviewed",
-            "subject": {
-              "id": 7,
-              "in": {
-                "commit": null
-              },
-              "type": "pull request"
-            }
-          },
-          {
-            "cause": "satisfied",
-            "check": "approved",
-            "inputs": [
-              {
-                "locations": [
-                  "/commits/1/pull_requests/0/approved_by"
-                ],
-                "name": "approved_by",
-                "value": "ann"
-              }
-            ],
-            "passed": true,
-            "requirement": "reviewed",
-            "subject": {
-              "id": 8,
-              "in": {
-                "commit": null
-              },
-              "type": "pull request"
-            }
-          }
-        ]
-      },
-      {
-        "description": "doesn't count one commit without an id as a repeat",
-        "rules": ["unique_ids.ancestors", "unique_ids"],
-        "input": {"commits": [{"pull_requests": [{"approved_by": "bob", "number": 7}], "sha": null}, {"pull_requests": [{"approved_by": "ann", "number": 8}], "sha": "a"}]},
-        "requirements": {"reviewed": {"causes": [], "status": "met"}},
-        "results": [
-          {
-            "cause": "satisfied",
-            "check": "$unique_ancestor_ids",
             "inputs": [
               {
                 "locations": [],
@@ -16428,7 +16386,237 @@
                 "value": []
               }
             ],
+            "message": "item 1 of commits: sha is missing; item 2 of commits: sha is null",
+            "passed": false,
+            "requirement": "reviewed",
+            "subject": {
+              "id": null,
+              "type": "commit"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "approved",
+            "inputs": [
+              {
+                "locations": [
+                  "/commits/0/pull_requests/0/approved_by"
+                ],
+                "name": "approved_by",
+                "value": "bob"
+              }
+            ],
             "passed": true,
+            "requirement": "reviewed",
+            "subject": {
+              "id": 7,
+              "in": {
+                "commit": null
+              },
+              "type": "pull request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "approved",
+            "inputs": [
+              {
+                "locations": [
+                  "/commits/1/pull_requests/0/approved_by"
+                ],
+                "name": "approved_by",
+                "value": "ann"
+              }
+            ],
+            "passed": true,
+            "requirement": "reviewed",
+            "subject": {
+              "id": 8,
+              "in": {
+                "commit": null
+              },
+              "type": "pull request"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails for each commit whose id is missing, and they don't repeat",
+        "rules": ["unique_ids.ancestors", "unique_ids"],
+        "input": {"commits": [{"pull_requests": [{"approved_by": "bob", "number": 7}]}, {"pull_requests": [{"approved_by": "ann", "number": 8}]}]},
+        "requirements": {"reviewed": {"causes": [{"cause": "absent", "rows": 1}], "status": "not_met"}},
+        "results": [
+          {
+            "cause": "absent",
+            "check": "$unique_ancestor_ids",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/commits/0"
+                    ],
+                    "name": "commits[0].sha",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "item",
+                "locations": [
+                  "/commits/0"
+                ],
+                "message": "sha is missing",
+                "name": "item 1 of commits",
+                "value": {
+                  "pull_requests": [
+                    {
+                      "approved_by": "bob",
+                      "number": 7
+                    }
+                  ]
+                }
+              },
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/commits/1"
+                    ],
+                    "name": "commits[1].sha",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "item",
+                "locations": [
+                  "/commits/1"
+                ],
+                "message": "sha is missing",
+                "name": "item 2 of commits",
+                "value": {
+                  "pull_requests": [
+                    {
+                      "approved_by": "ann",
+                      "number": 8
+                    }
+                  ]
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated commit ids",
+                "value": []
+              }
+            ],
+            "message": "item 1 of commits: sha is missing; item 2 of commits: sha is missing",
+            "passed": false,
+            "requirement": "reviewed",
+            "subject": {
+              "id": null,
+              "type": "commit"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "approved",
+            "inputs": [
+              {
+                "locations": [
+                  "/commits/0/pull_requests/0/approved_by"
+                ],
+                "name": "approved_by",
+                "value": "bob"
+              }
+            ],
+            "passed": true,
+            "requirement": "reviewed",
+            "subject": {
+              "id": 7,
+              "in": {
+                "commit": null
+              },
+              "type": "pull request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "approved",
+            "inputs": [
+              {
+                "locations": [
+                  "/commits/1/pull_requests/0/approved_by"
+                ],
+                "name": "approved_by",
+                "value": "ann"
+              }
+            ],
+            "passed": true,
+            "requirement": "reviewed",
+            "subject": {
+              "id": 8,
+              "in": {
+                "commit": null
+              },
+              "type": "pull request"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails for one commit without an id",
+        "rules": ["unique_ids.ancestors", "unique_ids"],
+        "input": {"commits": [{"pull_requests": [{"approved_by": "bob", "number": 7}], "sha": null}, {"pull_requests": [{"approved_by": "ann", "number": 8}], "sha": "a"}]},
+        "requirements": {"reviewed": {"causes": [{"cause": "null", "rows": 1}], "status": "not_met"}},
+        "results": [
+          {
+            "cause": "null",
+            "check": "$unique_ancestor_ids",
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/commits/0/sha"
+                    ],
+                    "name": "commits[0].sha",
+                    "outcome": "null",
+                    "value": null
+                  }
+                ],
+                "kind": "item",
+                "locations": [
+                  "/commits/0"
+                ],
+                "message": "sha is null",
+                "name": "item 1 of commits",
+                "value": {
+                  "pull_requests": [
+                    {
+                      "approved_by": "bob",
+                      "number": 7
+                    }
+                  ],
+                  "sha": null
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated commit ids",
+                "value": []
+              }
+            ],
+            "message": "item 1 of commits: sha is null",
+            "passed": false,
             "requirement": "reviewed",
             "subject": {
               "id": null,
@@ -16490,6 +16678,7 @@
           {
             "cause": "value",
             "check": "$unique_ancestor_ids",
+            "failures": [],
             "inputs": [
               {
                 "locations": [
@@ -16847,6 +17036,7 @@
           {
             "cause": "value",
             "check": "$unique_ancestor_ids",
+            "failures": [],
             "inputs": [
               {
                 "locations": [
@@ -16906,6 +17096,7 @@
           {
             "cause": "value",
             "check": "$unique_ancestor_ids",
+            "failures": [],
             "inputs": [
               {
                 "locations": [
@@ -16975,8 +17166,9 @@
           {
             "cause": "value",
             "check": "$unique_ancestor_ids",
-            "description": "Every commit id is unique",
-            "expression": "count(repeated(ids(commits))) == 0",
+            "description": "Every commit has a unique id",
+            "expression": "count(missing(ids(commits))) + count(repeated(ids(commits))) == 0",
+            "failures": [],
             "inputs": [
               {
                 "locations": [
@@ -17013,6 +17205,7 @@
           {
             "cause": "value",
             "check": "$unique_ancestor_ids",
+            "failures": [],
             "inputs": [
               {
                 "locations": [
@@ -17390,6 +17583,7 @@
           {
             "cause": "value",
             "check": "$unique_ancestor_ids",
+            "failures": [],
             "inputs": [
               {
                 "locations": [
@@ -17511,7 +17705,7 @@
             }
           }
         ],
-        "report": {"compliant": true, "requirements": {"signed": {"causes": [], "checks": {"$min_subjects": {"description": "The in-scope commit count is at least 1", "expression": "count(matching(commits)) >= 1", "meta": {}}, "$unique_ids": {"description": "Every commit id is unique", "expression": "count(repeated(ids(commits))) == 0", "meta": {}}, "$well_formed": {"description": "The requirement is written correctly", "expression": "count(problems) == 0", "meta": {}}, "signed": {"description": "", "expression": "signed is true", "meta": {}}}, "description": "", "meta": {}, "require": "every", "status": "met", "subject": "commit", "subjects": {"matching": 1, "total": 1}}}, "results": [{"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "signed", "subject": {"id": null, "type": "commit"}}, {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/commits/0"], "name": "in-scope commit count", "value": 1}], "passed": true, "requirement": "signed", "subject": {"id": null, "type": "commit"}}, {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated commit ids", "value": []}], "passed": true, "requirement": "signed", "subject": {"id": null, "type": "commit"}}, {"cause": "satisfied", "check": "signed", "inputs": [{"locations": ["/commits/0/signed"], "name": "signed", "value": true}], "passed": true, "requirement": "signed", "subject": {"id": "a", "type": "commit"}}]}
+        "report": {"compliant": true, "requirements": {"signed": {"causes": [], "checks": {"$min_subjects": {"description": "The in-scope commit count is at least 1", "expression": "count(matching(commits)) >= 1", "meta": {}}, "$unique_ids": {"description": "Every commit has a unique id", "expression": "count(missing(ids(commits))) + count(repeated(ids(commits))) == 0", "meta": {}}, "$well_formed": {"description": "The requirement is written correctly", "expression": "count(problems) == 0", "meta": {}}, "signed": {"description": "", "expression": "signed is true", "meta": {}}}, "description": "", "meta": {}, "require": "every", "status": "met", "subject": "commit", "subjects": {"matching": 1, "total": 1}}}, "results": [{"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "signed", "subject": {"id": null, "type": "commit"}}, {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/commits/0"], "name": "in-scope commit count", "value": 1}], "passed": true, "requirement": "signed", "subject": {"id": null, "type": "commit"}}, {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated commit ids", "value": []}], "passed": true, "requirement": "signed", "subject": {"id": null, "type": "commit"}}, {"cause": "satisfied", "check": "signed", "inputs": [{"locations": ["/commits/0/signed"], "name": "signed", "value": true}], "passed": true, "requirement": "signed", "subject": {"id": "a", "type": "commit"}}]}
       }
     ]
   },
@@ -17523,7 +17717,7 @@
         "description": "counts artifacts once and pull requests once per artifact, outermost first",
         "rules": ["unique_ids.ancestors", "subjects.chain.levels"],
         "input": {"artifacts": [{"prod": true, "pull_requests": [{"commits": [{"sha": "c1", "signed": true}], "number": 7}, {"commits": [{"sha": "c2", "signed": true}], "number": 7}], "sha": "x1"}, {"prod": true, "pull_requests": [{"commits": [{"sha": "c1", "signed": true}], "number": 7}], "sha": "x2"}, {"prod": false, "pull_requests": [{"number": 9}], "sha": "x1"}, {"pull_requests": [{"number": 1}, {"number": 1}], "sha": "x3"}, {"prod": true, "pull_requests": "none", "sha": "x4"}]},
-        "requirements": {"signed": {"causes": [{"cause": "unusable", "rows": 1}, {"cause": "absent", "rows": 1}, {"cause": "value", "rows": 2}], "checks": {"$unique_ancestor_ids": {"description": "Every artifact id is unique and every pull request id is unique", "expression": "count(repeated(ids(artifacts))) == 0 and count(repeated(ids(every artifact.pull_requests))) == 0"}, "$unique_ids": {"description": "Every commit id is unique", "expression": "count(repeated(ids(every \"pull request\".commits))) == 0"}}, "status": "not_met"}},
+        "requirements": {"signed": {"causes": [{"cause": "unusable", "rows": 1}, {"cause": "absent", "rows": 1}, {"cause": "value", "rows": 2}], "checks": {"$unique_ancestor_ids": {"description": "Every artifact has a unique id and every pull request has a unique id", "expression": "count(missing(ids(artifacts))) + count(repeated(ids(artifacts))) == 0 and count(missing(ids(every artifact.pull_requests))) + count(repeated(ids(every artifact.pull_requests))) == 0"}, "$unique_ids": {"description": "Every commit has a unique id", "expression": "count(missing(ids(every \"pull request\".commits))) + count(repeated(ids(every \"pull request\".commits))) == 0"}}, "status": "not_met"}},
         "results": [
           {
             "cause": "satisfied",
@@ -17641,6 +17835,7 @@
           {
             "cause": "value",
             "check": "$unique_ancestor_ids",
+            "failures": [],
             "inputs": [
               {
                 "locations": [
@@ -17664,6 +17859,7 @@
           {
             "cause": "value",
             "check": "$unique_ancestor_ids",
+            "failures": [],
             "inputs": [
               {
                 "locations": [
@@ -18308,6 +18504,1915 @@
               "id": null,
               "type": "row"
             }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "subjects without an id",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"d": {"from": "ds", "identified_by": "id"}}, "requirements": {"r": {"subject": "d", "min_subjects": 0, "checks": {"c": "ok exists"}}}},
+    "cases": [
+      {
+        "description": "fail $unique_ids after the repeated ids, each named by its place",
+        "rules": ["unique_ids", "row.parts"],
+        "input": {"ds": [{"id": "a", "ok": true}, {"ok": true}, {"id": null, "ok": true}, {"id": "a", "ok": true}]},
+        "requirements": {"r": {"status": "not_met"}},
+        "results": [
+          {
+            "cause": "absent",
+            "check": "$unique_ids",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ds/1"
+                    ],
+                    "name": "ds[1].id",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "item",
+                "locations": [
+                  "/ds/1"
+                ],
+                "message": "id is missing",
+                "name": "item 2 of ds",
+                "value": {
+                  "ok": true
+                }
+              },
+              {
+                "cause": "null",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ds/2/id"
+                    ],
+                    "name": "ds[2].id",
+                    "outcome": "null",
+                    "value": null
+                  }
+                ],
+                "kind": "item",
+                "locations": [
+                  "/ds/2"
+                ],
+                "message": "id is null",
+                "name": "item 3 of ds",
+                "value": {
+                  "id": null,
+                  "ok": true
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/ds/0/id",
+                  "/ds/3/id"
+                ],
+                "name": "repeated d ids",
+                "value": [
+                  "a"
+                ]
+              }
+            ],
+            "message": "repeated d ids is [\"a\"]; item 2 of ds: id is missing; item 3 of ds: id is null",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "d"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/ds/0/ok"
+                ],
+                "name": "ok",
+                "value": true
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "d"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/ds/1/ok"
+                ],
+                "name": "ok",
+                "value": true
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "d"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/ds/2/ok"
+                ],
+                "name": "ok",
+                "value": true
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "d"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/ds/3/ok"
+                ],
+                "name": "ok",
+                "value": true
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "d"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fail $unique_ids for a single subject without an id",
+        "rules": ["unique_ids"],
+        "input": {"ds": [{"ok": true}]},
+        "requirements": {"r": {"status": "not_met"}},
+        "results": [
+          {
+            "cause": "absent",
+            "check": "$unique_ids",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ds/0"
+                    ],
+                    "name": "ds[0].id",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "item",
+                "locations": [
+                  "/ds/0"
+                ],
+                "message": "id is missing",
+                "name": "item 1 of ds",
+                "value": {
+                  "ok": true
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated d ids",
+                "value": []
+              }
+            ],
+            "message": "item 1 of ds: id is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "d"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/ds/0/ok"
+                ],
+                "name": "ok",
+                "value": true
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "d"
+            }
+          }
+        ]
+      },
+      {
+        "description": "name the subjects after the third only by their count",
+        "rules": ["unique_ids", "message.items"],
+        "input": {"ds": [{"ok": true}, {"ok": true}, {"ok": true}, {"ok": true}, {"ok": true}]},
+        "requirements": {"r": {"status": "not_met"}},
+        "results": [
+          {
+            "cause": "absent",
+            "check": "$unique_ids",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ds/0"
+                    ],
+                    "name": "ds[0].id",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "item",
+                "locations": [
+                  "/ds/0"
+                ],
+                "message": "id is missing",
+                "name": "item 1 of ds",
+                "value": {
+                  "ok": true
+                }
+              },
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ds/1"
+                    ],
+                    "name": "ds[1].id",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "item",
+                "locations": [
+                  "/ds/1"
+                ],
+                "message": "id is missing",
+                "name": "item 2 of ds",
+                "value": {
+                  "ok": true
+                }
+              },
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ds/2"
+                    ],
+                    "name": "ds[2].id",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "item",
+                "locations": [
+                  "/ds/2"
+                ],
+                "message": "id is missing",
+                "name": "item 3 of ds",
+                "value": {
+                  "ok": true
+                }
+              },
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ds/3"
+                    ],
+                    "name": "ds[3].id",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "item",
+                "locations": [
+                  "/ds/3"
+                ],
+                "message": "id is missing",
+                "name": "item 4 of ds",
+                "value": {
+                  "ok": true
+                }
+              },
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ds/4"
+                    ],
+                    "name": "ds[4].id",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "item",
+                "locations": [
+                  "/ds/4"
+                ],
+                "message": "id is missing",
+                "name": "item 5 of ds",
+                "value": {
+                  "ok": true
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated d ids",
+                "value": []
+              }
+            ],
+            "message": "item 1 of ds: id is missing; item 2 of ds: id is missing; item 3 of ds: id is missing; and 2 more",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "d"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/ds/0/ok"
+                ],
+                "name": "ok",
+                "value": true
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "d"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/ds/1/ok"
+                ],
+                "name": "ok",
+                "value": true
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "d"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/ds/2/ok"
+                ],
+                "name": "ok",
+                "value": true
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "d"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/ds/3/ok"
+                ],
+                "name": "ok",
+                "value": true
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "d"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/ds/4/ok"
+                ],
+                "name": "ok",
+                "value": true
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "d"
+            }
+          }
+        ]
+      },
+      {
+        "description": "take an empty string, 0, false, an empty list and an empty object as ids",
+        "rules": ["unique_ids"],
+        "input": {"ds": [{"id": "", "ok": true}, {"id": 0, "ok": true}, {"id": false, "ok": true}, {"id": [], "ok": true}, {"id": {}, "ok": true}]},
+        "requirements": {"r": {"status": "met"}},
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated d ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "d"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/ds/0/ok"
+                ],
+                "name": "ok",
+                "value": true
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "",
+              "type": "d"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/ds/1/ok"
+                ],
+                "name": "ok",
+                "value": true
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": 0,
+              "type": "d"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/ds/2/ok"
+                ],
+                "name": "ok",
+                "value": true
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": false,
+              "type": "d"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/ds/3/ok"
+                ],
+                "name": "ok",
+                "value": true
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": [],
+              "type": "d"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/ds/4/ok"
+                ],
+                "name": "ok",
+                "value": true
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": {},
+              "type": "d"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "an identified_by that leads nowhere",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"d": {"from": "ds", "identified_by": "idd"}}, "requirements": {"r": {"subject": "d", "min_subjects": 0, "checks": {"c": "ok exists"}}}},
+    "cases": [
+      {
+        "description": "fails $unique_ids, so a typo doesn't pass quietly",
+        "rules": ["unique_ids", "subjects.id"],
+        "input": {"ds": [{"id": "a", "ok": true}]},
+        "requirements": {"r": {"status": "not_met"}},
+        "results": [
+          {
+            "cause": "absent",
+            "check": "$unique_ids",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ds/0"
+                    ],
+                    "name": "ds[0].idd",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "item",
+                "locations": [
+                  "/ds/0"
+                ],
+                "message": "idd is missing",
+                "name": "item 1 of ds",
+                "value": {
+                  "id": "a",
+                  "ok": true
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated d ids",
+                "value": []
+              }
+            ],
+            "message": "item 1 of ds: idd is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "d"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/ds/0/ok"
+                ],
+                "name": "ok",
+                "value": true
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "d"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "an id read through a field",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"d": {"from": "ds", "identified_by": "meta.id"}}, "requirements": {"r": {"subject": "d", "min_subjects": 0, "checks": {"c": "ok exists"}}}},
+    "cases": [
+      {
+        "description": "says what stopped the read, as the field's check would, and takes the worst cause",
+        "rules": ["unique_ids"],
+        "input": {"ds": [{"meta": 3, "ok": true}, {"meta": null, "ok": true}]},
+        "requirements": {"r": {"status": "not_met"}},
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "$unique_ids",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ds/0/meta"
+                    ],
+                    "name": "ds[0].meta.id",
+                    "outcome": "unusable",
+                    "value": null
+                  }
+                ],
+                "kind": "item",
+                "locations": [
+                  "/ds/0"
+                ],
+                "message": "meta is 3, which isn't an object",
+                "name": "item 1 of ds",
+                "value": {
+                  "meta": 3,
+                  "ok": true
+                }
+              },
+              {
+                "cause": "null",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ds/1/meta"
+                    ],
+                    "name": "ds[1].meta.id",
+                    "outcome": "null",
+                    "value": null
+                  }
+                ],
+                "kind": "item",
+                "locations": [
+                  "/ds/1"
+                ],
+                "message": "meta is null",
+                "name": "item 2 of ds",
+                "value": {
+                  "meta": null,
+                  "ok": true
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated d ids",
+                "value": []
+              }
+            ],
+            "message": "item 1 of ds: meta is 3, which isn't an object; item 2 of ds: meta is null",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "d"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/ds/0/ok"
+                ],
+                "name": "ok",
+                "value": true
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "d"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/ds/1/ok"
+                ],
+                "name": "ok",
+                "value": true
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "d"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a subject that is null",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"d": {"from": "ds"}}, "requirements": {"r": {"subject": "d", "min_subjects": 0, "checks": {"c": "ok exists"}}}},
+    "cases": [
+      {
+        "description": "is its own id, so it fails $unique_ids",
+        "rules": ["unique_ids", "subjects.id"],
+        "input": {"ds": ["a", null]},
+        "requirements": {"r": {"status": "not_met"}},
+        "results": [
+          {
+            "cause": "null",
+            "check": "$unique_ids",
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ds/1"
+                    ],
+                    "name": "ds[1]",
+                    "outcome": "null",
+                    "value": null
+                  }
+                ],
+                "kind": "item",
+                "locations": [
+                  "/ds/1"
+                ],
+                "message": "item 2 of ds is null",
+                "name": "item 2 of ds",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated d ids",
+                "value": []
+              }
+            ],
+            "message": "item 2 of ds is null",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "d"
+            }
+          },
+          {
+            "cause": "not_an_object",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "not_an_object",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ds/0"
+                    ],
+                    "name": "ok",
+                    "outcome": "not_an_object",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/c"
+                ],
+                "message": "d is \"a\", which isn't an object",
+                "name": "ok exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/ds/0"
+                ],
+                "name": "ok",
+                "outcome": "not_an_object",
+                "value": null
+              }
+            ],
+            "message": "d is \"a\", which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "d"
+            }
+          },
+          {
+            "cause": "not_an_object",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "not_an_object",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ds/1"
+                    ],
+                    "name": "ok",
+                    "outcome": "not_an_object",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/c"
+                ],
+                "message": "d is null, which isn't an object",
+                "name": "ok exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/ds/1"
+                ],
+                "name": "ok",
+                "outcome": "not_an_object",
+                "value": null
+              }
+            ],
+            "message": "d is null, which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "d"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "copies of a subject without an id",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"d": {"from": "every distinct ds", "identified_by": "id"}}, "requirements": {"r": {"subject": "d", "min_subjects": 0, "checks": {"c": "ok exists"}}}},
+    "cases": [
+      {
+        "description": "are one subject, listed at every copy",
+        "rules": ["unique_ids", "subjects.distinct"],
+        "input": {"ds": [{"ok": 1}, {"ok": 2}, {"ok": 1}]},
+        "requirements": {"r": {"status": "not_met"}},
+        "results": [
+          {
+            "cause": "absent",
+            "check": "$unique_ids",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ds/0"
+                    ],
+                    "name": "ds[0].id",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "item",
+                "locations": [
+                  "/ds/0",
+                  "/ds/2"
+                ],
+                "message": "id is missing",
+                "name": "item 1 of ds",
+                "value": {
+                  "ok": 1
+                }
+              },
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ds/1"
+                    ],
+                    "name": "ds[1].id",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "item",
+                "locations": [
+                  "/ds/1"
+                ],
+                "message": "id is missing",
+                "name": "item 2 of ds",
+                "value": {
+                  "ok": 2
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated d ids",
+                "value": []
+              }
+            ],
+            "message": "item 1 of ds: id is missing; item 2 of ds: id is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "d"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/ds/0/ok",
+                  "/ds/2/ok"
+                ],
+                "name": "ok",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "d"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/ds/1/ok"
+                ],
+                "name": "ok",
+                "value": 2
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "d"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "copies of a subject without an id inside an outer item",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"d": {"from": "every distinct ws.xs.meta", "identified_by": "id"}}, "requirements": {"r": {"subject": "d", "min_subjects": 0, "checks": {"c": "ok exists"}}}},
+    "cases": [
+      {
+        "description": "are one subject, whose entry under the outer item is listed at every copy",
+        "rules": ["unique_ids", "subjects.distinct"],
+        "input": {"ws": [{"xs": [{"meta": {"ok": true}}, {"meta": {"ok": true}}]}]},
+        "requirements": {"r": {"status": "not_met"}},
+        "results": [
+          {
+            "cause": "absent",
+            "check": "$unique_ids",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [{"locations": ["/ws/0/xs/0/meta"], "name": "ws[0].xs[0].meta.id", "outcome": "absent", "value": null}],
+                    "kind": "item",
+                    "locations": ["/ws/0/xs/0", "/ws/0/xs/1"],
+                    "message": "meta.id is missing",
+                    "name": "item 1 of xs",
+                    "value": {"meta": {"ok": true}}
+                  }
+                ],
+                "inputs": [],
+                "kind": "item",
+                "locations": ["/ws/0"],
+                "message": "",
+                "name": "item 1 of ws",
+                "value": {"xs": [{"meta": {"ok": true}}, {"meta": {"ok": true}}]}
+              }
+            ],
+            "inputs": [{"locations": [], "name": "repeated d ids", "value": []}],
+            "message": "item 1 of ws: item 1 of xs: meta.id is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {"id": null, "type": "d"}
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [{"locations": ["/ws/0/xs/0/meta/ok", "/ws/0/xs/1/meta/ok"], "name": "ok", "value": true}],
+            "passed": true,
+            "requirement": "r",
+            "subject": {"id": null, "type": "d"}
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a subject without an id that its conditions leave out",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"d": {"from": "ds whose keep exists", "identified_by": "id"}}, "requirements": {"r": {"subject": "d", "min_subjects": 0, "checks": {"c": "ok exists"}}}},
+    "cases": [
+      {
+        "description": "still fails $unique_ids, because it could be another record of one in scope",
+        "rules": ["unique_ids"],
+        "input": {"ds": [{"id": "a", "keep": 1, "ok": true}, {"ok": true}]},
+        "requirements": {"r": {"status": "not_met"}},
+        "results": [
+          {
+            "cause": "absent",
+            "check": "$unique_ids",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ds/1"
+                    ],
+                    "name": "ds[1].id",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "item",
+                "locations": [
+                  "/ds/1"
+                ],
+                "message": "id is missing",
+                "name": "item 2 of ds",
+                "value": {
+                  "ok": true
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated d ids",
+                "value": []
+              }
+            ],
+            "message": "item 2 of ds: id is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "d"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$applies",
+            "inputs": [
+              {
+                "locations": [
+                  "/ds/0/keep"
+                ],
+                "name": "keep",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "d"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "$applies",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ds/1"
+                    ],
+                    "name": "keep",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/subjects/d/from"
+                ],
+                "message": "keep is missing",
+                "name": "keep exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/ds/1"
+                ],
+                "name": "keep",
+                "outcome": "absent",
+                "value": null
+              }
+            ],
+            "message": "keep is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "d"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/ds/0/ok"
+                ],
+                "name": "ok",
+                "value": true
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "d"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a subject without an id in a list of lists",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"d": {"from": "every xs.bs", "identified_by": "id"}}, "requirements": {"r": {"subject": "d", "min_subjects": 0, "checks": {"c": "ok exists"}}}},
+    "cases": [
+      {
+        "description": "sits under the outer item",
+        "rules": ["unique_ids", "row.parts"],
+        "input": {"xs": [{"bs": [{"id": 1, "ok": true}, {"ok": true}]}]},
+        "requirements": {"r": {"status": "not_met"}},
+        "results": [
+          {
+            "cause": "absent",
+            "check": "$unique_ids",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/xs/0/bs/1"
+                        ],
+                        "name": "xs[0].bs[1].id",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/xs/0/bs/1"
+                    ],
+                    "message": "id is missing",
+                    "name": "item 2 of bs",
+                    "value": {
+                      "ok": true
+                    }
+                  }
+                ],
+                "inputs": [],
+                "kind": "item",
+                "locations": [
+                  "/xs/0"
+                ],
+                "message": "",
+                "name": "item 1 of xs",
+                "value": {
+                  "bs": [
+                    {
+                      "id": 1,
+                      "ok": true
+                    },
+                    {
+                      "ok": true
+                    }
+                  ]
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated d ids",
+                "value": []
+              }
+            ],
+            "message": "item 1 of xs: item 2 of bs: id is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "d"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/xs/0/bs/0/ok"
+                ],
+                "name": "ok",
+                "value": true
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": 1,
+              "type": "d"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/xs/0/bs/1/ok"
+                ],
+                "name": "ok",
+                "value": true
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "d"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a subject outside a list without an id",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"d": {"from": "thing", "identified_by": "id"}}, "requirements": {"r": {"subject": "d", "min_subjects": 0, "checks": {"c": "ok exists"}}}},
+    "cases": [
+      {
+        "description": "has no entry, and the read of its id is on the row",
+        "rules": ["unique_ids", "row.parts"],
+        "input": {"thing": {"ok": true}},
+        "requirements": {"r": {"status": "not_met"}},
+        "results": [
+          {
+            "cause": "absent",
+            "check": "$unique_ids",
+            "failures": [],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated d ids",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/thing"
+                ],
+                "name": "thing.id",
+                "outcome": "absent",
+                "value": null
+              }
+            ],
+            "message": "thing.id is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "d"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/thing/ok"
+                ],
+                "name": "ok",
+                "value": true
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "d"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a parent and a child without an id",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"art": {"from": "arts", "identified_by": "id"}, "d": {"from": "every art.prs", "identified_by": "id"}}, "requirements": {"r": {"subject": "d", "min_subjects": 0, "checks": {"c": "ok exists"}}}},
+    "cases": [
+      {
+        "description": "fail $unique_ancestor_ids and $unique_ids, each named from where it was read",
+        "rules": ["unique_ids.ancestors", "unique_ids"],
+        "input": {"arts": [{"id": "a1", "prs": [{"id": 1, "ok": true}, {"ok": true}]}, {"prs": [{"id": 2, "ok": true}]}]},
+        "requirements": {"r": {"status": "not_met"}},
+        "results": [
+          {
+            "cause": "absent",
+            "check": "$unique_ids",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/arts/0/prs/1"
+                    ],
+                    "name": "prs[1].id",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "item",
+                "locations": [
+                  "/arts/0/prs/1"
+                ],
+                "message": "id is missing",
+                "name": "item 2 of prs",
+                "value": {
+                  "ok": true
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated d ids",
+                "value": []
+              }
+            ],
+            "message": "item 2 of prs: id is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "art": "a1"
+              },
+              "type": "d"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated d ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "art": null
+              },
+              "type": "d"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "$unique_ancestor_ids",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/arts/1"
+                    ],
+                    "name": "arts[1].id",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "item",
+                "locations": [
+                  "/arts/1"
+                ],
+                "message": "id is missing",
+                "name": "item 2 of arts",
+                "value": {
+                  "prs": [
+                    {
+                      "id": 2,
+                      "ok": true
+                    }
+                  ]
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated art ids",
+                "value": []
+              }
+            ],
+            "message": "item 2 of arts: id is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "art"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/arts/0/prs/0/ok"
+                ],
+                "name": "ok",
+                "value": true
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": 1,
+              "in": {
+                "art": "a1"
+              },
+              "type": "d"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/arts/0/prs/1/ok"
+                ],
+                "name": "ok",
+                "value": true
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "art": "a1"
+              },
+              "type": "d"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/arts/1/prs/0/ok"
+                ],
+                "name": "ok",
+                "value": true
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": 2,
+              "in": {
+                "art": null
+              },
+              "type": "d"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a subject read through a field of each item without an id",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"d": {"from": "every xs.meta", "identified_by": "id"}}, "requirements": {"r": {"subject": "d", "checks": {"c": "ok exists"}}}},
+    "cases": [
+      {
+        "description": "is named by its item, and its item is the entry",
+        "rules": ["unique_ids", "row.parts"],
+        "input": {"xs": [{"meta": {"ok": true}}, {"meta": {"id": 1, "ok": true}}]},
+        "requirements": {"r": {"status": "not_met"}},
+        "results": [
+          {
+            "cause": "absent",
+            "check": "$unique_ids",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/xs/0/meta"
+                    ],
+                    "name": "xs[0].meta.id",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "item",
+                "locations": [
+                  "/xs/0"
+                ],
+                "message": "meta.id is missing",
+                "name": "item 1 of xs",
+                "value": {
+                  "meta": {
+                    "ok": true
+                  }
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated d ids",
+                "value": []
+              }
+            ],
+            "message": "item 1 of xs: meta.id is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "d"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/xs/0/meta/ok"
+                ],
+                "name": "ok",
+                "value": true
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "d"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/xs/1/meta/ok"
+                ],
+                "name": "ok",
+                "value": true
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": 1,
+              "type": "d"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a subject that is the whole input without an id",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"d": {"from": "$input", "identified_by": "id"}}, "requirements": {"r": {"subject": "d", "checks": {"c": "ok exists"}}}},
+    "cases": [
+      {
+        "description": "is named from $input, where it was read",
+        "rules": ["unique_ids"],
+        "input": {"ok": true},
+        "requirements": {"r": {"status": "not_met"}},
+        "results": [
+          {
+            "cause": "absent",
+            "check": "$unique_ids",
+            "failures": [],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated d ids",
+                "value": []
+              },
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "$input.id",
+                "outcome": "absent",
+                "value": null
+              }
+            ],
+            "message": "$input.id is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "d"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/ok"
+                ],
+                "name": "ok",
+                "value": true
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "d"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "an id that ends at a position",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"d": {"from": "ds", "identified_by": "meta[0]"}}, "requirements": {"r": {"subject": "d", "checks": {"c": "ok exists"}}}},
+    "cases": [
+      {
+        "description": "names the read of the id as a check names it",
+        "rules": ["unique_ids", "row.parts"],
+        "input": {"ds": [{"ok": true}]},
+        "requirements": {"r": {"status": "not_met"}},
+        "results": [
+          {
+            "cause": "absent",
+            "check": "$unique_ids",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ds/0"
+                    ],
+                    "name": "item 1 of ds[0].meta",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "item",
+                "locations": [
+                  "/ds/0"
+                ],
+                "message": "item 1 of meta is missing",
+                "name": "item 1 of ds",
+                "value": {
+                  "ok": true
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated d ids",
+                "value": []
+              }
+            ],
+            "message": "item 1 of ds: item 1 of meta is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "d"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/ds/0/ok"
+                ],
+                "name": "ok",
+                "value": true
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "d"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "an id that ends at a position on a subject outside a list",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"d": {"from": "art", "identified_by": "meta[0]"}}, "requirements": {"r": {"subject": "d", "checks": {"c": "ok exists"}}}},
+    "cases": [
+      {
+        "description": "is named from where the subject was read, with its position first",
+        "rules": ["unique_ids"],
+        "input": {"art": {"ok": true}},
+        "requirements": {"r": {"status": "not_met"}},
+        "results": [
+          {
+            "cause": "absent",
+            "check": "$unique_ids",
+            "failures": [],
+            "inputs": [
+              {"locations": [], "name": "repeated d ids", "value": []},
+              {"locations": ["/art"], "name": "item 1 of art.meta", "outcome": "absent", "value": null}
+            ],
+            "message": "item 1 of art.meta is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {"id": null, "type": "d"}
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [{"locations": ["/art/ok"], "name": "ok", "value": true}],
+            "passed": true,
+            "requirement": "r",
+            "subject": {"id": null, "type": "d"}
+          }
+        ]
+      },
+      {
+        "description": "is named the same way when the item at that position is null",
+        "rules": ["unique_ids"],
+        "input": {"art": {"meta": [null], "ok": true}},
+        "requirements": {"r": {"status": "not_met"}},
+        "results": [
+          {
+            "cause": "null",
+            "check": "$unique_ids",
+            "failures": [],
+            "inputs": [
+              {"locations": [], "name": "repeated d ids", "value": []},
+              {"locations": ["/art/meta/0"], "name": "item 1 of art.meta", "outcome": "null", "value": null}
+            ],
+            "message": "item 1 of art.meta is null",
+            "passed": false,
+            "requirement": "r",
+            "subject": {"id": null, "type": "d"}
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [{"locations": ["/art/ok"], "name": "ok", "value": true}],
+            "passed": true,
+            "requirement": "r",
+            "subject": {"id": null, "type": "d"}
           }
         ]
       }
