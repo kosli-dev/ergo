@@ -1,3 +1,4 @@
+use super::clause::Clause;
 use super::message;
 use super::{Check, Input, SidePath, Verdict, read_path, run as run_check};
 use crate::cause::Cause;
@@ -1101,6 +1102,25 @@ pub(super) fn focus_segs<'s>(item: &'s WalkItem, check: &Check) -> &'s [Seg] {
     } else {
         &item.item_segs
     }
+}
+
+#[allow(dead_code)]
+pub(super) fn item_own(
+    check: &Check,
+    item: &WalkItem,
+    walked: &Walked,
+    outer: &Ctx,
+) -> Option<Clause> {
+    let focus = focus_ctx(item, outer);
+    let said: Vec<Clause> = check
+        .paths()
+        .into_iter()
+        .filter_map(|path| super::key_base::of_path(path, false, &focus)?.base)
+        .map(|(text, cause, _)| Clause::said(cause, text))
+        .collect();
+    let cause = Cause::worst(said.iter().map(|clause| clause.cause))?;
+    let name = walked.item_name(focus_segs(item, check));
+    Some(Clause::item(&name, cause, String::new(), said))
 }
 
 fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
