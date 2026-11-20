@@ -2072,3 +2072,18 @@ fn a_count_says_a_value_before_a_missing_or_null_key_that_isnt_an_object_and_fai
         );
     }
 }
+
+#[test]
+fn a_count_fails_as_absent_when_a_null_key_meets_a_missing_value_before_it() {
+    assert_eq!(
+        cause_and_said(
+            "count of items.v that is m named by $params.k is 0",
+            json!([{"v": {}}]),
+            json!({"k": null}),
+        ),
+        (
+            Cause::Absent,
+            "$params.k is null; item 1 of items: v: m is missing".to_string()
+        )
+    );
+}
