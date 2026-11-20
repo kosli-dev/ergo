@@ -1221,19 +1221,22 @@ fn stood_in(check: &Check, focus: &Ctx, blocked: impl Fn(&Path) -> bool) -> Opti
         right.paths(&mut paths);
         paths.into_iter().any(&blocked)
     };
+    let mixed = |list: &Path| {
+        let kinds: std::collections::BTreeSet<&str> = path::read(list, focus)
+            .value
+            .and_then(Value::as_array)
+            .into_iter()
+            .flatten()
+            .filter(|value| !value.is_null())
+            .map(message::kind)
+            .collect();
+        kinds.len() > 1
+    };
     let compare = match check {
         Check::Compare(compare) => compare,
         Check::Contains(contains) if !blocked(&contains.path) => {
-            let kinds: std::collections::BTreeSet<&str> = path::read(&contains.path, focus)
-                .value
-                .and_then(Value::as_array)
-                .into_iter()
-                .flatten()
-                .filter(|value| !value.is_null())
-                .map(message::kind)
-                .collect();
             let wanted = match &contains.wanted {
-                _ if kinds.len() > 1 => return None,
+                _ if mixed(&contains.path) => return None,
                 Wanted::One(right) if right_blocked(right) => {
                     Wanted::One(Right::Written(Value::Null))
                 }
@@ -1254,6 +1257,19 @@ fn stood_in(check: &Check, focus: &Ctx, blocked: impl Fn(&Path) -> bool) -> Opti
             return Some(Check::In(In {
                 values: Right::Written(Value::Array(Vec::new())),
                 ..within.clone()
+            }));
+        }
+        Check::In(within) if !right_blocked(&within.values) => {
+            let (Right::Field(list) | Right::Ref(list)) = &within.values else {
+                return None;
+            };
+            if mixed(list) {
+                return None;
+            }
+            return Some(Check::Contains(Contains {
+                path: list.clone(),
+                wanted: Wanted::One(Right::Written(Value::Null)),
+                not: false,
             }));
         }
         Check::Matches(matches) if !blocked(&matches.path) && right_blocked(&matches.patterns) => {
