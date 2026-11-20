@@ -4,3 +4,4 @@ dist/
 node_modules
 engines/rust/wasm/pkg/
 engines/rust/sentences-wasm/pkg/
+__pycache__/
