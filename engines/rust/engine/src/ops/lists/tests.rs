@@ -1211,7 +1211,7 @@ fn in_ignoring_case_fails_on_a_field_that_isnt_text() {
 }
 
 #[test]
-fn in_ignoring_case_names_every_value_that_isnt_text_in_list_order() {
+fn in_ignoring_case_leaves_a_list_from_the_params_to_the_roots_and_names_its_own_side() {
     let check = In {
         path: x(),
         values: states(),
@@ -1237,23 +1237,42 @@ fn in_ignoring_case_names_every_value_that_isnt_text_in_list_order() {
     };
     assert_eq!(
         faults(json!({"x": 3}), json!(["Bug", 3, null, true])),
+        vec![("x".to_string(), "x is 3, which isn't text".to_string())]
+    );
+    assert_eq!(faults(json!({"x": "a"}), json!(["Bug", 3, null])), vec![]);
+    assert_eq!(faults(json!({"x": "a"}), json!("Bug")), vec![]);
+    assert_eq!(faults(json!({"x": "a"}), json!(["Bug"])), vec![]);
+}
+
+#[test]
+fn in_ignoring_case_names_every_value_of_a_field_list_that_isnt_text_in_list_order() {
+    let check = In {
+        path: x(),
+        values: Right::Field(key_path(Start::Subject, &["ys"])),
+        not: false,
+        ignoring: Some(BOTH),
+    };
+    let input = json!({"things": [{"x": 3, "ys": ["Bug", 3, null]}]});
+    let ctx = Ctx {
+        label: None,
+        item_by_item: false,
+        in_option: false,
+        subject: Located {
+            value: &input["things"][0],
+            location: Location::input_root().key("things").index(0),
+        },
+        input: &input,
+        params: None,
+        aliases: BTreeMap::new(),
+    };
+    assert_eq!(
+        in_faults(&check, &ctx),
         vec![
             ("x".to_string(), "x is 3, which isn't text".to_string()),
-            (
-                "$params.states".to_string(),
-                "item 2 of $params.states is 3, which isn't text".to_string()
-            ),
-            (
-                "$params.states".to_string(),
-                "item 3 of $params.states is null".to_string()
-            ),
-            (
-                "$params.states".to_string(),
-                "item 4 of $params.states is true, which isn't text".to_string()
-            ),
+            ("ys".to_string(), "item 2 of ys is 3, which isn't text".to_string()),
+            ("ys".to_string(), "item 3 of ys is null".to_string()),
         ]
     );
-    assert_eq!(faults(json!({"x": "a"}), json!(["Bug"])), vec![]);
 }
 
 #[test]
