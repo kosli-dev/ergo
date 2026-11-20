@@ -193,3 +193,38 @@ fn a_worse_base_makes_an_input_worse_and_a_milder_one_keeps_it() {
     );
     assert_eq!(worse_state(Outcome::Unusable, Cause::Absent), None);
 }
+
+#[test]
+fn an_assertion_lists_a_key_it_cant_read_when_an_item_that_isnt_an_object_makes_the_cause_worse() {
+    let tree =
+        ergo_policy_sentences::parse_check("count of es.v that is m named by $params.k is 0")
+            .unwrap();
+    let check =
+        crate::lower::lower_assertion(&tree.assertions[0], &crate::lower::Scope::new()).unwrap();
+    let subject = json!({"es": [{"v": 2}]});
+    let params = json!({"k": 3});
+    let names: Vec<Value> = entry_inputs(
+        &check,
+        &ctx(&subject, &params, &[]),
+        Cause::NotAnObject,
+        &[],
+    )
+    .into_iter()
+    .map(|input| input["name"].clone())
+    .collect();
+    assert_eq!(names, [json!("$params.k")]);
+}
+
+#[test]
+fn a_plain_check_on_an_input_that_is_a_list_lists_no_key_beside_the_input() {
+    let tree =
+        ergo_policy_sentences::parse_check("$input.m named by $params.k is a string").unwrap();
+    let check =
+        crate::lower::lower_assertion(&tree.assertions[0], &crate::lower::Scope::new()).unwrap();
+    let input = json!([{"id": "t", "tags": ["a"], "m": {"a": "a"}}]);
+    let params = json!({});
+    assert_eq!(
+        entry_inputs(&check, &ctx(&input, &params, &[]), Cause::NotAnObject, &[]),
+        Vec::<Value>::new()
+    );
+}
