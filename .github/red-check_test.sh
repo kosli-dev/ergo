@@ -143,6 +143,8 @@ mkdir -p "$fake/bin" "$fake/repo/.github" "$fake/repo/engines/rust/foo/src"
 cp "$here/red-check.sh" "$fake/repo/.github/red-check.sh"
 printf '#!/bin/sh\nprintf "%%s|%%s|%%s\\n" "$ASDF_RUST_VERSION" "$*" "$(stat -f %%m foo/src/lib.rs 2>/dev/null || stat -c %%Y foo/src/lib.rs)" >> "$FAKE_LOG"\nsleep 1\nprintf "test tests::%%s ... ok\\ntest result: ok. 1 passed\\n" "${FAKE_RAN:-$(for a; do :; done; echo $a)}"\n' > "$fake/bin/cargo"
 chmod +x "$fake/bin/cargo"
+printf '#!/bin/sh\ncase "$1 $2" in\n  "-c %%Y") /usr/bin/stat -f %%m "$3" ;;\n  *) printf "  File: \\"%%s\\"\\n    ID: 1 Namelen: 255 Type: ext2/ext3\\nBlock size: 4096\\nInodes: Total: 1 Free: 1\\n" "$3" ;;\nesac\n' > "$fake/bin/stat"
+chmod +x "$fake/bin/stat"
 git -C "$fake/repo" init --quiet
 git -C "$fake/repo" config user.email t@example.com
 git -C "$fake/repo" config user.name t
