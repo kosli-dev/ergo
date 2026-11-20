@@ -141,7 +141,7 @@ echo "red-check.sh runs cargo with the pinned Rust version, an exact test name a
 fake=$dir/fake
 mkdir -p "$fake/bin" "$fake/repo/.github" "$fake/repo/engines/rust/foo/src"
 cp "$here/red-check.sh" "$fake/repo/.github/red-check.sh"
-printf '#!/bin/sh\nprintf "%%s|%%s|%%s\\n" "$ASDF_RUST_VERSION" "$*" "$(stat -f %%m foo/src/lib.rs 2>/dev/null || stat -c %%Y foo/src/lib.rs)" >> "$FAKE_LOG"\nsleep 1\necho "test result: ok. 1 passed"\n' > "$fake/bin/cargo"
+printf '#!/bin/sh\nprintf "%%s|%%s|%%s\\n" "$ASDF_RUST_VERSION" "$*" "$(stat -f %%m foo/src/lib.rs 2>/dev/null || stat -c %%Y foo/src/lib.rs)" >> "$FAKE_LOG"\nsleep 1\nprintf "test tests::%%s ... ok\\ntest result: ok. 1 passed\\n" "${FAKE_RAN:-$(for a; do :; done; echo $a)}"\n' > "$fake/bin/cargo"
 chmod +x "$fake/bin/cargo"
 git -C "$fake/repo" init --quiet
 git -C "$fake/repo" config user.email t@example.com
@@ -166,11 +166,21 @@ if [ "$(cut -d'|' -f1 "$FAKE_LOG" | sort -u)" != 1.2.3 ]; then
   echo "cargo should run with the version in rust-toolchain.toml, and ran: $(cat "$FAKE_LOG")" >&2
   exit 1
 fi
-if [ "$(grep -c -e '-- --exact' "$FAKE_LOG")" != 2 ]; then
-  echo "cargo should get --exact after the test name, and got: $(cat "$FAKE_LOG")" >&2
+if grep -q -e '--exact' "$FAKE_LOG"; then
+  echo "cargo should not get --exact, which needs the whole module path, and got: $(cat "$FAKE_LOG")" >&2
   exit 1
 fi
 if [ "$(cut -d'|' -f3 "$FAKE_LOG" | sort -u | wc -l | tr -d ' ')" != 1 ]; then
   echo "the sources should be touched once, and cargo saw: $(cat "$FAKE_LOG")" >&2
   exit 1
 fi
+
+echo "red-check.sh does not list a test that cargo did not run by that exact name"
+out=$(cd "$fake/repo" && FAKE_RAN=foo_bar PATH=$fake/bin:$PATH env -u RED_CHECK_REGO_CMD -u RED_CHECK_RUST_CMD sh .github/red-check.sh "$fakebase")
+case $out in
+  *"0 pass"*"2 could not run."*) ;;
+  *)
+    echo "red-check.sh should count both tests as not run, and printed: $out" >&2
+    exit 1
+    ;;
+esac
