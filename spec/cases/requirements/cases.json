@@ -17060,6 +17060,324 @@
     ]
   },
   {
+    "description": "a child subject is counted per parent, so snapshots of one thing can be parents",
+    "policy": {"ergo_spec": "{{spec}}", "requirements": {"merged prs": {"checks": {"has number": "number exists"}, "min_subjects": 0, "subject": "pr"}}, "subjects": {"pr": {"from": "every trail.pull_requests whose state is \"MERGED\"", "identified_by": "number"}, "trail": {"from": "every trails", "identified_by": "name"}}},
+    "cases": [
+      {
+        "description": "is met when each trail is a parent, though merged pull requests of different trails share a number",
+        "input": {
+          "trails": [
+            {
+              "name": "t1",
+              "pull_requests": [
+                {
+                  "number": 7,
+                  "state": "OPEN"
+                }
+              ]
+            },
+            {
+              "name": "t2",
+              "pull_requests": [
+                {
+                  "merge_commit": "m1",
+                  "number": 7,
+                  "state": "MERGED"
+                },
+                {
+                  "merge_commit": "m1",
+                  "number": 9,
+                  "state": "OPEN"
+                }
+              ]
+            },
+            {
+              "labels": [
+                "x"
+              ],
+              "name": "t3",
+              "pull_requests": [
+                {
+                  "number": 7,
+                  "state": "MERGED"
+                }
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "merged prs": {
+            "causes": [],
+            "status": "met"
+          }
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated pr ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "merged prs",
+            "subject": {
+              "id": null,
+              "in": {
+                "trail": "t1"
+              },
+              "type": "pr"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated pr ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "merged prs",
+            "subject": {
+              "id": null,
+              "in": {
+                "trail": "t2"
+              },
+              "type": "pr"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated pr ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "merged prs",
+            "subject": {
+              "id": null,
+              "in": {
+                "trail": "t3"
+              },
+              "type": "pr"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ancestor_ids",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated trail ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "merged prs",
+            "subject": {
+              "id": null,
+              "type": "trail"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "$applies",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/trails/0/pull_requests/0/state"
+                    ],
+                    "name": "state",
+                    "outcome": "usable",
+                    "value": "OPEN"
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/subjects/pr/from"
+                ],
+                "message": "state is \"OPEN\"",
+                "name": "state is \"MERGED\""
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/trails/0/pull_requests/0/state"
+                ],
+                "name": "state",
+                "outcome": "usable",
+                "value": "OPEN"
+              }
+            ],
+            "message": "state is \"OPEN\"",
+            "passed": false,
+            "requirement": "merged prs",
+            "subject": {
+              "id": 7,
+              "in": {
+                "trail": "t1"
+              },
+              "type": "pr"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$applies",
+            "inputs": [
+              {
+                "locations": [
+                  "/trails/1/pull_requests/0/state"
+                ],
+                "name": "state",
+                "value": "MERGED"
+              }
+            ],
+            "passed": true,
+            "requirement": "merged prs",
+            "subject": {
+              "id": 7,
+              "in": {
+                "trail": "t2"
+              },
+              "type": "pr"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "$applies",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/trails/1/pull_requests/1/state"
+                    ],
+                    "name": "state",
+                    "outcome": "usable",
+                    "value": "OPEN"
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/subjects/pr/from"
+                ],
+                "message": "state is \"OPEN\"",
+                "name": "state is \"MERGED\""
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/trails/1/pull_requests/1/state"
+                ],
+                "name": "state",
+                "outcome": "usable",
+                "value": "OPEN"
+              }
+            ],
+            "message": "state is \"OPEN\"",
+            "passed": false,
+            "requirement": "merged prs",
+            "subject": {
+              "id": 9,
+              "in": {
+                "trail": "t2"
+              },
+              "type": "pr"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$applies",
+            "inputs": [
+              {
+                "locations": [
+                  "/trails/2/pull_requests/0/state"
+                ],
+                "name": "state",
+                "value": "MERGED"
+              }
+            ],
+            "passed": true,
+            "requirement": "merged prs",
+            "subject": {
+              "id": 7,
+              "in": {
+                "trail": "t3"
+              },
+              "type": "pr"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "has number",
+            "inputs": [
+              {
+                "locations": [
+                  "/trails/1/pull_requests/0/number"
+                ],
+                "name": "number",
+                "value": 7
+              }
+            ],
+            "passed": true,
+            "requirement": "merged prs",
+            "subject": {
+              "id": 7,
+              "in": {
+                "trail": "t2"
+              },
+              "type": "pr"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "has number",
+            "inputs": [
+              {
+                "locations": [
+                  "/trails/2/pull_requests/0/number"
+                ],
+                "name": "number",
+                "value": 7
+              }
+            ],
+            "passed": true,
+            "requirement": "merged prs",
+            "subject": {
+              "id": 7,
+              "in": {
+                "trail": "t3"
+              },
+              "type": "pr"
+            }
+          }
+        ],
+        "rules": [
+          "unique_ids",
+          "subjects.chain.count"
+        ]
+      }
+    ]
+  },
+  {
     "description": "a parent without identified_by is its own id",
     "policy": {"ergo_spec": "{{spec}}", "requirements": {"reviewed": {"checks": {"approved": "approved_by is a non-empty string"}, "require": "every", "subject": "pull request"}}, "subjects": {"commit": {"from": "commits"}, "pull request": {"from": "every commit.pull_requests", "identified_by": "number"}}},
     "cases": [

@@ -328,6 +328,7 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("lls contains m", "lls contains m", &[], &[]),
     ("ls equals ms", "ls equals ms", &[], &[]),
     ("m is in lls", "m is in lls", &[], &[]),
+    ("number exists", "number exists", &[], &[]),
     ("o equals $params.o", "o equals $params.o", &[], &[]),
     ("o equals p", "o equals p", &[], &[]),
     ("o is not p", "o does not equal p", &[], &[]),
