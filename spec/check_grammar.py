@@ -32,6 +32,10 @@ NON_SYNTAX = [
         r'^"followed by" can\'t take a count of, a sum of or a plus$',
         r'^"followed by" can\'t follow a count of, a sum of or a plus$',
         r'^"followed by" isn\'t supported yet after every or some, or in a whose$',
+        r'^"[^"]*" can\'t take ignoring ',
+        r'^"ignoring [^"]*" can\'t take a count of, a sum of or a plus$',
+        r'^"ignoring [^"]*" can\'t follow a count of, a sum of or a plus$',
+        r'^"ignoring surrounding spaces and case" is written "ignoring case and surrounding spaces"$',
     ]
 ]
 
