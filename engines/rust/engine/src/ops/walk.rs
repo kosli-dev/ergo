@@ -1523,7 +1523,7 @@ pub fn list_state(walked: &Walked) -> crate::path::Outcome {
     walked
         .failures
         .iter()
-        .find(|f| walked.items.is_empty() && !f.item.starts_with("item "))
+        .find(|f| walked.items.is_empty() && !crate::parts::is_item(&f.item))
         .map_or(crate::path::Outcome::Found, |f| match f.cause {
             Cause::Absent => crate::path::Outcome::Absent,
             Cause::Null => crate::path::Outcome::Null,

@@ -296,7 +296,9 @@ pub fn said_with_bases(mut said: Said, cause: Cause, bases: &[KeyBase]) -> (Said
                         .collect();
                     let kept: Vec<Clause> = clauses
                         .into_iter()
-                        .filter(|clause| !(said_alone(clause) && is_root(&bases_said, &clause.text)))
+                        .filter(|clause| {
+                            !(said_alone(clause) && is_root(&bases_said, &clause.text))
+                        })
                         .collect();
                     if kept.is_empty() {
                         at.get_or_insert(i);
@@ -316,7 +318,7 @@ pub fn said_with_bases(mut said: Said, cause: Cause, bases: &[KeyBase]) -> (Said
     if let Some((i, j)) = counted
         && let Some(Piece::Counted(clauses)) = said[i].get_mut(j)
     {
-        clauses.extend(roots.drain(..));
+        clauses.append(&mut roots);
     }
     roots.extend(
         keys.into_iter()

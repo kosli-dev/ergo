@@ -67,7 +67,6 @@ distinct / every and some distinct / copies that fail are one entry of failed_it
 distinct / every and some distinct / copies that pass pass
 distinct / every distinct with conditions / copies a condition can't decide fail one $applies row with every copy's location
 distinct / locations read through the subject and read from the input / a read through the subject lists every copy, and a path from the input lists only the location it names
-equals / is 2 with a ref step after a field, and the param is null / fails with the ref's cause when the parent field is missing
 for / a $params list that a for line reads fails it when the line's whose leaves nothing and an item of the list can't be read / fails, when the whose leaves nothing
 for / a $params list that a for line walks fails it on an empty list when an item of it can't be read / fails, with an empty rows, when an item of it has no name
 for / a $params list that a for line walks fails it on an empty list when an item of it is null / fails, with an empty rows
@@ -437,7 +436,6 @@ messages / nothing hides a problem / the roots come first and then the list's ow
 messages / the order of the roots a count of names / puts a root of the wrong type first, then the missing or null $params and $input roots sorted by name
 messages / the order of the roots a count of names when $params holds null / names a root of the wrong type first, then each null $params root sorted by name
 messages / the roots of one sentence, keys and sides alike, are said worst cause first and then by name / a missing key comes before a null value before it
-messages / the roots of one sentence, keys and sides alike, are said worst cause first and then by name / a value before the key that isn't an object comes before a missing key
 messages / the roots of one sentence, keys and sides alike, are said worst cause first and then by name / roots of one cause come by name, $params first
 messages / the roots of one sentence, with a key from $params that is null and nothing on the subject / says each missing root by name, then the null key
 messages / two roots after is in that aren't lists, in one relative clause / names both on an empty list too
@@ -445,7 +443,6 @@ messages / two roots after is in that aren't lists, in one relative clause / nam
 messages / two roots in a whose that fail in different ways, beside a list that can be read, take the worst cause / a root that is null and one that is missing fail as absent
 messages / two roots in one relative clause that fail in different ways / names every root that failed, whatever its cause, worst cause first and then by name
 messages / two roots in one relative clause that fail in different ways / names them in front of what the items say when an item fails in a worse way
-missing / does not exist with a ref step after a field, and the param is null / fails with the ref's cause when the parent field is missing
 parts / a child subject that reads its own field named like its parent's part, with no part of its own / prints no dot, because a bare name in the child doesn't read the parent's part
 parts / a child subject with no part of its own, reading a field named like its parent's part / prints no dot, because a bare name in the child doesn't read the parent's part
 parts / a count of or sum of a parent's part on the right side of a whose, alone and in a plus / counts the parent's part, not the parent's field of the same name, so a part with too many items fails
@@ -454,7 +451,6 @@ parts / a parent's name on the right side of a count of or sum of in a whose / f
 parts / a part or the subject's name in a count of after that, over items that aren't objects / fails as unusable when the part's list is text
 parts / a part's alias on the right of a whose, with a part that is missing, null or not a list / fails closed for each thing, and never reads the items' own field instead
 parts / the same check written with an alias and with the path it stands for / gives the same rows when the part is missing, null or a string
-present / exists with a ref step after a field, and the param is null / fails with the ref's cause when the parent field is missing
 requirements / a child subject of the whole input when it is a list / reads the child under each item, though the items aren't all of one type
 requirements / a field of the whole input when it is a list / ends unusable and names the list to read with every, because a key needs an object
 requirements / a filter / fails min_subjects when every subject is out of scope
@@ -704,7 +700,6 @@ subjects / a position isn't a name and never meets a list / needs every for a li
 subjects / a subject that narrows a parent read with every, over a list that can't be walked / fails min_subjects as unusable when a name read as a list isn't one in every item, and still checks the value
 subjects / a subject that narrows a parent read with every, over a list that can't be walked, with min_subjects 0 / fails min_subjects as unusable when a name read as a list isn't one in every item, and still checks the value
 subjects / a subject with nothing under it / fails $min_subjects as absent when the input has no such field
-subjects / a whose filter with a ref step after a field, and the param is null / fails with the ref's cause when the parent field is missing
 subjects / every in a from line that meets text where it needs an object / fails min_subjects as unusable, names the value where the read stopped as a check does, and lists each place
 that / a for line with that and whose gives the same cause in either order / an item that isn't an object is not_an_object, with that first
 that / a for line with that and whose gives the same cause in either order, with whose first / an item that isn't an object is not_an_object, with whose first

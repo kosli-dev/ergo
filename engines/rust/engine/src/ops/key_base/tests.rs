@@ -300,8 +300,12 @@ fn a_base_is_a_root_clause_in_root_order() {
         )
     );
     assert_eq!(
-        rewritten_plain("m.v named by $params.k is 1", &json!({"m": "s"}), &json!({}))
-            .as_deref(),
+        rewritten_plain(
+            "m.v named by $params.k is 1",
+            &json!({"m": "s"}),
+            &json!({})
+        )
+        .as_deref(),
         Some("m is \"s\", which isn't an object; $params.k is missing")
     );
 }
