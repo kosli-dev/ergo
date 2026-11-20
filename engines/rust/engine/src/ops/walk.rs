@@ -1521,7 +1521,8 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
                 })
             } else if let Some((check, verdict, _)) = first {
                 (super::tally::without_roots(check).is_none()
-                    && super::key_base::missing_keys(check, ctx).is_empty())
+                    && super::key_base::missing_keys(check, ctx).is_empty()
+                    && super::key_base::unusable_keys(check, ctx).is_empty())
                 .then(|| rooted_failure(walk, walked, item, check, verdict, &focus, ctx))
             } else if kept && !passed {
                 let off = message::off_item(&leaf_check, ctx, leaf.cause);

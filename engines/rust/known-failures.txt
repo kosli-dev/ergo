@@ -744,9 +744,7 @@ walks / a path whose named by key from $params isn't text and whose value before
 walks / a that clause whose key from $params is missing reads the value before the key on the focus / the focus has no m
 walks / a that clause whose key from $params isn't text reads the value before the key on the focus, not on the item / one focus has no m and another holds null
 walks / a that clause whose key from $params isn't text reads the value before the key on the focus, not on the item / the focus has no m, and the item has one
-walks / a that clause whose key from $params isn't text reads the value before the key on the focus, not on the item / the focus holds m
 walks / a that key that can't be read, on a list item that isn't an object, names the item and never a field under it / the key is null and the items are an object whose focus isn't an object and text
-walks / a that key that isn't text, on a list item that isn't an object, names the item and never a field under it / the focus is an object, so only the key is said
 walks / a that key that isn't text, on a list item that isn't an object, names the item and never a field under it / the item is text
 walks / a walk through a for name, read from a parent on its right side / fails as absent for a name the parent doesn't have
 walks / a walk through a for name, read from a parent on its right side / fails as null for a name that is null
