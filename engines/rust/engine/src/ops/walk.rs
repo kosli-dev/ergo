@@ -1122,6 +1122,7 @@ pub(super) fn item_own(
         let text = message::isnt(&name, focus.subject.value, "an object");
         return Some(Clause::item(&name, Cause::NotAnObject, text, Vec::new()));
     }
+    let outside = |path: &Path| reads_outside(path) || path.start == Start::Params;
     let mut said: Vec<Clause> = Vec::new();
     let mut own_at = None;
     for (path, found) in paths.into_iter().zip(keyed) {
@@ -1131,7 +1132,7 @@ pub(super) fn item_own(
                     .base
                     .map(|(text, cause, _)| Clause::said(cause, text)),
             ),
-            None if reads_outside(path) || path.start == Start::Params => {
+            None if outside(path) => {
                 said.extend(path.steps.iter().filter_map(|step| match step {
                     Step::Field(key) | Step::Ref(key)
                         if matches!(key.start, Start::Subject | Start::Own) =>
@@ -1148,7 +1149,7 @@ pub(super) fn item_own(
         }
     }
     if let Some(alone) = stood_in(check, |path| {
-        super::key_base::of_path(path, false, &focus).is_some()
+        outside(path) || super::key_base::of_path(path, false, &focus).is_some()
     }) {
         let verdict = run_check(&alone, &focus);
         if verdict.cause.is_failure() {
