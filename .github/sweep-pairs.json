@@ -6023,5 +6023,590 @@
    "l": null
   },
   "want": "$params.l is null; item 1 of xs: v is [1, \"x\"], which isn't a list of one kind of value"
+ },
+ {
+  "name": "map before a key from the focus/params map null, focus text",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id",
+     "has": {
+      "p": "pp"
+     }
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of es.v that is $params.m named by k is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": "a"
+      },
+      {
+       "v": "a"
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "m": null
+  }
+ },
+ {
+  "name": "map before a key from the focus/params map text, focus text",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id",
+     "has": {
+      "p": "pp"
+     }
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of es.v that is $params.m named by k is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": "a"
+      },
+      {
+       "v": "a"
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "m": "s"
+  }
+ },
+ {
+  "name": "map before a key from the focus/part map missing, focus a number",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id",
+     "has": {
+      "p": "pp"
+     }
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of es.v that is p.m named by k is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": 3
+      },
+      {
+       "v": 3
+      }
+     ],
+     "pp": {}
+    }
+   ]
+  },
+  "params": {}
+ },
+ {
+  "name": "map before a key from the focus/subject map null, focus a list",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id",
+     "has": {
+      "p": "pp"
+     }
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of es.v that is in thing.m named by k is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": [
+        "a"
+       ]
+      }
+     ],
+     "m": null
+    }
+   ]
+  },
+  "params": {}
+ },
+ {
+  "name": "map before a key from the focus/input map missing, focus null",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id",
+     "has": {
+      "p": "pp"
+     }
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of es.v that is $input.m named by k is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": null
+      },
+      {
+       "v": {
+        "k": "a"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "params": {}
+ },
+ {
+  "name": "map before a key from the focus/whose on an empty list with the part map null",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id",
+     "has": {
+      "p": "pp"
+     }
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of es whose v is p.m named by k is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [],
+     "pp": {
+      "m": null
+     }
+    }
+   ]
+  },
+  "params": {}
+ },
+ {
+  "name": "map before a key from the focus/key and own read both stop at a null value",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id",
+     "has": {
+      "p": "pp"
+     }
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of es whose v.w is $params.m named by v.k is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": null
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "m": "s"
+  }
+ },
+ {
+  "name": "map before a key from the focus/readable map, item without the key",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id",
+     "has": {
+      "p": "pp"
+     }
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of es whose v is $params.m named by k is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": 3
+      },
+      {
+       "v": 3,
+       "k": "a"
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "m": {
+    "a": "a"
+   }
+  },
+  "want": "item 1 of es: k is missing; item 2 of es: v is 3, which isn't text"
+ },
+ {
+  "name": "count roots/subject root of the wrong kind beside items that fail",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id",
+     "has": {
+      "p": "pp"
+     }
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of es whose v is more than thing.x is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "x": {
+      "a": 1
+     },
+     "es": [
+      {
+       "v": []
+      },
+      {
+       "v": null
+      }
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "want": "thing.x is {\"a\": 1}, which isn't a number; item 1 of es: v is [], which isn't a number; item 2 of es: v is null"
+ },
+ {
+  "name": "count roots/that with a missing subject root and mixed items",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id",
+     "has": {
+      "p": "pp"
+     }
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of es.v that is thing.x is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": [
+        [
+         1
+        ]
+       ]
+      },
+      {
+       "v": null
+      },
+      {
+       "v": [
+        1,
+        "a",
+        null
+       ]
+      },
+      {
+       "v": []
+      },
+      {}
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "want": "thing.x is missing; item 2 of es: v is null; item 3 of es: item 3 of v is null; item 5 of es: v is missing"
+ },
+ {
+  "name": "count roots/sum of with a subject root that is an object",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id",
+     "has": {
+      "p": "pp"
+     }
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "sum of es.v that is more than thing.x is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "x": {
+      "a": 1
+     },
+     "es": [
+      {
+       "v": null
+      },
+      "s",
+      {
+       "v": 3
+      },
+      {
+       "v": 3
+      }
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "want": "thing.x is {\"a\": 1}, which isn't a number; item 1 of es: v is null; item 2 of es is \"s\", which isn't an object"
+ },
+ {
+  "name": "count roots/whose key from params null beside a missing value",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id",
+     "has": {
+      "p": "pp"
+     }
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of es whose v is m named by $params.k is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": [
+        1,
+        "a",
+        null
+       ],
+       "m": {
+        "a": "abc",
+        "b": 2
+       }
+      },
+      {
+       "m": {
+        "a": "abc",
+        "b": 2
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "k": null
+  },
+  "want": "$params.k is null; item 2 of es: v is missing"
+ },
+ {
+  "name": "count roots/missing params root on the right and five items",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of xs whose f equals $params.r is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "f": null
+      },
+      {
+       "f": "a"
+      },
+      {
+       "f": null
+      },
+      {
+       "f": null
+      },
+      {
+       "f": null
+      }
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "want": "$params.r is missing; item 1 of xs: f is null; item 3 of xs: f is null; item 4 of xs: f is null; and 1 more"
+ },
+ {
+  "name": "count roots/input root on the left of the wrong kind",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of xs whose $input.r is at least f is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "f": "s"
+      }
+     ]
+    }
+   ],
+   "r": "s"
+  },
+  "params": {},
+  "want": "$input.r is \"s\", which isn't a number; item 1 of xs: f is \"s\", which isn't a number"
  }
 ]
