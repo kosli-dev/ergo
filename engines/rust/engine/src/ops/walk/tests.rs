@@ -724,6 +724,27 @@ fn item_own_is_what_any_check_says_when_its_roots_can_be_read() {
 }
 
 #[test]
+fn an_item_says_its_own_list_beside_a_root_before_its_key_it_cant_read() {
+    let sentence = "every items whose tags contains $params.m named by key exists";
+    let items = json!([{"key": "a"}, {"key": "a", "tags": "x"}]);
+    let readable = judged(sentence, items.clone(), json!({"m": {"a": "x"}}));
+    assert_eq!(
+        readable,
+        [
+            Some((Cause::Absent, "item 1 of items: tags is missing".to_string())),
+            Some((
+                Cause::Unusable,
+                "item 2 of items: tags is \"x\", which isn't a list".to_string()
+            )),
+        ]
+    );
+    assert_eq!(
+        own_said(sentence, items, json!({"m": null}), json!({})),
+        readable
+    );
+}
+
+#[test]
 fn an_item_whose_focus_cant_be_read_says_so_whatever_the_key() {
     let sentence = "every items.v that is m named by $params.k is 1";
     let items = json!([{}, {"w": 1}]);
