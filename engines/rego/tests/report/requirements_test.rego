@@ -17,6 +17,8 @@ test_a_null_id_is_not_an_id_so_it_never_repeats if {
 	[p[1] | some p in ergo._repeated_ids(refs)] == ["a"]
 }
 
+ds_keys(_) := ["ds"]
+
 id_fault_place(c, at, cause, text) := {"c": c, "at": at, "cause": cause, "value": null, "text": text, "note": false, "plain": false, "listed": true}
 
 test_ids_that_are_missing_or_null_fail_the_row_after_the_repeated_ids_with_the_worst_cause if {
@@ -26,7 +28,7 @@ test_ids_that_are_missing_or_null_fail_the_row_after_the_repeated_ids_with_the_w
 		id_fault_place(["ds", 2, "id"], "/ds/2/id", "null", "item 3 of ds: id is null"),
 	]
 	doc := {"ds": [{"id": "a"}, {"ok": true}, {"id": null}, {"id": "a"}]}
-	r := ergo._with_id_faults(row, places, doc, {"subject": "d"}, ["ds"])
+	r := ergo._with_id_faults(row, places, doc, {"subject": "d"}) with ergo._id_keys as ds_keys
 	r.cause == "absent"
 	r.message == "repeated d ids is [\"a\"]; item 2 of ds: id is missing; item 3 of ds: id is null"
 	r.failures == [
@@ -37,15 +39,15 @@ test_ids_that_are_missing_or_null_fail_the_row_after_the_repeated_ids_with_the_w
 
 test_a_unique_ids_row_that_fails_on_a_repeated_id_alone_has_no_failures_to_list if {
 	row := {"check": "$unique_ids", "inputs": [{"name": "repeated d ids", "value": ["a"], "locations": []}], "passed": false, "cause": "value"}
-	ergo._with_id_faults(row, [], {}, {"subject": "d"}, ["ds"]) == object.union(row, {"failures": []})
+	ergo._with_id_faults(row, [], {}, {"subject": "d"}) == object.union(row, {"failures": []})
 	passed := object.union(row, {"passed": true, "cause": "satisfied"})
-	ergo._with_id_faults(passed, [], {}, {"subject": "d"}, ["ds"]) == passed
+	ergo._with_id_faults(passed, [], {}, {"subject": "d"}) == passed
 }
 
 test_a_subject_outside_any_list_puts_its_id_read_on_the_row_and_has_no_entry if {
 	row := {"check": "$unique_ids", "inputs": [{"name": "repeated d ids", "value": [], "locations": []}], "passed": true, "cause": "satisfied"}
 	place := object.union(id_fault_place(["thing", "id"], "/thing", "absent", "thing.id is missing"), {"listed": false})
-	r := ergo._with_id_faults(row, [place], {"thing": {}}, {"subject": "d"}, ["thing"])
+	r := ergo._with_id_faults(row, [place], {"thing": {}}, {"subject": "d"})
 	r.cause == "absent"
 	r.message == "thing.id is missing"
 	r.failures == []
@@ -55,7 +57,7 @@ test_a_subject_outside_any_list_puts_its_id_read_on_the_row_and_has_no_entry if 
 test_the_message_names_three_subjects_without_an_id_and_counts_the_rest if {
 	row := {"check": "$unique_ids", "inputs": [{"name": "repeated d ids", "value": [], "locations": []}], "passed": true, "cause": "satisfied"}
 	places := [id_fault_place(["ds", i, "id"], concat("", ["/ds/", format_int(i, 10)]), "absent", concat("", ["item ", format_int(i + 1, 10), " of ds: id is missing"])) | some i in numbers.range(0, 4)]
-	r := ergo._with_id_faults(row, places, {"ds": [{}, {}, {}, {}, {}]}, {"subject": "d"}, ["ds"])
+	r := ergo._with_id_faults(row, places, {"ds": [{}, {}, {}, {}, {}]}, {"subject": "d"})
 	r.message == "item 1 of ds: id is missing; item 2 of ds: id is missing; item 3 of ds: id is missing; and 2 more"
 	count(r.failures) == 5
 }

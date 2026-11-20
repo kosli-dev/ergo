@@ -178,7 +178,7 @@ _every_walk(doc, keys) := {"subjects": [{"subject": e.v, "at": _walk_at(w, e), "
 
 _every_end_fail(e) := {"path": e.c, "item": e.c, "cause": _walk_stop_state(e.v), "value": _walk_value(e.v, e, null)}
 
-_fl_walk(doc, keys) := {"subjects": [{"subject": x, "at": concat("", [base, "/", format_int(i, 10)]), "c": array.concat(keys, [i])} | some i, x in end], "fails": [], "notes": []} if {
+_fl_walk(doc, keys) := {"subjects": [{"subject": x, "at": concat("", [base, "/", format_int(i, 10)]), "i": i} | some i, x in end], "fails": [], "notes": []} if {
 	end := _fl_simple_end(doc, keys)
 	base := _joined(_doc_at, keys)
 } else := _fl_full_walk(doc, keys)
@@ -591,14 +591,14 @@ _keys_refs(step) := {step.keys.ref} if _is_ref(step.keys)
 
 _listed_subjects(doc, req) := [] if {
 	_fl_met_at(doc, req)
-} else := [{"subject": subj, "at": concat("", [base, "/", format_int(i, 10)]), "c": array.concat(_id_keys(req), [i])} | some i, subj in coll] if {
+} else := [{"subject": subj, "at": concat("", [base, "/", format_int(i, 10)]), "i": i} | some i, subj in coll] if {
 	coll := _target(doc, req)
 	is_array(coll)
 	base := _pointer(_doc_at, doc, _from_keys(req))
-} else := [{"subject": coll, "at": _pointer(_doc_at, doc, _from_keys(req)), "c": _id_keys(req)}] if {
+} else := [{"subject": coll, "at": _pointer(_doc_at, doc, _from_keys(req))}] if {
 	coll := _target(doc, req)
 	is_object(coll)
-} else := [{"subject": v, "at": _pointer(_doc_at, doc, _from_keys(req)), "c": _id_keys(req)}] if {
+} else := [{"subject": v, "at": _pointer(_doc_at, doc, _from_keys(req))}] if {
 	v := _target_read(doc, req)
 	_fl_scalar_subject(v, req)
 } else := []
