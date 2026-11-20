@@ -105,3 +105,35 @@ fn it_has_no_left_path_of_its_own_and_gives_the_paths_of_all_its_checks() {
     assert_eq!(check.paths().len(), 2);
     assert_eq!(check.with_left(path("z")), check);
 }
+
+#[test]
+fn an_option_line_that_walks_says_its_clauses_and_not_its_text() {
+    let tree = ergo_policy_sentences::parse_check("every xs.v is 1").unwrap();
+    let every =
+        crate::lower::lower_assertion(&tree.assertions[0], &crate::lower::Scope::new()).unwrap();
+    let input = json!({"s": {"xs": [{"v": 2}, {}]}});
+    let ctx = Ctx {
+        label: None,
+        item_by_item: false,
+        subject: Located {
+            value: &input["s"],
+            location: Location::input_root().key("s"),
+        },
+        input: &input,
+        params: None,
+        aliases: BTreeMap::new(),
+    };
+    let runs = option_runs(
+        &AnyOf {
+            names: vec!["o".to_string()],
+            texts: vec![vec!["every xs.v is 1".to_string()]],
+            options: vec![vec![every]],
+        },
+        &ctx,
+    );
+    let said = &runs[0].lines[0].said;
+    assert!(
+        matches!(said.as_slice(), [group] if matches!(group.as_slice(), [crate::ops::message::Piece::Counted(_)])),
+        "{said:?}"
+    );
+}
