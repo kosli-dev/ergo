@@ -1113,9 +1113,9 @@ pub(super) fn item_own(
 ) -> Option<Clause> {
     let focus = focus_ctx(item, outer);
     let name = walked.item_name(focus_segs(item, check));
-    let keyed: Vec<Option<super::key_base::KeyBase>> = check
-        .paths()
-        .into_iter()
+    let paths: Vec<&Path> = check.paths().into_iter().chain(listed_refs(check)).collect();
+    let keyed: Vec<Option<super::key_base::KeyBase>> = paths
+        .iter()
         .map(|path| super::key_base::of_path(path, false, &focus))
         .collect();
     if keyed.iter().flatten().any(|found| found.off_object) {
@@ -1124,13 +1124,24 @@ pub(super) fn item_own(
     }
     let mut said: Vec<Clause> = Vec::new();
     let mut own_at = None;
-    for found in keyed {
+    for (path, found) in paths.into_iter().zip(keyed) {
         match found {
             Some(found) => said.extend(
                 found
                     .base
                     .map(|(text, cause, _)| Clause::said(cause, text)),
             ),
+            None if reads_outside(path) || path.start == Start::Params => {
+                said.extend(path.steps.iter().filter_map(|step| match step {
+                    Step::Field(key) | Step::Ref(key)
+                        if matches!(key.start, Start::Subject | Start::Own) =>
+                    {
+                        let (outcome, text, _) = super::key_base::key_flaw(key, &focus)?;
+                        Some(Clause::said(outcome.cause()?, text))
+                    }
+                    _ => None,
+                }));
+            }
             None => {
                 own_at.get_or_insert(said.len());
             }

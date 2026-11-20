@@ -15,7 +15,7 @@ pub struct KeyBase {
     pub key_cause: Cause,
 }
 
-fn key_flaw(key: &Path, ctx: &Ctx) -> Option<(Outcome, String, Input)> {
+pub(super) fn key_flaw(key: &Path, ctx: &Ctx) -> Option<(Outcome, String, Input)> {
     let read = path::read(key, ctx);
     let named = name::name(key);
     let location: Vec<String> = read.location.iter().map(|l| l.render()).collect();
