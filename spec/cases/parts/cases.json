@@ -12603,7 +12603,7 @@
         "expressions": {
           "r": {
             "$min_subjects": "count(matching(every artifact.pra.pull_requests)) >= 1",
-            "$unique_ids": "count(repeated(ids(every artifact.pra.pull_requests))) == 0"
+            "$unique_ids": "count(missing(ids(every artifact.pra.pull_requests))) + count(repeated(ids(every artifact.pra.pull_requests))) == 0"
           }
         },
         "report": {

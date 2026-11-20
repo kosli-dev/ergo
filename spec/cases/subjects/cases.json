@@ -448,21 +448,65 @@
             }
           },
           {
-            "cause": "value",
+            "cause": "absent",
             "check": "$unique_ids",
-            "inputs": [
+            "failures": [
               {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/deployments/0/meta"
+                    ],
+                    "name": "deployments[0].meta.id",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "item",
                 "locations": [
-                  "/deployments/0/meta",
+                  "/deployments/0"
+                ],
+                "message": "meta.id is missing",
+                "name": "item 1 of deployments",
+                "value": {
+                  "meta": {},
+                  "x": 1
+                }
+              },
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/deployments/1"
+                    ],
+                    "name": "deployments[1].meta.id",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "item",
+                "locations": [
                   "/deployments/1"
                 ],
-                "name": "repeated deployment ids",
-                "value": [
-                  null
-                ]
+                "message": "meta.id is missing",
+                "name": "item 2 of deployments",
+                "value": {
+                  "x": 1
+                }
               }
             ],
-            "message": "repeated deployment ids is [null]",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated deployment ids",
+                "value": []
+              }
+            ],
+            "message": "item 1 of deployments: meta.id is missing; item 2 of deployments: meta.id is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -10463,7 +10507,7 @@
     "cases": [
       {
         "description": "reads its path from the parent's one subject, and every row but $well_formed carries the parent's id under in",
-        "expressions": {"s": {"$min_subjects": "count(matching(every artifact.pulls)) >= 1", "$unique_ids": "count(repeated(ids(every artifact.pulls))) == 0"}},
+        "expressions": {"s": {"$min_subjects": "count(matching(every artifact.pulls)) >= 1", "$unique_ids": "count(missing(ids(every artifact.pulls))) + count(repeated(ids(every artifact.pulls))) == 0"}},
         "rules": ["added.text", "subjects.chain", "sentence.subject.chain", "sentence.path.start", "sentence.phrase.exists"],
         "input": {
           "artifacts": [
@@ -11047,6 +11091,7 @@
           {
             "cause": "value",
             "check": "$unique_ids",
+            "failures": [],
             "inputs": [
               {
                 "locations": [
@@ -13135,7 +13180,7 @@
         "expressions": {
           "r": {
             "$min_subjects": "count(matching(every artifacts.pull_requests)) >= 1",
-            "$unique_ids": "count(repeated(ids(every artifacts.pull_requests))) == 0"
+            "$unique_ids": "count(missing(ids(every artifacts.pull_requests))) + count(repeated(ids(every artifacts.pull_requests))) == 0"
           }
         },
         "requirements": {
@@ -13365,6 +13410,7 @@
           {
             "cause": "value",
             "check": "$unique_ids",
+            "failures": [],
             "inputs": [
               {
                 "locations": [
@@ -14415,7 +14461,7 @@
         ],
         "input": {"artifacts": [{"releases": 5}, {"releases": [{"id": "r1", "n": 1}]}]},
         "status": {"r": "not_met"},
-        "expressions": {"r": {"$min_subjects": "count(matching(every artifacts.releases)) >= 1", "$unique_ids": "count(repeated(ids(every artifacts.releases))) == 0"}},
+        "expressions": {"r": {"$min_subjects": "count(matching(every artifacts.releases)) >= 1", "$unique_ids": "count(missing(ids(every artifacts.releases))) + count(repeated(ids(every artifacts.releases))) == 0"}},
         "requirements": {"r": {"subjects": {"matching": 1, "total": 2}}},
         "results": [
           {
@@ -14661,7 +14707,7 @@
         ],
         "input": {"artifacts": [{"releases": 5}, {"releases": [{"id": "r1", "n": 1}]}]},
         "status": {"r": "not_met"},
-        "expressions": {"r": {"$min_subjects": "every artifacts.releases can be read", "$unique_ids": "count(repeated(ids(every artifacts.releases))) == 0"}},
+        "expressions": {"r": {"$min_subjects": "every artifacts.releases can be read", "$unique_ids": "count(missing(ids(every artifacts.releases))) + count(repeated(ids(every artifacts.releases))) == 0"}},
         "requirements": {"r": {"subjects": {"matching": 1, "total": 2}}},
         "results": [
           {
@@ -15714,7 +15760,7 @@
         "expressions": {
           "r": {
             "$min_subjects": "count(matching(every \"empty\".items)) >= 1",
-            "$unique_ids": "count(repeated(ids(every \"empty\".items))) == 0",
+            "$unique_ids": "count(missing(ids(every \"empty\".items))) + count(repeated(ids(every \"empty\".items))) == 0",
             "c2": "\"empty\".k is 7"
           }
         },
@@ -15849,7 +15895,7 @@
         "expressions": {
           "r": {
             "$min_subjects": "count(matching(every \"empty\".pa.items)) >= 1",
-            "$unique_ids": "count(repeated(ids(every \"empty\".pa.items))) == 0",
+            "$unique_ids": "count(missing(ids(every \"empty\".pa.items))) + count(repeated(ids(every \"empty\".pa.items))) == 0",
             "c2": "\"empty\".pa.k is 1"
           }
         },
@@ -15943,7 +15989,7 @@
         "expressions": {
           "r": {
             "$min_subjects": "count(matching(every .empty.items)) >= 1",
-            "$unique_ids": "count(repeated(ids(every .empty.items))) == 0"
+            "$unique_ids": "count(missing(ids(every .empty.items))) + count(repeated(ids(every .empty.items))) == 0"
           }
         }
       }
@@ -20731,6 +20777,7 @@
           {
             "cause": "value",
             "check": "$unique_ids",
+            "failures": [],
             "inputs": [
               {
                 "locations": [
@@ -28142,7 +28189,7 @@
         "expressions": {
           "r": {
             "$min_subjects": "count(matching(every .artifact.p)) >= 1",
-            "$unique_ids": "count(repeated(ids(every .artifact.p))) == 0"
+            "$unique_ids": "count(missing(ids(every .artifact.p))) + count(repeated(ids(every .artifact.p))) == 0"
           }
         },
         "report": {
@@ -28316,7 +28363,7 @@
         "expressions": {
           "r": {
             "$min_subjects": "count(matching(every .artifact.p)) >= 1",
-            "$unique_ids": "count(repeated(ids(every .artifact.p))) == 0"
+            "$unique_ids": "count(missing(ids(every .artifact.p))) + count(repeated(ids(every .artifact.p))) == 0"
           }
         },
         "report": {
@@ -28426,7 +28473,7 @@
         "expressions": {
           "r": {
             "$min_subjects": "count(matching(every .artifact)) >= 1",
-            "$unique_ids": "count(repeated(ids(every .artifact))) == 0"
+            "$unique_ids": "count(missing(ids(every .artifact))) + count(repeated(ids(every .artifact))) == 0"
           }
         },
         "report": {
@@ -28538,7 +28585,7 @@
         "expressions": {
           "r": {
             "$min_subjects": "count(matching(.artifact)) >= 1",
-            "$unique_ids": "count(repeated(ids(.artifact))) == 0"
+            "$unique_ids": "count(missing(ids(.artifact))) + count(repeated(ids(.artifact))) == 0"
           }
         },
         "report": {
@@ -28586,6 +28633,7 @@
         "input": {
           "artifacts": [
             {
+              "id": "a",
               "p": [
                 {
                   "x": 1
@@ -28649,7 +28697,7 @@
                 "x": 1
               },
               "in": {
-                "artifact": null
+                "artifact": "a"
               },
               "type": "p"
             }
@@ -28713,7 +28761,7 @@
         "expressions": {
           "r": {
             "$min_subjects": "count(matching(.artifact)) >= 1",
-            "$unique_ids": "count(repeated(ids(.artifact))) == 0"
+            "$unique_ids": "count(missing(ids(.artifact))) + count(repeated(ids(.artifact))) == 0"
           }
         },
         "report": {
@@ -30448,7 +30496,7 @@
         "expressions": {
           "r": {
             "$min_subjects": "count(matching(item 1 of .artifact.p)) >= 1",
-            "$unique_ids": "count(repeated(ids(item 1 of .artifact.p))) == 0"
+            "$unique_ids": "count(missing(ids(item 1 of .artifact.p))) + count(repeated(ids(item 1 of .artifact.p))) == 0"
           }
         },
         "report": {
@@ -37523,8 +37571,31 @@
             }
           },
           {
-            "cause": "satisfied",
+            "cause": "null",
             "check": "$unique_ids",
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/tags/1"
+                    ],
+                    "name": "tags[1]",
+                    "outcome": "null",
+                    "value": null
+                  }
+                ],
+                "kind": "item",
+                "locations": [
+                  "/tags/1"
+                ],
+                "message": "item 2 of tags is null",
+                "name": "item 2 of tags",
+                "value": null
+              }
+            ],
             "inputs": [
               {
                 "locations": [],
@@ -37532,7 +37603,8 @@
                 "value": []
               }
             ],
-            "passed": true,
+            "message": "item 2 of tags is null",
+            "passed": false,
             "requirement": "t",
             "subject": {
               "id": null,
