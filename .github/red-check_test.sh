@@ -43,10 +43,24 @@ echo "red-check.sh lists the new tests that pass on the old source and skips the
 out=$(run "$base")
 expected="## New tests that already pass on the old source
 
-6 new tests (4 Rust, 2 Rego), 3 pass on $base:
+6 new tests (4 Rust, 2 Rego): 3 pass, 3 fail on the old source (good), 0 could not run.
+
+Pass on the old source:
 - engines/rego/tests/x_test.rego test_green_rule
 - engines/rust/foo/src/tests.rs green_one
-- engines/rust/foo/tests/api.rs api_new"
+- engines/rust/foo/tests/api.rs api_new
+
+<details>
+<summary>Tests checked (6)</summary>
+
+- engines/rego/tests/x_test.rego test_green_rule: passes
+- engines/rego/tests/x_test.rego test_red_rule: fails
+- engines/rust/foo/src/tests.rs green_one: passes
+- engines/rust/foo/src/tests.rs red_one: fails
+- engines/rust/foo/tests/api.rs api_new: passes
+- engines/rust/foo/tests/api.rs red_api: fails
+
+</details>"
 if [ "$out" != "$expected" ]; then
   echo "red-check.sh should print:" >&2
   echo "$expected" >&2
@@ -86,7 +100,7 @@ printf '\n#[test]\nfn none_one() {}\n' >> "$repo/engines/rust/foo/src/tests.rs"
 git -C "$repo" commit --quiet -am more
 out=$(run "$base")
 case $out in
-  *"Could not run: 1"*"- engines/rust/foo/src/tests.rs none_one"*) ;;
+  *"1 could not run."*"- engines/rust/foo/src/tests.rs none_one: could not run"*) ;;
   *)
     echo "red-check.sh should list the test that did not run, and printed: $out" >&2
     exit 1
