@@ -19558,6 +19558,60 @@
     ]
   },
   {
+    "description": "copies of a subject without an id inside an outer item",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"d": {"from": "every distinct ws.xs.meta", "identified_by": "id"}}, "requirements": {"r": {"subject": "d", "min_subjects": 0, "checks": {"c": "ok exists"}}}},
+    "cases": [
+      {
+        "description": "are one subject, whose entry under the outer item is listed at every copy",
+        "rules": ["unique_ids", "subjects.distinct"],
+        "input": {"ws": [{"xs": [{"meta": {"ok": true}}, {"meta": {"ok": true}}]}]},
+        "requirements": {"r": {"status": "not_met"}},
+        "results": [
+          {
+            "cause": "absent",
+            "check": "$unique_ids",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [{"locations": ["/ws/0/xs/0/meta"], "name": "ws[0].xs[0].meta.id", "outcome": "absent", "value": null}],
+                    "kind": "item",
+                    "locations": ["/ws/0/xs/0", "/ws/0/xs/1"],
+                    "message": "meta.id is missing",
+                    "name": "item 1 of xs",
+                    "value": {"meta": {"ok": true}}
+                  }
+                ],
+                "inputs": [],
+                "kind": "item",
+                "locations": ["/ws/0"],
+                "message": "",
+                "name": "item 1 of ws",
+                "value": {"xs": [{"meta": {"ok": true}}, {"meta": {"ok": true}}]}
+              }
+            ],
+            "inputs": [{"locations": [], "name": "repeated d ids", "value": []}],
+            "message": "item 1 of ws: item 1 of xs: meta.id is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {"id": null, "type": "d"}
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [{"locations": ["/ws/0/xs/0/meta/ok", "/ws/0/xs/1/meta/ok"], "name": "ok", "value": true}],
+            "passed": true,
+            "requirement": "r",
+            "subject": {"id": null, "type": "d"}
+          }
+        ]
+      }
+    ]
+  },
+  {
     "description": "a subject without an id that its conditions leave out",
     "policy": {"ergo_spec": "{{spec}}", "subjects": {"d": {"from": "ds whose keep exists", "identified_by": "id"}}, "requirements": {"r": {"subject": "d", "min_subjects": 0, "checks": {"c": "ok exists"}}}},
     "cases": [
