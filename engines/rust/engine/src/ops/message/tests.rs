@@ -118,6 +118,49 @@ fn root_clauses_say_the_value_before_an_item_key_that_cant_take_a_key() {
 }
 
 #[test]
+fn root_clauses_leave_out_the_value_before_a_key_when_it_comes_from_the_item() {
+    let subject = json!({"id": "t", "items": [{"zz": "a"}]});
+    let input = json!({});
+    let params = json!({});
+    let said = root_clauses_of(
+        "every items whose zz is m named by $params.k exists",
+        &subject,
+        &input,
+        Some(&params),
+    );
+    assert_eq!(
+        said,
+        vec![("$params.k".to_string(), "$params.k is missing".to_string())]
+    );
+}
+
+#[test]
+fn root_clauses_keep_each_item_of_a_count_a_root_reads() {
+    let subject = json!({"id": "t", "items": [{"n": 1}]});
+    let input = json!({});
+    let params = json!({"pos": [{"name": "a"}, {}, {}]});
+    let said = root_clauses_of(
+        "every items whose n is count of $params.pos.name exists",
+        &subject,
+        &input,
+        Some(&params),
+    );
+    assert_eq!(
+        said,
+        vec![
+            (
+                "item 2 of $params.pos".to_string(),
+                String::new()
+            ),
+            (
+                "item 3 of $params.pos".to_string(),
+                String::new()
+            ),
+        ]
+    );
+}
+
+#[test]
 fn a_clause_an_earlier_sentence_gave_is_left_out_and_the_rest_is_kept() {
     let mut said: Vec<String> = Vec::new();
     assert_eq!(
