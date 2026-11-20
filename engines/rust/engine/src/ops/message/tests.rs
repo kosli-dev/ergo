@@ -11,7 +11,24 @@ fn root_clauses_of(
     input: &Value,
     params: Option<&Value>,
 ) -> Vec<(String, String)> {
-    let whole = lowered(sentence);
+    root_clauses_in(
+        &crate::lower::Scope::new(),
+        sentence,
+        subject,
+        input,
+        params,
+    )
+}
+
+fn root_clauses_in(
+    scope: &crate::lower::Scope,
+    sentence: &str,
+    subject: &Value,
+    input: &Value,
+    params: Option<&Value>,
+) -> Vec<(String, String)> {
+    let tree = ergo_policy_sentences::parse_check(sentence).unwrap();
+    let whole = crate::lower::lower_assertion(&tree.assertions[0], scope).unwrap();
     let inside: Vec<&super::Check> = match &whole {
         super::Check::Walk(walk) => walk
             .whose
@@ -20,17 +37,18 @@ fn root_clauses_of(
             .collect(),
         other => vec![other],
     };
+    let located = crate::path::Located {
+        value: subject,
+        location: crate::path::Location::input_root().key("s"),
+    };
     let ctx = crate::path::Ctx {
         label: None,
         item_by_item: false,
         in_option: false,
-        subject: crate::path::Located {
-            value: subject,
-            location: crate::path::Location::input_root().key("s"),
-        },
+        subject: located.clone(),
         input,
         params,
-        aliases: std::collections::BTreeMap::new(),
+        aliases: std::collections::BTreeMap::from([(crate::path::OUTER.to_string(), located)]),
     };
     super::root_clauses(&inside, &ctx)
         .into_iter()
@@ -115,6 +133,40 @@ fn root_clauses_say_the_value_before_an_item_key_that_cant_take_a_key() {
         said,
         vec![("$input.m".to_string(), "$input.m is null".to_string())]
     );
+}
+
+#[test]
+fn root_clauses_say_a_part_before_an_item_key_that_cant_take_a_key_by_the_parts_name() {
+    let scope = crate::lower::Scope::new().with_part(
+        "cov",
+        crate::lower::PartDef {
+            steps: vec![crate::path::Step::Key("c".into())],
+            id: None,
+        },
+    );
+    let input = json!({});
+    for (part, said) in [
+        (Some(json!("s")), r#"cov is "s", which isn't an object"#),
+        (Some(json!(null)), "cov is null"),
+        (Some(json!({})), "cov.m is missing"),
+        (None, "cov is missing"),
+    ] {
+        let mut subject = json!({"id": "t", "xs": [{"key": "a", "tags": ["x"]}]});
+        if let Some(part) = &part {
+            subject["c"] = part.clone();
+        }
+        let text: Vec<String> = root_clauses_in(
+            &scope,
+            "every xs whose tags contains cov.m named by key, if any, exists",
+            &subject,
+            &input,
+            None,
+        )
+        .into_iter()
+        .map(|(_, text)| text)
+        .collect();
+        assert_eq!(text, [said], "{part:?}");
+    }
 }
 
 #[test]
