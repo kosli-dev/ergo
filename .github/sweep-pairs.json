@@ -4841,5 +4841,304 @@
   "params": {
    "min": "s"
   }
+ },
+ {
+  "name": "for alias key/ks=a,3,null",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every ks as k",
+       "assert": "count of es whose zz is m named by k is 0"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "ks": [
+      "a",
+      3,
+      null
+     ],
+     "es": [
+      {
+       "zz": 1
+      }
+     ]
+    }
+   ]
+  },
+  "params": {}
+ },
+ {
+  "name": "for alias key/g=k:3",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every gs as g",
+       "assert": "count of es.v that is m named by g.k is 0"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "gs": [
+      {
+       "k": 3
+      }
+     ],
+     "es": [
+      {
+       "v": 2
+      }
+     ]
+    }
+   ]
+  },
+  "params": {}
+ },
+ {
+  "name": "part before item key/cov=s",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id",
+     "has": {
+      "cov": "c"
+     }
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of xs whose tags contains cov.m named by key is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "c": "s",
+     "xs": [
+      {
+       "key": "a",
+       "tags": [
+        "x"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "params": {}
+ },
+ {
+  "name": "part before item key/cov=null",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id",
+     "has": {
+      "cov": "c"
+     }
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of xs whose tags contains cov.m named by key is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "c": null,
+     "xs": [
+      {
+       "key": "a",
+       "tags": [
+        "x"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "want": "cov is null"
+ },
+ {
+  "name": "root left of is in/tags=a,obj",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of tags whose $params.k is in tags is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "tags": [
+      "a",
+      {
+       "tags": 1
+      }
+     ]
+    }
+   ]
+  },
+  "params": {}
+ },
+ {
+  "name": "root left of is in/tags=a",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of tags whose $params.k is in tags is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "tags": [
+      "a"
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "want": "$params.k is missing; item 1 of tags is \"a\", which isn't an object"
+ },
+ {
+  "name": "count/$params.k=3/v=2",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of es.v that is m named by $params.k is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": 2
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "k": 3
+  }
+ },
+ {
+  "name": "root left of at least/q=s",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of xs whose $params.q is at least v is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": 1
+      },
+      {},
+      {
+       "v": "x"
+      },
+      {
+       "v": null
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "q": "s"
+  },
+  "want": "$params.q is \"s\", which isn't a number; item 2 of xs: v is missing; item 3 of xs: v is \"x\", which isn't a number; item 4 of xs: v is null"
  }
 ]
