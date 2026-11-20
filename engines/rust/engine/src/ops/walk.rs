@@ -1172,6 +1172,9 @@ pub(super) fn item_own(
 
 fn stood_in(check: &Check, blocked: impl Fn(&Path) -> bool) -> Option<Check> {
     use super::compare::{Compare, Side};
+    if !check.paths().into_iter().chain(listed_refs(check)).any(&blocked) {
+        return Some(check.clone());
+    }
     let Check::Compare(compare) = check else {
         return None;
     };
@@ -1179,8 +1182,7 @@ fn stood_in(check: &Check, blocked: impl Fn(&Path) -> bool) -> Option<Check> {
     let own = match (blocked(&compare.left), blocked(&compare.right)) {
         (false, true) => &compare.left,
         (true, false) => &compare.right,
-        (false, false) => return Some(check.clone()),
-        (true, true) => return None,
+        _ => return None,
     };
     Some(Check::Compare(Compare {
         left: own.clone(),
