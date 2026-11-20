@@ -1004,7 +1004,37 @@ impl Parser {
             }
         }
         self.is_phrases(&mut out, i);
+        let mut ignored = Vec::new();
+        for (phrase, end) in &out {
+            if let Some(k) = self.ws(*end).filter(|_| ignoring_reads_after(phrase)) {
+                for (ignoring, stop) in self.ignoring(k) {
+                    ignored.push((
+                        Phrase::Ignoring {
+                            phrase: Box::new(phrase.clone()),
+                            ignoring,
+                        },
+                        stop,
+                    ));
+                }
+            }
+        }
+        out.extend(ignored);
         out
+    }
+
+    fn ignoring(&self, i: usize) -> Vec<(Ignoring, usize)> {
+        [
+            Ignoring::CaseAndSurroundingSpaces,
+            Ignoring::SurroundingSpacesAndCase,
+            Ignoring::Case,
+            Ignoring::SurroundingSpaces,
+        ]
+        .into_iter()
+        .filter_map(|ignoring| {
+            self.words(i, ignoring.words())
+                .map(|end| (ignoring, end))
+        })
+        .collect()
     }
 
     pub(crate) fn condition(&self, i: usize) -> Reads<Condition> {
@@ -1209,4 +1239,20 @@ impl Parser {
 
 pub(crate) fn trim(line: &str) -> &str {
     line.trim()
+}
+
+fn ignoring_reads_after(phrase: &Phrase) -> bool {
+    !matches!(
+        phrase,
+        Phrase::Contains { .. }
+            | Phrase::ContainsAll(_)
+            | Phrase::ContainsNone(_)
+            | Phrase::ContainsSome(_)
+            | Phrase::NotContainsAll(_)
+            | Phrase::StartsWith(_)
+            | Phrase::EndsWith(_)
+            | Phrase::NotStartsWith(_)
+            | Phrase::NotEndsWith(_)
+            | Phrase::Alphabetically { .. }
+    )
 }
