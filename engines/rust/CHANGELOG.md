@@ -16,6 +16,16 @@ Each release names the version of the spec it follows. The spec's own changes ar
 
 - Failed rows list their parts in `failures` and inputs carry `outcome`, and messages say what spec 0.7 says: the same change as `ergo.rego` 0.7.0 ([row.parts](../../spec/semantics.md#what-a-row-shows)). `failures` replaces `failed_items` and `failed_assertions`, `any_of` rows list each failed option, and a name read through a `for` alias keeps its alias in messages.  Reports change as in `ergo.rego` 0.7.0.
 
+- A `count of` or a `sum of` names every item it can't read, in list order, after the roots, and each item is an `item` entry under its assertion, as spec 0.7 says ([message.items](../../spec/semantics.md#messages), [row.parts](../../spec/semantics.md#what-a-row-shows)). A `for` alias that holds a list nests its items under the alias, and a walk, a `count of` or a `sum of` has the same entries beside other sentences, in an option of an `any_of`, on a `from` line and under a `for` item. An option's `message` is `""`, and the list a sentence walks is no longer an input of its assertion.
+
+- The `$min_subjects` row has `failures` in place of `failed_items`, on every failed row, and `every.same` says the kind in each item, like `item 1 of builds: tags is a list, item 2 of builds: tags is text`, with a clause both rules give said once ([subjects.every.broken](../../spec/semantics.md#requirements)).
+
+- A root in a `whose` that can't be read no longer hides the items the clause can't read after the phrases that order numbers or times and after `starts with`: the root comes first, then each such item. After `is`, `is not`, `is one of` and `is in` the Rust engine still says only the root when it is missing.
+
+- A `named by` key that can't be read is said once before the items, with each item's own problem after it, and a count whose two sides fail in different ways takes an item with its missing end as the spec decides.
+
+- The Rust engine does not yet say every item on a `from` line without `every` (D8 of #688), and the shapes that `spec/OPEN.md` lists under "Left for a later PR" keep the old message. Their cases are in `known-failures.txt`.
+
 ### Fixed
 
 - A `sum of` or a `plus` that fails as `unusable` only because it needs more than 15 digits says so, like `sum of items.x needs more than 15 digits`, as `ergo.rego` does, where Rust said `sum of items.x is 0 is false`.
