@@ -122,3 +122,41 @@ if command -v opa > /dev/null 2>&1; then
 else
   echo "opa is not on PATH, skipping the real Rego test"
 fi
+
+echo "red-check.sh runs cargo with the pinned Rust version, an exact test name and one touch per source"
+fake=$dir/fake
+mkdir -p "$fake/bin" "$fake/repo/.github" "$fake/repo/engines/rust/foo/src"
+cp "$here/red-check.sh" "$fake/repo/.github/red-check.sh"
+printf '#!/bin/sh\nprintf "%%s|%%s|%%s\\n" "$ASDF_RUST_VERSION" "$*" "$(stat -f %%m foo/src/lib.rs 2>/dev/null || stat -c %%Y foo/src/lib.rs)" >> "$FAKE_LOG"\nsleep 1\necho "test result: ok. 1 passed"\n' > "$fake/bin/cargo"
+chmod +x "$fake/bin/cargo"
+git -C "$fake/repo" init --quiet
+git -C "$fake/repo" config user.email t@example.com
+git -C "$fake/repo" config user.name t
+printf '[toolchain]\nchannel = "1.2.3"\n' > "$fake/repo/engines/rust/rust-toolchain.toml"
+printf '[package]\nname = "foo"\n' > "$fake/repo/engines/rust/foo/Cargo.toml"
+printf 'fn main() {}\n' > "$fake/repo/engines/rust/foo/src/lib.rs"
+printf '#[test]\nfn foo_bar() {}\n' > "$fake/repo/engines/rust/foo/src/tests.rs"
+git -C "$fake/repo" add -A
+git -C "$fake/repo" commit --quiet -m base
+fakebase=$(git -C "$fake/repo" rev-parse HEAD)
+printf '\n#[test]\nfn foo() {}\n\n#[test]\nfn foo_two() {}\n' >> "$fake/repo/engines/rust/foo/src/tests.rs"
+git -C "$fake/repo" commit --quiet -am head
+export FAKE_LOG=$fake/log
+: > "$FAKE_LOG"
+(cd "$fake/repo" && PATH=$fake/bin:$PATH env -u RED_CHECK_REGO_CMD -u RED_CHECK_RUST_CMD sh .github/red-check.sh "$fakebase" > /dev/null)
+if [ "$(wc -l < "$FAKE_LOG" | tr -d ' ')" != 2 ]; then
+  echo "cargo should have run twice, and ran: $(cat "$FAKE_LOG")" >&2
+  exit 1
+fi
+if [ "$(cut -d'|' -f1 "$FAKE_LOG" | sort -u)" != 1.2.3 ]; then
+  echo "cargo should run with the version in rust-toolchain.toml, and ran: $(cat "$FAKE_LOG")" >&2
+  exit 1
+fi
+if [ "$(grep -c -e '-- --exact' "$FAKE_LOG")" != 2 ]; then
+  echo "cargo should get --exact after the test name, and got: $(cat "$FAKE_LOG")" >&2
+  exit 1
+fi
+if [ "$(cut -d'|' -f3 "$FAKE_LOG" | sort -u | wc -l | tr -d ' ')" != 1 ]; then
+  echo "the sources should be touched once, and cargo saw: $(cat "$FAKE_LOG")" >&2
+  exit 1
+fi
