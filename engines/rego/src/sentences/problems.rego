@@ -4,7 +4,7 @@ import rego.v1
 
 _s_sentence_problems(parsed) := (_s_base_problems(parsed) | _s_join_problems(parsed)) | _s_ignoring_problems(parsed)
 
-_s_ignoring_problems(parsed) := set() if not contains(json.marshal(parsed), `"ignoring":`)
+_s_ignoring_problems(parsed) := set() if not _s_ignores(parsed)
 
 else := ({concat("", [`"ignoring surrounding spaces and case" is written "ignoring case and surrounding spaces"`]) |
 	some node in _s_nodes(parsed)
@@ -457,3 +457,8 @@ _s_parsed_anyway(text, pat) := {"assertions": assertions} if {
 _s_number_problem(false) := "number out of range: "
 
 _s_number_problem(true) := concat("", [_too_long_problem, ": "])
+
+_s_ignores(parsed) if {
+	walk(parsed, [path, _])
+	path[count(path) - 1] == "ignoring"
+}
