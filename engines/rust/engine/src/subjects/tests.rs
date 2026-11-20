@@ -32,6 +32,21 @@ fn input_of(row: &Value, at: usize) -> Value {
 }
 
 #[test]
+fn the_chain_of_a_subject_that_narrows_a_child_holds_the_childs_ancestors() {
+    let policy = crate::policy::Policy::read(&json!({
+        "ergo_spec": SPEC,
+        "subjects": {
+            "art": {"from": "arts"}, "b": {"from": "art.bs"}, "nb": {"from": "b whose x exists"},
+            "c": {"from": "nb.cs"}
+        },
+        "requirements": {}
+    }));
+    let reading = crate::reading::Reading::of(&policy);
+    assert_eq!(super::chain_of(&reading, "nb"), ["art"]);
+    assert_eq!(super::chain_of(&reading, "c"), ["art", "nb"]);
+}
+
+#[test]
 fn each_item_of_the_list_is_a_subject_with_its_id_and_location() {
     let r = run(
         json!({"thing": {"from": "every data.ds", "identified_by": "id"}}),

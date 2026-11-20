@@ -269,6 +269,39 @@ fn a_chain_of_four_subjects_is_written_wrong() {
 }
 
 #[test]
+fn narrowing_a_child_does_not_count_as_a_level_of_a_chain() {
+    let (_, r) = reading(json!({
+        "art": {"from": "arts"}, "b": {"from": "art.bs"}, "nb": {"from": "b whose x exists"},
+        "nnb": {"from": "nb whose y exists"}, "c": {"from": "nnb.cs"}, "d": {"from": "c.ds"}
+    }));
+    assert!(problem_names(&r, "c").is_empty());
+    assert_eq!(
+        texts(&r, "d", "subjects.d.from"),
+        ["a chain of more than three subjects isn't supported yet"]
+    );
+}
+
+#[test]
+fn a_subject_that_narrows_a_child_has_the_childs_parent() {
+    let (_, r) = reading(json!({
+        "art": {"from": "arts"}, "b": {"from": "art.bs"}, "nb": {"from": "b whose x exists"},
+        "nnb": {"from": "nb whose y exists"}, "c": {"from": "nnb.cs"}
+    }));
+    assert_eq!(r.parent_of("nb"), Some("art".to_string()));
+    assert_eq!(r.parent_of("nnb"), Some("art".to_string()));
+    assert_eq!(r.parent_of("c"), Some("nnb".to_string()));
+    assert_eq!(r.parent_of("art"), None);
+    assert_eq!(r.infos["nnb"].scope.parent_names(), ["art"]);
+    assert_eq!(r.infos["c"].scope.parent_names(), ["art", "nnb"]);
+}
+
+#[test]
+fn a_subject_that_narrows_a_root_has_no_parent() {
+    let (_, r) = reading(json!({"art": {"from": "arts"}, "na": {"from": "art whose x exists"}}));
+    assert_eq!(r.parent_of("na"), None);
+}
+
+#[test]
 fn a_blank_subject_name_cannot_start_a_chain() {
     let (_, r) = reading(json!({" ": {"from": "things"}, "b": {"from": "\" \" whose id exists"}}));
     assert_eq!(
@@ -459,11 +492,15 @@ fn identified_by_is_allowed_with_named_by_and_under_a_keyed_parent() {
 }
 
 #[test]
-fn a_subject_that_narrows_a_child_subject_is_written_wrong() {
+fn a_subject_that_narrows_a_child_subject_reads_the_childs_path_with_both_conditions() {
     let (_, r) = reading(
-        json!({"art": {"from": "arts"}, "k": {"from": "art.ks"}, "n": {"from": "k whose x exists"}}),
+        json!({"art": {"from": "arts"}, "k": {"from": "art.ks whose y exists"}, "n": {"from": "k whose x exists"}}),
     );
-    assert!(r.infos["n"].problems.contains_key("subjects.n.from"));
+    assert!(r.infos["n"].problems.is_empty());
+    let lowered = r.lowered("n").unwrap();
+    assert!(matches!(lowered.source, Source::Child { .. }));
+    assert_eq!(lowered.from_text, "art.ks");
+    assert_eq!(r.filters_text("n").unwrap(), "y exists and x exists");
 }
 
 #[test]
@@ -610,25 +647,26 @@ fn requirement_problems(subjects: Value) -> Problems {
 }
 
 #[test]
-fn a_narrowed_child_with_an_unknown_name_lists_its_own_problem_for_the_requirement() {
+fn a_subject_that_narrows_a_child_with_an_unknown_name_lists_the_childs_problem_for_the_requirement()
+ {
     let problems = requirement_problems(json!({
         "parent": {"from": "things", "identified_by": "id"},
         "mid": {"from": "parent.items whose zz is $foo", "identified_by": "n"},
         "kid": {"from": "mid whose n is 1"}
     }));
     assert!(problems.contains_key("subjects.mid.from"));
-    assert!(problems["subjects.kid.from"].contains(NARROWING_A_CHILD_PROBLEM));
+    assert!(!problems.contains_key("subjects.kid.from"));
 }
 
 #[test]
-fn a_narrowed_child_with_mixed_types_lists_its_own_problem_for_the_requirement() {
+fn a_subject_that_narrows_a_child_with_mixed_types_lists_the_childs_problem_for_the_requirement() {
     let problems = requirement_problems(json!({
         "parent": {"from": "things", "identified_by": "id"},
         "mid": {"from": "parent.items whose n is one of 1, \"a\"", "identified_by": "n"},
         "kid": {"from": "mid whose n is 1"}
     }));
     assert!(problems.contains_key("subjects.mid.from"));
-    assert!(problems.contains_key("subjects.kid.from"));
+    assert!(!problems.contains_key("subjects.kid.from"));
 }
 
 #[test]

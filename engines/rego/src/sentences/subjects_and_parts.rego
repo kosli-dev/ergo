@@ -104,14 +104,21 @@ _p_lines(subjects) := {name: _from_line(def.from) | some name, def in subjects; 
 
 _p_narrow(subjects, lines) := {name: _s_chain_parent(name, lines, subjects) | some name, _ in subjects}
 
-_p_descend(subjects, lines) := {name: lines[name].path.steps[0] | some name, _ in lines; "path" in object.keys(lines[name]); _s_descends(name, lines[name], subjects)}
+_p_descend(subjects, lines, narrow) := object.union(direct, {name: direct[root] |
+	some name, _ in subjects
+	not name in object.keys(direct)
+	some root in graph.reachable(narrow, [name])
+	root in object.keys(direct)
+}) if {
+	direct := {name: lines[name].path.steps[0] | some name, _ in lines; "path" in object.keys(lines[name]); _s_descends(name, lines[name], subjects)}
+}
 
 _p_parts(subjects) := {"own": own, "effective": {name: _p_merged(name, own, narrow) | some name, _ in subjects}, "problems": _p_problems(subjects, own, narrow, descend), "lines": lines, "narrow": narrow, "descend": descend} if {
 	is_object(subjects)
 	lines := _p_lines(subjects)
 	read := {name: object.get(line, "parsed", line) | some name, line in lines}
 	narrow := _p_narrow(subjects, read)
-	descend := _p_descend(subjects, read)
+	descend := _p_descend(subjects, read, narrow)
 	own := _p_own_reads(subjects)
 }
 
@@ -519,7 +526,7 @@ _s_subject_sentences(subjects, reads, parts) := {
 	"lines": parts.lines,
 	"parts": parts.effective,
 	"has_problems": parts.problems,
-	"chains": {name: p | some name, r in reads; _s_from_used(subjects[name], r); p := object.get(r, "parent", null); p != null},
+	"chains": _s_chains(subjects, reads),
 	"listed": {name: _s_listed_parent(r) | some name, r in reads; _s_listed_parent(r) != null},
 	"narrowing": _s_narrowing_of(reads),
 	"rooted": _s_rooted(subjects, reads, parts.lines),
@@ -531,6 +538,17 @@ _s_subject_sentences(subjects, reads, parts) := {
 	"problems": {name: probs | some name, def in subjects; probs := _s_subject_problems(name, def, reads, parts.lines); probs != {}},
 	"follows": {name: r.follows | some name, r in reads; "follows" in object.keys(r)},
 } if is_object(subjects)
+
+_s_chains(subjects, reads) := object.union(direct, {name: direct[root] |
+	some name, r in reads
+	_s_from_used(subjects[name], r)
+	not name in object.keys(direct)
+	some root in graph.reachable(narrowing, [name])
+	root in object.keys(direct)
+}) if {
+	direct := {name: p | some name, r in reads; _s_from_used(subjects[name], r); p := object.get(r, "parent", null); p != null}
+	narrowing := {n: object.get(_s_narrowing_of(reads), n, []) | some n, _ in reads}
+}
 
 _s_narrowing_of(reads) := {name: [parent] | some name, r in reads; parent := _s_narrowed_parent(r); is_string(parent); trim_space(parent) != ""}
 

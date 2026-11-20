@@ -89,12 +89,6 @@ _member_problems(members) := union({
 		some m in members
 		some p in _def_problems(_raw_subject(m))
 	},
-	{[["subjects", m, "from"], "can't build on a subject read from another subject yet"] |
-		some m in members
-		of := object.get(_raw_subject(m), "of", null)
-		is_string(of)
-		of in object.keys(object.get(data.ergo_subject_sentences, "chains", {}))
-	},
 	{[["subjects", m, "of"], "not in subjects"] |
 		some m in members
 		of := object.get(_raw_subject(m), "of", null)
