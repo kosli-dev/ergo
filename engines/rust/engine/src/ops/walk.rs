@@ -1184,6 +1184,7 @@ pub(super) fn item_own(
 
 fn stood_in(check: &Check, blocked: impl Fn(&Path) -> bool) -> Option<Check> {
     use super::compare::{Compare, Side};
+    use super::lists::{Contains, In, Right, Wanted};
     if !check
         .paths()
         .into_iter()
@@ -1192,8 +1193,34 @@ fn stood_in(check: &Check, blocked: impl Fn(&Path) -> bool) -> Option<Check> {
     {
         return Some(check.clone());
     }
-    let Check::Compare(compare) = check else {
-        return None;
+    let right_blocked = |right: &Right| right.ref_paths().into_iter().any(&blocked);
+    let compare = match check {
+        Check::Compare(compare) => compare,
+        Check::Contains(contains) if !blocked(&contains.path) => {
+            let wanted = match &contains.wanted {
+                Wanted::One(right) if right_blocked(right) => {
+                    Wanted::One(Right::Written(Value::Null))
+                }
+                Wanted::All(right) if right_blocked(right) => {
+                    Wanted::All(Right::Written(Value::Array(vec![Value::Null])))
+                }
+                Wanted::Some(right) if right_blocked(right) => {
+                    Wanted::Some(Right::Written(Value::Array(vec![Value::Null])))
+                }
+                _ => return None,
+            };
+            return Some(Check::Contains(Contains {
+                wanted,
+                ..contains.clone()
+            }));
+        }
+        Check::In(within) if !blocked(&within.path) && right_blocked(&within.values) => {
+            return Some(Check::In(In {
+                values: Right::Written(Value::Array(Vec::new())),
+                ..within.clone()
+            }));
+        }
+        _ => return None,
     };
     let blocked = |side: &Side| side.paths().into_iter().any(&blocked);
     let own = match (blocked(&compare.left), blocked(&compare.right)) {
