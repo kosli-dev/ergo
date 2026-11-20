@@ -1388,6 +1388,47 @@ fn a_some_says_the_same_as_every() {
 }
 
 #[test]
+fn an_every_says_a_root_after_the_phrase_and_then_its_items() {
+    assert_eq!(
+        said_row(
+            "every xs.v is at least $params.min",
+            json!({"xs": [{}, {}, {}, {}, {}]}),
+            json!({"min": "s"}),
+        ),
+        (
+            Cause::Unusable,
+            "$params.min is \"s\", which isn't a number; item 1 of xs: v is missing; item 2 of xs: v is missing; item 3 of xs: v is missing; and 2 more"
+                .to_string()
+        )
+    );
+}
+
+#[test]
+fn a_value_that_holds_a_semicolon_stays_whole_in_a_walk_row() {
+    use crate::ops::clause::Kind;
+    let out = thing_row(
+        "every xs whose v is at least $params.min, if any, exists",
+        json!({"xs": [{"v": 1}, {}]}),
+        json!({"min": "a; b"}),
+    );
+    let parts: Vec<(Kind, String)> = out
+        .parts
+        .iter()
+        .map(|part| (part.kind, crate::ops::clause::text(std::slice::from_ref(part))))
+        .collect();
+    assert_eq!(
+        parts,
+        [
+            (
+                Kind::Root,
+                "$params.min is \"a; b\", which isn't a number".to_string()
+            ),
+            (Kind::Item, "item 2 of xs: v is missing".to_string()),
+        ]
+    );
+}
+
+#[test]
 fn an_every_keeps_its_items_beside_a_missing_key() {
     assert_eq!(
         said_row(
