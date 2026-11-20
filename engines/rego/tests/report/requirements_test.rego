@@ -74,3 +74,10 @@ test_the_message_names_three_subjects_without_an_id_and_counts_the_rest if {
 	r.message == "item 1 of ds: id is missing; item 2 of ds: id is missing; item 3 of ds: id is missing; and 2 more"
 	count(r.failures) == 5
 }
+
+test_the_ids_message_keeps_each_text_once_in_the_order_it_first_comes_like_the_other_messages if {
+	texts := ["repeated d ids is [\"a\"]", "item 2 of ds: id is missing", "b.id is missing", "item 2 of ds: id is missing", "item 1 of ds: id is null", "item 4 of ds is null", "item 9 of ds: id is missing"]
+	ergo._id_joined(texts) == ergo._m_joined(texts)
+	ergo._id_joined(texts) == "repeated d ids is [\"a\"]; item 2 of ds: id is missing; b.id is missing; item 1 of ds: id is null; item 4 of ds is null; and 1 more"
+	ergo._id_joined(array.slice(texts, 0, 3)) == ergo._m_joined(array.slice(texts, 0, 3))
+}
