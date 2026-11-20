@@ -467,6 +467,10 @@ messages / two roots in one relative clause that can't be read / names every roo
 messages / two roots in one relative clause that fail in different ways / names every root that failed, whatever its cause, in the order the sentence reads them
 messages / two roots in one relative clause that fail in different ways / names them in front of what the items say when an item fails in a worse way
 messages / two worked-out values that can't be used / the values are joined with a comma and and
+messages / a named by key from the params or the input that isn't text, beside a list that fails, is said first, then the list, and the row fails as unusable / with the list missing, the key is said first and the row fails as unusable, not absent
+messages / a named by key from the params or the input that isn't text, beside a list that fails, is said first, then the list, and the row fails as unusable / with the list null, the key is said first and the row fails as unusable, not null
+messages / a named by key from the params or the input that isn't text, beside a list that fails, is said first, then the list, and the row fails as unusable / with the list text, both are said
+messages / a named by key from the params or the input that isn't text, beside a list that fails, is said first, then the list, and the row fails as unusable / with the list empty, an every or some without if any says the key, then the empty list
 missing / does not exist with a ref step after a field, and the param is null / fails with the ref's cause when the parent field is missing
 parts / a child subject that reads its own field named like its parent's part, with no part of its own / prints no dot, because a bare name in the child doesn't read the parent's part
 parts / a child subject with no part of its own, reading a field named like its parent's part / prints no dot, because a bare name in the child doesn't read the parent's part
