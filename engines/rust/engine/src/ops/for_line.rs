@@ -2205,14 +2205,6 @@ impl For {
             .flat_map(|item| item.whose.iter())
             .collect();
         let outer_flaw = super::message::root_flaw_ordered(&whose, &outer, &counted, &nested);
-        let outer_flaw = match (outer_flaw, super::message::key_cause(&counted, &outer)) {
-            (Some((cause, text)), Some((key, said))) if !text.contains(&said) => Some((
-                Cause::worst([cause, key]).unwrap_or(cause),
-                format!("{said}; {text}"),
-            )),
-            (None, key) => key,
-            (flaw, _) => flaw,
-        };
         let outer_flaw = if !run.verdict.cause.is_failure() {
             super::message::worse_key_cause(outer_flaw, &item_whose, &outer)
         } else {
