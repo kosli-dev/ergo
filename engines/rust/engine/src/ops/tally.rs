@@ -1412,6 +1412,35 @@ fn rich_item(
     entry
 }
 
+enum ItemRead {
+    End(Value),
+}
+
+fn item_record(
+    walked: &walk::Walked,
+    item: &walk::WalkItem,
+    read: ItemRead,
+    cause: Cause,
+    text: &str,
+) -> Option<Value> {
+    let (path, value, location) = match read {
+        ItemRead::End(value) => (
+            walked.name_of(&item.end_segs, item.unaliased),
+            value,
+            Some(item.end_location.render()),
+        ),
+    };
+    Some(rich_item(
+        &walked.name_of(&item.item_segs, item.unaliased),
+        path,
+        cause,
+        value,
+        location,
+        Some((item.item.value, item.item.location.render())),
+        text,
+    ))
+}
+
 /// What a `count of` or `sum of` says about its list, and the list or items
 /// it says it about, in the form a walk's failed items take.
 pub fn counted_said(counted: &Counted, ctx: &Ctx, cause: Cause) -> (Option<String>, Vec<Value>) {
@@ -1700,8 +1729,6 @@ pub fn counted_said(counted: &Counted, ctx: &Ctx, cause: Cause) -> (Option<Strin
                 continue;
             }
             let rest = crate::name::name(&item.rest_path());
-            let end_name = walked.name_of(&item.end_segs, item.unaliased);
-            let end_at = Some(item.end_location.render());
             let said = if item.miss == Cause::NotAnObject {
                 Some((
                     Cause::NotAnObject,
@@ -1748,12 +1775,11 @@ pub fn counted_said(counted: &Counted, ctx: &Ctx, cause: Cause) -> (Option<Strin
                     _ => None,
                 }
             };
-            if let Some((c, text, value)) = said {
+            if let Some((c, text, value)) = said
+                && let Some(record) = item_record(&walked, item, ItemRead::End(value), c, &text)
+            {
                 items_at.insert(found.len(), item.item_segs.clone());
-                records.push((
-                    found.len(),
-                    rich_item(&listed, end_name, c, value, end_at, seen(), &text),
-                ));
+                records.push((found.len(), record));
                 found.push((c, text));
             }
         }
