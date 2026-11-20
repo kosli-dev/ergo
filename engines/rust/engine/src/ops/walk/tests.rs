@@ -641,3 +641,23 @@ fn an_item_says_its_own_key_when_the_root_before_it_cant_be_read() {
         ]
     );
 }
+
+#[test]
+fn an_item_says_its_own_value_beside_a_compare_root_it_cant_use() {
+    assert_eq!(
+        own_said(
+            "every items whose v is at least $params.min exists",
+            json!([{}, {"v": 1}, {"v": "x"}]),
+            json!({"min": "s"}),
+            json!({}),
+        ),
+        [
+            Some((Cause::Absent, "item 1 of items: v is missing".to_string())),
+            None,
+            Some((
+                Cause::Unusable,
+                "item 3 of items: v is \"x\", which isn't a number".to_string()
+            )),
+        ]
+    );
+}
