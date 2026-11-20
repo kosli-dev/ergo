@@ -137,3 +137,57 @@ fn is_ignoring_case_says_each_side_that_isnt_text() {
         "x is \"  Blocked \""
     );
 }
+
+fn in_said(subject: Value, list: Value) -> (crate::cause::Cause, String) {
+    use crate::ops::compare::Ignoring;
+    use crate::ops::lists::{In, Right};
+    use crate::path::{Located, Location, Path, Start, Step};
+    let key = |start: Start, name: &str| Path {
+        start,
+        steps: vec![Step::Key(name.to_string())],
+    };
+    let check = crate::ops::Check::In(In {
+        path: key(Start::Subject, "x"),
+        values: Right::Ref(key(Start::Params, "l")),
+        not: false,
+        ignoring: Some(Ignoring {
+            case: true,
+            spaces: false,
+        }),
+    });
+    let input = json!({"things": [subject]});
+    let params = json!({ "l": list });
+    let ctx = crate::path::Ctx {
+        label: None,
+        item_by_item: false,
+        in_option: false,
+        subject: Located {
+            value: &input["things"][0],
+            location: Location::input_root().key("things").index(0),
+        },
+        input: &input,
+        params: Some(&params),
+        aliases: std::collections::BTreeMap::new(),
+    };
+    let verdict = crate::ops::run(&check, &ctx);
+    (verdict.cause, super::message(&check, &ctx, &verdict))
+}
+
+#[test]
+fn is_in_ignoring_case_says_each_null_value_of_the_list_when_it_fails_as_null() {
+    use crate::cause::Cause;
+    assert_eq!(
+        in_said(json!({"x": "bug"}), json!(["Bug", null, "a", null])),
+        (
+            Cause::Null,
+            "item 2 of $params.l is null, and item 4 of $params.l is null".to_string()
+        )
+    );
+    assert_eq!(
+        in_said(json!({"x": null}), json!(["Bug", null])),
+        (
+            Cause::Null,
+            "x is null, and item 2 of $params.l is null".to_string()
+        )
+    );
+}
