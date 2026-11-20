@@ -843,7 +843,7 @@ pub fn pieces(check: &Check, ctx: &Ctx, verdict: &Verdict) -> Vec<Piece> {
                     for side in tally::tally_sides(tally_check) {
                         if let TallySide::Derived(derived) = side {
                             found.extend(
-                                tally::derived_clauses(derived, ctx, verdict.cause)
+                                tally::derived_clauses(derived, ctx)
                                     .into_iter()
                                     .map(Piece::Counted),
                             );
@@ -916,7 +916,7 @@ pub fn pieces(check: &Check, ctx: &Ctx, verdict: &Verdict) -> Vec<Piece> {
                         TallySide::Derived(d) => Some(d),
                         TallySide::Plain(_) => None,
                     })
-                    .flat_map(|d| tally::derived_clauses(d, ctx, Cause::NotAnObject))
+                    .flat_map(|d| tally::derived_clauses(d, ctx))
                     .map(Piece::Counted)
                     .collect(),
                 _ => Vec::new(),
@@ -1371,7 +1371,7 @@ fn tally_faults(check: &tally::Tally, ctx: &Ctx) -> Vec<(String, Piece)> {
                     let tally::Term::Counted(term) = term else {
                         continue;
                     };
-                    if let Some(clauses) = tally::counted_clauses(term, ctx, Cause::Unusable) {
+                    if let Some(clauses) = tally::counted_clauses(term, ctx) {
                         out.push((String::new(), Piece::Counted(clauses)));
                         any = true;
                     } else if let Some(input) = first_input(&term.path, ctx)
@@ -2094,6 +2094,14 @@ pub fn walked_root_clauses(checks: &[&Check], ctx: &Ctx) -> Vec<Clause> {
 }
 
 pub fn root_clauses(checks: &[&Check], ctx: &Ctx) -> Vec<Clause> {
+    roots_with(checks, ctx, true)
+}
+
+pub fn side_root_clauses(checks: &[&Check], ctx: &Ctx) -> Vec<Clause> {
+    roots_with(checks, ctx, false)
+}
+
+fn roots_with(checks: &[&Check], ctx: &Ctx, item_keys: bool) -> Vec<Clause> {
     let reads = root_reads_with(checks, ctx, &[], &[], true)
         .map(|(_, reads)| reads)
         .unwrap_or_default();
@@ -2106,7 +2114,7 @@ pub fn root_clauses(checks: &[&Check], ctx: &Ctx) -> Vec<Clause> {
                 .chain(super::walk::listed_refs(check))
         })
         .filter_map(|path| {
-            super::key_base::base_of(path, ctx)
+            super::key_base::base_of(path, item_keys, ctx)
                 .map(|(name, text, cause)| Clause::root(&name, cause, text))
         });
     let counted = checks

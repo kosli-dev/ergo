@@ -168,9 +168,9 @@ pub fn of_path(path: &Path, tally: bool, ctx: &Ctx) -> Option<KeyBase> {
 }
 
 /// The value before the first `named by` key of `path`, read from outside the
-/// item, when it can't take a key and the key can't be read or comes from the
-/// item.
-pub fn base_of(path: &Path, ctx: &Ctx) -> Option<(String, String, Cause)> {
+/// item, when it can't take a key and the key can't be read or, when
+/// `item_keys` is true, comes from the item.
+pub fn base_of(path: &Path, item_keys: bool, ctx: &Ctx) -> Option<(String, String, Cause)> {
     let at = path
         .steps
         .iter()
@@ -182,7 +182,9 @@ pub fn base_of(path: &Path, ctx: &Ctx) -> Option<(String, String, Cause)> {
         Step::Ref(key) => {
             key_flaw(key, ctx)?;
         }
-        Step::Field(key) if !matches!(key.start, path::Start::Subject | path::Start::Own) => {
+        Step::Field(key)
+            if !item_keys || !matches!(key.start, path::Start::Subject | path::Start::Own) =>
+        {
             return None;
         }
         _ => {}

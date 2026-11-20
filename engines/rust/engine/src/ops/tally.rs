@@ -208,7 +208,7 @@ const MICROS: i128 = 1_000_000;
 impl Tally {
     /// The lists a `count of` or `sum of` walks, by the name the row's
     /// inputs give them, with what each says about its list and items.
-    pub fn counted_lists(&self, ctx: &Ctx, cause: Cause) -> Vec<(String, Vec<Value>)> {
+    pub fn counted_lists(&self, ctx: &Ctx) -> Vec<(String, Vec<Value>)> {
         let outer = outer_ctx(ctx);
         let mut out = Vec::new();
         for side in std::iter::once(&self.left).chain(self.right.as_ref()) {
@@ -225,7 +225,7 @@ impl Tally {
                                 empty_adds_nothing: true,
                             },
                         );
-                        out.push((walked.name, counted_said(counted, ctx, cause).1));
+                        out.push((walked.name, counted_said(counted, ctx).1));
                     }
                 }
             }
@@ -235,10 +235,10 @@ impl Tally {
 
     /// What a `count of` or `sum of` says about its lists and their items,
     /// one clause for each root, list and item it can't read.
-    pub fn counted_clauses(&self, ctx: &Ctx, cause: Cause) -> Vec<Clause> {
+    pub fn counted_clauses(&self, ctx: &Ctx) -> Vec<Clause> {
         self.counted_terms()
             .into_iter()
-            .flat_map(|counted| counted_said(counted, ctx, cause).0)
+            .flat_map(|counted| counted_said(counted, ctx).0)
             .collect()
     }
 
@@ -358,6 +358,15 @@ impl Tally {
 }
 
 pub fn run(check: &Tally, ctx: &Ctx) -> Verdict {
+    let numbers = numbers_verdict(check, ctx);
+    Verdict {
+        cause: Cause::worst(std::iter::once(numbers.cause).chain(root_causes(check, ctx)))
+            .unwrap_or(numbers.cause),
+        inputs: numbers.inputs,
+    }
+}
+
+fn numbers_verdict(check: &Tally, ctx: &Ctx) -> Verdict {
     let left = work_side(&check.left, ctx);
     let right = check.right.as_ref().map(|side| work_side(side, ctx));
     let mut entries = left.entries;
@@ -382,6 +391,19 @@ pub fn run(check: &Tally, ctx: &Ctx) -> Verdict {
         cause,
         inputs: merged(entries),
     }
+}
+
+fn root_causes(check: &Tally, ctx: &Ctx) -> Vec<Cause> {
+    let outer = outer_ctx(ctx);
+    check
+        .counted_terms()
+        .into_iter()
+        .flat_map(|counted| {
+            let whose: Vec<&Check> = counted.whose.iter().collect();
+            super::message::root_clauses(&whose, &outer)
+        })
+        .map(|root| root.cause)
+        .collect()
 }
 
 fn decide(test: &Test, left: &Value, right: Option<Value>, ctx: &Ctx) -> Cause {
@@ -622,7 +644,11 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
         };
     }
     let mut causes: Vec<Cause> = walked.failures.iter().map(|f| f.cause).collect();
-    causes.extend(roots.iter().map(|root| root.cause));
+    causes.extend(
+        super::message::side_root_clauses(&whose, &outer)
+            .iter()
+            .map(|root| root.cause),
+    );
     let mut numbers: Vec<Value> = Vec::new();
     let mut at = outer.clone();
     let mut any_undecided = false;
@@ -659,6 +685,7 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
         causes.extend(
             super::message::walked_root_clauses(&whose, &outer)
                 .iter()
+                .chain(&roots)
                 .map(|root| root.cause),
         );
     }
@@ -1257,7 +1284,7 @@ pub(super) fn counted_fault_clauses(
                 && counted.path == *path
                 && let Err(cause) = work_counted(counted, ctx).result
             {
-                let said = counted_said(counted, ctx, cause).0;
+                let said = counted_said(counted, ctx).0;
                 if !said.is_empty() {
                     faults.push((cause, said));
                 }
@@ -1279,7 +1306,7 @@ pub fn with_all_items(check: &Tally, ctx: &Ctx, cause: Cause, said: Vec<Piece>) 
         return text;
     }
     let items: Vec<Clause> = check
-        .counted_clauses(ctx, cause)
+        .counted_clauses(ctx)
         .into_iter()
         .filter(|clause| clause.kind != clause::Kind::Root)
         .collect();
@@ -1301,13 +1328,27 @@ pub fn with_all_items(check: &Tally, ctx: &Ctx, cause: Cause, said: Vec<Piece>) 
 
 /// The message of a `count of` or `sum of` row: the check's own pieces,
 /// with the roots its whose reads first when a walked root can't be read,
-/// or else with every item it can't read.
+/// or else with every item it can't read, and then what its numbers say
+/// when they read fine but a root can't be read.
 pub fn row_message(check: &Tally, ctx: &Ctx, cause: Cause, said: Vec<Piece>) -> String {
     let text = super::message::pieces_text(&said);
-    match with_walked_roots(check, ctx, text.clone()) {
+    let text = match with_walked_roots(check, ctx, text.clone()) {
         rooted if rooted != text => rooted,
         _ => with_all_items(check, ctx, cause, said),
+    };
+    match numbers_said(check, ctx, cause) {
+        Some(own) => super::message::joined(vec![text, own]),
+        None => text,
     }
+}
+
+fn numbers_said(check: &Tally, ctx: &Ctx, cause: Cause) -> Option<String> {
+    let rooted = root_causes(check, ctx).iter().any(|root| root.is_failure());
+    let numbers = numbers_verdict(check, ctx);
+    (rooted && cause.is_failure() && numbers.cause == Cause::Value).then(|| {
+        let check = Check::Tally(check.clone());
+        super::message::pieces_text(&super::message::pieces(&check, ctx, &numbers))
+    })
 }
 
 fn with_walked_roots(check: &Tally, ctx: &Ctx, message: String) -> String {
@@ -1346,12 +1387,12 @@ pub fn tally_sides(check: &Tally) -> Vec<&Side> {
         .collect()
 }
 
-pub fn derived_clauses(derived: &Derived, ctx: &Ctx, cause: Cause) -> Vec<Vec<Clause>> {
+pub fn derived_clauses(derived: &Derived, ctx: &Ctx) -> Vec<Vec<Clause>> {
     derived
         .terms
         .iter()
         .filter_map(|term| match term {
-            Term::Counted(counted) => counted_clauses(counted, ctx, cause),
+            Term::Counted(counted) => counted_clauses(counted, ctx),
             _ => None,
         })
         .collect()
@@ -1412,8 +1453,8 @@ pub fn without_roots(check: &Check) -> Option<Check> {
     }
 }
 
-pub fn counted_clauses(counted: &Counted, ctx: &Ctx, cause: Cause) -> Option<Vec<Clause>> {
-    let said = counted_said(counted, ctx, cause).0;
+pub fn counted_clauses(counted: &Counted, ctx: &Ctx) -> Option<Vec<Clause>> {
+    let said = counted_said(counted, ctx).0;
     (!said.is_empty()).then_some(said)
 }
 
@@ -1535,7 +1576,7 @@ fn item_record<'c>(
 
 /// What a `count of` or `sum of` says about its list, and the list or items
 /// it says it about, in the form a walk's failed items take.
-pub fn counted_said(counted: &Counted, ctx: &Ctx, _cause: Cause) -> (Vec<Clause>, Vec<Value>) {
+pub fn counted_said(counted: &Counted, ctx: &Ctx) -> (Vec<Clause>, Vec<Value>) {
     let mut out: Vec<Clause> = Vec::new();
     let mut rich: Vec<Value> = Vec::new();
     {
