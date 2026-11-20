@@ -14,49 +14,126 @@ fn read(name: &str, value: Value, state: Outcome) -> Input {
     }
 }
 
+fn lowered(sentence: &str) -> crate::ops::Check {
+    let tree = ergo_policy_sentences::parse_check(sentence).unwrap();
+    crate::lower::lower_assertion(&tree.assertions[0], &crate::lower::Scope::new()).unwrap()
+}
+
+fn outcome_of(
+    sentences: &[&str],
+    input: &Value,
+    params: Option<&Value>,
+    name: &str,
+) -> Option<&'static str> {
+    let checks: Vec<crate::ops::Check> = sentences.iter().map(|s| lowered(s)).collect();
+    let all: Vec<&crate::ops::Check> = checks.iter().collect();
+    let ctx = crate::path::Ctx {
+        subject: crate::path::Located {
+            value: input,
+            location: crate::path::Location::input_root(),
+        },
+        input,
+        params,
+        aliases: std::collections::BTreeMap::new(),
+        label: None,
+        item_by_item: checks.iter().any(crate::ops::Check::reads_by_item),
+        in_option: false,
+    };
+    let read = checks
+        .iter()
+        .flat_map(|check| crate::ops::run(check, &ctx).inputs)
+        .find(|read| read.name == name)
+        .unwrap();
+    outcome(&read, crate::checks::input_unfit(&all, &read, &ctx))
+}
+
 #[test]
 fn a_missing_input_is_absent_and_a_null_one_is_null() {
     assert_eq!(
-        outcome(&read("x", Value::Null, Outcome::Absent), "", &[]),
+        outcome(&read("x", Value::Null, Outcome::Absent), true),
         Some("absent")
     );
     assert_eq!(
-        outcome(&read("x", Value::Null, Outcome::Null), "", &[]),
+        outcome(&read("x", Value::Null, Outcome::Null), true),
         Some("null")
     );
 }
 
 #[test]
-fn a_value_the_message_says_is_the_wrong_kind_is_unusable() {
+fn a_found_value_is_unusable_only_when_the_check_cant_use_it() {
     let x = read("x", json!("1"), Outcome::Found);
-    let sides = ["x".to_string()];
+    assert_eq!(outcome(&x, true), Some("unusable"));
+    assert_eq!(outcome(&x, false), Some("usable"));
+}
+
+#[test]
+fn a_side_the_compare_cant_use_is_unusable_without_a_message() {
     assert_eq!(
-        outcome(&x, "x is \"1\", which isn't a number", &sides),
+        outcome_of(&["v is at least 3"], &json!({"v": "a"}), None, "v"),
         Some("unusable")
     );
-    assert_eq!(outcome(&x, "x is \"1\"", &sides), Some("usable"));
 }
 
 #[test]
-fn a_key_of_the_wrong_kind_is_still_usable_because_the_check_uses_only_what_it_names() {
-    let k = read("k", json!(3), Outcome::Found);
+fn a_side_the_compare_can_use_is_usable_when_the_check_fails() {
     assert_eq!(
-        outcome(&k, "k is 3, which isn't text", &["x".to_string()]),
+        outcome_of(&["v is at least 3"], &json!({"v": 1}), None, "v"),
         Some("usable")
     );
 }
 
 #[test]
-#[ignore = "694: the outcome of an input comes from the check, not from the words of the message"]
-fn a_walked_root_stays_usable_when_another_clause_of_the_message_says_which_isnt() {
-    let xs = read("$input.xs[]", json!([3]), Outcome::Found);
+fn a_missing_side_is_absent_where_the_compare_needs_a_number() {
     assert_eq!(
-        outcome(
-            &xs,
-            "item 1 of $input.xs is 3; $params.q is \"s\", which isn't a number",
-            &[]
+        outcome_of(&["v is at least 3"], &json!({}), None, "v"),
+        Some("absent")
+    );
+}
+
+#[test]
+fn a_null_side_is_null_where_the_compare_needs_a_number() {
+    assert_eq!(
+        outcome_of(&["v is at least 3"], &json!({"v": null}), None, "v"),
+        Some("null")
+    );
+}
+
+#[test]
+fn a_key_of_the_wrong_kind_stays_usable() {
+    assert_eq!(
+        outcome_of(
+            &["m named by k is 1"],
+            &json!({"k": 3, "m": {"a": 1}}),
+            None,
+            "k"
         ),
         Some("usable")
+    );
+}
+
+#[test]
+fn a_walked_root_stays_usable_when_another_clause_of_the_message_says_which_isnt() {
+    assert_eq!(
+        outcome_of(
+            &["every $input.xs is at least 5", "$params.q is at least 1"],
+            &json!({"xs": [3]}),
+            Some(&json!({"q": "s"})),
+            "$input.xs[]"
+        ),
+        Some("usable")
+    );
+}
+
+#[test]
+fn a_walked_root_with_an_item_the_walk_cant_read_is_unusable() {
+    assert_eq!(
+        outcome_of(
+            &["x is in $input.os.name"],
+            &json!({"x": "bob", "os": [{"name": "bob"}, 3]}),
+            None,
+            "$input.os[].name"
+        ),
+        Some("unusable")
     );
 }
 
@@ -64,7 +141,7 @@ fn a_walked_root_stays_usable_when_another_clause_of_the_message_says_which_isnt
 fn a_worked_out_number_has_no_outcome() {
     let mut count = read("count of xs", json!(2), Outcome::Found);
     count.worked = true;
-    assert_eq!(outcome(&count, "", &[]), None);
+    assert_eq!(outcome(&count, true), None);
 }
 
 #[test]
