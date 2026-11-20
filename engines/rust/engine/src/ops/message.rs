@@ -1743,11 +1743,6 @@ pub(super) fn root_kind_fault(check: &Check, root: &Path, ctx: &Ctx) -> Option<S
     }
     let read = path::read(root, ctx);
     let value = read.value.filter(|_| read.outcome == Outcome::Found)?;
-    if let Check::Compare(compare) = check
-        && compare.ignoring.is_some()
-    {
-        return (!value.is_string()).then(|| isnt(&name::name(root), value, "text"));
-    }
     super::walk::right_needs(check, value).map(|kind| isnt(&name::name(root), value, kind))
 }
 

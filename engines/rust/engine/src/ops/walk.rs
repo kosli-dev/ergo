@@ -1022,6 +1022,9 @@ fn from_a_root(path: &Path) -> bool {
 pub(super) fn right_needs(check: &Check, value: &Value) -> Option<&'static str> {
     use super::compare::Cmp;
     match check {
+        Check::Compare(compare) if compare.ignoring.is_some() => {
+            (!value.is_string()).then_some("text")
+        }
         Check::Compare(compare) => match compare.cmp {
             Cmp::Gt | Cmp::Gte | Cmp::Lt | Cmp::Lte => (!value.is_number()).then_some("a number"),
             Cmp::StartsWith

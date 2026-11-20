@@ -1432,7 +1432,7 @@ pub fn without_roots(check: &Check) -> Option<Check> {
         Check::Compare(c) if root(&c.left) != root(&c.right) => {
             let value = match c.cmp {
                 Cmp::Gt | Cmp::Gte | Cmp::Lt | Cmp::Lte => Value::from(0),
-                Cmp::Eq | Cmp::Ne => return None,
+                Cmp::Eq | Cmp::Ne if c.ignoring.is_none() => return None,
                 _ => Value::from(""),
             };
             Some(Check::Compare(Compare {
