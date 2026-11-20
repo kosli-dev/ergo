@@ -1030,10 +1030,7 @@ impl Parser {
             Ignoring::SurroundingSpaces,
         ]
         .into_iter()
-        .filter_map(|ignoring| {
-            self.words(i, ignoring.words())
-                .map(|end| (ignoring, end))
-        })
+        .filter_map(|ignoring| self.words(i, ignoring.words()).map(|end| (ignoring, end)))
         .collect()
     }
 

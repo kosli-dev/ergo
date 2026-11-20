@@ -1089,7 +1089,10 @@ fn other_phrases_cant_take_ignoring_words() {
         ("x is empty ignoring case", "is empty"),
         ("x exists ignoring case", "exists"),
         ("x is a string ignoring case", "is a"),
-        ("x is a non-empty string ignoring case", "is a non-empty string"),
+        (
+            "x is a non-empty string ignoring case",
+            "is a non-empty string",
+        ),
     ] {
         assert_eq!(
             problems(line),

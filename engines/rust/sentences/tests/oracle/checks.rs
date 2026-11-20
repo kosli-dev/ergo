@@ -10334,6 +10334,114 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("sum of xs.v is 0", "sum of xs.v is 0", &[], &[]),
     ("x is \"w\"", "x is \"w\"", &[], &[]),
     ("x is \"z\"", "x is \"z\"", &[], &[]),
+    (
+        ".ignoring is \"a\" ignoring case",
+        ".ignoring is \"a\" ignoring case",
+        &[],
+        &[],
+    ),
+    (
+        "dotted is \"i\" ignoring case",
+        "dotted is \"i\" ignoring case",
+        &[],
+        &[],
+    ),
+    (
+        "kelvin is \"k\" ignoring case",
+        "kelvin is \"k\" ignoring case",
+        &[],
+        &[],
+    ),
+    (
+        "sharp is \"ß\" ignoring case",
+        "sharp is \"ß\" ignoring case",
+        &[],
+        &[],
+    ),
+    (
+        "sigma is \"σασ\" ignoring case",
+        "sigma is \"σασ\" ignoring case",
+        &[],
+        &[],
+    ),
+    (
+        "status is \"in progress\" ignoring case and surrounding spaces",
+        "status is \"in progress\" ignoring case and surrounding spaces",
+        &[],
+        &[],
+    ),
+    (
+        "status is not \"in progress\" ignoring case and surrounding spaces",
+        "status is not \"in progress\" ignoring case and surrounding spaces",
+        &[],
+        &[],
+    ),
+    (
+        "street is \"straße\" ignoring case",
+        "street is \"straße\" ignoring case",
+        &[],
+        &[],
+    ),
+    (
+        "type is in $params.states ignoring case",
+        "type is in $params.states ignoring case",
+        &[],
+        &[],
+    ),
+    (
+        "type is not in $params.states ignoring case",
+        "type is not in $params.states ignoring case",
+        &[],
+        &[],
+    ),
+    (
+        "type is not one of \"bug\", \"incident\" ignoring case",
+        "type is not one of \"bug\", \"incident\" ignoring case",
+        &[],
+        &[],
+    ),
+    (
+        "type is one of \"bug\", \"incident\" ignoring case",
+        "type is one of \"bug\", \"incident\" ignoring case",
+        &[],
+        &[],
+    ),
+    (
+        "x equals y ignoring case",
+        "x equals y ignoring case",
+        &[],
+        &[],
+    ),
+    (
+        "x equals x ignoring case",
+        "x equals x ignoring case",
+        &["x is compared with itself"],
+        &["x is compared with itself"],
+    ),
+    (
+        "x is equal to y  ignoring  surrounding spaces",
+        "x equals y ignoring surrounding spaces",
+        &[],
+        &[],
+    ),
+    (
+        "x is 'a' followed by y ignoring case",
+        "x is \"a\" followed by y ignoring case",
+        &[],
+        &[],
+    ),
+    (
+        "every xs whose k is not \"a\" ignoring case exists",
+        "every xs whose k is not \"a\" ignoring case exists",
+        &[],
+        &[],
+    ),
+    (
+        "x is in ys ignoring case and surrounding spaces",
+        "x is in ys ignoring case and surrounding spaces",
+        &[],
+        &[],
+    ),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -11448,6 +11556,17 @@ pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
     (
         "every region.items whose a is 1 is 2",
         &["a is a word of the grammar: write .a"],
+    ),
+    ("x starts with \"a\" ignoring case", &["doesn't parse"]),
+    ("x contains \"a\" ignoring case", &["doesn't parse"]),
+    (
+        "x is alphabetically before \"a\" ignoring case",
+        &["doesn't parse"],
+    ),
+    ("x is \"a\" ignoring spaces", &["doesn't parse"]),
+    (
+        "ignoring is \"a\"",
+        &["ignoring is a word of the grammar: write .ignoring"],
     ),
 ];
 
@@ -12607,6 +12726,41 @@ pub const CHECK_WRITTEN_WRONG: &[(&str, &[&str])] = &[
     (
         "v starts with \"x\" followed by 1.5",
         &["\"followed by\" takes text"],
+    ),
+    (
+        "x is \"a\" ignoring surrounding spaces and case",
+        &[
+            "\"ignoring surrounding spaces and case\" is written \"ignoring case and surrounding spaces\"",
+        ],
+    ),
+    (
+        "x is at least 1 ignoring case",
+        &["\"is at least\" can't take ignoring case"],
+    ),
+    (
+        "x is 1 within 2 ignoring case",
+        &["\"within\" can't take ignoring case"],
+    ),
+    (
+        "x matches \"a\" ignoring case",
+        &["\"matches\" can't take ignoring case"],
+    ),
+    (
+        "x exists ignoring surrounding spaces",
+        &["\"exists\" can't take ignoring surrounding spaces"],
+    ),
+    ("x is 1 ignoring case", &["\"ignoring case\" takes text"]),
+    (
+        "x is one of \"a\", null ignoring case",
+        &["\"ignoring case\" takes text"],
+    ),
+    (
+        "x is y plus 1 ignoring case",
+        &["\"ignoring case\" can't take a count of, a sum of or a plus"],
+    ),
+    (
+        "count of xs is \"a\" ignoring case",
+        &["\"ignoring case\" can't follow a count of, a sum of or a plus"],
     ),
 ];
 
