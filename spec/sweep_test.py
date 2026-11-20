@@ -3,6 +3,7 @@ import os
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import sweep
@@ -52,6 +53,26 @@ class PairsTest(unittest.TestCase):
         self.assertGreater(len(pairs), 100)
         for pair in pairs:
             self.assertTrue(pair["want"] is None or isinstance(pair["want"], str), pair["name"])
+
+    def run_pairs_with(self, rust):
+        with tempfile.TemporaryDirectory() as directory:
+            path = write(directory, [{"name": "n", "policy": {}, "input": {}}])
+            args = mock.Mock(pairs=path, opa="opa", rust="rust")
+            with mock.patch.object(sweep.subprocess, "run"), \
+                    mock.patch.object(sweep, "run_rego", return_value=[report("a")]), \
+                    mock.patch.object(sweep, "run_rust", **rust):
+                try:
+                    sweep.run_pairs(args)
+                except RuntimeError:
+                    pass
+
+    def test_a_pairs_run_leaves_no_sweep_folder_in_dist(self):
+        self.run_pairs_with({"return_value": ("v", [report("a")])})
+        self.assertFalse(os.path.exists(sweep.WORK))
+
+    def test_a_failed_pairs_run_leaves_no_sweep_folder_in_dist(self):
+        self.run_pairs_with({"side_effect": RuntimeError("boom")})
+        self.assertFalse(os.path.exists(sweep.WORK))
 
 
 if __name__ == "__main__":
