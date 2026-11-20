@@ -1173,9 +1173,10 @@ pub(super) fn item_own(
     }
     let root_key = |path: &Path| {
         path.steps.iter().any(|step| {
-            matches!(step, Step::Field(key)
+            matches!(step, Step::Field(key) | Step::Ref(key)
                 if !matches!(key.start, Start::Subject | Start::Own)
-                    && super::key_base::key_flaw(key, &focus).is_some())
+                    && (super::key_base::key_flaw(key, &focus).is_some()
+                        || path::read(key, &focus).outcome != Outcome::Found))
         })
     };
     let mut item = Clause::item(&name, Cause::Satisfied, String::new(), Vec::new());

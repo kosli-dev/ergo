@@ -2081,7 +2081,9 @@ pub fn walked_root_clauses(checks: &[&Check], ctx: &Ctx) -> Vec<Clause> {
         .flat_map(|check| {
             lists::right_paths(check)
                 .into_iter()
-                .filter(|root| lists::walked_in(check, root, ctx).is_some())
+                .filter(|root| {
+                    reads_from_a_root(root) && lists::walked_in(check, root, ctx).is_some()
+                })
                 .filter_map(|root| {
                     lists::walked_root_fault(check, root, ctx)
                         .filter(|(cause, _)| *cause != Cause::Value)
@@ -2102,10 +2104,16 @@ pub fn root_clauses(checks: &[&Check], ctx: &Ctx) -> Vec<Clause> {
             super::key_base::base_of(path, ctx)
                 .map(|(name, text, cause)| Clause::root(&name, cause, text))
         });
+    let counted = checks
+        .iter()
+        .filter(|check| matches!(check, Check::Tally(_)))
+        .flat_map(|check| off_item(check, ctx, Cause::Unusable))
+        .map(|text| Clause::said(Cause::Unusable, text));
     let mut said: Vec<Clause> = Vec::new();
     for clause in key_problems(checks, ctx)
         .into_iter()
         .chain(bases)
+        .chain(counted)
         .chain(reads.into_iter().flat_map(|(_, said)| said))
     {
         let root = clause.kind == clause::Kind::Root;

@@ -1608,8 +1608,8 @@ pub fn counted_said(counted: &Counted, ctx: &Ctx, _cause: Cause) -> (Vec<Clause>
             out.splice(0..0, roots);
             return (out, rich);
         }
-        if let (path::Start::Params, [], Some(params)) =
-            (&counted.path.start, counted.path.steps.as_slice(), outer.params)
+        if let (path::Start::Params, Some(params)) = (&counted.path.start, outer.params)
+            && !matches!(counted.path.steps.first(), Some(path::Step::Index(_)))
             && walk::params_unreadable(&outer)
         {
             let text = super::message::isnt("$params", params, "an object");
