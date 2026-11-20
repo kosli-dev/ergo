@@ -1696,11 +1696,11 @@ pub fn counted_said(counted: &Counted, ctx: &Ctx, cause: Cause) -> (Vec<Clause>,
                 if verdict.cause.is_failure() {
                     undecided = true;
                     let said = if lost {
-                        told(
+                        vec![told(
                             &name,
                             verdict.cause,
                             &super::message::message(&walk::focus_check(item), &at, &verdict),
-                        )
+                        )]
                     } else {
                         let off = super::message::off_item(check, &outer, verdict.cause);
                         let walked_root = super::lists::field_walk_fault(check, &focus)
@@ -1709,21 +1709,26 @@ pub fn counted_said(counted: &Counted, ctx: &Ctx, cause: Cause) -> (Vec<Clause>,
                         if let Some(fault) =
                             super::message::root_fault(check, &outer, verdict.cause)
                         {
-                            Clause::said(verdict.cause, fault)
+                            root_reads
+                                .iter()
+                                .flat_map(|(_, reads)| reads)
+                                .find(|(text, _)| *text == fault)
+                                .map(|(_, said)| said.clone())
+                                .unwrap_or_else(|| vec![Clause::said(verdict.cause, fault)])
                         } else if let Some(text) = walked_root {
-                            Clause::said(verdict.cause, text)
+                            vec![Clause::said(verdict.cause, text)]
                         } else if off.is_empty() {
-                            told(
+                            vec![told(
                                 &walked.item_name(walk::focus_segs(item, check)),
                                 verdict.cause,
                                 &super::message::message(check, &focus, &verdict),
-                            )
+                            )]
                         } else {
-                            Clause::said(verdict.cause, off.join(", and "))
+                            vec![Clause::said(verdict.cause, off.join(", and "))]
                         }
                     };
                     if !item.rest.is_empty() && walk::reads_focus(check) {
-                        always.insert(found.len());
+                        always.extend(found.len()..found.len() + said.len());
                     }
                     if !lost
                         && rooted
@@ -1758,20 +1763,21 @@ pub fn counted_said(counted: &Counted, ctx: &Ctx, cause: Cause) -> (Vec<Clause>,
                     } else {
                         ItemRead::Field(check)
                     };
-                    if own_item(&said, &name)
+                    if let [one] = said.as_slice()
+                        && own_item(one, &name)
                         && let Some(record) = item_record(
                             &walked,
                             item,
                             &focus,
                             read,
                             verdict.cause,
-                            &said_text(&said),
+                            &said_text(one),
                         )
                     {
                         items_at.insert(found.len(), item.item_segs.clone());
                         records.push((found.len(), record));
                     }
-                    found.push((verdict.cause, said));
+                    found.extend(said.into_iter().map(|one| (verdict.cause, one)));
                 }
             }
             let kept = counted
