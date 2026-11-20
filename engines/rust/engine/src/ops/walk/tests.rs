@@ -708,3 +708,14 @@ fn item_own_is_what_any_check_says_when_it_reads_no_root() {
         judged(sentence, items, json!({}))
     );
 }
+
+#[test]
+fn item_own_is_what_any_check_says_when_its_roots_can_be_read() {
+    let sentence = "every items whose tags contains $params.m named by key exists";
+    let items = json!([{"key": "a"}, {"tags": ["x"]}, {"key": "a", "tags": ["x"]}]);
+    let params = json!({"m": {"a": "x"}});
+    assert_eq!(
+        own_said(sentence, items.clone(), params.clone(), json!({})),
+        judged(sentence, items, params)
+    );
+}
