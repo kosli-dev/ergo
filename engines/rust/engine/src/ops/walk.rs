@@ -912,12 +912,13 @@ pub(super) fn named_side_of<'a>(
             .copied()
             .filter(|side| keep(side.path))
             .collect();
-        side_read(&kept, ctx)
+        (kept.is_empty() && !paths.is_empty(), side_read(&kept, ctx))
     });
-    let left = sides.next().flatten();
-    let right = sides.next().flatten();
-    let right_alone = left.as_ref().is_none_or(|(_, _, read)| *read)
-        && right.as_ref().is_some_and(|(_, _, read)| !*read);
+    let (left_left_out, left) = sides.next().unwrap_or((false, None));
+    let right = sides.next().and_then(|(_, read)| read);
+    let right_alone = left_left_out
+        || left.as_ref().is_none_or(|(_, _, read)| *read)
+            && right.as_ref().is_some_and(|(_, _, read)| !*read);
     let (path, read, _) = if right_alone { right } else { left }?;
     Some((path, read))
 }
