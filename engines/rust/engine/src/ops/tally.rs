@@ -1517,10 +1517,35 @@ fn said_before_key(
     focus: &Ctx,
     outer: &Ctx,
 ) -> Option<Vec<(Cause, String)>> {
-    if lost || item.end.is_none() || item.rest.is_empty() || !walk::reads_focus(check) {
+    if !keyed_focus(check, item, lost) {
         return None;
     }
     before_unfit_key(check, focus, outer)
+}
+
+fn keyed_focus(check: &Check, item: &walk::WalkItem, lost: bool) -> bool {
+    !lost && item.end.is_some() && !item.rest.is_empty() && walk::reads_focus(check)
+}
+
+fn key_under_each_item(counted: &Counted, walked: &walk::Walked, outer: &Ctx) -> bool {
+    let whose: Vec<&Check> = counted.whose.iter().collect();
+    let unusable = super::message::key_clauses(&whose, outer)
+        .first()
+        .is_some_and(|key| key.cause == Cause::Unusable);
+    let mut at = outer.clone();
+    unusable
+        && walked.items.iter().any(|item| {
+            at.subject = item.item.clone();
+            at.label = None;
+            let focus = walk::focus_ctx(item, outer);
+            counted.whose.iter().any(|check| {
+                let (verdict, lost) = walk::focus_verdict(check, item, &at, &focus);
+                verdict.cause.is_failure()
+                    && (lost
+                        || keyed_focus(check, item, lost)
+                            && before_unfit_key(check, &focus, outer).is_none())
+            })
+        })
 }
 
 fn said_text(said: &Clause) -> String {
@@ -1756,6 +1781,9 @@ pub fn counted_said(counted: &Counted, ctx: &Ctx, cause: Cause) -> (Vec<Clause>,
             found.extend(keys.into_iter().map(|key| (Cause::Unusable, key)));
         }
         let rooted = !root_said.is_empty();
+        let keyed_out = key_under_each_item(counted, &walked, &outer);
+        let mut placed: std::collections::BTreeMap<usize, Vec<walk::Seg>> =
+            std::collections::BTreeMap::new();
         let mut at = outer.clone();
         for item in &walked.items {
             at.subject = item.item.clone();
@@ -1767,7 +1795,10 @@ pub fn counted_said(counted: &Counted, ctx: &Ctx, cause: Cause) -> (Vec<Clause>,
                 let (verdict, lost) = walk::focus_verdict(check, item, &at, &focus);
                 if verdict.cause.is_failure() {
                     undecided = true;
-                    if let Some(before) = said_before_key(check, item, lost, &focus, &outer) {
+                    let keyed = keyed_out && keyed_focus(check, item, lost);
+                    if !keyed_out
+                        && let Some(before) = said_before_key(check, item, lost, &focus, &outer)
+                    {
                         for key in super::message::key_clauses(&[check], &outer) {
                             match found.iter().position(|(_, said)| *said == key) {
                                 Some(at) => {
@@ -1782,11 +1813,18 @@ pub fn counted_said(counted: &Counted, ctx: &Ctx, cause: Cause) -> (Vec<Clause>,
                         let named = walked.item_name(walk::focus_segs(item, check));
                         for (own, text) in before {
                             always.insert(found.len());
+                            placed.insert(found.len(), item.item_segs.clone());
                             found.push((own, told(&named, own, &text)));
                         }
                         continue;
                     }
-                    let said = if lost {
+                    let said = if keyed {
+                        let named = walked.item_name(walk::focus_segs(item, check));
+                        super::message::key_clauses(&[check], &outer)
+                            .into_iter()
+                            .map(|key| told(&named, key.cause, &key.text))
+                            .collect()
+                    } else if lost {
                         vec![told(
                             &name,
                             verdict.cause,
@@ -1851,6 +1889,8 @@ pub fn counted_said(counted: &Counted, ctx: &Ctx, cause: Cause) -> (Vec<Clause>,
                     }
                     let read = if lost {
                         ItemRead::End(Value::Null)
+                    } else if keyed {
+                        ItemRead::End(item.end.cloned().unwrap_or(Value::Null))
                     } else {
                         ItemRead::Field(check)
                     };
@@ -1948,7 +1988,10 @@ pub fn counted_said(counted: &Counted, ctx: &Ctx, cause: Cause) -> (Vec<Clause>,
         let mut order: Vec<usize> = (0..found.len())
             .filter(|at| keep(at, &found[*at].0, &found[*at].1))
             .collect();
-        order.sort_by_key(|at| (items_at.contains_key(at), items_at.get(at).cloned(), *at));
+        order.sort_by_key(|at| {
+            let segs = items_at.get(at).or_else(|| placed.get(at));
+            (segs.is_some(), segs.cloned(), *at)
+        });
         let mut records: std::collections::BTreeMap<usize, Value> = records.into_iter().collect();
         rich.extend(order.iter().filter_map(|at| records.remove(at)));
         let mut texts: Vec<String> = Vec::new();
