@@ -1450,9 +1450,9 @@ fn rooted_failure(
 
 fn before_key<'a>(path: &Path, at: &Ctx<'a>) -> Option<(Path, path::Read<'a>, Cause)> {
     let found = super::key_base::of_path(path, false, at)?;
-    let cut = path.steps.iter().position(|step| {
-        matches!(step, Step::Ref(key) if super::key_base::key_flaw(key, at).is_some())
-    })?;
+    let cut = path.steps.iter().position(
+        |step| matches!(step, Step::Ref(key) if super::key_base::key_flaw(key, at).is_some()),
+    )?;
     let before = Path {
         start: path.start.clone(),
         steps: path.steps[..cut].to_vec(),

@@ -1350,10 +1350,7 @@ fn each_key_then(cause: Cause, items: &str) -> Vec<(Cause, String)> {
 #[test]
 fn an_every_says_a_that_key_it_cant_read_once_and_each_item_its_own_value() {
     assert_eq!(
-        said_beside_each_key(
-            "every",
-            json!([{"v": "s"}, {"v": {}}, {"v": {"m": null}}])
-        ),
+        said_beside_each_key("every", json!([{"v": "s"}, {"v": {}}, {"v": {"m": null}}])),
         each_key_then(
             Cause::NotAnObject,
             "item 1 of es: v is \"s\", which isn't an object; item 2 of es: v: m is missing; item 3 of es: v: m is null"
@@ -1364,10 +1361,7 @@ fn an_every_says_a_that_key_it_cant_read_once_and_each_item_its_own_value() {
 #[test]
 fn a_some_says_the_same_as_every() {
     assert_eq!(
-        said_beside_each_key(
-            "some",
-            json!([{"v": "s"}, {"v": {}}, {"v": {"m": null}}])
-        ),
+        said_beside_each_key("some", json!([{"v": "s"}, {"v": {}}, {"v": {"m": null}}])),
         each_key_then(
             Cause::NotAnObject,
             "item 1 of es: v is \"s\", which isn't an object; item 2 of es: v: m is missing; item 3 of es: v: m is null"
@@ -1416,7 +1410,12 @@ fn a_value_that_holds_a_semicolon_stays_whole_in_a_walk_row() {
     let parts: Vec<(Kind, String)> = out
         .parts
         .iter()
-        .map(|part| (part.kind, crate::ops::clause::text(std::slice::from_ref(part))))
+        .map(|part| {
+            (
+                part.kind,
+                crate::ops::clause::text(std::slice::from_ref(part)),
+            )
+        })
         .collect();
     assert_eq!(
         parts,
@@ -1460,15 +1459,10 @@ fn records(sentence: &str, es: Value, params: Value) -> Vec<(Value, Value, Value
 }
 
 #[test]
-fn a_walk_item_beside_a_key_it_cant_read_holds_the_value_before_the_key_with_the_reads_outcome()
-{
+fn a_walk_item_beside_a_key_it_cant_read_holds_the_value_before_the_key_with_the_reads_outcome() {
     let sentence = "every es.v that is m named by $params.k is 1";
     assert_eq!(
-        records(
-            sentence,
-            json!([{"v": {}}, {"v": {"m": null}}]),
-            json!({})
-        ),
+        records(sentence, json!([{"v": {}}, {"v": {"m": null}}]), json!({})),
         [
             (json!("es[0].v.m"), json!(null), json!("absent")),
             (json!("es[1].v.m"), json!(null), json!("absent")),
