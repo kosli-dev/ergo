@@ -288,6 +288,43 @@ test_a_subject_that_narrows_a_child_reads_the_childs_subjects_with_their_id_and_
 	rep.requirements.r.status == "met"
 }
 
+narrowed_child_policy := {"ergo_spec": ergo._spec, "subjects": {"record": {"from": "records", "identified_by": "id"}, "job": {"from": "every record.jobs", "identified_by": "key"}, "open job": {"from": "job whose state is \"open\""}}, "requirements": {"r": {"subject": "open job", "checks": {"c": "owner exists"}}}}
+
+test_a_subject_that_narrows_a_child_fails_min_subjects_under_a_parent_it_cannot_read_the_list_of if {
+	every pair in [[{"id": "r1"}, "absent"], [{"id": "r1", "jobs": null}, "null"], [{"id": "r1", "jobs": "x"}, "unusable"], ["x", "not_an_object"], [null, "not_an_object"]] {
+		rep := ergo.report({"records": [pair[0]]}, narrowed_child_policy, {})
+		[[r.cause, r.subject] | some r in rep.results; r.check == "$min_subjects"] == [[pair[1], {"type": "open job", "id": null, "in": {"record": _id_of(pair[0])}}]]
+		rep.requirements.r.status == "not_met"
+	}
+}
+
+_id_of(record) := record.id if is_object(record)
+
+_id_of(record) := record if not is_object(record)
+
+test_a_subject_that_narrows_a_child_fails_the_one_that_lacks_its_field_and_keeps_the_others if {
+	doc := {"records": [{"id": "r1", "jobs": [{"key": "k1"}, {"key": "k2", "state": "open", "owner": "ana"}]}]}
+	rep := ergo.report(doc, narrowed_child_policy, {})
+	[[r.cause, r.subject.id] | some r in rep.results; r.check == "$applies"] == [["absent", "k1"], ["satisfied", "k2"]]
+}
+
+test_a_subject_that_narrows_a_child_checks_ids_per_parent if {
+	job := {"key": "k1", "state": "open", "owner": "ana"}
+	doc := {"records": [{"id": "r1", "jobs": [job, job]}, {"id": "r2", "jobs": [job]}]}
+	rep := ergo.report(doc, narrowed_child_policy, {})
+	[[r.cause, r.subject.in.record] | some r in rep.results; r.check == "$unique_ids"] == [["value", "r1"], ["satisfied", "r2"]]
+}
+
+test_a_subject_that_narrows_a_child_needs_a_passing_subject_under_each_parent_under_some if {
+	policy := object.union(narrowed_child_policy, {"requirements": {"r": {"subject": "open job", "require": "some", "checks": {"c": "owner exists"}}}})
+	doc := {"records": [
+		{"id": "r1", "jobs": [{"key": "k1", "state": "open"}, {"key": "k2", "state": "open", "owner": "ana"}]},
+		{"id": "r2", "jobs": [{"key": "k3", "state": "open"}]},
+	]}
+	rep := ergo.report(doc, policy, {})
+	rep.requirements.r.causes == [{"cause": "value", "rows": 1}]
+}
+
 test_named_by_a_field_reads_the_key_the_subjects_field_holds if {
 	doc := {"things": [
 		{"id": "v1", "severity": "high", "age": 3},
