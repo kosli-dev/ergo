@@ -19,6 +19,19 @@ test_a_null_id_is_not_an_id_so_it_never_repeats if {
 
 ds_keys(req) := ["ds"] if is_object(req)
 
+place_at(entry, req) := {"c": entry.c} if is_object(req)
+
+test_subjects_without_an_id_are_named_in_the_order_of_the_subjects_whatever_order_their_ids_are_kept_in if {
+	raw := [{"subject": {}, "at": concat("", ["/ds/", format_int(i, 10)]), "c": ["ds", i]} | some i in numbers.range(0, 11)]
+	refs := {i: {"id": id} | some i, _ in raw; id := _id_or_null(i)}
+	places := ergo._id_fault_places(raw, refs, {"subject": "d"}) with ergo._id_fault_place as place_at
+	[p.c[1] | some p in places] == [1, 9, 10, 11]
+}
+
+_id_or_null(i) := null if i in {1, 9, 10, 11}
+
+else := i
+
 id_fault_place(c, at, cause, text) := {"c": c, "at": at, "cause": cause, "value": null, "text": text, "note": false, "plain": false, "listed": true}
 
 test_ids_that_are_missing_or_null_fail_the_row_after_the_repeated_ids_with_the_worst_cause if {
