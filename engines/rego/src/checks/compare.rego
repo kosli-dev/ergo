@@ -309,15 +309,15 @@ _list_flaw(leaf, x) := {"value"} if {
 
 _list_flaw(leaf, x) := {"unusable"} if {
 	_list_cmp(leaf)
-	not "ignoring" in object.keys(leaf)
+	not leaf.ignoring
 	_lstate(leaf, x) == "value"
 	not _lfailed(leaf, x)
 	not _list_right_usable(leaf.cmp, _lvalue(leaf, x))
 }
 
 _list_flaw(leaf, x) := states if {
+	leaf.ignoring
 	_list_cmp(leaf)
-	"ignoring" in object.keys(leaf)
 	_lstate(leaf, x) == "value"
 	not _lfailed(leaf, x)
 	items := _text_item_states(_lvalue(leaf, x))

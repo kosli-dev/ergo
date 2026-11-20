@@ -374,7 +374,7 @@ _m_message(check, subj, cause) := m if {
 	m := concat(", and ", _once(array.concat(keys, _m_unkeyed_said(subj, check, cause))))
 } else := m if {
 	cause in _no_value_states
-	clauses := _once(array.concat(array.concat([_m_state_clause(s) | some s in _m_sources(subj, check); _m_side_said(s, cause, check)], _m_tallies(subj, check, cause)), _m_null_items(subj, check, cause)))
+	clauses := _once(_m_with_null_items(array.concat([_m_state_clause(s) | some s in _m_sources(subj, check); _m_side_said(s, cause, check)], _m_tallies(subj, check, cause)), subj, check, cause))
 	count(clauses) > 0
 	m := concat(", and ", clauses)
 } else := _m_fallback(check) if cause in _no_value_states
@@ -467,19 +467,19 @@ _m_message(check, subj, "not_an_object") := m if {
 	m := concat(", and ", clauses)
 } else := _m_fallback(check) if is_object(subj)
 
-_m_list_names(check) := {_input_name(array.slice(p, 0, i)) |
+_m_list_names(check) := _m_with_text_list_names(check, {_input_name(array.slice(p, 0, i)) |
 	some side in _m_tally_parts(check)
 	p := side[_basic_form(side)]
 	is_array(p)
 	some i in numbers.range(1, count(p))
-} | _m_text_list_names(check)
+})
 
-_m_text_list_names(check) := {_ref_name(check.values.ref)} if {
-	"ignoring" in object.keys(check)
+_m_with_text_list_names(check, names) := names | {_ref_name(check.values.ref)} if {
+	check.ignoring
 	check.op in _membership_ops
 	_is_ref(check.values)
-} else := {_input_name(check.right)} if {
-	"ignoring" in object.keys(check)
+} else := names | {_input_name(check.right)} if {
+	check.ignoring
 	_list_cmp(check)
 	is_array(check.right)
-} else := set()
+} else := names

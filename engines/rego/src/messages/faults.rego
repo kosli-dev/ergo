@@ -292,15 +292,17 @@ _m_holder(step) := "a list" if is_number(step)
 
 _m_holder(step) := "an object" if not is_number(step)
 
-_m_faults(subj, check) := array.concat(
-	[_m_isnt(s.name, s.value, kind) |
-		some f in _m_fault(subj, check)
-		s := _m_shown(subj, f[0])
-		s.state == "value"
-		kind := f[1]
-	],
-	_m_text_item_faults(subj, check),
-)
+_m_faults(subj, check) := _m_with_text_item_faults(subj, check, [_m_isnt(s.name, s.value, kind) |
+	some f in _m_fault(subj, check)
+	s := _m_shown(subj, f[0])
+	s.state == "value"
+	kind := f[1]
+])
+
+_m_with_text_item_faults(subj, check, faults) := array.concat(faults, ts) if {
+	check.ignoring
+	ts := _m_text_item_faults(subj, check)
+} else := faults
 
 _m_text_item_faults(subj, check) := [concat(", and ", ts)] if {
 	ts := _m_text_item_list(subj, check)
@@ -313,13 +315,13 @@ _m_text_item_list(subj, check) := _m_text_items(s.name, s.value) if {
 } else := []
 
 _m_text_list(subj, check) := s if {
-	"ignoring" in object.keys(check)
+	check.ignoring
 	check.op in _membership_ops
 	_is_ref(check.values)
 	s := _m_shown(null, check.values)
 	s.state == "value"
 } else := s if {
-	"ignoring" in object.keys(check)
+	check.ignoring
 	_list_cmp(check)
 	s := _m_shown(subj, check.right)
 	s.state == "value"
@@ -334,9 +336,11 @@ _m_text_item(name, v) := concat("", [name, " is null"]) if v == null
 
 else := _m_isnt(name, v, "text")
 
-_m_null_items(subj, check, "null") := [t | some t in _m_text_item_list(subj, check); endswith(t, " is null")]
-
-default _m_null_items(_, _, _) := []
+_m_with_null_items(clauses, subj, check, cause) := array.concat(clauses, items) if {
+	check.ignoring
+	cause == "null"
+	items := [t | some t in _m_text_item_list(subj, check); endswith(t, " is null")]
+} else := clauses
 
 _m_ref_blocked(check) := [m |
 	some r in sort(_check_refs(check))
@@ -370,12 +374,12 @@ _m_unusable_ref_walks(check) := [_ref_walk_text(r) | some r in sort(_check_refs(
 _m_unusable_side_walks(subj, check) := [t | some side in _m_sides(check); _walked_side(side); s := _m_shown(subj, side); s.state == "unusable"; t := s.text]
 
 _m_ref_list_fault(check) := [[check.values, "a list"]] if {
-	"ignoring" in object.keys(check)
+	check.ignoring
 	_is_ref(check.values)
 	_ref_state(check.values.ref) == "value"
 	not is_array(_ref_shown(check.values.ref))
 } else := [[check[f], _m_right_kind(cmp, v)]] if {
-	not "ignoring" in object.keys(check)
+	not check.ignoring
 	some f in _list_argument_keys
 	_is_ref(check[f])
 	cmp := _m_ref_cmp(check.op, f)
@@ -436,11 +440,11 @@ _m_fault_6(subj, check) := [[check.path, _m_kind(w)]] if {
 
 _m_fault_7(subj, check) := [[check.path, "text"]] if {
 	check.op in _membership_ops
-	"ignoring" in object.keys(check)
+	check.ignoring
 	not is_string(_found(subj, check.path))
 } else := [[check.path, _m_kinds(vals)]] if {
 	check.op in _membership_ops
-	not "ignoring" in object.keys(check)
+	not check.ignoring
 	v := _found(subj, check.path)
 	vals := _wants(check.values)
 	_value_list(vals)
@@ -459,12 +463,12 @@ _m_fault_9(subj, check) := fs if {
 } else := []
 
 _m_list_right(subj, check) := [[check.right, "a list"]] if {
-	"ignoring" in object.keys(check)
+	check.ignoring
 	_lstate(check, subj) == "value"
 	not _lfailed(check, subj)
 	not is_array(_lvalue(check, subj))
 } else := [[check.right, _m_right_kind(check.cmp, r)]] if {
-	not "ignoring" in object.keys(check)
+	not check.ignoring
 	_lstate(check, subj) == "value"
 	not _lfailed(check, subj)
 	r := _lvalue(check, subj)
@@ -490,10 +494,10 @@ _m_right_kind(cmp, r) := "a list of one kind of value" if {
 }
 
 _m_list_left(subj, check) := [[check.left, "text"]] if {
-	"ignoring" in object.keys(check)
+	check.ignoring
 	not is_string(_found(subj, check.left))
 } else := [] if {
-	"ignoring" in object.keys(check)
+	check.ignoring
 } else := [[check.left, "text"]] if {
 	check.cmp in _pattern_ops
 	not is_string(_found(subj, check.left))
@@ -580,7 +584,7 @@ _m_parts_fault(subj, side) := [[p, "text"] | some p in side.join; v := _found(su
 
 _m_side_kind(_, check, _) := "a number" if "within" in object.keys(check)
 
-_m_side_kind(_, check, _) := "text" if "ignoring" in object.keys(check)
+_m_side_kind(_, check, _) := "text" if check.ignoring
 
 _m_side_kind(_, check, _) := "text" if {
 	not "within" in object.keys(check)
@@ -607,7 +611,7 @@ _m_contain_kind(v) := _m_list_of([""]) if {
 
 _m_side_kind(subj, check, side) := _m_kind(o) if {
 	not "within" in object.keys(check)
-	not "ignoring" in object.keys(check)
+	not check.ignoring
 	check.cmp in _equality_cmps
 	side == check.left
 	_basic_form(check.left) != "literal"
@@ -616,7 +620,7 @@ _m_side_kind(subj, check, side) := _m_kind(o) if {
 
 _m_side_kind(subj, check, side) := _m_kind(o) if {
 	not "within" in object.keys(check)
-	not "ignoring" in object.keys(check)
+	not check.ignoring
 	check.cmp in _equality_cmps
 	side == check.right
 	_basic_form(check.left) == "literal"
@@ -626,7 +630,7 @@ _m_side_kind(subj, check, side) := _m_kind(o) if {
 _m_fits_kind(v, k) if _m_kind(v) == k
 
 _m_root_kind_text(subj, c, p, k) := concat(", and ", ts) if {
-	"ignoring" in object.keys(c)
+	c.ignoring
 	ts := _m_text_items(_root_label(p), _root_value(subj, p))
 	ts != []
 } else := _m_isnt(_root_label(p), _root_value(subj, p), k)

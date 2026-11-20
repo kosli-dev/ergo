@@ -2,11 +2,11 @@ package ergo
 
 import rego.v1
 
-_s_sentence_problems(parsed) := (_s_base_problems(parsed) | _s_join_problems(parsed)) | _s_ignoring_problems(parsed)
+_s_sentence_problems(parsed, pat) := (_s_base_problems(parsed) | _s_join_problems(parsed)) | _s_ignoring_problems(parsed) if pat.ignoring
 
-_s_ignoring_problems(parsed) := set() if not _s_ignores(parsed)
+else := _s_base_problems(parsed) | _s_join_problems(parsed)
 
-else := ({concat("", [`"ignoring surrounding spaces and case" is written "ignoring case and surrounding spaces"`]) |
+_s_ignoring_problems(parsed) := ({concat("", [`"ignoring surrounding spaces and case" is written "ignoring case and surrounding spaces"`]) |
 	some node in _s_nodes(parsed)
 	is_object(node)
 	object.get(node, "ignoring", "") == "surrounding spaces and case"
@@ -391,7 +391,7 @@ _s_problems(text, pat) := [concat("", ["unclosed quote at column ", _json_text(c
 	]
 	count(invalid) > 0
 } else := sort(problems) if {
-	problems := _s_sentence_problems(_s_parsed_anyway(text, pat)) | _s_text_names(text)
+	problems := _s_sentence_problems(_s_parsed_anyway(text, pat), pat) | _s_text_names(text)
 	count(problems) > 0
 } else := ["two quantifiers in one sentence: put them on a for line"] if {
 	regex.match(`^(?:every|some) +\S+ +(?:every|some) `, text)
@@ -457,8 +457,3 @@ _s_parsed_anyway(text, pat) := {"assertions": assertions} if {
 _s_number_problem(false) := "number out of range: "
 
 _s_number_problem(true) := concat("", [_too_long_problem, ": "])
-
-_s_ignores(parsed) if {
-	walk(parsed, [path, _])
-	path[count(path) - 1] == "ignoring"
-}

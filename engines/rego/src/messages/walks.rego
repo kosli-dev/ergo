@@ -61,14 +61,17 @@ _m_parts_marks(raw, key, ns) := {key: [object.union(o, {"inputs": _m_marked(o.in
 	count(names) > 0
 } else := {}
 
-_m_unusable_names(check, subj) := {s.name |
+_m_unusable_names(check, subj) := _m_with_text_list_name(check, subj, {s.name |
 	some f in _m_fault(subj, check)
 	s := _m_shown(subj, f[0])
 	s.state == "value"
-} | {s.name |
+})
+
+_m_with_text_list_name(check, subj, names) := names | {s.name} if {
+	check.ignoring
 	_m_text_item_faults(subj, check) != []
 	s := _m_text_list(subj, check)
-}
+} else := names
 
 _m_marked(inputs, names) := [_m_marked_input(i, names) | some i in inputs]
 

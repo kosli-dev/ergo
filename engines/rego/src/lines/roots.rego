@@ -208,10 +208,10 @@ _root_state(subj, c, p, lists) := "not_an_object" if {
 } else := _root_list_state(subj, p, lists)
 
 _root_kind(subj, c, p) := k if {
-	"ignoring" in object.keys(c)
+	c.ignoring
 	k := _text_root_kind(subj, c, p)
 } else := _m_right_kind(cmp, v) if {
-	not "ignoring" in object.keys(c)
+	not c.ignoring
 	some f in _list_argument_keys
 	object.get(c, f, null) == {"ref": p}
 	not _ref_walks(p)

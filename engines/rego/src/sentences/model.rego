@@ -324,7 +324,7 @@ _s_line_self(line, names) := _s_self_problems([_s_aliased(a, names) | some a in 
 	every p in parsed.problems {
 		startswith(p, "unknown name ")
 	}
-	anyway := _s_parsed_anyway(trim_space(line), _s_patterns)
+	anyway := _s_parsed_anyway(trim_space(line), _s_patterns_for(line))
 	"assertions" in object.keys(anyway)
 } else := set()
 
