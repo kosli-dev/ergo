@@ -897,8 +897,19 @@ pub(super) fn named_side<'a>(
     check: &'a Check,
     ctx: &Ctx<'a>,
 ) -> Option<(&'a Path, path::Read<'a>)> {
+    named_side_of(check, ctx, |_| true)
+}
+
+pub(super) fn named_side_of<'a>(
+    check: &'a Check,
+    ctx: &Ctx<'a>,
+    keep: impl Fn(&Path) -> bool,
+) -> Option<(&'a Path, path::Read<'a>)> {
     let sides = check.sides();
-    let mut sides = sides.iter().map(|paths| side_read(paths, ctx));
+    let mut sides = sides.iter().map(|paths| {
+        let kept: Vec<SidePath> = paths.iter().copied().filter(|side| keep(side.path)).collect();
+        side_read(&kept, ctx)
+    });
     let left = sides.next().flatten();
     let right = sides.next().flatten();
     let right_alone = left.as_ref().is_none_or(|(_, _, read)| *read)
@@ -1104,7 +1115,6 @@ pub(super) fn focus_segs<'s>(item: &'s WalkItem, check: &Check) -> &'s [Seg] {
     }
 }
 
-#[allow(dead_code)]
 pub(super) fn item_own(
     check: &Check,
     item: &WalkItem,
@@ -1135,7 +1145,8 @@ pub(super) fn item_own(
         let text = message::isnt(&name, focus.subject.value, "an object");
         return Some(Clause::item(&name, Cause::NotAnObject, text, Vec::new()));
     }
-    let rooted = !message::root_clauses(&[check], outer).is_empty();
+    let rooted = !message::root_clauses(&[check], outer).is_empty()
+        || !message::walked_root_clauses(&[check], outer).is_empty();
     let outside = |path: &Path| (reads_outside(path) || path.start == Start::Params) && rooted;
     let mut said: Vec<Clause> = Vec::new();
     let mut own_at = None;
@@ -1160,9 +1171,16 @@ pub(super) fn item_own(
             }
         }
     }
+    let root_key = |path: &Path| {
+        path.steps.iter().any(|step| {
+            matches!(step, Step::Field(key)
+                if !matches!(key.start, Start::Subject | Start::Own)
+                    && super::key_base::key_flaw(key, &focus).is_some())
+        })
+    };
     let mut item = Clause::item(&name, Cause::Satisfied, String::new(), Vec::new());
-    if let Some(alone) = stood_in(check, |path| {
-        outside(path) || super::key_base::of_path(path, false, &focus).is_some()
+    if let Some(alone) = stood_in(check, &focus, |path| {
+        outside(path) || root_key(path) || super::key_base::of_path(path, false, &focus).is_some()
     }) {
         let verdict = run_check(&alone, &focus);
         if verdict.cause.is_failure() {
@@ -1182,9 +1200,9 @@ pub(super) fn item_own(
     Some(item)
 }
 
-fn stood_in(check: &Check, blocked: impl Fn(&Path) -> bool) -> Option<Check> {
+fn stood_in(check: &Check, focus: &Ctx, blocked: impl Fn(&Path) -> bool) -> Option<Check> {
     use super::compare::{Compare, Side};
-    use super::lists::{Contains, In, Right, Wanted};
+    use super::lists::{Contains, In, Matches, Right, Wanted};
     if !check
         .paths()
         .into_iter()
@@ -1197,7 +1215,16 @@ fn stood_in(check: &Check, blocked: impl Fn(&Path) -> bool) -> Option<Check> {
     let compare = match check {
         Check::Compare(compare) => compare,
         Check::Contains(contains) if !blocked(&contains.path) => {
+            let kinds: std::collections::BTreeSet<&str> = path::read(&contains.path, focus)
+                .value
+                .and_then(Value::as_array)
+                .into_iter()
+                .flatten()
+                .filter(|value| !value.is_null())
+                .map(message::kind)
+                .collect();
             let wanted = match &contains.wanted {
+                _ if kinds.len() > 1 => return None,
                 Wanted::One(right) if right_blocked(right) => {
                     Wanted::One(Right::Written(Value::Null))
                 }
@@ -1218,6 +1245,12 @@ fn stood_in(check: &Check, blocked: impl Fn(&Path) -> bool) -> Option<Check> {
             return Some(Check::In(In {
                 values: Right::Written(Value::Array(Vec::new())),
                 ..within.clone()
+            }));
+        }
+        Check::Matches(matches) if !blocked(&matches.path) && right_blocked(&matches.patterns) => {
+            return Some(Check::Matches(Matches {
+                patterns: Right::Written(Value::Array(vec![Value::from("x")])),
+                ..matches.clone()
             }));
         }
         _ => return None,

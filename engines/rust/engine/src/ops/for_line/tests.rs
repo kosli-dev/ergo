@@ -766,11 +766,11 @@ fn a_count_on_a_for_line_says_every_item_of_each_alias_or_counts_it_in_and_n_mor
     for (gs, said) in [
         (
             json!([{"es": [{"v": {}}, {"v": {}}, {"v": {}}, {"v": {}}, {"v": {}}]}]),
-            "item 1 of gs: $params.k is missing; item 1 of g.es: v: $params.k is missing; item 2 of g.es: v: $params.k is missing; item 3 of g.es: v: $params.k is missing; and 2 more",
+            "item 1 of gs: $params.k is missing; item 1 of g.es: v: m is missing; item 2 of g.es: v: m is missing; item 3 of g.es: v: m is missing; and 2 more",
         ),
         (
             json!([{"es": [{"v": {}}, {"v": {}}]}, {"es": [{"v": {}}, {"v": {}}]}]),
-            "item 1 of gs: $params.k is missing; item 1 of g.es: v: $params.k is missing; item 2 of g.es: v: $params.k is missing; item 2 of gs: $params.k is missing; item 1 of g.es: v: $params.k is missing; item 2 of g.es: v: $params.k is missing",
+            "item 1 of gs: $params.k is missing; item 1 of g.es: v: m is missing; item 2 of g.es: v: m is missing; item 2 of gs: $params.k is missing; item 1 of g.es: v: m is missing; item 2 of g.es: v: m is missing",
         ),
     ] {
         assert_eq!(

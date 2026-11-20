@@ -161,21 +161,35 @@ fn root_clauses_keep_each_item_of_a_count_a_root_reads() {
 }
 
 #[test]
-fn root_clauses_say_a_walked_root_that_holds_values_of_more_than_one_kind() {
+fn walked_root_clauses_say_a_walked_root_that_holds_values_of_more_than_one_kind() {
+    let super::Check::Walk(walk) = lowered("every items whose v is in $params.os.name exists") else {
+        panic!("not a walk");
+    };
     let subject = json!({"id": "t", "items": [{"v": "bob"}]});
     let input = json!({});
     let params = json!({"os": [{"name": "bob"}, {"name": 3}]});
-    let said = root_clauses_of(
-        "every items whose v is in $params.os.name exists",
-        &subject,
-        &input,
-        Some(&params),
-    );
-    let text: Vec<&str> = said.iter().map(|(_, text)| text.as_str()).collect();
+    let ctx = crate::path::Ctx {
+        label: None,
+        item_by_item: false,
+        in_option: false,
+        subject: crate::path::Located {
+            value: &subject,
+            location: crate::path::Location::input_root().key("s"),
+        },
+        input: &input,
+        params: Some(&params),
+        aliases: std::collections::BTreeMap::new(),
+    };
+    let whose: Vec<&super::Check> = walk.whose.iter().collect();
+    let text: Vec<String> = super::walked_root_clauses(&whose, &ctx)
+        .into_iter()
+        .map(|clause| clause.text)
+        .collect();
     assert_eq!(
         text,
         ["$params.os[].name is [\"bob\", 3], which isn't a list of one kind of value"]
     );
+    assert_eq!(super::root_clauses(&whose, &ctx), []);
 }
 
 #[test]

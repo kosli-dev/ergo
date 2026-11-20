@@ -1767,21 +1767,8 @@ fn root_flaw_with(
         .map(|(cause, texts)| (cause, texts.join("; ")))
 }
 
-pub fn root_reads_counted(checks: &[&Check], ctx: &Ctx) -> Option<(Cause, Vec<RootRead>)> {
-    root_reads_with(checks, ctx, checks, &[], true)
-}
-
 pub fn key_cause(checks: &[&Check], ctx: &Ctx) -> Option<(Cause, String)> {
     worst_texts(key_problems(checks, ctx))
-}
-
-pub fn key_clauses(checks: &[&Check], ctx: &Ctx) -> Vec<Clause> {
-    let found = key_problems(checks, ctx);
-    let worst = Cause::worst(found.iter().map(|clause| clause.cause));
-    found
-        .into_iter()
-        .filter(|clause| Some(clause.cause) == worst)
-        .collect()
 }
 
 pub fn worse_key_cause(
@@ -2088,7 +2075,22 @@ fn root_reads_with(
     Some((worst, reads))
 }
 
-#[allow(dead_code)]
+pub fn walked_root_clauses(checks: &[&Check], ctx: &Ctx) -> Vec<Clause> {
+    checks
+        .iter()
+        .flat_map(|check| {
+            lists::right_paths(check)
+                .into_iter()
+                .filter(|root| lists::walked_in(check, root, ctx).is_some())
+                .filter_map(|root| {
+                    lists::walked_root_fault(check, root, ctx)
+                        .filter(|(cause, _)| *cause != Cause::Value)
+                        .map(|(cause, text)| Clause::root(&name::name(root), cause, text))
+                })
+        })
+        .collect()
+}
+
 pub fn root_clauses(checks: &[&Check], ctx: &Ctx) -> Vec<Clause> {
     let reads = root_reads_with(checks, ctx, &[], &[], true)
         .map(|(_, reads)| reads)
@@ -2106,11 +2108,21 @@ pub fn root_clauses(checks: &[&Check], ctx: &Ctx) -> Vec<Clause> {
         .chain(bases)
         .chain(reads.into_iter().flat_map(|(_, said)| said))
     {
-        if !said.iter().any(|found| found.text == clause.text) {
+        let root = clause.kind == clause::Kind::Root;
+        if !said
+            .iter()
+            .any(|found| *found == clause || root && found.text == clause.text)
+        {
             said.push(clause);
         }
     }
-    clause::shown(&said)
+    said.sort_by(|a, b| match (a.kind, b.kind) {
+        (clause::Kind::Root, clause::Kind::Root) => (a.cause, &a.name).cmp(&(b.cause, &b.name)),
+        (clause::Kind::Root, _) => std::cmp::Ordering::Less,
+        (_, clause::Kind::Root) => std::cmp::Ordering::Greater,
+        _ => std::cmp::Ordering::Equal,
+    });
+    said
 }
 
 pub fn off_item(check: &Check, ctx: &Ctx, cause: Cause) -> Vec<String> {
