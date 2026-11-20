@@ -72,6 +72,10 @@ fn a_missing_input_is_absent_and_a_null_one_is_null_beside_a_value_the_row_cant_
         outcome_of(&check, &json!({"w": "a"}), None, "w"),
         Some("unusable")
     );
+    for state in [Outcome::Absent, Outcome::Null] {
+        let missing = read("x", Value::Null, state);
+        assert_eq!(outcome(&missing, true), outcome(&missing, false));
+    }
 }
 
 #[test]
