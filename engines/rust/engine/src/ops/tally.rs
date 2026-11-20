@@ -1618,8 +1618,6 @@ pub fn counted_said(counted: &Counted, ctx: &Ctx, cause: Cause) -> (Option<Strin
             at.label = None;
             let focus = walk::focus_ctx(item, &outer);
             let name = walked.item_name(&item.item_segs);
-            let listed = walked.name_of(&item.item_segs, item.unaliased);
-            let seen = || Some((item.item.value, item.item.location.render()));
             let own = |said: &str| {
                 said.starts_with(&format!("{name}:")) || said.starts_with(&format!("{name} "))
             };
@@ -1666,33 +1664,18 @@ pub fn counted_said(counted: &Counted, ctx: &Ctx, cause: Cause) -> (Option<Strin
                                 &walked.item_name(walk::focus_segs(item, check)),
                                 &super::message::message(&alone, &focus, &mine),
                             );
-                            let read = walk::named_side(&alone, &focus).map(|(path, read)| {
-                                let mut steps: Vec<path::Step> = walk::focus_segs(item, check)
-                                    .iter()
-                                    .map(walk::Seg::to_step)
-                                    .collect();
-                                steps.extend(path.steps.iter().cloned());
-                                (
-                                    walked.name_of_steps(steps, item.unaliased),
-                                    read.value.cloned().unwrap_or(Value::Null),
-                                    read.location.map(|l| l.render()),
+                            if own(&text)
+                                && let Some(record) = item_record(
+                                    &walked,
+                                    item,
+                                    &focus,
+                                    ItemRead::Side(&alone),
+                                    mine.cause,
+                                    &text,
                                 )
-                            });
-                            if let Some((read_name, value, location)) = read.filter(|_| own(&text))
                             {
                                 items_at.insert(found.len(), item.item_segs.clone());
-                                records.push((
-                                    found.len(),
-                                    rich_item(
-                                        &listed,
-                                        read_name,
-                                        mine.cause,
-                                        value,
-                                        location,
-                                        seen(),
-                                        &text,
-                                    ),
-                                ));
+                                records.push((found.len(), record));
                                 found.push((mine.cause, text));
                             }
                         }
