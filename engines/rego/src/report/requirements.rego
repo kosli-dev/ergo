@@ -669,13 +669,20 @@ _with_id_faults(row, [], _, _) := object.union(row, {"failures": []}) if row.pas
 _with_id_faults(row, places, doc, req) := object.union(row, {
 	"passed": false,
 	"cause": _worst_of({p.cause | some p in places} | {row.cause | row.passed == false}),
-	"message": _m_joined(array.concat([_m_is(row.inputs[0].name, row.inputs[0].value) | row.passed == false], [p.text | some p in places])),
+	"message": _id_joined(array.concat([_m_is(row.inputs[0].name, row.inputs[0].value) | row.passed == false], [p.text | some p in places])),
 	"inputs": array.concat(row.inputs, [{"name": _ms_read_name(req, p.c), "value": null, "locations": [p.at], "outcome": p.cause} | some p in places; not p.listed]),
 	"failures": [_id_copies(e, copies) | some e in _ms_tree(req, doc, [p | some p in places; p.listed], [k | some k in _id_keys(req); is_string(k)])],
 }) if {
 	places != []
 	copies := {p.item_at: p.ats | some p in places; p.listed; count(p.ats) > 1}
 }
+
+_id_joined(texts) := concat("; ", array.concat([m | some m in ms; _m_shown_clause(m, array.slice(leads, 0, 3))], [concat("", ["and ", _literal_text(count(leads) - 3), " more"]) | count(leads) > 3])) if {
+	ms := _sorted_once(texts)
+	leads := _sorted_once([_m_item_lead(m) | some m in ms; startswith(m, "item ")])
+}
+
+_sorted_once(xs) := [xs[i] | some i in sort({t[1] | some k, t in s; _ms_run_start(s, k)})] if s := sort([[x, i] | some i, x in xs])
 
 _id_copies(e, copies) := object.union(e, {"locations": ats}) if ats := copies[e.locations[0]]
 
