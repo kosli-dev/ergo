@@ -167,18 +167,22 @@ pub fn of_path(path: &Path, tally: bool, ctx: &Ctx) -> Option<KeyBase> {
     })
 }
 
-/// The value before the first `named by` key of `path` when that key can't be
-/// read and the value can't take a key.
+/// The value before the first `named by` key of `path` when the value can't
+/// take a key, and the key can't be read or comes from the item while the
+/// value comes from outside it.
 #[allow(dead_code)]
 pub fn base_of(path: &Path, ctx: &Ctx) -> Option<(String, String, Cause)> {
     let at = path
         .steps
         .iter()
-        .position(|step| matches!(step, Step::Ref(_)))?;
-    let Step::Ref(key) = &path.steps[at] else {
-        return None;
-    };
-    key_flaw(key, ctx)?;
+        .position(|step| matches!(step, Step::Ref(_) | Step::Field(_)))?;
+    match &path.steps[at] {
+        Step::Ref(key) => {
+            key_flaw(key, ctx)?;
+        }
+        _ if super::walk::reads_outside(path) || path.start == path::Start::Params => {}
+        _ => return None,
+    }
     let keys: Vec<String> = path.steps[..at]
         .iter()
         .map_while(|step| match step {

@@ -2095,7 +2095,7 @@ pub fn root_clauses(checks: &[&Check], ctx: &Ctx) -> Vec<Clause> {
         .unwrap_or_default();
     let bases = checks
         .iter()
-        .flat_map(|check| check.paths())
+        .flat_map(|check| check.paths().into_iter().chain(super::walk::listed_refs(check)))
         .filter_map(|path| {
             super::key_base::base_of(path, ctx)
                 .map(|(name, text, cause)| Clause::root(&name, cause, text))
