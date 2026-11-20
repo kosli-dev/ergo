@@ -134,11 +134,11 @@ _unique_ancestor_ids_def(req) := {"$unique_ancestor_ids": _with_refs(
 	count(levels) > 0
 } else := {}
 
-_unique_ancestor_description(0, a) := concat("", ["Every ", _text(a), " id is unique"])
+_unique_ancestor_description(0, a) := concat("", ["Every ", _text(a), " has a unique id"])
 
-_unique_ancestor_description(i, a) := concat("", ["every ", _text(a), " id is unique"]) if i > 0
+_unique_ancestor_description(i, a) := concat("", ["every ", _text(a), " has a unique id"]) if i > 0
 
-_ids_expression(f) := concat("", ["count(repeated(ids(", f, "))) == 0"])
+_ids_expression(f) := concat("", ["count(missing(ids(", f, "))) + count(repeated(ids(", f, "))) == 0"])
 
 _repeated_ids_name(req) := concat(" ", ["repeated", _text(_subject_type_of(req)), "ids"])
 
@@ -660,7 +660,9 @@ _id_input(entry, req) := scope if {
 	scope := _scope_of(req, entry.subject) with input as _row_input(entry.at)
 } else := _row_input(entry.at)
 
-_repeated_ids(refs) := [] if count({ref.id | some ref in refs}) == count(refs)
+_repeated_ids(all) := _repeated_of([ref | some ref in all; ref.id != null])
+
+_repeated_of(refs) := [] if count({ref.id | some ref in refs}) == count(refs)
 
 else := _repeated_keys(refs, [x | some x in {ref.id | some ref in refs}; _has_number(x)] != [])
 

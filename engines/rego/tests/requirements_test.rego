@@ -220,9 +220,9 @@ test_unique_ids_definition_is_in_the_check_table if {
 		d := report({}, {"s": object.union(owner_req.s, {"from": from})}).requirements.s.checks["$unique_ids"]
 	]
 	rows == [
-		["Every repo id is unique", "count(repeated(ids(repos))) == 0"],
-		["Every repo id is unique", "count(repeated(ids($input))) == 0"],
-		["Every repo id is unique", "count(repeated(ids(<invalid from>))) == 0"],
+		["Every repo has a unique id", "count(missing(ids(repos))) + count(repeated(ids(repos))) == 0"],
+		["Every repo has a unique id", "count(missing(ids($input))) + count(repeated(ids($input))) == 0"],
+		["Every repo has a unique id", "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0"],
 	]
 }
 
