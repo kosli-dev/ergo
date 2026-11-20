@@ -16,6 +16,9 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "every t.cs whose k is $input.m named by $params.k",
         "every t.cs whose k equals $input.m named by $params.k",
     ),
+    ("ds whose keep exists", "ds whose keep exists"),
+    ("every distinct ds", "every distinct ds"),
+    ("every distinct ws.xs.meta", "every distinct ws.xs.meta"),
     ("every t.cs", "every t.cs"),
     (
         "commits whose merged is true",
@@ -56,6 +59,8 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("every ws that is not empty", "every ws that is not empty"),
     ("c whose type is \"library\"", "c whose type is \"library\""),
     ("c.licenses", "c.licenses"),
+    ("every xs.bs", "every xs.bs"),
+    ("every xs.meta", "every xs.meta"),
     ("lic.terms", "lic.terms"),
     ("los", "los"),
     ("ok", "ok"),
@@ -3281,6 +3286,7 @@ pub const FROM_PARTIAL: &[(&str, &[&str])] = &[
 
 pub const PATH_OK: &[(&str, &str)] = &[
     ("by", "by"),
+    ("idd", "idd"),
     ("number", "number"),
     ("thing", "thing"),
     ("owner.name", "owner.name"),
@@ -3341,6 +3347,7 @@ pub const PATH_OK: &[(&str, &str)] = &[
     ("meta", "meta"),
     ("meta.id", "meta.id"),
     ("meta.w", "meta.w"),
+    ("meta[0]", "item 1 of meta"),
     ("mid", "mid"),
     ("name", "name"),
     ("ps", "ps"),

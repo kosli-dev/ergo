@@ -24810,7 +24810,7 @@
             }
           }
         ],
-        "expressions": {"s": {"$min_subjects": "count(matching(things)) >= 1", "$unique_ids": "count(repeated(ids(things))) == 0", "$well_formed": "count(problems) == 0", "all": "l contains all of y", "has": "l contains w", "in": "x is in y", "lacks": "l does not contain w", "match": "x matches p", "no_match": "x does not match p", "none": "l contains none of y", "not_in": "x is not in y"}},
+        "expressions": {"s": {"$min_subjects": "count(matching(things)) >= 1", "$unique_ids": "count(missing(ids(things))) + count(repeated(ids(things))) == 0", "$well_formed": "count(problems) == 0", "all": "l contains all of y", "has": "l contains w", "in": "x is in y", "lacks": "l does not contain w", "match": "x matches p", "no_match": "x does not match p", "none": "l contains none of y", "not_in": "x is not in y"}},
         "refs": {
           "s": {
             "$min_subjects": [],
@@ -25215,7 +25215,7 @@
             }
           }
         ],
-        "expressions": {"s": {"$min_subjects": "count(matching(things)) >= 1", "$unique_ids": "count(repeated(ids(things))) == 0", "$well_formed": "count(problems) == 0", "all": "l contains all of y", "has": "l contains w", "in": "x is in y", "lacks": "l does not contain w", "match": "x matches p", "no_match": "x does not match p", "none": "l contains none of y", "not_in": "x is not in y"}}
+        "expressions": {"s": {"$min_subjects": "count(matching(things)) >= 1", "$unique_ids": "count(missing(ids(things))) + count(repeated(ids(things))) == 0", "$well_formed": "count(problems) == 0", "all": "l contains all of y", "has": "l contains w", "in": "x is in y", "lacks": "l does not contain w", "match": "x matches p", "no_match": "x does not match p", "none": "l contains none of y", "not_in": "x is not in y"}}
       },
       {
         "description": "fails as absent on the right when the field is missing, whatever the left side is",
@@ -26183,7 +26183,7 @@
             }
           }
         ],
-        "expressions": {"s": {"$min_subjects": "count(matching(things)) >= 1", "$unique_ids": "count(repeated(ids(things))) == 0", "$well_formed": "count(problems) == 0", "all": "l contains all of y", "has": "l contains w", "in": "x is in y", "lacks": "l does not contain w", "match": "x matches p", "no_match": "x does not match p", "none": "l contains none of y", "not_in": "x is not in y"}}
+        "expressions": {"s": {"$min_subjects": "count(matching(things)) >= 1", "$unique_ids": "count(missing(ids(things))) + count(repeated(ids(things))) == 0", "$well_formed": "count(problems) == 0", "all": "l contains all of y", "has": "l contains w", "in": "x is in y", "lacks": "l does not contain w", "match": "x matches p", "no_match": "x does not match p", "none": "l contains none of y", "not_in": "x is not in y"}}
       },
       {
         "description": "fails as null on the right when the field is null, whatever the left side is",
@@ -27151,7 +27151,7 @@
             }
           }
         ],
-        "expressions": {"s": {"$min_subjects": "count(matching(things)) >= 1", "$unique_ids": "count(repeated(ids(things))) == 0", "$well_formed": "count(problems) == 0", "all": "l contains all of y", "has": "l contains w", "in": "x is in y", "lacks": "l does not contain w", "match": "x matches p", "no_match": "x does not match p", "none": "l contains none of y", "not_in": "x is not in y"}}
+        "expressions": {"s": {"$min_subjects": "count(matching(things)) >= 1", "$unique_ids": "count(missing(ids(things))) + count(repeated(ids(things))) == 0", "$well_formed": "count(problems) == 0", "all": "l contains all of y", "has": "l contains w", "in": "x is in y", "lacks": "l does not contain w", "match": "x matches p", "no_match": "x does not match p", "none": "l contains none of y", "not_in": "x is not in y"}}
       },
       {
         "description": "fails as unusable on the right when it isn't a list, whatever the left side is, but any value is a value to look for after contains",
@@ -28127,7 +28127,7 @@
             }
           }
         ],
-        "expressions": {"s": {"$min_subjects": "count(matching(things)) >= 1", "$unique_ids": "count(repeated(ids(things))) == 0", "$well_formed": "count(problems) == 0", "all": "l contains all of y", "has": "l contains w", "in": "x is in y", "lacks": "l does not contain w", "match": "x matches p", "no_match": "x does not match p", "none": "l contains none of y", "not_in": "x is not in y"}}
+        "expressions": {"s": {"$min_subjects": "count(matching(things)) >= 1", "$unique_ids": "count(missing(ids(things))) + count(repeated(ids(things))) == 0", "$well_formed": "count(problems) == 0", "all": "l contains all of y", "has": "l contains w", "in": "x is in y", "lacks": "l does not contain w", "match": "x matches p", "no_match": "x does not match p", "none": "l contains none of y", "not_in": "x is not in y"}}
       },
       {
         "description": "fails as unusable on the right when it's an empty list after contains all of or none of, or holds a pattern that isn't valid",
@@ -29069,7 +29069,7 @@
             }
           }
         ],
-        "expressions": {"s": {"$min_subjects": "count(matching(things)) >= 1", "$unique_ids": "count(repeated(ids(things))) == 0", "$well_formed": "count(problems) == 0", "all": "l contains all of y", "has": "l contains w", "in": "x is in y", "lacks": "l does not contain w", "match": "x matches p", "no_match": "x does not match p", "none": "l contains none of y", "not_in": "x is not in y"}}
+        "expressions": {"s": {"$min_subjects": "count(matching(things)) >= 1", "$unique_ids": "count(missing(ids(things))) + count(repeated(ids(things))) == 0", "$well_formed": "count(problems) == 0", "all": "l contains all of y", "has": "l contains w", "in": "x is in y", "lacks": "l does not contain w", "match": "x matches p", "no_match": "x does not match p", "none": "l contains none of y", "not_in": "x is not in y"}}
       },
       {
         "description": "looks at the left side only when the right side can be used",
@@ -30509,7 +30509,7 @@
             }
           }
         ],
-        "expressions": {"s": {"$min_subjects": "count(matching(things)) >= 1", "$unique_ids": "count(repeated(ids(things))) == 0", "$well_formed": "count(problems) == 0", "all": "l contains all of y", "has": "l contains w", "in": "x is in y", "lacks": "l does not contain w", "match": "x matches p", "no_match": "x does not match p", "none": "l contains none of y", "not_in": "x is not in y"}}
+        "expressions": {"s": {"$min_subjects": "count(matching(things)) >= 1", "$unique_ids": "count(missing(ids(things))) + count(repeated(ids(things))) == 0", "$well_formed": "count(problems) == 0", "all": "l contains all of y", "has": "l contains w", "in": "x is in y", "lacks": "l does not contain w", "match": "x matches p", "no_match": "x does not match p", "none": "l contains none of y", "not_in": "x is not in y"}}
       }
     ]
   },
@@ -30740,7 +30740,7 @@
             }
           }
         ],
-        "expressions": {"s": {"$min_subjects": "count(matching(things)) >= 1", "$unique_ids": "count(repeated(ids(things))) == 0", "$well_formed": "count(problems) == 0", "has": "l contains y.z", "in": "x is in y.z"}}
+        "expressions": {"s": {"$min_subjects": "count(matching(things)) >= 1", "$unique_ids": "count(missing(ids(things))) + count(repeated(ids(things))) == 0", "$well_formed": "count(problems) == 0", "has": "l contains y.z", "in": "x is in y.z"}}
       }
     ]
   },
@@ -30839,7 +30839,7 @@
             }
           }
         ],
-        "expressions": {"s": {"$min_subjects": "count(matching(things)) >= 1", "$unique_ids": "count(repeated(ids(things))) == 0", "$well_formed": "count(problems) == 0", "in": "x is in y", "not_in": "x is not in y"}}
+        "expressions": {"s": {"$min_subjects": "count(matching(things)) >= 1", "$unique_ids": "count(missing(ids(things))) + count(repeated(ids(things))) == 0", "$well_formed": "count(problems) == 0", "in": "x is in y", "not_in": "x is not in y"}}
       }
     ]
   },
@@ -31403,7 +31403,7 @@
             }
           }
         ],
-        "expressions": {"s": {"$min_subjects": "count(matching(things)) >= 1", "$unique_ids": "count(repeated(ids(things))) == 0", "$well_formed": "count(problems) == 0", "dev": "$input.dev does not contain tested_by", "every": "every commits.sha is in ok", "files": "files contains all of gap_files", "for": "for every approvers as ap: ap.username is not in excluded", "some": "some commits.sha is in ok"}}
+        "expressions": {"s": {"$min_subjects": "count(matching(things)) >= 1", "$unique_ids": "count(missing(ids(things))) + count(repeated(ids(things))) == 0", "$well_formed": "count(problems) == 0", "dev": "$input.dev does not contain tested_by", "every": "every commits.sha is in ok", "files": "files contains all of gap_files", "for": "for every approvers as ap: ap.username is not in excluded", "some": "some commits.sha is in ok"}}
       }
     ]
   },

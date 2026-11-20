@@ -27,8 +27,8 @@
           "meta": {}
         },
         "$unique_ids": {
-          "description": "Every deployment id is unique",
-          "expression": "count(repeated(ids(deployments))) == 0",
+          "description": "Every deployment has a unique id",
+          "expression": "count(missing(ids(deployments))) + count(repeated(ids(deployments))) == 0",
           "meta": {}
         },
         "$well_formed": {

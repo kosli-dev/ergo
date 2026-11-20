@@ -26,8 +26,8 @@
           "meta": {}
         },
         "$unique_ids": {
-          "description": "Every release id is unique",
-          "expression": "count(repeated(ids(releases))) == 0",
+          "description": "Every release has a unique id",
+          "expression": "count(missing(ids(releases))) + count(repeated(ids(releases))) == 0",
           "meta": {}
         },
         "$well_formed": {

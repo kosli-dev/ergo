@@ -75,8 +75,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every D id is unique",
-              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "description": "Every D has a unique id",
+              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -235,8 +235,8 @@
                   ]
                 }
               ],
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(m))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(m))) + count(repeated(ids(m))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -421,8 +421,8 @@
                   "value": []
                 }
               ],
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(m))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(m))) + count(repeated(ids(m))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -588,8 +588,8 @@
                   ]
                 }
               ],
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(m))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(m))) + count(repeated(ids(m))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -783,8 +783,8 @@
                   ]
                 }
               ],
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(m))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(m))) + count(repeated(ids(m))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -1011,8 +1011,8 @@
                   "value": null
                 }
               ],
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(m))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(m))) + count(repeated(ids(m))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -1177,8 +1177,8 @@
                   "value": null
                 }
               ],
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(m))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(m))) + count(repeated(ids(m))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -1341,8 +1341,8 @@
                   "value": null
                 }
               ],
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(m))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(m))) + count(repeated(ids(m))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -1513,8 +1513,8 @@
                   }
                 }
               ],
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(m))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(m))) + count(repeated(ids(m))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -1679,8 +1679,8 @@
                   "value": "k1"
                 }
               ],
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(m))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(m))) + count(repeated(ids(m))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -1854,8 +1854,8 @@
                   ]
                 }
               ],
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(m named by $params.key))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(m named by $params.key))) + count(repeated(ids(m named by $params.key))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -2031,8 +2031,8 @@
                   "value": []
                 }
               ],
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(m named by $params.key))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(m named by $params.key))) + count(repeated(ids(m named by $params.key))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -2211,8 +2211,8 @@
                   ]
                 }
               ],
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(m named by $params.key))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(m named by $params.key))) + count(repeated(ids(m named by $params.key))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -2396,8 +2396,8 @@
                   ]
                 }
               ],
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(m named by $params.key))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(m named by $params.key))) + count(repeated(ids(m named by $params.key))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -2571,8 +2571,8 @@
                   "value": null
                 }
               ],
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(m named by $params.key))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(m named by $params.key))) + count(repeated(ids(m named by $params.key))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -2745,8 +2745,8 @@
                   "value": null
                 }
               ],
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(m named by $params.key))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(m named by $params.key))) + count(repeated(ids(m named by $params.key))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -2917,8 +2917,8 @@
                   "value": null
                 }
               ],
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(m named by $params.key))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(m named by $params.key))) + count(repeated(ids(m named by $params.key))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -3097,8 +3097,8 @@
                   }
                 }
               ],
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(m named by $params.key))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(m named by $params.key))) + count(repeated(ids(m named by $params.key))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -3268,8 +3268,8 @@
                   "value": "k1"
                 }
               ],
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(m named by $params.key))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(m named by $params.key))) + count(repeated(ids(m named by $params.key))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -3472,8 +3472,8 @@
                   "value": "k1"
                 }
               ],
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(m named by $params.key))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(m named by $params.key))) + count(repeated(ids(m named by $params.key))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -3714,8 +3714,8 @@
                   ]
                 }
               ],
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(m))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(m))) + count(repeated(ids(m))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -3903,8 +3903,8 @@
                   ]
                 }
               ],
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(m named by $input.sel))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(m named by $input.sel))) + count(repeated(ids(m named by $input.sel))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -4071,8 +4071,8 @@
                   "value": "a"
                 }
               ],
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(m named by $input.sel))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(m named by $input.sel))) + count(repeated(ids(m named by $input.sel))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -4274,8 +4274,8 @@
                   "value": true
                 }
               ],
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(zz))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(zz))) + count(repeated(ids(zz))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -4461,8 +4461,8 @@
                   "value": null
                 }
               ],
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(zz))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(zz))) + count(repeated(ids(zz))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -4650,8 +4650,8 @@
                   "value": null
                 }
               ],
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(zz))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(zz))) + count(repeated(ids(zz))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -4837,8 +4837,8 @@
                   "value": null
                 }
               ],
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(zz))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(zz))) + count(repeated(ids(zz))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -5026,8 +5026,8 @@
                   "value": 3
                 }
               ],
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(zz))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(zz))) + count(repeated(ids(zz))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -5221,8 +5221,8 @@
                   }
                 }
               ],
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(zz))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(zz))) + count(repeated(ids(zz))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -5410,8 +5410,8 @@
                   "value": "k1"
                 }
               ],
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(zz))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(zz))) + count(repeated(ids(zz))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -5599,8 +5599,8 @@
                   "value": true
                 }
               ],
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(m named by $params.key.k))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(m named by $params.key.k))) + count(repeated(ids(m named by $params.key.k))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -5794,8 +5794,8 @@
                   ]
                 }
               ],
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(m named by $params.key.k))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(m named by $params.key.k))) + count(repeated(ids(m named by $params.key.k))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -5991,8 +5991,8 @@
                   ]
                 }
               ],
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(m named by $params.key.k))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(m named by $params.key.k))) + count(repeated(ids(m named by $params.key.k))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -6180,8 +6180,8 @@
                   "value": null
                 }
               ],
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(m named by $params.key.k))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(m named by $params.key.k))) + count(repeated(ids(m named by $params.key.k))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -6369,8 +6369,8 @@
                   "value": null
                 }
               ],
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(m named by $params.key.k))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(m named by $params.key.k))) + count(repeated(ids(m named by $params.key.k))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -6556,8 +6556,8 @@
                   "value": null
                 }
               ],
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(m named by $params.key.k))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(m named by $params.key.k))) + count(repeated(ids(m named by $params.key.k))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -6745,8 +6745,8 @@
                   "value": 3
                 }
               ],
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(m named by $params.key.k))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(m named by $params.key.k))) + count(repeated(ids(m named by $params.key.k))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -6940,8 +6940,8 @@
                   }
                 }
               ],
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(m named by $params.key.k))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(m named by $params.key.k))) + count(repeated(ids(m named by $params.key.k))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -7131,8 +7131,8 @@
                   "value": "k1"
                 }
               ],
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(m named by $params.key.k))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(m named by $params.key.k))) + count(repeated(ids(m named by $params.key.k))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -7320,8 +7320,8 @@
                   "value": true
                 }
               ],
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(zz named by $params.key))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(zz named by $params.key))) + count(repeated(ids(zz named by $params.key))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -7515,8 +7515,8 @@
                   ]
                 }
               ],
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(zz named by $params.key))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(zz named by $params.key))) + count(repeated(ids(zz named by $params.key))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -7712,8 +7712,8 @@
                   ]
                 }
               ],
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(zz named by $params.key))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(zz named by $params.key))) + count(repeated(ids(zz named by $params.key))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -7901,8 +7901,8 @@
                   "value": null
                 }
               ],
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(zz named by $params.key))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(zz named by $params.key))) + count(repeated(ids(zz named by $params.key))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -8090,8 +8090,8 @@
                   "value": null
                 }
               ],
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(zz named by $params.key))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(zz named by $params.key))) + count(repeated(ids(zz named by $params.key))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -8277,8 +8277,8 @@
                   "value": null
                 }
               ],
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(zz named by $params.key))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(zz named by $params.key))) + count(repeated(ids(zz named by $params.key))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -8466,8 +8466,8 @@
                   "value": 3
                 }
               ],
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(zz named by $params.key))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(zz named by $params.key))) + count(repeated(ids(zz named by $params.key))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -8661,8 +8661,8 @@
                   }
                 }
               ],
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(zz named by $params.key))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(zz named by $params.key))) + count(repeated(ids(zz named by $params.key))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -8852,8 +8852,8 @@
                   "value": "k1"
                 }
               ],
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(zz named by $params.key))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(zz named by $params.key))) + count(repeated(ids(zz named by $params.key))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -9055,8 +9055,8 @@
                   ]
                 }
               ],
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(g named by $params.key))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(g named by $params.key))) + count(repeated(ids(g named by $params.key))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -9264,8 +9264,8 @@
                   "value": "a"
                 }
               ],
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(g named by $params.key))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(g named by $params.key))) + count(repeated(ids(g named by $params.key))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -9495,8 +9495,8 @@
                   "value": "k1"
                 }
               ],
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(m named by $params.key))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(m named by $params.key))) + count(repeated(ids(m named by $params.key))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -9700,13 +9700,13 @@
                   ]
                 }
               ],
-              "description": "Every p id is unique",
-              "expression": "count(repeated(ids(g named by $params.key))) == 0",
+              "description": "Every p has a unique id",
+              "expression": "count(missing(ids(g named by $params.key))) + count(repeated(ids(g named by $params.key))) == 0",
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(p.items))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(p.items))) + count(repeated(ids(p.items))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -9900,13 +9900,13 @@
                   "value": null
                 }
               ],
-              "description": "Every p id is unique",
-              "expression": "count(repeated(ids(g named by $params.key))) == 0",
+              "description": "Every p has a unique id",
+              "expression": "count(missing(ids(g named by $params.key))) + count(repeated(ids(g named by $params.key))) == 0",
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(p.items))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(p.items))) + count(repeated(ids(p.items))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -10097,13 +10097,13 @@
                   "value": "a"
                 }
               ],
-              "description": "Every p id is unique",
-              "expression": "count(repeated(ids(g named by $params.key))) == 0",
+              "description": "Every p has a unique id",
+              "expression": "count(missing(ids(g named by $params.key))) + count(repeated(ids(g named by $params.key))) == 0",
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(every p.items))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(every p.items))) + count(repeated(ids(every p.items))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -10311,8 +10311,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(items))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(items))) + count(repeated(ids(items))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -10475,8 +10475,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(items))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(items))) + count(repeated(ids(items))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -10584,8 +10584,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(items))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(items))) + count(repeated(ids(items))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -10748,8 +10748,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(items))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(items))) + count(repeated(ids(items))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -10857,8 +10857,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(items))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(items))) + count(repeated(ids(items))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -11021,8 +11021,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(items))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(items))) + count(repeated(ids(items))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -11185,8 +11185,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(items))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(items))) + count(repeated(ids(items))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -11299,8 +11299,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(items))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(items))) + count(repeated(ids(items))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -11413,8 +11413,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(items))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(items))) + count(repeated(ids(items))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -11527,8 +11527,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(items))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(items))) + count(repeated(ids(items))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -11641,8 +11641,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(items))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(items))) + count(repeated(ids(items))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -11753,8 +11753,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every x y id is unique",
-              "expression": "count(repeated(ids(\"x y\"))) == 0",
+              "description": "Every x y has a unique id",
+              "expression": "count(missing(ids(\"x y\"))) + count(repeated(ids(\"x y\"))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -11918,8 +11918,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every B id is unique",
-              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "description": "Every B has a unique id",
+              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -12068,8 +12068,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every C id is unique",
-              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "description": "Every C has a unique id",
+              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -12213,8 +12213,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every C id is unique",
-              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "description": "Every C has a unique id",
+              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -12354,8 +12354,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every B id is unique",
-              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "description": "Every B has a unique id",
+              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -12500,8 +12500,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every B id is unique",
-              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "description": "Every B has a unique id",
+              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -12647,8 +12647,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every B id is unique",
-              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "description": "Every B has a unique id",
+              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -12793,8 +12793,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every B id is unique",
-              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "description": "Every B has a unique id",
+              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -12940,8 +12940,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every B id is unique",
-              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "description": "Every B has a unique id",
+              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -13086,8 +13086,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every B id is unique",
-              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "description": "Every B has a unique id",
+              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -13233,8 +13233,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every B id is unique",
-              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "description": "Every B has a unique id",
+              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -13379,8 +13379,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every B id is unique",
-              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "description": "Every B has a unique id",
+              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -13526,8 +13526,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every B id is unique",
-              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "description": "Every B has a unique id",
+              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -13672,8 +13672,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every B id is unique",
-              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "description": "Every B has a unique id",
+              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -13814,8 +13814,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every B id is unique",
-              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "description": "Every B has a unique id",
+              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -13949,8 +13949,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every B id is unique",
-              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "description": "Every B has a unique id",
+              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -14088,13 +14088,13 @@
               "meta": {}
             },
             "$unique_ancestor_ids": {
-              "description": "Every B id is unique",
-              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "description": "Every B has a unique id",
+              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every C id is unique",
-              "expression": "count(repeated(ids(B.b))) == 0",
+              "description": "Every C has a unique id",
+              "expression": "count(missing(ids(B.b))) + count(repeated(ids(B.b))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -14244,13 +14244,13 @@
               "meta": {}
             },
             "$unique_ancestor_ids": {
-              "description": "Every B id is unique",
-              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "description": "Every B has a unique id",
+              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every C id is unique",
-              "expression": "count(repeated(ids(B.b))) == 0",
+              "description": "Every C has a unique id",
+              "expression": "count(missing(ids(B.b))) + count(repeated(ids(B.b))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -14400,13 +14400,13 @@
               "meta": {}
             },
             "$unique_ancestor_ids": {
-              "description": "Every B id is unique",
-              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "description": "Every B has a unique id",
+              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every C id is unique",
-              "expression": "count(repeated(ids(B.b))) == 0",
+              "description": "Every C has a unique id",
+              "expression": "count(missing(ids(B.b))) + count(repeated(ids(B.b))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -14556,13 +14556,13 @@
               "meta": {}
             },
             "$unique_ancestor_ids": {
-              "description": "Every B id is unique",
-              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "description": "Every B has a unique id",
+              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every C id is unique",
-              "expression": "count(repeated(ids(B.b))) == 0",
+              "description": "Every C has a unique id",
+              "expression": "count(missing(ids(B.b))) + count(repeated(ids(B.b))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -14712,13 +14712,13 @@
               "meta": {}
             },
             "$unique_ancestor_ids": {
-              "description": "Every B id is unique",
-              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "description": "Every B has a unique id",
+              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every C id is unique",
-              "expression": "count(repeated(ids(B.b))) == 0",
+              "description": "Every C has a unique id",
+              "expression": "count(missing(ids(B.b))) + count(repeated(ids(B.b))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -14868,13 +14868,13 @@
               "meta": {}
             },
             "$unique_ancestor_ids": {
-              "description": "Every B id is unique",
-              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "description": "Every B has a unique id",
+              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every C id is unique",
-              "expression": "count(repeated(ids(B.b))) == 0",
+              "description": "Every C has a unique id",
+              "expression": "count(missing(ids(B.b))) + count(repeated(ids(B.b))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -15018,8 +15018,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every C id is unique",
-              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "description": "Every C has a unique id",
+              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -15162,8 +15162,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every C id is unique",
-              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "description": "Every C has a unique id",
+              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -15318,8 +15318,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every C id is unique",
-              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "description": "Every C has a unique id",
+              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -15474,8 +15474,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every C id is unique",
-              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "description": "Every C has a unique id",
+              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -15630,8 +15630,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every C id is unique",
-              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "description": "Every C has a unique id",
+              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -15786,8 +15786,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every C id is unique",
-              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "description": "Every C has a unique id",
+              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -15942,8 +15942,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every C id is unique",
-              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "description": "Every C has a unique id",
+              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -16087,8 +16087,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every C id is unique",
-              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "description": "Every C has a unique id",
+              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -16201,8 +16201,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -16316,8 +16316,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(items))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(items))) + count(repeated(ids(items))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -16430,8 +16430,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(items))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(items))) + count(repeated(ids(items))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -16544,8 +16544,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(items))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(items))) + count(repeated(ids(items))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -16680,13 +16680,13 @@
                   ]
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans))) + count(repeated(ids(scans))) == 0",
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every finding id is unique",
-              "expression": "count(repeated(ids(scan.findings))) == 0",
+              "description": "Every finding has a unique id",
+              "expression": "count(missing(ids(scan.findings))) + count(repeated(ids(scan.findings))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -16871,13 +16871,13 @@
                   ]
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans))) + count(repeated(ids(scans))) == 0",
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every finding id is unique",
-              "expression": "count(repeated(ids(scan.findings))) == 0",
+              "description": "Every finding has a unique id",
+              "expression": "count(missing(ids(scan.findings))) + count(repeated(ids(scan.findings))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -17084,8 +17084,8 @@
                   ]
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans))) + count(repeated(ids(scans))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -17317,8 +17317,8 @@
                   ]
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans))) + count(repeated(ids(scans))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -17570,8 +17570,8 @@
                   ]
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -17822,8 +17822,8 @@
                   ]
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -18069,8 +18069,8 @@
                   ]
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -18280,8 +18280,8 @@
                   ]
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -18491,8 +18491,8 @@
                   "value": null
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans named by $params.nope))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans named by $params.nope))) + count(repeated(ids(scans named by $params.nope))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -18678,8 +18678,8 @@
                   ]
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans))) + count(repeated(ids(scans))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -18871,8 +18871,8 @@
                   ]
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans))) + count(repeated(ids(scans))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -19084,8 +19084,8 @@
                   ]
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -19296,8 +19296,8 @@
                   ]
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -19507,8 +19507,8 @@
                   ]
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -19704,8 +19704,8 @@
                   ]
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -19901,8 +19901,8 @@
                   "value": null
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans named by $params.nope))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans named by $params.nope))) + count(repeated(ids(scans named by $params.nope))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -20081,8 +20081,8 @@
                   "value": []
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans))) + count(repeated(ids(scans))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -20258,8 +20258,8 @@
                   "value": []
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans))) + count(repeated(ids(scans))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -20455,8 +20455,8 @@
                   "value": []
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -20651,8 +20651,8 @@
                   "value": []
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -20846,8 +20846,8 @@
                   "value": []
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -21048,8 +21048,8 @@
                   "value": null
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans named by $params.nope))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans named by $params.nope))) + count(repeated(ids(scans named by $params.nope))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -21226,8 +21226,8 @@
                   "value": []
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans))) + count(repeated(ids(scans))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -21389,8 +21389,8 @@
                   "value": []
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans))) + count(repeated(ids(scans))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -21572,8 +21572,8 @@
                   "value": []
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -21754,8 +21754,8 @@
                   "value": []
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -21935,8 +21935,8 @@
                   "value": []
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -22123,8 +22123,8 @@
                   "value": null
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans named by $params.nope))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans named by $params.nope))) + count(repeated(ids(scans named by $params.nope))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -22301,8 +22301,8 @@
                   "value": null
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans))) + count(repeated(ids(scans))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -22497,8 +22497,8 @@
                   "value": null
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -22691,8 +22691,8 @@
                   "value": null
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -22867,8 +22867,8 @@
                   "value": null
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans))) + count(repeated(ids(scans))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -23049,8 +23049,8 @@
                   "value": null
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -23229,8 +23229,8 @@
                   "value": null
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -23418,8 +23418,8 @@
                   ]
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans))) + count(repeated(ids(scans))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -23624,8 +23624,8 @@
                   ]
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -23828,8 +23828,8 @@
                   ]
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -24039,8 +24039,8 @@
                   ]
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -24250,8 +24250,8 @@
                   "value": null
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans named by $params.nope))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans named by $params.nope))) + count(repeated(ids(scans named by $params.nope))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -24437,8 +24437,8 @@
                   ]
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans))) + count(repeated(ids(scans))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -24629,8 +24629,8 @@
                   ]
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -24819,8 +24819,8 @@
                   ]
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -25016,8 +25016,8 @@
                   ]
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -25213,8 +25213,8 @@
                   "value": null
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans named by $params.nope))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans named by $params.nope))) + count(repeated(ids(scans named by $params.nope))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -25393,8 +25393,8 @@
                   "value": null
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans))) + count(repeated(ids(scans))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -25590,8 +25590,8 @@
                   "value": null
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -25785,8 +25785,8 @@
                   "value": null
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -25963,8 +25963,8 @@
                   "value": null
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans))) + count(repeated(ids(scans))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -26146,8 +26146,8 @@
                   "value": null
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -26327,8 +26327,8 @@
                   "value": null
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -26513,8 +26513,8 @@
                   ]
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans))) + count(repeated(ids(scans))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -26716,8 +26716,8 @@
                   ]
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -26917,8 +26917,8 @@
                   ]
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -27125,8 +27125,8 @@
                   ]
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -27333,8 +27333,8 @@
                   "value": null
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans named by $params.nope))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans named by $params.nope))) + count(repeated(ids(scans named by $params.nope))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -27517,8 +27517,8 @@
                   ]
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans))) + count(repeated(ids(scans))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -27706,8 +27706,8 @@
                   ]
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -27893,8 +27893,8 @@
                   ]
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -28087,8 +28087,8 @@
                   ]
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -28281,8 +28281,8 @@
                   "value": null
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans named by $params.nope))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans named by $params.nope))) + count(repeated(ids(scans named by $params.nope))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -28455,13 +28455,13 @@
                   "value": null
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans named by $params.nope))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans named by $params.nope))) + count(repeated(ids(scans named by $params.nope))) == 0",
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every finding id is unique",
-              "expression": "count(repeated(ids(scan.findings))) == 0",
+              "description": "Every finding has a unique id",
+              "expression": "count(missing(ids(scan.findings))) + count(repeated(ids(scan.findings))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -28648,13 +28648,13 @@
                   "value": null
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans named by $params.nope))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans named by $params.nope))) + count(repeated(ids(scans named by $params.nope))) == 0",
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every finding id is unique",
-              "expression": "count(repeated(ids(scan.findings))) == 0",
+              "description": "Every finding has a unique id",
+              "expression": "count(missing(ids(scan.findings))) + count(repeated(ids(scan.findings))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -28848,8 +28848,8 @@
                   "value": "a"
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans))) + count(repeated(ids(scans))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -29043,8 +29043,8 @@
                   "value": "a"
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -29244,8 +29244,8 @@
                   "value": null
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans named by $params.nope))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans named by $params.nope))) + count(repeated(ids(scans named by $params.nope))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -29422,8 +29422,8 @@
                   "value": "a"
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans))) + count(repeated(ids(scans))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -29603,8 +29603,8 @@
                   "value": "a"
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -29790,8 +29790,8 @@
                   "value": null
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans named by $params.nope))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans named by $params.nope))) + count(repeated(ids(scans named by $params.nope))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -29973,8 +29973,8 @@
                   ]
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans))) + count(repeated(ids(scans))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -30196,8 +30196,8 @@
                   ]
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans))) + count(repeated(ids(scans))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -30439,8 +30439,8 @@
                   ]
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -30681,8 +30681,8 @@
                   ]
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -30897,8 +30897,8 @@
                   ]
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans))) + count(repeated(ids(scans))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -31084,8 +31084,8 @@
                   ]
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans))) + count(repeated(ids(scans))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -31291,8 +31291,8 @@
                   ]
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -31497,8 +31497,8 @@
                   ]
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -31684,8 +31684,8 @@
                   "value": []
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans))) + count(repeated(ids(scans))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -31875,8 +31875,8 @@
                   "value": []
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -32039,8 +32039,8 @@
                   "value": []
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans))) + count(repeated(ids(scans))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -32216,8 +32216,8 @@
                   "value": []
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -32390,8 +32390,8 @@
                   ]
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans))) + count(repeated(ids(scans))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -32597,8 +32597,8 @@
                   ]
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -32777,8 +32777,8 @@
                   ]
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans))) + count(repeated(ids(scans))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -32970,8 +32970,8 @@
                   ]
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -33149,8 +33149,8 @@
                   ]
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans))) + count(repeated(ids(scans))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -33353,8 +33353,8 @@
                   ]
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -33530,8 +33530,8 @@
                   ]
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans))) + count(repeated(ids(scans))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -33720,8 +33720,8 @@
                   ]
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -33909,8 +33909,8 @@
                   ]
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans))) + count(repeated(ids(scans))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -34138,8 +34138,8 @@
                   ]
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans))) + count(repeated(ids(scans))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -34387,8 +34387,8 @@
                   ]
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -34635,8 +34635,8 @@
                   ]
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -34853,8 +34853,8 @@
                   ]
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans))) + count(repeated(ids(scans))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -35042,8 +35042,8 @@
                   ]
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans))) + count(repeated(ids(scans))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -35251,8 +35251,8 @@
                   ]
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -35459,8 +35459,8 @@
                   ]
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -35648,8 +35648,8 @@
                   "value": []
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans))) + count(repeated(ids(scans))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -35841,8 +35841,8 @@
                   "value": []
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -36007,8 +36007,8 @@
                   "value": []
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans))) + count(repeated(ids(scans))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -36186,8 +36186,8 @@
                   "value": []
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -36380,8 +36380,8 @@
                   ]
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -36587,8 +36587,8 @@
                   ]
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -36787,8 +36787,8 @@
                   ]
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -36980,8 +36980,8 @@
                   ]
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -37173,8 +37173,8 @@
                   "value": []
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -37364,8 +37364,8 @@
                   "value": []
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -37553,8 +37553,8 @@
                   ]
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans))) + count(repeated(ids(scans))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -37798,8 +37798,8 @@
                   ]
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -38016,8 +38016,8 @@
                   ]
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans))) + count(repeated(ids(scans))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -38228,8 +38228,8 @@
                   ]
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -38420,8 +38420,8 @@
                   "value": []
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans))) + count(repeated(ids(scans))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -38616,8 +38616,8 @@
                   "value": []
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -38785,8 +38785,8 @@
                   "value": []
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans))) + count(repeated(ids(scans))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -38967,8 +38967,8 @@
                   "value": []
                 }
               ],
-              "description": "Every scan id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every scan has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -39152,8 +39152,8 @@
                   ]
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans))) + count(repeated(ids(scans))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -39445,8 +39445,8 @@
                   ]
                 }
               ],
-              "description": "Every only id is unique",
-              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "description": "Every only has a unique id",
+              "expression": "count(missing(ids(scans named by $params.env))) + count(repeated(ids(scans named by $params.env))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -39696,8 +39696,8 @@
                   ]
                 }
               ],
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(m))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(m))) + count(repeated(ids(m))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -39885,8 +39885,8 @@
                   ]
                 }
               ],
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(m))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(m))) + count(repeated(ids(m))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -40095,8 +40095,8 @@
                   ]
                 }
               ],
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(m))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(m))) + count(repeated(ids(m))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -40258,8 +40258,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(items))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(items))) + count(repeated(ids(items))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -40693,8 +40693,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(items))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(items))) + count(repeated(ids(items))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -40842,8 +40842,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(items))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(items))) + count(repeated(ids(items))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -41027,8 +41027,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(items))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(items))) + count(repeated(ids(items))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -41099,6 +41099,7 @@
         {
           "cause": "value",
           "check": "$unique_ids",
+          "failures": [],
           "inputs": [
             {
               "locations": [
@@ -41261,8 +41262,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(items))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(items))) + count(repeated(ids(items))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -41333,6 +41334,7 @@
         {
           "cause": "value",
           "check": "$unique_ids",
+          "failures": [],
           "inputs": [
             {
               "locations": [
@@ -41507,8 +41509,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(items))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(items))) + count(repeated(ids(items))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -41802,8 +41804,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(items))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(items))) + count(repeated(ids(items))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -42142,13 +42144,13 @@
               "meta": {}
             },
             "$unique_ancestor_ids": {
-              "description": "Every g id is unique",
-              "expression": "count(repeated(ids(g))) == 0",
+              "description": "Every g has a unique id",
+              "expression": "count(missing(ids(g))) + count(repeated(ids(g))) == 0",
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(g.items))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(g.items))) + count(repeated(ids(g.items))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -42358,8 +42360,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(items))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(items))) + count(repeated(ids(items))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -42631,8 +42633,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(items))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(items))) + count(repeated(ids(items))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -42918,8 +42920,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(items))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(items))) + count(repeated(ids(items))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -43097,8 +43099,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(items))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(items))) + count(repeated(ids(items))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -43374,8 +43376,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(every g.items))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(every g.items))) + count(repeated(ids(every g.items))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -43666,8 +43668,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(items))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(items))) + count(repeated(ids(items))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -43829,8 +43831,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(every g.items))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(every g.items))) + count(repeated(ids(every g.items))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -44107,8 +44109,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(every nolist.x))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(every nolist.x))) + count(repeated(ids(every nolist.x))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -44296,8 +44298,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(items))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(items))) + count(repeated(ids(items))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -44641,8 +44643,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(items))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(items))) + count(repeated(ids(items))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -44937,8 +44939,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(nolist))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(nolist))) + count(repeated(ids(nolist))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -45129,8 +45131,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(items))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(items))) + count(repeated(ids(items))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -45432,8 +45434,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(items))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(items))) + count(repeated(ids(items))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -45783,8 +45785,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(items))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(items))) + count(repeated(ids(items))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -46047,8 +46049,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(items))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(items))) + count(repeated(ids(items))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -46321,8 +46323,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(items))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(items))) + count(repeated(ids(items))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -46593,8 +46595,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(items))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(items))) + count(repeated(ids(items))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -46899,13 +46901,13 @@
               "meta": {}
             },
             "$unique_ancestor_ids": {
-              "description": "Every g id is unique",
-              "expression": "count(repeated(ids(g))) == 0",
+              "description": "Every g has a unique id",
+              "expression": "count(missing(ids(g))) + count(repeated(ids(g))) == 0",
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(g.items))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(g.items))) + count(repeated(ids(g.items))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -47117,8 +47119,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(items))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(items))) + count(repeated(ids(items))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -47362,8 +47364,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every every id is unique",
-              "expression": "count(repeated(ids(.every))) == 0",
+              "description": "Every every has a unique id",
+              "expression": "count(missing(ids(.every))) + count(repeated(ids(.every))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -47530,8 +47532,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -47670,6 +47672,10 @@
             {
               "cause": "unusable",
               "rows": 1
+            },
+            {
+              "cause": "null",
+              "rows": 1
             }
           ],
           "checks": {
@@ -47679,8 +47685,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(every g))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(every g))) + count(repeated(ids(every g))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -47821,8 +47827,31 @@
           }
         },
         {
-          "cause": "satisfied",
+          "cause": "null",
           "check": "$unique_ids",
+          "failures": [
+            {
+              "cause": "null",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/g/2"
+                  ],
+                  "name": "g[2]",
+                  "outcome": "null",
+                  "value": null
+                }
+              ],
+              "kind": "item",
+              "locations": [
+                "/g/2"
+              ],
+              "message": "item 3 of g is null",
+              "name": "item 3 of g",
+              "value": null
+            }
+          ],
           "inputs": [
             {
               "locations": [],
@@ -47830,7 +47859,8 @@
               "value": []
             }
           ],
-          "passed": true,
+          "message": "item 3 of g is null",
+          "passed": false,
           "requirement": "r",
           "subject": {
             "id": null,
@@ -48098,8 +48128,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(every g))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(every g))) + count(repeated(ids(every g))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -48315,8 +48345,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(every g.i))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(every g.i))) + count(repeated(ids(every g.i))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -48578,8 +48608,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(every g.i))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(every g.i))) + count(repeated(ids(every g.i))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -48815,8 +48845,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(every g.i))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(every g.i))) + count(repeated(ids(every g.i))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -49005,8 +49035,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(every g.i))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(every g.i))) + count(repeated(ids(every g.i))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -49190,8 +49220,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(every g.i))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(every g.i))) + count(repeated(ids(every g.i))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -49383,8 +49413,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(every g.i))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(every g.i))) + count(repeated(ids(every g.i))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -49583,8 +49613,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(every items.y))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(every items.y))) + count(repeated(ids(every items.y))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -49827,8 +49857,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(every w.x))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(every w.x))) + count(repeated(ids(every w.x))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -50035,8 +50065,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every whose id is unique",
-              "expression": "count(repeated(ids(.whose))) == 0",
+              "description": "Every whose has a unique id",
+              "expression": "count(missing(ids(.whose))) + count(repeated(ids(.whose))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -50229,8 +50259,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -50384,13 +50414,13 @@
               "meta": {}
             },
             "$unique_ancestor_ids": {
-              "description": "Every p id is unique",
-              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "description": "Every p has a unique id",
+              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every n id is unique",
-              "expression": "count(repeated(ids(p.c))) == 0",
+              "description": "Every n has a unique id",
+              "expression": "count(missing(ids(p.c))) + count(repeated(ids(p.c))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -50559,13 +50589,13 @@
               "meta": {}
             },
             "$unique_ancestor_ids": {
-              "description": "Every p id is unique",
-              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "description": "Every p has a unique id",
+              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every n id is unique",
-              "expression": "count(repeated(ids(p.c))) == 0",
+              "description": "Every n has a unique id",
+              "expression": "count(missing(ids(p.c))) + count(repeated(ids(p.c))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -50735,13 +50765,13 @@
               "meta": {}
             },
             "$unique_ancestor_ids": {
-              "description": "Every p id is unique",
-              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "description": "Every p has a unique id",
+              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every n id is unique",
-              "expression": "count(repeated(ids(p.c))) == 0",
+              "description": "Every n has a unique id",
+              "expression": "count(missing(ids(p.c))) + count(repeated(ids(p.c))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -50917,13 +50947,13 @@
               "meta": {}
             },
             "$unique_ancestor_ids": {
-              "description": "Every p id is unique",
-              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "description": "Every p has a unique id",
+              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every n id is unique",
-              "expression": "count(repeated(ids(p.c))) == 0",
+              "description": "Every n has a unique id",
+              "expression": "count(missing(ids(p.c))) + count(repeated(ids(p.c))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -51089,8 +51119,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every e id is unique",
-              "expression": "count(repeated(ids(items))) == 0",
+              "description": "Every e has a unique id",
+              "expression": "count(missing(ids(items))) + count(repeated(ids(items))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -51363,8 +51393,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every f id is unique",
-              "expression": "count(repeated(ids(items))) == 0",
+              "description": "Every f has a unique id",
+              "expression": "count(missing(ids(items))) + count(repeated(ids(items))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -51530,8 +51560,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every e id is unique",
-              "expression": "count(repeated(ids(items))) == 0",
+              "description": "Every e has a unique id",
+              "expression": "count(missing(ids(items))) + count(repeated(ids(items))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -51692,8 +51722,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every e id is unique",
-              "expression": "count(repeated(ids(items))) == 0",
+              "description": "Every e has a unique id",
+              "expression": "count(missing(ids(items))) + count(repeated(ids(items))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -51852,8 +51882,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every e id is unique",
-              "expression": "count(repeated(ids(items))) == 0",
+              "description": "Every e has a unique id",
+              "expression": "count(missing(ids(items))) + count(repeated(ids(items))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -51965,8 +51995,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every of id is unique",
-              "expression": "count(repeated(ids(.of))) == 0",
+              "description": "Every of has a unique id",
+              "expression": "count(missing(ids(.of))) + count(repeated(ids(.of))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -52153,8 +52183,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(\"a b\"))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(\"a b\"))) + count(repeated(ids(\"a b\"))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -52349,13 +52379,13 @@
               "meta": {}
             },
             "$unique_ancestor_ids": {
-              "description": "Every pull request id is unique",
-              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "description": "Every pull request has a unique id",
+              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(\"pull request\".c))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(\"pull request\".c))) + count(repeated(ids(\"pull request\".c))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -52509,13 +52539,13 @@
               "meta": {}
             },
             "$unique_ancestor_ids": {
-              "description": "Every pull request id is unique",
-              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "description": "Every pull request has a unique id",
+              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(\"pull request\".c))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(\"pull request\".c))) + count(repeated(ids(\"pull request\".c))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -52671,13 +52701,13 @@
               "meta": {}
             },
             "$unique_ancestor_ids": {
-              "description": "Every pull request id is unique",
-              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "description": "Every pull request has a unique id",
+              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(\"pull request\".c))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(\"pull request\".c))) + count(repeated(ids(\"pull request\".c))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -52828,13 +52858,13 @@
               "meta": {}
             },
             "$unique_ancestor_ids": {
-              "description": "Every pull request id is unique",
-              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "description": "Every pull request has a unique id",
+              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(\"pull request\".c))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(\"pull request\".c))) + count(repeated(ids(\"pull request\".c))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -52992,13 +53022,13 @@
               "meta": {}
             },
             "$unique_ancestor_ids": {
-              "description": "Every pull request id is unique",
-              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "description": "Every pull request has a unique id",
+              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(\"pull request\".c))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(\"pull request\".c))) + count(repeated(ids(\"pull request\".c))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -53165,8 +53195,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(items))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(items))) + count(repeated(ids(items))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -53308,8 +53338,8 @@
                   ]
                 }
               ],
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(.to))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(.to))) + count(repeated(ids(.to))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -53471,8 +53501,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every d id is unique",
-              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "description": "Every d has a unique id",
+              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -53617,8 +53647,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every x id is unique",
-              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "description": "Every x has a unique id",
+              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -53760,8 +53790,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every whose id is unique",
-              "expression": "count(repeated(ids(.whose))) == 0",
+              "description": "Every whose has a unique id",
+              "expression": "count(missing(ids(.whose))) + count(repeated(ids(.whose))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -53930,8 +53960,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -54167,8 +54197,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -54405,8 +54435,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -54642,8 +54672,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -54860,8 +54890,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -55078,8 +55108,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -55296,8 +55326,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -55548,8 +55578,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -55800,8 +55830,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -56052,8 +56082,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -56317,8 +56347,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -56582,8 +56612,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -56847,8 +56877,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -57118,8 +57148,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -57390,8 +57420,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -57662,8 +57692,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -57948,8 +57978,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -58234,8 +58264,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -58520,8 +58550,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -58757,8 +58787,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -58994,8 +59024,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -59231,8 +59261,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -59514,8 +59544,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -59797,8 +59827,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -60085,8 +60115,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -60384,8 +60414,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -60684,8 +60714,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -60983,8 +61013,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -61289,8 +61319,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -61596,8 +61626,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -61902,8 +61932,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -62197,8 +62227,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -62493,8 +62523,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -62788,8 +62818,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -63109,8 +63139,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -63430,8 +63460,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -63751,8 +63781,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -64079,8 +64109,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -64407,8 +64437,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {

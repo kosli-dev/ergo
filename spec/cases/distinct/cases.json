@@ -86,7 +86,7 @@
             }
           }
         ],
-        "expressions": {"r": {"$min_subjects": "count(matching(every distinct sbom.components)) >= 1", "$unique_ids": "count(repeated(ids(every distinct sbom.components))) == 0"}}
+        "expressions": {"r": {"$min_subjects": "count(matching(every distinct sbom.components)) >= 1", "$unique_ids": "count(missing(ids(every distinct sbom.components))) + count(repeated(ids(every distinct sbom.components))) == 0"}}
       },
       {
         "description": "items that share an id but differ are all kept, and $unique_ids fails with the location of every copy",
@@ -96,6 +96,7 @@
           {
             "cause": "value",
             "check": "$unique_ids",
+            "failures": [],
             "inputs": [
               {
                 "locations": [
@@ -1170,7 +1171,7 @@
             }
           }
         ],
-        "expressions": {"r": {"$min_subjects": "count(matching(every distinct sbom.components)) >= 1", "$unique_ids": "count(repeated(ids(every distinct sbom.components))) == 0"}}
+        "expressions": {"r": {"$min_subjects": "count(matching(every distinct sbom.components)) >= 1", "$unique_ids": "count(missing(ids(every distinct sbom.components))) + count(repeated(ids(every distinct sbom.components))) == 0"}}
       }
     ]
   },
@@ -11072,6 +11073,7 @@
           {
             "cause": "value",
             "check": "$unique_ancestor_ids",
+            "failures": [],
             "inputs": [
               {
                 "locations": [

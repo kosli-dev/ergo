@@ -22,8 +22,8 @@
           "meta": {}
         },
         "$unique_ids": {
-          "description": "Every component id is unique",
-          "expression": "count(repeated(ids(components))) == 0",
+          "description": "Every component has a unique id",
+          "expression": "count(missing(ids(components))) + count(repeated(ids(components))) == 0",
           "meta": {}
         },
         "$well_formed": {

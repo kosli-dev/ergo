@@ -65,8 +65,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -214,8 +214,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -371,8 +371,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -559,13 +559,13 @@
               "meta": {}
             },
             "$unique_ancestor_ids": {
-              "description": "Every kid id is unique",
-              "expression": "count(repeated(ids(kids))) == 0",
+              "description": "Every kid has a unique id",
+              "expression": "count(missing(ids(kids))) + count(repeated(ids(kids))) == 0",
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(every kid.things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(every kid.things))) + count(repeated(ids(every kid.things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -873,8 +873,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -1098,8 +1098,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -1232,8 +1232,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -1458,8 +1458,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -1670,8 +1670,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -1901,8 +1901,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -2127,8 +2127,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -2348,8 +2348,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -2691,8 +2691,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -2999,8 +2999,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -3237,8 +3237,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -3573,8 +3573,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -3878,8 +3878,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -4163,8 +4163,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -4453,8 +4453,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -4756,13 +4756,13 @@
               "meta": {}
             },
             "$unique_ancestor_ids": {
-              "description": "Every kid id is unique",
-              "expression": "count(repeated(ids(kids))) == 0",
+              "description": "Every kid has a unique id",
+              "expression": "count(missing(ids(kids))) + count(repeated(ids(kids))) == 0",
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(every kid.things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(every kid.things))) + count(repeated(ids(every kid.things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -5136,8 +5136,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -5321,8 +5321,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -5794,8 +5794,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -6168,8 +6168,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -6592,8 +6592,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -7068,8 +7068,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -7470,8 +7470,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -7845,8 +7845,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -7994,8 +7994,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -8143,8 +8143,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -8292,8 +8292,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -8446,8 +8446,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -8593,8 +8593,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -8891,8 +8891,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -9150,8 +9150,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -9270,8 +9270,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -9493,8 +9493,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -9751,8 +9751,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -9905,8 +9905,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -10048,8 +10048,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -10306,8 +10306,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -10554,8 +10554,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -10843,8 +10843,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -11170,8 +11170,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -11290,8 +11290,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -11490,8 +11490,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -11726,8 +11726,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -11883,8 +11883,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -12033,8 +12033,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -12183,8 +12183,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -12306,8 +12306,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -12499,8 +12499,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -12692,8 +12692,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -12885,8 +12885,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -13082,8 +13082,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -13289,8 +13289,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -13538,8 +13538,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -13764,8 +13764,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -13913,8 +13913,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -14062,8 +14062,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -14211,8 +14211,8 @@
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(things))) == 0",
+              "description": "Every thing has a unique id",
+              "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
               "meta": {}
             },
             "$well_formed": {
