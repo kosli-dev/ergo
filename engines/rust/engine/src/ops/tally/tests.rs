@@ -1967,3 +1967,32 @@ fn two_sums_in_a_row_each_say_their_own_items_joined_with_and() {
         "item 1 of items: n is \"y\", which isn't a number, and item 1 of items: m is \"z\", which isn't a number"
     );
 }
+
+#[test]
+fn a_count_says_a_key_root_it_cant_use_once_first_and_each_item_the_value_before_the_key() {
+    let sentence = "count of items.v that is m named by $params.k is 0";
+    for (items, params, cause, said) in [
+        (
+            json!([{"v": {}}, {"v": {"m": null}}]),
+            json!({"k": 3}),
+            Cause::Unusable,
+            "$params.k is 3, which isn't text; item 1 of items: v: m is missing; item 2 of items: v: m is null",
+        ),
+        (
+            json!([{"v": {"m": {"a": 1}}}]),
+            json!({"k": 3}),
+            Cause::Unusable,
+            "$params.k is 3, which isn't text",
+        ),
+        (
+            json!([{"v": {}}]),
+            json!({}),
+            Cause::Absent,
+            "$params.k is missing; item 1 of items: v: m is missing",
+        ),
+    ] {
+        let clauses = tally_clauses(sentence, items, params, cause);
+        assert_eq!(clause::text(&clause::shown(&clauses)), said);
+        assert_eq!(clauses.first().map(|said| said.kind), Some(clause::Kind::Root));
+    }
+}
