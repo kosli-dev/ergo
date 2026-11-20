@@ -622,3 +622,22 @@ fn an_item_says_each_of_its_own_reads_beside_a_key_it_cant_read() {
         ))]
     );
 }
+
+#[test]
+fn an_item_says_its_own_key_when_the_root_before_it_cant_be_read() {
+    assert_eq!(
+        own_said(
+            "every items whose tags contains $input.m named by key exists",
+            json!([{"tags": ["x"]}, {"key": 3, "tags": ["x"]}]),
+            json!({}),
+            json!({"m": null}),
+        ),
+        [
+            Some((Cause::Absent, "item 1 of items: key is missing".to_string())),
+            Some((
+                Cause::Unusable,
+                "item 2 of items: key is 3, which isn't text".to_string()
+            )),
+        ]
+    );
+}
