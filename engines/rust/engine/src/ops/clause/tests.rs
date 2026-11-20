@@ -25,6 +25,279 @@ fn missing(name: &str) -> Clause {
     root(name, Cause::Absent, &format!("{name} is missing"))
 }
 
+fn null(name: &str) -> Clause {
+    root(name, Cause::Null, &format!("{name} is null"))
+}
+
+fn unread(name: &str, cause: Cause, text: &str) -> Clause {
+    read(Kind::Item, name, cause, text)
+}
+
+fn items_of(list: &str, from: usize, to: usize, said: impl Fn() -> Vec<Clause>) -> Vec<Clause> {
+    (from..=to)
+        .map(|n| item(&format!("item {n} of {list}"), Cause::Absent, said()))
+        .collect()
+}
+
+fn with(mut clauses: Vec<Clause>, more: Vec<Clause>) -> Vec<Clause> {
+    clauses.extend(more);
+    clauses
+}
+
+#[test]
+fn shown_and_text_give_what_joined_gives() {
+    let rows: Vec<(Vec<Clause>, Vec<&str>)> = vec![
+        (
+            vec![
+                root(
+                    "$params.min",
+                    Cause::Unusable,
+                    "$params.min is \"s\", which isn't a number",
+                ),
+                item("item 2 of xs", Cause::Absent, vec![missing("v")]),
+            ],
+            vec![
+                "$params.min is \"s\", which isn't a number",
+                "item 2 of xs: v is missing",
+            ],
+        ),
+        (
+            items_of("cs", 1, 2, || items_of("rs", 1, 2, || vec![missing("ok")])),
+            vec![
+                "item 1 of cs: item 1 of rs: ok is missing",
+                "item 1 of cs: item 2 of rs: ok is missing",
+                "item 2 of cs: item 1 of rs: ok is missing",
+                "item 2 of cs: item 2 of rs: ok is missing",
+            ],
+        ),
+        (
+            items_of("xs", 1, 5, || vec![missing("x.v"), missing("x.w")]),
+            vec![
+                "item 1 of xs: x.v is missing, and x.w is missing",
+                "item 2 of xs: x.v is missing, and x.w is missing",
+                "item 3 of xs: x.v is missing, and x.w is missing",
+                "item 4 of xs: x.v is missing, and x.w is missing",
+                "item 5 of xs: x.v is missing, and x.w is missing",
+            ],
+        ),
+        (
+            vec![
+                missing("$params.q"),
+                missing("pr.z"),
+                item("item 2 of xs", Cause::Absent, vec![missing("aa")]),
+                item("item 2 of xs", Cause::Absent, vec![missing("b")]),
+            ],
+            vec![
+                "$params.q is missing",
+                "pr.z is missing",
+                "item 2 of xs: aa is missing",
+                "item 2 of xs: b is missing",
+            ],
+        ),
+        (
+            vec![
+                root("pr.l", Cause::Unusable, "pr.l is \"s\", which isn't a list"),
+                null("$params.l"),
+                item("item 1 of xs", Cause::Absent, vec![missing("w")]),
+            ],
+            vec![
+                "pr.l is \"s\", which isn't a list",
+                "$params.l is null",
+                "item 1 of xs: w is missing",
+            ],
+        ),
+        (
+            vec![
+                unread(
+                    "item 2 of $params.envs",
+                    Cause::Unusable,
+                    "item 2 of $params.envs is null, which isn't an object",
+                ),
+                item("item 3 of $params.envs", Cause::Absent, vec![missing("name")]),
+                unread(
+                    "item 4 of $params.envs",
+                    Cause::Unusable,
+                    "item 4 of $params.envs is 3, which isn't an object",
+                ),
+                item("item 5 of $params.envs", Cause::Absent, vec![missing("name")]),
+                item("item 6 of $params.envs", Cause::Absent, vec![missing("name")]),
+            ],
+            vec![
+                "item 2 of $params.envs is null, which isn't an object",
+                "item 3 of $params.envs: name is missing",
+                "item 4 of $params.envs is 3, which isn't an object",
+                "item 5 of $params.envs: name is missing",
+                "item 6 of $params.envs: name is missing",
+            ],
+        ),
+        (
+            with(
+                vec![item(
+                    "item 1 of xs",
+                    Cause::Absent,
+                    vec![
+                        item("item 2 of ys", Cause::Absent, vec![missing("n")]),
+                        item("item 3 of ys", Cause::Null, vec![null("n")]),
+                    ],
+                )],
+                items_of("xs", 2, 4, || vec![missing("ys")]),
+            ),
+            vec![
+                "item 1 of xs: item 2 of ys: n is missing",
+                "item 1 of xs: item 3 of ys: n is null",
+                "item 2 of xs: ys is missing",
+                "item 3 of xs: ys is missing",
+                "item 4 of xs: ys is missing",
+            ],
+        ),
+        (
+            vec![item(
+                "item 1 of ws",
+                Cause::Unusable,
+                vec![
+                    unread(
+                        "item 2 of items",
+                        Cause::Unusable,
+                        "item 2 of items is null, which isn't an object",
+                    ),
+                    missing("cov.x"),
+                ],
+            )],
+            vec![
+                "item 1 of ws: item 2 of items is null, which isn't an object",
+                "item 1 of ws: cov.x is missing",
+            ],
+        ),
+        (
+            vec![
+                root(
+                    "$params",
+                    Cause::NotAnObject,
+                    "$params is 3, which isn't an object",
+                ),
+                read(Kind::List, "es", Cause::Absent, "es is missing"),
+            ],
+            vec!["$params is 3, which isn't an object", "es is missing"],
+        ),
+        (
+            vec![
+                root(
+                    "za",
+                    Cause::Unusable,
+                    "za is 3, which isn't a list or an object",
+                ),
+                root(
+                    "zb",
+                    Cause::Unusable,
+                    "zb is \"s\", which isn't a list or an object",
+                ),
+            ],
+            vec![
+                "za is 3, which isn't a list or an object",
+                "zb is \"s\", which isn't a list or an object",
+            ],
+        ),
+        (
+            with(
+                vec![missing("$params.k"), missing("$params.k")],
+                items_of("es", 1, 5, || vec![missing("m")]),
+            ),
+            vec![
+                "$params.k is missing",
+                "$params.k is missing",
+                "item 1 of es: m is missing",
+                "item 2 of es: m is missing",
+                "item 3 of es: m is missing",
+                "item 4 of es: m is missing",
+                "item 5 of es: m is missing",
+            ],
+        ),
+        (
+            vec![root("x", Cause::Value, "x is \"a; y is 1, which isn't b\"")],
+            vec!["x is \"a; y is 1, which isn't b\""],
+        ),
+        (
+            vec![missing("zz"), null("x")],
+            vec!["zz is missing", "x is null"],
+        ),
+        (
+            vec![
+                item(
+                    "item 1 of lst",
+                    Cause::Value,
+                    vec![root("l.x", Cause::Value, "l.x is 5")],
+                ),
+                unread(
+                    "item 2 of lst",
+                    Cause::Unusable,
+                    "item 2 of lst is null, which isn't an object",
+                ),
+                unread(
+                    "item 3 of lst",
+                    Cause::Unusable,
+                    "item 3 of lst is 5, which isn't an object",
+                ),
+                item(
+                    "item 4 of lst",
+                    Cause::Value,
+                    vec![root("l.x", Cause::Value, "l.x is 6")],
+                ),
+            ],
+            vec![
+                "item 1 of lst: l.x is 5",
+                "item 2 of lst is null, which isn't an object",
+                "item 3 of lst is 5, which isn't an object",
+                "item 4 of lst: l.x is 6",
+            ],
+        ),
+        (
+            vec![
+                null("$params.k"),
+                item("item 2 of es", Cause::Absent, vec![missing("m")]),
+                item("item 3 of es", Cause::Absent, vec![missing("zz")]),
+                item("item 4 of es", Cause::Null, vec![null("m")]),
+                item("item 5 of es", Cause::Absent, vec![missing("m")]),
+            ],
+            vec![
+                "$params.k is null",
+                "item 2 of es: m is missing",
+                "item 3 of es: zz is missing",
+                "item 4 of es: m is null",
+                "item 5 of es: m is missing",
+            ],
+        ),
+        (
+            vec![item(
+                "item 1 of xs",
+                Cause::Value,
+                (1..=4)
+                    .map(|n| {
+                        unread(
+                            &format!("item {n} of x.ns"),
+                            Cause::Value,
+                            &format!("item {n} of x.ns is {}", n + 1),
+                        )
+                    })
+                    .collect(),
+            )],
+            vec![
+                "item 1 of xs: item 1 of x.ns is 2",
+                "item 1 of xs: item 2 of x.ns is 3",
+                "item 1 of xs: item 3 of x.ns is 4",
+                "item 1 of xs: item 4 of x.ns is 5",
+            ],
+        ),
+    ];
+    for (clauses, strings) in rows {
+        let strings: Vec<String> = strings.into_iter().map(str::to_string).collect();
+        assert_eq!(
+            text(&shown(&clauses)),
+            crate::ops::message::joined(strings.clone()),
+            "{strings:?}"
+        );
+    }
+}
+
 #[test]
 fn and_n_more_comes_after_the_roots_and_the_lists_in_a_count() {
     let mut clauses: Vec<Clause> = (1..=5)
