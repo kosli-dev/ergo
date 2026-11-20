@@ -1,5 +1,57 @@
 use serde_json::{Value, json};
 
+fn lowered(sentence: &str) -> super::Check {
+    let tree = ergo_policy_sentences::parse_check(sentence).unwrap();
+    crate::lower::lower_assertion(&tree.assertions[0], &crate::lower::Scope::new()).unwrap()
+}
+
+fn root_clauses_of(
+    sentence: &str,
+    subject: &Value,
+    input: &Value,
+    params: Option<&Value>,
+) -> Vec<(String, String)> {
+    let check = lowered(sentence);
+    let ctx = crate::path::Ctx {
+        label: None,
+        item_by_item: false,
+        in_option: false,
+        subject: crate::path::Located {
+            value: subject,
+            location: crate::path::Location::input_root().key("s"),
+        },
+        input,
+        params,
+        aliases: std::collections::BTreeMap::new(),
+    };
+    super::root_clauses(&[&check], &ctx)
+        .into_iter()
+        .map(|clause| (clause.name, clause.text))
+        .collect()
+}
+
+#[test]
+fn root_clauses_say_every_key_that_cant_be_read_worst_first_then_by_name() {
+    let subject = json!({"id": "t", "es": [{"zz": "a", "m": "a", "v": "a"}]});
+    let input = json!({"j": 3});
+    let said = root_clauses_of(
+        "every es whose zz is m named by $input.k and whose v is m named by $input.j, if any, exists",
+        &subject,
+        &input,
+        None,
+    );
+    assert_eq!(
+        said,
+        vec![
+            (
+                "$input.j".to_string(),
+                "$input.j is 3, which isn't text".to_string()
+            ),
+            ("$input.k".to_string(), "$input.k is missing".to_string()),
+        ]
+    );
+}
+
 #[test]
 fn a_clause_an_earlier_sentence_gave_is_left_out_and_the_rest_is_kept() {
     let mut said: Vec<String> = Vec::new();
