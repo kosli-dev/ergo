@@ -1321,6 +1321,72 @@ fn said_row(sentence: &str, subject: Value, params: Value) -> (Cause, String) {
     (out.verdict.cause, out.message.unwrap_or_default())
 }
 
+const KEYS_THAT_CANT_BE_READ: [(&str, &str); 3] = [
+    ("{}", "$params.k is missing"),
+    ("{\"k\": null}", "$params.k is null"),
+    ("{\"k\": 3}", "$params.k is 3, which isn't text"),
+];
+
+fn said_beside_each_key(form: &str, es: Value) -> Vec<(Cause, String)> {
+    KEYS_THAT_CANT_BE_READ
+        .iter()
+        .map(|(params, _)| {
+            said_row(
+                &format!("{form} es.v that is m named by $params.k is 1"),
+                json!({"es": es.clone()}),
+                serde_json::from_str(params).unwrap(),
+            )
+        })
+        .collect()
+}
+
+fn each_key_then(cause: Cause, items: &str) -> Vec<(Cause, String)> {
+    KEYS_THAT_CANT_BE_READ
+        .iter()
+        .map(|(_, key)| (cause, format!("{key}; {items}")))
+        .collect()
+}
+
+#[test]
+fn an_every_says_a_that_key_it_cant_read_once_and_each_item_its_own_value() {
+    assert_eq!(
+        said_beside_each_key(
+            "every",
+            json!([{"v": "s"}, {"v": {}}, {"v": {"m": null}}])
+        ),
+        each_key_then(
+            Cause::NotAnObject,
+            "item 1 of es: v is \"s\", which isn't an object; item 2 of es: v: m is missing; item 3 of es: v: m is null"
+        )
+    );
+}
+
+#[test]
+fn a_some_says_the_same_as_every() {
+    assert_eq!(
+        said_beside_each_key(
+            "some",
+            json!([{"v": "s"}, {"v": {}}, {"v": {"m": null}}])
+        ),
+        each_key_then(
+            Cause::NotAnObject,
+            "item 1 of es: v is \"s\", which isn't an object; item 2 of es: v: m is missing; item 3 of es: v: m is null"
+        )
+    );
+    assert_eq!(
+        said_beside_each_key("some", json!([{"v": {}}, {"v": {}}, {"v": {}}, {"v": {}}])),
+        said_beside_each_key("every", json!([{"v": {}}, {"v": {}}, {"v": {}}, {"v": {}}]))
+    );
+    assert_eq!(
+        said_beside_each_key("some", json!([{"v": {}}, {"v": {"m": null}}]))[0],
+        (
+            Cause::Absent,
+            "$params.k is missing; item 1 of es: v: m is missing; item 2 of es: v: m is null"
+                .to_string()
+        )
+    );
+}
+
 #[test]
 fn an_every_keeps_its_items_beside_a_missing_key() {
     assert_eq!(
