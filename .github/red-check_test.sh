@@ -186,3 +186,18 @@ case $out in
     exit 1
     ;;
 esac
+
+echo "red-check.sh builds with its own empty target dir, so a stale binary in a shared one never makes a test pass"
+stale=$dir/stale
+mkdir -p "$stale/bin" "$stale/target"
+: > "$stale/target/stale-binary"
+printf '#!/bin/sh\nif [ -e "$CARGO_TARGET_DIR/stale-binary" ]; then\n  for a; do :; done\n  printf "test tests::%%s ... ok\\ntest result: ok. 1 passed\\n" "$a"\n  exit 0\nfi\nprintf "error[E0425]: cannot find function root_clauses\\nerror: could not compile foo\\n"\nexit 101\n' > "$stale/bin/cargo"
+chmod +x "$stale/bin/cargo"
+out=$(cd "$fake/repo" && CARGO_TARGET_DIR=$stale/target PATH=$stale/bin:$PATH env -u RED_CHECK_REGO_CMD -u RED_CHECK_RUST_CMD sh .github/red-check.sh "$fakebase")
+case $out in
+  *"0 pass, 2 fail"*"the test build did not compile on the old source, so every Rust test counts as failing there"*) ;;
+  *)
+    echo "red-check.sh should count both tests as failing and say the build did not compile, and printed: $out" >&2
+    exit 1
+    ;;
+esac
