@@ -86,7 +86,7 @@ rego_cmd=${RED_CHECK_REGO_CMD:-}
 build_cmd=${RED_CHECK_BUILD_CMD:-.github/build-ergo.sh}
 
 default_rust() {
-  export CARGO_TARGET_DIR=${CARGO_TARGET_DIR:-$HOME/.cache/ergo-cargo-target}
+  export CARGO_TARGET_DIR=${RED_CHECK_TARGET_DIR:-$work/target}
   out=$work/cargo.out
   tree_dir=$1
   shift
@@ -100,7 +100,10 @@ default_rust() {
     touched=1
   fi
   for test_name; do :; done
-  (cd "$tree_dir/engines/rust" && cargo test -j 4 -p "$@" > "$out" 2>&1) || return 1
+  (cd "$tree_dir/engines/rust" && cargo test -j 4 -p "$@" > "$out" 2>&1) || {
+    if grep -q 'could not compile' "$out"; then echo "$test_name" >> "$work/nocompile.txt"; fi
+    return 1
+  }
   if grep -q "^test \(.*::\)\{0,1\}$test_name \.\.\. ok\$" "$out"; then return 0; fi
   return 3
 }
@@ -128,6 +131,7 @@ crate_of() {
 : > "$work/pass.txt"
 : > "$work/unrun.txt"
 : > "$work/all.txt"
+: > "$work/nocompile.txt"
 rust_count=0
 rego_count=0
 built=0
@@ -195,6 +199,11 @@ if [ "$unrun" != 0 ]; then
   echo
   echo "Could not run:"
   cat "$work/unrun.txt"
+fi
+nocompile=$(wc -l < "$work/nocompile.txt" | tr -d ' ')
+if [ "$rust_count" != 0 ] && [ "$nocompile" = "$rust_count" ]; then
+  echo
+  echo "the test build did not compile on the old source, so every Rust test counts as failing there"
 fi
 echo
 echo "<details>"
