@@ -228,3 +228,49 @@ fn a_plain_check_on_an_input_that_is_a_list_lists_no_key_beside_the_input() {
         Vec::<Value>::new()
     );
 }
+
+fn rewritten(sentence: &str, subject: &Value, params: &Value) -> Option<String> {
+    let tree = ergo_policy_sentences::parse_check(sentence).unwrap();
+    let check =
+        crate::lower::lower_assertion(&tree.assertions[0], &crate::lower::Scope::new()).unwrap();
+    let Check::Tally(tally) = &check else {
+        panic!("{sentence} is not a count or a sum");
+    };
+    let ctx = ctx(subject, params, &[]);
+    let mut verdict = crate::ops::run(&check, &ctx);
+    let said = crate::ops::tally::row_message(
+        tally,
+        &ctx,
+        verdict.cause,
+        crate::ops::message::pieces(&check, &ctx, &verdict),
+    );
+    rewrite(&check, &ctx, &mut verdict.cause, &mut verdict.inputs, said)
+}
+
+#[test]
+fn a_rewrite_says_a_key_and_a_base_that_hold_a_semicolon_once_each() {
+    assert_eq!(
+        rewritten(
+            "count of o.v named by $params.k is 1",
+            &json!({"o": "a; b"}),
+            &json!({"k": ["x; y"]}),
+        )
+        .as_deref(),
+        Some("$params.k is [\"x; y\"], which isn't text; o is \"a; b\", which isn't an object")
+    );
+}
+
+#[test]
+fn a_rewrite_says_each_key_once_when_the_keys_are_joined_with_and() {
+    assert_eq!(
+        rewritten(
+            "count of o named by $params.k plus count of p named by $params.j is 1",
+            &json!({"o": "s"}),
+            &json!({"k": 3, "j": 4}),
+        )
+        .as_deref(),
+        Some(
+            "$params.k is 3, which isn't text, and $params.j is 4, which isn't text; o is \"s\", which isn't a list or an object; p is missing"
+        )
+    );
+}

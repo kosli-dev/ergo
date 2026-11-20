@@ -1833,14 +1833,13 @@ fn merge_runs_keeps_the_rows_of_the_first_run_whatever_the_length_of_the_others(
     assert!(super::merge_runs(Vec::new(), &[&long]).is_empty());
 }
 
-fn tally_message(sentence: &str, subject: Value, params: Value) -> String {
+fn tally_assertion(sentence: &str, input: Value, params: Value) -> crate::parts::Part {
     let tree = ergo_policy_sentences::parse_check(sentence).unwrap();
     let check =
         crate::lower::lower_assertion(&tree.assertions[0], &crate::lower::Scope::new()).unwrap();
     let crate::ops::Check::Tally(tally) = &check else {
         panic!("{sentence} is not a count or a sum");
     };
-    let input = json!({"things": [subject]});
     let ctx = crate::path::Ctx {
         label: None,
         item_by_item: false,
@@ -1853,9 +1852,21 @@ fn tally_message(sentence: &str, subject: Value, params: Value) -> String {
         params: Some(&params),
         aliases: std::collections::BTreeMap::new(),
     };
-    let verdict = crate::ops::run(&check, &ctx);
+    let mut verdict = crate::ops::run(&check, &ctx);
     let row = super::default_message(&check, &ctx, &verdict);
-    super::tally_part(sentence, verdict.cause, &[], &row, tally, &ctx).message
+    let row = crate::ops::key_base::rewrite(
+        &check,
+        &ctx,
+        &mut verdict.cause,
+        &mut verdict.inputs,
+        row.clone(),
+    )
+    .unwrap_or(row);
+    super::tally_part(sentence, verdict.cause, &[], &row, tally, &ctx)
+}
+
+fn tally_message(sentence: &str, subject: Value, params: Value) -> String {
+    tally_assertion(sentence, json!({"things": [subject]}), params).message
 }
 
 #[test]
@@ -1898,4 +1909,48 @@ fn an_assertion_with_two_counts_says_no_item_either_count_says() {
             "{sentence}"
         );
     }
+}
+
+#[test]
+fn a_counts_assertion_says_only_the_root_before_an_item_key() {
+    let part = tally_assertion(
+        "count of xs whose tags contains $input.m named by key is 1",
+        json!({"m": null, "things": [{"xs": [
+            {"tags": ["x"]},
+            "s",
+            {"key": 3, "tags": ["x"]},
+            {"tags": ["x"]},
+            {"tags": ["x"]}
+        ]}]}),
+        json!({}),
+    );
+    assert_eq!(part.message, "$input.m is null");
+    assert_eq!(part.failures.len(), 5);
+}
+
+#[test]
+fn a_counts_assertion_says_only_its_key_root() {
+    for (params, key) in [
+        (json!({}), "$params.k is missing"),
+        (json!({"k": null}), "$params.k is null"),
+        (json!({"k": 3}), "$params.k is 3, which isn't text"),
+    ] {
+        let part = tally_assertion(
+            "count of es.v that is m named by $params.k is 0",
+            json!({"things": [{"es": [{"v": {}}, {"v": {}}, {"v": {}}, {"v": {}}]}]}),
+            params,
+        );
+        assert_eq!(part.message, key);
+        assert_eq!(part.failures.len(), 4, "{key}");
+    }
+}
+
+#[test]
+fn a_counts_assertion_keeps_a_key_and_a_base_that_hold_a_semicolon_whole() {
+    let part = tally_assertion(
+        "count of o.v named by $params.k is 1",
+        json!({"things": [{"o": "a; b"}]}),
+        json!({"k": ["x; y"]}),
+    );
+    assert_eq!(part.message, "$params.k is [\"x; y\"], which isn't text");
 }
