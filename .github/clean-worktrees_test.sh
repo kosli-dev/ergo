@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 script=$(cd "$(dirname "$0")" && pwd)/clean-worktrees.sh
-dir=$(mktemp -d)
+dir=$(cd "$(mktemp -d)" && pwd -P)
 trap 'rm -rf "$dir"' EXIT
 repo=$dir/repo
 mkdir -p "$repo"
