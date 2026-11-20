@@ -35,6 +35,7 @@ printf 't / g / c\nt / g / d\nu / g / f2\n' > "$dir/known-b.txt"
 run() {
   PR_FACTS_BASE_DUMP=$a PR_FACTS_HEAD_DUMP=$b \
     PR_FACTS_BASE_KNOWN=$dir/known-a.txt PR_FACTS_HEAD_KNOWN=$dir/known-b.txt \
+    PR_FACTS_HEAD_CARGO_EXIT=${cargo_exit:-0} \
     sh "$script" base
 }
 
@@ -51,7 +52,11 @@ expect() {
 }
 
 echo "pr-facts.sh counts changed reports, follows renamed keys, and puts cases that stopped passing first"
-expect "## Rust report changes
+expect "CASES THAT PASSED ON base AND FAIL OR ARE GONE NOW: 2
+- t / g / d
+- w / g / v (gone)
+
+## Rust report changes
 
 6 case reports changed between base and the working tree.
 
@@ -65,10 +70,6 @@ Cases only on one side: 0 new, 2 removed.
 ## Known failures
 
 known-failures.txt had 4 lines and has 3 now.
-
-CASES THAT PASSED ON base AND FAIL OR ARE GONE NOW: 2
-- t / g / d
-- w / g / v (gone)
 
 Pass now, and did not before: 1
 - t / g / b
@@ -105,6 +106,30 @@ case $out in
   *"Cases only on one side: 1 new, 0 removed."*) ;;
   *)
     echo "pr-facts.sh should count new cases, and printed: $out" >&2
+    exit 1
+    ;;
+esac
+
+echo "pr-facts.sh prints a failing cargo exit as one line and still prints the report and the gate"
+/bin/rm -rf "$b"
+mkdir -p "$b"
+cp -R "$a/." "$b/"
+cp "$dir/known-a.txt" "$dir/known-b.txt"
+printf 't / g / a\n' >> "$dir/known-b.txt"
+cargo_exit=101
+out=$(run)
+first=$(printf '%s\n' "$out" | sed -n 1p)
+case $first in
+  "CASES THAT PASSED ON base AND FAIL OR ARE GONE NOW: 1") ;;
+  *)
+    echo "pr-facts.sh should start with the gate when cargo fails, and printed: $out" >&2
+    exit 1
+    ;;
+esac
+case $out in
+  *"cargo test exited with 101 on the working tree."*"## Rust report changes"*) ;;
+  *)
+    echo "pr-facts.sh should print the cargo exit and the report, and printed: $out" >&2
     exit 1
     ;;
 esac
