@@ -259,6 +259,58 @@ def empty():
     return out
 
 
+def member_value(state):
+    return M if state == "missing" else {"fine": 5, "bad": "s", "null": None}[state]
+
+
+def members(size, state, field):
+    out = {}
+    for k in range(size):
+        value = member_value(state if (k == 0 or size == 5) else "fine")
+        if field:
+            out[f"k{k + 1}"] = {} if value is M else {"v": value}
+        else:
+            out[f"k{k + 1}"] = value
+    return out
+
+
+def member_pair(name, line, sentence, thing, params, check=None):
+    policy = {
+        "subjects": {"thing": {"from": "things", "identified_by": "id"}},
+        "requirements": {"s": {"subject": "thing", "checks": {"c": check if check else {"for": line, "assert": sentence}}}},
+    }
+    return {"name": name, "policy": policy, "input": {"things": [dict({"id": "t"}, **thing)]}, "params": params}
+
+
+def member_family():
+    out = []
+    for nested in (False, True):
+        line = "every ws as w, every member of w.ms as m" if nested else "every member of ms as m"
+        for r in ("fine", "wrong", "missing", "null"):
+            for state in ("fine", "bad", "missing", "null"):
+                for size in (2, 5):
+                    params = {}
+                    put(params, "r", r)
+                    ms = members(size, state, True)
+                    thing = {"ws": [{"ms": ms}]} if nested else {"ms": ms}
+                    name = f"for/member/{'nested' if nested else 'plain'}/{r}/{state}/{size}"
+                    out.append(member_pair(name, line, "m.v is at least $params.r", thing, params))
+    checks = {
+        "every": ("every member of ms is at least $params.r", False),
+        "count": ("count of member of ms whose v is at least $params.r is 0", True),
+    }
+    for form, (sentence, field) in checks.items():
+        for r in ("fine", "wrong", "missing", "null"):
+            for state in ("fine", "bad", "missing", "null") if field else ("fine", "bad", "null"):
+                params = {}
+                put(params, "r", r)
+                out.append(member_pair(f"for/member/{form}/{r}/{state}", None, None, {"ms": members(2, state, field)}, params, sentence))
+    for shape, value in {"missing": M, "null": None, "list": [1], "text": "s", "empty": {}}.items():
+        thing = {} if value is M else {"ms": value}
+        out.append(member_pair(f"for/member/root/{shape}", "every member of ms as m", "m.v is at least 1", thing, {}))
+    return out
+
+
 def main(path):
     pairs = []
     i = 0
@@ -298,7 +350,7 @@ def main(path):
         pair = build("every xs as x", sentences, [item, dict(item)], params, {})
         pair["name"] = f"for/two/{first[0]}-{first_state}/{other[0]}-{other_state}/{item_state}/{n}"
         pairs.append(pair)
-    for family in (two_lists, picks, sums, twice, left, line_roots, not_objects, empty):
+    for family in (two_lists, picks, sums, twice, left, line_roots, not_objects, empty, member_family):
         pairs.extend(family())
     with open(path, "w") as handle:
         json.dump(pairs, handle, indent=1)
