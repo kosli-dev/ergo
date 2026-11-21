@@ -11,6 +11,7 @@ printf 'CASES THAT PASSED ON abc1234 AND FAIL OR ARE GONE NOW: 3\n- t / g / d\n\
 printf 'cargo test exited with 2 on the working tree.\n\n## Rust report changes\n\nNo case report changed between abc1234 and the working tree.\n' > "$dir/reports-cargo-failed-plain.md"
 printf 'PAIRS THAT MOVED AWAY FROM REGO OR FROM THEIR WANT: 1\n\n- apart: p -> z\n\n## Pairs\n\n1 of 5 pairs differ between Rego and Rust.\n\nPairs that say their want message: Rego 3 of 3, Rust 3 of 3.\n\nRust output changed on 3 pairs between base and the working tree.\n\n- apart: p -> z (Rust equals Rego: no)\n' > "$dir/pairs-changed.md"
 printf '## Pairs\n\n1 of 5 pairs differ between Rego and Rust.\n\nNo pair'"'"'s Rust output changed between base and the working tree.\n' > "$dir/pairs-same.md"
+printf '## Pairs\n\n1 of 5 pairs differ between Rego and Rust.\n\nRust output changed on 1 pair between base and the working tree.\n' > "$dir/pairs-one.md"
 printf 'No file under engines/rust, engines/rego or spec changed.\n' > "$dir/pairs-skipped.md"
 
 run() {
@@ -128,6 +129,74 @@ expect_not_in "WARNING" "$out"
 echo "body-facts.sh treats an empty body as having no line"
 out=$(BODY_FACTS_BODY= sh "$script" "$dir/reports-changed.md" "$dir/pairs-same.md")
 expect_in "WARNING" "$out"
+
+printf '## Rust report changes\n\n6 case reports changed between base and the working tree.\n\n## Known failures\n\nknown-failures.txt had 1 line and has 3 now.\n' > "$dir/reports-known.md"
+printf '## Rust report changes\n\nNo case report changed between base and the working tree.\n\n## Known failures\n\nknown-failures.txt had 2 lines and has 2 now.\n' > "$dir/reports-known-same.md"
+printf 'garbled\n' > "$dir/garbled.md"
+
+fails_with() {
+  if out=$(BODY_FACTS_BODY=$1 sh "$script" "$2" "$3" 2>&1); then
+    echo "expected a failure for: $1, got: $out" >&2
+    exit 1
+  fi
+}
+
+echo "body-facts.sh passes when the numbers in the body match"
+body=$(printf 'Changes the report: 6 Rust case reports changed, Rust output changed on 3 pairs.\n\nknown-failures.txt had 1 line and has 3 now.\n\n1 of 5 pairs differ between Rego and Rust.\n\nPairs that say their want message: Rego 3 of 3, Rust 3 of 3.\n')
+out=$(run "$body" "$dir/reports-known.md" "$dir/pairs-changed.md")
+expect_not_in "MISMATCH" "$out"
+expect_in "Checked 5 numbers" "$out"
+
+echo "body-facts.sh fails and names each case report count that differs"
+fails_with "Changes the report: 7 Rust case reports changed." "$dir/reports-changed.md" "$dir/pairs-same.md"
+expect_in "MISMATCH: the body says 7 case reports changed, the facts say 6" "$out"
+
+echo "body-facts.sh fails on a pair count that differs"
+fails_with "Rust output changed on 4 pairs." "$dir/reports-same.md" "$dir/pairs-changed.md"
+expect_in "MISMATCH: the body says Rust output changed on 4 pairs, the facts say 3" "$out"
+
+echo "body-facts.sh fails on the known failures line and names both numbers"
+fails_with "known-failures.txt had 1 line and has 4 now." "$dir/reports-known.md" "$dir/pairs-same.md"
+expect_in "MISMATCH: the body says known-failures.txt had 1 and has 4, the facts say had 1 and has 3" "$out"
+
+echo "body-facts.sh fails on the want and differ lines"
+fails_with "Pairs that say their want message: Rego 3 of 3, Rust 2 of 3." "$dir/reports-same.md" "$dir/pairs-changed.md"
+expect_in "MISMATCH" "$out"
+fails_with "2 of 5 pairs differ between Rego and Rust." "$dir/reports-same.md" "$dir/pairs-changed.md"
+expect_in "MISMATCH: the body says 2 of 5 pairs differ, the facts say 1 of 5" "$out"
+
+echo "body-facts.sh lists every mismatch, not only the first"
+fails_with "$(printf '9 Rust case reports changed\n\nRust output changed on 8 pairs\n')" "$dir/reports-changed.md" "$dir/pairs-changed.md"
+expect_in "the body says 9 case reports changed" "$out"
+expect_in "the body says Rust output changed on 8 pairs" "$out"
+
+echo "body-facts.sh reads the singular forms"
+out=$(run "$(printf 'Changes the report: 1 Rust case report changed, Rust output changed on 1 pair.\n\nknown-failures.txt had 1 line and has 1 now.\n')" "$dir/reports-one.md" "$dir/pairs-one.md")
+expect_not_in "MISMATCH" "$out"
+fails_with "1 Rust case report changed." "$dir/reports-changed.md" "$dir/pairs-same.md"
+
+echo "body-facts.sh checks a zero against a file that says nothing changed"
+out=$(run "0 case reports changed" "$dir/reports-same.md" "$dir/pairs-same.md")
+expect_not_in "MISMATCH" "$out"
+fails_with "0 case reports changed" "$dir/reports-changed.md" "$dir/pairs-same.md"
+
+echo "body-facts.sh fails with unknown when a number is needed and the file cannot be read"
+fails_with "Rust output changed on 3 pairs." "$dir/reports-same.md" "$dir/garbled.md"
+expect_in "MISMATCH: the body says Rust output changed on 3 pairs, the facts say unknown" "$out"
+fails_with "6 Rust case reports changed." "$dir/missing.md" "$dir/pairs-same.md"
+expect_in "the facts say unknown" "$out"
+fails_with "known-failures.txt had 1 line and has 3 now." "$dir/garbled.md" "$dir/pairs-same.md"
+expect_in "the facts say unknown" "$out"
+
+echo "body-facts.sh passes with a note when the body has no such line, even if the files cannot be read"
+out=$(run "Fixes a thing. About 6 case reports are nice." "$dir/garbled.md" "$dir/missing.md")
+expect_in "NOTE: no number in the body was checked" "$out"
+expect_not_in "MISMATCH" "$out"
+
+echo "body-facts.sh ignores these sentences inside a code fence"
+out=$(run "$(printf '```\n7 Rust case reports changed\n```\n')" "$dir/reports-changed.md" "$dir/pairs-same.md")
+expect_not_in "MISMATCH" "$out"
+expect_in "NOTE: no number in the body was checked" "$out"
 
 echo "body-facts.sh fails with usage on the wrong arguments"
 if sh "$script" one > /dev/null 2>&1; then
