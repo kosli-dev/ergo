@@ -12761,6 +12761,193 @@
     ]
   },
   {
+    "description": "count of and sum of a field named like a part, among several assertions and in an option, never list the walked list on the assertion",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"repo": {"from": "repos", "identified_by": "id", "has": {"lock": "lockfile"}}}, "requirements": {"s": {"subject": "repo", "checks": {"several": {"assert": ["id exists", "sum of .lock.pkgs.n is 1"]}, "option": {"any_of": {"o": "count of .lock.pkgs is 1", "p": "zz is 1"}}}}}},
+    "cases": [
+      {
+        "description": "the assertion lists the sum or the count and the row lists the walked list",
+        "rules": ["row.parts", "walk.right", "compare.list"],
+        "input": {"repos": [{"id": "t1", "lock": {"pkgs": [{"n": 1}, {"n": 2}]}, "lockfile": {"pkgs": [{"n": 5}]}}]},
+        "results": [
+          {
+            "cause": "absent",
+            "check": "option",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [
+                  {
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/repos/0/lock/pkgs/0",
+                          "/repos/0/lock/pkgs/1"
+                        ],
+                        "name": "count of .lock.pkgs",
+                        "value": 2
+                      }
+                    ],
+                    "kind": "assertion",
+                    "locations": [
+                      "$policy:/requirements/s/checks/option/any_of/o"
+                    ],
+                    "message": "count of .lock.pkgs is 2",
+                    "name": "count of .lock.pkgs is 1"
+                  }
+                ],
+                "inputs": [],
+                "kind": "option",
+                "locations": [
+                  "$policy:/requirements/s/checks/option/any_of/o"
+                ],
+                "message": "",
+                "name": "o"
+              },
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/repos/0"
+                        ],
+                        "name": "zz",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "assertion",
+                    "locations": [
+                      "$policy:/requirements/s/checks/option/any_of/p"
+                    ],
+                    "message": "zz is missing",
+                    "name": "zz is 1"
+                  }
+                ],
+                "inputs": [],
+                "kind": "option",
+                "locations": [
+                  "$policy:/requirements/s/checks/option/any_of/p"
+                ],
+                "message": "",
+                "name": "p"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/repos/0/lock/pkgs/0",
+                  "/repos/0/lock/pkgs/1"
+                ],
+                "name": ".lock.pkgs[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "n": 1
+                  },
+                  {
+                    "n": 2
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/repos/0/lock/pkgs/0",
+                  "/repos/0/lock/pkgs/1"
+                ],
+                "name": "count of .lock.pkgs",
+                "value": 2
+              },
+              {
+                "locations": [
+                  "/repos/0"
+                ],
+                "name": "zz",
+                "outcome": "absent",
+                "value": null
+              }
+            ],
+            "message": "o: count of .lock.pkgs is 2; p: zz is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "repo"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "several",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/repos/0/lock/pkgs/0/n",
+                      "/repos/0/lock/pkgs/1/n"
+                    ],
+                    "name": "sum of .lock.pkgs.n",
+                    "value": 3
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/several/assert/1"
+                ],
+                "message": "sum of .lock.pkgs.n is 3",
+                "name": "sum of .lock.pkgs.n is 1"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/repos/0/lock/pkgs/0/n",
+                  "/repos/0/lock/pkgs/1/n"
+                ],
+                "name": ".lock.pkgs[].n",
+                "outcome": "usable",
+                "value": [
+                  1,
+                  2
+                ]
+              },
+              {
+                "locations": [
+                  "/repos/0/id"
+                ],
+                "name": "id",
+                "outcome": "usable",
+                "value": "t1"
+              },
+              {
+                "locations": [
+                  "/repos/0/lock/pkgs/0/n",
+                  "/repos/0/lock/pkgs/1/n"
+                ],
+                "name": "sum of .lock.pkgs.n",
+                "value": 3
+              }
+            ],
+            "message": "sum of .lock.pkgs.n is 3",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "repo"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
     "description": "a field that is on both sides of a phrase is named once in the message",
     "policy": {"ergo_spec": "{{spec}}", "subjects": {"plain": {"from": "repos", "identified_by": "id"}}, "requirements": {"s": {"subject": "plain", "checks": {"bare": "tags contains none of tags", "dot": "tags contains none of .tags"}}}},
     "cases": [
