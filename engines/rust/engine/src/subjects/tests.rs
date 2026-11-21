@@ -1890,7 +1890,7 @@ fn tally_assertion(sentence: &str, input: Value, params: Value) -> crate::parts:
         aliases: std::collections::BTreeMap::new(),
     };
     let mut verdict = crate::ops::run(&check, &ctx);
-    let row = super::default_said(&check, &ctx, &verdict);
+    let row = crate::ops::message::row_said(&check, &ctx, &verdict);
     let row = crate::ops::key_base::rewrite(
         &check,
         &ctx,

@@ -873,6 +873,16 @@ pub fn said(check: &Check, ctx: &Ctx, verdict: &Verdict) -> Said {
     }
 }
 
+/// What `check` says for `verdict` as a row of its own: a `count of` or a
+/// `sum of` also says the roots and the items it can't read.
+pub fn row_said(check: &Check, ctx: &Ctx, verdict: &Verdict) -> Said {
+    let said = said(check, ctx, verdict);
+    match check {
+        Check::Tally(tally) => tally::row_said(tally, ctx, verdict.cause, said),
+        _ => said,
+    }
+}
+
 fn null_keys(check: &Check, ctx: &Ctx, verdict: &Verdict) -> Vec<String> {
     if matches!(check, Check::AnyOf(_))
         || !matches!(verdict.cause, Cause::Absent | Cause::Null | Cause::Unusable)
