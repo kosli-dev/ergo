@@ -3019,6 +3019,18 @@ fn for_items(
     subject: Value,
     params: Value,
 ) -> Vec<crate::ops::clause::Clause> {
+    for_run(for_line, assertions, subject, params).items
+}
+
+fn for_row(for_line: &str, assertions: &[&str], subject: Value, params: Value) -> (String, String) {
+    let run = for_run(for_line, assertions, subject, params);
+    (
+        run.verdict.cause.name().to_string(),
+        run.message.unwrap_or_default(),
+    )
+}
+
+fn for_run(for_line: &str, assertions: &[&str], subject: Value, params: Value) -> super::Run {
     let line = ergo_policy_sentences::parse_for(for_line).unwrap();
     let parsed: Vec<_> = assertions
         .iter()
@@ -3045,7 +3057,128 @@ fn for_items(
         params: Some(&params),
         aliases: std::collections::BTreeMap::new(),
     };
-    line.run(&ctx).items
+    line.run(&ctx)
+}
+
+#[test]
+fn a_for_line_says_every_root_and_caps_only_items() {
+    assert_eq!(
+        for_row(
+            "every xs as x",
+            &[
+                "x.v is at least $params.a",
+                "x.v is at most $params.b",
+                "x.w is $params.c",
+                "x.u is in $params.d",
+            ],
+            json!({"xs": [{"v": 1, "w": 1, "u": 1}]}),
+            json!({}),
+        ),
+        (
+            "absent".to_string(),
+            "$params.a is missing; $params.b is missing; $params.c is missing; $params.d is missing"
+                .to_string()
+        )
+    );
+}
+
+#[test]
+fn a_count_under_the_line_names_the_outer_item_before_each_inner_item() {
+    assert_eq!(
+        for_row(
+            "every gs as g",
+            &["count of g.es whose v is at least $params.min is 0"],
+            json!({"gs": [{"es": [{}, {}]}, {"es": [{}, {"v": 2}]}]}),
+            json!({"min": "s"}),
+        ),
+        (
+            "unusable".to_string(),
+            "$params.min is \"s\", which isn't a number; item 1 of gs: item 1 of g.es: v is missing; item 1 of gs: item 2 of g.es: v is missing; item 2 of gs: item 1 of g.es: v is missing"
+                .to_string()
+        )
+    );
+    assert_eq!(
+        for_row(
+            "every gs as g",
+            &["sum of g.rs.n is 3"],
+            json!({"gs": [{"rs": [{"n": "a"}, {}]}, {"rs": [{"n": null}]}]}),
+            json!({}),
+        ),
+        (
+            "unusable".to_string(),
+            "item 1 of gs: item 1 of g.rs: n is \"a\", which isn't a number; item 1 of gs: item 2 of g.rs: n is missing; item 2 of gs: item 1 of g.rs: n is null"
+                .to_string()
+        )
+    );
+}
+
+#[test]
+fn two_sentences_walking_one_list_say_its_items_in_list_order() {
+    assert_eq!(
+        for_row(
+            "every xs as x",
+            &["every x.ys.n is 1", "every x.ys.m is 1"],
+            json!({"xs": [{"ys": [{"n": 1, "m": 2}, {"m": 1}]}]}),
+            json!({}),
+        )
+        .1,
+        "item 1 of xs: item 1 of x.ys: m is 2; item 1 of xs: item 2 of x.ys: n is missing"
+    );
+}
+
+#[test]
+fn a_value_that_holds_a_semicolon_stays_whole_on_a_second_list() {
+    assert_eq!(
+        for_row(
+            "every ws as w, some ys whose n is at least w.z and whose n is at most u as y",
+            &["y.n exists"],
+            json!({"ws": [{"z": "p; q"}], "ys": [{"n": 1}, {"n": 2}]}),
+            json!({}),
+        )
+        .1,
+        "item 1 of ws: w.z is \"p; q\", which isn't a number; item 1 of ws: item 1 of ys: u is missing; item 1 of ws: item 2 of ys: u is missing"
+    );
+}
+
+#[test]
+fn a_key_from_params_is_said_once_before_the_items_of_a_count_under_the_line() {
+    let gs: Vec<Value> = (0..5).map(|_| json!({"es": [{"v": {}}]})).collect();
+    assert_eq!(
+        for_row(
+            "every gs as g",
+            &["count of g.es.v that is m named by $params.k is 0"],
+            json!({ "gs": gs }),
+            json!({}),
+        )
+        .1,
+        "$params.k is missing; item 1 of gs: item 1 of g.es: v: m is missing; item 2 of gs: item 1 of g.es: v: m is missing; item 3 of gs: item 1 of g.es: v: m is missing; and 2 more"
+    );
+}
+
+#[test]
+fn the_roots_of_two_sentences_keep_their_order() {
+    assert_eq!(
+        for_row(
+            "every xs as x",
+            &["x.v is $params.a", "x.v is $params.b"],
+            json!({"xs": [{"v": 1}]}),
+            json!({"a": null}),
+        ),
+        (
+            "absent".to_string(),
+            "$params.a is null; $params.b is missing".to_string()
+        )
+    );
+    assert_eq!(
+        for_row(
+            "every xs as x",
+            &["x.v is at least $params.b", "x.w is at least $params.a"],
+            json!({"xs": [{"v": 1, "w": 1}]}),
+            json!({"a": "s"}),
+        )
+        .1,
+        "$params.b is missing; $params.a is \"s\", which isn't a number"
+    );
 }
 
 fn tree(clauses: &[crate::ops::clause::Clause]) -> Vec<String> {
