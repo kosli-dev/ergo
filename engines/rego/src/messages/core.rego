@@ -395,9 +395,9 @@ _m_unkeyed_said(subj, check, cause) := [] if {
 	[c |
 		some side in _m_tally_parts(check)
 		not _m_keyed_unread(subj, side[_basic_form(side)])
-		cs := [x[1] | some x in _m_tally_said(subj, side, cause)]
+		cs := _m_tally_said(subj, side, cause)
 		count(cs) > 0
-		c := _m_joined(cs)
+		c := _m_clauses_text(_m_clauses_shown(cs))
 	],
 )
 
