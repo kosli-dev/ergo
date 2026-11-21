@@ -1338,7 +1338,7 @@ fn before_key<'a>(path: &Path, at: &Ctx<'a>) -> Option<(Path, path::Read<'a>, Ca
 fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
     let mut at = ctx.clone();
     let leaf_roots = message::root_clauses(&[&*walk.check], ctx);
-    let leaf_walked = message::walked_root_clauses(&[&*walk.check], ctx);
+    let leaf_walked = message::walked_root_clauses_with(&[&*walk.check], ctx, true);
     walked
         .items
         .iter()

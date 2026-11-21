@@ -2180,6 +2180,10 @@ fn root_reads_with(
 }
 
 pub fn walked_root_clauses(checks: &[&Check], ctx: &Ctx) -> Vec<Clause> {
+    walked_root_clauses_with(checks, ctx, false)
+}
+
+pub fn walked_root_clauses_with(checks: &[&Check], ctx: &Ctx, empty: bool) -> Vec<Clause> {
     checks
         .iter()
         .flat_map(|check| {
@@ -2190,7 +2194,7 @@ pub fn walked_root_clauses(checks: &[&Check], ctx: &Ctx) -> Vec<Clause> {
                 })
                 .filter_map(|root| {
                     lists::walked_root_fault(check, root, ctx)
-                        .filter(|(cause, _)| *cause != Cause::Value)
+                        .filter(|(cause, _)| empty || *cause != Cause::Value)
                         .map(|(cause, text)| Clause::root(&name::name(root), cause, text))
                 })
         })
