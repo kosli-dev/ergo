@@ -5,7 +5,8 @@
     "cases": [
       {
         "description": "picks the member whose field has the value, whatever its key, in key order",
-        "rules": ["subjects.every.member", "sentence.subject.member"],
+        "rules": ["subjects.every.member", "sentence.subject.member", "added.text"],
+        "expressions": {"approved": {"$min_subjects": "count(matching(every member of record.evidence)) >= 1", "$unique_ids": "count(missing(ids(every member of record.evidence))) + count(repeated(ids(every member of record.evidence))) == 0"}},
         "input": {"records": [{"id": "r1", "evidence": {"sign-off": {"kind": "approval", "status": "COMPLETE"}, "build-7": {"kind": "scan", "status": "DONE"}}}]},
         "compliant": true,
         "results": [
@@ -442,7 +443,8 @@
     "cases": [
       {
         "description": "the same key in two records clashes, and identified_by reads the id inside each member",
-        "rules": ["subjects.every.member.id"],
+        "rules": ["subjects.every.member.id", "added.text"],
+        "expressions": {"by id": {"$min_subjects": "count(matching(every member of records.evidence)) >= 1", "$unique_ids": "count(missing(ids(every member of records.evidence))) + count(repeated(ids(every member of records.evidence))) == 0"}, "by key": {"$min_subjects": "count(matching(every member of records.evidence)) >= 1", "$unique_ids": "count(missing(ids(every member of records.evidence))) + count(repeated(ids(every member of records.evidence))) == 0"}},
         "input": {"records": [{"id": "r1", "evidence": {"sign-off": {"attestation_id": "a-11", "status": "COMPLETE"}}}, {"id": "r2", "evidence": {"sign-off": {"attestation_id": "a-12", "status": "PENDING"}}}]},
         "compliant": false,
         "results": [
@@ -749,7 +751,8 @@
     "cases": [
       {
         "description": "fails min_subjects as unusable, names every place that broke, and still checks the members it read",
-        "rules": ["subjects.every.member.not_an_object", "subjects.every.member"],
+        "rules": ["subjects.every.member.not_an_object", "subjects.every.member", "added.text"],
+        "expressions": {"done": {"$min_subjects": "every member of records.evidence can be read", "$unique_ids": "count(missing(ids(every member of records.evidence))) + count(repeated(ids(every member of records.evidence))) == 0"}},
         "input": {"records": [{"evidence": {"a": {"status": 1}}}, {"evidence": [{"status": 2}]}, {"evidence": "x"}, {}, {"evidence": null}, {"evidence": {}}]},
         "compliant": false,
         "results": [
@@ -1083,7 +1086,8 @@
     "cases": [
       {
         "description": "reads the members of the one object it ends at, and an empty object gives none",
-        "rules": ["subjects.every.member"],
+        "rules": ["subjects.every.member", "added.text"],
+        "expressions": {"re": {"$min_subjects": "count(matching(every member of evidence)) >= 1", "$unique_ids": "count(missing(ids(every member of evidence))) + count(repeated(ids(every member of evidence))) == 0"}, "rq": {"$min_subjects": "every member of p.q can be read", "$unique_ids": "count(missing(ids(every member of p.q))) + count(repeated(ids(every member of p.q))) == 0"}},
         "input": {"evidence": {"b": {"status": 1}, "a": {"status": 2}}, "p": {"q": {}}},
         "compliant": true,
         "results": [
@@ -1376,7 +1380,8 @@
     "cases": [
       {
         "description": "reads the members of the input",
-        "rules": ["subjects.every.member"],
+        "rules": ["subjects.every.member", "added.text"],
+        "expressions": {"t": {"$min_subjects": "count(matching(every member of $input)) >= 1", "$unique_ids": "count(missing(ids(every member of $input))) + count(repeated(ids(every member of $input))) == 0"}},
         "input": {"b": {"status": 1}, "a": {"status": 2}},
         "compliant": true,
         "results": [
@@ -1509,7 +1514,8 @@
     "cases": [
       {
         "description": "reads the members of each parent, and a parent that isn't an object fails as not_an_object",
-        "rules": ["subjects.every.member", "subjects.chain.not_an_object"],
+        "rules": ["subjects.every.member", "subjects.chain.not_an_object", "added.text"],
+        "expressions": {"k": {"$min_subjects": "count(matching(every member of record)) >= 1", "$unique_ids": "count(missing(ids(every member of record))) + count(repeated(ids(every member of record))) == 0"}},
         "input": {"records": [{"y": {"n": "b"}, "x": {"n": "r1"}}, [1], "t"]},
         "compliant": false,
         "results": [
