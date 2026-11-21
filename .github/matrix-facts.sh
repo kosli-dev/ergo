@@ -141,7 +141,9 @@ def missing(base_row, head_row):
     have = " ".join(fragments(head_row)) if head_row is not None else ""
     lost = []
     for text in fragments(base_row):
-        for part in text.split(", and "):
+        for part in re.split(r"; |, and (?!\d+ more)", text):
+            if re.fullmatch(r"(and )?\d+ more", part):
+                continue
             if part not in have and part not in lost:
                 lost.append(part)
     return lost
