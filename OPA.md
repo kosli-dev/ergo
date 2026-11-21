@@ -192,6 +192,8 @@ const parseTime = (v) => {
 const policy = await loadPolicy(wasm, undefined, { "time.parse_rfc3339_ns": parseTime });
 ```
 
+The module needs about 270 KB of memory before it starts, for the data `ergo.rego` compiles to. `@open-policy-agent/opa-wasm` gives a module 5 pages of 64 KB, 320 KB, when `loadPolicy` gets no memory argument, and that is enough today. If your host creates its own `WebAssembly.Memory`, give it more than that, for example `{ initial: 16 }` (1 MB), to leave room. The number can change between releases. When the memory is too small, loading fails before anything is evaluated, with an error like `WebAssembly.instantiate(): data segment 4 is out of bounds`.
+
 ## Compiling a policy
 
 **Experimental:** `ergo.compile` may change or go away in any version of Ergo.

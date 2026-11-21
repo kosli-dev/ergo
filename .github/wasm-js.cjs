@@ -38,7 +38,7 @@ const builtinsOf = (policy) => {
   return Object.keys(JSON.parse(Buffer.from(memory.slice(start, memory.indexOf(0, start))).toString()));
 };
 
-Promise.all([load(runtimeDir, { initial: 16 }), load(ergoDir)]).then(async ([policy, ergo]) => {
+Promise.all([load(runtimeDir, { initial: 32 }), load(ergoDir)]).then(async ([policy, ergo]) => {
   const outside = builtinsOf(ergo).filter((b) => b !== "time.parse_rfc3339_ns");
   if (outside.length > 0) {
     console.error(`ergo uses built-ins that OPA's Wasm build runs outside the module: ${outside.join(", ")}`);

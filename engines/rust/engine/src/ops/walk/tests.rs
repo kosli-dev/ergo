@@ -17,7 +17,6 @@ fn ctx<'a>(subject: &'a Value, input: &'a Value, params: Option<&'a Value>) -> C
     Ctx {
         label: None,
         item_by_item: false,
-        in_option: false,
         subject: Located {
             value: subject,
             location: Location::input_root().key("s"),
@@ -678,7 +677,10 @@ fn judged(sentence: &str, items: Value, params: Value) -> Vec<Option<(Cause, Str
     let walked = walk(&walk_check.path, &outer, Options::default());
     judge(&walk_check, &walked, &outer)
         .into_iter()
-        .map(|said| said.failure.map(|failure| (failure.cause, failure.msg)))
+        .map(|said| {
+            said.failure
+                .map(|(failure, _)| (failure.cause, failure.msg))
+        })
         .collect()
 }
 
@@ -1260,6 +1262,577 @@ fn an_item_says_once_a_value_its_own_read_and_the_key_of_a_map_it_cant_read_both
             "item 1 of items: v is null".to_string()
         ))]
     );
+}
+
+fn row_of(sentence: &str, subject: Value, params: Value) -> Run {
+    let Check::Walk(walk_check) = lowered(sentence) else {
+        panic!("{sentence} is not every or some");
+    };
+    let input = json!({});
+    let context = ctx(&subject, &input, Some(&params));
+    run(&walk_check, &context)
+}
+
+#[test]
+fn a_walk_row_keeps_roots_and_items_apart() {
+    use crate::ops::clause::Kind;
+    let out = row_of(
+        "every xs.v is at least $params.min",
+        json!({"xs": [{"v": 1}, {"v": 2}, {}]}),
+        json!({"min": "s"}),
+    );
+    let kinds: Vec<Kind> = out.parts.iter().map(|part| part.kind).collect();
+    assert_eq!(kinds, [Kind::Root, Kind::Item]);
+    assert_eq!(
+        out.parts[0].text,
+        "$params.min is \"s\", which isn't a number"
+    );
+    assert_eq!(out.parts[1].name, "item 3 of xs");
+    assert_eq!(out.parts[1].said[0].text, "v is missing");
+    assert_eq!(
+        out.message.as_deref(),
+        Some("$params.min is \"s\", which isn't a number; item 3 of xs: v is missing")
+    );
+}
+
+#[test]
+fn an_item_value_that_holds_a_semicolon_or_an_and_stays_whole_in_its_clause() {
+    use crate::ops::clause::Kind;
+    let out = row_of(
+        "every xs.v is \"a\"",
+        json!({"xs": [{"v": "p; q, and r"}]}),
+        json!({}),
+    );
+    assert_eq!(out.parts.len(), 1);
+    assert_eq!(out.parts[0].kind, Kind::Item);
+    assert_eq!(out.parts[0].name, "item 1 of xs");
+    assert_eq!(out.parts[0].said.len(), 1);
+    assert_eq!(out.parts[0].said[0].text, "v is \"p; q, and r\"");
+}
+
+fn thing_row(sentence: &str, subject: Value, params: Value) -> Run {
+    let Check::Walk(walk_check) = lowered(sentence) else {
+        panic!("{sentence} is not every or some");
+    };
+    let input = json!({});
+    let mut context = ctx(&subject, &input, Some(&params));
+    context.label = Some("thing".to_string());
+    run(&walk_check, &context)
+}
+
+fn said_row(sentence: &str, subject: Value, params: Value) -> (Cause, String) {
+    let out = thing_row(sentence, subject, params);
+    (out.verdict.cause, out.message.unwrap_or_default())
+}
+
+const KEYS_THAT_CANT_BE_READ: [(&str, &str); 3] = [
+    ("{}", "$params.k is missing"),
+    ("{\"k\": null}", "$params.k is null"),
+    ("{\"k\": 3}", "$params.k is 3, which isn't text"),
+];
+
+fn said_beside_each_key(form: &str, es: Value) -> Vec<(Cause, String)> {
+    KEYS_THAT_CANT_BE_READ
+        .iter()
+        .map(|(params, _)| {
+            said_row(
+                &format!("{form} es.v that is m named by $params.k is 1"),
+                json!({"es": es.clone()}),
+                serde_json::from_str(params).unwrap(),
+            )
+        })
+        .collect()
+}
+
+fn each_key_then(cause: Cause, items: &str) -> Vec<(Cause, String)> {
+    KEYS_THAT_CANT_BE_READ
+        .iter()
+        .map(|(_, key)| (cause, format!("{key}; {items}")))
+        .collect()
+}
+
+#[test]
+fn an_every_says_a_that_key_it_cant_read_once_and_each_item_its_own_value() {
+    assert_eq!(
+        said_beside_each_key("every", json!([{"v": "s"}, {"v": {}}, {"v": {"m": null}}])),
+        each_key_then(
+            Cause::NotAnObject,
+            "item 1 of es: v is \"s\", which isn't an object; item 2 of es: v: m is missing; item 3 of es: v: m is null"
+        )
+    );
+}
+
+#[test]
+fn a_some_says_the_same_as_every() {
+    assert_eq!(
+        said_beside_each_key("some", json!([{"v": "s"}, {"v": {}}, {"v": {"m": null}}])),
+        each_key_then(
+            Cause::NotAnObject,
+            "item 1 of es: v is \"s\", which isn't an object; item 2 of es: v: m is missing; item 3 of es: v: m is null"
+        )
+    );
+    assert_eq!(
+        said_beside_each_key("some", json!([{"v": {}}, {"v": {}}, {"v": {}}, {"v": {}}])),
+        said_beside_each_key("every", json!([{"v": {}}, {"v": {}}, {"v": {}}, {"v": {}}]))
+    );
+    assert_eq!(
+        said_beside_each_key("some", json!([{"v": {}}, {"v": {"m": null}}]))[0],
+        (
+            Cause::Absent,
+            "$params.k is missing; item 1 of es: v: m is missing; item 2 of es: v: m is null"
+                .to_string()
+        )
+    );
+}
+
+#[test]
+fn an_every_says_a_root_after_the_phrase_and_then_its_items() {
+    assert_eq!(
+        said_row(
+            "every xs.v is at least $params.min",
+            json!({"xs": [{}, {}, {}, {}, {}]}),
+            json!({"min": "s"}),
+        ),
+        (
+            Cause::Unusable,
+            "$params.min is \"s\", which isn't a number; item 1 of xs: v is missing; item 2 of xs: v is missing; item 3 of xs: v is missing; and 2 more"
+                .to_string()
+        )
+    );
+}
+
+#[test]
+fn a_value_that_holds_a_semicolon_stays_whole_in_a_walk_row() {
+    use crate::ops::clause::Kind;
+    let out = thing_row(
+        "every xs whose v is at least $params.min, if any, exists",
+        json!({"xs": [{"v": 1}, {}]}),
+        json!({"min": "a; b"}),
+    );
+    let parts: Vec<(Kind, String)> = out
+        .parts
+        .iter()
+        .map(|part| {
+            (
+                part.kind,
+                crate::ops::clause::text(std::slice::from_ref(part)),
+            )
+        })
+        .collect();
+    assert_eq!(
+        parts,
+        [
+            (
+                Kind::Root,
+                "$params.min is \"a; b\", which isn't a number".to_string()
+            ),
+            (Kind::Item, "item 2 of xs: v is missing".to_string()),
+        ]
+    );
+}
+
+#[test]
+fn an_every_says_a_key_that_isnt_text_once_beside_an_item_that_says_nothing_of_its_own() {
+    assert_eq!(
+        said_row(
+            "every es.v that is m named by $params.k exists",
+            json!({"es": [{"v": {"m": {"a": 1}}}, {"v": {}}]}),
+            json!({"k": 3}),
+        ),
+        (
+            Cause::Unusable,
+            "$params.k is 3, which isn't text; item 2 of es: v: m is missing".to_string()
+        )
+    );
+}
+
+fn records(sentence: &str, es: Value, params: Value) -> Vec<(Value, Value, Value)> {
+    thing_row(sentence, json!({"es": es}), params)
+        .rich
+        .iter()
+        .map(|record| {
+            (
+                record["path"].clone(),
+                record["value"].clone(),
+                record.get("ergo/outcome").cloned().unwrap_or(Value::Null),
+            )
+        })
+        .collect()
+}
+
+#[test]
+fn a_walk_item_beside_a_key_it_cant_read_holds_the_value_before_the_key_with_the_reads_outcome() {
+    let sentence = "every es.v that is m named by $params.k is 1";
+    assert_eq!(
+        records(sentence, json!([{"v": {}}, {"v": {"m": null}}]), json!({})),
+        [
+            (json!("es[0].v.m"), json!(null), json!("absent")),
+            (json!("es[1].v.m"), json!(null), json!("absent")),
+        ]
+    );
+    assert_eq!(
+        records(
+            sentence,
+            json!([{"v": {}}, {"v": {"m": null}}]),
+            json!({"k": null})
+        ),
+        [
+            (json!("es[0].v.m"), json!(null), json!("absent")),
+            (json!("es[1].v.m"), json!(null), json!("null")),
+        ]
+    );
+    assert_eq!(
+        records(sentence, json!([{"v": {"m": "s"}}]), json!({"k": 3})),
+        [(json!("es[0].v.m"), json!("s"), json!("unusable"))]
+    );
+}
+
+#[test]
+fn a_walk_row_says_a_root_its_items_cant_read_before_them() {
+    assert_eq!(
+        said_row(
+            "every es whose v contains $params.x is an object",
+            json!({"es": [{}, {"v": []}, {"v": 3}]}),
+            json!({}),
+        ),
+        (
+            Cause::Unusable,
+            "$params.x is missing; item 1 of es: v is missing; item 3 of es: v is 3, which isn't a list"
+                .to_string()
+        )
+    );
+}
+
+#[test]
+fn an_every_keeps_its_items_beside_a_missing_key() {
+    assert_eq!(
+        said_row(
+            "every es.v that is m named by $params.k is 1",
+            json!({"es": [{"v": {}}, {"v": {"m": null}}]}),
+            json!({}),
+        ),
+        (
+            Cause::Absent,
+            "$params.k is missing; item 1 of es: v: m is missing; item 2 of es: v: m is null"
+                .to_string()
+        )
+    );
+}
+
+#[test]
+fn a_root_value_that_holds_an_and_stays_one_clause_in_a_walk_row() {
+    let out = thing_row(
+        "every xs.v is at least $params.min",
+        json!({"xs": [{"v": 1}, {}]}),
+        json!({"min": "a, and b"}),
+    );
+    let parts: Vec<(Kind, String)> = out
+        .parts
+        .iter()
+        .map(|part| (part.kind, clause::text(std::slice::from_ref(part))))
+        .collect();
+    assert_eq!(
+        parts,
+        [
+            (
+                Kind::Root,
+                "$params.min is \"a, and b\", which isn't a number".to_string()
+            ),
+            (Kind::Item, "item 2 of xs: v is missing".to_string()),
+        ]
+    );
+}
+
+#[test]
+fn a_walk_row_says_the_roots_then_the_lists_own_problem_then_the_items_with_the_worst_cause() {
+    let item = Clause::item(
+        "item 1 of xs",
+        Cause::Absent,
+        String::new(),
+        vec![Clause::said(Cause::Absent, "v is missing".to_string())],
+    );
+    let list = Clause::list("ys", Cause::Value, "ys is []".to_string());
+    let roots = vec![
+        Clause::root("$params.b", Cause::Null, "$params.b is null".to_string()),
+        Clause::root(
+            "$params.a",
+            Cause::Unusable,
+            "$params.a is 3, which isn't text".to_string(),
+        ),
+    ];
+    let (cause, parts) = row_clauses(roots, vec![list], vec![item]);
+    assert_eq!(cause, Cause::Unusable);
+    assert_eq!(
+        clause::text(&clause::shown(&parts)),
+        "$params.a is 3, which isn't text; $params.b is null; ys is []; item 1 of xs: v is missing"
+    );
+}
+
+#[test]
+fn an_item_that_isnt_a_time_says_so_beside_a_time_root_that_cant_be_read() {
+    let items = json!([{"v": 2}, {"v": "2024-01-01T00:00:00Z"}, {}]);
+    let not_a_time = (
+        Cause::Unusable,
+        "item 1 of items: v is 2, which isn't a time written like \"1970-01-01T00:00:00Z\""
+            .to_string(),
+    );
+    for sentence in [
+        "every items whose v is before $params.x exists",
+        "every items whose v is on or after $params.x exists",
+        "some items whose v is before $params.x exists",
+    ] {
+        for params in [json!({}), json!({"x": null}), json!({"x": "s"})] {
+            assert_eq!(
+                own_said(sentence, items.clone(), params, json!({})),
+                vec![
+                    Some(not_a_time.clone()),
+                    None,
+                    Some((Cause::Absent, "item 3 of items: v is missing".to_string())),
+                ],
+                "{sentence}"
+            );
+        }
+    }
+}
+
+#[test]
+fn an_item_a_that_root_leaves_undecided_still_says_what_the_phrase_cant_use_in_its_own_value() {
+    assert_eq!(
+        judged(
+            "every items.v that is on or after $params.x is 1",
+            json!([{"v": "2024-01-01T00:00:00Z"}, {"v": 2}]),
+            json!({"x": null}),
+        ),
+        vec![
+            Some((
+                Cause::Unusable,
+                "item 1 of items: v is \"2024-01-01T00:00:00Z\", which isn't a number".to_string()
+            )),
+            Some((
+                Cause::Unusable,
+                "item 2 of items: v is 2, which isn't a time written like \"1970-01-01T00:00:00Z\""
+                    .to_string()
+            )),
+        ]
+    );
+}
+
+#[test]
+fn an_item_a_whose_that_doesnt_read_it_leaves_undecided_says_nothing_of_its_own() {
+    assert_eq!(
+        judged(
+            "every items.b whose $params.z is 1 exists",
+            json!([{"b": 1}, null, {"b": "s"}]),
+            json!({}),
+        ),
+        vec![None, None, None]
+    );
+}
+
+#[test]
+fn a_whose_root_that_isnt_a_list_is_said_first_and_keeps_the_lists_own_problem() {
+    let root = "$params.z is \"s\", which isn't a list";
+    for form in ["every", "some"] {
+        let sentence = format!("{form} es whose v is in $params.z exists");
+        for (subject, list) in [
+            (json!({}), "es is missing"),
+            (json!({"es": null}), "es is null"),
+            (json!({"es": []}), "es is []"),
+            (json!({"es": 3}), "es is 3, which isn't a list or an object"),
+        ] {
+            assert_eq!(
+                said_row(&sentence, subject, json!({"z": "s"})),
+                (Cause::Unusable, format!("{root}; {list}")),
+                "{sentence}"
+            );
+        }
+    }
+}
+
+#[test]
+fn a_whose_root_that_isnt_a_list_keeps_what_each_item_says_on_another_condition() {
+    assert_eq!(
+        said_row(
+            "every xs whose v is at least $params.x and whose w is in $params.y exists",
+            json!({"xs": [{"v": "s", "w": 1}, {"w": 1}, null]}),
+            json!({"x": 2, "y": 3}),
+        ),
+        (
+            Cause::NotAnObject,
+            "$params.y is 3, which isn't a list; item 1 of xs: v is \"s\", which isn't a number; item 2 of xs: v is missing; item 3 of xs is null, which isn't an object".to_string()
+        )
+    );
+}
+
+#[test]
+fn an_item_says_nothing_of_its_own_for_a_condition_whose_list_root_isnt_a_list() {
+    assert_eq!(
+        said_row(
+            "every xs.v whose kind is not in $params.l, if any, is 1",
+            json!({"xs": [{"v": 2, "kind": "a"}]}),
+            json!({"l": "text"}),
+        ),
+        (
+            Cause::Unusable,
+            "$params.l is \"text\", which isn't a list".to_string()
+        )
+    );
+}
+
+#[test]
+fn a_walk_row_takes_the_worst_cause_of_a_list_root_said_beside_its_items() {
+    assert_eq!(
+        said_row(
+            "every rows whose v is in $params.a.name and whose v is in $params.os.name exists",
+            json!({"rows": [{"v": "bob"}]}),
+            json!({"a": [{"name": "bob"}, {}], "os": [{"name": "bob"}, {"name": 3}]}),
+        ),
+        (
+            Cause::Unusable,
+            "$params.os[].name is [\"bob\", 3], which isn't a list of one kind of value; item 2 of $params.a: name is missing".to_string()
+        )
+    );
+}
+
+#[test]
+fn a_list_root_after_the_phrase_that_isnt_a_list_is_said_alone_whatever_the_list_holds() {
+    let root = "$params.z is \"s\", which isn't a list".to_string();
+    for sentence in [
+        "every es.v is in $params.z",
+        "some es.v is not in $params.z",
+        "every es.v, if any, matches $params.z",
+    ] {
+        for subject in [
+            json!({}),
+            json!({"es": null}),
+            json!({"es": []}),
+            json!({"es": [{"v": "a"}, {}, null]}),
+        ] {
+            assert_eq!(
+                said_row(sentence, subject, json!({"z": "s"})),
+                (Cause::Unusable, root.clone()),
+                "{sentence}"
+            );
+        }
+        assert_eq!(
+            said_row(sentence, json!({"es": "t"}), json!({"z": "s"})),
+            (
+                Cause::Unusable,
+                format!("{root}; es is \"t\", which isn't an object")
+            ),
+            "{sentence}"
+        );
+    }
+}
+
+#[test]
+fn a_list_root_after_the_phrase_is_said_with_the_roots_of_a_whose_and_the_list() {
+    for (subject, list) in [
+        (json!({}), "es is missing"),
+        (json!({"es": null}), "es is null"),
+    ] {
+        assert_eq!(
+            said_row(
+                "some es whose v is in $params.z is in $params.y",
+                subject,
+                json!({"y": "s"}),
+            ),
+            (
+                Cause::Unusable,
+                format!("$params.y is \"s\", which isn't a list; $params.z is missing; {list}")
+            )
+        );
+    }
+}
+
+#[test]
+fn a_walk_whose_key_step_cant_be_read_says_the_key_then_each_root_after_the_phrase() {
+    for (subject, root) in [
+        (json!({"xs": []}), "q is missing"),
+        (json!({"xs": [], "q": null}), "q is null"),
+    ] {
+        assert_eq!(
+            said_row(
+                "every xs named by $params.k, if any, equals q",
+                subject.clone(),
+                json!({}),
+            ),
+            (Cause::Absent, format!("$params.k is missing; {root}"))
+        );
+        assert_eq!(
+            said_row("some xs named by $params.k equals q", subject, json!({})),
+            (
+                Cause::Absent,
+                format!("$params.k is missing; {root}; xs is []")
+            )
+        );
+    }
+}
+
+#[test]
+fn an_empty_list_root_after_the_phrase_is_said_once_and_not_inside_each_item() {
+    assert_eq!(
+        said_row(
+            "every rows.v is in $params.d.name",
+            json!({"rows": [{"v": "a"}, {"v": "b"}]}),
+            json!({"d": []}),
+        ),
+        (Cause::Value, "$params.d is []".to_string())
+    );
+}
+
+#[test]
+fn an_item_whose_own_list_is_empty_is_said_after_a_root_that_cant_be_used() {
+    use crate::ops::clause::Kind;
+    let out = thing_row(
+        "every pkgs.licenses is in $params.allowed",
+        json!({"pkgs": [{"licenses": ["MIT"]}, {"licenses": []}]}),
+        json!({}),
+    );
+    assert_eq!(out.verdict.cause, Cause::Absent);
+    assert_eq!(
+        out.message.as_deref(),
+        Some("$params.allowed is missing; item 2 of pkgs: licenses is []")
+    );
+    let kinds: Vec<Kind> = out.parts.iter().map(|part| part.kind).collect();
+    assert_eq!(kinds, [Kind::Root, Kind::Item]);
+    assert_eq!(out.parts[1].name, "item 2 of pkgs");
+    assert_eq!(out.failed_items.len(), 1);
+}
+
+#[test]
+fn a_some_says_an_item_whose_own_list_is_empty_after_a_root_that_cant_be_used() {
+    assert_eq!(
+        said_row(
+            "some pkgs.licenses is in $params.allowed",
+            json!({"pkgs": [{"licenses": ["MIT"]}, {"licenses": []}]}),
+            json!({}),
+        ),
+        (
+            Cause::Absent,
+            "$params.allowed is missing; item 2 of pkgs: licenses is []".to_string()
+        )
+    );
+}
+
+#[test]
+fn an_item_that_fails_only_because_of_a_root_that_cant_be_used_says_nothing() {
+    for quantifier in ["every", "some"] {
+        for pkgs in [
+            json!([{"licenses": ["MIT"]}, {"licenses": ["GPL"]}]),
+            json!([{"licenses": []}, {"licenses": []}]),
+        ] {
+            assert_eq!(
+                said_row(
+                    &format!("{quantifier} pkgs.licenses is in $params.allowed"),
+                    json!({"pkgs": pkgs}),
+                    json!({}),
+                ),
+                (Cause::Absent, "$params.allowed is missing".to_string()),
+                "{quantifier} {pkgs}"
+            );
+        }
+    }
 }
 
 #[test]

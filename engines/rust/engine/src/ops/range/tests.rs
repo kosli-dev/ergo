@@ -23,7 +23,6 @@ fn outcome(subject: &str, min: &str, max: &str, outside: bool) -> Cause {
     let ctx = Ctx {
         label: None,
         item_by_item: false,
-        in_option: false,
         subject: Located {
             value: &input["things"][0],
             location: Location::input_root().key("things").index(0),

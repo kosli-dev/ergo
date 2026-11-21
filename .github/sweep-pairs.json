@@ -6608,5 +6608,962 @@
   },
   "params": {},
   "want": "$input.r is \"s\", which isn't a number; item 1 of xs: f is \"s\", which isn't a number"
+ },
+ {
+  "name": "key base text/count whose key and base hold a semicolon",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of o.v named by $params.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "o": "a; b"
+    }
+   ]
+  },
+  "params": {
+   "k": [
+    "x; y"
+   ]
+  },
+  "want": "$params.k is [\"x; y\"], which isn't text; o is \"a; b\", which isn't an object"
+ },
+ {
+  "name": "key base text/count whose key and list hold a semicolon",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of o named by $params.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "o": "a; b"
+    }
+   ]
+  },
+  "params": {
+   "k": [
+    "x; y"
+   ]
+  },
+  "want": "$params.k is [\"x; y\"], which isn't text; o is \"a; b\", which isn't a list or an object"
+ },
+ {
+  "name": "key base text/count whose key holds a semicolon and whose list is missing",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of o named by $params.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t"
+    }
+   ]
+  },
+  "params": {
+   "k": [
+    "a; b"
+   ]
+  },
+  "want": "$params.k is [\"a; b\"], which isn't text; o is missing"
+ },
+ {
+  "name": "key base text/sum whose key and base hold a comma and",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "sum of o.v named by $params.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "o": "a, and b"
+    }
+   ]
+  },
+  "params": {
+   "k": [
+    "x, and y"
+   ]
+  },
+  "want": "$params.k is [\"x, and y\"], which isn't text; o is \"a, and b\", which isn't an object"
+ },
+ {
+  "name": "key base text/plain check whose key and base hold a semicolon",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "o.v named by $params.k is \"a\""
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "o": "a; b"
+    }
+   ]
+  },
+  "params": {
+   "k": [
+    "x; y"
+   ]
+  },
+  "want": "$params.k is [\"x; y\"], which isn't text; o is \"a; b\", which isn't an object"
+ },
+ {
+  "name": "key base text/count of two lists whose keys are joined with and",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of o named by $params.k plus count of p named by $params.j is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "o": "s"
+    }
+   ]
+  },
+  "params": {
+   "k": 3,
+   "j": 4
+  },
+  "want": "$params.j is 4, which isn't text; $params.k is 3, which isn't text; o is \"s\", which isn't a list or an object; p is missing"
+ },
+ {
+  "name": "key base text/plain check of two paths whose keys are joined with and",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "o.v named by $params.k plus p.w named by $params.j is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "o": "s"
+    }
+   ]
+  },
+  "params": {
+   "k": 3,
+   "j": 4
+  },
+  "want": "$params.j is 4, which isn't text; $params.k is 3, which isn't text; o is \"s\", which isn't an object; p.w is missing"
+ },
+ {
+  "name": "walk roots/every that key missing beside a missing and a null value",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every es.v that is m named by $params.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {}
+      },
+      {
+       "v": {
+        "m": null
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "want": "$params.k is missing; item 1 of es: v: m is missing; item 2 of es: v: m is null"
+ },
+ {
+  "name": "walk roots/some that key null beside four missing values",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "some es.v that is m named by $params.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "k": null
+  },
+  "want": "$params.k is null; item 1 of es: v: m is missing; item 2 of es: v: m is missing; item 3 of es: v: m is missing; and 1 more"
+ },
+ {
+  "name": "walk roots/every that key not text beside a value that isn't an object",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every es.v that is m named by $params.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {
+        "m": "s"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "k": 3
+  },
+  "want": "$params.k is 3, which isn't text; item 1 of es: v: m is \"s\", which isn't an object"
+ },
+ {
+  "name": "walk roots/every that key not text beside a focus that isn't an object",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every es.v that is m named by $params.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": "s"
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {
+        "m": null
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "k": 3
+  }
+ },
+ {
+  "name": "walk roots/some that key null beside a focus that is null",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "some es.v that is m named by $params.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": null
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "k": null
+  }
+ },
+ {
+  "name": "walk roots/every whose key not text beside items that fail their other field",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every rs whose zz is m named by $params.k exists"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "rs": [
+      {
+       "v": 1
+      },
+      {
+       "v": 2
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "k": 3
+  }
+ },
+ {
+  "name": "walk roots/every whose root after is in missing beside a missing value",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every xs whose v is in $params.l, if any, exists"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": 1
+      },
+      {}
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "want": "$params.l is missing; item 2 of xs: v is missing"
+ },
+ {
+  "name": "walk roots/every that key null beside a value that holds a semicolon",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every es.v that is m named by $params.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {
+        "m": "p; q"
+       }
+      },
+      {
+       "v": {}
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "k": null
+  },
+  "want": "$params.k is null; item 1 of es: v: m is \"p; q\", which isn't an object; item 2 of es: v: m is missing"
+ },
+ {
+  "name": "walk rows/every key after the phrase and the part before it, on an empty list",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id",
+     "has": {
+      "p": "pp"
+     }
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every es.v is p.m named by $params.k"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "pp": {
+      "m": null
+     },
+     "es": []
+    }
+   ]
+  },
+  "params": {},
+  "want": "$params.k is missing; p.m is null"
+ },
+ {
+  "name": "walk rows/every root in a whose beside an empty list",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every es whose v is in $input.z exists"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": []
+    }
+   ]
+  },
+  "params": {},
+  "want": "$input.z is missing; es is []"
+ },
+ {
+  "name": "walk rows/every root after the phrase that holds a semicolon",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every xs.v is at least $params.min"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": 1
+      },
+      {}
+     ]
+    }
+   ]
+  },
+  "params": {
+   "min": "a; b"
+  },
+  "want": "$params.min is \"a; b\", which isn't a number; item 2 of xs: v is missing"
+ },
+ {
+  "name": "walk rows/every two lists in a whose that tie on their cause, the part written first",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id",
+     "has": {
+      "pos": "os"
+     }
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every rows whose v is in pos.name and whose v is in $params.os.name exists"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "os": [
+      {
+       "name": "bob"
+      },
+      {
+       "name": 3
+      }
+     ],
+     "rows": [
+      {
+       "v": "bob"
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "os": [
+    {
+     "name": "bob"
+    },
+    {
+     "name": 3
+    }
+   ]
+  },
+  "want": "$params.os[].name is [\"bob\", 3], which isn't a list of one kind of value; pos[].name is [\"bob\", 3], which isn't a list of one kind of value"
+ },
+ {
+  "name": "walk rows/every two keys on an empty list, a null one after one that isn't text, params not an object",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every es whose zz is m named by $input.k and whose v is m named by $input.j, if any, exists"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "m": {
+      "a": 2
+     },
+     "es": []
+    }
+   ],
+   "j": 3,
+   "k": null
+  },
+  "params": 3,
+  "want": "$input.j is 3, which isn't text; $input.k is null"
+ },
+ {
+  "name": "walk rows/every root before a key from the item, beside an item that isn't an object",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every xs whose tags contains $input.m named by key is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      null,
+      {
+       "key": "a",
+       "tags": [
+        "x"
+       ]
+      },
+      {
+       "tags": [
+        "x"
+       ]
+      }
+     ]
+    }
+   ],
+   "m": null
+  },
+  "params": {}
+ },
+ {
+  "name": "walk rows/every whose root beside four items that fail on their own",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every es whose v is at least $params.min exists"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {},
+      {},
+      {},
+      {}
+     ]
+    }
+   ]
+  },
+  "params": {
+   "min": "s"
+  },
+  "want": "$params.min is \"s\", which isn't a number; item 1 of es: v is missing; item 2 of es: v is missing; item 3 of es: v is missing; and 1 more"
+ },
+ {
+  "name": "walk rows/every item's own empty list beside a root after the phrase that is missing",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every pkgs.licenses is in $params.allowed"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "pkgs": [
+      {
+       "licenses": [
+        "MIT"
+       ]
+      },
+      {
+       "licenses": []
+      }
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "want": "$params.allowed is missing; item 2 of pkgs: licenses is []"
+ },
+ {
+  "name": "walk rows/some item's own empty list in the middle of the path beside a root that isn't a number",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "some xs.ys.v is at least $params.min"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "ys": [
+        {
+         "v": 1
+        }
+       ]
+      },
+      {
+       "ys": []
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "min": "s"
+  },
+  "want": "$params.min is \"s\", which isn't a number; item 2 of xs: ys is []"
+ },
+ {
+  "name": "walk rows/every item's own empty list beside a named by key that is null",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every rs.zz is m named by $input.k"
+     }
+    }
+   }
+  },
+  "input": {
+   "k": null,
+   "things": [
+    {
+     "id": "t",
+     "m": {
+      "a": "a"
+     },
+     "rs": [
+      {
+       "zz": [
+        1
+       ]
+      },
+      {
+       "zz": []
+      }
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "want": "$input.k is null; item 2 of rs: zz is []"
+ },
+ {
+  "name": "walk rows/every only empty lists of its own beside a root that is null says only the root",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every pkgs.licenses starts with $input.p"
+     }
+    }
+   }
+  },
+  "input": {
+   "p": null,
+   "things": [
+    {
+     "id": "t",
+     "pkgs": [
+      {
+       "licenses": []
+      },
+      {
+       "licenses": []
+      }
+     ]
+    }
+   ]
+  },
+  "params": {}
  }
 ]

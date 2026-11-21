@@ -57,7 +57,6 @@ fn verdict_on_input(sentence: &str, input: Value) -> Verdict {
     let ctx = Ctx {
         label: None,
         item_by_item: false,
-        in_option: false,
         subject: Located {
             value: &input["things"][0],
             location: Location::input_root().key("things").index(0),
@@ -641,7 +640,6 @@ fn run_on(sentence: &str, subject: Value, input_rest: Value, params: Value) -> V
     let ctx = Ctx {
         label: None,
         item_by_item: false,
-        in_option: false,
         subject: Located {
             value: &input["things"][0],
             location: Location::input_root().key("things").index(0),
@@ -1209,7 +1207,6 @@ fn failed_items_of(sentence: &str, items: Value, params: Value) -> Vec<Value> {
     let ctx = Ctx {
         label: None,
         item_by_item: false,
-        in_option: false,
         subject: Located {
             value: &input["things"][0],
             location: Location::input_root().key("things").index(0),
@@ -1361,18 +1358,19 @@ fn a_whose_root_that_cant_be_read_leaves_no_failed_item_when_the_item_reads_fine
     }
 }
 
-fn failed_items_with(
+type Read = (String, Value, Vec<String>);
+
+fn ran_with(
     scope: &Scope,
     sentence: &str,
     input: Value,
     aliases: &[(&str, Located)],
-) -> Vec<Value> {
+) -> (Vec<Value>, Vec<Read>) {
     let tree = s::parse_check(sentence).unwrap();
     let check = crate::lower::lower_assertion(&tree.assertions[0], scope).unwrap();
     let ctx = Ctx {
         label: None,
         item_by_item: false,
-        in_option: false,
         subject: Located {
             value: &input["things"][0],
             location: Location::input_root().key("things").index(0),
@@ -1384,11 +1382,19 @@ fn failed_items_with(
             .map(|(name, at)| (name.to_string(), at.clone()))
             .collect(),
     };
-    crate::ops::run_full(&check, &ctx).failed_items.unwrap()
+    let ran = crate::ops::run_full(&check, &ctx);
+    let inputs = ran
+        .verdict
+        .inputs
+        .into_iter()
+        .map(|input| (input.name, input.value, input.locations))
+        .collect();
+    (ran.failed_items.unwrap(), inputs)
 }
 
 #[test]
-fn a_whose_names_a_part_of_the_subject_by_its_alias_with_the_subjects_location() {
+fn a_whose_that_only_a_part_of_the_subject_stops_lists_no_item_and_reads_the_part_at_the_subjects_location()
+ {
     let scope = Scope::new().with_part(
         "w",
         crate::lower::PartDef {
@@ -1397,20 +1403,23 @@ fn a_whose_names_a_part_of_the_subject_by_its_alias_with_the_subjects_location()
         },
     );
     let input = json!({"things": [{"id": "t", "meta": {}, "items": [{"lo": 1, "s": "ok"}]}]});
-    let failed = failed_items_with(
+    let (failed, inputs) = ran_with(
         &scope,
         "every items whose lo is at least w exists",
         input,
         &[],
     );
-    assert_eq!(
-        named(&failed),
-        [("w", &json!(null), &json!("/things/0/meta"))]
-    );
+    assert!(failed.is_empty());
+    assert!(inputs.contains(&(
+        "w".to_string(),
+        json!(null),
+        vec!["/things/0/meta".to_string()]
+    )));
 }
 
 #[test]
-fn a_whose_names_a_parents_field_with_the_parents_location() {
+fn a_whose_that_only_a_parents_field_stops_lists_no_item_and_reads_the_field_at_the_parents_location()
+ {
     let scope = Scope::new().with_parent("art", BTreeMap::new());
     let input =
         json!({"arts": [{"id": "a"}], "things": [{"id": "t", "items": [{"lo": 1, "s": "ok"}]}]});
@@ -1418,13 +1427,18 @@ fn a_whose_names_a_parents_field_with_the_parents_location() {
         value: &input["arts"][0],
         location: Location::input_root().key("arts").index(0),
     };
-    let failed = failed_items_with(
+    let (failed, inputs) = ran_with(
         &scope,
         "every items whose lo is at least art.q exists",
         input.clone(),
         &[("art", parent)],
     );
-    assert_eq!(named(&failed), [("art.q", &json!(null), &json!("/arts/0"))]);
+    assert!(failed.is_empty());
+    assert!(inputs.contains(&(
+        "art.q".to_string(),
+        json!(null),
+        vec!["/arts/0".to_string()]
+    )));
 }
 
 fn verdict_in(
@@ -1438,7 +1452,6 @@ fn verdict_in(
     let ctx = Ctx {
         label: None,
         item_by_item: false,
-        in_option: false,
         subject: Located {
             value: &input["things"][0],
             location: Location::input_root().key("things").index(0),
@@ -1676,7 +1689,6 @@ fn counted_records(sentence: &str, items: Value, params: Value) -> Vec<Value> {
     let ctx = Ctx {
         label: None,
         item_by_item: false,
-        in_option: false,
         subject: Located {
             value: &input["things"][0],
             location: Location::input_root().key("things").index(0),
@@ -1832,7 +1844,6 @@ fn cause_and_row_in(sentence: &str, input: Value, params: Value) -> (Cause, Stri
     let ctx = Ctx {
         label: None,
         item_by_item: false,
-        in_option: false,
         subject: Located {
             value: &input["things"][0],
             location: Location::input_root().key("things").index(0),
@@ -1842,13 +1853,13 @@ fn cause_and_row_in(sentence: &str, input: Value, params: Value) -> (Cause, Stri
         aliases: BTreeMap::new(),
     };
     let verdict = crate::ops::run(&check, &ctx);
-    let said = super::row_message(
+    let said = super::row_said(
         tally,
         &ctx,
         verdict.cause,
-        super::super::message::pieces(&check, &ctx, &verdict),
+        super::super::message::said(&check, &ctx, &verdict),
     );
-    (verdict.cause, said)
+    (verdict.cause, super::super::message::said_text(&said))
 }
 
 #[test]
@@ -1938,7 +1949,6 @@ fn a_count_whose_row_fails_for_params_it_walks_doesnt_say_its_number() {
     let ctx = Ctx {
         label: None,
         item_by_item: false,
-        in_option: false,
         subject: Located {
             value: &input["things"][0],
             location: Location::input_root().key("things").index(0),
@@ -1951,9 +1961,10 @@ fn a_count_whose_row_fails_for_params_it_walks_doesnt_say_its_number() {
         cause: Cause::Unusable,
         inputs: crate::ops::run(&check, &ctx).inputs,
     };
-    let pieces = super::super::message::pieces(&check, &ctx, &verdict);
+    let said = super::super::message::said(&check, &ctx, &verdict);
+    let row = super::row_said(tally, &ctx, Cause::Unusable, said);
     assert!(
-        !super::row_message(tally, &ctx, Cause::Unusable, pieces).contains("is 0"),
+        !super::super::message::said_text(&row).contains("is 0"),
         "the count's number isn't said"
     );
 }
@@ -2094,7 +2105,6 @@ fn tally_clauses_on(sentence: &str, subject: Value, params: Value) -> Vec<Clause
     let ctx = Ctx {
         label: None,
         item_by_item: false,
-        in_option: false,
         subject: Located {
             value: &input["things"][0],
             location: Location::input_root().key("things").index(0),
@@ -2235,7 +2245,6 @@ fn row_message(sentence: &str, items: Value, params: Value) -> String {
     let ctx = Ctx {
         label: None,
         item_by_item: false,
-        in_option: false,
         subject: Located {
             value: &input["things"][0],
             location: Location::input_root().key("things").index(0),
@@ -2245,12 +2254,12 @@ fn row_message(sentence: &str, items: Value, params: Value) -> String {
         aliases: BTreeMap::new(),
     };
     let verdict = crate::ops::run(&check, &ctx);
-    with_all_items(
+    super::super::message::said_text(&with_all_items(
         tally,
         &ctx,
         verdict.cause,
-        super::super::message::pieces(&check, &ctx, &verdict),
-    )
+        super::super::message::said(&check, &ctx, &verdict),
+    ))
 }
 
 #[test]

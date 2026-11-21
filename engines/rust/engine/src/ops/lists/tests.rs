@@ -19,7 +19,6 @@ fn on(subject: Value, params: Option<Value>, run: impl Fn(&Ctx) -> Verdict) -> V
     let ctx = Ctx {
         label: None,
         item_by_item: false,
-        in_option: false,
         subject: Located {
             value: &input["things"][0],
             location: Location::input_root().key("things").index(0),
@@ -717,7 +716,6 @@ fn flawed_with(check: &Check, params: Value) -> bool {
     let ctx = Ctx {
         label: None,
         item_by_item: false,
-        in_option: false,
         subject: Located {
             value: &input["things"][0],
             location: Location::input_root().key("things").index(0),
@@ -878,7 +876,6 @@ fn a_walk_names_the_path_with_brackets_and_lists_where_each_value_was_read() {
     let ctx = Ctx {
         label: None,
         item_by_item: false,
-        in_option: false,
         subject: Located {
             value: &input["things"][0],
             location: Location::input_root().key("things").index(0),
@@ -907,7 +904,6 @@ fn steps_walk(w: Value, after_x: Vec<Step>) -> Walked {
     let ctx = Ctx {
         label: None,
         item_by_item: false,
-        in_option: false,
         subject: Located {
             value: &input["things"][0],
             location: Location::input_root().key("things").index(0),
@@ -1030,7 +1026,6 @@ fn a_key_read_from_a_list_input_says_the_input_isnt_an_object_whatever_the_sente
         let ctx = Ctx {
             label: None,
             item_by_item: true,
-            in_option: false,
             subject: Located {
                 value: &item,
                 location: Location::input_root(),
@@ -1160,7 +1155,6 @@ fn in_ignoring_case_names_the_field_that_isnt_text() {
         let ctx = Ctx {
             label: None,
             item_by_item: false,
-            in_option: false,
             subject: Located {
                 value: &input["things"][0],
                 location: Location::input_root().key("things").index(0),

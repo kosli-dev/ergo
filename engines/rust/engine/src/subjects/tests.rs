@@ -1838,18 +1838,16 @@ fn merge_runs_keeps_the_rows_of_the_first_run_whatever_the_length_of_the_others(
     assert!(super::merge_runs(Vec::new(), &[&long]).is_empty());
 }
 
-fn tally_message(sentence: &str, subject: Value, params: Value) -> String {
+fn tally_assertion(sentence: &str, input: Value, params: Value) -> crate::parts::Part {
     let tree = ergo_policy_sentences::parse_check(sentence).unwrap();
     let check =
         crate::lower::lower_assertion(&tree.assertions[0], &crate::lower::Scope::new()).unwrap();
     let crate::ops::Check::Tally(tally) = &check else {
         panic!("{sentence} is not a count or a sum");
     };
-    let input = json!({"things": [subject]});
     let ctx = crate::path::Ctx {
         label: None,
         item_by_item: false,
-        in_option: false,
         subject: crate::path::Located {
             value: &input["things"][0],
             location: crate::path::Location::input_root().key("things").index(0),
@@ -1858,9 +1856,21 @@ fn tally_message(sentence: &str, subject: Value, params: Value) -> String {
         params: Some(&params),
         aliases: std::collections::BTreeMap::new(),
     };
-    let verdict = crate::ops::run(&check, &ctx);
-    let row = super::default_message(&check, &ctx, &verdict);
-    super::tally_part(sentence, verdict.cause, &[], &row, tally, &ctx).message
+    let mut verdict = crate::ops::run(&check, &ctx);
+    let row = super::default_said(&check, &ctx, &verdict);
+    let row = crate::ops::key_base::rewrite(
+        &check,
+        &ctx,
+        &mut verdict.cause,
+        &mut verdict.inputs,
+        row.clone(),
+    )
+    .unwrap_or(row);
+    super::tally_part(sentence, verdict.cause, &[], &row, tally, &ctx)
+}
+
+fn tally_message(sentence: &str, subject: Value, params: Value) -> String {
+    tally_assertion(sentence, json!({"things": [subject]}), params).message
 }
 
 #[test]
@@ -1903,6 +1913,160 @@ fn an_assertion_with_two_counts_says_no_item_either_count_says() {
             "{sentence}"
         );
     }
+}
+
+#[test]
+fn a_counts_assertion_says_only_the_root_before_an_item_key() {
+    let part = tally_assertion(
+        "count of xs whose tags contains $input.m named by key is 1",
+        json!({"m": null, "things": [{"xs": [
+            {"tags": ["x"]},
+            "s",
+            {"key": 3, "tags": ["x"]},
+            {"tags": ["x"]},
+            {"tags": ["x"]}
+        ]}]}),
+        json!({}),
+    );
+    assert_eq!(part.message, "$input.m is null");
+    assert_eq!(part.failures.len(), 5);
+}
+
+#[test]
+fn a_counts_assertion_says_only_its_key_root() {
+    for (params, key) in [
+        (json!({}), "$params.k is missing"),
+        (json!({"k": null}), "$params.k is null"),
+        (json!({"k": 3}), "$params.k is 3, which isn't text"),
+    ] {
+        let part = tally_assertion(
+            "count of es.v that is m named by $params.k is 0",
+            json!({"things": [{"es": [{"v": {}}, {"v": {}}, {"v": {}}, {"v": {}}]}]}),
+            params,
+        );
+        assert_eq!(part.message, key);
+        assert_eq!(part.failures.len(), 4, "{key}");
+    }
+}
+
+#[test]
+fn a_counts_assertion_keeps_a_key_and_a_base_that_hold_a_semicolon_whole() {
+    let part = tally_assertion(
+        "count of o.v named by $params.k is 1",
+        json!({"things": [{"o": "a; b"}]}),
+        json!({"k": ["x; y"]}),
+    );
+    assert_eq!(part.message, "$params.k is [\"x; y\"], which isn't text");
+}
+
+fn walk_assertion(sentence: &str, input: Value, params: Value) -> crate::parts::Part {
+    let tree = ergo_policy_sentences::parse_check(sentence).unwrap();
+    let check =
+        crate::lower::lower_assertion(&tree.assertions[0], &crate::lower::Scope::new()).unwrap();
+    let crate::ops::Check::Walk(walk) = &check else {
+        panic!("{sentence} is not every or some");
+    };
+    let ctx = crate::path::Ctx {
+        label: Some("thing".to_string()),
+        item_by_item: false,
+        subject: crate::path::Located {
+            value: &input["things"][0],
+            location: crate::path::Location::input_root().key("things").index(0),
+        },
+        input: &input,
+        params: Some(&params),
+        aliases: std::collections::BTreeMap::new(),
+    };
+    let run = crate::ops::walk::run(walk, &ctx);
+    super::walk_part(
+        sentence,
+        run.verdict.cause,
+        &[],
+        &[vec![crate::ops::message::Piece::Counted(run.parts.clone())]],
+        &run.failed_items,
+        &run.rich,
+        Some(&run.parts),
+        walk,
+        &ctx,
+        true,
+    )
+}
+
+#[test]
+fn a_walks_assertion_says_a_root_after_the_phrase_once_holds_it_as_an_input_and_lists_each_item() {
+    let part = walk_assertion(
+        "every xs.v is at least $params.min",
+        json!({"things": [{"xs": [{}, {}, {}, {}, {}]}]}),
+        json!({"min": "s"}),
+    );
+    assert_eq!(part.message, "$params.min is \"s\", which isn't a number");
+    assert_eq!(part.cause, crate::cause::Cause::Unusable);
+    assert!(
+        part.inputs
+            .iter()
+            .any(|input| input["name"] == "$params.min")
+    );
+    assert_eq!(part.failures.len(), 5);
+}
+
+fn entry_messages(part: &crate::parts::Part) -> Vec<(String, String)> {
+    part.failures
+        .iter()
+        .map(|entry| match entry {
+            crate::parts::Failure::Item { part, .. } | crate::parts::Failure::List(part) => {
+                (part.name.clone(), part.message.clone())
+            }
+            _ => panic!("an entry that is neither an item nor a list"),
+        })
+        .collect()
+}
+
+#[test]
+fn a_walks_assertion_keeps_an_item_value_that_holds_a_semicolon_whole() {
+    let part = walk_assertion(
+        "every xs.v is 1",
+        json!({"things": [{"xs": [{"v": "p; q"}]}]}),
+        json!({}),
+    );
+    assert_eq!(part.message, "");
+    assert_eq!(
+        entry_messages(&part),
+        [(
+            "item 1 of xs".to_string(),
+            "v is \"p; q\", which isn't a number".to_string()
+        )]
+    );
+}
+
+#[test]
+fn a_walks_assertion_keeps_a_root_that_holds_a_comma_and_whole() {
+    let part = walk_assertion(
+        "every xs.v is at least $params.min",
+        json!({"things": [{"xs": [{}, {}]}]}),
+        json!({"min": "a, and b; c"}),
+    );
+    assert_eq!(
+        part.message,
+        "$params.min is \"a, and b; c\", which isn't a number"
+    );
+    assert_eq!(part.failures.len(), 2);
+}
+
+#[test]
+fn a_walks_assertion_says_an_item_with_several_clauses_once_in_its_entry() {
+    let part = walk_assertion(
+        "every xs.v is in ys.v",
+        json!({"things": [{"xs": [{"v": "a"}], "ys": [{}, 3]}]}),
+        json!({}),
+    );
+    assert_eq!(part.message, "");
+    assert_eq!(
+        entry_messages(&part),
+        [(
+            "item 1 of xs".to_string(),
+            "item 1 of ys: v is missing; item 2 of ys is 3, which isn't an object".to_string()
+        )]
+    );
 }
 
 fn judged_list(items: &[Value], ids: &[Value]) -> Vec<super::Judged<'static>> {

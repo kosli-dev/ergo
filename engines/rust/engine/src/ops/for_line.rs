@@ -1542,7 +1542,7 @@ impl For {
                 let parts = match ran.parts {
                     Some(parts) if walks && !parts.is_empty() => {
                         let mut once: Vec<String> = Vec::new();
-                        for part in parts {
+                        for part in super::clause::lines(&parts) {
                             push_new(&mut once, part);
                         }
                         once
@@ -2533,7 +2533,7 @@ impl For {
             causes.push(verdict.cause);
             let walks = matches!(sentence.check, Check::Walk(_));
             let lines = match (ran.message, ran.parts) {
-                (_, Some(parts)) if walks && !parts.is_empty() => parts,
+                (_, Some(parts)) if walks && !parts.is_empty() => super::clause::lines(&parts),
                 (Some(said), _) if walks => vec![said],
                 _ => vec![super::message::message(&sentence.check, ctx, &verdict)],
             };

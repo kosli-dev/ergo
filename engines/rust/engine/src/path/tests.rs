@@ -57,7 +57,6 @@ impl World {
         let ctx = Ctx {
             label: None,
             item_by_item,
-            in_option: false,
             subject: Located {
                 value: &self.subject,
                 location: Location::input_root().key("s"),
@@ -173,7 +172,6 @@ fn a_key_on_an_alias_that_is_not_an_object_is_not_an_object() {
     let ctx = Ctx {
         label: None,
         item_by_item: false,
-        in_option: false,
         subject: Located {
             value: &w.subject,
             location: Location::input_root(),
@@ -210,7 +208,6 @@ fn a_number_an_alias_holds_is_unusable_as_a_key_not_a_position() {
         let ctx = Ctx {
             label: None,
             item_by_item: false,
-            in_option: false,
             subject: Located {
                 value: &w.subject,
                 location: Location::input_root(),
@@ -233,7 +230,6 @@ fn an_alias_nothing_holds_is_absent_with_no_location() {
     let ctx = Ctx {
         label: None,
         item_by_item: false,
-        in_option: false,
         subject: Located {
             value: &w.subject,
             location: Location::input_root(),
@@ -739,7 +735,6 @@ fn a_part_of_an_alias_starts_at_the_alias_value() {
     let ctx = Ctx {
         label: None,
         item_by_item: false,
-        in_option: false,
         subject: Located {
             value: &w.subject,
             location: Location::input_root(),
@@ -765,7 +760,6 @@ fn a_part_tag_has_the_alias_and_the_id_read_inside_the_part() {
     let ctx = Ctx {
         label: None,
         item_by_item: false,
-        in_option: false,
         subject: Located {
             value: &w.subject,
             location: Location::input_root(),
@@ -785,7 +779,6 @@ fn a_part_tag_id_is_null_without_an_id_path_or_when_the_id_leads_nowhere() {
     let ctx = Ctx {
         label: None,
         item_by_item: false,
-        in_option: false,
         subject: Located {
             value: &w.subject,
             location: Location::input_root(),
@@ -814,7 +807,6 @@ fn a_path_that_does_not_start_at_a_part_has_no_tag() {
     let ctx = Ctx {
         label: None,
         item_by_item: false,
-        in_option: false,
         subject: Located {
             value: &w.subject,
             location: Location::input_root(),
