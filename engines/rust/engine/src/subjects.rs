@@ -2848,8 +2848,12 @@ fn walk_part(
     }
 }
 
-fn walked_list_input(name: &str, lists: &[String], _walk: &ops::walk::Walk, _ctx: &Ctx) -> bool {
+fn walked_list_input(name: &str, lists: &[String], walk: &ops::walk::Walk, ctx: &Ctx) -> bool {
     parts::item_input(name, lists)
+        || (matches!(walk.path.steps.last(), Some(Step::Members))
+            && walk::walked_names(walk, ctx)
+                .first()
+                .is_some_and(|n| n == name))
 }
 
 fn line_of(said: &Clause) -> String {
