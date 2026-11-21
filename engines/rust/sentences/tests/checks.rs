@@ -328,3 +328,80 @@ fn a_check_is_printed_in_canonical_spacing() {
         "every items whose k is 1, if any, is empty"
     );
 }
+
+#[test]
+fn member_of_reads_after_every_some_count_of_and_sum_of() {
+    let Assertion::Quantified { path, options, .. } = assertion("every member of xs.y is 1") else {
+        panic!("not a walk");
+    };
+    assert!(options.member && !options.distinct);
+    assert_eq!(path, with_steps(key("xs"), vec![dot("y")]));
+    let Assertion::Quantified { options, .. } = assertion("some member of xs whose k is 1 exists")
+    else {
+        panic!("not a walk");
+    };
+    assert!(options.member);
+    for line in [
+        "count of member of xs is 1",
+        "sum of member of xs whose k is 1 is 1",
+    ] {
+        let Assertion::Derived { terms, .. } = assertion(line) else {
+            panic!("not derived");
+        };
+        let Term::Derived(derived) = &terms[0] else {
+            panic!("not a count");
+        };
+        assert!(derived.member && !derived.distinct);
+        assert_eq!(derived.path, key("xs"));
+    }
+    let Assertion::Quantified { options, .. } = assertion("every member.x is 1") else {
+        panic!("not a walk");
+    };
+    assert!(!options.member);
+    let ForItem::Walk { member, .. } = &for_line("every rs as r, some member of r.e as m").items[1]
+    else {
+        panic!("not a walk");
+    };
+    assert!(*member);
+    assert!(from("xs whose some member of t is 1").whose.len() == 1);
+}
+
+#[test]
+fn member_of_prints_after_distinct_and_before_the_path() {
+    assert_eq!(
+        printed_check("every  member  of xs is 1"),
+        "every member of xs is 1"
+    );
+    assert_eq!(
+        printed_check("x is count of member of xs"),
+        "x is count of member of xs"
+    );
+    assert_eq!(
+        printed_check("count of member of xs whose k is 1 is 1"),
+        "count of member of xs whose k is 1 is 1"
+    );
+    assert_eq!(
+        printed_check("every distinct member of xs is 1"),
+        "every distinct member of xs is 1"
+    );
+    assert_eq!(
+        printed_for("every member of xs whose k is 1 as m"),
+        "every member of xs whose k is 1 as m"
+    );
+    assert_eq!(
+        printed("xs whose some member of t is 1"),
+        "xs whose some member of t is 1"
+    );
+}
+
+#[test]
+fn member_of_with_distinct_is_written_wrong() {
+    let said = vec!["distinct can't go with every member of".to_string()];
+    assert_eq!(problems("every distinct member of xs is 1"), said);
+    assert_eq!(problems("count of distinct member of xs is 1"), said);
+    assert_eq!(
+        for_problems(&for_line("every distinct member of xs as m"), &[]),
+        said
+    );
+    assert!(problems("every member of xs is 1").is_empty());
+}
