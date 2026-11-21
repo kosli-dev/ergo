@@ -32,6 +32,8 @@ else := "."
 
 _every_word(req) := "every distinct " if _distinct_from(req)
 
+else := "every member of " if _member_from(req)
+
 else := "every " if _every_from(req)
 
 else := ""
