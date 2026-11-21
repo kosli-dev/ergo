@@ -2701,6 +2701,7 @@ impl For {
                 let mut run = run;
                 run.verdict.cause = cause;
                 run.message = Some(super::message::joined(texts.clone()));
+                run.items = self.free_clauses(ctx);
                 return RunItems {
                     run,
                     free: texts,
