@@ -86,3 +86,9 @@ _m_clause(kind, name, cause, text) := {"kind": kind, "name": name, "cause": caus
 _m_item_clause(name, cause, said) := {"kind": "item", "name": name, "cause": cause, "text": "", "said": said}
 
 _m_clause_more(n) := {"kind": "more", "count": n, "name": "", "cause": "value", "text": "", "said": []}
+
+_m_clauses_text(clauses) := concat("; ", [t | some c in clauses; some t in _m_clause_lines(c)])
+
+_m_clause_lines(c) := [c.text] if c.kind in {"root", "list"}
+
+_m_clause_lines(c) := [concat("", ["and ", _literal_text(c.count), " more"])] if c.kind == "more"
