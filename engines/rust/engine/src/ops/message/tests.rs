@@ -53,7 +53,6 @@ fn root_clauses_in(
     let ctx = crate::path::Ctx {
         label: None,
         item_by_item: false,
-        in_option: false,
         subject: located.clone(),
         input,
         params,
@@ -174,7 +173,6 @@ fn a_count_on_an_input_that_is_a_list_says_the_input_once_and_then_its_items() {
     let ctx = crate::path::Ctx {
         label: None,
         item_by_item: false,
-        in_option: false,
         subject: located,
         input: &input,
         params: None,
@@ -315,7 +313,6 @@ fn walked_root_clauses_say_a_walked_root_that_holds_values_of_more_than_one_kind
     let ctx = crate::path::Ctx {
         label: None,
         item_by_item: false,
-        in_option: false,
         subject: crate::path::Located {
             value: &subject,
             location: crate::path::Location::input_root().key("s"),
@@ -346,7 +343,6 @@ fn walked_root_clauses_leave_out_a_list_the_item_holds() {
     let ctx = crate::path::Ctx {
         label: None,
         item_by_item: false,
-        in_option: false,
         subject: crate::path::Located {
             value: &subject,
             location: crate::path::Location::input_root().key("s"),
@@ -379,7 +375,6 @@ fn root_clauses_say_a_list_from_the_subject_a_count_in_the_item_cant_walk() {
     let ctx = crate::path::Ctx {
         label: None,
         item_by_item: false,
-        in_option: false,
         subject: located.clone(),
         input: &input,
         params: None,
@@ -415,7 +410,6 @@ fn root_clauses_say_a_key_from_the_subject_alone_when_the_value_before_it_is_mis
     let ctx = crate::path::Ctx {
         label: None,
         item_by_item: false,
-        in_option: false,
         subject: located.clone(),
         input: &input,
         params: Some(&params),
@@ -441,6 +435,23 @@ fn a_clause_an_earlier_sentence_gave_is_left_out_and_the_rest_is_kept() {
         "as_of is missing"
     );
     assert_eq!(super::unsaid("as_of is missing", &mut said), "");
+}
+
+#[test]
+fn unsaid_keeps_a_value_that_holds_a_semicolon_whole() {
+    let mut seen = Vec::new();
+    let first = super::unsaid_clauses(&super::said_as_text("b is missing".to_string()), &mut seen);
+    assert_eq!(super::said_text(&first), "b is missing");
+    let second = super::unsaid_clauses(
+        &super::said_as_text("a; b is missing".to_string()),
+        &mut seen,
+    );
+    assert_eq!(super::said_text(&second), "a; b is missing");
+    let third = super::unsaid_clauses(
+        &super::said_as_text("a; b is missing".to_string()),
+        &mut seen,
+    );
+    assert_eq!(super::said_text(&third), "");
 }
 
 #[test]
@@ -522,7 +533,6 @@ fn compare_said(subject: Value, right: crate::ops::compare::Side) -> String {
     let ctx = crate::path::Ctx {
         label: None,
         item_by_item: false,
-        in_option: false,
         subject: Located {
             value: &input["things"][0],
             location: Location::input_root().key("things").index(0),

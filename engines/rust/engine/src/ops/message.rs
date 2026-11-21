@@ -439,6 +439,26 @@ pub fn pieces_text(pieces: &[Piece]) -> String {
         .join(", and ")
 }
 
+/// What a check says, as groups of pieces: the pieces of a group are joined
+/// with `, and `, and the groups with `; `.
+pub type Said = Vec<Vec<Piece>>;
+
+/// The message `said` makes.
+#[must_use]
+pub fn said_text(said: &[Vec<Piece>]) -> String {
+    said.iter()
+        .map(|group| pieces_text(group))
+        .filter(|text| !text.is_empty())
+        .collect::<Vec<_>>()
+        .join("; ")
+}
+
+/// A message held as one piece of text.
+#[must_use]
+pub fn said_as_text(text: String) -> Said {
+    vec![vec![Piece::Said(text)]]
+}
+
 fn push_piece(pieces: &mut Vec<Piece>, piece: Piece) {
     let text = piece.text();
     if !pieces.iter().any(|said| said.text() == text) {
@@ -654,21 +674,16 @@ fn unflawed_cause(line: &Check, ctx: &Ctx) -> Cause {
     }
 }
 
-/// What an `any_of` line that didn't pass says, run in its option's `ctx`.
-pub fn option_line_text(
-    line: &Check,
-    ctx: &Ctx,
-    said: Option<String>,
-    verdict: &Verdict,
-) -> String {
+/// What an `any_of` line that didn't pass says, as its groups of pieces.
+pub fn option_line_said(line: &Check, ctx: &Ctx, said: Option<String>, verdict: &Verdict) -> Said {
     if let Some(said) = said {
-        return said;
+        return said_as_text(said);
     }
     let mut verdict = verdict.clone();
     if verdict.cause == Cause::Unusable && line.flawed(ctx) {
         verdict.cause = unflawed_cause(line, ctx);
     }
-    message(line, ctx, &verdict)
+    self::said(line, ctx, &verdict)
 }
 
 fn split_outside_quotes<'t>(text: &'t str, by: &str) -> Vec<&'t str> {
@@ -720,32 +735,91 @@ pub fn unsaid(text: &str, said: &mut Vec<String>) -> String {
     groups.join("; ")
 }
 
+/// `said` without the clauses `seen` held before it, adding the ones it keeps
+/// to `seen`.
+pub fn unsaid_clauses(said: &Said, seen: &mut Vec<Clause>) -> Said {
+    let before = seen.len();
+    let mut out: Said = Vec::new();
+    for group in said {
+        let mut kept: Vec<Piece> = Vec::new();
+        for piece in group {
+            let clauses = match piece {
+                Piece::Said(text) if text.is_empty() => continue,
+                Piece::Said(text) => vec![Clause::said(Cause::Value, text.clone())],
+                Piece::Counted(clauses) => clauses.clone(),
+            };
+            let fresh: Vec<Clause> = clauses
+                .into_iter()
+                .filter(|clause| !seen[..before].contains(clause))
+                .collect();
+            if fresh.is_empty() {
+                continue;
+            }
+            seen.extend(fresh.iter().cloned());
+            kept.push(match piece {
+                Piece::Said(_) => piece.clone(),
+                Piece::Counted(_) => Piece::Counted(fresh),
+            });
+        }
+        if !kept.is_empty() {
+            out.push(kept);
+        }
+    }
+    out
+}
+
+/// The groups of pieces `text` holds, cut at `; ` and `, and ` outside quoted
+/// strings, for a message that is only text, like a `for` line's.
+pub fn said_of_text(text: &str) -> Said {
+    split_outside_quotes(text, "; ")
+        .into_iter()
+        .map(|group| {
+            split_outside_quotes(group, ", and ")
+                .into_iter()
+                .filter(|clause| !clause.is_empty())
+                .map(|clause| Piece::Said(clause.to_string()))
+                .collect::<Vec<Piece>>()
+        })
+        .filter(|group| !group.is_empty())
+        .collect()
+}
+
+/// What a run says, as pieces: its clauses when it has them and they make its
+/// message, its message cut into clauses otherwise.
+pub fn ran_said(ran: &super::Ran) -> Option<Said> {
+    let text = ran.message.as_ref()?;
+    match &ran.parts {
+        Some(parts) if !parts.is_empty() && clause::text(&clause::shown(parts)) == *text => {
+            Some(vec![vec![Piece::Counted(parts.clone())]])
+        }
+        _ => Some(said_of_text(text)),
+    }
+}
+
 fn any_of_message(any: &super::any_of::AnyOf, ctx: &Ctx) -> String {
-    let in_option = Ctx {
-        in_option: true,
-        ..ctx.clone()
-    };
-    let ctx = &in_option;
     let mut parts = Vec::new();
     for (at, option) in any.options.iter().enumerate() {
-        let lines: Vec<String> = option
+        let lines: Vec<Said> = option
             .iter()
             .filter_map(|line| {
                 let ran = run_full(line, ctx);
                 if ran.verdict.passed() {
                     return None;
                 }
-                Some(option_line_text(line, ctx, ran.message, &ran.verdict))
+                Some(
+                    ran_said(&ran)
+                        .unwrap_or_else(|| option_line_said(line, ctx, None, &ran.verdict)),
+                )
             })
             .collect();
         if lines.is_empty() {
             continue;
         }
         let name = any.names.get(at).cloned().unwrap_or_default();
-        let mut said: Vec<String> = Vec::new();
+        let mut seen: Vec<Clause> = Vec::new();
         let once: Vec<String> = lines
             .iter()
-            .map(|line| unsaid(line, &mut said))
+            .map(|line| said_text(&unsaid_clauses(line, &mut seen)))
             .filter(|line| !line.is_empty())
             .collect();
         parts.push(format!("{name}: {}", once.join(", and ")));
@@ -782,7 +856,35 @@ pub fn null_key_parts(path: &Path, ctx: &Ctx) -> Vec<String> {
 }
 
 pub fn message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
-    pieces_text(&pieces(check, ctx, verdict))
+    said_text(&said(check, ctx, verdict))
+}
+
+/// What `check` says for `verdict`, with each `null` value before a key and
+/// each key it stops at in a group of its own.
+pub fn said(check: &Check, ctx: &Ctx, verdict: &Verdict) -> Said {
+    let parts = null_keys(check, ctx, verdict);
+    if parts.is_empty() {
+        vec![pieces(check, ctx, verdict)]
+    } else {
+        parts
+            .into_iter()
+            .map(|part| vec![Piece::Said(part)])
+            .collect()
+    }
+}
+
+fn null_keys(check: &Check, ctx: &Ctx, verdict: &Verdict) -> Vec<String> {
+    if matches!(check, Check::AnyOf(_))
+        || !matches!(verdict.cause, Cause::Absent | Cause::Null | Cause::Unusable)
+    {
+        return Vec::new();
+    }
+    once_of(
+        side_paths(check)
+            .into_iter()
+            .flat_map(|path| null_key_parts(path, ctx))
+            .collect(),
+    )
 }
 
 /// The pieces of the message `check` gives for `verdict`, with what each
@@ -791,16 +893,9 @@ pub fn pieces(check: &Check, ctx: &Ctx, verdict: &Verdict) -> Vec<Piece> {
     if let Check::AnyOf(any) = check {
         return vec![Piece::Said(any_of_message(any, ctx))];
     }
-    if matches!(verdict.cause, Cause::Absent | Cause::Null | Cause::Unusable) {
-        let parts: Vec<String> = once_of(
-            side_paths(check)
-                .into_iter()
-                .flat_map(|path| null_key_parts(path, ctx))
-                .collect(),
-        );
-        if !parts.is_empty() {
-            return vec![Piece::Said(parts.join("; "))];
-        }
+    let parts = null_keys(check, ctx, verdict);
+    if !parts.is_empty() {
+        return vec![Piece::Said(parts.join("; "))];
     }
     let clauses: Vec<Piece> = match verdict.cause {
         Cause::Value => {
@@ -1750,14 +1845,6 @@ pub fn root_flaw(checks: &[&Check], ctx: &Ctx) -> Option<(Cause, String)> {
     root_flaw_ordered(checks, ctx, &[], &[])
 }
 
-pub fn root_flaw_texts(
-    checks: &[&Check],
-    ctx: &Ctx,
-    refs_first: &[&Check],
-) -> Option<(Cause, Vec<String>)> {
-    root_texts_with(checks, ctx, refs_first, &[], true)
-}
-
 pub fn root_flaw_ordered(
     checks: &[&Check],
     ctx: &Ctx,
@@ -1852,19 +1939,24 @@ pub fn walked_roots_ahead(
     ctx: &Ctx,
     refs_first: &[&Check],
 ) -> Option<String> {
-    let walked = checks.iter().any(|check| {
+    let message = message?;
+    if !walks_a_root(checks, ctx) {
+        return Some(message);
+    }
+    let roots = ordered_roots(checks, ctx, refs_first);
+    Some(joined(roots_ahead(&message, &roots)))
+}
+
+/// Whether one of `checks` reads a list from outside the item whose values
+/// can't be used.
+pub fn walks_a_root(checks: &[&Check], ctx: &Ctx) -> bool {
+    checks.iter().any(|check| {
         lists::right_paths(check).into_iter().any(|path| {
             reads_from_a_root(path)
                 && lists::walked_root_fault(check, path, ctx)
                     .is_some_and(|(cause, _)| cause != Cause::Value)
         })
-    });
-    let message = message?;
-    if !walked {
-        return Some(message);
-    }
-    let roots = ordered_roots(checks, ctx, refs_first);
-    Some(joined(roots_ahead(&message, &roots)))
+    })
 }
 
 pub fn ordered_roots(checks: &[&Check], ctx: &Ctx, refs_first: &[&Check]) -> Vec<String> {
@@ -2093,6 +2185,10 @@ fn root_reads_with(
 }
 
 pub fn walked_root_clauses(checks: &[&Check], ctx: &Ctx) -> Vec<Clause> {
+    walked_root_clauses_with(checks, ctx, false)
+}
+
+pub fn walked_root_clauses_with(checks: &[&Check], ctx: &Ctx, empty: bool) -> Vec<Clause> {
     checks
         .iter()
         .flat_map(|check| {
@@ -2103,7 +2199,7 @@ pub fn walked_root_clauses(checks: &[&Check], ctx: &Ctx) -> Vec<Clause> {
                 })
                 .filter_map(|root| {
                     lists::walked_root_fault(check, root, ctx)
-                        .filter(|(cause, _)| *cause != Cause::Value)
+                        .filter(|(cause, _)| empty || *cause != Cause::Value)
                         .map(|(cause, text)| Clause::root(&name::name(root), cause, text))
                 })
         })

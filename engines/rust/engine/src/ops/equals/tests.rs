@@ -8,7 +8,6 @@ fn cause(subject: Value, value: Value) -> Cause {
     let ctx = Ctx {
         label: None,
         item_by_item: false,
-        in_option: false,
         subject: Located {
             value: &input["things"][0],
             location: Location::input_root().key("things").index(0),

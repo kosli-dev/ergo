@@ -4,7 +4,6 @@ pub mod compare;
 pub mod equals;
 pub mod for_line;
 pub mod key_base;
-pub mod keyed_roots;
 pub mod kinds;
 pub mod list_start;
 pub mod lists;
@@ -477,7 +476,7 @@ pub struct Ran {
     pub failed_items: Option<Vec<Value>>,
     pub rich: Vec<Value>,
     pub message: Option<String>,
-    pub parts: Option<Vec<String>>,
+    pub parts: Option<Vec<clause::Clause>>,
 }
 
 thread_local! {

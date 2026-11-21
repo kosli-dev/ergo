@@ -7,7 +7,6 @@ fn ctx<'a>(subject: &'a Value, params: &'a Value, aliases: &[(&str, &'a Value)])
     Ctx {
         label: None,
         item_by_item: false,
-        in_option: false,
         subject: Located {
             value: subject,
             location: Location::input_root().key("s"),
@@ -226,5 +225,87 @@ fn a_plain_check_on_an_input_that_is_a_list_lists_no_key_beside_the_input() {
     assert_eq!(
         entry_inputs(&check, &ctx(&input, &params, &[]), Cause::NotAnObject, &[]),
         Vec::<Value>::new()
+    );
+}
+
+fn rewritten(sentence: &str, subject: &Value, params: &Value) -> Option<String> {
+    let tree = ergo_policy_sentences::parse_check(sentence).unwrap();
+    let check =
+        crate::lower::lower_assertion(&tree.assertions[0], &crate::lower::Scope::new()).unwrap();
+    let Check::Tally(tally) = &check else {
+        panic!("{sentence} is not a count or a sum");
+    };
+    let ctx = ctx(subject, params, &[]);
+    let mut verdict = crate::ops::run(&check, &ctx);
+    let said = crate::ops::tally::row_said(
+        tally,
+        &ctx,
+        verdict.cause,
+        crate::ops::message::said(&check, &ctx, &verdict),
+    );
+    rewrite(&check, &ctx, &mut verdict.cause, &mut verdict.inputs, said)
+        .map(|said| crate::ops::message::said_text(&said))
+}
+
+#[test]
+fn a_rewrite_says_a_key_and_a_base_that_hold_a_semicolon_once_each() {
+    assert_eq!(
+        rewritten(
+            "count of o.v named by $params.k is 1",
+            &json!({"o": "a; b"}),
+            &json!({"k": ["x; y"]}),
+        )
+        .as_deref(),
+        Some("$params.k is [\"x; y\"], which isn't text; o is \"a; b\", which isn't an object")
+    );
+}
+
+#[test]
+fn a_rewrite_says_each_key_once_in_root_order_when_the_keys_are_joined_with_and() {
+    assert_eq!(
+        rewritten(
+            "count of o named by $params.k plus count of p named by $params.j is 1",
+            &json!({"o": "s"}),
+            &json!({"k": 3, "j": 4}),
+        )
+        .as_deref(),
+        Some(
+            "$params.j is 4, which isn't text; $params.k is 3, which isn't text; o is \"s\", which isn't a list or an object; p is missing"
+        )
+    );
+}
+
+fn rewritten_plain(sentence: &str, subject: &Value, params: &Value) -> Option<String> {
+    let tree = ergo_policy_sentences::parse_check(sentence).unwrap();
+    let check =
+        crate::lower::lower_assertion(&tree.assertions[0], &crate::lower::Scope::new()).unwrap();
+    let ctx = ctx(subject, params, &[]);
+    let mut verdict = crate::ops::run(&check, &ctx);
+    let said = crate::ops::message::said(&check, &ctx, &verdict);
+    rewrite(&check, &ctx, &mut verdict.cause, &mut verdict.inputs, said)
+        .map(|said| crate::ops::message::said_text(&said))
+}
+
+#[test]
+fn a_base_is_a_root_clause_in_root_order() {
+    assert_eq!(
+        rewritten_plain(
+            "o.v named by $params.k plus p.w named by $params.j is 1",
+            &json!({"o": "s"}),
+            &json!({"k": 3, "j": 4}),
+        )
+        .as_deref(),
+        Some(
+            "$params.j is 4, which isn't text; $params.k is 3, which isn't text; o is \"s\", which isn't an object; p.w is missing"
+        )
+    );
+    assert_eq!(
+        rewritten_plain(
+            "m.v named by $params.k is 1",
+            &json!({"m": "s"}),
+            &json!({})
+        )
+        .as_deref(),
+        Some("m is \"s\", which isn't an object; $params.k is missing")
     );
 }

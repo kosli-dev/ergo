@@ -130,8 +130,6 @@ pub struct Ctx<'a> {
     /// read from an input that is neither a list nor an object ends
     /// `Unusable`. When it's false, the path ends `NotAnObject`.
     pub item_by_item: bool,
-    /// True while a line of an `any_of` option runs.
-    pub in_option: bool,
 }
 
 impl<'a> Ctx<'a> {

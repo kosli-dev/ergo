@@ -617,7 +617,6 @@ fn ctx_of<'a>(subject: &'a Value, params: &'a Value) -> crate::path::Ctx<'a> {
     crate::path::Ctx {
         label: None,
         item_by_item: true,
-        in_option: false,
         subject: crate::path::Located {
             value: subject,
             location: crate::path::Location::input_root(),

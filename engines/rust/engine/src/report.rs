@@ -257,7 +257,8 @@ pub fn with_id_faults(mut row: Row, faults: &[IdFault], input: &Value) -> Row {
             "outcome": fault.cause.name(),
         }));
     }
-    let entries = crate::parts::walk_entries(&records).entries;
+    let entries =
+        crate::parts::walk_entries(&records, &crate::parts::record_clauses(&records)).entries;
     row.failures = Some(crate::parts::to_json(&crate::parts::nest(entries, input)));
     row
 }

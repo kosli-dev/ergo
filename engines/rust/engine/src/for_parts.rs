@@ -168,7 +168,7 @@ fn walked_under(
         &text(l, "assertion"),
         cause,
         list(l, "inputs"),
-        "",
+        &[],
         &at,
         true,
     );

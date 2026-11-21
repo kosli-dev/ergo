@@ -47,7 +47,6 @@ fn outcome_in(
         aliases: std::collections::BTreeMap::new(),
         label: None,
         item_by_item: checks.iter().any(crate::ops::Check::reads_by_item),
-        in_option: false,
     };
     let read = checks
         .iter()
@@ -253,5 +252,130 @@ fn an_option_written_as_one_string_points_at_the_option() {
     assert_eq!(
         assertion_locations("r", "c", &json!({"any_of": {"o": "a is 1"}}), Some("o"), 1),
         vec!["$policy:/requirements/r/checks/c/any_of/o"]
+    );
+}
+
+fn record(item: &str, path: &str, cause: &str, text: &str) -> Value {
+    json!({
+        "path": path,
+        "item": item,
+        "cause": cause,
+        "value": 1,
+        "locations": [],
+        "ergo/text": text,
+    })
+}
+
+#[test]
+fn an_item_entry_says_its_clauses_without_its_name() {
+    use crate::ops::clause::Kind;
+    let item = said_clause("item 1 of xs", Cause::Value, "item 1 of xs: w is 2");
+    assert_eq!(
+        (item.kind, item.said[0].text.as_str()),
+        (Kind::Item, "w is 2")
+    );
+    let root = said_clause("item 2 of xs", Cause::Value, "$params.min is \"s\"");
+    assert_eq!(root.kind, Kind::Root);
+    let list = said_clause("xs", Cause::Absent, "xs: is missing");
+    assert_eq!(
+        (list.kind, list.said[0].text.as_str()),
+        (Kind::List, "is missing")
+    );
+    let records = [
+        record(
+            "item 1 of xs",
+            "xs[0].v",
+            "value",
+            "item 1 of xs: v is \"p; q\"",
+        ),
+        record("item 1 of xs", "xs[0].w", "value", "item 1 of xs: w is 2"),
+        record(
+            "item 2 of xs",
+            "xs[1].v",
+            "unusable",
+            "$params.min is \"s\"",
+        ),
+        record("xs", "xs", "absent", "xs: is missing"),
+    ];
+    let walked = walk_entries(&records, &record_clauses(&records));
+    assert_eq!(
+        walked.roots,
+        [Clause::root(
+            "item 2 of xs",
+            Cause::Unusable,
+            "$params.min is \"s\"".to_string()
+        )]
+    );
+    let said: Vec<(&str, &str)> = walked
+        .entries
+        .iter()
+        .map(|entry| match entry {
+            Failure::Item { part, .. } | Failure::List(part) => {
+                (part.name.as_str(), part.message.as_str())
+            }
+            _ => panic!("an entry that is neither an item nor a list"),
+        })
+        .collect();
+    assert_eq!(
+        said,
+        [
+            ("item 1 of xs", "v is \"p; q\"; w is 2"),
+            ("xs", "is missing"),
+        ]
+    );
+}
+
+#[test]
+fn walk_entries_read_each_records_clause_kind_and_not_its_text() {
+    use crate::ops::clause::Kind;
+    let records = [
+        record(
+            "item 1 of xs",
+            "xs[0].v",
+            "unusable",
+            "item 1 of xs: v is 1",
+        ),
+        record("item 2 of xs", "xs[1].v", "value", "$params.min is 1"),
+        record("xs", "xs", "absent", "xs: is missing"),
+    ];
+    let clauses = [
+        Clause::root(
+            "$params.min",
+            Cause::Unusable,
+            "$params.min is \"s\"".to_string(),
+        ),
+        Clause::item(
+            "item 2 of xs",
+            Cause::Value,
+            String::new(),
+            vec![Clause::said(Cause::Value, "v is 2".to_string())],
+        ),
+        Clause {
+            said: vec![Clause::said(Cause::Absent, "is missing".to_string())],
+            ..Clause::list("xs", Cause::Absent, "xs: is missing".to_string())
+        },
+    ];
+    let walked = walk_entries(&records, &clauses);
+    let roots: Vec<(Kind, &str)> = walked
+        .roots
+        .iter()
+        .map(|root| (root.kind, root.text.as_str()))
+        .collect();
+    assert_eq!(roots, [(Kind::Root, "$params.min is \"s\"")]);
+    let said: Vec<(bool, &str, &str)> = walked
+        .entries
+        .iter()
+        .map(|entry| match entry {
+            Failure::Item { part, .. } => (true, part.name.as_str(), part.message.as_str()),
+            Failure::List(part) => (false, part.name.as_str(), part.message.as_str()),
+            _ => panic!("an entry that is neither an item nor a list"),
+        })
+        .collect();
+    assert_eq!(
+        said,
+        [
+            (true, "item 2 of xs", "v is 2"),
+            (false, "xs", "is missing")
+        ]
     );
 }
