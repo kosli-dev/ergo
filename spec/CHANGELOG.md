@@ -14,6 +14,8 @@ Each version says whether reports changed, so that anyone who only stores report
 
 ### Changed
 
+- [for.roots](semantics.md#for) now says where the sentences that read no alias go among a `for` line's roots: first, as [for.pass](semantics.md#for) says, each with its own roots, and the roots of the line's own `whose` after them. With `w exists`, `y is at least 1` and `z is 1` under `for: every xs, if any, as x`, `y` holding `"s"`, `z` holding `3` and `xs` holding `[]`, the row says `w is missing; y is "s", which isn't a number; z is 3`. The Rust engine says this, and `ergo.rego` says `y` first ([OPEN.md](OPEN.md#differs-from-the-general-rules)). Reports change only in the Rust engine, and only in that order.
+
 - A `for` line's alias read whole, not through a field, like `k` in `named by k`, doesn't need its item to be an object, and fails like any other root when its value can't be read. An item of the first list that is a list is walked by a field read like any list, and a member that can't be read fails the item even when nothing is checked for it. Reports don't change: both engines already do this.
 
 - On a `for` line, the roots of the line's own `whose` are said first, then the roots of each sentence in the order the sentences are written, each group worst cause first and then by name. Roots that can't be read and come from different sentences, or from the line and a sentence, are said in this order whatever their causes and names, so a report changes where an engine sorted them together.

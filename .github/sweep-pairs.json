@@ -9825,5 +9825,83 @@
   },
   "note": "for.second_failures and row.parts give the `item 1 of ws: ` lead (row.parts: `item 2 of ws: w.o is missing`); problems.where_said rules out the same message without the item, because `w.ms` depends on the item. walk.member.not_an_object: a list where an object is expected \"fails as `unusable`, named with the message a check gives where it needs an object\". for.walk: \"The second item's path and its `whose` checks can start at the first item's alias\". Naming the value as written, `w.ms`, follows message.items (`item 1 of prs: item 1 of pr.meta.cs`); no case pins this exact form, so it is derived by combining the rules.",
   "want": "item 1 of ws: w.ms is [1], which isn't an object"
+ },
+ {
+  "name": "for r5/free sentence roots [for.roots]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs, if any, as x",
+       "assert": [
+        "w exists",
+        "y is at least 1",
+        "z is 1"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [],
+     "z": 3,
+     "y": "s"
+    }
+   ]
+  },
+  "want": "w is missing; y is \"s\", which isn't a number; z is 3"
+ },
+ {
+  "name": "for r5/free sentence before a key [for.pass]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every o named by $params.k as x",
+       "assert": [
+        "x is 1",
+        "z is 3"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "o": {
+      "a": [
+       1
+      ]
+     },
+     "z": 2
+    }
+   ]
+  },
+  "want": "z is 2; $params.k is missing"
  }
 ]
