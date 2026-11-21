@@ -90,10 +90,14 @@ fn a_whose_key_that_is_missing_is_said_once_and_each_item_says_the_value_before_
     );
     assert_eq!(
         kinds(&got),
-        vec![
-            entry("list", "xs", "$params.k is missing"),
-            entry("item", "item 1 of xs", "m is missing")
-        ]
+        vec![entry("item", "item 1 of xs", "m is missing")]
+    );
+    assert!(
+        got["inputs"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|input| input["name"] == "$params.k" && input["outcome"] == "absent")
     );
 }
 

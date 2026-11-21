@@ -748,8 +748,28 @@ pub fn for_failures(
         );
     }
     out.extend(lists);
-    out.extend(rest);
+    out.extend(rest.into_iter().filter_map(said_item));
     out
+}
+
+fn said_item(entry: Failure) -> Option<Failure> {
+    let Failure::Item {
+        mut part,
+        value,
+        locations,
+    } = entry
+    else {
+        return Some(entry);
+    };
+    part.failures = std::mem::take(&mut part.failures)
+        .into_iter()
+        .filter_map(said_item)
+        .collect();
+    (!part.message.is_empty() || !part.failures.is_empty()).then_some(Failure::Item {
+        part,
+        value,
+        locations,
+    })
 }
 
 fn list_label(line: &For, said: &str) -> String {
