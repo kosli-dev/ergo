@@ -3910,9 +3910,12 @@ fn sentence_root_clauses(forms: &[(Check, bool)], ctx: &Ctx) -> Vec<Clause> {
     forms
         .iter()
         .flat_map(|form| {
-            let Some((cause, texts)) = sentence_root_flaw(std::slice::from_ref(form), ctx) else {
-                return Vec::new();
-            };
+            let mut faults: Vec<(Cause, String)> = Vec::new();
+            for (cause, text) in sentence_root_faults(std::slice::from_ref(form), ctx) {
+                if !faults.iter().any(|(_, seen)| *seen == text) {
+                    faults.push((cause, text));
+                }
+            }
             let (check, _) = form;
             let mut named: Vec<String> = check
                 .paths()
@@ -3928,9 +3931,9 @@ fn sentence_root_clauses(forms: &[(Check, bool)], ctx: &Ctx) -> Vec<Clause> {
                 })
                 .collect();
             named.sort_by_key(|name| std::cmp::Reverse(name.len()));
-            texts
+            faults
                 .into_iter()
-                .map(|text| {
+                .map(|(cause, text)| {
                     let name = named
                         .iter()
                         .find(|name| text.starts_with(name.as_str()))
@@ -3938,14 +3941,22 @@ fn sentence_root_clauses(forms: &[(Check, bool)], ctx: &Ctx) -> Vec<Clause> {
                         .unwrap_or_else(|| text.clone());
                     Clause::root(&name, cause, text)
                 })
-                .collect()
+                .collect::<Vec<Clause>>()
         })
         .collect()
 }
 
 fn sentence_root_flaw(forms: &[(Check, bool)], ctx: &Ctx) -> Option<(Cause, Vec<String>)> {
+    let faults = sentence_root_faults(forms, ctx);
     let mut texts: Vec<String> = Vec::new();
-    let mut causes: Vec<Cause> = Vec::new();
+    for (_, text) in &faults {
+        push_new(&mut texts, text.clone());
+    }
+    Cause::worst(faults.into_iter().map(|(cause, _)| cause)).map(|cause| (cause, texts))
+}
+
+fn sentence_root_faults(forms: &[(Check, bool)], ctx: &Ctx) -> Vec<(Cause, String)> {
+    let mut faults: Vec<(Cause, String)> = Vec::new();
     for (check, keyed_form) in forms {
         let mut roots: Vec<&Path> = check.paths();
         roots.extend(walk::listed_refs(check));
@@ -4046,12 +4057,9 @@ fn sentence_root_flaw(forms: &[(Check, bool)], ctx: &Ctx) -> Option<(Cause, Vec<
             }
         }
         found.sort_by_key(|(cause, _)| *cause);
-        for (cause, text) in found {
-            causes.push(cause);
-            push_new(&mut texts, text);
-        }
+        faults.extend(found);
     }
-    Cause::worst(causes).map(|cause| (cause, texts))
+    faults
 }
 
 fn unread_key<'p>(root: &'p Path, keys: &[&Path], ctx: &Ctx) -> Option<&'p Path> {
