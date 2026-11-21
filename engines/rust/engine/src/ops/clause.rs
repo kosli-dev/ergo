@@ -58,19 +58,16 @@ impl Clause {
 const SHOWN_ITEMS: usize = 3;
 
 pub fn shown(clauses: &[Clause]) -> Vec<Clause> {
-    let mut once: Vec<&Clause> = Vec::new();
+    let mut once: Vec<Clause> = Vec::new();
     for clause in clauses {
-        if !once.contains(&clause) {
-            once.push(clause);
+        match once.iter_mut().find(|seen| same_but_group(seen, clause)) {
+            Some(seen) => seen.group = seen.group.min(clause.group),
+            None => once.push(clause.clone()),
         }
     }
-    let of_kind = |kind: Kind| {
-        once.iter()
-            .copied()
-            .filter(move |clause| clause.kind == kind)
-    };
+    let of_kind = |kind: Kind| once.iter().filter(move |clause| clause.kind == kind);
     let mut out: Vec<Clause> = of_kind(Kind::Root).cloned().collect();
-    out.sort_by(|a, b| (a.cause, &a.name).cmp(&(b.cause, &b.name)));
+    out.sort_by(|a, b| (a.group, a.cause, &a.name).cmp(&(b.group, b.cause, &b.name)));
     out.extend(of_kind(Kind::List).cloned());
     let items: Vec<&Clause> = of_kind(Kind::Item).collect();
     let leaves: usize = items.iter().map(|item| pieces(item).len()).sum();
@@ -89,6 +86,10 @@ pub fn shown(clauses: &[Clause]) -> Vec<Clause> {
         group: 0,
     });
     out
+}
+
+fn same_but_group(a: &Clause, b: &Clause) -> bool {
+    (a.kind, &a.name, a.cause, &a.text, &a.said) == (b.kind, &b.name, b.cause, &b.text, &b.said)
 }
 
 pub fn text(clauses: &[Clause]) -> String {
