@@ -287,3 +287,20 @@ test_an_items_own_text_counts_as_one_leaf_of_the_cap if {
 		"and 1 more",
 	])
 }
+
+test_two_clauses_for_one_item_count_as_one_item_in_the_cap if {
+	ergo._m_clauses_text(ergo._m_clauses_shown([
+		_clause_item("item 1 of xs", "absent", [_clause_missing("v")]),
+		_clause_item("item 1 of xs", "absent", [_clause_missing("w")]),
+		_clause_item("item 2 of xs", "absent", [_clause_missing("v")]),
+		_clause_item("item 3 of xs", "absent", [_clause_missing("v")]),
+		_clause_item("item 4 of xs", "absent", [_clause_missing("v")]),
+		_clause_item("item 4 of xs", "absent", [_clause_missing("w")]),
+	])) == concat("; ", [
+		"item 1 of xs: v is missing",
+		"item 1 of xs: w is missing",
+		"item 2 of xs: v is missing",
+		"item 3 of xs: v is missing",
+		"and 1 more",
+	])
+}
