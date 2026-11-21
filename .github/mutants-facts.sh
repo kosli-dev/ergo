@@ -24,6 +24,7 @@ if [ -z "${MUTANTS_FACTS_CARGO:-}" ]; then
   export ASDF_RUST_VERSION
 fi
 
+find "$root/engines/rust" -name '*.rs' -exec touch {} +
 cd "$root/engines/rust"
 "$cargo" mutants --workspace --in-diff "$work/diff" --output "$work/out" --timeout "$per" --minimum-test-timeout 20 --in-place > "$work/log" 2>&1 &
 pid=$!
