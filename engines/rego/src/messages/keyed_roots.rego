@@ -59,13 +59,17 @@ _keyed_side(side, other) := {"path": side.count_of, "clause": c} if {
 }
 
 _keyed_clause(path, whose) := c if {
+	c := _keyed_clause_of(path, whose)
+	c.cmp in {"includes", "matches_any"}
+}
+
+_keyed_clause_of(path, whose) := c if {
 	_keyed_plain(path)
 	count(path) == 1
 	is_array(whose)
 	count(whose) == 1
 	c := whose[0]
 	c.op == "compare"
-	c.cmp in {"includes", "matches_any"}
 	is_array(c.left)
 	count(c.left) == 1
 	_keyed_plain(c.left)
@@ -143,6 +147,8 @@ _keyed_operand_fits("includes", v) if {
 }
 
 _keyed_operand_fits("matches_any", v) if is_string(v)
+
+_keyed_operand_fits("eq", v) if v != null
 
 _keyed_operand_mixed("includes", v) if {
 	is_array(v)

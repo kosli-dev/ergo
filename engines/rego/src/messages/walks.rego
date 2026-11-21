@@ -508,8 +508,28 @@ _m_tally(subj, side) := [["unusable", c] | some c in _m_parent_clause(subj, {"op
 }
 
 _m_tally(subj, side) := ts if {
+	ts := _m_tally_keyed_base_items(subj, side)
+} else := ts if {
 	ts := _m_tally_key_items(subj, side)
 } else := _m_tally_walked_side(subj, side)
+
+_m_tally_keyed_base_items(subj, side) := array.concat(
+	[[concat("", ["root ", b.fault.cause]), b.fault.text]],
+	[[_worst_of(x.causes), x.text, {"item": e}] | some x in xs; x.text != ""; e := x.e],
+) if {
+	b := _m_tally_keyed_base(subj, side)
+	w := _walk(_walk_start({"path": b.k.path}, subj), _walk_keys({"path": b.k.path}, subj), true)
+	_keyed_list_read(w)
+	xs := [object.union(x, {"e": e}) | some e in w.items; x := _keyed_item(e, b.k)]
+	count(xs) == count(w.items)
+}
+
+_m_tally_keyed_base(subj, side) := {"k": {"path": side.count_of, "clause": c}, "fault": f} if {
+	c := _keyed_clause_of(object.get(side, "count_of", null), object.get(side, "whose", null))
+	c.cmp == "eq"
+	not _unreadable_input
+	f := _keyed_root_fault(subj, c.right)
+}
 
 _m_tally_fail_state(side, x) := concat("", ["root ", x.cause]) if {
 	count(_key_item_flaws(side)) > 0
