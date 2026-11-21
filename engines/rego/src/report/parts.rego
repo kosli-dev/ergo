@@ -520,10 +520,19 @@ else := concat("; ", [c |
 _and_more(q) if regex.match(`^and [0-9]+ more$`, q)
 
 _tally_own_read(i, c, _, _) if {
+	contains(i.name, "[]")
 	some side in _m_tally_parts(c)
 	p := side[_basic_form(side)]
 	is_array(p)
-	_m_aliased(i.name) == concat("", [_m_aliased(_input_name(p)), "[]"])
+	_walked_path_read({"name": _m_aliased(i.name)}, _m_aliased(_input_name(p)))
+}
+
+_tally_own_read(i, c, _, items) if {
+	items != []
+	some side in _m_tally_parts(c)
+	p := side[_basic_form(side)]
+	is_array(p)
+	_m_aliased(i.name) == _m_aliased(_input_name(p))
 }
 
 _sentence_walked_read(x, c) if {
