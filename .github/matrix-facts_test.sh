@@ -80,3 +80,54 @@ if sh "$script" nothing-here > /dev/null 2>&1; then
   echo "matrix-facts.sh should fail for an unknown generator" >&2
   exit 1
 fi
+
+repo=$(git -C "$(dirname "$script")" rev-parse --show-toplevel)
+
+echo "matrix-facts.sh says when BASE is not a ref"
+err=$(sh "$script" matrix-a no-such-ref-here 2>&1 >/dev/null) && {
+  echo "matrix-facts.sh should fail for a BASE that is not a ref" >&2
+  exit 1
+}
+case $err in
+  *"cannot find BASE no-such-ref-here"*) ;;
+  *)
+    echo "matrix-facts.sh should say it cannot find BASE, and printed: $err" >&2
+    exit 1
+    ;;
+esac
+
+cat > "$dir/cargo" <<SH
+#!/bin/sh
+echo "\$ASDF_RUST_VERSION" >> "$dir/versions"
+exit 1
+SH
+chmod +x "$dir/cargo"
+tmp=$dir/tmp
+mkdir "$tmp"
+trees=$(git -C "$repo" worktree list | wc -l)
+
+echo "matrix-facts.sh says the build failed on BASE, reads the Rust version from rust-toolchain.toml and removes what it made"
+err=$(TMPDIR=$tmp MATRIX_FACTS_CARGO=$dir/cargo sh "$script" matrix-a HEAD 2>&1 >/dev/null) && {
+  echo "matrix-facts.sh should fail when the build fails" >&2
+  exit 1
+}
+case $err in
+  *"the build failed on BASE HEAD"*) ;;
+  *)
+    echo "matrix-facts.sh should say the build failed on BASE HEAD, and printed: $err" >&2
+    exit 1
+    ;;
+esac
+want=$(sed -n 's/^channel = "\(.*\)"/\1/p' "$repo/engines/rust/rust-toolchain.toml")
+if [ "$(cat "$dir/versions")" != "$want" ]; then
+  echo "matrix-facts.sh should build with Rust $want, and used: $(cat "$dir/versions")" >&2
+  exit 1
+fi
+if [ -n "$(ls -A "$tmp")" ]; then
+  echo "matrix-facts.sh should remove its temporary folder, and left: $(ls "$tmp")" >&2
+  exit 1
+fi
+if [ "$(git -C "$repo" worktree list | wc -l)" != "$trees" ]; then
+  echo "matrix-facts.sh should remove its worktree" >&2
+  exit 1
+fi
