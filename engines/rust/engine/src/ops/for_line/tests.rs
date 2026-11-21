@@ -2390,8 +2390,6 @@ const CAPPED_ROOT: &str = "an item says the capped list of a name read outside t
 
 const WALKED_ROOT_UNDER_ITEM: &str = "a name read outside the item by a sentence that walks a list under the item, like pos.name in every m.ys.v is in pos.name, isn't a root clause, so the item says it, and no step of the R5 design makes it one";
 
-const FREE_JOIN: &str = "the row joins two sentences that read no alias with , and and the tree with ; and no step of the R5 design says which one is right";
-
 const NESTED_PAIR: &str = "a walk under the first item over the list the second item walks puts the second list's item under the walk's item, and no step of the R5 design keeps them apart";
 
 const WALK_ITEMS_JOINED: &str = "the row joins two items of a list walked under a walked item with , and and the tree gives each its own part, and no step of the R5 design says which one is right";
@@ -2400,7 +2398,7 @@ const FREE_BEFORE_KEY: &str = "the tree says a sentence that reads no alias firs
 
 const ENTRY_CAUSE: &str = "the tree gives an item the cause the case gives its entry and Rust's entry doesn't, until R5-7 builds the entries from the clauses";
 
-const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 102] = [
+const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 101] = [
     (
         "for / a $params list that a for line reads fails it when the line's whose leaves nothing and an item of the list can't be read / fails, when the whose leaves nothing",
         SAID_OUTSIDE,
@@ -2424,10 +2422,6 @@ const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 102] = [
     (
         "for / a count or sum of a name read from outside the item on a for line says how many more of its items can't be read / 7 items without the name",
         CAPPED_ROOT,
-    ),
-    (
-        "for / a failed sentence on a for line lists its inputs in the order of its kind / a walk lists what starts at an alias first, both in name order, and a comparison or a count lists its left side and then its right side",
-        FREE_JOIN,
     ),
     (
         "for / a for line runs the sentences that don't read the alias of an empty list it tolerates on an item that isn't an object only when one of them reads the item / fails an approver that isn't an object with the sentence that reads it, and passes it when every sentence reads commit",
@@ -2811,9 +2805,9 @@ const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 102] = [
     ),
 ];
 
-const ROWS_COMPARED: usize = 1423;
+const ROWS_COMPARED: usize = 1424;
 
-const ROWS_LISTED: usize = 159;
+const ROWS_LISTED: usize = 158;
 
 fn item_entries(failures: &Value, out: &mut Vec<(String, String)>) {
     for failure in failures.as_array().into_iter().flatten() {

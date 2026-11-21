@@ -2107,18 +2107,26 @@ impl For {
                 }
             }
         }
+        let whole = !self
+            .items
+            .iter()
+            .any(|item| reads_alias(&sentence.check, &item.alias));
         let mut clauses: Vec<Clause> = Vec::new();
-        for piece in super::message::unsaid_clauses(&said, &mut seen)
-            .into_iter()
-            .flatten()
-        {
-            match piece {
-                Piece::Said(text) => push_new(&mut clauses, Clause::said(cause, text)),
-                Piece::Counted(counted) => {
-                    for clause in counted {
-                        push_new(&mut clauses, clause);
+        for group in super::message::unsaid_clauses(&said, &mut seen) {
+            let mut texts: Vec<String> = Vec::new();
+            for piece in group {
+                match piece {
+                    Piece::Said(text) if whole => texts.push(text),
+                    Piece::Said(text) => push_new(&mut clauses, Clause::said(cause, text)),
+                    Piece::Counted(counted) => {
+                        for clause in counted {
+                            push_new(&mut clauses, clause);
+                        }
                     }
                 }
+            }
+            if !texts.is_empty() {
+                push_new(&mut clauses, Clause::said(cause, texts.join(", and ")));
             }
         }
         let said_texts: Vec<&str> = seen.iter().map(|clause| clause.text.as_str()).collect();
