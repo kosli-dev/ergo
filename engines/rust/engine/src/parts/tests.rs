@@ -410,3 +410,27 @@ fn a_member_record_becomes_an_item_entry_named_by_its_key() {
     assert_eq!(part.name, "member a of xs");
     assert_eq!(part.inputs[0]["name"], json!("xs.a"));
 }
+
+#[test]
+fn a_member_entry_of_an_object_in_a_list_nests_under_its_item_named_by_its_key() {
+    let input = json!({"s": {"rs": [{"statuses": {"a": "DONE", "b": 1}}]}});
+    let entry = Failure::Item {
+        part: Part {
+            name: "member b of rs[0].statuses".to_string(),
+            cause: Cause::Unusable,
+            inputs: Vec::new(),
+            failures: Vec::new(),
+            message: "item 1 of rs: member b of statuses is 1, which isn't text".to_string(),
+        },
+        value: json!(1),
+        locations: vec!["/s/rs/0/statuses/b".to_string()],
+    };
+    let nested = nest(vec![entry], &input);
+    assert_eq!(nested[0].part().name, "item 1 of rs");
+    let inner = &nested[0].part().failures[0];
+    assert_eq!(inner.part().name, "member b of statuses");
+    assert_eq!(
+        inner.part().message,
+        "member b of statuses is 1, which isn't text"
+    );
+}

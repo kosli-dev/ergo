@@ -196,3 +196,45 @@ fn an_object_with_no_members_fails_as_value_unless_if_any_or_a_tally_skips_it() 
         assert!(items.is_empty() && failures.is_empty());
     }
 }
+
+#[test]
+fn a_failed_member_is_named_by_its_key_in_the_failed_items() {
+    let subject = json!({"rs": [{"e": {"a": 1, "b": 2}}]});
+    let input = json!({});
+    let ctx = Ctx {
+        label: None,
+        item_by_item: false,
+        subject: Located {
+            value: &subject,
+            location: Location::input_root().key("s"),
+        },
+        input: &input,
+        params: None,
+        aliases: BTreeMap::new(),
+    };
+    let walk = Walk {
+        quantifier: Quantifier::Every,
+        path: Path {
+            start: Start::Subject,
+            steps: vec![
+                Step::Key("rs".to_string()),
+                Step::Key("e".to_string()),
+                Step::Members,
+            ],
+        },
+        distinct: false,
+        whose: Vec::new(),
+        if_any: false,
+        check: Box::new(Check::Equals(crate::ops::equals::Equals {
+            path: Path {
+                start: Start::Subject,
+                steps: Vec::new(),
+            },
+            value: json!(1),
+        })),
+        for_aliases: Vec::new(),
+    };
+    let row = run(&walk, &ctx);
+    assert_eq!(row.failed_items.len(), 1);
+    assert_eq!(row.failed_items[0]["item"], json!("member b of rs[0].e"));
+}
