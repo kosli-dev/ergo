@@ -52,6 +52,9 @@ python3 .github/rego-layers.py
 .github/pr-facts_test.sh
 .github/pairs-facts_test.sh
 .github/body-facts_test.sh
+.github/message-cuts_test.sh
+.github/rules_test.sh
+.github/gitattributes_test.sh
 .github/matrix-facts_test.sh
 .github/spec-placeholder.sh
 .github/spec-placeholder_test.sh
@@ -77,7 +80,7 @@ Run them from the repo root. The last three lines use a virtual environment that
 
 `.github/mutants-facts_test.sh` tests `.github/mutants-facts.sh`, which runs `cargo-mutants` on the lines of Rust source a change touches, stops at a time limit (`MUTANTS_FACTS_TIMEOUT`, 900 seconds by default) and prints how many mutants were caught, missed, unviable or timed out, and the missed ones; it only informs, and the `mutants-facts` job writes it in the summary of a pull request.
 
-`.github/body-facts_test.sh` tests `.github/body-facts.sh`, which reads the output of `pr-facts.sh` and `pairs-facts.sh` and the pull request body, prints the counts of reports and pairs a change moved in a line to paste after `Changes the report:`, and warns when something moved and the body has no line starting with that, or notes the line when nothing moved; it only informs, and the `body-facts` job writes it in the summary of a pull request. The job reads the body when it runs on a push, so after editing the body push or re-run the job. When `cargo test` failed, it says the report count is unknown and warns.
+`.github/body-facts_test.sh` tests `.github/body-facts.sh`, which reads the output of `pr-facts.sh` and `pairs-facts.sh` and the pull request body, prints the counts of reports and pairs a change moved in a line to paste after `Changes the report:`, and warns when something moved and the body has no line starting with that, or notes the line when nothing moved; it also fails, and lists each one, when the body repeats a sentence of those facts with other numbers (`N case reports changed`, `Rust output changed on N pairs`, `known-failures.txt had X lines and has Y now`, `N of M pairs differ between Rego and Rust`, `Pairs that say their want message: Rego N of M, Rust N of M`), and when the facts for such a line can't be read, while other prose is never checked, and it checks every such sentence when a line holds more than one; a fenced code block is the way to write prose that looks like one of those sentences without it being checked; the `body-facts` job writes it in the summary of a pull request, and its last step is the one that goes red, so a job that fails on the numbers means the body is wrong. The job reads the body when it runs on a push, so after editing the body push or re-run the job. When `cargo test` failed, it says the report count is unknown and warns.
 
 `.github/matrix-facts_test.sh` tests `.github/matrix-facts.sh`, which runs one of the generators in `.github/matrix` (`matrix-a` by default) on a base and on the working tree and prints the pairs that got worse than the base and the Rust causes that are lower than `ergo.rego`'s; it only informs, and the `matrix-facts` job writes it in the summary of a pull request. `.github/matrix/README.md` says what each generator makes and how to run one by hand.
 
@@ -134,6 +137,8 @@ CI also fails when a line of Rego isn't reached by any test. It runs the tests o
 ```
 
 When a change touches how a message or a cause is worked out, run `python3 spec/sweep.py` too, as `spec/README.md` says, on `main` and on your branch, and compare the cells that differ. It isn't a required check, and it never fails on a difference, but review has found message differences in odd shapes that nobody had probed.
+
+`engines/rust/known-failures.txt` merges with its own driver, so two branches that add or delete lines in it merge without a conflict (the result is the base minus every deleted line plus every added line, sorted). Git's own `merge=union` would bring deleted lines back. The driver is set once per clone (its worktrees share it) with `.github/setup-merge-drivers.sh`; CI doesn't need it, because it never merges, and without it git reports the conflict as usual. The changelogs have no driver, because two entries under the same heading need a person to order them.
 
 ## Tests
 
@@ -217,11 +222,13 @@ The report must stay byte-identical for the same policy and input, whatever orde
 - `$` marks Ergo's own names. Only `$input` and `$params` can also be read, and a label inside `inputs` or a message is plain words.
 - A line that coverage lists isn't dead code. Check every caller and try a real policy before deleting it. If it can be reached, add a test.
 - In Rego, `not f(x.y)` is undefined when `x.y` is missing. Put the test in a small rule and negate that.
+- Don't cut a message as text. Today messages are built from finished text and then split again on `; `, `, and ` and `item `, which is why a quoted `; ` or a name that looks like an item gives a wrong reading (#694 moves messages to parts). `.github/message-cuts.sh` counts those cuts in `engines/rust/engine/src` and `engines/rego/src`, per named pattern and per file. CI runs `.github/message-cuts.sh --against origin/main` on pull requests, which counts the same cuts in the base branch's tree and fails when any pattern, or the total, is higher in your tree, and prints the lines you added. Your own net change decides, so two pull requests that each remove a cut never conflict. When a cut is truly needed, list its pattern name in `.github/message-cuts.allow` (empty by default) and say why in the pull request. `.github/message-cuts_test.sh` tests it.
 
 ## Spec rules
 
 - Ergo must be easy to reimplement outside Rego. Prefer rules that a TypeScript or Python version can follow to the same report over OPA behaviour.
 - Ergo reports every failure. Name every failed root and every problem, not only the first one.
+- `.github/rules.sh WORDS` finds the rules for a shape, like `.github/rules.sh item alias`, with how many cases cite each. Run it before you ask whether a rule exists. When it prints `no rule contains: ...`, that output is your evidence that no rule decides the shape.
 - Before you take an engine difference, or a question about a message or a cause, to a decision, check it against the four general rules under "Which problems a message says" in `spec/semantics.md`: `problems.same_path`, `problems.where_said`, `problems.all_said` and `problems.item_order`. They often answer it. A shape that breaks one of them and isn't fixed in the same change goes under "Differs from the general rules" in `spec/OPEN.md`.
 
 ## Docs
