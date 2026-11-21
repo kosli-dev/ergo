@@ -33,3 +33,39 @@ test_listed_refs_name_the_path_before_named_by_and_not_a_walk_of_it if {
 test_a_null_on_the_path_stops_the_read_at_the_step_after_the_first_key if {
 	ergo._null_stop_at({"c": null}, ["c", "z"]) == 1
 }
+
+test_is_in_ignoring_case_fails_on_a_list_item_that_isnt_text_whatever_the_field_holds if {
+	cases := [
+		[["A", 3], "unusable"],
+		[[1, "a"], "unusable"],
+		[[null], "null"],
+		[["a", null], "null"],
+		[["a", null, 3], "unusable"],
+		[["a", ["a"]], "unusable"],
+		[["a", {"a": 1}], "unusable"],
+		[[true], "unusable"],
+	]
+	every c in cases {
+		every cmp in ["in", "not_in"] {
+			field := {"op": "compare", "left": ["x"], "cmp": cmp, "right": ["ys"], "ignoring": "case"}
+			every subj in [{"x": "a", "ys": c[0]}, {"x": 3, "ys": c[0]}, {"x": null, "ys": c[0]}, {"ys": c[0]}] {
+				ergo._leaf_cause(field, subj) == c[1]
+			}
+			ref := {"op": cmp, "path": ["x"], "values": {"ref": ["$$params[]", "l"]}, "ignoring": "case"}
+			every subj in [{"x": "a"}, {"x": 3}, {"x": null}, {}] {
+				ergo._leaf_cause(ref, subj) == c[1] with data.ergo_params as {"l": c[0]}
+			}
+		}
+	}
+}
+
+test_is_in_ignoring_case_compares_with_a_list_from_the_input_once_both_sides_are_prepared if {
+	field := {"op": "compare", "left": ["x"], "cmp": "in", "right": ["ys"], "ignoring": "case and surrounding spaces"}
+	ergo._leaf_cause(field, {"x": " Bug ", "ys": ["incident", "BUG"]}) == "satisfied"
+	ergo._leaf_cause(object.union(field, {"cmp": "not_in"}), {"x": " Bug ", "ys": ["incident", "BUG"]}) == "value"
+	ergo._leaf_cause(field, {"x": "bug", "ys": []}) == "value"
+	ergo._leaf_cause(object.union(field, {"cmp": "not_in"}), {"x": "bug", "ys": []}) == "satisfied"
+	ref := {"op": "in", "path": ["x"], "values": {"ref": ["$$params[]", "l"]}, "ignoring": "case"}
+	ergo._leaf_cause(ref, {"x": "BUG"}) == "satisfied" with data.ergo_params as {"l": ["bug"]}
+	ergo._leaf_cause(ref, {"x": 3}) == "unusable" with data.ergo_params as {"l": ["bug"]}
+}
