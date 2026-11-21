@@ -141,7 +141,35 @@ _m_plural(v) := "objects" if is_object(v)
 
 _m_is(name, v) := concat("", [name, " is ", _m_print_at(v, name, null)])
 
-_m_isnt(name, v, kind) := concat("", [name, " is ", _m_print_at(v, name, null), ", which isn't ", kind])
+_m_isnt(name, v, kind) := _m_text_items(name, v) if kind == _m_text_items_kind
+
+else := concat("", [name, " is ", _m_print_at(v, name, null), ", which isn't ", kind])
+
+_m_text_items_kind := "text in every item"
+
+_m_text_items(name, v) := concat("; ", [_m_text_item(concat("", ["item ", format_int(i + 1, 10), " of ", name]), x) |
+	some i, x in v
+	not is_string(x)
+])
+
+_m_text_item(name, null) := concat("", [name, " is null"])
+
+_m_text_item(name, x) := concat("", [name, " is ", _m_print_at(x, name, null), ", which isn't text"]) if x != null
+
+_m_text_list_said(subj, check, cause) := [_m_text_items(s.name, s.value)] if {
+	check.ignoring
+	s := _m_shown(subj, _m_text_list_side(check))
+	s.state == "value"
+	is_array(s.value)
+	_text_items_state(s.value) == cause
+} else := []
+
+_m_text_list_side(check) := check.right if {
+	_list_cmp(check)
+	is_array(check.right)
+}
+
+_m_text_list_side(check) := check.values if _is_ref(check.values)
 
 _m_state_word("absent") := "missing"
 
@@ -374,7 +402,7 @@ _m_message(check, subj, cause) := m if {
 	m := concat(", and ", _once(array.concat(keys, _m_unkeyed_said(subj, check, cause))))
 } else := m if {
 	cause in _no_value_states
-	clauses := _once(array.concat([_m_state_clause(s) | some s in _m_sources(subj, check); _m_side_said(s, cause, check)], _m_tallies(subj, check, cause)))
+	clauses := _once(array.concat(array.concat([_m_state_clause(s) | some s in _m_sources(subj, check); _m_side_said(s, cause, check)], _m_tallies(subj, check, cause)), _m_text_list_said(subj, check, cause)))
 	count(clauses) > 0
 	m := concat(", and ", clauses)
 } else := _m_fallback(check) if cause in _no_value_states

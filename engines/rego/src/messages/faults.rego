@@ -330,7 +330,13 @@ _m_unusable_ref_walks(check) := [_ref_walk_text(r) | some r in sort(_check_refs(
 
 _m_unusable_side_walks(subj, check) := [t | some side in _m_sides(check); _walked_side(side); s := _m_shown(subj, side); s.state == "unusable"; t := s.text]
 
-_m_ref_list_fault(check) := [[check[f], _m_right_kind(cmp, v)]] if {
+_m_ref_list_fault(check) := [[check.values, k]] if {
+	check.ignoring
+	_is_ref(check.values)
+	_ref_state(check.values.ref) == "value"
+	k := _m_text_list_kind(_ref_shown(check.values.ref))
+} else := [[check[f], _m_right_kind(cmp, v)]] if {
+	not check.ignoring
 	some f in _list_argument_keys
 	_is_ref(check[f])
 	cmp := _m_ref_cmp(check.op, f)
@@ -413,7 +419,13 @@ _m_fault_9(subj, check) := fs if {
 	fs != []
 } else := []
 
-_m_list_right(subj, check) := [[check.right, _m_right_kind(check.cmp, r)]] if {
+_m_list_right(subj, check) := [[check.right, k]] if {
+	check.ignoring
+	_lstate(check, subj) == "value"
+	not _lfailed(check, subj)
+	k := _m_text_list_kind(_lvalue(check, subj))
+} else := [[check.right, _m_right_kind(check.cmp, r)]] if {
+	not check.ignoring
 	_lstate(check, subj) == "value"
 	not _lfailed(check, subj)
 	r := _lvalue(check, subj)
@@ -439,6 +451,12 @@ _m_right_kind(cmp, r) := "a list of one kind of value" if {
 }
 
 _m_list_left(subj, check) := [[check.left, "text"]] if {
+	check.ignoring
+	not is_string(_found(subj, check.left))
+	not _list_flawed(check, subj)
+} else := [] if {
+	check.ignoring
+} else := [[check.left, "text"]] if {
 	check.cmp in _pattern_ops
 	not is_string(_found(subj, check.left))
 } else := [[check.left, "a list"]] if {
@@ -568,3 +586,7 @@ _m_side_kind(subj, check, side) := _m_kind(o) if {
 }
 
 _m_fits_kind(v, k) if _m_kind(v) == k
+
+_m_text_list_kind(r) := "a list" if not is_array(r)
+
+else := _m_text_items_kind if _text_items_state(r) == "unusable"
