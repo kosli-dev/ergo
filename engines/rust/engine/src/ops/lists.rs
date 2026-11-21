@@ -537,6 +537,14 @@ impl Matches {
     }
 }
 
+fn text_items_cause(values: &[Value]) -> Option<Cause> {
+    Cause::worst(values.iter().filter_map(|value| match value {
+        Value::String(_) => None,
+        Value::Null => Some(Cause::Null),
+        _ => Some(Cause::Unusable),
+    }))
+}
+
 fn in_text(
     check: &In,
     ignoring: super::compare::Ignoring,
@@ -544,14 +552,14 @@ fn in_text(
     outcome: &Outcome,
     found: Option<&Value>,
 ) -> Cause {
+    if let Some(cause) = text_items_cause(values) {
+        return cause;
+    }
     let text = match left_cause(outcome, found) {
         Ok(Value::String(text)) => text,
         Ok(_) => return Cause::Unusable,
         Err(cause) => return cause,
     };
-    if !values.iter().all(Value::is_string) {
-        return Cause::Unusable;
-    }
     let text = ignoring.prepare(&text);
     let hit = values
         .iter()
