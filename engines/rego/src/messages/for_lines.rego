@@ -403,7 +403,7 @@ _m_for_joined(ents) := concat("; ", array.concat(_once([e.t | some e in ents; _m
 _m_for_counted(ents) := _once([_m_item_lead(e.t) | some e in ents; e.x == false; _walk_kind(e.t) == "item"])
 
 _m_item_lead(t) := concat(": ", [_m_item_head(p) | some i, p in ps; i < n]) if {
-	ps := split(t, ": ")
+	ps := _m_quote_split(t, ": ")
 	n := count([i | some i, _ in ps; _m_items_up_to(ps, i)])
 }
 
@@ -413,7 +413,9 @@ _m_items_up_to(ps, i) if {
 	}
 }
 
-_m_item_head(p) := substring(p, 0, o + s) if {
+_m_item_head(p) := concat("", [x[0], " of ", split(x[1], " ")[0]]) if x := _member_parts(p)
+
+else := substring(p, 0, o + s) if {
 	o := indexof(p, " of ") + 4
 	s := indexof(substring(p, o, -1), " ")
 	s >= 0
@@ -1246,10 +1248,18 @@ _m_whose_said_in(spec, names, c, iv, cause) := _m_unclean_said(c, iv, cause) if 
 } else := _m_whose_said(c, iv, cause)
 
 _for_list_unclean(spec, subj, c) if {
-	xs := _value_at(subj, spec.path)
-	is_array(xs)
-	some x in xs
+	some x in _for_listed_values(spec, _value_at(subj, spec.path))
 	not _key_items_clean({"items": [{"iv": x}]}, [c])
+}
+
+_for_listed_values(spec, xs) := xs if {
+	object.get(spec, "member", false) != true
+	is_array(xs)
+}
+
+_for_listed_values(spec, xs) := [v | some v in xs] if {
+	spec.member == true
+	is_object(xs)
 }
 
 _key_item_unclean(e) if object.get(e, "ergo/unclean", false) == true

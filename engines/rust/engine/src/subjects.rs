@@ -2604,19 +2604,11 @@ fn walked_roots_run(check: &Check, ctx: &Ctx) -> (ops::Ran, Option<Said>) {
         }
         let said = match ops::message::ran_said(&again) {
             Some(said) => said,
-            None => default_said(check, ctx, &again.verdict),
+            None => ops::message::row_said(check, ctx, &again.verdict),
         };
         again.message = Some(said_text(&said));
         (again, Some(said))
     })
-}
-
-fn default_said(check: &Check, ctx: &Ctx, verdict: &Verdict) -> Said {
-    let said = ops::message::said(check, ctx, verdict);
-    match check {
-        Check::Tally(tally) => ops::tally::row_said(tally, ctx, verdict.cause, said),
-        _ => said,
-    }
 }
 
 struct RanItems {
@@ -2837,7 +2829,7 @@ fn walk_part(
             .iter()
             .filter(|i| {
                 let n = i.get("name").and_then(Value::as_str).unwrap_or("");
-                !parts::item_input(n, &lists)
+                !walked_list_input(n, &lists, walk, ctx)
                     && ((failures.is_empty() && !keyed) || !own.iter().any(|o| o == n))
             })
             .cloned()
@@ -2846,6 +2838,14 @@ fn walk_part(
         failures,
         message: clause::text(&said),
     }
+}
+
+fn walked_list_input(name: &str, lists: &[String], walk: &ops::walk::Walk, ctx: &Ctx) -> bool {
+    parts::item_input(name, lists)
+        || (matches!(walk.path.steps.last(), Some(Step::Members))
+            && walk::walked_names(walk, ctx)
+                .first()
+                .is_some_and(|n| n == name))
 }
 
 fn line_of(said: &Clause) -> String {
@@ -3119,7 +3119,9 @@ fn with_failures(
                 .zip(ran.checks.iter().zip(&ran.verdicts).zip(&ran.said))
                 .filter(|(_, ((_, v), _))| !v.passed())
                 .map(|((k, item), ((check, v), own))| {
-                    let said = own.clone().unwrap_or_else(|| default_said(check, ctx, v));
+                    let said = own
+                        .clone()
+                        .unwrap_or_else(|| ops::message::row_said(check, ctx, v));
                     let mut inputs = outcomes(&v.inputs, false, &[check], ctx);
                     let extra = ops::key_base::entry_inputs(check, ctx, v.cause, &inputs);
                     inputs.extend(extra);
@@ -3203,7 +3205,7 @@ fn with_failures(
                     .unwrap_or_default();
                 let said = match (ran.said.first(), ran.verdicts.first()) {
                     (Some(Some(said)), _) => said.clone(),
-                    (_, Some(verdict)) => default_said(check, ctx, verdict),
+                    (_, Some(verdict)) => ops::message::row_said(check, ctx, verdict),
                     _ => Vec::new(),
                 };
                 let said = if said_text(&said) == message {
@@ -3247,7 +3249,7 @@ fn with_failures(
             Some(check @ Check::Tally(tally)) if tally.counts() => {
                 let said = match (ran.said.first(), ran.verdicts.first()) {
                     (Some(Some(said)), _) => said.clone(),
-                    (_, Some(verdict)) => default_said(check, ctx, verdict),
+                    (_, Some(verdict)) => ops::message::row_said(check, ctx, verdict),
                     _ => Vec::new(),
                 };
                 Some(vec![Failure::Assertion {
@@ -3332,7 +3334,7 @@ fn check_row(
             if env.unreadable.is_empty() && !verdict.passed() {
                 let said = own
                     .clone()
-                    .unwrap_or_else(|| default_said(check, ctx, &verdict));
+                    .unwrap_or_else(|| ops::message::row_said(check, ctx, &verdict));
                 if let Some(rewritten) = ops::key_base::rewrite(
                     check,
                     ctx,
@@ -3375,7 +3377,7 @@ fn check_row(
             .filter(|((_, v), _)| !v.passed())
             .map(|((check, v), own)| match own {
                 Some(said) => said.clone(),
-                None => default_said(check, ctx, v),
+                None => ops::message::row_said(check, ctx, v),
             })
             .map(|said| ops::message::unsaid_clauses(&said, &mut seen))
             .filter(|said| !said_text(said).is_empty())

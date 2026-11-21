@@ -70,6 +70,15 @@ test_a_member_nests_under_the_items_of_the_lists_before_it_like_an_item if {
 	ergo._level_names("item 2 of rs[0].statuses", 1) == ["item 1 of rs", "item 2 of statuses"]
 }
 
+test_a_tally_entry_keeps_a_member_name_whole_when_its_key_holds_a_colon if {
+	e := {"kind": "item", "name": `member "a: b" of statuses`, "cause": "unusable", "inputs": [], "locations": ["~~/statuses/a: b"], "message": `member "a: b" of statuses is "x", which isn't a number`}
+	x := ergo._tally_leveled(e, ["statuses", {"member": "a: b"}], {"trail": []}, "/things/0")
+	[x.name, x.message] == [`member "a: b" of statuses`, `member "a: b" of statuses is "x", which isn't a number`]
+	not x["ergo/levels"]
+	y := ergo._tally_leveled(object.union(e, {"name": `member "a; b: c" of statuses`, "message": "kind is missing"}), ["statuses", {"member": "a; b: c"}], {"trail": []}, "/things/0")
+	[y.name, y.message] == [`member "a; b: c" of statuses`, "kind is missing"]
+}
+
 test_the_list_of_a_member_is_what_follows_its_key if {
 	ergo._list_base("member b of statuses") == "statuses"
 	ergo._list_base(`member "x of y" of r.evidence`) == "r.evidence"

@@ -1894,3 +1894,1886 @@ fn a_part_that_is_text_null_missing_or_an_object_with_a_list_is_read_as_before_i
         assert_eq!(message.as_str().unwrap_or(""), said);
     }
 }
+
+fn for_roots(for_line: &str, assertions: &[&str], subject: Value, params: Value) -> String {
+    let clauses = for_root_clauses(for_line, assertions, subject, params);
+    crate::ops::clause::text(&crate::ops::clause::shown(&clauses))
+}
+
+fn for_root_clauses(
+    for_line: &str,
+    assertions: &[&str],
+    subject: Value,
+    params: Value,
+) -> Vec<crate::ops::clause::Clause> {
+    let line = ergo_policy_sentences::parse_for(for_line).unwrap();
+    let parsed: Vec<_> = assertions
+        .iter()
+        .flat_map(|assertion| {
+            ergo_policy_sentences::parse_check(assertion)
+                .unwrap()
+                .assertions
+        })
+        .collect();
+    let places: Vec<String> = assertions.iter().map(|_| "p".to_string()).collect();
+    let checked = super::lower_for(&line, &parsed, &places, &crate::lower::Scope::new()).unwrap();
+    let crate::ops::Check::For(line) = checked else {
+        panic!("{for_line} is not a for line");
+    };
+    let input = json!({"things": [subject]});
+    let ctx = crate::path::Ctx {
+        label: None,
+        item_by_item: false,
+        subject: crate::path::Located {
+            value: &input["things"][0],
+            location: crate::path::Location::input_root().key("things").index(0),
+        },
+        input: &input,
+        params: Some(&params),
+        aliases: std::collections::BTreeMap::new(),
+    };
+    line.root_clauses(&ctx)
+}
+
+#[test]
+fn root_clauses_say_each_sentences_roots_in_turn() {
+    assert_eq!(
+        for_roots(
+            "every xs as x",
+            &["x.v is at least $params.b", "x.w is at least $params.a"],
+            json!({"xs": [{"v": 1, "w": 1}]}),
+            json!({"a": "s"}),
+        ),
+        "$params.b is missing; $params.a is \"s\", which isn't a number"
+    );
+}
+
+#[test]
+fn root_clauses_say_the_lines_whose_roots_first() {
+    assert_eq!(
+        for_roots(
+            "every xs whose v is at least $params.min as x",
+            &["x.w is at least $params.a"],
+            json!({"xs": [{"v": 1, "w": 1}]}),
+            json!({"a": "s"}),
+        ),
+        "$params.min is missing; $params.a is \"s\", which isn't a number"
+    );
+}
+
+#[test]
+fn the_lists_unreadable_key_comes_before_the_roots_of_the_sentences() {
+    assert_eq!(
+        for_roots(
+            "every xs named by $params.k as x",
+            &["x.w is at least $params.a"],
+            json!({"xs": [{"w": 1}]}),
+            json!({"a": "s"}),
+        ),
+        "$params.k is missing; $params.a is \"s\", which isn't a number"
+    );
+}
+
+#[test]
+fn a_root_whose_value_holds_a_semicolon_is_one_clause() {
+    let line = ergo_policy_sentences::parse_for("every xs as x").unwrap();
+    let tree = ergo_policy_sentences::parse_check("x.v is at least $params.min").unwrap();
+    let crate::ops::Check::For(line) = super::lower_for(
+        &line,
+        &tree.assertions,
+        &["p".to_string()],
+        &crate::lower::Scope::new(),
+    )
+    .unwrap() else {
+        panic!("not a for line");
+    };
+    let input = json!({"things": [{"xs": [{"v": "a; b"}]}]});
+    let params = json!({"min": "s; t"});
+    let ctx = crate::path::Ctx {
+        label: None,
+        item_by_item: false,
+        subject: crate::path::Located {
+            value: &input["things"][0],
+            location: crate::path::Location::input_root().key("things").index(0),
+        },
+        input: &input,
+        params: Some(&params),
+        aliases: std::collections::BTreeMap::new(),
+    };
+    let clauses = crate::ops::clause::shown(&line.root_clauses(&ctx));
+    assert_eq!(clauses.len(), 1);
+    assert_eq!(
+        clauses[0].text,
+        "$params.min is \"s; t\", which isn't a number"
+    );
+}
+
+#[test]
+fn root_clauses_give_the_roots_the_row_says_today() {
+    for (for_line, assertions, subject, params) in [
+        (
+            "every xs as x",
+            vec!["x.v is at least $params.b"],
+            json!({"xs": [{"v": 1}]}),
+            json!({}),
+        ),
+        (
+            "every xs whose v is at least $params.min as x",
+            vec!["x.w is at least $params.a"],
+            json!({"xs": [{"v": 1, "w": 1}]}),
+            json!({"a": "s"}),
+        ),
+    ] {
+        let roots = for_roots(for_line, &assertions, subject.clone(), params.clone());
+        let message = for_row_message(for_line, assertions[0], subject, params);
+        assert!(!roots.is_empty(), "{for_line}: no roots");
+        assert!(
+            message.starts_with(&roots),
+            "{for_line}: {message} does not start with {roots}"
+        );
+    }
+}
+
+fn item_clauses(
+    for_line: &str,
+    assertions: &[&str],
+    subject: Value,
+    params: Value,
+    item: usize,
+    sentence: usize,
+) -> (crate::cause::Cause, Vec<crate::ops::clause::Clause>) {
+    let line = ergo_policy_sentences::parse_for(for_line).unwrap();
+    let parsed: Vec<_> = assertions
+        .iter()
+        .flat_map(|assertion| {
+            ergo_policy_sentences::parse_check(assertion)
+                .unwrap()
+                .assertions
+        })
+        .collect();
+    let places: Vec<String> = assertions.iter().map(|_| "p".to_string()).collect();
+    let checked = super::lower_for(&line, &parsed, &places, &crate::lower::Scope::new()).unwrap();
+    let crate::ops::Check::For(line) = checked else {
+        panic!("{for_line} is not a for line");
+    };
+    let input = json!({"things": [subject]});
+    let list = crate::name::name(&line.items[0].path);
+    let mut ctx = crate::path::Ctx {
+        label: None,
+        item_by_item: false,
+        subject: crate::path::Located {
+            value: &input["things"][0],
+            location: crate::path::Location::input_root().key("things").index(0),
+        },
+        input: &input,
+        params: Some(&params),
+        aliases: std::collections::BTreeMap::new(),
+    };
+    ctx.aliases.insert(
+        line.items[0].alias.clone(),
+        crate::path::Located {
+            value: &input["things"][0][&list][item],
+            location: crate::path::Location::input_root()
+                .key("things")
+                .index(0)
+                .key(&list)
+                .index(item as u64),
+        },
+    );
+    line.sentence_clauses(sentence, &ctx)
+}
+
+fn item_text(
+    for_line: &str,
+    assertions: &[&str],
+    subject: Value,
+    params: Value,
+    item: usize,
+    sentence: usize,
+) -> String {
+    let (_, clauses) = item_clauses(for_line, assertions, subject, params, item, sentence);
+    crate::ops::clause::text(&clauses)
+}
+
+#[test]
+fn a_sentence_says_its_own_read_without_the_root() {
+    let subject = json!({"xs": [{"v": "a"}, {}]});
+    let params = json!({"min": "s"});
+    let said = |item| {
+        item_text(
+            "every xs as x",
+            &["x.v is at least $params.min"],
+            subject.clone(),
+            params.clone(),
+            item,
+            0,
+        )
+    };
+    assert_eq!(said(0), "x.v is \"a\", which isn't a number");
+    assert_eq!(said(1), "x.v is missing");
+}
+
+#[test]
+fn a_sentence_keeps_a_value_that_holds_a_semicolon_whole() {
+    let (_, clauses) = item_clauses(
+        "every xs as x",
+        &["x.v is at least $params.min"],
+        json!({"xs": [{"v": "a; b"}, {}]}),
+        json!({"min": "s; t"}),
+        0,
+        0,
+    );
+    let texts: Vec<&str> = clauses.iter().map(|clause| clause.text.as_str()).collect();
+    assert_eq!(texts, ["x.v is \"a; b\", which isn't a number"]);
+}
+
+#[test]
+fn a_count_under_the_line_gives_its_items_as_clauses() {
+    let (_, clauses) = item_clauses(
+        "every gs as g",
+        &["count of g.es whose v is at least $params.min is 0"],
+        json!({"gs": [{"es": [{}, {}]}, {"es": [{}, {"v": 2}]}]}),
+        json!({"min": "s"}),
+        0,
+        0,
+    );
+    let items: Vec<(crate::ops::clause::Kind, &str)> = clauses
+        .iter()
+        .map(|clause| (clause.kind, clause.name.as_str()))
+        .collect();
+    assert_eq!(
+        items,
+        [
+            (crate::ops::clause::Kind::Item, "item 1 of g.es"),
+            (crate::ops::clause::Kind::Item, "item 2 of g.es"),
+        ]
+    );
+    assert_eq!(
+        crate::ops::clause::text(&clauses),
+        "item 1 of g.es: v is missing; item 2 of g.es: v is missing"
+    );
+}
+
+#[test]
+fn a_sum_under_the_line_gives_its_items_as_clauses() {
+    let subject = json!({"gs": [{"rs": [{"n": "a"}, {}]}, {"rs": [{"n": null}]}]});
+    let said = |item| {
+        item_text(
+            "every gs as g",
+            &["sum of g.rs.n is 3"],
+            subject.clone(),
+            json!({}),
+            item,
+            0,
+        )
+    };
+    assert_eq!(
+        said(0),
+        "item 1 of g.rs: n is \"a\", which isn't a number; item 2 of g.rs: n is missing"
+    );
+    assert_eq!(said(1), "item 1 of g.rs: n is null");
+}
+
+#[test]
+fn a_key_from_params_is_left_out_of_the_items_of_a_count_under_the_line() {
+    assert_eq!(
+        item_text(
+            "every gs as g",
+            &["count of g.es.v that is m named by $params.k is 0"],
+            json!({"gs": [{"es": [{"v": {}}]}, {"es": [{"v": {}}]}]}),
+            json!({}),
+            0,
+            0,
+        ),
+        "item 1 of g.es: v: m is missing"
+    );
+}
+
+#[test]
+fn two_sentences_walking_one_list_give_their_own_items_as_clauses() {
+    let assertions = ["every x.ys.n is 1", "every x.ys.m is 1"];
+    let subject = json!({"xs": [{"ys": [{"n": 1, "m": 2}, {"m": 1}]}]});
+    let said = |sentence| {
+        item_text(
+            "every xs as x",
+            &assertions,
+            subject.clone(),
+            json!({}),
+            0,
+            sentence,
+        )
+    };
+    assert_eq!(said(0), "item 2 of x.ys: n is missing");
+    assert_eq!(said(1), "item 1 of x.ys: m is 2");
+}
+
+#[test]
+fn a_sentence_whose_only_problems_are_roots_says_nothing_for_the_item() {
+    let assertions = [
+        "x.v is at least $params.a",
+        "x.v is at most $params.b",
+        "x.w is $params.c",
+        "x.u is in $params.d",
+    ];
+    for sentence in 0..assertions.len() {
+        let (cause, clauses) = item_clauses(
+            "every xs as x",
+            &assertions,
+            json!({"xs": [{"v": 1, "w": 1, "u": 1}]}),
+            json!({}),
+            0,
+            sentence,
+        );
+        assert_eq!(
+            cause,
+            crate::cause::Cause::Absent,
+            "{}",
+            assertions[sentence]
+        );
+        assert!(clauses.is_empty(), "{}: {clauses:?}", assertions[sentence]);
+    }
+}
+
+#[test]
+fn a_sentence_says_what_it_says_as_a_check_of_its_own() {
+    let subject = json!({"xs": [{"v": 2, "es": [{"v": 2}, {}, {"v": 1}]}]});
+    for assertion in [
+        "x.v is 1",
+        "count of x.es whose v is 1 is 3",
+        "sum of x.es.v is 1",
+        "every x.es.v is 1",
+    ] {
+        let line = ergo_policy_sentences::parse_for("every xs as x").unwrap();
+        let tree = ergo_policy_sentences::parse_check(assertion).unwrap();
+        let crate::ops::Check::For(line) = super::lower_for(
+            &line,
+            &tree.assertions,
+            &["p".to_string()],
+            &crate::lower::Scope::new(),
+        )
+        .unwrap() else {
+            panic!("not a for line");
+        };
+        let input = json!({"things": [subject.clone()]});
+        let params = json!({});
+        let mut ctx = crate::path::Ctx {
+            label: None,
+            item_by_item: false,
+            subject: crate::path::Located {
+                value: &input["things"][0],
+                location: crate::path::Location::input_root().key("things").index(0),
+            },
+            input: &input,
+            params: Some(&params),
+            aliases: std::collections::BTreeMap::new(),
+        };
+        ctx.aliases.insert(
+            "x".to_string(),
+            crate::path::Located {
+                value: &input["things"][0]["xs"][0],
+                location: crate::path::Location::input_root()
+                    .key("things")
+                    .index(0)
+                    .key("xs")
+                    .index(0),
+            },
+        );
+        let check = &line.sentences[0].check;
+        let ran = crate::ops::run_full(check, &ctx);
+        let own = match &ran.parts {
+            Some(parts) if !parts.is_empty() => {
+                crate::ops::clause::text(&crate::ops::clause::shown(parts))
+            }
+            _ => crate::ops::message::said_text(&crate::ops::message::row_said(
+                check,
+                &ctx,
+                &ran.verdict,
+            )),
+        };
+        let (cause, clauses) = line.sentence_clauses(0, &ctx);
+        assert_eq!(cause, ran.verdict.cause, "{assertion}");
+        assert_eq!(crate::ops::clause::text(&clauses), own, "{assertion}");
+    }
+}
+
+#[test]
+fn a_sentence_says_the_value_before_a_key_it_cant_read_after_leaving_out_the_key() {
+    let subject = json!({"xs": [{"m": 3}, {"m": {}}]});
+    let said = |item| {
+        let (cause, clauses) = item_clauses(
+            "every xs as x",
+            &["x.m named by $params.k is 1"],
+            subject.clone(),
+            json!({}),
+            item,
+            0,
+        );
+        (cause, crate::ops::clause::text(&clauses))
+    };
+    assert_eq!(
+        said(0),
+        (
+            crate::cause::Cause::Unusable,
+            "x.m is 3, which isn't an object".to_string()
+        )
+    );
+    assert_eq!(said(1), (crate::cause::Cause::Absent, String::new()));
+}
+
+#[test]
+fn each_root_of_one_sentence_keeps_its_own_cause() {
+    assert_eq!(
+        for_roots(
+            "every xs as x",
+            &["$params.a is at least $params.b"],
+            json!({"xs": [{}]}),
+            json!({"b": "s"}),
+        ),
+        "$params.b is \"s\", which isn't a number; $params.a is missing"
+    );
+}
+
+#[test]
+fn a_sentence_says_an_item_once_when_two_of_its_whose_clauses_cant_read_it() {
+    assert_eq!(
+        item_text(
+            "every xs as x",
+            &["count of x.es whose v is at least $params.a and whose v is at most $params.b is 0"],
+            json!({"xs": [{"es": [{"v": 1}, {}]}]}),
+            json!({"a": "s"}),
+            0,
+            0,
+        ),
+        "item 2 of x.es: v is missing"
+    );
+}
+
+fn for_line_cases() -> Vec<(String, Value, Value, Value)> {
+    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("..");
+    let mut topics: Vec<std::path::PathBuf> = std::fs::read_dir(root.join("../../spec/cases"))
+        .unwrap()
+        .map(|entry| entry.unwrap().path())
+        .filter(|path| path.is_dir())
+        .collect();
+    topics.sort();
+    let mut out = Vec::new();
+    for topic in topics {
+        let name = topic.file_name().unwrap().to_string_lossy().into_owned();
+        let text = std::fs::read_to_string(topic.join("cases.json"))
+            .unwrap()
+            .replace("{{spec}}", SPEC);
+        let groups: Value = serde_json::from_str(&text).unwrap();
+        for group in groups.as_array().unwrap() {
+            if !group["policy"].to_string().contains("\"for\"") {
+                continue;
+            }
+            for case in group["cases"].as_array().unwrap() {
+                let id = format!(
+                    "{name} / {} / {}",
+                    group["description"].as_str().unwrap(),
+                    case["description"].as_str().unwrap()
+                );
+                let params = group.get("params").cloned().unwrap_or_else(|| json!({}));
+                out.push((id, case["input"].clone(), group["policy"].clone(), params));
+            }
+        }
+    }
+    out
+}
+
+const NO_LIST: &str = "the tree has no clause for the list itself until R5-6";
+
+const SAID_OUTSIDE: &str = "the row's message comes from message::row_said after the check runs again to read its walked roots, not from the for line, until R5-6 gives the for line the message its clauses say";
+
+const ITEMS_BY_SENTENCE: &str = "the case says item 2 before item 1, which spec/OPEN.md lists under problems.item_order, and no R5 step changes it until that line is decided";
+
+const PAIR_LEAD_INSIDE: &str = "the case says the pair's lead after a sentence that doesn't read the second item, which spec/OPEN.md lists under message.join, and no R5 step changes it until that line is decided";
+
+const WHOSE_ROOT: &str = "an item the line's whose can't decide says the whose's root again in its own clause, until R5-5 gives it only its own read through walk::item_own";
+
+const TREE_IS_THE_CASE: &str = "the tree says what the case says and Rust's row doesn't, until R5-6 builds the row from the tree";
+
+const WALK_ITEMS_JOINED: &str = "the tree gives each item of a list walked under a walked item its own part, as message.items and message.join say and as the plain walk every zs.k is 9 does, where the case and both engines' rows join two items of k with , and";
+
+const FREE_BEFORE_KEY: &str = "the tree says a sentence that reads no alias first and then the key of the line's whose, as for.pass says, where Rust's row leaves the key out and the case says it first, until R5-6 builds the row from the tree and moves the case";
+
+const ENTRY_CAUSE: &str = "the tree gives an item the cause the case gives its entry and Rust's entry doesn't, until R5-7 builds the entries from the clauses";
+
+const SECOND_KEY: &str = "the tree says the sentence that reads only the first alias for the item, as for.pass says and the case does, but like the row it says the second list's key from $params inside each item, where problems.where_said says it once before any item, and no step of the R5 design makes that key a root clause";
+
+const OTHER_SUBJECTS_CAUSE: &str = "the tree gives item 1 of ys its own cause, absent, as for.try says, in a subject where neither engine gives it an entry, and this test compares it with the entries of the same name in the case's other subjects, which are unusable and null";
+
+const READ_WHOLE_FAILS: &str = "the case fails an item of the first list on an empty second list for an alias read whole as a named by key, as for.roots says, or for a member it walks through its alias that can't be read, as walk.right.fail says, and Rust's row does too, but the tree doesn't say it yet, so R5-6 must make the row fail from the tree and never pass";
+
+const SAID_NOWHERE: &str = "the row fails from something it says nowhere, a subject that isn't an object or an item of the first list that picks nothing, as for.pick says, so no clause of the tree carries that cause, and R5-6 must take the row's cause from the line as well as from the tree";
+
+const ROW_LEAVES_OUT_AN_ITEM: &str = "the row and the tree leave out the item of the second list that the whose can't read, which the case says and which gives the row its cause, and the case is in known-failures.txt until the Rust engine says that item";
+
+const ROWS_THE_CLAUSES_DONT_SAY_YET: &[(&str, usize, &str)] = &[
+    (
+        "for / a $params list that a for line reads fails it when the line's whose leaves nothing and an item of the list can't be read / fails, when the whose leaves nothing",
+        1,
+        SAID_OUTSIDE,
+    ),
+    (
+        "for / a $params list that a for line reads fails it when the line's whose leaves nothing and an item of the list can't be read / fails, when the whose leaves nothing",
+        3,
+        SAID_OUTSIDE,
+    ),
+    (
+        "for / a $params list that a for line walks fails it on an empty list when an item of it can't be read / fails, with an empty rows, when an item of it has no name",
+        1,
+        SAID_OUTSIDE,
+    ),
+    (
+        "for / a $params list that a for line walks fails it on an empty list when an item of it can't be read / fails, with an empty rows, when an item of it has no name",
+        3,
+        SAID_OUTSIDE,
+    ),
+    (
+        "for / a $params list that a for line walks fails it on an empty list when an item of it is null / fails, with an empty rows",
+        1,
+        SAID_OUTSIDE,
+    ),
+    (
+        "for / a $params list that a for line walks fails it on an empty list when an item of it is null / fails, with an empty rows",
+        3,
+        SAID_OUTSIDE,
+    ),
+    (
+        "for / a for line on a subject that isn't an object / fails as not_an_object when the first path starts at the subject",
+        1,
+        SAID_NOWHERE,
+    ),
+    (
+        "for / a for line on a subject that isn't an object names the subject / the message names thing, never the subject",
+        1,
+        SAID_NOWHERE,
+    ),
+    (
+        "for / a for line runs the sentences that don't read the alias of an empty list it tolerates on an item that isn't an object only when one of them reads the item / fails an approver that isn't an object with the sentence that reads it, and passes it when every sentence reads commit",
+        3,
+        ITEMS_BY_SENTENCE,
+    ),
+    (
+        "for / a for line runs the sentences that don't read the alias of an empty list it tolerates, for each item of the list before it / fails each approver that didn't approve when there are no commits, and skips the sentences that read commit",
+        5,
+        ITEMS_BY_SENTENCE,
+    ),
+    (
+        "for / a for line runs the sentences that don't read the alias of an empty list it tolerates, for each item of the list before it / fails each approver that didn't approve when there are no commits, and skips the sentences that read commit",
+        8,
+        ITEMS_BY_SENTENCE,
+    ),
+    (
+        "for / a for line runs the sentences that don't read the alias of an empty list it tolerates, for each item of the list before it / fails each approver that didn't approve when there are no commits, and skips the sentences that read commit",
+        9,
+        ITEMS_BY_SENTENCE,
+    ),
+    (
+        "for / a for line runs the sentences that don't read the alias of an empty list it tolerates, for each item of the list before it / fails each approver that didn't approve when there are no commits, and skips the sentences that read commit",
+        10,
+        ITEMS_BY_SENTENCE,
+    ),
+    (
+        "for / a for line runs the sentences that don't read the alias of an empty list it tolerates, for each item of the list before it / fails each approver that didn't approve when there are no commits, and skips the sentences that read commit",
+        11,
+        ITEMS_BY_SENTENCE,
+    ),
+    (
+        "for / a for line sorted by a key from $params that is missing says the key once and gives an item an entry only for its own problem / an item whose m is a list and an item without m",
+        1,
+        TREE_IS_THE_CASE,
+    ),
+    (
+        "for / a for line sorted by a path named by a key from $params / a key that isn't a string fails as unusable, even on a list where a number could be a position, a null key as null and a missing one as absent, and a string key sorts by that field",
+        2,
+        TREE_IS_THE_CASE,
+    ),
+    (
+        "for / a for line sorted by a path named by a key from $params / a key that isn't a string fails as unusable, even on a list where a number could be a position, a null key as null and a missing one as absent, and a string key sorts by that field",
+        4,
+        TREE_IS_THE_CASE,
+    ),
+    (
+        "for / a for line sorted by a path named by a key from $params / a key that isn't a string fails as unusable, even on a list where a number could be a position, a null key as null and a missing one as absent, and a string key sorts by that field",
+        6,
+        TREE_IS_THE_CASE,
+    ),
+    (
+        "for / a for line sorted by a path named by a key from $params / a key that isn't a string fails as unusable, even on a list where a number could be a position, a null key as null and a missing one as absent, and a string key sorts by that field",
+        11,
+        TREE_IS_THE_CASE,
+    ),
+    (
+        "for / a for line walks a subject that is a list / an empty list fails as value, and a null subject as not_an_object",
+        2,
+        SAID_NOWHERE,
+    ),
+    (
+        "for / a for line walks a subject that is a list / an empty list fails as value, and a null subject as not_an_object",
+        5,
+        SAID_NOWHERE,
+    ),
+    (
+        "for / a for line walks a subject that is a list / an empty list fails as value, and a null subject as not_an_object",
+        6,
+        SAID_NOWHERE,
+    ),
+    (
+        "for / a for line walks a subject that is a list / an empty list fails as value, and a null subject as not_an_object",
+        7,
+        SAID_NOWHERE,
+    ),
+    (
+        "for / a for line walks a subject that is a list / an empty list fails as value, and a null subject as not_an_object",
+        8,
+        SAID_NOWHERE,
+    ),
+    (
+        "for / a for line walks a subject that is a list / every and some walk the stages, and an item with a position fails as not_an_object",
+        2,
+        SAID_NOWHERE,
+    ),
+    (
+        "for / a for line whose item path is the subject's own name walks a subject that is a list, and fails one that isn't an object / a text subject is not an object",
+        1,
+        SAID_NOWHERE,
+    ),
+    (
+        "for / a for line whose second list fails for an item, with sentences that don't read the second alias / runs the sentences that don't read y for each item and says them before the list",
+        1,
+        TREE_IS_THE_CASE,
+    ),
+    (
+        "for / a for line whose second list has a named by key from $params that isn't text / says the key once on the row, after the sentence that doesn't read x",
+        1,
+        SECOND_KEY,
+    ),
+    (
+        "for / a for line whose sentence reads a key from an alias of an earlier line / names a key of the wrong type once under its first item, on an empty list too",
+        1,
+        READ_WHOLE_FAILS,
+    ),
+    (
+        "for / a for line's own whose lists a list it walks, as a check without a for line does / an item without the name is listed as null",
+        1,
+        WHOSE_ROOT,
+    ),
+    (
+        "for / a for line's own whose lists a list it walks, as a check without a for line does / an item without the name is listed as null",
+        2,
+        WHOSE_ROOT,
+    ),
+    (
+        "for / a for line's own whose lists a list it walks, as a check without a for line does / an item without the name is listed as null",
+        3,
+        WHOSE_ROOT,
+    ),
+    (
+        "for / a for line's own whose lists a list it walks, as a check without a for line does / an item without the name is listed as null",
+        4,
+        WHOSE_ROOT,
+    ),
+    (
+        "for / a name read from outside the item and walked on a for line is said once, before what each item says on its own / an item without the name it reads is named after the root, without the root",
+        4,
+        WHOSE_ROOT,
+    ),
+    (
+        "for / a name read from outside the item and walked on a for line is said once, before what each item says on its own / with more than three items without the name, the name's own list says how many more once",
+        4,
+        WHOSE_ROOT,
+    ),
+    (
+        "for / a name read from outside the item and walked on the right of is in on a for line is said once, with no item / a list of names of more than one kind fails as unusable and is said once",
+        4,
+        WHOSE_ROOT,
+    ),
+    (
+        "for / a name read from outside the item and walked on the right of is in on a for line is said once, with no item / an item whose name is null fails as null and is said once",
+        4,
+        WHOSE_ROOT,
+    ),
+    (
+        "for / a name read from outside the item and walked on the right of is in on a for line is said once, with no item / an item without the name fails as absent and is said once",
+        4,
+        WHOSE_ROOT,
+    ),
+    (
+        "for / a name read from outside the item and walked on the right of is in on a for line is said once, with no item / items that aren't objects fail as unusable and are said once",
+        4,
+        WHOSE_ROOT,
+    ),
+    (
+        "for / a named by key read from $params on a for line over a null item, with the second list missing / names $params.k once and then the missing list",
+        1,
+        TREE_IS_THE_CASE,
+    ),
+    (
+        "for / a parent's part that a for line's sentence walks fails it on an empty list when an item of it can't be read / fails, with an empty rows, when an item of it has no name",
+        1,
+        SAID_OUTSIDE,
+    ),
+    (
+        "for / a parent's part that a for line's sentence walks fails it on an empty list when an item of it can't be read / fails, with an empty rows, when an item of it has no name",
+        3,
+        SAID_OUTSIDE,
+    ),
+    (
+        "for / a parent's part that a for line's sentence walks fails it on an empty list when an item of it can't be read / fails, with an empty rows, when an item of it is null",
+        1,
+        SAID_OUTSIDE,
+    ),
+    (
+        "for / a parent's part that a for line's sentence walks fails it on an empty list when an item of it can't be read / fails, with an empty rows, when an item of it is null",
+        3,
+        SAID_OUTSIDE,
+    ),
+    (
+        "for / a parent's part that a for line's sentence walks fails it on an empty list when an item of it can't be read / fails, with an empty rows, when it holds names of more than one kind",
+        1,
+        SAID_OUTSIDE,
+    ),
+    (
+        "for / a parent's part that a for line's sentence walks fails it on an empty list when an item of it can't be read / fails, with an empty rows, when it holds names of more than one kind",
+        3,
+        SAID_OUTSIDE,
+    ),
+    (
+        "for / a part that a for line reads fails it when the line's whose leaves nothing and an item of the part can't be read / fails, when the whose leaves nothing, when an item of it has no name",
+        1,
+        SAID_OUTSIDE,
+    ),
+    (
+        "for / a part that a for line reads fails it when the line's whose leaves nothing and an item of the part can't be read / fails, when the whose leaves nothing, when an item of it has no name",
+        3,
+        SAID_OUTSIDE,
+    ),
+    (
+        "for / a part that a for line walks as a list fails it on an empty list when an item of it can't be read / fails, with an empty rows, when an item of it has no name",
+        1,
+        SAID_OUTSIDE,
+    ),
+    (
+        "for / a part that a for line walks as a list fails it on an empty list when an item of it can't be read / fails, with an empty rows, when an item of it has no name",
+        3,
+        SAID_OUTSIDE,
+    ),
+    (
+        "for / a part that a for line walks as a list fails it on an empty list when an item of it can't be read / fails, with an empty rows, when an item of it is null",
+        1,
+        SAID_OUTSIDE,
+    ),
+    (
+        "for / a part that a for line walks as a list fails it on an empty list when an item of it can't be read / fails, with an empty rows, when an item of it is null",
+        3,
+        SAID_OUTSIDE,
+    ),
+    (
+        "for / a part that a for line walks as a list fails it on an empty list when an item of it can't be read / fails, with an empty rows, when it holds names of more than one kind",
+        1,
+        SAID_OUTSIDE,
+    ),
+    (
+        "for / a part that a for line walks as a list fails it on an empty list when an item of it can't be read / fails, with an empty rows, when it holds names of more than one kind",
+        3,
+        SAID_OUTSIDE,
+    ),
+    (
+        "for / a part that holds a list is walked in the whose of a for line and in a whose under it / an empty part leaves every item out",
+        1,
+        NO_LIST,
+    ),
+    (
+        "for / a part that holds a list is walked in the whose of a for line and in a whose under it / an empty part leaves every item out",
+        4,
+        NO_LIST,
+    ),
+    (
+        "for / a part that holds a list is walked on the right of is in on a for line / an item without the name fails as absent and names the item",
+        3,
+        WHOSE_ROOT,
+    ),
+    (
+        "for / a root in a for line's relative clause doesn't hide an item's own problem / names the root once, then the item's own problem",
+        1,
+        WHOSE_ROOT,
+    ),
+    (
+        "for / a root in a for line's relative clause doesn't hide an item's own problem / names the root once, then the item's own problem",
+        2,
+        WHOSE_ROOT,
+    ),
+    (
+        "for / a root in a for line's relative clause doesn't hide an item's own problem / names the root once, then the item's own problem",
+        3,
+        WHOSE_ROOT,
+    ),
+    (
+        "for / a root in a for line's relative clause doesn't hide an item's own problem / names the root once, then the item's own problem",
+        4,
+        WHOSE_ROOT,
+    ),
+    (
+        "for / a root in one of two relative clauses, in either order / gives the same report in either order, the root first, then the item's own problem",
+        1,
+        WHOSE_ROOT,
+    ),
+    (
+        "for / a root in one of two relative clauses, in either order / gives the same report in either order, the root first, then the item's own problem",
+        2,
+        WHOSE_ROOT,
+    ),
+    (
+        "for / a root in one of two relative clauses, in either order / gives the same report in either order, the root first, then the item's own problem",
+        3,
+        WHOSE_ROOT,
+    ),
+    (
+        "for / a root in one of two relative clauses, in either order / gives the same report in either order, the root first, then the item's own problem",
+        4,
+        WHOSE_ROOT,
+    ),
+    (
+        "for / a second for item picking after the first alias lists nothing when it picks nothing / a first item that fails its check is listed and one that matches nothing is not",
+        1,
+        SAID_NOWHERE,
+    ),
+    (
+        "for / a second for item picking after the first alias lists nothing when it picks nothing / a first item that matches nothing fails as absent and lists no failed item",
+        1,
+        NO_LIST,
+    ),
+    (
+        "for / a second for item picking after the first alias lists nothing when it picks nothing / an empty second list fails as absent and lists no failed item",
+        1,
+        NO_LIST,
+    ),
+    (
+        "for / a second item with a position lists its failed list / lists no entry for an empty list, which a position allows",
+        1,
+        NO_LIST,
+    ),
+    (
+        "for / a whose that reads a $params list that isn't a list / fails as unusable, whatever the items hold, and lists the items it couldn't decide",
+        1,
+        WHOSE_ROOT,
+    ),
+    (
+        "for / an alias of an earlier line that walks a list fails a second line on an empty list when an item of it can't be read / fails, with an empty rows, when an item of it has no name",
+        2,
+        READ_WHOLE_FAILS,
+    ),
+    (
+        "for / an alias of an earlier line that walks a list fails a second line on an empty list when an item of it can't be read / fails, with an empty rows, when an item of it has no name",
+        4,
+        READ_WHOLE_FAILS,
+    ),
+    (
+        "for / an alias of an earlier line that walks a list fails a second line on an empty list when an item of it can't be read / fails, with an empty rows, when an item of it is null",
+        2,
+        READ_WHOLE_FAILS,
+    ),
+    (
+        "for / an alias of an earlier line that walks a list fails a second line on an empty list when an item of it can't be read / fails, with an empty rows, when an item of it is null",
+        4,
+        READ_WHOLE_FAILS,
+    ),
+    (
+        "for / an alias of an earlier line that walks a list fails a second line on an empty list when an item of it can't be read / fails, with an empty rows, when it holds names of more than one kind",
+        2,
+        READ_WHOLE_FAILS,
+    ),
+    (
+        "for / an alias of an earlier line that walks a list fails a second line on an empty list when an item of it can't be read / fails, with an empty rows, when it holds names of more than one kind",
+        4,
+        READ_WHOLE_FAILS,
+    ),
+    (
+        "for / an alias that a pick on an empty list leaves without a value, read on a later line / names the alias as the policy writes it, with no $",
+        1,
+        NO_LIST,
+    ),
+    (
+        "for / an alias that a pick on an empty list leaves without a value, read on a later line / names the alias as the policy writes it, with no $",
+        2,
+        NO_LIST,
+    ),
+    (
+        "for / an item of a second list that the whose can't read is said beside an item that fails the sentence / one deploy and one approver fail the sentence, and one of each has no key",
+        1,
+        ROW_LEAVES_OUT_AN_ITEM,
+    ),
+    (
+        "for / an item of a second list that the whose can't read is said beside an item that fails the sentence / one deploy and one approver fail the sentence, and one of each has no key",
+        2,
+        ROW_LEAVES_OUT_AN_ITEM,
+    ),
+    (
+        "for / an item's own problem on a for line is said after a $params or $input root of its whose that can't be read / an item without v, with $input.os that is text",
+        2,
+        WHOSE_ROOT,
+    ),
+    (
+        "for / an item's own problem on a for line is said after a $params or $input root of its whose that can't be read / an item without v, with an item of the list without the name",
+        1,
+        WHOSE_ROOT,
+    ),
+    (
+        "for / an item's own problem on a for line is said after a $params or $input root of its whose that can't be read / an item without v, with an item of the list without the name",
+        2,
+        WHOSE_ROOT,
+    ),
+    (
+        "for / an item's own problem on a for line is said after a parent's root of its whose that can't be read / an item without v, with an item of the parent list without the name",
+        1,
+        WHOSE_ROOT,
+    ),
+    (
+        "for / an item's own problem on a for line is said after a parent's root of its whose that can't be read / an item without v, with an item of the parent list without the name",
+        2,
+        WHOSE_ROOT,
+    ),
+    (
+        "for / an item's own problem on a for line is said after a root of its whose that can't be read, even when it fails no worse than the root / an item that is null, with an item of the part without the name",
+        1,
+        WHOSE_ROOT,
+    ),
+    (
+        "for / an item's own problem on a for line is said after a root of its whose that can't be read, even when it fails no worse than the root / an item without v, with an item of the part without the name",
+        1,
+        WHOSE_ROOT,
+    ),
+    (
+        "for / an item's own problem on a for line is said after a root of its whose that can't be read, even when it fails no worse than the root / an item without v, with names of more than one kind",
+        1,
+        WHOSE_ROOT,
+    ),
+    (
+        "for / first of and last of an empty second for list whose whose reads params that are an object, not a list, say the params, then the empty list / ys is empty",
+        1,
+        NO_LIST,
+    ),
+    (
+        "for / first of and last of an empty second for list whose whose reads params that are an object, not a list, say the params, then the empty list / ys is empty",
+        2,
+        NO_LIST,
+    ),
+    (
+        "for / first of and last of an empty second for list whose whose reads params that are an object, not a list, say the params, then the empty list / ys is empty",
+        3,
+        NO_LIST,
+    ),
+    (
+        "for / first of and last of an empty second for list whose whose reads params that are text, not a list, say the params, then the empty list / ys is empty",
+        1,
+        NO_LIST,
+    ),
+    (
+        "for / first of and last of an empty second for list whose whose reads params that are text, not a list, say the params, then the empty list / ys is empty",
+        2,
+        NO_LIST,
+    ),
+    (
+        "for / first of and last of an empty second for list whose whose reads params that are text, not a list, say the params, then the empty list / ys is empty",
+        3,
+        NO_LIST,
+    ),
+    (
+        "for / the latest commit picked on a for line / fails as absent on an empty list, since there's nothing to pick",
+        1,
+        NO_LIST,
+    ),
+    (
+        "for / the second latest approval, filtered before it is sorted / fails as absent when fewer items are left than the position",
+        1,
+        NO_LIST,
+    ),
+    (
+        "for / two items over sibling lists, with two assertions / an approver who breaks both sentences lists both, in the order written",
+        1,
+        PAIR_LEAD_INSIDE,
+    ),
+    (
+        "for / two items over sibling lists, with two assertions / fails as value when no approver is left, and the commits are not read as a failure",
+        1,
+        NO_LIST,
+    ),
+    (
+        "for / whose on a for item / when whose leaves no item in, every and some fail as value and if any passes",
+        1,
+        NO_LIST,
+    ),
+    (
+        "for / whose on a for item / when whose leaves no item in, every and some fail as value and if any passes",
+        4,
+        NO_LIST,
+    ),
+    (
+        "list_items / a missing $params name and a walked part in one whose are each named, with the $params name first only in a count / an item of the part has no name",
+        1,
+        WHOSE_ROOT,
+    ),
+    (
+        "list_items / a missing $params name and a walked part in one whose are each named, with the $params name first only in a count / the part holds more than one kind of value",
+        1,
+        WHOSE_ROOT,
+    ),
+    (
+        "list_items / two names read from outside the item in a whose, one with an item without the name, are each named once, worst cause first and then by name / an item of the part has no name too",
+        1,
+        WHOSE_ROOT,
+    ),
+    (
+        "list_items / two names read from outside the item in a whose, one with an item without the name, are each named once, worst cause first and then by name / the part holds more than one kind of value",
+        1,
+        WHOSE_ROOT,
+    ),
+    (
+        "members / every member of on a for line whose whose reads a named by key from $params that isn't text, beside a member that fails on its own field / says the key in each member, the member that has its field too, in key order",
+        1,
+        WHOSE_ROOT,
+    ),
+    (
+        "messages / a count of in a for line, and the order of its roots / names the $params root first and each root once",
+        2,
+        TREE_IS_THE_CASE,
+    ),
+    (
+        "messages / a for item with a whose that reads a part over items that aren't all objects / names the part first, once, then each item in turn",
+        1,
+        ENTRY_CAUSE,
+    ),
+    (
+        "messages / a for line over a list of lists whose values spell the alias / a list that holds the alias in its items is printed as the input had it",
+        1,
+        WALK_ITEMS_JOINED,
+    ),
+    (
+        "messages / a for line over two lists, with a sentence on the second item before a walk under the first / the parts follow the items, not the sentences",
+        1,
+        TREE_IS_THE_CASE,
+    ),
+    (
+        "messages / a for line over two lists, with a walk under the first item before a sentence on the second / the parts follow the items, not the sentences",
+        1,
+        TREE_IS_THE_CASE,
+    ),
+    (
+        "messages / a for line that picks nothing prints the list it read / a whose that leaves no item prints the list",
+        1,
+        NO_LIST,
+    ),
+    (
+        "messages / a for line that picks nothing prints the list it read / an empty list prints as empty",
+        1,
+        NO_LIST,
+    ),
+    (
+        "messages / a parent's part read in a that on a for line / names a part of the wrong type once, before what each item says",
+        1,
+        WHOSE_ROOT,
+    ),
+    (
+        "messages / a parent's part read in a whose, on a for line and in a count of / names a part of the wrong type once with no item",
+        1,
+        WHOSE_ROOT,
+    ),
+    (
+        "messages / a parent's part read in a whose, on a for line and in a count of / names a part of the wrong type once with no item",
+        2,
+        WHOSE_ROOT,
+    ),
+    (
+        "messages / a root name after is in inside a relative clause that isn't a list, on a list with items / names the root once, with no item, on a for line too",
+        1,
+        WHOSE_ROOT,
+    ),
+    (
+        "messages / a root of a for line, said once / names the root once, with no item, whatever the list holds",
+        3,
+        WHOSE_ROOT,
+    ),
+    (
+        "messages / a root of a for line, said once / names the root once, with no item, whatever the list holds",
+        4,
+        WHOSE_ROOT,
+    ),
+    (
+        "messages / a root that reads the alias of the first item of a for line, in the second item / fails before any item of the second list, naming each first item, on an empty list too",
+        5,
+        OTHER_SUBJECTS_CAUSE,
+    ),
+    (
+        "messages / a whose that leaves no item of a part prints the part's list / the part's list is printed",
+        1,
+        NO_LIST,
+    ),
+    (
+        "messages / two roots after is in that aren't lists, in one relative clause / names both, worst cause first and then by name, on a list with items",
+        1,
+        WHOSE_ROOT,
+    ),
+    (
+        "messages / two roots in a whose that fail in different ways, beside a list that can be read, take the worst cause / a root that is null and one that is missing fail as absent",
+        1,
+        TREE_IS_THE_CASE,
+    ),
+    (
+        "messages / two roots in one relative clause that fail in different ways / names every root that failed, whatever its cause, worst cause first and then by name",
+        1,
+        TREE_IS_THE_CASE,
+    ),
+    (
+        "messages / two roots in one relative clause that fail in different ways / names them in front of what the items say when an item fails in a worse way",
+        1,
+        TREE_IS_THE_CASE,
+    ),
+    (
+        "row_parts / a count of and a sum of on a for line name the items they can't read under the item of the for line / items named through the alias, an inner list that is missing, a sentence that doesn't read the alias, and a second list",
+        2,
+        TREE_IS_THE_CASE,
+    ),
+    (
+        "row_parts / a count of and a sum of on a for line name the items they can't read under the item of the for line / items named through the alias, an inner list that is missing, a sentence that doesn't read the alias, and a second list",
+        3,
+        TREE_IS_THE_CASE,
+    ),
+    (
+        "row_parts / two sentences on a for line that walk the same list under the item say its items in list order, and a check with several sentences keeps their order / two sentences that walk the same inner list say its items in list order on a for line, and in the order of the sentences outside one",
+        1,
+        TREE_IS_THE_CASE,
+    ),
+    (
+        "sentences / a for line item that reads a null before a named by field / fails as null whatever the field holds, and failed_items names the null, as the item does without the field, whether it reads the first alias or not",
+        7,
+        NO_LIST,
+    ),
+    (
+        "sentences / a for line item that reads a null before a named by field / fails as null whatever the field holds, and failed_items names the null, as the item does without the field, whether it reads the first alias or not",
+        11,
+        NO_LIST,
+    ),
+    (
+        "sentences / a for line item that reads a null before a named by field / fails as null whatever the field holds, and failed_items names the null, as the item does without the field, whether it reads the first alias or not",
+        15,
+        NO_LIST,
+    ),
+    (
+        "sentences / a for line that walks a path with a named by field / that is null fails as null whatever the field holds, as the walk does without the field",
+        3,
+        NO_LIST,
+    ),
+    (
+        "sentences / a for line that walks a path with a named by field / that is null fails as null whatever the field holds, as the walk does without the field",
+        5,
+        NO_LIST,
+    ),
+    (
+        "sentences / a for line that walks a path with a named by field / that is null fails as null whatever the field holds, as the walk does without the field",
+        7,
+        NO_LIST,
+    ),
+    (
+        "sentences / a for line that walks a path with a named by field / that is null fails as null whatever the field holds, as the walk does without the field",
+        9,
+        NO_LIST,
+    ),
+    (
+        "sentences / a named by key from the subject after a parent or an alias, inside a relative clause / fails as absent once when the subject has no k",
+        1,
+        TREE_IS_THE_CASE,
+    ),
+    (
+        "sentences / a root name of the wrong type on the left of a compare inside a relative clause / says its problem once, with no item named, as on the right, even on an empty list",
+        2,
+        WHOSE_ROOT,
+    ),
+    (
+        "sentences / a root name of the wrong type on the left of a compare inside a relative clause / says its problem once, with no item named, as on the right, even on an empty list",
+        3,
+        WHOSE_ROOT,
+    ),
+    (
+        "walks / a for line whose whose reads a named by key from $params that isn't text says only the items whose own value can't take the key, the last one fine / an item without m before an item whose m is an object",
+        1,
+        WHOSE_ROOT,
+    ),
+    (
+        "walks / a one-line walk whose whose reads a named by key from $params that isn't text says the key once, with no item in front / two items whose m is an object get no entry",
+        1,
+        WHOSE_ROOT,
+    ),
+    (
+        "walks / a one-line walk whose whose reads a named by key from $params that isn't text says the key once, with no item in front / two items without m",
+        1,
+        WHOSE_ROOT,
+    ),
+    (
+        "walks / a path whose named by key from $params isn't text and whose value before the key can't take a key, in a plain check, a count, a sum, an every, a for line and a for line's whose / says the key and then the value before it that is missing, with the worst cause",
+        2,
+        WHOSE_ROOT,
+    ),
+    (
+        "walks / a path whose named by key from $params isn't text and whose value before the key can't take a key, in a plain check, a count, a sum, an every, a for line and a for line's whose / says the key and then the value before it that is null, with the worst cause",
+        2,
+        WHOSE_ROOT,
+    ),
+    (
+        "walks / a path whose named by key from $params isn't text and whose value before the key can't take a key, in a plain check, a count, a sum, an every, a for line and a for line's whose / says the key and then the value before it that is text, with the worst cause",
+        2,
+        WHOSE_ROOT,
+    ),
+    (
+        "walks / a whose key from $params that isn't text is said before a list that can't be walked, and the row takes the worst cause / the list is missing",
+        1,
+        TREE_IS_THE_CASE,
+    ),
+    (
+        "walks / a whose key from $params that isn't text is said before a list that can't be walked, and the row takes the worst cause / the list is null",
+        1,
+        TREE_IS_THE_CASE,
+    ),
+    (
+        "walks / a whose key from $params that isn't text, beside items that fail on their own fields, says the key in each item / five mixed items say the key in each item and the item that isn't an object",
+        1,
+        WHOSE_ROOT,
+    ),
+    (
+        "walks / a whose key from $params that isn't text, beside items that fail on their own fields, says the key in each item / two items without zz or m say the key in each item",
+        1,
+        WHOSE_ROOT,
+    ),
+    (
+        "walks / a whose key from $params that isn't text, in a walk beside another sentence or option, a for line beside a sentence that doesn't read the alias, and a count of that, is said wherever the walk is said / the list holds an item the whose leaves out",
+        1,
+        WHOSE_ROOT,
+    ),
+    (
+        "walks / a whose key from $params that isn't text, in a walk beside another sentence or option, a for line beside a sentence that doesn't read the alias, and a count of that, is said wherever the walk is said / the list holds text",
+        1,
+        WHOSE_ROOT,
+    ),
+    (
+        "walks / a whose key from $params that isn't text, in a walk beside another sentence or option, a for line beside a sentence that doesn't read the alias, and a count of that, is said wherever the walk is said / the list is missing",
+        1,
+        FREE_BEFORE_KEY,
+    ),
+    (
+        "walks / a whose key from $params that isn't text, said once before the items, doesn't count as one of the three items the message shows / five items without m show three and count two more",
+        1,
+        WHOSE_ROOT,
+    ),
+    (
+        "walks / a whose key from $params that isn't text, said once before the items, doesn't count as one of the three items the message shows / four items without m show three and count one more",
+        1,
+        WHOSE_ROOT,
+    ),
+    (
+        "walks / a whose key from $params that isn't text, said once before the items, doesn't count as one of the three items the message shows / three items without m show all three",
+        1,
+        WHOSE_ROOT,
+    ),
+    (
+        "walks / an every, a some, a for item or a count whose whose reads two named by keys on an empty list fails with the worse cause, and names each key that can't be read, worst cause first / neither key is text",
+        1,
+        TREE_IS_THE_CASE,
+    ),
+    (
+        "walks / an every, a some, a for item or a count whose whose reads two named by keys on an empty list fails with the worse cause, and names each key that can't be read, worst cause first / one key is missing and the other isn't text",
+        1,
+        TREE_IS_THE_CASE,
+    ),
+    (
+        "walks / an every, a some, a for item or a count whose whose reads two named by keys on an empty list fails with the worse cause, and names each key that can't be read, worst cause first / one key is null and the other isn't text",
+        1,
+        TREE_IS_THE_CASE,
+    ),
+];
+
+fn item_entries(failures: &Value, out: &mut Vec<(String, String)>) {
+    for failure in failures.as_array().into_iter().flatten() {
+        if failure["kind"] == "item" {
+            out.push((
+                failure["name"].as_str().unwrap_or("").to_string(),
+                failure["cause"].as_str().unwrap_or("").to_string(),
+            ));
+        }
+        item_entries(&failure["failures"], out);
+    }
+}
+
+fn item_causes(clauses: &[crate::ops::clause::Clause], out: &mut Vec<(String, String)>) {
+    for clause in clauses {
+        if clause.kind == crate::ops::clause::Kind::Item {
+            out.push((clause.name.clone(), clause.cause.name().to_string()));
+        }
+        item_causes(&clause.said, out);
+    }
+}
+
+fn tree_causes(clauses: &[crate::ops::clause::Clause]) -> Vec<crate::cause::Cause> {
+    clauses
+        .iter()
+        .flat_map(|clause| std::iter::once(clause.cause).chain(tree_causes(&clause.said)))
+        .collect()
+}
+
+#[test]
+fn the_clauses_of_every_for_row_say_what_the_row_and_its_entries_say_today() {
+    let mut differ: Vec<String> = Vec::new();
+    let mut compared = 0;
+    let mut listed: Vec<(&str, usize)> = Vec::new();
+    for (id, input, policy, params) in for_line_cases() {
+        super::RAN.with(|ran| ran.borrow_mut().clear());
+        let report = crate::report(&input, &policy, &params);
+        let mut entries: Vec<(String, String)> = Vec::new();
+        for result in report["results"].as_array().into_iter().flatten() {
+            item_entries(&result["failures"], &mut entries);
+        }
+        for (at, (cause, message, roots, items)) in
+            super::RAN.with(|ran| ran.take()).into_iter().enumerate()
+        {
+            let row = at + 1;
+            let message = message.unwrap_or_default();
+            let clauses: Vec<crate::ops::clause::Clause> = roots.into_iter().chain(items).collect();
+            let shown = crate::ops::clause::shown(&clauses);
+            let said = crate::ops::clause::text(&shown);
+            let mut causes: Vec<(String, String)> = Vec::new();
+            item_causes(&shown, &mut causes);
+            let mut wrong: Vec<String> = causes
+                .iter()
+                .filter(|(name, cause)| {
+                    let same: Vec<&String> = entries
+                        .iter()
+                        .filter(|(entry, _)| entry == name)
+                        .map(|(_, cause)| cause)
+                        .collect();
+                    !same.is_empty() && !same.contains(&cause)
+                })
+                .map(|(name, cause)| format!("{name} is {cause}"))
+                .collect();
+            let worst = crate::cause::Cause::worst(tree_causes(&clauses))
+                .unwrap_or(crate::cause::Cause::Satisfied);
+            if worst != cause {
+                wrong.push(format!(
+                    "the clauses fail as {} and the row as {}",
+                    worst.name(),
+                    cause.name()
+                ));
+            }
+            if said == message && wrong.is_empty() {
+                if cause != crate::cause::Cause::Satisfied {
+                    compared += 1;
+                }
+                continue;
+            }
+            match ROWS_THE_CLAUSES_DONT_SAY_YET
+                .iter()
+                .find(|(listed, listed_row, _)| *listed == id && *listed_row == row)
+            {
+                Some((listed_id, listed_row, _)) => listed.push((*listed_id, *listed_row)),
+                None => differ.push(format!(
+                    "{id}, row {row}\n  row:   {message}\n  items: {said}\n  causes: {}\n  tree: {}",
+                    wrong.join(", "),
+                    self::causes(&clauses).join(", ")
+                )),
+            }
+        }
+    }
+    assert!(
+        differ.is_empty(),
+        "{} rows differ, {compared} say what the row says:\n{}",
+        differ.len(),
+        differ.join("\n")
+    );
+    for (id, row, reason) in ROWS_THE_CLAUSES_DONT_SAY_YET {
+        assert!(
+            listed.contains(&(*id, *row)),
+            "{id}, row {row} is listed ({reason}) but says what the row says"
+        );
+    }
+    assert!(compared > 0);
+}
+
+fn for_items(
+    for_line: &str,
+    assertions: &[&str],
+    subject: Value,
+    params: Value,
+) -> Vec<crate::ops::clause::Clause> {
+    let line = ergo_policy_sentences::parse_for(for_line).unwrap();
+    let parsed: Vec<_> = assertions
+        .iter()
+        .flat_map(|assertion| {
+            ergo_policy_sentences::parse_check(assertion)
+                .unwrap()
+                .assertions
+        })
+        .collect();
+    let places: Vec<String> = assertions.iter().map(|_| "p".to_string()).collect();
+    let checked = super::lower_for(&line, &parsed, &places, &crate::lower::Scope::new()).unwrap();
+    let crate::ops::Check::For(line) = checked else {
+        panic!("{for_line} is not a for line");
+    };
+    let input = json!({"things": [subject]});
+    let ctx = crate::path::Ctx {
+        label: Some("thing".to_string()),
+        item_by_item: false,
+        subject: crate::path::Located {
+            value: &input["things"][0],
+            location: crate::path::Location::input_root().key("things").index(0),
+        },
+        input: &input,
+        params: Some(&params),
+        aliases: std::collections::BTreeMap::new(),
+    };
+    line.run(&ctx).items
+}
+
+fn tree(clauses: &[crate::ops::clause::Clause]) -> Vec<String> {
+    clauses
+        .iter()
+        .map(|clause| {
+            let said = tree(&clause.said);
+            if said.is_empty() {
+                format!("{}|{}", clause.name, clause.text)
+            } else {
+                format!("{}[{}]", clause.name, said.join(", "))
+            }
+        })
+        .collect()
+}
+
+#[test]
+fn a_sentence_of_the_first_list_rides_with_the_first_pair() {
+    let items = for_items(
+        "every prs as pr, every pr.as as ap",
+        &["ap.state is 1", "ap.user is 1", "pr.ok is true"],
+        json!({"prs": [{"ok": false, "as": [{"state": 2, "user": 1}, {"state": 1, "user": 3}]}]}),
+        json!({}),
+    );
+    assert_eq!(
+        tree(&items),
+        [
+            "item 1 of prs[item 1 of pr.as[ap.state is 2|ap.state is 2, pr.ok is false|pr.ok is false], item 2 of pr.as[ap.user is 3|ap.user is 3]]"
+        ]
+    );
+}
+
+#[test]
+fn two_sentences_walking_one_list_merge_by_item() {
+    let items = for_items(
+        "every xs as x",
+        &["every x.ys.n is 1", "every x.ys.m is 1"],
+        json!({"xs": [{"ys": [{"n": 1, "m": 2}, {"m": 1}]}]}),
+        json!({}),
+    );
+    assert_eq!(
+        tree(&items),
+        ["item 1 of xs[item 1 of x.ys[m is 2|m is 2], item 2 of x.ys[n is missing|n is missing]]"]
+    );
+}
+
+fn causes(clauses: &[crate::ops::clause::Clause]) -> Vec<String> {
+    clauses
+        .iter()
+        .flat_map(|clause| {
+            std::iter::once(format!("{}: {}", clause.name, clause.cause.name()))
+                .chain(causes(&clause.said))
+        })
+        .collect()
+}
+
+#[test]
+fn an_item_beside_a_root_takes_only_its_own_cause() {
+    let items = for_items(
+        "every xs as x",
+        &["count of x.es whose v is at least $params.a is $params.b"],
+        json!({"xs": [{"es": [{"v": 1}, {}]}]}),
+        json!({"a": "s", "b": 0}),
+    );
+    assert_eq!(
+        causes(&items),
+        [
+            "item 1 of xs: absent",
+            "item 2 of x.es: absent",
+            "v is missing: absent"
+        ]
+    );
+}
+
+fn for_tree(for_line: &str, assertions: &[&str], subject: Value, params: Value) -> String {
+    super::RAN.with(|ran| ran.borrow_mut().clear());
+    for_items(for_line, assertions, subject, params);
+    let (_, _, roots, items) = super::RAN
+        .with(|ran| ran.take())
+        .pop()
+        .expect("the line ran");
+    let clauses: Vec<crate::ops::clause::Clause> = roots.into_iter().chain(items).collect();
+    crate::ops::clause::text(&crate::ops::clause::shown(&clauses))
+}
+
+#[test]
+fn the_list_before_a_key_that_cant_be_read_comes_after_the_key() {
+    assert_eq!(
+        for_tree(
+            "every o named by $params.k as x",
+            &["x is 1"],
+            json!({"o": "s"}),
+            json!({}),
+        ),
+        "$params.k is missing; o is \"s\", which isn't a list or an object"
+    );
+}
+
+#[test]
+fn a_sentence_that_reads_no_alias_comes_before_a_key_that_cant_be_read() {
+    let said = |o: Value| {
+        for_tree(
+            "every o named by $params.k as x",
+            &["x is 1", "z is 3"],
+            json!({"z": 2, "o": o}),
+            json!({}),
+        )
+    };
+    assert_eq!(said(json!({"a": [1]})), "z is 2; $params.k is missing");
+    assert_eq!(
+        said(json!("s")),
+        "z is 2; $params.k is missing; o is \"s\", which isn't a list or an object"
+    );
+}
+
+#[test]
+fn an_item_takes_no_cause_from_a_root_a_later_line_reads_through_its_alias() {
+    let items = for_items(
+        "every items as i, every $params.l whose v is at least i.t as x",
+        &["x.v is 1"],
+        json!({"items": [{"t": "s"}]}),
+        json!({"l": [{"w": 1}]}),
+    );
+    assert_eq!(causes(&items)[0], "item 1 of items: absent");
+}
+
+#[test]
+fn an_item_whose_path_goes_through_a_key_that_cant_be_read_takes_the_keys_cause() {
+    let items = for_items(
+        "every rs as r",
+        &["r.x.y named by $params.i does not exist"],
+        json!({"rs": [{}]}),
+        json!({"i": [1]}),
+    );
+    assert_eq!(
+        causes(&items),
+        ["item 1 of rs: unusable", "r.x.y is missing: unusable"]
+    );
+}
+
+#[test]
+fn a_sentence_that_reads_no_alias_is_a_clause_on_an_empty_list_the_line_tolerates() {
+    assert_eq!(
+        for_tree(
+            "every xs, if any, as x",
+            &["x.w is 1", "z is 3"],
+            json!({"xs": [], "z": 2}),
+            json!({}),
+        ),
+        "z is 2"
+    );
+}
+
+#[test]
+fn a_root_that_a_sentence_reading_no_alias_gives_is_said_once_on_an_empty_list() {
+    assert_eq!(
+        for_tree(
+            "every ys, if any, as m",
+            &["count of zb is count of za"],
+            json!({"id": "p0", "zb": "s", "za": 3, "ys": []}),
+            json!({}),
+        ),
+        "za is 3, which isn't a list or an object; zb is \"s\", which isn't a list or an object"
+    );
+}
+
+#[test]
+fn a_path_whose_key_cant_be_read_isnt_said_again_after_the_key() {
+    let said = |assertion: &str, subject: Value, params: Value| {
+        for_tree("every rs as r", &[assertion], subject, params)
+    };
+    let things = json!({"m": {"a": "a"}, "rs": [{"v": "a"}, {"v": 4}]});
+    assert_eq!(
+        said(
+            "r.zz is m named by $params.k",
+            things.clone(),
+            json!({"k": null})
+        ),
+        "$params.k is null; item 1 of rs: r.zz is missing; item 2 of rs: r.zz is missing"
+    );
+    assert_eq!(
+        said("k is m named by $params.k", things, json!({"k": null})),
+        "k is missing; $params.k is null"
+    );
+    let rows = json!({"m": {"k": [1]}, "rs": [{"v": [1]}, {"v": "no"}]});
+    assert_eq!(said("r.v is m named by p", rows, json!({})), "p is missing");
+    assert_eq!(
+        said(
+            "r.v is zz.x named by p",
+            json!({"zz": "str", "p": 3, "rs": [{"v": 1}]}),
+            json!({})
+        ),
+        "p is 3, which isn't text, and zz is \"str\", which isn't an object"
+    );
+    assert_eq!(
+        for_tree(
+            "every ks as k",
+            &["count of n named by k is at most 5"],
+            json!({"ks": [null], "n": {"q": [1]}}),
+            json!({}),
+        ),
+        "item 1 of ks: k is null"
+    );
+}
+
+#[test]
+fn a_key_that_sorts_the_line_is_said_once_before_the_items_own_problems() {
+    let said = |rows: Value| {
+        for_tree(
+            "first of rows sorted by m named by $params.km as r",
+            &["r.v is 1"],
+            json!({ "rows": rows }),
+            json!({}),
+        )
+    };
+    assert_eq!(
+        said(json!([{"m": {"q": 2}, "v": 2}, {"m": {"q": 1}, "v": 1}])),
+        "$params.km is missing"
+    );
+    assert_eq!(
+        said(json!([{"m": [5, 1]}, {"m": {"a": 1}}, {"v": 1}])),
+        "$params.km is missing; item 1 of rows: m is [5, 1], which isn't an object; item 3 of rows: m is missing"
+    );
+    assert_eq!(
+        for_tree(
+            "first of rows sorted by m named by $params.kn as r",
+            &["r.v is 1"],
+            json!({"rows": [{"m": [5, 1], "v": 1}]}),
+            json!({"kn": 1}),
+        ),
+        "$params.kn is 1, which isn't text; item 1 of rows: m is [5, 1], which isn't an object"
+    );
+}
+
+#[test]
+fn a_key_read_from_a_field_of_the_subject_on_the_first_list_is_a_root_clause() {
+    let said = |p: Option<Value>| {
+        let mut subject = json!({"rows": [{"w": {"k": "xy"}}]});
+        if let Some(p) = p {
+            subject["p"] = p;
+        }
+        for_tree(
+            "every rows.w named by p as w",
+            &["w is \"xy\""],
+            subject,
+            json!({}),
+        )
+    };
+    assert_eq!(said(None), "p is missing");
+    assert_eq!(said(Some(Value::Null)), "p is null");
+    assert_eq!(said(Some(json!(3))), "p is 3, which isn't text");
+}
+
+#[test]
+fn a_sentence_that_reads_no_alias_comes_before_the_key_of_the_lines_whose() {
+    assert_eq!(
+        for_tree(
+            "every es whose zz is m named by $params.k as e",
+            &["e.v exists", "z is 1"],
+            json!({"z": 2}),
+            json!({"k": 3}),
+        ),
+        "z is 2; $params.k is 3, which isn't text; es is missing"
+    );
+}
+
+#[test]
+fn a_clause_an_earlier_sentence_gave_for_the_item_is_left_out() {
+    assert_eq!(
+        for_tree(
+            "every xs as x",
+            &["x.e exists", "x.e is after x.a"],
+            json!({"xs": [{}]}),
+            json!({}),
+        ),
+        "item 1 of xs: x.e is missing, and x.a is missing"
+    );
+}
+
+#[test]
+fn a_sentence_that_reads_no_alias_keeps_its_message_whole() {
+    assert_eq!(
+        for_tree(
+            "every xs as x",
+            &["count of rows is at least m"],
+            json!({"m": 3, "rows": [{"n": 1}], "xs": [{"v": 5}]}),
+            json!({}),
+        ),
+        "count of rows is 1, and m is 3"
+    );
+}
+
+#[test]
+fn a_walk_over_the_second_list_under_the_first_item_gives_its_items_beside_the_pairs() {
+    let said = |assertions: &[&str]| {
+        for_tree(
+            "every ws as w, every w.items as i",
+            assertions,
+            json!({"ws": [{"items": [{"k": 2, "m": 1}, {"k": 1}]}]}),
+            json!({}),
+        )
+    };
+    let want =
+        "item 1 of ws: item 1 of w.items: i.k is 2; item 1 of ws: item 2 of w.items: m is missing";
+    assert_eq!(said(&["every w.items.m is 1", "i.k is 1"]), want);
+    assert_eq!(said(&["i.k is 1", "every w.items.m is 1"]), want);
+}
+
+#[test]
+fn a_sentence_that_reads_only_the_first_alias_is_said_before_a_second_list_that_fails() {
+    let said = |assertion: &str, items: Value| {
+        for_tree(
+            "every ws as w, every w.items as i",
+            &[assertion, "i.k is 1"],
+            json!({"ws": [{"items": items, "zs": [{}]}]}),
+            json!({}),
+        )
+    };
+    assert_eq!(
+        said("w.n is 1", json!(null)),
+        "item 1 of ws: w.n is missing; item 1 of ws: w.items is null"
+    );
+    assert_eq!(
+        said("every w.zs.m is 1", json!({})),
+        "item 1 of ws: item 1 of w.zs: m is missing; item 1 of ws: w.items is {}, which isn't a list"
+    );
+    assert_eq!(
+        said("every w.zs.m is 1", json!([])),
+        "item 1 of ws: item 1 of w.zs: m is missing; item 1 of ws: w.items is []"
+    );
+}
+
+#[test]
+fn a_root_read_through_the_first_alias_fails_the_item_when_nothing_is_checked_for_it() {
+    assert_eq!(
+        for_tree(
+            "every ks as k, every xs, if any, as m",
+            &["m.t named by k is 1"],
+            json!({"ks": [{}], "xs": []}),
+            json!({}),
+        ),
+        "item 1 of ks: k is {}, which isn't text"
+    );
+    assert_eq!(
+        for_tree(
+            "every ys as m, every xs whose w is in m.q and whose v is in $params.l, if any, as n",
+            &["n.v is 1"],
+            json!({"xs": [], "ys": [{"q": 1}, {}]}),
+            json!({}),
+        ),
+        "$params.l is missing; item 1 of ys: m.q is 1, which isn't a list; item 2 of ys: m.q is missing"
+    );
+}
+
+#[test]
+fn a_root_that_lists_items_is_said_once_with_its_own_count_before_the_items_of_the_line() {
+    let os = json!([{"name": "bob"}, {"v": 0}, {"v": 1}, {"v": 2}, {"v": 3}, {"v": 4}]);
+    let root = "item 2 of $params.os: name is missing; item 3 of $params.os: name is missing; item 4 of $params.os: name is missing; and 2 more";
+    let said = |rows: Value| {
+        for_tree(
+            "every rows whose n is count of $params.os.name as r",
+            &["r.n is 1"],
+            json!({ "rows": rows }),
+            json!({ "os": os.clone() }),
+        )
+    };
+    assert_eq!(said(json!([{"n": 1}])), root);
+    assert_eq!(
+        said(json!([{"n": 1}, {}, {}])),
+        format!("{root}; item 2 of rows: n is missing; item 3 of rows: n is missing")
+    );
+}
+
+#[test]
+fn a_root_walked_by_a_sentence_that_walks_a_list_under_the_item_is_said_once_with_no_item() {
+    assert_eq!(
+        for_tree(
+            "every ms as m",
+            &["every m.ys.v is in $params.os.name"],
+            json!({"ms": [{"ys": [{"v": "bob"}]}, {"ys": [{"v": "ann"}]}]}),
+            json!({"os": [{"name": "bob"}, {"k": 1}]}),
+        ),
+        "item 2 of $params.os: name is missing"
+    );
+}
+
+#[test]
+fn an_item_whose_second_list_reads_a_missing_name_through_its_alias_fails_as_absent_on_an_empty_list()
+ {
+    let items = for_items(
+        "some approvers as approver, every commits whose author does not equal approver.u as commit",
+        &["commit.signed is true"],
+        json!({
+            "approvers": [{"username": "ada"}, {"username": "grace", "u": "grace", "state": "APPROVED"}],
+            "commits": []
+        }),
+        json!({}),
+    );
+    assert_eq!(
+        causes(&items),
+        [
+            "commits: value",
+            "item 1 of approvers: absent",
+            "approver.u is missing: absent"
+        ]
+    );
+}
+
+#[test]
+fn a_root_list_walked_through_a_list_in_its_items_sorts_by_the_path_it_starts_at() {
+    assert_eq!(
+        for_roots(
+            "every rows whose n is count of $params.os.tags.n and whose m is $params.ot as r",
+            &["r.n is 1"],
+            json!({"rows": [{"n": 1, "m": 1}]}),
+            json!({"os": [{"tags": [{"n": 1}, {}]}]}),
+        ),
+        "item 1 of $params.os: item 2 of tags: n is missing; $params.ot is missing"
+    );
+}
+
+#[test]
+fn two_root_lists_whose_inner_lists_have_the_same_name_are_two_roots_named_by_their_paths() {
+    let names: Vec<String> = for_root_clauses(
+        "every rows whose n is count of $params.os.tags.n and whose m is count of $params.ps.tags.n as r",
+        &["r.n is 1"],
+        json!({"rows": [{"n": 1, "m": 1}]}),
+        json!({"os": [{"tags": [{}]}], "ps": [{"tags": [{}]}]}),
+    )
+    .into_iter()
+    .map(|clause| clause.name)
+    .collect();
+    assert_eq!(names, ["$params.os.tags.n", "$params.ps.tags.n"]);
+}
+
+#[test]
+fn a_root_list_whose_name_holds_a_colon_is_named_whole() {
+    assert_eq!(
+        for_roots(
+            "every rows whose n is count of $params.\"x: y\".n and whose m is $params.a as r",
+            &["r.n is 1"],
+            json!({"rows": [{"n": 1, "m": 1}]}),
+            json!({"x: y": [{}]}),
+        ),
+        "item 1 of $params.\"x: y\": n is missing; $params.a is missing"
+    );
+}

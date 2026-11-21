@@ -24,6 +24,12 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
+        "every member of xs is at least y",
+        "every member of xs is at least y",
+        &[],
+        &[],
+    ),
+    (
         "sum of member of costs is at most 3",
         "sum of member of costs is at most 3",
         &[],
@@ -9919,6 +9925,7 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     ("ys exists", "ys exists", &[], &[]),
+    ("e.v is 1", "e.v is 1", &[], &[]),
     ("e.v is 2", "e.v is 2", &[], &[]),
     (
         "every es whose zz is m named by $input.k, if any, exists",
@@ -12999,6 +13006,12 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
+        "every member of ev whose kind is m named by $params.k as e",
+        "every member of ev whose kind equals m named by $params.k as e",
+        &[],
+        &[],
+    ),
+    (
         "every records as r, every member of r.evidence as e",
         "every records as r, every member of r.evidence as e",
         &[],
@@ -13007,6 +13020,12 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "every member of xs as m",
         "every member of xs as m",
+        &[],
+        &[],
+    ),
+    (
+        "every member of ms as m",
+        "every member of ms as m",
         &[],
         &[],
     ),

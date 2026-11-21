@@ -686,7 +686,7 @@ pub fn option_line_said(line: &Check, ctx: &Ctx, said: Option<String>, verdict: 
     self::said(line, ctx, &verdict)
 }
 
-fn split_outside_quotes<'t>(text: &'t str, by: &str) -> Vec<&'t str> {
+pub(crate) fn split_outside_quotes<'t>(text: &'t str, by: &str) -> Vec<&'t str> {
     let mut out = Vec::new();
     let mut from = 0;
     let mut quoted = false;
@@ -870,6 +870,16 @@ pub fn said(check: &Check, ctx: &Ctx, verdict: &Verdict) -> Said {
             .into_iter()
             .map(|part| vec![Piece::Said(part)])
             .collect()
+    }
+}
+
+/// What `check` says for `verdict` as a row of its own: a `count of` or a
+/// `sum of` also says the roots and the items it can't read.
+pub fn row_said(check: &Check, ctx: &Ctx, verdict: &Verdict) -> Said {
+    let said = said(check, ctx, verdict);
+    match check {
+        Check::Tally(tally) => tally::row_said(tally, ctx, verdict.cause, said),
+        _ => said,
     }
 }
 
@@ -2104,6 +2114,7 @@ fn root_reads_with(
                     if walked_counts && let Check::Tally(tally) = check {
                         for (cause, said) in super::tally::counted_fault_clauses(tally, path, ctx) {
                             let text = clause::text(&clause::shown(&said));
+                            let said = listed(&name::name(&root), said);
                             found.push((at, cause, text, false, said));
                         }
                     }
@@ -2209,15 +2220,48 @@ pub fn walked_root_clauses_with(checks: &[&Check], ctx: &Ctx, empty: bool) -> Ve
         .collect()
 }
 
+fn listed(list: &str, said: Vec<Clause>) -> Vec<Clause> {
+    let (items, mut out): (Vec<Clause>, Vec<Clause>) = said
+        .into_iter()
+        .partition(|clause| clause.kind == clause::Kind::Item);
+    if !items.is_empty() {
+        let cause = Cause::worst(items.iter().map(|item| item.cause)).unwrap_or(Cause::Value);
+        let text = clause::text(&clause::shown(&items));
+        out.push(Clause {
+            said: items,
+            ..Clause::root(list, cause, text)
+        });
+    }
+    out
+}
+
+fn is_listed(clause: &Clause) -> bool {
+    clause.kind == clause::Kind::Root && !clause.said.is_empty()
+}
+
+pub fn unlisted(clause: Clause) -> Vec<Clause> {
+    if is_listed(&clause) {
+        clause.said
+    } else {
+        vec![clause]
+    }
+}
+
 pub fn root_clauses(checks: &[&Check], ctx: &Ctx) -> Vec<Clause> {
-    roots_with(checks, ctx, true)
+    roots_with(checks, ctx, true, false)
 }
 
 pub fn side_root_clauses(checks: &[&Check], ctx: &Ctx) -> Vec<Clause> {
-    roots_with(checks, ctx, false)
+    roots_with(checks, ctx, false, false)
 }
 
-fn roots_with(checks: &[&Check], ctx: &Ctx, item_keys: bool) -> Vec<Clause> {
+/// The roots `root_clauses` gives, or `side_root_clauses` without
+/// `item_keys`, with the items of each list a root walks under that root.
+pub fn listed_root_clauses(checks: &[&Check], ctx: &Ctx, item_keys: bool) -> Vec<Clause> {
+    roots_with(checks, ctx, item_keys, true)
+}
+
+fn roots_with(checks: &[&Check], ctx: &Ctx, item_keys: bool, keep_lists: bool) -> Vec<Clause> {
     let reads = root_reads_with(checks, ctx, &[], &[], true)
         .map(|(_, reads)| reads)
         .unwrap_or_default();
@@ -2283,7 +2327,14 @@ fn roots_with(checks: &[&Check], ctx: &Ctx, item_keys: bool) -> Vec<Clause> {
             reads
                 .into_iter()
                 .flat_map(|(_, said)| said)
-                .filter(|clause| !stopped.contains(&clause.name)),
+                .flat_map(|clause| {
+                    if keep_lists {
+                        vec![clause]
+                    } else {
+                        unlisted(clause)
+                    }
+                })
+                .filter(|clause| is_listed(clause) || !stopped.contains(&clause.name)),
         )
     {
         let root = clause.kind == clause::Kind::Root;

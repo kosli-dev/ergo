@@ -1323,6 +1323,24 @@ fn the_min_subjects_row_passes_at_the_minimum_and_fails_with_the_cause_it_is_giv
 }
 
 #[test]
+fn a_failed_min_subjects_row_has_an_empty_failures_list_and_a_passed_one_has_none() {
+    let (_, requirement) =
+        requirement_of(json!({"subject": "thing", "min_subjects": 2, "checks": {"c": "x exists"}}));
+    assert_eq!(
+        min_subjects_row("s", &requirement, 1, &[], None, vec![]).failures,
+        Some(json!([]))
+    );
+    assert_eq!(
+        min_subjects_row("s", &requirement, 5, &[], Some(Cause::Absent), vec![]).failures,
+        Some(json!([]))
+    );
+    assert_eq!(
+        min_subjects_row("s", &requirement, 2, &[], None, vec![]).failures,
+        None
+    );
+}
+
+#[test]
 fn written_expressions_follow_what_was_written() {
     let expression = |check: Value| {
         written_expression(

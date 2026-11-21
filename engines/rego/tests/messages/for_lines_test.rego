@@ -74,6 +74,14 @@ test_the_lead_of_a_clause_goes_through_items_and_members_alike if {
 	ergo._m_item_lead("member y of evidence: item 2 of ks is 1") == "member y of evidence: item 2 of ks"
 }
 
+test_the_lead_of_a_clause_reads_a_member_key_whole_whatever_it_holds if {
+	ergo._m_item_lead(`member "a: b" of statuses is 1, which isn't text`) == `member "a: b" of statuses`
+	ergo._m_item_lead(`member "a; b: c" of statuses is 1`) == `member "a; b: c" of statuses`
+	ergo._m_item_lead(`member "a\" of b" of statuses is 1`) == `member "a\" of b" of statuses`
+	ergo._m_item_lead(`member "x of y" of statuses is 1`) == `member "x of y" of statuses`
+	ergo._m_item_lead(`item 1 of records: member "a: b" of r.evidence: e.status is 1`) == `item 1 of records: member "a: b" of r.evidence`
+}
+
 test_an_item_a_member_walk_wanted_as_an_object_says_it_isnt_one if {
 	ergo._m_named_item({"item": "evidence", "cause": "unusable", "value": [1], "wants": "an object"}) == "evidence is [1], which isn't an object"
 	ergo._m_named_item({"item": "evidence", "cause": "unusable", "value": [1]}) == "evidence is [1], which isn't a list or an object"
@@ -100,4 +108,14 @@ test_a_for_line_reads_the_lead_and_the_list_of_a_member_clause if {
 	ergo._m_lead_list("member x of r.evidence") == "r.evidence"
 	ergo._m_lead_list(`member "x of y" of r.evidence`) == "r.evidence"
 	ergo._m_releaded("item 1 of rs", "member b of r.e: v is 1") == "item 1 of rs: member b of r.e: v is 1"
+}
+
+_unclean_key_whose := {"cmp": "eq", "left": ["kind"], "op": "compare", "right": ["m", {"ref": ["$$params", "k"]}]}
+
+test_message_for_item_reads_each_member_when_it_asks_whether_an_item_cant_take_the_key if {
+	ergo._for_list_unclean({"path": ["ev"], "member": true}, {"ev": {"a": {"kind": "a", "m": {}}, "b": {"m": {}}}}, _unclean_key_whose) with data.ergo_params as {"k": 3}
+	ergo._for_list_unclean({"path": ["ev"]}, {"ev": [{"kind": "a", "m": {}}, {"m": {}}]}, _unclean_key_whose) with data.ergo_params as {"k": 3}
+	not ergo._for_list_unclean({"path": ["ev"], "member": true}, {"ev": {"a": {"kind": "a", "m": {}}, "b": {"kind": "b", "m": {}}}}, _unclean_key_whose) with data.ergo_params as {"k": 3}
+	not ergo._for_list_unclean({"path": ["ev"], "member": true}, {"ev": [{"m": {}}]}, _unclean_key_whose) with data.ergo_params as {"k": 3}
+	not ergo._for_list_unclean({"path": ["ev"]}, {"ev": {"b": {"m": {}}}}, _unclean_key_whose) with data.ergo_params as {"k": 3}
 }
