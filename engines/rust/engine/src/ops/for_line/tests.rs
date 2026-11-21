@@ -2695,6 +2695,22 @@ fn a_key_read_from_a_field_isnt_said_when_the_list_before_it_is_null() {
 }
 
 #[test]
+fn a_sentence_that_reads_the_alias_only_as_a_key_of_a_count_is_said_for_each_item() {
+    let (cause, message) = for_row(
+        "every ks as k",
+        &["count of es whose zz is m named by k is 0"],
+        json!({"ks": ["a", 3, null], "es": [{"zz": 1}]}),
+        json!({}),
+    );
+    assert_eq!(cause, "unusable");
+    assert!(
+        message.contains("item 2 of ks: k is 3, which isn't text")
+            && message.contains("item 3 of ks: k is null"),
+        "{message}"
+    );
+}
+
+#[test]
 fn a_for_line_says_every_root_and_caps_only_items() {
     assert_eq!(
         for_row(
