@@ -499,6 +499,10 @@ _m_text_list_names(check) := {_input_name(check.right)} if {
 	check.ignoring
 	_list_cmp(check)
 	is_array(check.right)
+} else := {_ref_name(array.slice(check.values.ref, 0, i)) | some i in numbers.range(1, count(check.values.ref) - 1)} | {_ref_label(check.values.ref)} if {
+	check.ignoring
+	_is_ref(check.values)
+	_ref_walks(check.values.ref)
 } else := {_ref_label(check.values.ref)} if {
 	check.ignoring
 	_is_ref(check.values)
