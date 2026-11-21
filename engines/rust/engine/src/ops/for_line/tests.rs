@@ -2398,7 +2398,7 @@ const WALK_ITEMS_JOINED: &str = "the row joins two items of a list walked under 
 
 const DUPLICATE_CLAUSE: &str = "the tree says again, under the item, a clause an earlier sentence of the item gave, and no step of the R5 design leaves it out";
 
-const FREE_BEFORE_KEY: &str = "the tree says a sentence that reads no alias before the key of the line's whose, where the case says the key first, and no step of the R5 design moves it";
+const FREE_BEFORE_KEY: &str = "the tree says a sentence that reads no alias first and then the key of the line's whose, as for.pass says, where Rust's row leaves the key out and the case says it first, until R5-6 builds the row from the tree and moves the case";
 
 const ENTRY_CAUSE: &str = "the tree gives an item the cause the case gives its entry and Rust's entry doesn't, until R5-7 builds the entries from the clauses";
 
@@ -3190,4 +3190,17 @@ fn a_key_read_from_a_field_of_the_subject_on_the_first_list_is_a_root_clause() {
     assert_eq!(said(None), "p is missing");
     assert_eq!(said(Some(Value::Null)), "p is null");
     assert_eq!(said(Some(json!(3))), "p is 3, which isn't text");
+}
+
+#[test]
+fn a_sentence_that_reads_no_alias_comes_before_the_key_of_the_lines_whose() {
+    assert_eq!(
+        for_tree(
+            "every es whose zz is m named by $params.k as e",
+            &["e.v exists", "z is 1"],
+            json!({"z": 2}),
+            json!({"k": 3}),
+        ),
+        "z is 2; $params.k is 3, which isn't text; es is missing"
+    );
 }
