@@ -1821,6 +1821,17 @@ fn first_null_step(root: &Path, ctx: &Ctx) -> Option<(Cause, String)> {
 }
 
 pub(super) fn root_kind_fault(check: &Check, root: &Path, ctx: &Ctx) -> Option<String> {
+    root_kind_flaw(check, root, ctx).map(|(_, text)| text)
+}
+
+fn root_kind_flaw(check: &Check, root: &Path, ctx: &Ctx) -> Option<(Cause, String)> {
+    if let Some(flaw) = lists::text_fault(check, root, ctx) {
+        return Some(flaw);
+    }
+    root_kind_text(check, root, ctx).map(|text| (Cause::Unusable, text))
+}
+
+fn root_kind_text(check: &Check, root: &Path, ctx: &Ctx) -> Option<String> {
     if lists::haystacks(check).contains(&root) {
         return lists::ref_faults(check, ctx).into_iter().next();
     }
@@ -1836,7 +1847,7 @@ pub(super) fn root_kind_fault(check: &Check, root: &Path, ctx: &Ctx) -> Option<S
             within: within.clone(),
             ignoring: None,
         });
-        return root_kind_fault(&compare, root, ctx);
+        return root_kind_text(&compare, root, ctx);
     }
     let sides = match check {
         Check::Compare(c) => [&c.left, &c.right],
@@ -2149,9 +2160,9 @@ fn root_reads_with(
                     let text = isnt(&name::name(&root), value, "text");
                     let said = one(&root, Cause::Unusable, &text);
                     found.push((at, Cause::Unusable, text, true, said));
-                } else if !is_key && let Some(text) = root_kind_fault(check, &root, ctx) {
-                    let said = one(&root, Cause::Unusable, &text);
-                    found.push((at, Cause::Unusable, text, false, said));
+                } else if !is_key && let Some((cause, text)) = root_kind_flaw(check, &root, ctx) {
+                    let said = one(&root, cause, &text);
+                    found.push((at, cause, text, false, said));
                 }
             }
         }
