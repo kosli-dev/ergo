@@ -78,7 +78,7 @@ if [ -n "$passed_now_fail" ]; then
 fi
 if [ -n "$cargo_line" ]; then
   echo
-  echo "WARNING: $cargo_line The report counts could not be read because cargo failed, so the report counts above are not known."
+  echo "WARNING: $cargo_line So the report counts could not be read because cargo failed."
 fi
 
 if [ "$changed" = yes ]; then
