@@ -204,15 +204,9 @@ pub fn rendered(name: &str, texts: &[String]) -> String {
 
 /// Whether `check` reads the `for` alias `alias`.
 pub fn reads_alias(check: &Check, alias: &str) -> bool {
-    all_paths(check).into_iter().any(|path| {
-        matches!(&path.start, Start::Alias(name) if name == alias)
-            || path.steps.iter().any(|step| match step {
-                Step::Ref(reference) => {
-                    matches!(&reference.start, Start::Alias(name) if name == alias)
-                }
-                _ => false,
-            })
-    })
+    all_paths(check)
+        .into_iter()
+        .any(|path| reads_path(path, alias))
 }
 
 fn reads_path(path: &Path, alias: &str) -> bool {
