@@ -3204,3 +3204,16 @@ fn a_sentence_that_reads_no_alias_comes_before_the_key_of_the_lines_whose() {
         "z is 2; $params.k is 3, which isn't text; es is missing"
     );
 }
+
+#[test]
+fn a_clause_an_earlier_sentence_gave_for_the_item_is_left_out() {
+    assert_eq!(
+        for_tree(
+            "every xs as x",
+            &["x.e exists", "x.e is after x.a"],
+            json!({"xs": [{}]}),
+            json!({}),
+        ),
+        "item 1 of xs: x.e is missing, and x.a is missing"
+    );
+}
