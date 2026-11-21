@@ -4611,6 +4611,47 @@
   "want": "$params.k is 3, which isn't text; item 1 of es: zz is missing, and m is missing; item 2 of es: zz is missing, and m is missing"
  },
  {
+  "name": "D14/for",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every es whose zz is m named by $params.k as e",
+       "assert": "e.v exists"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": 1
+      },
+      {
+       "v": 2
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "k": 3
+  },
+  "want": "$params.k is 3, which isn't text; item 1 of es: zz is missing, and m is missing; item 2 of es: zz is missing, and m is missing"
+ },
+ {
   "name": "D14/two",
   "policy": {
    "subjects": {
