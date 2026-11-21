@@ -453,3 +453,34 @@ fn lookup_all_turns_every_kind_on_and_none_turns_every_kind_off() {
         }
     );
 }
+
+#[test]
+fn member_of_ends_the_walked_path_with_its_members_and_is_not_one_of_the_ten_steps() {
+    let scope = Scope::new();
+    let lower = |text: &str| lower_assertion(&s::parse_check(text).unwrap().assertions[0], &scope);
+    let Ok(Check::Walk(walk)) = lower("every member of xs.y is 1") else {
+        panic!("not a walk");
+    };
+    assert_eq!(walk.path.steps, vec![key("xs"), key("y"), Step::Members]);
+    let Ok(Check::Walk(walk)) = lower("every xs is 1") else {
+        panic!("not a walk");
+    };
+    assert_eq!(walk.path.steps, vec![key("xs")]);
+    let Ok(Check::Tally(tally)) = lower("count of member of xs is 1") else {
+        panic!("not a tally");
+    };
+    let counted = tally.counted_paths();
+    assert_eq!(counted.len(), 1);
+    assert_eq!(counted[0].steps, vec![key("xs"), Step::Members]);
+    assert!(lower("every member of k1.k2.k3.k4.k5.k6.k7.k8.k9.k10 is 1").is_ok());
+    let assertion = s::parse_check("m is 1").unwrap().assertions.remove(0);
+    let Ok(Check::For(line)) = lower_for(
+        &s::parse_for("every member of xs as m").unwrap(),
+        &[assertion],
+        &["c".to_string()],
+        &scope,
+    ) else {
+        panic!("not a for line");
+    };
+    assert_eq!(line.items[0].path.steps, vec![key("xs"), Step::Members]);
+}

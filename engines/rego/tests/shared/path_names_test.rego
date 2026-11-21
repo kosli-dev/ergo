@@ -39,3 +39,38 @@ test_a_path_with_no_name_is_called_the_subject_and_never_it if {
 test_the_input_path_of_nothing_is_the_input if {
 	ergo._input_path_name([]) == "$input"
 }
+
+test_a_member_step_is_named_by_its_key_written_as_a_path_writes_it if {
+	ergo._input_name(["statuses", {"member": "sign-off"}]) == "member sign-off of statuses"
+	ergo._input_name(["statuses", {"member": "a; b"}]) == `member "a; b" of statuses`
+	ergo._input_name(["rs", 0, "statuses", {"member": "1"}]) == `member "1" of rs[0].statuses`
+	ergo._input_name(["evidence", {"member": "y"}, "kind"]) == "evidence.y.kind"
+	ergo._steps_name(["statuses", {"member": "sign-off"}]) == "statuses.sign-off"
+	ergo._steps_name(["statuses", {"member": ""}]) == `statuses.""`
+	ergo._steps_name(["rs", 0, "statuses", {"member": "b"}]) == "rs[0].statuses.b"
+}
+
+test_an_entry_named_like_an_item_or_a_member_is_an_item_and_anything_else_is_a_list if {
+	ergo._walk_kind("item 2 of xs") == "item"
+	ergo._walk_kind("member sign-off of statuses") == "item"
+	ergo._walk_kind(`member "a; b" of statuses`) == "item"
+	ergo._walk_kind(`member "" of statuses`) == "item"
+	ergo._walk_kind("member y of evidence: kind is missing") == "item"
+	ergo._walk_kind("xs") == "list"
+	ergo._walk_kind("member") == "list"
+	ergo._walk_kind("member is missing") == "list"
+	ergo._walk_kind("member.x of y") == "list"
+	ergo._walk_kind(`member "a of statuses`) == "list"
+}
+
+test_a_member_name_reads_its_key_up_to_the_closing_quote_and_then_the_list if {
+	ergo._item_parts(`member "a: b" of statuses is 1`) == [`member "a: b"`, "statuses is 1"]
+	ergo._item_parts(`member "a; b: c" of statuses`) == [`member "a; b: c"`, "statuses"]
+	ergo._item_parts(`member "a\" of b" of statuses`) == [`member "a\" of b"`, "statuses"]
+	ergo._item_parts(`member "x of y" of statuses`) == [`member "x of y"`, "statuses"]
+	ergo._item_parts(`member "" of statuses`) == [`member ""`, "statuses"]
+	ergo._item_parts("member sign-off of r.evidence: e.status is 1") == ["member sign-off", "r.evidence: e.status is 1"]
+	ergo._item_parts("item 2 of xs: v is 1") == ["item 2", "xs: v is 1"]
+	not ergo._item_parts(`member "a of statuses`)
+	not ergo._item_parts("member.x of y")
+}

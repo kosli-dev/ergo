@@ -230,15 +230,33 @@ test_member_of_without_every_or_with_distinct_still_reads_so_a_rule_can_name_it 
 	ergo._s_from_line_text(ergo._from_line(`every distinct member of x`)) == `every distinct member of x`
 }
 
-test_every_member_of_anywhere_but_the_start_of_a_from_line_says_it_only_goes_there if {
-	said := ["every member of only goes on a from line for now"]
-	ergo._sentence(`every member of xs is 1`).problems == said
-	ergo._sentence(`some member of xs.y exists`).problems == said
-	ergo._sentence(`count of member of xs is 1`).problems == said
-	ergo._sentence(`sum of member of xs is 1`).problems == said
+test_member_of_reads_after_every_some_count_of_and_sum_of if {
+	ergo._sentence(`every member of xs is 1`) == {"assertions": [{"every": {"steps": ["xs"]}, "member": true, "phrase": {"op": "is", "value": 1}}]}
+	ergo._sentence(`some  member  of xs.y whose k is 1 exists`) == {"assertions": [{"some": {"steps": ["xs", "y"]}, "member": true, "where": [{"path": {"steps": ["k"]}, "phrase": {"op": "is", "value": 1}}], "phrase": {"op": "exists"}}]}
+	ergo._sentence(`count of member of xs is 1`).assertions[0].terms == [{"count": {"steps": ["xs"]}, "member": true}]
+	ergo._sentence(`sum of member of xs is at most 2`).assertions[0].terms == [{"sum": {"steps": ["xs"]}, "member": true}]
+	ergo._sentence(`x is count of member of xs`).assertions[0].phrase.terms == [{"count": {"steps": ["xs"]}, "member": true}]
+	ergo._sentence(`every member of member is 1`).assertions[0].every == {"steps": ["member"]}
+	ergo._for_line(`every member of xs as m`) == {"items": [{"every": {"steps": ["xs"]}, "member": true, "as": "m"}]}
+	ergo._from_line(`xs whose every member of t is 1`).where == [{"every": {"steps": ["t"]}, "member": true, "phrase": {"op": "is", "value": 1}}]
+}
+
+test_member_of_writes_back_as_it_reads if {
+	every line in [
+		`every member of xs is 1`,
+		`some member of xs.y whose k is 1 exists`,
+		`count of member of xs is 1`,
+		`every member of xs, if any, is 1`,
+	] {
+		ergo._s_assertion_text(ergo._sentence(line).assertions[0]) == line
+	}
+	ergo._s_assertion_text(ergo._sentence(`x is count of member of xs`).assertions[0]) == `x equals count of member of xs`
+	ergo._s_for_line_text(ergo._for_line(`every records as r, every member of r.evidence as e`)) == `every records as r, every member of r.evidence as e`
+}
+
+test_distinct_with_member_of_is_written_wrong_everywhere if {
+	said := ["distinct can't go with every member of"]
 	ergo._sentence(`every distinct member of xs is 1`).problems == said
-	ergo._sentence(`x is count of member of xs`).problems == said
-	ergo._for_line(`every member of xs as m`).problems == said
-	ergo._from_line(`xs whose every member of t is 1`).problems == said
-	ergo._from_line(`every member of xs whose some member of t is 1`).problems == said
+	ergo._sentence(`count of distinct member of xs is 1`).problems == said
+	ergo._for_line(`every distinct member of xs as m`).problems == said
 }

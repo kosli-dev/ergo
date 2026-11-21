@@ -28,3 +28,23 @@ test_a_root_said_once_is_not_said_again_under_an_item_and_its_count_of_more_goes
 	ergo._for_deduped("item 2 of pos: name is missing; item 1 of ms: item 2 of pos: name is missing; item 1 of ms: and 2 more") == "item 2 of pos: name is missing"
 	ergo._for_deduped("item 1 of ms: v is missing; item 1 of ms: and 2 more") == "item 1 of ms: v is missing; item 1 of ms: and 2 more"
 }
+
+test_a_for_line_keeps_that_a_member_walk_wanted_an_object if {
+	ergo._for_failed_flags({"msg": "an object"}).wants == "an object"
+	not ergo._for_failed_flags({"msg": "a list"}).wants
+	not ergo._for_failed_flags({}).wants
+}
+
+test_a_for_line_drops_a_member_clause_that_only_repeats_a_text_or_says_how_many_more if {
+	not ergo._for_led_once("member a of xs: $params.k is missing", ["member b of ys: $params.k is missing"])
+	ergo._for_led_once("member a of xs: member b of ys is 1", ["member b of ys is 1"])
+	ergo._for_led_more("member a of xs: and 2 more")
+	not ergo._for_led_more("member a of xs: v is 1")
+}
+
+test_an_item_of_the_second_list_keeps_that_a_member_walk_wanted_an_object if {
+	check := {"items": [{"as": "r", "path": ["rs"]}, {"as": "y", "path": ["$r", "s"]}]}
+	f := {"path": ["$r", "s"], "item": ["$r", "s"], "cause": "unusable", "value": [1], "msg": "an object"}
+	ergo._for_unchecked_item(check, f).wants == "an object"
+	not ergo._for_unchecked_item(check, object.union(f, {"msg": "a list"})).wants
+}

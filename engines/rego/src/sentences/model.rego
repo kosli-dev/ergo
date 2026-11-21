@@ -462,7 +462,7 @@ _s_model(a) := object.union(
 		"whose": [_s_leaf_model(c) | some c in object.get(a, "where", [])],
 		"if_any": object.get(a, "if_any", false),
 	},
-	_s_distinct_of_node(a),
+	_s_list_words_of_node(a),
 ) if {
 	q := _s_quantifier_of(a)
 	q != ""
@@ -754,7 +754,7 @@ _s_term_side(t) := _s_model_path(t) if {
 	"steps" in object.keys(t)
 }
 
-_s_term_side(t) := object.union({concat("", [k, "_of"]): _s_model_path(t[k]), "whose": [], "text": _s_term_text(t)}, _s_distinct_of_node(t)) if {
+_s_term_side(t) := object.union({concat("", [k, "_of"]): _s_model_path(t[k]), "whose": [], "text": _s_term_text(t)}, _s_list_words_of_node(t)) if {
 	is_object(t)
 	some k in _term_tally_keys
 	k in object.keys(t)
@@ -894,7 +894,7 @@ _s_for_item_model(item, names) := object.union(
 		"if_any": object.get(item, "if_any", false),
 		"as": item.as,
 	},
-	_s_distinct_of_node(item),
+	_s_list_words_of_node(item),
 ) if {
 	q := _s_quantifier_of(item)
 	q != "pick"

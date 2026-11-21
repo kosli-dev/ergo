@@ -147,6 +147,7 @@ pub(crate) fn from_base(line: &FromLine) -> BTreeSet<String> {
                 phrase,
             } => {
                 walk.if_any_with_some(*quantifier, options.if_any);
+                walk.member_with_distinct(options.distinct, options.member);
                 walk.path(path);
                 walk.phrase(phrase, true);
             }
@@ -258,6 +259,13 @@ impl Walk {
         self.out
     }
 
+    fn member_with_distinct(&mut self, distinct: bool, member: bool) {
+        if distinct && member {
+            self.out
+                .insert("distinct can't go with every member of".to_string());
+        }
+    }
+
     fn if_any_with_some(&mut self, quantifier: Quantifier, if_any: bool) {
         if quantifier == Quantifier::Some && if_any {
             self.out.insert("if any can't go with some".to_string());
@@ -319,6 +327,7 @@ impl Walk {
     }
 
     fn derived(&mut self, derived: &Derived) {
+        self.member_with_distinct(derived.distinct, derived.member);
         self.path(&derived.path);
         for condition in &derived.whose {
             self.condition(condition);
@@ -656,6 +665,7 @@ impl Walk {
                 phrase,
             } => {
                 self.if_any_with_some(*quantifier, options.if_any);
+                self.member_with_distinct(options.distinct, options.member);
                 self.path(path);
                 for condition in whose {
                     self.condition(condition);
@@ -686,9 +696,12 @@ impl Walk {
                 path,
                 whose,
                 if_any,
+                distinct,
+                member,
                 ..
             } => {
                 self.if_any_with_some(*quantifier, *if_any);
+                self.member_with_distinct(*distinct, *member);
                 self.path(path);
                 for condition in whose {
                     self.condition(condition);

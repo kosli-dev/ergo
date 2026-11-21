@@ -3,6 +3,12 @@ package ergo_test
 import data.ergo
 import rego.v1
 
+test_a_clause_about_a_member_of_a_walked_list_is_not_a_root if {
+	ergo._m_list_item_clause("member a of xs: v is missing", {"xs"})
+	ergo._m_list_item_clause(`member "a of b" of xs is 1`, {"xs"})
+	not ergo._m_list_item_clause("member a of ys: v is missing", {"xs"})
+}
+
 test_a_clause_holds_its_kind_name_cause_text_and_what_it_says if {
 	ergo._m_clause("root", "$params.min", "unusable", `$params.min is "s", which isn't a number`) == {
 		"kind": "root",
