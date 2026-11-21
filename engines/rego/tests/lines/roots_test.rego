@@ -30,6 +30,14 @@ test_a_root_a_whose_cant_read_stands_in_for_a_value_so_each_item_is_still_read i
 	ergo._root_stand_in(listed) == {"op": "compare", "cmp": "eq", "left": ["v"], "right": ["v"]}
 }
 
+test_a_root_list_after_is_in_ignoring_case_stands_in_for_text_so_an_item_whose_own_value_isnt_text_is_still_named if {
+	listed := {"op": "in", "path": ["v"], "values": {"ref": ["$$params[]", "l"]}, "ignoring": "case"}
+	ergo._root_stand_in(listed) == {"op": "compare", "cmp": "eq", "left": ["v"], "right": ["v"], "ignoring": "case"}
+	ergo._leaf_cause(ergo._root_stand_in(listed), {"v": 5}) == "unusable"
+	field := {"op": "compare", "cmp": "in", "left": ["v"], "right": [`${"alias":"thing","n":0,"of":null,"old":true}`, "ys"], "ignoring": "case"}
+	ergo._leaf_cause(ergo._root_stand_in(field), {"v": 5}) == "unusable"
+}
+
 test_a_root_a_whose_cant_read_has_no_stand_in_after_a_key_or_a_phrase_b9_leaves_out if {
 	keyed := {"op": "compare", "cmp": "eq", "left": ["v"], "right": ["$$params", "m", {"ref": ["$$params", "k"]}]}
 	ergo._root_stand_in(keyed) == keyed
