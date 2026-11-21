@@ -12,6 +12,8 @@ Each release names the version of the spec it follows. The spec's own changes ar
 
 ### Changed
 
+- A failed `$min_subjects` row has `failures`, `[]` when it has no entries, whatever its `from` line, as spec 0.7 says ([row.parts](../../spec/semantics.md#requirements)). A passed one has none. Changes the report of every failed `$min_subjects` row that had no `failures`.
+
 - `ergo-policy-sentences` reads `member of` into a new public field of `FromLine`, `member`, so a struct literal of `FromLine` outside the crate no longer compiles until it sets the field.
 
 - `ergo-policy-sentences` reads the words into a new variant, `Phrase::Ignoring`, which holds the phrase they follow and an `Ignoring`. `Phrase` is an exhaustive public enum, so a `match` on it outside the crate no longer compiles until it handles the new variant.
