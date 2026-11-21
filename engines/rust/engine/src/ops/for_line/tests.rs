@@ -2390,8 +2390,6 @@ const TREE_IS_THE_CASE: &str = "the tree says what the case says and Rust's row 
 
 const SORT_KEY: &str = "a key that sorts the line's list isn't a root clause, so each item says it, and no step of the R5 design makes it one";
 
-const SENTENCE_KEY: &str = "a sentence's path named by a key that can't be read says the path again under each item, as m named by p is missing, and no step of the R5 design leaves it out";
-
 const CAPPED_ROOT: &str = "an item says the capped list of a name read outside the item, with its and N more, as a clause of its own, so the tree counts one more item, and no step of the R5 design takes it out";
 
 const WALKED_ROOT_UNDER_ITEM: &str = "a name read outside the item by a sentence that walks a list under the item, like pos.name in every m.ys.v is in pos.name, isn't a root clause, so the item says it, and no step of the R5 design makes it one";
@@ -2408,11 +2406,7 @@ const FREE_BEFORE_KEY: &str = "the tree says a sentence that reads no alias befo
 
 const ENTRY_CAUSE: &str = "the tree gives an item the cause the case gives its entry and Rust's entry doesn't, until R5-7 builds the entries from the clauses";
 
-const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 109] = [
-    (
-        "compare / a for line whose sentence can't be read in different ways, with a named by key from $input, the key is null / the key is null",
-        SENTENCE_KEY,
-    ),
+const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 105] = [
     (
         "distinct / distinct under a for line that is written wrong for another reason, part 4 of 4 / each check lists only its own problems, and none is about distinct",
         KEY_FROM_A_FIELD,
@@ -2738,10 +2732,6 @@ const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 109] = [
         TREE_IS_THE_CASE,
     ),
     (
-        "sentences / a for alias that holds anything but a string, after named by / fails as null when it holds null and as unusable otherwise, in an assertion, in a second item and in a one-line every or some, a number never read as a position, and the failed item shows what it held",
-        SENTENCE_KEY,
-    ),
-    (
         "sentences / a for line item that reads a null before a named by field / fails as null whatever the field holds, and failed_items names the null, as the item does without the field, whether it reads the first alias or not",
         NO_LIST,
     ),
@@ -2754,20 +2744,12 @@ const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 109] = [
         NO_LIST,
     ),
     (
-        "sentences / a for line whose check reads a path with named by a field of the subject / lists the whole path and the field among the row's inputs, sorted by name, and after the path in each failed assertion",
-        SENTENCE_KEY,
-    ),
-    (
         "sentences / a named by key from the subject after a parent or an alias, inside a relative clause / fails as absent once when the subject has no k",
         TREE_IS_THE_CASE,
     ),
     (
         "sentences / a root name of the wrong type on the left of a compare inside a relative clause / says its problem once, with no item named, as on the right, even on an empty list",
         WHOSE_ROOT,
-    ),
-    (
-        "sentences / the path before a named by field that can't be read, in a count, a sum, a plus, an elapsed time, a some and a for line / ends unusable when the path goes through a string, whatever the field holds",
-        SENTENCE_KEY,
     ),
     (
         "walks / a for line whose whose reads a named by key from $params that isn't text says only the items whose own value can't take the key, the last one fine / an item without m before an item whose m is an object",
@@ -2847,9 +2829,9 @@ const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 109] = [
     ),
 ];
 
-const ROWS_COMPARED: usize = 1411;
+const ROWS_COMPARED: usize = 1418;
 
-const ROWS_LISTED: usize = 171;
+const ROWS_LISTED: usize = 164;
 
 fn item_entries(failures: &Value, out: &mut Vec<(String, String)>) {
     for failure in failures.as_array().into_iter().flatten() {
@@ -3142,7 +3124,11 @@ fn a_path_whose_key_cant_be_read_isnt_said_again_after_the_key() {
     };
     let things = json!({"m": {"a": "a"}, "rs": [{"v": "a"}, {"v": 4}]});
     assert_eq!(
-        said("r.zz is m named by $params.k", things.clone(), json!({"k": null})),
+        said(
+            "r.zz is m named by $params.k",
+            things.clone(),
+            json!({"k": null})
+        ),
         "$params.k is null; item 1 of rs: r.zz is missing; item 2 of rs: r.zz is missing"
     );
     assert_eq!(

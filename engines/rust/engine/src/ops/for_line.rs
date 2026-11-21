@@ -2080,6 +2080,16 @@ impl For {
             .into_iter()
             .flat_map(|root| [Clause::said(Cause::Value, root.text.clone()), root])
             .collect();
+        let roots: Vec<String> = seen.iter().map(|root| root.text.clone()).collect();
+        for group in &said {
+            if roots.contains(&super::message::pieces_text(group)) {
+                for piece in group {
+                    if let Piece::Said(text) = piece {
+                        seen.push(Clause::said(Cause::Value, text.clone()));
+                    }
+                }
+            }
+        }
         let mut clauses: Vec<Clause> = Vec::new();
         for piece in super::message::unsaid_clauses(&said, &mut seen)
             .into_iter()
@@ -2094,6 +2104,15 @@ impl For {
                 }
             }
         }
+        let said_texts: Vec<&str> = seen.iter().map(|clause| clause.text.as_str()).collect();
+        let again: Vec<String> = key_paths_said(&sentence.check, ctx)
+            .into_iter()
+            .filter(|(key, _)| said_texts.contains(&key.as_str()))
+            .map(|(_, path)| path)
+            .collect();
+        clauses.retain(|clause| {
+            clause.kind == super::clause::Kind::Item || !again.contains(&clause.text)
+        });
         if !walks
             && let Some((key, base, worse)) = sentence
                 .check
@@ -3581,6 +3600,31 @@ fn unrooted(clause: Clause, roots: &[&str]) -> Option<Clause> {
     let empty =
         clause.kind == super::clause::Kind::Item && clause.text.is_empty() && said.is_empty();
     (!empty).then_some(Clause { said, ..clause })
+}
+
+fn key_paths_said(check: &Check, ctx: &Ctx) -> Vec<(String, String)> {
+    let mut out: Vec<(String, String)> = Vec::new();
+    for path in check.paths() {
+        for (at, step) in path.steps.iter().enumerate() {
+            let (Step::Ref(key) | Step::Field(key)) = step else {
+                continue;
+            };
+            let word = match path::read(key, ctx).outcome {
+                path::Outcome::Absent => "missing",
+                path::Outcome::Null => "null",
+                _ => continue,
+            };
+            let through = Path {
+                start: path.start.clone(),
+                steps: path.steps[..=at].to_vec(),
+            };
+            out.push((
+                format!("{} is {word}", crate::name::name(key)),
+                format!("{} is {word}", crate::name::name(&through)),
+            ));
+        }
+    }
+    out
 }
 
 fn tie_clause(text: String) -> Clause {
