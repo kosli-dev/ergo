@@ -9925,6 +9925,7 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     ("ys exists", "ys exists", &[], &[]),
+    ("e.v is 1", "e.v is 1", &[], &[]),
     ("e.v is 2", "e.v is 2", &[], &[]),
     (
         "every es whose zz is m named by $input.k, if any, exists",
@@ -13001,6 +13002,12 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "every member of evidence whose kind is \"approval\" as e",
         "every member of evidence whose kind is \"approval\" as e",
+        &[],
+        &[],
+    ),
+    (
+        "every member of ev whose kind is m named by $params.k as e",
+        "every member of ev whose kind equals m named by $params.k as e",
         &[],
         &[],
     ),
