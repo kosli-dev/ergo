@@ -527,8 +527,12 @@ _tally_own_read(i, c, _, items) if {
 	some side in _m_tally_parts(c)
 	p := side[_basic_form(side)]
 	is_array(p)
-	_m_aliased(i.name) == concat("", [_m_aliased(_input_name(p)), "[]"])
+	_m_aliased(i.name) == _tally_own_name(side, p)
 }
+
+_tally_own_name(side, p) := _m_aliased(_input_name(p)) if side.member == true
+
+else := concat("", [_m_aliased(_input_name(p)), "[]"])
 
 _sentence_walked_read(x, c) if {
 	_walks(c)
