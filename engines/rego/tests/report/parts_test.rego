@@ -137,3 +137,23 @@ test_the_object_a_count_of_member_of_reads_is_its_own_read_as_a_walked_list_is i
 	ergo._tally_own_read({"name": "costs[]"}, items, set(), [{"kind": "item"}])
 	not ergo._tally_own_read({"name": "costs"}, items, set(), [{"kind": "item"}])
 }
+
+test_a_list_after_is_in_ignoring_case_that_holds_an_item_that_isnt_text_is_an_unusable_input_even_when_the_row_fails_as_null if {
+	ergo._with_outcome({"name": "ys", "value": ["a", null]}) == {"name": "ys", "value": ["a", null], "outcome": "unusable"} with data.ergo_text_lists as {"ys"}
+	ergo._with_outcome({"name": "ys", "value": [3]}).outcome == "unusable" with data.ergo_text_lists as {"ys"}
+	ergo._with_outcome({"name": "ys", "value": ["a"]}).outcome == "usable" with data.ergo_text_lists as {"ys"}
+	ergo._with_outcome({"name": "zs", "value": [null]}).outcome == "usable" with data.ergo_text_lists as {"ys"}
+	ergo._with_outcome({"name": "ys", "value": null}) == {"name": "ys", "value": null} with data.ergo_text_lists as {"ys"}
+}
+
+test_the_lists_a_check_compares_ignoring_case_are_named_as_its_inputs_name_them if {
+	field := {"op": "compare", "left": ["x"], "cmp": "in", "right": ["ys"], "ignoring": "case"}
+	ergo._text_list_names(field) == {"ys"}
+	ergo._text_list_names(object.remove(field, ["ignoring"])) == set()
+	ref := {"op": "in", "path": ["x"], "values": {"ref": ["$$params[]", "l"]}, "ignoring": "case"}
+	ergo._text_list_names({"op": "every", "path": ["xs"], "check": {"op": "present", "path": ["x"]}, "whose": [ref]}) == {"$params.l"}
+	parent := {"op": "compare", "left": ["v"], "cmp": "in", "right": [`${"alias":"thing","n":0,"of":null,"old":true}`, "ys"], "ignoring": "case"}
+	ergo._text_list_names({"op": "compare", "cmp": "eq", "left": {"count_of": ["xs"], "whose": [parent]}, "right": {"literal": 0}}) == {"thing.ys"}
+	root := {"op": "compare", "left": ["x"], "cmp": "not_in", "right": [`${"alias":"","n":-1,"of":null,"old":true}`, "ys"], "ignoring": "case"}
+	ergo._text_list_names({"op": "every", "path": ["xs", "v"], "check": root}) == {"ys"}
+}
