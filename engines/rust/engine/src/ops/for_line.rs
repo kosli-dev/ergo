@@ -1441,7 +1441,12 @@ impl For {
                         .into_iter()
                         .filter_map(|clause| unrooted(clause, &texts))
                         .collect();
-                    let clauses: Vec<Clause> = lifted.iter().cloned().chain(clauses).collect();
+                    let clauses: Vec<Clause> = lifted
+                        .iter()
+                        .cloned()
+                        .chain(self.first_alias_clauses(&nested, depth, &bound))
+                        .chain(clauses)
+                        .collect();
                     let said = if leaf.is_empty() {
                         parts.join("; ").replace(FREE, "")
                     } else {
@@ -3478,6 +3483,25 @@ impl For {
             {
                 continue;
             }
+            let (_, clauses) = self.said_clauses(sentence, &run_full(&sentence.check, ctx), ctx);
+            for clause in clauses {
+                merge_clause(&mut out, &clause);
+            }
+        }
+        out
+    }
+
+    fn first_alias_clauses(&self, nested: &Level, depth: usize, ctx: &Ctx) -> Vec<Clause> {
+        let mut out: Vec<Clause> = Vec::new();
+        if !nested.children.is_empty() || nested.cause == Cause::Satisfied {
+            return out;
+        }
+        let alias = &self.items[depth].alias;
+        for sentence in self
+            .sentences
+            .iter()
+            .filter(|sentence| !sentence.reads_last && reads_alias(&sentence.check, alias))
+        {
             let (_, clauses) = self.said_clauses(sentence, &run_full(&sentence.check, ctx), ctx);
             for clause in clauses {
                 merge_clause(&mut out, &clause);

@@ -2396,7 +2396,9 @@ const FREE_BEFORE_KEY: &str = "the tree says a sentence that reads no alias firs
 
 const ENTRY_CAUSE: &str = "the tree gives an item the cause the case gives its entry and Rust's entry doesn't, until R5-7 builds the entries from the clauses";
 
-const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 99] = [
+const SECOND_KEY: &str = "the tree says the sentence that reads only the first alias for the item, as for.pass says and the case does, but like the row it says the second list's key from $params inside each item, where problems.where_said says it once before any item, and no step of the R5 design makes that key a root clause";
+
+const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 103] = [
     (
         "for / a $params list that a for line reads fails it when the line's whose leaves nothing and an item of the list can't be read / fails, when the whose leaves nothing",
         SAID_OUTSIDE,
@@ -2442,8 +2444,12 @@ const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 99] = [
         EARLIER_ALIAS,
     ),
     (
-        "for / a for line that starts with some passes when one of its items passes, whatever item comes after it / fails when the approver who approved has an empty list of commits to go with it",
-        EARLIER_ALIAS,
+        "for / a for line whose second list fails for an item, with sentences that don't read the second alias / runs the sentences that don't read y for each item and says them before the list",
+        TREE_IS_THE_CASE,
+    ),
+    (
+        "for / a for line whose second list has a named by key from $params that isn't text / says the key once on the row, after the sentence that doesn't read x",
+        SECOND_KEY,
     ),
     (
         "for / a for line whose sentence reads a key from an alias of an earlier line / names a key of the wrong type once under its first item, on an empty list too",
@@ -2480,6 +2486,10 @@ const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 99] = [
     (
         "for / a name read from outside the item and walked on the right of is in on a for line is said once, with no item / items that aren't objects fail as unusable and are said once",
         WALKED_ROOT_UNDER_ITEM,
+    ),
+    (
+        "for / a named by key read from $params on a for line over a null item, with the second list missing / names $params.k once and then the missing list",
+        TREE_IS_THE_CASE,
     ),
     (
         "for / a parent's part that a for line's sentence walks fails it on an empty list when an item of it can't be read / fails, with an empty rows, when an item of it has no name",
@@ -2642,6 +2652,14 @@ const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 99] = [
         WALK_ITEMS_JOINED,
     ),
     (
+        "messages / a for line over two lists, with a sentence on the second item before a walk under the first / the parts follow the items, not the sentences",
+        TREE_IS_THE_CASE,
+    ),
+    (
+        "messages / a for line over two lists, with a walk under the first item before a sentence on the second / the parts follow the items, not the sentences",
+        TREE_IS_THE_CASE,
+    ),
+    (
         "messages / a for line that picks nothing prints the list it read / a whose that leaves no item prints the list",
         NO_LIST,
     ),
@@ -2795,9 +2813,9 @@ const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 99] = [
     ),
 ];
 
-const ROWS_COMPARED: usize = 1426;
+const ROWS_COMPARED: usize = 1425;
 
-const ROWS_LISTED: usize = 156;
+const ROWS_LISTED: usize = 157;
 
 fn item_entries(failures: &Value, out: &mut Vec<(String, String)>) {
     for failure in failures.as_array().into_iter().flatten() {
