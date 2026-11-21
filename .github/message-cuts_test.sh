@@ -161,6 +161,48 @@ if out=$(run --against nowhere); then
   exit 1
 fi
 
+echo "message-cuts.sh counts the idioms that end a message in a known clause or cut it at a root"
+idioms=$dir/idioms
+mkdir -p "$idioms/engines/rust/engine/src" "$idioms/engines/rego/src"
+cat > "$idioms/engines/rust/engine/src/i.rs" <<'RS'
+fn i(text: &str, root: &str) {
+    let a = text.ends_with(" is missing");
+    let b = text.ends_with(" is null");
+    let c = text.ends_with(&format!(": {root}"));
+    let d = text.ends_with(&format!(", and {root}"));
+    let e = text.matches('"').count();
+}
+RS
+cat > "$idioms/engines/rego/src/i.rego" <<'RG'
+package ergo
+
+a if endswith(m, " is null")
+b if endswith(c, " more")
+c := substring(m, 11, -1)
+RG
+out=$(MESSAGE_CUTS_ROOT=$idioms sh "$script" 2>&1)
+expect_in "rust-ends-with-missing-null total 2" "$out"
+expect_in "rust-ends-with-root total 2" "$out"
+expect_in "rust-count-quotes total 1" "$out"
+expect_in "rego-endswith-message total 2" "$out"
+expect_in "rego-substring-message total 1" "$out"
+
+echo "message-cuts.sh does not count function names, path names or subject names as cuts"
+names=$dir/names
+mkdir -p "$names/engines/rust/engine/src" "$names/engines/rego/src"
+cat > "$names/engines/rust/engine/src/n.rs" <<'RS'
+fn n(text: &str) {
+    let a = ran_said(&ran);
+    let b = text.split_once('[');
+    let c = text.starts_with("count of ");
+    let d = text.starts_with("item ");
+    let e = text.strip_prefix("item ");
+    let f = text.replace(FREE, "");
+}
+RS
+out=$(MESSAGE_CUTS_ROOT=$names sh "$script" 2>&1)
+expect_in "total 0" "$out"
+
 echo "message-cuts.sh fails on an unknown argument"
 if run --update > /dev/null; then
   echo "message-cuts.sh should fail on an unknown argument" >&2
