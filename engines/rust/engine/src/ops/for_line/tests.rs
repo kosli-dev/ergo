@@ -2384,21 +2384,11 @@ fn for_line_cases() -> Vec<(String, Value, Value, Value)> {
     out
 }
 
-
-
-
-
-const TREE_IS_THE_CASE: &str = "the tree says what the case says and Rust's row doesn't, until R5-6 builds the row from the tree";
-
-
 const ENTRY_CAUSE: &str = "the tree gives an item the cause the case gives its entry and Rust's entry doesn't, until R5-7 builds the entries from the clauses";
-
-
 
 const OTHER_SUBJECTS_CAUSE: &str = "the tree gives item 1 of ys its own cause, absent, as for.try says, in a subject where neither engine gives it an entry, and this test compares it with the entries of the same name in the case's other subjects, which are unusable and null";
 
-
-const SAID_NOWHERE: &str = "the row fails from something it says nowhere, a subject that isn't an object or an item of the first list that picks nothing, as for.pick says, so no clause of the tree carries that cause, and R5-6 must take the row's cause from the line as well as from the tree";
+const SAID_NOWHERE: &str = "the row fails from something it says nowhere, a subject that isn't an object or an item of the first list that picks nothing, as for.pick says, so no clause of the tree carries that cause, and the row takes that cause from the line";
 
 const ROW_LEAVES_OUT_AN_ITEM: &str = "the row and the tree leave out the item of the second list that the whose can't read, which the case says and which gives the row its cause, and the case is in known-failures.txt until the Rust engine says that item";
 
@@ -2416,7 +2406,7 @@ const ROWS_THE_CLAUSES_DONT_SAY_YET: &[(&str, usize, &str)] = &[
     (
         "for / a for line sorted by a key from $params that is missing says the key once and gives an item an entry only for its own problem / an item whose m is a list and an item without m",
         1,
-        TREE_IS_THE_CASE,
+        ENTRY_CAUSE,
     ),
     (
         "for / a for line walks a subject that is a list / an empty list fails as value, and a null subject as not_an_object",

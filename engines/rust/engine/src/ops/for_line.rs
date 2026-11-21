@@ -1279,19 +1279,18 @@ impl For {
                 } else {
                     let assertions = self.aggregate(&nested.children);
                     let mut leaf: Vec<(String, bool)> = Vec::new();
-                    let mut parts: Vec<String> =
-                        match self.two_list_parts(&nested.children) {
-                            Some(grouped) => {
-                                leaf = grouped;
-                                Vec::new()
-                            }
-                            None => nested
-                                .children
-                                .iter()
-                                .flat_map(|c| self.child_texts(c))
-                                .map(|(text, _)| text)
-                                .collect(),
-                        };
+                    let mut parts: Vec<String> = match self.two_list_parts(&nested.children) {
+                        Some(grouped) => {
+                            leaf = grouped;
+                            Vec::new()
+                        }
+                        None => nested
+                            .children
+                            .iter()
+                            .flat_map(|c| self.child_texts(c))
+                            .map(|(text, _)| text)
+                            .collect(),
+                    };
                     let second = self.shared_second();
                     if assertions.is_empty() {
                         parts.extend(
@@ -1424,11 +1423,7 @@ impl For {
             .unwrap_or_default()
     }
 
-    fn try_sentences(
-        &self,
-        ctx: &Ctx,
-        skip_last: bool,
-    ) -> (Option<Outcome>, Vec<Sfail>) {
+    fn try_sentences(&self, ctx: &Ctx, skip_last: bool) -> (Option<Outcome>, Vec<Sfail>) {
         let alias = self.last_alias();
         let mut sfails = Vec::new();
         for (idx, sentence) in self.sentences.iter().enumerate() {
@@ -1854,8 +1849,9 @@ impl For {
             .chain(run.items.iter().cloned())
             .collect();
         let shown = super::clause::shown(&clauses);
-        run.verdict.cause = Cause::worst(tree_causes(&clauses).into_iter().chain([run.verdict.cause]))
-            .unwrap_or(Cause::Satisfied);
+        run.verdict.cause =
+            Cause::worst(tree_causes(&clauses).into_iter().chain([run.verdict.cause]))
+                .unwrap_or(Cause::Satisfied);
         if run.verdict.cause != Cause::Satisfied {
             self.key_inputs(&mut run, ctx);
             run.message = (!shown.is_empty()).then(|| super::clause::text(&shown));
