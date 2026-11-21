@@ -7,11 +7,11 @@ trap 'rm -rf "$dir"' EXIT
 cat > "$dir/pairs.json" <<'JSON'
 [
  {"name": "same", "policy": {}, "input": {}},
- {"name": "passes_now", "policy": {}, "input": {}},
- {"name": "cause_moved", "policy": {}, "input": {}},
- {"name": "always_lower", "policy": {}, "input": {}},
- {"name": "fixed", "policy": {}, "input": {}},
- {"name": "higher", "policy": {}, "input": {}}
+ {"name": "went_up", "policy": {}, "input": {}},
+ {"name": "went_down", "policy": {}, "input": {}},
+ {"name": "down_on_base", "policy": {}, "input": {}},
+ {"name": "says_less", "policy": {}, "input": {}},
+ {"name": "passes_now", "policy": {}, "input": {}}
 ]
 JSON
 
@@ -19,23 +19,23 @@ row() {
   if [ "$1" = satisfied ]; then
     printf '{"requirement":"r","check":"c","subject":"t","passed":true,"cause":"satisfied"}'
   else
-    printf '{"requirement":"r","check":"c","subject":"t","passed":false,"cause":"%s"}' "$1"
+    printf '{"requirement":"r","check":"c","subject":"t","passed":false,"cause":"%s","message":"%s","failures":[{"message":"%s"}]}' "$1" "${2:-$1 problem}" "${2:-$1 problem}"
   fi
 }
 report() {
-  printf '{"results":[%s]}' "$(row "$1")"
+  printf '{"results":[%s]}' "$(row "$@")"
 }
 six() {
-  printf '[%s,%s,%s,%s,%s,%s]' "$(report "$1")" "$(report "$2")" "$(report "$3")" "$(report "$4")" "$(report "$5")" "$(report "$6")"
+  printf '[%s,%s,%s,%s,%s,%s]' "$1" "$2" "$3" "$4" "$5" "$6"
 }
 
-six value value absent absent absent absent > "$dir/rego.json"
-six value satisfied value value absent unusable > "$dir/head.json"
-six value value absent value value absent > "$dir/base.json"
+six "$(report value)" "$(report absent)" "$(report absent)" "$(report absent)" "$(report value 'a is 1, and b is 2')" "$(report value)" > "$dir/rego.json"
+six "$(report value)" "$(report unusable)" "$(report value)" "$(report value)" "$(report value 'a is 1')" "$(report satisfied)" > "$dir/head.json"
+six "$(report value)" "$(report absent)" "$(report absent)" "$(report null)" "$(report value 'a is 1, and b is 2')" "$(report value)" > "$dir/base.json"
 
 run() {
   MATRIX_FACTS_PAIRS=$dir/pairs.json MATRIX_FACTS_REGO=$dir/rego.json \
-    MATRIX_FACTS_RUST=$1 MATRIX_FACTS_BASE_RUST=$2 sh "$script" matrix-a base
+    MATRIX_FACTS_RUST=$1 MATRIX_FACTS_BASE_RUST=$2 sh "$script" base matrix-a
 }
 
 expect() {
@@ -49,34 +49,53 @@ expect() {
   fi
 }
 
-echo "matrix-facts.sh lists the pairs that got worse than the base and the Rust causes that are lower than Rego's"
+echo "matrix-facts.sh lists the causes that went down, the problems that are gone and the causes that went up"
 expect "$dir/head.json" "$dir/base.json" "## Matrix matrix-a
 
-PAIRS WORSE THAN base: 3
+### Cause went down (usually a bug): 3
 
+- went_down: r/c: base absent, working tree value, Rego absent
+- down_on_base: r/c: base null, working tree value, Rego absent (already on base)
 - passes_now: r/c: base value, working tree satisfied, Rego value
-- cause_moved: r/c: base absent, working tree value, Rego absent
-- higher: r/c: base absent, working tree unusable, Rego absent
 
-RUST CAUSES LOWER THAN REGO'S: 2
+### Says less than base (usually a bug): 2
 
-- cause_moved: r/c: Rust value, Rego absent
-- always_lower: r/c: Rust value, Rego absent (already on base)"
+- says_less: r/c: missing \"b is 2\"; base says \"a is 1, and b is 2\", working tree says \"a is 1\"
+- passes_now: r/c: missing \"value problem\"; base says \"value problem\", working tree says \"none\"
 
-echo "matrix-facts.sh says when nothing got worse and no cause is lower"
-out=$(MATRIX_FACTS_PAIRS=$dir/pairs.json MATRIX_FACTS_REGO=$dir/rego.json MATRIX_FACTS_RUST=$dir/rego.json MATRIX_FACTS_BASE_RUST=$dir/base.json sh "$script" matrix-a base)
+### Cause went up (usually the rule problems.all_said; list for the Rego steps): 1
+
+- went_up: r/c: base absent, working tree unusable, Rego absent"
+
+echo "matrix-facts.sh says None. for each list that is empty"
+out=$(MATRIX_FACTS_PAIRS=$dir/pairs.json MATRIX_FACTS_REGO=$dir/rego.json MATRIX_FACTS_RUST=$dir/base.json MATRIX_FACTS_BASE_RUST=$dir/base.json sh "$script" base matrix-a)
 expect_out="## Matrix matrix-a
 
-No pair is worse than base.
+### Cause went down (usually a bug): 0
 
-No Rust cause is lower than Rego's."
+None.
+
+### Says less than base (usually a bug): 0
+
+None.
+
+### Cause went up (usually the rule problems.all_said; list for the Rego steps): 0
+
+None."
 if [ "$out" != "$expect_out" ]; then
-  echo "matrix-facts.sh should say nothing is worse, and printed: $out" >&2
+  echo "matrix-facts.sh should say None. three times, and printed: $out" >&2
+  exit 1
+fi
+
+echo "matrix-facts.sh gives one heading for each generator it is given"
+out=$(MATRIX_FACTS_PAIRS=$dir/pairs.json MATRIX_FACTS_REGO=$dir/rego.json MATRIX_FACTS_RUST=$dir/base.json MATRIX_FACTS_BASE_RUST=$dir/base.json sh "$script" base matrix-a walk)
+if [ "$(printf '%s\n' "$out" | grep -c '^## Matrix ')" != 2 ] || ! printf '%s\n' "$out" | grep -q '^## Matrix walk$'; then
+  echo "matrix-facts.sh should print a heading for matrix-a and one for walk, and printed: $out" >&2
   exit 1
 fi
 
 echo "matrix-facts.sh refuses a generator that does not exist"
-if sh "$script" nothing-here > /dev/null 2>&1; then
+if sh "$script" base nothing-here > /dev/null 2>&1; then
   echo "matrix-facts.sh should fail for an unknown generator" >&2
   exit 1
 fi
@@ -84,7 +103,7 @@ fi
 repo=$(git -C "$(dirname "$script")" rev-parse --show-toplevel)
 
 echo "matrix-facts.sh says when BASE is not a ref"
-err=$(sh "$script" matrix-a no-such-ref-here 2>&1 >/dev/null) && {
+err=$(sh "$script" no-such-ref-here matrix-a 2>&1 >/dev/null) && {
   echo "matrix-facts.sh should fail for a BASE that is not a ref" >&2
   exit 1
 }
@@ -107,7 +126,7 @@ mkdir "$tmp"
 trees=$(git -C "$repo" worktree list | wc -l)
 
 echo "matrix-facts.sh says the build failed on BASE, reads the Rust version from rust-toolchain.toml and removes what it made"
-err=$(TMPDIR=$tmp MATRIX_FACTS_CARGO=$dir/cargo sh "$script" matrix-a HEAD 2>&1 >/dev/null) && {
+err=$(TMPDIR=$tmp MATRIX_FACTS_CARGO=$dir/cargo sh "$script" HEAD matrix-a 2>&1 >/dev/null) && {
   echo "matrix-facts.sh should fail when the build fails" >&2
   exit 1
 }
