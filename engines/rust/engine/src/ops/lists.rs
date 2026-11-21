@@ -318,6 +318,14 @@ pub(super) fn text_fault(check: &super::Check, path: &Path, ctx: &Ctx) -> Option
     text_walk(check, path, ctx).and_then(|walk| walk.cause.map(|cause| (cause, walk.text)))
 }
 
+/// Whether `check` is `is in` ignoring case with a list, read by the name
+/// `name`, that holds an item that isn't text, like `ys` holding `["a", 3]`.
+pub(crate) fn text_unfit(check: &super::Check, name: &str, ctx: &Ctx) -> bool {
+    text_right(check)
+        .and_then(|list| text_walk(check, list, ctx))
+        .is_some_and(|walk| walk.cause.is_some() && walk.name == name)
+}
+
 pub(super) fn text_stand_in(check: &super::Check, ctx: &Ctx) -> Option<super::Check> {
     let super::Check::In(within) = check else {
         return None;

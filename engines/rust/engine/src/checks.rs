@@ -500,7 +500,14 @@ pub(crate) fn ref_unfit(checks: &[&Check], reference: &Path, value: &Value, ctx:
             && crate::ops::for_line::all_paths(check)
                 .into_iter()
                 .any(|path| steps_key(path, reference));
-        keyed || (check.refs().contains(reference) && check.flawed(ctx))
+        keyed
+            || (check.refs().contains(reference)
+                && (check.flawed(ctx)
+                    || crate::ops::lists::text_unfit(
+                        check,
+                        &crate::name::name(reference),
+                        ctx,
+                    )))
     })
 }
 
@@ -527,7 +534,11 @@ pub(crate) fn input_unfit(checks: &[&Check], input: &crate::ops::Input, ctx: &Ct
             let inner: Vec<&Check> = any.options.iter().flatten().collect();
             input_unfit(&inner, input, ctx)
         }
-        _ => said_unfit(check, input, ctx) || walked_root_unfit(check, input, ctx),
+        _ => {
+            said_unfit(check, input, ctx)
+                || walked_root_unfit(check, input, ctx)
+                || crate::ops::lists::text_unfit(check, &input.name, ctx)
+        }
     })
 }
 
