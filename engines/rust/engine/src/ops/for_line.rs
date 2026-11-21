@@ -2020,12 +2020,16 @@ impl For {
             let cause = found.key.state.cause().unwrap_or(Cause::Unusable);
             clauses.push(Clause::root(&found.key.name, cause, found.key_text));
             if let Some((text, cause, input)) = found.base {
-                clauses.push(Clause::root(&input.name, cause, text));
+                clauses.push(Clause::list(&input.name, cause, text));
             }
         }
+        let mut clauses: Vec<Clause> = clauses
+            .into_iter()
+            .map(|clause| clause.in_group(1))
+            .collect();
         for (at, sentence) in self.sentences.iter().enumerate() {
             let said = sentence_roots_said(&sentence.check, &outer);
-            clauses.extend(said.into_iter().map(|clause| clause.in_group(at + 1)));
+            clauses.extend(said.into_iter().map(|clause| clause.in_group(at + 2)));
         }
         let mut once: Vec<Clause> = Vec::new();
         for clause in clauses {
@@ -3382,7 +3386,7 @@ impl For {
             }
             let (_, clauses) = self.said_clauses(sentence, &run_full(&sentence.check, ctx), ctx);
             for clause in clauses {
-                merge_clause(&mut out, &clause.in_group(self.sentences.len() + 1));
+                merge_clause(&mut out, &clause);
             }
         }
         out
@@ -3456,8 +3460,14 @@ impl For {
     }
 
     fn level_clauses(&self, level: &Level, free: &[Clause], roots: &[Clause]) -> Vec<Clause> {
+        let lines = super::clause::lines(roots);
+        let texts: Vec<&str> = lines.iter().map(String::as_str).collect();
         if level.unreadable {
-            return Vec::new();
+            return free
+                .iter()
+                .cloned()
+                .filter_map(|clause| unrooted(clause, &texts))
+                .collect();
         }
         let mut items: Vec<(Vec<Seg>, Clause)> = level
             .dead
@@ -3512,8 +3522,6 @@ impl For {
                 .map(|d| (d.order.clone(), self.dead_clause(d))),
         );
         first.sort_by(|a, b| a.0.cmp(&b.0));
-        let lines = super::clause::lines(roots);
-        let texts: Vec<&str> = lines.iter().map(String::as_str).collect();
         free.iter()
             .cloned()
             .chain(first.into_iter().chain(items).map(|(_, clause)| clause))
