@@ -153,8 +153,12 @@ _every_cause(doc, req) := c if {
 	_every_unwalked(doc)
 	c := _target_state(doc, req)
 	c != "value"
+} else := "not_an_object" if {
+	_member_from(req)
+	is_array(doc)
+	_fl_parent_unread(doc, req)
 } else := _worst_of({f.cause | some f in w.fails} | {"unusable" | count(w.notes) > 0}) if {
-	w := _fl_broken(doc, _from_keys(req))
+	w := _fl_broken(doc, _fl_keys(req))
 	count(w.fails) + count(w.notes) > 0
 }
 
@@ -178,12 +182,17 @@ _every_walk(doc, keys) := {"subjects": [{"subject": e.v, "at": _walk_at(w, e), "
 
 _every_end_fail(e) := {"path": e.c, "item": e.c, "cause": _walk_stop_state(e.v), "value": _walk_value(e.v, e, null)}
 
-_fl_walk(doc, keys) := {"subjects": [{"subject": x, "at": concat("", [base, "/", format_int(i, 10)]), "i": i} | some i, x in end], "fails": [], "notes": []} if {
+_fl_walk(doc, keys) := _fm_walk(doc, _fm_path(keys)) if {
+	_fm_keyed(keys)
+} else := {"subjects": [{"subject": x, "at": concat("", [base, "/", format_int(i, 10)]), "i": i} | some i, x in end], "fails": [], "notes": []} if {
 	end := _fl_simple_end(doc, keys)
 	base := _joined(_doc_at, keys)
 } else := _fl_full_walk(doc, keys)
 
-_fl_broken(doc, keys) := {"fails": [], "notes": []} if {
+_fl_broken(doc, keys) := {"fails": w.fails, "notes": w.notes} if {
+	_fm_keyed(keys)
+	w := _fm_walk(doc, _fm_path(keys))
+} else := {"fails": [], "notes": []} if {
 	_fl_simple_end(doc, keys)
 } else := _fl_full_walk(doc, keys)
 
@@ -464,7 +473,7 @@ _fl_typed_only(doc, req) if {
 _fl_typed_only(doc, req) if {
 	_every_from(req)
 	_walkable(doc)
-	_fl_broken(doc, _from_keys(req)).fails == []
+	_fl_broken(doc, _fl_keys(req)).fails == []
 }
 
 _fl_parent_unread(doc, req) if {
@@ -475,6 +484,13 @@ _fl_parent_unread(doc, req) if {
 _fl_parent_unread(doc, req) if {
 	_chained(req)
 	doc == _absent
+}
+
+_fl_parent_unread(doc, req) if {
+	_chained(req)
+	_member_from(req)
+	is_array(doc)
+	_from_keys(req) == []
 }
 
 _keys_step(req) if "keys" in object.keys(_each_step(req))
@@ -495,6 +511,8 @@ _starts_at_position(req) if _index_step(_from_keys(req)[0])
 _reads_inside_parent(req) if count(_from_keys(req)) > 0
 
 _reads_inside_parent(req) if _keys_step(req)
+
+_reads_inside_parent(req) if _member_from(req)
 
 default _from_state(_, _) := "absent"
 
@@ -609,7 +627,7 @@ _raw_entries(doc, req) := [entry | some entry in _listed_subjects(doc, req)] if 
 	not _every_from(req)
 }
 
-_raw_entries(doc, req) := _distinct_entries(_fl_walk(doc, _from_keys(req)).subjects, req) if {
+_raw_entries(doc, req) := _fm_entries(_distinct_entries(_fl_walk(doc, _fl_keys(req)).subjects, req), _id_of(req)) if {
 	_from_well_formed(req)
 	_every_from(req)
 	_walkable(doc)

@@ -95,13 +95,15 @@ test_a_member_keeps_its_key_as_its_id_only_without_identified_by if {
 	ergo._fm_entries(entries, ["id"]) == [{"subject": 1, "at": "/o/a", "c": ["o", "a"]}]
 }
 
+_fm_kid_resolved := {"kid": {"def": {"from": []}}, "record": {"def": {"from": ["records"]}}}
+
 _fm_kid_data := {"chains": {"kid": "record"}, "every": {"kid"}, "member": {"kid"}, "narrowing": {}}
 
 test_a_parent_that_is_a_list_with_no_path_after_it_is_not_an_object_and_is_named if {
 	req := {"subject": "kid", "from": []}
-	ergo._every_cause([1], req) == "not_an_object" with data.ergo_subject_sentences as _fm_kid_data with data.ergo_resolved as {"kid": {}, "record": {}} with data.ergo_parent as {"record": [1]}
-	ergo._fl_parent_unread([1], req) with data.ergo_subject_sentences as _fm_kid_data with data.ergo_resolved as {"kid": {}, "record": {}}
-	ergo._every_cause("t", req) == "not_an_object" with data.ergo_subject_sentences as _fm_kid_data with data.ergo_resolved as {"kid": {}, "record": {}} with data.ergo_parent as {"record": "t"}
+	ergo._every_cause([1], req) == "not_an_object" with data.ergo_subject_sentences as _fm_kid_data with data.ergo_resolved as _fm_kid_resolved with data.ergo_parent as {"record": [1]}
+	ergo._fl_parent_unread([1], req) with data.ergo_subject_sentences as _fm_kid_data with data.ergo_resolved as _fm_kid_resolved
+	ergo._every_cause("t", req) == "not_an_object" with data.ergo_subject_sentences as _fm_kid_data with data.ergo_resolved as _fm_kid_resolved with data.ergo_parent as {"record": "t"}
 }
 
 test_a_list_in_the_middle_is_walked_as_every_walks_it if {

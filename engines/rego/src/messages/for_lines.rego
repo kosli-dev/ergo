@@ -882,9 +882,14 @@ _m_from_message(doc, req, false, cause) := {"message": m} if {
 	_chained(req)
 	not _walkable(doc)
 	not _walk_gone(doc)
+} else := {"message": _m_isnt(_m_from_root(req), doc, "an object")} if {
+	cause == "not_an_object"
+	_member_from(req)
+	is_array(doc)
+	_fl_parent_unread(doc, req)
 } else := {"message": m} if {
 	_every_from(req)
-	w := _fl_broken(doc, _from_keys(req))
+	w := _fl_broken(doc, _fl_keys(req))
 	ms := array.concat([_fl_fail_text(req, f) | some p in sort({f.path | some f in w.fails}); some f in w.fails; f.path == p], _fl_notes_once([_fl_note_text(req, n) | some n in w.notes]))
 	count(ms) > 0
 	m := concat("; ", _once(ms))

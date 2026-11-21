@@ -451,7 +451,7 @@ _ms_entries(doc, req) := [_entry("list", _m_from_root(req), row_cause, [{"name":
 	not _fl_parent_unread(doc, req)
 	_from_well_formed(req)
 	not _from_unreadable(req)
-	w := _fl_broken(doc, _from_keys(req))
+	w := _fl_broken(doc, _fl_keys(req))
 } else := _ms_tree(req, doc, _ms_note_places(req, n), _from_keys(req)) if {
 	not _every_from(req)
 	n := _fl_plain_typed(doc, req)
