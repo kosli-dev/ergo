@@ -39,6 +39,10 @@ jobs:
           .github/build-ergo_test.sh
           .github/build-ergo.sh
       - run: opa check --strict engines/rego dist spec:spec examples:examples --ignore src
+      - name: Check the marked policy, input and output blocks in the docs by running them
+        run: |
+          .github/docs-run_test.sh
+          .github/docs-run.sh
       - name: Check Ergo compiles where input is checked against a closed schema
         run: opa check --strict --schema .github/closed-input-schema.json dist/ergo.rego
       - name: Check Ergo compiles without built-ins whose answer depends on the machine

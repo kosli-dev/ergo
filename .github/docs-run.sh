@@ -6,7 +6,8 @@ ergo=${DOCS_RUN_ERGO_REGO:-$here/dist/ergo.rego}
 export DOCS_RUN_OPA="$opa"
 
 if [ "$#" -eq 0 ]; then
-  set -- "$here/OPA.md" "$here/REFERENCE.md" "$here/README.md" "$here/CLI.md"
+  cd "$here"
+  set -- OPA.md REFERENCE.md README.md CLI.md
 fi
 
 tab=$(printf '\t')
@@ -166,7 +167,7 @@ ROWS
   [ "$command_ergo" != - ] || command_ergo=ergo.rego
   mkdir -p "$run/$(dirname "$command_ergo")"
   cp -f "$ergo" "$run/$command_ergo"
-  if (cd "$run" && sh -c 'opa() { "$DOCS_RUN_OPA" "$@"; }; . "$1"' sh "$command_block" > "$work/actual.$gi" 2> "$work/stderr.$gi"); then
+  if (cd "$run" && sh -c 'opa() { command "$DOCS_RUN_OPA" "$@"; }; . "$1"' sh "$command_block" > "$work/actual.$gi" 2> "$work/stderr.$gi"); then
     :
   else
     echo "group $name: the command at $command_at failed" >&2

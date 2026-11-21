@@ -221,6 +221,8 @@ When behaviour changes, update its rule in `spec/` and add or change cases for i
 
 Every output shown in the docs must come from actually running it, not from memory.
 
+To have CI run an example, put a line like `<!-- ergo-run: NAME role=file path=policy.yaml -->` right before the code block (readers don't see it). The roles are `file` (written to `path`; `normalise=ergo_spec` swaps its `ergo_spec:` line for the version of `dist/ergo.rego`), `command` (the `opa` command, run in that folder with `dist/ergo.rego` copied to `ergo.rego`, or to `ergo=PATH`) and `output` (what it prints, compared word for word). Blocks with the same NAME are one group, and may be in different files. Run `.github/docs-run.sh [FILE...]` after `.github/build-ergo.sh`; it lists every group that differs, with a diff.
+
 ## Writing
 
 This applies to everything you write: docs, test names, commit messages, pull requests, issues, and your replies to the people you're working with.
