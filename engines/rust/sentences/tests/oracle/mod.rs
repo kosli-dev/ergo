@@ -89,6 +89,27 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "every distinct sboms.components",
         "every distinct sboms.components",
     ),
+    (
+        "every member of records.evidence",
+        "every member of records.evidence",
+    ),
+    (
+        "every member of record.evidence whose kind is \"approval\"",
+        "every member of record.evidence whose kind is \"approval\"",
+    ),
+    ("every member of evidence", "every member of evidence"),
+    ("every member of p.q", "every member of p.q"),
+    ("every member of $input", "every member of $input"),
+    ("every member of record", "every member of record"),
+    ("member of records.evidence", "member of records.evidence"),
+    (
+        "every distinct member of records.evidence",
+        "every distinct member of records.evidence",
+    ),
+    (
+        "every member of records named by each of $params.l",
+        "every member of records named by each of $params.l",
+    ),
     ("round.items whose .cov is 1", "round.items whose cov is 1"),
     ("y", "y"),
     ("t.ws whose t is t", "t.ws whose t equals t"),
@@ -3285,6 +3306,7 @@ pub const FROM_PARTIAL: &[(&str, &[&str])] = &[
 
 pub const PATH_OK: &[(&str, &str)] = &[
     ("by", "by"),
+    ("x.n", "x.n"),
     ("idd", "idd"),
     ("number", "number"),
     ("thing", "thing"),

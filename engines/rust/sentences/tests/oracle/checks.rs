@@ -1,4 +1,6 @@
 pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
+    ("m is 1", "m is 1", &[], &[]),
+    ("status is \"COMPLETE\"", "status is \"COMPLETE\"", &[], &[]),
     (
         "count of gs.es whose v is in $params.z is 0",
         "count of gs.es whose v is in $params.z is 0",
@@ -10497,6 +10499,14 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
     (
+        "every member of xs is 1",
+        &["every member of only goes on a from line for now"],
+    ),
+    (
+        "count of member of xs is 1",
+        &["every member of only goes on a from line for now"],
+    ),
+    (
         "every ws.x whose x is 1 and 'a' is 'a' is not empty",
         &["doesn't parse"],
     ),
@@ -15196,6 +15206,10 @@ pub const FOR_ERRORS: &[(&str, &[&str])] = &[
     (
         "every ts as t, distinct first of ts as u",
         &["distinct goes after every, some, count of or sum of"],
+    ),
+    (
+        "every member of xs as m",
+        &["every member of only goes on a from line for now"],
     ),
     (
         "every ts whose distinct is 1 as t",
