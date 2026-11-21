@@ -81,7 +81,7 @@ pub struct Failure {
     pub cause: Cause,
     pub value: Value,
     pub location: Option<Location>,
-    pub copies: Vec<String>,
+    pub copies: Vec<(String, String)>,
     pub msg: String,
     pub seen: Option<(Value, Location)>,
     pub outcome: Option<Cause>,
@@ -112,7 +112,7 @@ fn rank_of(start: &Start, segs: &[Seg]) -> Vec<Rank> {
 impl Failure {
     pub fn to_json(&self) -> Value {
         let mut locations: Vec<String> = self.location.iter().map(Location::render).collect();
-        locations.extend(self.copies.iter().cloned());
+        locations.extend(self.copies.iter().map(|(end, _)| end.clone()));
         json!({
             "path": self.path,
             "item": self.item,
@@ -132,7 +132,7 @@ impl Failure {
         }
         if let Some((value, location)) = &self.seen {
             let mut places = vec![location.render()];
-            places.extend(self.copies.iter().cloned());
+            places.extend(self.copies.iter().map(|(_, item)| item.clone()));
             entry["ergo/item"] = json!({"value": value, "locations": places});
         }
         entry
@@ -931,7 +931,9 @@ fn merged_copies(walked: &Walked, judged: Vec<Judged>) -> Vec<Judged> {
         match seen.get(&key) {
             Some(&at) => {
                 if let Some((failure, _)) = &mut out[at].failure {
-                    failure.copies.push(item.end_location.render());
+                    failure
+                        .copies
+                        .push((item.end_location.render(), item.item.location.render()));
                 }
             }
             None => {
