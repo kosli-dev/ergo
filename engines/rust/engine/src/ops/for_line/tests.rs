@@ -2388,8 +2388,6 @@ const WHOSE_ROOT: &str = "an item the line's whose can't decide says the whose's
 
 const TREE_IS_THE_CASE: &str = "the tree says what the case says and Rust's row doesn't, until R5-6 builds the row from the tree";
 
-const SORT_KEY: &str = "a key that sorts the line's list isn't a root clause, so each item says it, and no step of the R5 design makes it one";
-
 const CAPPED_ROOT: &str = "an item says the capped list of a name read outside the item, with its and N more, as a clause of its own, so the tree counts one more item, and no step of the R5 design takes it out";
 
 const WALKED_ROOT_UNDER_ITEM: &str = "a name read outside the item by a sentence that walks a list under the item, like pos.name in every m.ys.v is in pos.name, isn't a root clause, so the item says it, and no step of the R5 design makes it one";
@@ -2449,11 +2447,11 @@ const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 105] = [
     ),
     (
         "for / a for line sorted by a key from $params that is missing says the key once and gives an item an entry only for its own problem / an item whose m is a list and an item without m",
-        SORT_KEY,
+        TREE_IS_THE_CASE,
     ),
     (
         "for / a for line sorted by a path named by a key from $params / a key that isn't a string fails as unusable, even on a list where a number could be a position, a null key as null and a missing one as absent, and a string key sorts by that field",
-        SORT_KEY,
+        TREE_IS_THE_CASE,
     ),
     (
         "for / a for line that starts with some fails when the only items that pass have an alias the sentence can't read, even when nothing comes after them to check / fails when the only approver has no u for the sentence to read, even though there are no commits",
@@ -3173,5 +3171,14 @@ fn a_key_that_sorts_the_line_is_said_once_before_the_items_own_problems() {
     assert_eq!(
         said(json!([{"m": [5, 1]}, {"m": {"a": 1}}, {"v": 1}])),
         "$params.km is missing; item 1 of rows: m is [5, 1], which isn't an object; item 3 of rows: m is missing"
+    );
+    assert_eq!(
+        for_tree(
+            "first of rows sorted by m named by $params.kn as r",
+            &["r.v is 1"],
+            json!({"rows": [{"m": [5, 1], "v": 1}]}),
+            json!({"kn": 1}),
+        ),
+        "$params.kn is 1, which isn't text; item 1 of rows: m is [5, 1], which isn't an object"
     );
 }
