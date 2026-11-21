@@ -1896,6 +1896,16 @@ fn a_part_that_is_text_null_missing_or_an_object_with_a_list_is_read_as_before_i
 }
 
 fn for_roots(for_line: &str, assertions: &[&str], subject: Value, params: Value) -> String {
+    let clauses = for_root_clauses(for_line, assertions, subject, params);
+    crate::ops::clause::text(&crate::ops::clause::shown(&clauses))
+}
+
+fn for_root_clauses(
+    for_line: &str,
+    assertions: &[&str],
+    subject: Value,
+    params: Value,
+) -> Vec<crate::ops::clause::Clause> {
     let line = ergo_policy_sentences::parse_for(for_line).unwrap();
     let parsed: Vec<_> = assertions
         .iter()
@@ -1922,8 +1932,7 @@ fn for_roots(for_line: &str, assertions: &[&str], subject: Value, params: Value)
         params: Some(&params),
         aliases: std::collections::BTreeMap::new(),
     };
-    let clauses = line.root_clauses(&ctx);
-    crate::ops::clause::text(&crate::ops::clause::shown(&clauses))
+    line.root_clauses(&ctx)
 }
 
 #[test]
@@ -3721,5 +3730,45 @@ fn an_item_whose_second_list_reads_a_missing_name_through_its_alias_fails_as_abs
             "item 1 of approvers: absent",
             "approver.u is missing: absent"
         ]
+    );
+}
+
+#[test]
+fn a_root_list_walked_through_a_list_in_its_items_is_named_by_the_list_it_starts_at() {
+    assert_eq!(
+        for_roots(
+            "every rows whose n is count of $params.os.tags.n and whose m is $params.ot as r",
+            &["r.n is 1"],
+            json!({"rows": [{"n": 1, "m": 1}]}),
+            json!({"os": [{"tags": [{"n": 1}, {}]}]}),
+        ),
+        "item 1 of $params.os: item 2 of tags: n is missing; $params.ot is missing"
+    );
+}
+
+#[test]
+fn two_root_lists_whose_inner_lists_have_the_same_name_are_two_roots() {
+    let names: Vec<String> = for_root_clauses(
+        "every rows whose n is count of $params.os.tags.n and whose m is count of $params.ps.tags.n as r",
+        &["r.n is 1"],
+        json!({"rows": [{"n": 1, "m": 1}]}),
+        json!({"os": [{"tags": [{}]}], "ps": [{"tags": [{}]}]}),
+    )
+    .into_iter()
+    .map(|clause| clause.name)
+    .collect();
+    assert_eq!(names, ["$params.os", "$params.ps"]);
+}
+
+#[test]
+fn a_root_list_whose_name_holds_a_colon_is_named_whole() {
+    assert_eq!(
+        for_roots(
+            "every rows whose n is count of $params.\"x: y\".n and whose m is $params.a as r",
+            &["r.n is 1"],
+            json!({"rows": [{"n": 1, "m": 1}]}),
+            json!({"x: y": [{}]}),
+        ),
+        "item 1 of $params.\"x: y\": n is missing; $params.a is missing"
     );
 }
