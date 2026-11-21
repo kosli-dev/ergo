@@ -3277,3 +3277,22 @@ fn a_root_read_through_the_first_alias_fails_the_item_when_nothing_is_checked_fo
         "$params.l is missing; item 1 of ys: m.q is 1, which isn't a list; item 2 of ys: m.q is missing"
     );
 }
+
+#[test]
+fn a_root_that_lists_items_is_said_once_with_its_own_count_before_the_items_of_the_line() {
+    let os = json!([{"name": "bob"}, {"v": 0}, {"v": 1}, {"v": 2}, {"v": 3}, {"v": 4}]);
+    let root = "item 2 of $params.os: name is missing; item 3 of $params.os: name is missing; item 4 of $params.os: name is missing; and 2 more";
+    let said = |rows: Value| {
+        for_tree(
+            "every rows whose n is count of $params.os.name as r",
+            &["r.n is 1"],
+            json!({ "rows": rows }),
+            json!({ "os": os.clone() }),
+        )
+    };
+    assert_eq!(said(json!([{"n": 1}])), root);
+    assert_eq!(
+        said(json!([{"n": 1}, {}, {}])),
+        format!("{root}; item 2 of rows: n is missing; item 3 of rows: n is missing")
+    );
+}
