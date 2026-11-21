@@ -7,6 +7,8 @@ trap 'rm -rf "$dir"' EXIT
 printf '## Rust report changes\n\n6 case reports changed between base and the working tree.\n\n- t 1-4\n- u 1, 3\n\nPassing cases whose report changed: 4 (information only).\n' > "$dir/reports-changed.md"
 printf '## Rust report changes\n\nNo case report changed between base and the working tree.\n' > "$dir/reports-same.md"
 printf 'CASES THAT PASSED ON base AND FAIL OR ARE GONE NOW: 2\n- t / g / d\n- w / g / v (gone)\n\n## Rust report changes\n\n1 case report changed between base and the working tree.\n' > "$dir/reports-one.md"
+printf 'CASES THAT PASSED ON abc1234 AND FAIL OR ARE GONE NOW: 3\n- t / g / d\n\ncargo test exited with 101 on the working tree.\n\n## Rust report changes\n\nNo case report changed between abc1234 and the working tree.\n' > "$dir/reports-cargo-failed.md"
+printf 'cargo test exited with 2 on the working tree.\n\n## Rust report changes\n\nNo case report changed between abc1234 and the working tree.\n' > "$dir/reports-cargo-failed-plain.md"
 printf 'PAIRS THAT MOVED AWAY FROM REGO OR FROM THEIR WANT: 1\n\n- apart: p -> z\n\n## Pairs\n\n1 of 5 pairs differ between Rego and Rust.\n\nPairs that say their want message: Rego 3 of 3, Rust 3 of 3.\n\nRust output changed on 3 pairs between base and the working tree.\n\n- apart: p -> z (Rust equals Rego: no)\n' > "$dir/pairs-changed.md"
 printf '## Pairs\n\n1 of 5 pairs differ between Rego and Rust.\n\nNo pair'"'"'s Rust output changed between base and the working tree.\n' > "$dir/pairs-same.md"
 printf 'No file under engines/rust, engines/rego or spec changed.\n' > "$dir/pairs-skipped.md"
@@ -82,6 +84,17 @@ expect_not_in "WARNING" "$out"
 echo "body-facts.sh warns on a known change even when the other count is unknown"
 out=$(run "Fixes a thing." "$dir/missing.md" "$dir/pairs-changed.md")
 expect_in "WARNING" "$out"
+
+echo "body-facts.sh does not call the reports 0 when cargo failed, and warns"
+out=$(run "Fixes a thing." "$dir/reports-cargo-failed.md" "$dir/pairs-same.md")
+expect_in "Rust case reports changed: unknown" "$out"
+expect_in "WARNING: cargo test exited with 101 on the working tree." "$out"
+expect_in "the report counts could not be read because cargo failed" "$out"
+expect_in "- Cases that passed and now fail or are gone: 3" "$out"
+out=$(run "Fixes a thing." "$dir/reports-cargo-failed-plain.md" "$dir/pairs-same.md")
+expect_in "Rust case reports changed: unknown" "$out"
+expect_in "WARNING: cargo test exited with 2 on the working tree." "$out"
+expect_not_in "Cases that passed and now fail" "$out"
 
 echo "body-facts.sh reads the body from a file"
 printf 'Changes the report: yes.\n' > "$dir/body.md"
