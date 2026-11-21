@@ -660,10 +660,12 @@ impl For {
                 undecided_whose().find_map(|(check, _)| walk::item_own(check, w, &walked, &outer));
             let first_alias = self.items[0].alias.as_str();
             let root = undecided_whose().find_map(|(check, _)| {
+                let keys = super::key_base::unreadable_keys(check, &outer);
                 let roots: Vec<Clause> =
                     super::message::listed_root_clauses(&[check], &outer, true)
                         .into_iter()
                         .chain(super::message::walked_root_clauses(&[check], &outer))
+                        .filter(|root| !keys.iter().any(|(_, key)| *key == root.text))
                         .collect();
                 let line = super::clause::lines(&roots).into_iter().next()?;
                 Some(if reads_alias(check, first_alias) {
@@ -672,8 +674,11 @@ impl For {
                     format!("{FREE}{line}")
                 })
             });
-            let rootless =
-                root.is_none() && !undecided_whose().any(|(check, _)| check.flawed(&outer));
+            let unread_key = undecided_whose()
+                .any(|(check, _)| !super::key_base::unreadable_keys(check, &outer).is_empty());
+            let rootless = root.is_none()
+                && !unread_key
+                && !undecided_whose().any(|(check, _)| check.flawed(&outer));
             let keyed_input = undecided_whose().find_map(|(check, _)| {
                 super::lists::input_key_fault(check, &outer)
                     .into_iter()
@@ -688,7 +693,7 @@ impl For {
                         &super::message::message(check, &focus, verdict),
                     )
                 }),
-                (None, None) if depth > 0 => root.clone(),
+                (None, None) if depth > 0 => root.clone().or_else(|| unread_key.then(String::new)),
                 (None, None) => Some(String::new()),
             };
             let says = undecided.is_some() && (depth > 0 || !matches!(item.how, How::Pick { .. }));
@@ -714,9 +719,7 @@ impl For {
                         .any(|path| super::key_base::of_path(path, false, &at).is_some())
                 });
                 let own = told.as_ref().filter(|_| keyed).map(|clause| clause.cause);
-                dead.push(dead_item(
-                    Cause::worst(own.into_iter().chain([cause])).unwrap_or(cause),
-                ));
+                dead.push(dead_item(own.unwrap_or(cause)));
                 continue;
             }
             if causes.contains(&Cause::Value) {
@@ -2054,17 +2057,17 @@ impl For {
     }
 
     fn whose_keys_first(&self, run: &mut Run, ctx: &Ctx) {
-        let outer = outer_ctx(ctx);
         let mut keys: Vec<(Cause, String)> = Vec::new();
-        for key in self
-            .items
-            .iter()
-            .flat_map(|item| item.whose.iter())
-            .flat_map(|check| super::key_base::unreadable_keys(check, &outer))
-        {
-            if !keys.contains(&key) {
-                keys.push(key);
+        for (cause, text, input) in self.whose_keys(ctx) {
+            if !run
+                .verdict
+                .inputs
+                .iter()
+                .any(|seen| seen.name == input.name)
+            {
+                run.verdict.inputs.push(input);
             }
+            keys.push((cause, text));
         }
         if keys.is_empty() {
             return;
@@ -2084,6 +2087,24 @@ impl For {
                 .chain([run.verdict.cause]),
         )
         .unwrap_or(run.verdict.cause);
+    }
+
+    /// Each `$params` or `$input` key the lines' `whose` checks read that
+    /// can't be read, once, with its cause, what is said and its read.
+    pub fn whose_keys(&self, ctx: &Ctx) -> Vec<(Cause, String, Input)> {
+        let outer = outer_ctx(ctx);
+        let mut keys: Vec<(Cause, String, Input)> = Vec::new();
+        for key in self
+            .items
+            .iter()
+            .flat_map(|item| item.whose.iter())
+            .flat_map(|check| super::key_base::unreadable_key_reads(check, &outer))
+        {
+            if !keys.iter().any(|(_, said, _)| *said == key.1) {
+                keys.push(key);
+            }
+        }
+        keys
     }
 
     fn key_base_after_key(&self, run: &mut Run, ctx: &Ctx) {
@@ -2514,9 +2535,11 @@ impl For {
                 let said = super::message::root_flaw(&[cond], &outer)
                     .map(|(_, said)| said)
                     .unwrap_or_default();
+                let keys = super::key_base::unreadable_keys(cond, &outer);
                 let extra: Vec<&str> = text
                     .split("; ")
                     .filter(|part| !said.split("; ").any(|old| old == *part))
+                    .filter(|part| !keys.iter().any(|(_, key)| key == part))
                     .collect();
                 if !extra.is_empty() {
                     causes.push(cause);

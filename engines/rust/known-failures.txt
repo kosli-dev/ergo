@@ -562,7 +562,6 @@ walks / a for line whose whose reads a named by key from $params that isn't text
 walks / a for line with a walk next to a parent / lists the for line's list and the parent's value, and never the alias's value
 walks / a one-line every whose whose reads a named by key from $params that is missing / says the key once and then an item whose value before the key isn't an object, which makes the row worse
 walks / a one-line walk whose whose reads a named by key from $params that is missing says the key once and each item's own problem / an item without m and an item whose m is null
-walks / a one-line walk whose whose reads a named by key from $params that isn't text says the key once, with no item in front / two items whose m is an object get no entry
 walks / a one-line walk whose whose reads a named by key from $params that isn't text says the key once, with no item in front / two items without m
 walks / a parent's list that a phrase walks fails a check on an empty list when an item of it can't be read / fails, with an empty rows, when it holds names of more than one kind
 walks / a parent's part that a phrase walks fails a check on an empty list when an item of it can't be read / fails, with an empty rows, when it holds names of more than one kind
@@ -587,8 +586,6 @@ walks / a walk through a for name, read from a parent on its right side / fails 
 walks / a walk whose parent path is named by a bare name, read from the subject / fails as absent when the subject has no such field, even when each item has one
 walks / a walk whose parent path is named by a bare name, read from the subject / fails as absent when the subject has no such field, whatever the parent and the items hold
 walks / a walked path whose named by key from $params is missing, with a value partway that isn't an object / names the step that isn't an object
-walks / a whose key from $params that is missing is said before a list that can't be walked, and the row takes the worst cause / the list is missing
-walks / a whose key from $params that is missing is said before a list that can't be walked, and the row takes the worst cause / the list is null
 walks / a whose key from $params that is missing, beside conditions on the same items that read $params and $input / an item without m, beside conditions that read $params and $input fine
 walks / a whose key from $params that is missing, in a walk beside another sentence or option, a for line beside a sentence that doesn't read the alias, and a count of that, is said wherever the walk is said / the list holds an item the whose leaves out
 walks / a whose key from $params that is missing, in a walk beside another sentence or option, a for line beside a sentence that doesn't read the alias, and a count of that, is said wherever the walk is said / the list holds text
@@ -602,8 +599,6 @@ walks / a whose key from $params that is null, in a walk beside another sentence
 walks / a whose key from $params that is null, in a walk beside another sentence or option, a for line beside a sentence that doesn't read the alias, and a count of that, is said wherever the walk is said / the list is empty
 walks / a whose key from $params that is null, in a walk beside another sentence or option, a for line beside a sentence that doesn't read the alias, and a count of that, is said wherever the walk is said / the list is missing
 walks / a whose key from $params that isn't text is said before a list that can't be walked, and the row takes the worst cause / the list is empty
-walks / a whose key from $params that isn't text is said before a list that can't be walked, and the row takes the worst cause / the list is missing
-walks / a whose key from $params that isn't text is said before a list that can't be walked, and the row takes the worst cause / the list is null
 walks / a whose key from $params that isn't text, beside items that fail on their own fields, says the key in each item / five mixed items say the key in each item and the item that isn't an object
 walks / a whose key from $params that isn't text, beside items that fail on their own fields, says the key in each item / two items without zz or m say the key in each item
 walks / a whose key from $params that isn't text, in a walk beside another sentence or option, a for line beside a sentence that doesn't read the alias, and a count of that, is said wherever the walk is said / the list holds an item the whose leaves out
@@ -618,11 +613,7 @@ walks / an empty list before a named by key from $params that is missing / fails
 walks / an every, a some or a for item that reads a named by key from $input reads the key before any item, on an empty list too / the key is a list
 walks / an every, a some or a for item that reads a named by key from $input reads the key before any item, on an empty list too / the key is a number
 walks / an every, a some or a for item that reads a named by key from $input reads the key before any item, on an empty list too / the key is an object
-walks / an every, a some or a for item that reads a named by key from $input reads the key before any item, on an empty list too / the key is missing
-walks / an every, a some or a for item that reads a named by key from $input reads the key before any item, on an empty list too / the key is null
 walks / an every, a some or a for item that reads a named by key from $input reads the key before any item, on an empty list too / the key is true
-walks / an every, a some or a for item that reads a named by key from $params that is missing reads the key before any item, on an empty list too / the list is empty
-walks / an every, a some or a for item that reads a named by key from $params that is null reads the key before any item, on an empty list too / the list is empty
 walks / an every, a some, a for item or a count whose whose reads two named by keys on an empty list fails with the worse cause, and names each key that can't be read, worst cause first / neither key is text
 walks / an every, a some, a for item or a count whose whose reads two named by keys on an empty list fails with the worse cause, and names each key that can't be read, worst cause first / one key is missing and the other isn't text
 walks / an every, a some, a for item or a count whose whose reads two named by keys on an empty list fails with the worse cause, and names each key that can't be read, worst cause first / one key is null and the other isn't text
@@ -634,5 +625,3 @@ walks / two whose keys from $params, the second one not text, beside an item tha
 walks / whose under every / fails as value with no failed items when whose leaves no items
 walks / whose under some / fails as value with no failed items when whose keeps nothing
 walks / with params that aren't an object, an every, a some or a for item on an empty list still names the named by key it reads from $input / the key is a number
-walks / with params that aren't an object, an every, a some or a for item on an empty list still names the named by key it reads from $input / the key is missing
-walks / with params that aren't an object, an every, a some or a for item on an empty list still names the named by key it reads from $input / the key is null

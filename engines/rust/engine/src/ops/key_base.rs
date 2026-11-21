@@ -592,15 +592,23 @@ pub fn alias_base(path: &Path, ctx: &Ctx) -> Option<(String, String, Cause)> {
 /// that is missing, `null` or not text, with the cause: said once, before
 /// any item.
 pub fn unreadable_keys(check: &Check, ctx: &Ctx) -> Vec<(Cause, String)> {
-    let mut out: Vec<(Cause, String)> = Vec::new();
+    unreadable_key_reads(check, ctx)
+        .into_iter()
+        .map(|(cause, text, _)| (cause, text))
+        .collect()
+}
+
+/// [`unreadable_keys`], with each key's read.
+pub fn unreadable_key_reads(check: &Check, ctx: &Ctx) -> Vec<(Cause, String, Input)> {
+    let mut out: Vec<(Cause, String, Input)> = Vec::new();
     for path in check.paths() {
         for step in &path.steps {
             if let Step::Ref(key) = step
                 && matches!(key.start, path::Start::Params | path::Start::Input)
-                && let Some((outcome, text, _)) = key_flaw(key, ctx)
-                && !out.iter().any(|(_, said)| *said == text)
+                && let Some((outcome, text, input)) = key_flaw(key, ctx)
+                && !out.iter().any(|(_, said, _)| *said == text)
             {
-                out.push((outcome.cause().unwrap_or(Cause::Unusable), text));
+                out.push((outcome.cause().unwrap_or(Cause::Unusable), text, input));
             }
         }
     }
