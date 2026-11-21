@@ -60,3 +60,27 @@ test_a_nested_item_says_each_leaf_after_every_name_above_it if {
 		"item 1 of ws: item 3 of ys: item 1 of y.zs: n is missing",
 	])
 }
+
+test_roots_come_worst_cause_first_then_by_name_before_the_lists_and_the_items if {
+	ergo._m_clauses_shown([
+		_item("item 1 of xs", "absent", [_missing("v")]),
+		ergo._m_clause("list", "xs", "value", "xs is []"),
+		_root("za", "null", "za is null"),
+		_root("zc", "unusable", `zc is "s", which isn't a number`),
+		_missing("zd"),
+		_root("zb", "unusable", `zb is "s", which isn't a number`),
+		_root("ze", "not_an_object", "ze is 3, which isn't an object"),
+		_root("zf", "ambiguous", "zf is ambiguous"),
+		_root("zg", "value", "zg is 1"),
+	]) == [
+		_root("ze", "not_an_object", "ze is 3, which isn't an object"),
+		_root("zf", "ambiguous", "zf is ambiguous"),
+		_root("zb", "unusable", `zb is "s", which isn't a number`),
+		_root("zc", "unusable", `zc is "s", which isn't a number`),
+		_missing("zd"),
+		_root("za", "null", "za is null"),
+		_root("zg", "value", "zg is 1"),
+		ergo._m_clause("list", "xs", "value", "xs is []"),
+		_item("item 1 of xs", "absent", [_missing("v")]),
+	]
+}
