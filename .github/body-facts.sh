@@ -65,7 +65,11 @@ changed=no
 [ "$pairs" != unknown ] && [ "$pairs" != 0 ] && changed=yes
 
 has_line=no
-if grep -q '^Changes the report:' "$work/body"; then
+awk '
+  /^(```|~~~)/ { infence = !infence; next }
+  !infence { print }
+' "$work/body" > "$work/body-open"
+if sed -n 's/^Changes the report://p' "$work/body-open" | sed 's/<!--[^>]*-->//g' | grep -q '[^[:space:]]'; then
   has_line=yes
 fi
 
