@@ -2031,7 +2031,7 @@ impl For {
             .iter()
             .flat_map(|item| item.whose.iter())
             .collect();
-        let mut clauses = super::message::root_clauses(&whose, &outer);
+        let mut clauses = super::message::listed_root_clauses(&whose, &outer, true);
         clauses.extend(super::message::walked_root_clauses(&whose, &outer));
         for key in self.items.iter().flat_map(|item| sort_keys(&item.how)) {
             if let Some((outcome, text, input)) = super::key_base::key_flaw(key, &outer) {
@@ -2062,7 +2062,7 @@ impl For {
             .map(|clause| clause.in_group(1))
             .collect();
         for (at, sentence) in self.sentences.iter().enumerate() {
-            let said = sentence_roots_said(&sentence.check, &outer);
+            let said = sentence_roots_listed(&sentence.check, &outer);
             clauses.extend(said.into_iter().map(|clause| clause.in_group(at + 2)));
         }
         let mut once: Vec<Clause> = Vec::new();
@@ -3485,6 +3485,14 @@ impl For {
                     .into_iter()
                     .chain(said.iter().skip(outcome.lifted).map(|clause| clause.cause)),
             )
+            .or_else(|| {
+                Cause::worst(
+                    said.iter()
+                        .take(outcome.lifted)
+                        .map(|clause| clause.cause)
+                        .chain([outcome.cause]),
+                )
+            })
             .unwrap_or(outcome.cause);
             return Some(Clause::item(name, cause, text, said));
         }
@@ -3734,21 +3742,25 @@ fn listed_roots(clauses: Vec<Clause>) -> Vec<Clause> {
     let mut out: Vec<Clause> = Vec::new();
     let mut lists: Vec<(usize, String, Vec<Clause>)> = Vec::new();
     for clause in clauses {
-        if clause.kind != super::clause::Kind::Item {
+        if clause.kind != super::clause::Kind::Root || clause.said.is_empty() {
             out.push(clause);
             continue;
         }
-        let last = clause.name.rsplit(": ").next().unwrap_or(&clause.name);
-        let list = last
-            .split_once(" of ")
-            .map_or(last, |(_, list)| list)
-            .to_string();
-        match lists
+        let list = lists
             .iter_mut()
-            .find(|(group, name, _)| *group == clause.group && *name == list)
-        {
-            Some((_, _, items)) => items.push(clause),
-            None => lists.push((clause.group, list, vec![clause])),
+            .find(|(group, name, _)| *group == clause.group && *name == clause.name);
+        let Some((_, _, items)) = list else {
+            lists.push((clause.group, clause.name, clause.said));
+            continue;
+        };
+        for item in clause.said {
+            let line = super::clause::text(std::slice::from_ref(&item));
+            if !items
+                .iter()
+                .any(|seen| super::clause::text(std::slice::from_ref(seen)) == line)
+            {
+                items.push(item);
+            }
         }
     }
     for (group, list, items) in lists {
@@ -4535,9 +4547,16 @@ fn bound_alias(root: &Path, ctx: &Ctx) -> bool {
 }
 
 fn sentence_roots_said(check: &Check, ctx: &Ctx) -> Vec<Clause> {
+    sentence_roots_listed(check, ctx)
+        .into_iter()
+        .flat_map(super::message::unlisted)
+        .collect()
+}
+
+fn sentence_roots_listed(check: &Check, ctx: &Ctx) -> Vec<Clause> {
     let nested = nested_whose(check, false);
     let mut said = sentence_root_clauses(&root_forms(check), ctx);
-    said.extend(super::message::side_root_clauses(&nested, ctx));
+    said.extend(super::message::listed_root_clauses(&nested, ctx, false));
     said.extend(super::message::walked_root_clauses(&nested, ctx));
     said.extend(super::message::walked_root_clauses(&[check], ctx));
     if let Check::Walk(walk) = check {
