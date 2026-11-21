@@ -90,27 +90,31 @@ _m_clause_more(n) := {"kind": "more", "count": n, "name": "", "cause": "value", 
 _m_clauses_shown(clauses) := array.concat(_m_clauses_ahead(once), items) if {
 	once := _once(clauses)
 	items := [c | some c in once; c.kind == "item"]
-	count([u | some u in _m_clause_units(items); u.counted]) <= 3
+	count(_m_clause_counted_names(_m_clause_units(items))) <= 3
 }
 
-_m_clauses_shown(clauses) := array.concat(array.concat(_m_clauses_ahead(once), [u.clause | some u in pieces; _m_clause_kept(u, kept)]), [_m_clause_more(count(counted) - 3)]) if {
+_m_clauses_shown(clauses) := array.concat(array.concat(_m_clauses_ahead(once), [u.clause | some u in pieces; _m_clause_kept(u, pieces, kept)]), [_m_clause_more(count(names) - 3)]) if {
 	once := _once(clauses)
 	pieces := _m_clause_units([c | some c in once; c.kind == "item"])
-	counted := [u.key | some u in pieces; u.counted]
-	count(counted) > 3
-	kept := array.slice(counted, 0, 3)
+	names := _m_clause_counted_names(pieces)
+	count(names) > 3
+	kept := {n | some n in array.slice(names, 0, 3)}
 }
 
-_m_clause_kept(u, kept) if {
+_m_clause_counted_names(pieces) := _once([u.clause.name | some u in pieces; u.counted])
+
+_m_clause_kept(u, _, kept) if {
 	u.counted
-	u.key in kept
+	u.clause.name in kept
 }
 
-_m_clause_kept(u, kept) if {
+_m_clause_kept(u, pieces, kept) if {
 	not u.counted
 	under := array.slice(u.key, 0, count(u.key) - 1)
-	some k in kept
-	array.slice(k, 0, count(under)) == under
+	some p in pieces
+	p.counted
+	p.clause.name in kept
+	array.slice(p.key, 0, count(under)) == under
 }
 
 _m_clauses_ahead(once) := array.concat(
