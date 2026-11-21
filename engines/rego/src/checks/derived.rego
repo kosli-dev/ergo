@@ -295,7 +295,7 @@ _tally(subj, side) := {"states": {"not_an_object"}, "list": _path_name(path), "v
 	st := _tally_list_state(subj, path)
 } else := r if {
 	f := _basic_form(side)
-	w := _walk(_walk_start({"path": side[f]}, subj), _walk_keys({"path": side[f]}, subj), true)
+	w := _tally_walk(subj, side)
 	flaws := [_cond_flaw(c) | some c in side.whose]
 	long := _long_text(json.marshal([e.iv | some e in w.items]))
 	judged := [_tally_judge(side, e, flaws, w, long) | some e in w.items]
@@ -309,6 +309,8 @@ _tally(subj, side) := {"states": {"not_an_object"}, "list": _path_name(path), "v
 	states := (((walk_states | judged_states) | _tally_number_states(f, _tally_distinct(side, read, subj, "read"))) | flaw_states) | root_flaw_states
 	r := object.union(object.union({"states": states, "list": _walk_name(side[f], w.walked), "values": [_walk_value(e.v, e, w) | some e in w.items], "locations": _walk_locations(w)}, _tally_value(f, _tally_distinct(side, kept, subj, "kept"), states)), _tally_stop_outcome(stop))
 }
+
+_tally_walk(subj, side) := _walk(_walk_start({"path": p}, subj), _walk_keys({"path": p}, subj), true) if p := side[_basic_form(side)]
 
 _tally_stop_outcome(stop) := {"ergo/outcome": stop[0].cause} if {
 	stop != []
@@ -364,7 +366,7 @@ _cond_tally(item, side) := {"states": {"not_an_object"}} if {
 } else := {"states": {_walk_read_state(item, side.count_of)}} if {
 	not _walk_keys({"path": side.count_of}, item)
 } else := r if {
-	w := _walk(_walk_start({"path": side.count_of}, item), _walk_keys({"path": side.count_of}, item), true)
+	w := _tally_walk(item, side)
 	kept := [e.v | some e in w.items]
 	states := ({x.cause | some x in w.fails} | {x.cause | some x in _walk_stop(w)}) | {c | some e in w.items; some c in _tally_mark(true, e)}
 	r := object.union({"states": states}, _tally_value("count_of", _tally_distinct(side, kept, item, "kept"), states))

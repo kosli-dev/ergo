@@ -1405,7 +1405,7 @@ _tally_keyed_found(c, subj, m) := [{"side": side, "w": w, "roots": roots, "e": e
 	every seg in side[f] {
 		is_string(seg)
 	}
-	w := _walk(_walk_start({"path": side[f]}, subj), _walk_keys({"path": side[f]}, subj), true)
+	w := _tally_walk(subj, side)
 	roots := _dotted_roots([side[f]])
 	some clause in _m_top_split(m, "; ")
 	lead := _m_lead_of(clause)
@@ -1427,7 +1427,7 @@ _tally_item_records(c, subj, cause, at, m) := [x |
 	mc := object.union(_m_with_sides(_m_walked(c, subj)), {"ergo/row": true})
 	some side in _m_tally_parts(mc)
 	f := _basic_form(side)
-	w := _walk(_walk_start({"path": side[f]}, subj), _walk_keys({"path": side[f]}, subj), true)
+	w := _tally_walk(subj, side)
 	roots := _dotted_roots([side[f]])
 	rs := _m_tally_said(subj, side, cause)
 	some r0 in rs

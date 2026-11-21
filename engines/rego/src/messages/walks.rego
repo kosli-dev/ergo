@@ -497,7 +497,7 @@ _m_tally_key_items(subj, side) := array.concat(
 	f := _basic_form(side)
 	count(_key_item_flaws(side)) > 0
 	not _unreadable_input
-	w := _walk(_walk_start({"path": side[f]}, subj), _walk_keys({"path": side[f]}, subj), true)
+	w := _tally_walk(subj, side)
 	w.items != []
 	w.fails == []
 	_key_items_clean(w, side.whose)
@@ -515,7 +515,7 @@ _m_tally_walked_side(subj, side) := array.concat(
 	))],
 ) if {
 	f := _basic_form(side)
-	w := _walk(_walk_start({"path": side[f]}, subj), _walk_keys({"path": side[f]}, subj), true)
+	w := _tally_walk(subj, side)
 	roots := _dotted_roots([side[f]])
 	fs := array.concat(w.fails, _walk_stop(w))
 	said := array.concat(
@@ -555,7 +555,7 @@ _m_tally_items(subj, side) := [x[2] | some x in _m_tally_items_at(subj, side)]
 
 _m_tally_items_at(subj, side) := [[_m_positions(e.i), [1, k], array.concat(x, [{"item": e}])] | some e in w.items; some k, x in array.concat(_m_whose_undecided(subj, alone, e, flaws, roots), [y | _tally_judge(side, e, flaws, w, long).read; some y in _m_tally_item(f, e, roots)])] if {
 	f := _basic_form(side)
-	w := _walk(_walk_start({"path": side[f]}, subj), _walk_keys({"path": side[f]}, subj), true)
+	w := _tally_walk(subj, side)
 	alone := _whose_alone(subj, side)
 	flaws := [_cond_flaw(c) | some c in alone.whose]
 	roots := _dotted_roots([side[f]])
