@@ -93,9 +93,13 @@ fn item(
     }
 }
 
+fn clauses(text: &str) -> Vec<&str> {
+    text.split("; ").collect()
+}
+
 fn without_roots(message: &str, roots: &[String], moved: &mut Vec<String>) -> String {
-    message
-        .split("; ")
+    clauses(message)
+        .into_iter()
         .map(|part| {
             part.split(", and ")
                 .filter(|piece| {
@@ -407,6 +411,30 @@ fn item_read(f: &Value) -> Value {
     })
 }
 
+fn item_made(failed: &[Value], key_texts: &[String]) -> Vec<String> {
+    let mut made: Vec<String> = Vec::new();
+    for f in failed {
+        let mut after_key = false;
+        for piece in clauses(&text(f, "ergo/text")) {
+            if after_key || crate::parts::is_item(piece) || !crate::parts::is_item(&text(f, "item"))
+            {
+                ops::push_new(&mut made, piece.to_string());
+            }
+            after_key = crate::parts::is_item(piece)
+                && key_texts.iter().any(|k| piece.ends_with(k.as_str()));
+        }
+    }
+    made
+}
+
+fn row_roots(message: &str, item_made: &[String]) -> Vec<String> {
+    clauses(message)
+        .into_iter()
+        .filter(|m| !m.is_empty() && !item_made.iter().any(|t| t == m))
+        .map(str::to_string)
+        .collect()
+}
+
 /// The entries of a failed `for` row's `failures`.
 pub fn for_failures(
     line: &For,
@@ -423,24 +451,13 @@ pub fn for_failures(
             && !f.get("value").is_some_and(Value::is_object)
             && !list(f, "failed_assertions").is_empty()
     };
-    let mut item_made: Vec<String> = Vec::new();
     let key_texts: Vec<String> = line
         .items
         .iter()
         .flat_map(|i| i.whose.iter())
         .flat_map(|check| ops::key_base::unusable_keys(check, ctx))
         .collect();
-    for f in failed {
-        let mut after_key = false;
-        for piece in text(f, "ergo/text").split("; ") {
-            if after_key || crate::parts::is_item(piece) || !crate::parts::is_item(&text(f, "item"))
-            {
-                ops::push_new(&mut item_made, piece.to_string());
-            }
-            after_key = crate::parts::is_item(piece)
-                && key_texts.iter().any(|k| piece.ends_with(k.as_str()));
-        }
-    }
+    let item_made = item_made(failed, &key_texts);
     let whose_roots = line.whose_roots(ctx);
     let list_names: Vec<String> = line
         .items
@@ -489,7 +506,12 @@ pub fn for_failures(
     let free_said: Vec<String> = frees
         .iter()
         .flatten()
-        .flat_map(|(_, said, _)| said.split("; ").map(str::to_string).collect::<Vec<_>>())
+        .flat_map(|(_, said, _)| {
+            clauses(said)
+                .into_iter()
+                .map(str::to_string)
+                .collect::<Vec<_>>()
+        })
         .collect();
     let off_subject = row_cause == Cause::NotAnObject && !ctx.subject.value.is_object();
     let owns: Vec<Vec<String>> = (0..line.sentences.len())
@@ -513,7 +535,7 @@ pub fn for_failures(
     let first_reads: Option<String> = (line.items.len() == 2
         && matches!(line.items[0].how, for_line::How::Some { .. }))
     .then(|| format!(" of {}: {}.", list_names[0], line.items[0].alias));
-    for clause in message.split("; ") {
+    for clause in clauses(message) {
         if let Some(middle) = &first_reads
             && crate::parts::is_item(clause)
             && clause.contains(middle.as_str())
@@ -538,9 +560,11 @@ pub fn for_failures(
                     && clause
                         .strip_prefix(&format!("{named}: "))
                         .is_some_and(|rest| {
-                            list(f, "failed_assertions")
-                                .iter()
-                                .any(|l| texts(l).iter().any(|t| t.split("; ").any(|p| p == rest)))
+                            list(f, "failed_assertions").iter().any(|l| {
+                                texts(l)
+                                    .iter()
+                                    .any(|t| clauses(t).into_iter().any(|p| p == rest))
+                            })
                         })
             })
             || ops::message::cap_note(clause).is_some()
@@ -565,11 +589,7 @@ pub fn for_failures(
             ops::push_new(&mut owned[0], clause.to_string());
         }
     }
-    let roots: Vec<String> = message
-        .split("; ")
-        .filter(|m| !m.is_empty() && !item_made.iter().any(|t| t == m))
-        .map(str::to_string)
-        .collect();
+    let roots = row_roots(message, &item_made);
     let mut out: Vec<Failure> = Vec::new();
     for (i, sentence) in line.sentences.iter().enumerate() {
         let first = line
@@ -604,10 +624,8 @@ pub fn for_failures(
                             for kid in &n.part().failures {
                                 said_by(kid, &[], &mut said);
                             }
-                            let mut want: Vec<String> = m
-                                .part()
-                                .message
-                                .split("; ")
+                            let mut want: Vec<String> = clauses(&m.part().message)
+                                .into_iter()
                                 .filter(|p| !p.is_empty() && ops::message::cap_note(p).is_none())
                                 .map(str::to_string)
                                 .collect();
@@ -633,7 +651,7 @@ pub fn for_failures(
             }
             None => {
                 let mut own: Vec<String> = Vec::new();
-                for clause in message.split("; ") {
+                for clause in clauses(message) {
                     if owned[i].iter().any(|o| o == clause) || moved.iter().any(|m| m == clause) {
                         ops::push_new(&mut own, clause.to_string());
                     }
@@ -677,9 +695,11 @@ pub fn for_failures(
         let said = text(f, "ergo/text");
         if !said.is_empty()
             && list(f, "failed_items").is_empty()
-            && said.split("; ").all(|p| whose_roots.iter().any(|t| t == p))
+            && clauses(&said)
+                .into_iter()
+                .all(|p| whose_roots.iter().any(|t| t == p))
         {
-            for p in said.split("; ") {
+            for p in clauses(&said) {
                 ops::push_new(&mut walk_texts, p.to_string());
             }
             let second = line.items.len() == 2
@@ -744,3 +764,6 @@ fn list_label(line: &For, said: &str) -> String {
     }
     crate::name::name(&line.items[0].path)
 }
+
+#[cfg(test)]
+mod tests;
