@@ -45,6 +45,8 @@ Here is a policy that says "_every production deployment must have an approver_"
 
 `policy.yaml`:
 
+<!-- ergo-run: first-policy role=file path=policy.yaml -->
+
 ```yaml
 ergo_spec: v0.6
 subjects:
@@ -77,6 +79,8 @@ Several requirements can check the same subject. Each one gets its own rows in t
 ### The report
 
 With the following `deployments.json` input:
+
+<!-- ergo-run: first-policy role=file path=deployments.json -->
 
 ```json
 {
@@ -141,6 +145,10 @@ When a check fails, `cause` tells you why. `d-2` failed with `absent` because it
 ### Violations
 
 The report holds every row, passed or failed. To tell someone only what went wrong, ask for the violations, with `ergo violations` or `ergo.violations`. They are:
+
+<!-- ergo-run: first-policy role=command use=release run=`opa eval -d ergo.rego -d policy.yaml -i deployments.json --format pretty 'data.ergo.violations(data.ergo.report(input, {"ergo_spec": data.ergo_spec, "subjects": data.subjects, "requirements": data.requirements}, {}))'` -->
+
+<!-- ergo-run: first-policy role=output -->
 
 ```json
 [
