@@ -141,3 +141,12 @@ test_a_note_about_a_value_not_in_a_list_item_reads_that_value_as_usable if {
 	ergo._ms_list_outcome({"note": true, "cause": "unusable"}) == "usable"
 	ergo._ms_list_outcome({"note": false, "cause": "absent"}) == ergo._key_list_outcome("absent")
 }
+
+test_a_null_member_outside_a_list_has_no_id_and_is_named_by_its_path if {
+	req := {"subject": "m"}
+	place := ergo._id_fault_place({"subject": null, "at": "/evidence/a", "c": ["evidence", "a"]}, req, {"evidence": {"a": null}}) with data.ergo_resolved as {"m": {"def": {"from": ["evidence"], "identified_by": ["id"]}}} with data.ergo_subject_sentences as {"every": {"m"}, "member": {"m"}, "narrowing": {}, "chains": {}}
+	place.text == "evidence.a is null"
+	place.cause == "null"
+	place.listed == false
+	place.at == "/evidence/a"
+}
