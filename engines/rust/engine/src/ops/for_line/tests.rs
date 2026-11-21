@@ -3182,3 +3182,22 @@ fn a_key_that_sorts_the_line_is_said_once_before_the_items_own_problems() {
         "$params.kn is 1, which isn't text; item 1 of rows: m is [5, 1], which isn't an object"
     );
 }
+
+#[test]
+fn a_key_read_from_a_field_of_the_subject_on_the_first_list_is_a_root_clause() {
+    let said = |p: Option<Value>| {
+        let mut subject = json!({"rows": [{"w": {"k": "xy"}}]});
+        if let Some(p) = p {
+            subject["p"] = p;
+        }
+        for_tree(
+            "every rows.w named by p as w",
+            &["w is \"xy\""],
+            subject,
+            json!({}),
+        )
+    };
+    assert_eq!(said(None), "p is missing");
+    assert_eq!(said(Some(Value::Null)), "p is null");
+    assert_eq!(said(Some(json!(3))), "p is 3, which isn't text");
+}
