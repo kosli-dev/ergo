@@ -126,17 +126,44 @@ fn text_of(failed: &Value, key: &str) -> String {
 }
 
 pub(crate) fn is_item(name: &str) -> bool {
-    name.starts_with("item ")
+    name.starts_with("item ") || member_of(name).is_some()
 }
 
-/// The list an item or list entry belongs to: `xs` for `item 2 of xs` or `xs`.
+fn member_of(name: &str) -> Option<(&str, &str)> {
+    let rest = name.strip_prefix("member ")?;
+    let end = if rest.starts_with('"') {
+        let mut escaped = false;
+        let mut end = None;
+        for (at, c) in rest.char_indices().skip(1) {
+            match c {
+                _ if escaped => escaped = false,
+                '\\' => escaped = true,
+                '"' => {
+                    end = Some(at + 1);
+                    break;
+                }
+                _ => {}
+            }
+        }
+        end?
+    } else {
+        rest.find(|c: char| !(c.is_ascii_alphanumeric() || c == '_' || c == '-'))
+            .unwrap_or(rest.len())
+    };
+    let (key, after) = rest.split_at(end);
+    let list = after.strip_prefix(" of ")?;
+    (!key.is_empty()).then_some((key, list))
+}
+
+/// The list an item or list entry belongs to: `xs` for `item 2 of xs`, `member k of xs` or `xs`.
 pub fn list_base(name: &str) -> String {
-    let unitemed = match name.strip_prefix("item ") {
-        Some(_) => match name.split_once(" of ") {
+    let unitemed = match (name.strip_prefix("item "), member_of(name)) {
+        (_, Some((_, list))) => list,
+        (Some(_), None) => match name.split_once(" of ") {
             Some((_, rest)) => rest,
             None => name,
         },
-        None => name,
+        (None, None) => name,
     };
     match unitemed.split_once('[') {
         Some((base, _)) => base.to_string(),
@@ -152,8 +179,11 @@ pub fn item_input(name: &str, lists: &[String]) -> bool {
     }
 }
 
-/// The name of an item read by its position: `xs[1]` for `item 2 of xs`.
+/// The name of an item read by its position: `xs[1]` for `item 2 of xs`, and `xs.k` for `member k of xs`.
 pub fn position_name(item: &str) -> String {
+    if let Some((key, list)) = member_of(item) {
+        return format!("{list}.{key}");
+    }
     let Some(rest) = item.strip_prefix("item ") else {
         return item.to_string();
     };

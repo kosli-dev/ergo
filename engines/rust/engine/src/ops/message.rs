@@ -1238,7 +1238,10 @@ pub fn joined(parts: Vec<String>) -> String {
             fresh.push(true);
         }
     }
-    let items = once.iter().filter(|part| part.starts_with("item ")).count();
+    let items = once
+        .iter()
+        .filter(|part| crate::parts::is_item(part))
+        .count();
     let counted = if items == 0 { once.len() } else { items };
     if counted + hidden <= 3 {
         once.join("; ")
@@ -1247,7 +1250,7 @@ pub fn joined(parts: Vec<String>) -> String {
         let mut left = 3;
         let mut shown: Vec<String> = Vec::new();
         for part in once {
-            if items > 0 && !part.starts_with("item ") {
+            if items > 0 && !crate::parts::is_item(&part) {
                 shown.push(part);
             } else if left > 0 {
                 left -= 1;
