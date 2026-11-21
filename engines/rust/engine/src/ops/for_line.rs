@@ -3485,6 +3485,14 @@ impl For {
                     .into_iter()
                     .chain(said.iter().skip(outcome.lifted).map(|clause| clause.cause)),
             )
+            .or_else(|| {
+                Cause::worst(
+                    said.iter()
+                        .take(outcome.lifted)
+                        .map(|clause| clause.cause)
+                        .chain([outcome.cause]),
+                )
+            })
             .unwrap_or(outcome.cause);
             return Some(Clause::item(name, cause, text, said));
         }
