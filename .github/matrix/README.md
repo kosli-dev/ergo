@@ -29,11 +29,12 @@ PATH=engines/rust/target/debug:$PATH python3 spec/sweep.py --pairs /tmp/pairs.js
 
 ## See what a change did to one generator
 
-`.github/matrix-facts.sh [NAME [BASE]]` runs the generator `NAME` (`matrix-a` by default) on `BASE` (`origin/main` by default) and on the working tree, and prints a Markdown summary:
+`.github/matrix-facts.sh BASE NAME...` runs each generator `NAME` (`matrix-a`, `matrix-b`, `walk`) on `BASE` (a ref, like `origin/main`) and on the working tree, and prints a Markdown summary with one heading per generator and three lists. Each list is about the pairs where the working tree's Rust row differs from `BASE`'s Rust row, one pair on each line with the pair's name and the values:
 
-- the pairs that are worse than `BASE`: a row where `BASE` had the same verdict and cause as `ergo.rego` and the working tree doesn't;
-- the pairs where the Rust cause is lower than the one `ergo.rego` gives.
+- Cause went down (usually a bug): the cause comes later in the order of [Causes](../../REFERENCE.md#causes) than on `BASE`, or than the one `ergo.rego` gives on the working tree. A pair that was already lower than Rego's on `BASE` says `already on base`.
+- Says less than `BASE` (usually a bug): the `BASE` row failed and a problem it said is gone. It splits the messages of the row and of its `failures` at `, and ` and lists every piece that no message of the working tree's row contains. A row that is gone, or a report that now gives an error, counts too.
+- Cause went up (usually the rule `problems.all_said`; list for the Rego steps): the cause comes earlier in the order than on `BASE`, or than the one `ergo.rego` gives.
 
-A row's cause is lower when it comes later in the order of [Causes](../../REFERENCE.md#causes): `not_an_object`, `ambiguous`, `unusable`, `absent`, `null`, `value`. A pair that was already lower on `BASE` says `already on BASE`. Rows are compared by requirement, check and subject.
+The order is `not_an_object`, `ambiguous`, `unusable`, `absent`, `null`, `value`, and a passed row comes after all of them. The rule `problems.all_said` takes the worst cause of all, so a cause that goes up is usually the rule and one that goes down is usually a bug. Rows are compared by requirement, check and subject. A list with nothing in it says `None.`
 
-It builds both Rust commands with `cargo`, so it needs Rust and `opa` on your machine, and it only informs: it fails only when a tool fails. The `matrix-facts` job runs it on pull requests for all three generators, `matrix-a`, `matrix-b` and `walk`, each in its own step and under its own heading in the job summary.
+It builds both Rust commands with `cargo`, so it needs Rust and `opa` on your machine, and it only informs: it fails only when a tool fails. The `matrix-facts` job runs it on pull requests for all three generators, `matrix-a`, `matrix-b` and `walk`, in one run that builds `BASE` and the working tree once, with one heading for each generator in the job summary.

@@ -19,7 +19,7 @@ row() {
   if [ "$1" = satisfied ]; then
     printf '{"requirement":"r","check":"c","subject":"t","passed":true,"cause":"satisfied"}'
   else
-    printf '{"requirement":"r","check":"c","subject":"t","passed":false,"cause":"%s","message":"%s","failures":[{"message":"%s"}]}' "$1" "${2:-$1 problem}" "${2:-$1 problem}"
+    printf '{"requirement":"r","check":"c","subject":"t","passed":false,"cause":"%s","message":"%s","failures":[{"message":"%s"}]}' "$1" "${2:-a problem}" "${2:-a problem}"
   fi
 }
 report() {
@@ -61,7 +61,7 @@ expect "$dir/head.json" "$dir/base.json" "## Matrix matrix-a
 ### Says less than base (usually a bug): 2
 
 - says_less: r/c: missing \"b is 2\"; base says \"a is 1, and b is 2\", working tree says \"a is 1\"
-- passes_now: r/c: missing \"value problem\"; base says \"value problem\", working tree says \"none\"
+- passes_now: r/c: missing \"a problem\"; base says \"a problem\", working tree says \"none\"
 
 ### Cause went up (usually the rule problems.all_said; list for the Rego steps): 1
 
