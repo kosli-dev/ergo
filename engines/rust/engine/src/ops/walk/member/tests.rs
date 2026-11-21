@@ -238,3 +238,90 @@ fn a_failed_member_is_named_by_its_key_in_the_failed_items() {
     assert_eq!(row.failed_items.len(), 1);
     assert_eq!(row.failed_items[0]["item"], json!("member b of rs[0].e"));
 }
+
+fn for_row(line: &str, assertion: &str, subject: Value) -> Value {
+    let policy = json!({
+        "ergo_spec": crate::SPEC,
+        "subjects": {"thing": {"from": "things", "identified_by": "id"}},
+        "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": line, "assert": assertion}}}}
+    });
+    let mut subject = subject;
+    subject["id"] = json!(1);
+    let report = crate::report(&json!({"things": [subject]}), &policy, &json!({}));
+    report["results"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|row| row["check"] == "c")
+        .unwrap()
+        .clone()
+}
+
+fn entries(row: &Value) -> Vec<(String, String, Vec<String>)> {
+    row["failures"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|f| {
+            (
+                f["kind"].as_str().unwrap().to_string(),
+                f["name"].as_str().unwrap().to_string(),
+                f["inputs"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .map(|i| i["name"].as_str().unwrap().to_string())
+                    .collect(),
+            )
+        })
+        .collect()
+}
+
+#[test]
+fn a_member_a_for_line_whose_cannot_decide_is_an_item_entry_named_by_its_key() {
+    let row = for_row(
+        "every member of ev whose k is 1 as e",
+        "e.s is \"OK\"",
+        json!({"ev": {"a": {"s": 1}, "b": 3, "c": {"k": 1}}}),
+    );
+    let found = entries(&row);
+    assert_eq!(
+        found[1..],
+        [
+            (
+                "item".to_string(),
+                "member a of ev".to_string(),
+                vec!["ev.a.k".to_string()]
+            ),
+            ("item".to_string(), "member b of ev".to_string(), Vec::new()),
+        ]
+    );
+    let row = for_row(
+        "every member of ev as e",
+        "e.s is \"OK\"",
+        json!({"ev": {"a": 1}}),
+    );
+    assert_eq!(
+        entries(&row),
+        [("item".to_string(), "member a of ev".to_string(), Vec::new())]
+    );
+}
+
+#[test]
+fn a_for_line_says_a_value_it_reads_members_of_isnt_an_object() {
+    let row = for_row(
+        "every member of ev as e",
+        "e.s is \"OK\"",
+        json!({"ev": [1]}),
+    );
+    assert_eq!(row["message"], json!("ev is [1], which isn't an object"));
+    let row = for_row(
+        "every rs as r, every member of r.ev as f",
+        "f.s is \"OK\"",
+        json!({"rs": [{"ev": {"a": {"s": "OK"}}}, {"ev": 3}]}),
+    );
+    assert_eq!(
+        row["message"],
+        json!("item 2 of rs: r.ev is 3, which isn't an object")
+    );
+}
