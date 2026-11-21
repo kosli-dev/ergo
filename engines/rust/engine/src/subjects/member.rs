@@ -181,9 +181,21 @@ pub(super) fn member_walk<'a>(
     }
 }
 
-fn parent_failure<'a>(value: &Value, first: Option<&Step>, _root: &str) -> Option<Read<'a>> {
+fn parent_failure<'a>(value: &Value, first: Option<&Step>, root: &str) -> Option<Read<'a>> {
     match (value, first) {
         (Value::Object(_), _) | (Value::Array(_), Some(_)) => None,
+        (Value::Array(_), None) => Some(Read::Entries {
+            entries: Vec::new(),
+            broken: vec![Broken {
+                listed: false,
+                ..Broken::listed(
+                    ops::message::isnt(root, value, "an object"),
+                    Cause::NotAnObject,
+                    Value::Null,
+                    None,
+                )
+            }],
+        }),
         (Value::Null, Some(Step::Index(_))) => Some(Read::Failed(Cause::Absent)),
         (_, Some(Step::Index(_))) => Some(Read::Failed(Cause::Unusable)),
         _ => Some(Read::Failed(Cause::NotAnObject)),
