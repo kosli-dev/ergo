@@ -1,6 +1,39 @@
 use crate::SPEC;
 use serde_json::{Value, json};
 
+fn walk_of(sentence: &str) -> crate::ops::walk::Walk {
+    let tree = ergo_policy_sentences::parse_check(sentence).unwrap();
+    match crate::lower::lower_assertion(&tree.assertions[0], &crate::lower::Scope::new()).unwrap() {
+        crate::ops::Check::Walk(walk) => *walk,
+        _ => panic!("not a walk: {sentence}"),
+    }
+}
+
+#[test]
+fn the_object_a_member_walk_reads_is_its_own_list_input_as_a_walked_list_is() {
+    let subject = json!({"xs": {"b": null, "a": 5}});
+    let input = json!({});
+    let ctx = crate::path::Ctx {
+        label: None,
+        item_by_item: false,
+        subject: crate::path::Located {
+            value: &subject,
+            location: crate::path::Location::input_root().key("s"),
+        },
+        input: &input,
+        params: None,
+        aliases: std::collections::BTreeMap::new(),
+    };
+    let members = walk_of("every member of xs is at least y");
+    assert!(super::walked_list_input("xs", &[], &members, &ctx));
+    assert!(!super::walked_list_input("y", &[], &members, &ctx));
+    let list = walk_of("every xs is at least y");
+    let lists = ["xs".to_string()];
+    assert!(super::walked_list_input("xs[]", &lists, &list, &ctx));
+    assert!(!super::walked_list_input("xs", &lists, &list, &ctx));
+    assert!(!super::walked_list_input("y", &lists, &list, &ctx));
+}
+
 fn report(input: &Value, policy: &Value, params: &Value) -> Value {
     crate::report::keeping_stash(|| crate::report(input, policy, params))
 }
