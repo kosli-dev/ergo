@@ -2384,8 +2384,6 @@ const WHOSE_ROOT: &str = "an item the line's whose can't decide says the whose's
 
 const TREE_IS_THE_CASE: &str = "the tree says what the case says and Rust's row doesn't, until R5-6 builds the row from the tree";
 
-const CAPPED_ROOT: &str = "an item says the capped list of a name read outside the item, with its and N more, as a clause of its own, so the tree counts one more item, and no step of the R5 design takes it out";
-
 const WALKED_ROOT_UNDER_ITEM: &str = "a name read outside the item by a sentence that walks a list under the item, like pos.name in every m.ys.v is in pos.name, isn't a root clause, so the item says it, and no step of the R5 design makes it one";
 
 const WALK_ITEMS_JOINED: &str = "the row joins two items of a list walked under a walked item with , and and the tree gives each its own part, and no step of the R5 design says which one is right";
@@ -2400,7 +2398,7 @@ const OTHER_SUBJECTS_CAUSE: &str = "the tree gives item 1 of ys its own cause, a
 
 const CASE_AGAINST_FOR_PASS: &str = "the case fails an item of the first list that isn't an object, a value read whole as a named by key or a list walked through its alias, when nothing is checked for it on an empty second list, where for.pass says an item that isn't an object passes when nothing is checked for it, and the tree follows the rule";
 
-const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 100] = [
+const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 96] = [
     (
         "for / a $params list that a for line reads fails it when the line's whose leaves nothing and an item of the list can't be read / fails, when the whose leaves nothing",
         SAID_OUTSIDE,
@@ -2412,18 +2410,6 @@ const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 100] = [
     (
         "for / a $params list that a for line walks fails it on an empty list when an item of it is null / fails, with an empty rows",
         SAID_OUTSIDE,
-    ),
-    (
-        "for / a count or sum of a name read from outside the item on a for line says how many more of its items can't be read / 5 items without the name",
-        CAPPED_ROOT,
-    ),
-    (
-        "for / a count or sum of a name read from outside the item on a for line says how many more of its items can't be read / 5 items without the name, and items of the line without their own",
-        CAPPED_ROOT,
-    ),
-    (
-        "for / a count or sum of a name read from outside the item on a for line says how many more of its items can't be read / 7 items without the name",
-        CAPPED_ROOT,
     ),
     (
         "for / a for line runs the sentences that don't read the alias of an empty list it tolerates on an item that isn't an object only when one of them reads the item / fails an approver that isn't an object with the sentence that reads it, and passes it when every sentence reads commit",
@@ -2584,10 +2570,6 @@ const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 100] = [
     (
         "for / an item's own problem on a for line is said after a root of its whose that can't be read, even when it fails no worse than the root / an item without v, with names of more than one kind",
         WHOSE_ROOT,
-    ),
-    (
-        "for / and N more counts each problem of a part of a subject that is a list once / four items that aren't objects are three shown and one more",
-        CAPPED_ROOT,
     ),
     (
         "for / first of and last of an empty second for list whose whose reads params that are an object, not a list, say the params, then the empty list / ys is empty",
@@ -2803,9 +2785,9 @@ const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 100] = [
     ),
 ];
 
-const ROWS_COMPARED: usize = 1432;
+const ROWS_COMPARED: usize = 1440;
 
-const ROWS_LISTED: usize = 150;
+const ROWS_LISTED: usize = 142;
 
 fn item_entries(failures: &Value, out: &mut Vec<(String, String)>) {
     for failure in failures.as_array().into_iter().flatten() {

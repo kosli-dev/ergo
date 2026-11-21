@@ -2075,7 +2075,7 @@ impl For {
                 once.push(clause);
             }
         }
-        once
+        listed_roots(once)
     }
 
     #[cfg_attr(not(test), expect(dead_code))]
@@ -2758,7 +2758,7 @@ impl For {
                 let mut run = run;
                 run.verdict.cause = cause;
                 run.message = Some(super::message::joined(texts.clone()));
-                let lines = super::clause::lines(&self.root_clauses(ctx));
+                let lines = root_lines(&self.root_clauses(ctx));
                 let roots: Vec<&str> = lines.iter().map(String::as_str).collect();
                 run.items = self
                     .free_clauses(ctx)
@@ -3617,7 +3617,7 @@ impl For {
         roots: &[Clause],
         ctx: &Ctx,
     ) -> Vec<Clause> {
-        let lines = super::clause::lines(roots);
+        let lines = root_lines(roots);
         let texts: Vec<&str> = lines.iter().map(String::as_str).collect();
         if level.unreadable {
             return free
@@ -3714,8 +3714,46 @@ impl For {
     }
 }
 
+fn root_lines(roots: &[Clause]) -> Vec<String> {
+    let mut out: Vec<String> = Vec::new();
+    for line in super::clause::lines(roots) {
+        for piece in line.split("; ") {
+            push_new(&mut out, piece.to_string());
+        }
+        push_new(&mut out, line);
+    }
+    out
+}
+
+fn listed_roots(clauses: Vec<Clause>) -> Vec<Clause> {
+    let mut out: Vec<Clause> = Vec::new();
+    let mut lists: Vec<(usize, String, Vec<Clause>)> = Vec::new();
+    for clause in clauses {
+        if clause.kind != super::clause::Kind::Item {
+            out.push(clause);
+            continue;
+        }
+        let last = clause.name.rsplit(": ").next().unwrap_or(&clause.name);
+        let list = last.split_once(" of ").map_or(last, |(_, list)| list).to_string();
+        match lists
+            .iter_mut()
+            .find(|(group, name, _)| *group == clause.group && *name == list)
+        {
+            Some((_, _, items)) => items.push(clause),
+            None => lists.push((clause.group, list, vec![clause])),
+        }
+    }
+    for (group, list, items) in lists {
+        let cause = Cause::worst(items.iter().map(|item| item.cause)).unwrap_or(Cause::Value);
+        let text = super::clause::text(&super::clause::shown(&items));
+        out.push(Clause::root(&list, cause, text).in_group(group));
+    }
+    out
+}
+
 fn unrooted(clause: Clause, roots: &[&str]) -> Option<Clause> {
-    let rooted = clause.text.split("; ").all(|piece| roots.contains(&piece));
+    let rooted = roots.contains(&clause.text.as_str())
+        || clause.text.split("; ").all(|piece| roots.contains(&piece));
     if rooted && clause.said.is_empty() {
         return None;
     }
