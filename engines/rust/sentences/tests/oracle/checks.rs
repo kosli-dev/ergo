@@ -13017,6 +13017,12 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
+        "every member of ms as m",
+        "every member of ms as m",
+        &[],
+        &[],
+    ),
+    (
         "every rs as r, some member of r.e whose k is 1 as m",
         "every rs as r, some member of r.e whose k is 1 as m",
         &[],

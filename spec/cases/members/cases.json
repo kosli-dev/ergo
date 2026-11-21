@@ -4147,5 +4147,185 @@
         ]
       }
     ]
+  },
+  {
+    "description": "every member of on a for line, read only through its alias",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": "every member of ms as m", "assert": "m is 1"}}}}},
+    "cases": [
+      {
+        "description": "names the member as the value when the sentence reads only the alias",
+        "rules": [
+          "walk.member",
+          "message.alias",
+          "message.items"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "ms": {
+                "a": 0,
+                "b": 0,
+                "c": 0,
+                "d": 0,
+                "e": 0
+              }
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "type": "thing",
+              "id": "t1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "ms",
+                "value": [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                "locations": [
+                  "/things/0/ms/a",
+                  "/things/0/ms/b",
+                  "/things/0/ms/c",
+                  "/things/0/ms/d",
+                  "/things/0/ms/e"
+                ],
+                "outcome": "usable"
+              }
+            ],
+            "message": "member a of ms is 0; member b of ms is 0; member c of ms is 0; and 2 more",
+            "failures": [
+              {
+                "kind": "assertion",
+                "name": "m is 1",
+                "cause": "value",
+                "message": "",
+                "inputs": [],
+                "failures": [
+                  {
+                    "kind": "item",
+                    "name": "member a of ms",
+                    "cause": "value",
+                    "message": "member a of ms is 0",
+                    "inputs": [
+                      {
+                        "name": "m",
+                        "value": 0,
+                        "locations": [
+                          "/things/0/ms/a"
+                        ],
+                        "outcome": "usable"
+                      }
+                    ],
+                    "failures": [],
+                    "value": 0,
+                    "locations": [
+                      "/things/0/ms/a"
+                    ]
+                  },
+                  {
+                    "kind": "item",
+                    "name": "member b of ms",
+                    "cause": "value",
+                    "message": "member b of ms is 0",
+                    "inputs": [
+                      {
+                        "name": "m",
+                        "value": 0,
+                        "locations": [
+                          "/things/0/ms/b"
+                        ],
+                        "outcome": "usable"
+                      }
+                    ],
+                    "failures": [],
+                    "value": 0,
+                    "locations": [
+                      "/things/0/ms/b"
+                    ]
+                  },
+                  {
+                    "kind": "item",
+                    "name": "member c of ms",
+                    "cause": "value",
+                    "message": "member c of ms is 0",
+                    "inputs": [
+                      {
+                        "name": "m",
+                        "value": 0,
+                        "locations": [
+                          "/things/0/ms/c"
+                        ],
+                        "outcome": "usable"
+                      }
+                    ],
+                    "failures": [],
+                    "value": 0,
+                    "locations": [
+                      "/things/0/ms/c"
+                    ]
+                  },
+                  {
+                    "kind": "item",
+                    "name": "member d of ms",
+                    "cause": "value",
+                    "message": "member d of ms is 0",
+                    "inputs": [
+                      {
+                        "name": "m",
+                        "value": 0,
+                        "locations": [
+                          "/things/0/ms/d"
+                        ],
+                        "outcome": "usable"
+                      }
+                    ],
+                    "failures": [],
+                    "value": 0,
+                    "locations": [
+                      "/things/0/ms/d"
+                    ]
+                  },
+                  {
+                    "kind": "item",
+                    "name": "member e of ms",
+                    "cause": "value",
+                    "message": "member e of ms is 0",
+                    "inputs": [
+                      {
+                        "name": "m",
+                        "value": 0,
+                        "locations": [
+                          "/things/0/ms/e"
+                        ],
+                        "outcome": "usable"
+                      }
+                    ],
+                    "failures": [],
+                    "value": 0,
+                    "locations": [
+                      "/things/0/ms/e"
+                    ]
+                  }
+                ],
+                "locations": [
+                  "$policy:/requirements/r/checks/c/assert"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
   }
 ]
