@@ -4532,6 +4532,9 @@ fn sentence_roots_said(check: &Check, ctx: &Ctx) -> Vec<Clause> {
     said.extend(super::message::side_root_clauses(&nested, ctx));
     said.extend(super::message::walked_root_clauses(&nested, ctx));
     said.extend(super::message::walked_root_clauses(&[check], ctx));
+    if let Check::Walk(walk) = check {
+        said.extend(super::message::walked_root_clauses(&[&*walk.check], ctx));
+    }
     said
 }
 

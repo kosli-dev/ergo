@@ -2384,8 +2384,6 @@ const WHOSE_ROOT: &str = "an item the line's whose can't decide says the whose's
 
 const TREE_IS_THE_CASE: &str = "the tree says what the case says and Rust's row doesn't, until R5-6 builds the row from the tree";
 
-const WALKED_ROOT_UNDER_ITEM: &str = "a name read outside the item by a sentence that walks a list under the item, like pos.name in every m.ys.v is in pos.name, isn't a root clause, so the item says it, and no step of the R5 design makes it one";
-
 const WALK_ITEMS_JOINED: &str = "the row joins two items of a list walked under a walked item with , and and the tree gives each its own part, and no step of the R5 design says which one is right";
 
 const FREE_BEFORE_KEY: &str = "the tree says a sentence that reads no alias first and then the key of the line's whose, as for.pass says, where Rust's row leaves the key out and the case says it first, until R5-6 builds the row from the tree and moves the case";
@@ -2465,7 +2463,7 @@ const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 96] = [
     ),
     (
         "for / a name read from outside the item and walked on the right of is in on a for line is said once, with no item / items that aren't objects fail as unusable and are said once",
-        WALKED_ROOT_UNDER_ITEM,
+        WHOSE_ROOT,
     ),
     (
         "for / a named by key read from $params on a for line over a null item, with the second list missing / names $params.k once and then the missing list",
@@ -2505,7 +2503,7 @@ const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 96] = [
     ),
     (
         "for / a part that holds a list is walked on the right of is in on a for line / an item without the name fails as absent and names the item",
-        WALKED_ROOT_UNDER_ITEM,
+        WHOSE_ROOT,
     ),
     (
         "for / a root in a for line's relative clause doesn't hide an item's own problem / names the root once, then the item's own problem",
@@ -2785,9 +2783,9 @@ const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 96] = [
     ),
 ];
 
-const ROWS_COMPARED: usize = 1440;
+const ROWS_COMPARED: usize = 1441;
 
-const ROWS_LISTED: usize = 142;
+const ROWS_LISTED: usize = 143;
 
 fn item_entries(failures: &Value, out: &mut Vec<(String, String)>) {
     for failure in failures.as_array().into_iter().flatten() {
