@@ -191,4 +191,3 @@ test_a_row_keeps_the_items_of_a_list_walked_from_the_input_after_is_in_ignoring_
 	ref := {"op": "in", "path": ["x"], "values": {"ref": ["$$input[]", "cs", "name"]}, "ignoring": "case"}
 	ergo._m_row_text(ref, {"x": "a"}, "unusable") == "item 1 of $input.cs: name is null; item 3 of $input.cs: name is true, which isn't text" with data.ergo_document as {"cs": [{"name": null}, {"name": "a"}, {"name": true}]}
 }
-

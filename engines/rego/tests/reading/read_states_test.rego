@@ -97,4 +97,3 @@ test_is_in_ignoring_case_with_an_empty_list_from_a_field_still_fails_a_field_tha
 	}
 	ergo._leaf_cause({"op": "compare", "left": ["x"], "cmp": "in", "right": ["ys"], "ignoring": "case"}, {"x": "a", "ys": []}) == "value"
 }
-
