@@ -71,3 +71,14 @@ test_a_count_gives_an_item_entry_for_each_item_beside_a_key_it_cant_read if {
 	[[p.name, p.cause, p.message] | some p in parts] == [["item 1 of es", "absent", "m is missing"], ["item 2 of es", "absent", "m is missing"], ["item 3 of es", "absent", "m is missing"], ["item 4 of es", "absent", "m is missing"]]
 	ergo._tally_rest_of(m, set(), ergo._tally_item_texts(check, {"es": [{"zz": 1}, {"zz": 1}, {"zz": 1}, {"zz": 1}]}, "absent", m)) == "$params.k is missing" with data.ergo_params as {}
 }
+
+test_a_count_item_beside_a_key_it_cant_read_reads_the_value_before_the_key_as_an_every_item_does if {
+	check := ergo._s_written_check("count of es whose zz is m named by $params.k is 0")
+	m := "$params.k is missing; item 1 of es: m is missing; item 2 of es: m is null; item 3 of es: m is 3, which isn't an object"
+	parts := ergo._tally_item_parts(check, {"es": [{"zz": 1}, {"zz": 1, "m": null}, {"zz": 1, "m": 3}]}, "unusable", "/things/0", m) with data.ergo_params as {}
+	[[p.name, p.cause, p.inputs] | some p in parts] == [
+		["item 1 of es", "absent", [{"name": "es[0].m", "value": null, "locations": ["/things/0/es/0"], "outcome": "absent"}]],
+		["item 2 of es", "null", [{"name": "es[1].m", "value": null, "locations": ["/things/0/es/1/m"], "outcome": "absent"}]],
+		["item 3 of es", "unusable", [{"name": "es[2].m", "value": 3, "locations": ["/things/0/es/2/m"], "outcome": "unusable"}]],
+	]
+}
