@@ -1851,3 +1851,26 @@ fn a_root_compared_ignoring_case_needs_text_so_it_is_said_once_before_the_items(
     assert_eq!(right_needs(&check, &json!({"a": 1})), Some("text"));
     assert_eq!(right_needs(&check, &json!("A")), None);
 }
+
+#[test]
+fn the_item_entry_of_copies_lists_the_location_of_each_item_not_the_end_of_its_path() {
+    let mut walk = every(&["commits", "author"], vec![], equals(json!("ann")), false);
+    walk.distinct = true;
+    let subject = json!({"commits": [
+        {"author": "ann"}, {"author": "bob"}, {"author": "bob"}, {"author": "bob"}
+    ]});
+    let run = row(&walk, subject);
+    assert_eq!(run.rich.len(), 1);
+    assert_eq!(
+        run.rich[0]["ergo/item"]["locations"],
+        json!(["/s/commits/1", "/s/commits/2", "/s/commits/3"])
+    );
+    assert_eq!(
+        run.failed_items[0]["locations"],
+        json!([
+            "/s/commits/1/author",
+            "/s/commits/2/author",
+            "/s/commits/3/author"
+        ])
+    );
+}
