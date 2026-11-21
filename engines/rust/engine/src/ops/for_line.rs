@@ -88,7 +88,6 @@ pub struct Run {
     pub verdict: Verdict,
     pub failed_items: Vec<Value>,
     pub message: Option<String>,
-    #[cfg_attr(not(test), expect(dead_code))]
     pub items: Vec<Clause>,
 }
 
