@@ -487,9 +487,9 @@ _fl_parent_unread(doc, req) if {
 }
 
 _fl_parent_unread(doc, req) if {
-	_chained(req)
 	_member_from(req)
 	is_array(doc)
+	_chained(req)
 	_from_keys(req) == []
 }
 

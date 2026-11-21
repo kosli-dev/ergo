@@ -394,13 +394,13 @@ _s_descends(name, fl, subjects) if {
 }
 
 _s_descends(name, fl, subjects) if {
+	object.get(fl, "member", false) == true
 	not "start" in object.keys(fl.path)
 	object.get(fl.path, "dot", false) != true
 	fl.path.steps == [fl.path.steps[0]]
 	is_string(fl.path.steps[0])
 	fl.path.steps[0] != name
 	fl.path.steps[0] in object.keys(subjects)
-	object.get(fl, "member", false) == true
 }
 
 _s_narrows(name, fl, subjects) if {

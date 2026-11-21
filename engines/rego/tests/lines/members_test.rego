@@ -85,8 +85,8 @@ test_members_of_mixed_types_name_the_first_member_of_each_type if {
 
 test_the_from_walk_reads_members_when_its_keys_end_with_the_member_mark if {
 	doc := {"records": [{"evidence": {"a": 1}}, {"evidence": [1]}]}
-	ergo._fl_walk(doc, ["records", "evidence", ergo._fm_mark]) == ergo._fm_walk(doc, ["records", "evidence"])
-	ergo._fl_broken(doc, ["records", "evidence", ergo._fm_mark]) == {"fails": ergo._fm_walk(doc, ["records", "evidence"]).fails, "notes": []}
+	ergo._fl_walk(doc, ["records", "evidence", ergo._fm_mark]) == ergo._fm_walk(doc, ["records", "evidence"]) with data.ergo_subject_sentences as {"member": {"m"}}
+	ergo._fl_broken(doc, ["records", "evidence", ergo._fm_mark]) == {"fails": ergo._fm_walk(doc, ["records", "evidence"]).fails, "notes": []} with data.ergo_subject_sentences as {"member": {"m"}}
 }
 
 test_a_member_keeps_its_key_as_its_id_only_without_identified_by if {

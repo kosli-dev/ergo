@@ -4,10 +4,14 @@ import rego.v1
 
 _fm_mark := {"ergo/member": true}
 
+default _fm_any := false
+
+_fm_any if count(object.get(data.ergo_subject_sentences, "member", [])) > 0
+
 default _member_from(_) := false
 
 _member_from(req) if {
-	object.get(data.ergo_subject_sentences, "member", set()) != set()
+	_fm_any
 	is_object(req)
 	is_string(object.get(req, "subject", null))
 	some m in graph.reachable({n: object.get(object.get(data.ergo_subject_sentences, "narrowing", {}), n, []) | some n, _ in data.ergo_resolved}, [req.subject])
@@ -19,6 +23,7 @@ _fl_keys(req) := array.concat(_from_keys(req), [_fm_mark]) if _member_from(req)
 else := _from_keys(req)
 
 _fm_keyed(keys) if {
+	_fm_any
 	count(keys) > 0
 	keys[count(keys) - 1] == _fm_mark
 }
