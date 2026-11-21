@@ -40863,11 +40863,11 @@
         "input": {"ts": [{"id": "a", "gs": [{"es": null}, {}]}]},
         "results": [
           {
-            "cause": "absent",
+            "cause": "not_an_object",
             "check": "count",
             "failures": [
               {
-                "cause": "absent",
+                "cause": "not_an_object",
                 "failures": [
                   {
                     "cause": "not_an_object",
@@ -41066,6 +41066,311 @@
                   {}
                 ],
                 "id": "a"
+              },
+              "type": "t"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a root in a whose that is missing, beside items whose own value the clause can't use, fails a count with the worst cause of the root and the items",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "requirements": {
+        "r": {
+          "checks": {
+            "count": "count of items whose w is at least $params.n is 1"
+          },
+          "subject": "t"
+        }
+      },
+      "subjects": {
+        "t": {
+          "from": "ts"
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "an item whose value is text and one without it",
+        "rules": [
+          "problems.all_said",
+          "message.items",
+          "row.parts"
+        ],
+        "input": {
+          "ts": [
+            {
+              "id": "a",
+              "items": [
+                {
+                  "w": "s"
+                },
+                {}
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "count",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/items/0/w"
+                        ],
+                        "name": "items[0].w",
+                        "outcome": "unusable",
+                        "value": "s"
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/items/0"
+                    ],
+                    "message": "w is \"s\", which isn't a number",
+                    "name": "item 1 of items",
+                    "value": {
+                      "w": "s"
+                    }
+                  },
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/items/1"
+                        ],
+                        "name": "items[1].w",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/items/1"
+                    ],
+                    "message": "w is missing",
+                    "name": "item 2 of items",
+                    "value": {}
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/items/0",
+                      "/ts/0/items/1"
+                    ],
+                    "name": "count of items whose w is at least $params.n",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/count"
+                ],
+                "message": "$params.n is missing",
+                "name": "count of items whose w is at least $params.n is 1"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/ts/0/items/0",
+                  "/ts/0/items/1"
+                ],
+                "name": "count of items whose w is at least $params.n",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/ts/0/items/0",
+                  "/ts/0/items/1"
+                ],
+                "name": "items[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "w": "s"
+                  },
+                  {}
+                ]
+              }
+            ],
+            "message": "$params.n is missing; item 1 of items: w is \"s\", which isn't a number; item 2 of items: w is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": {
+                "id": "a",
+                "items": [
+                  {
+                    "w": "s"
+                  },
+                  {}
+                ]
+              },
+              "type": "t"
+            }
+          }
+        ]
+      },
+      {
+        "description": "an item whose value is an object and one whose value is null",
+        "rules": [
+          "problems.all_said",
+          "message.items",
+          "row.parts"
+        ],
+        "input": {
+          "ts": [
+            {
+              "id": "a",
+              "items": [
+                {
+                  "w": {
+                    "a": 1
+                  }
+                },
+                {
+                  "w": null
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "count",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/items/0/w"
+                        ],
+                        "name": "items[0].w",
+                        "outcome": "unusable",
+                        "value": {
+                          "a": 1
+                        }
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/items/0"
+                    ],
+                    "message": "w is {\"a\": 1}, which isn't a number",
+                    "name": "item 1 of items",
+                    "value": {
+                      "w": {
+                        "a": 1
+                      }
+                    }
+                  },
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/items/1/w"
+                        ],
+                        "name": "items[1].w",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/items/1"
+                    ],
+                    "message": "w is null",
+                    "name": "item 2 of items",
+                    "value": {
+                      "w": null
+                    }
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/items/0",
+                      "/ts/0/items/1"
+                    ],
+                    "name": "count of items whose w is at least $params.n",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/count"
+                ],
+                "message": "$params.n is missing",
+                "name": "count of items whose w is at least $params.n is 1"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/ts/0/items/0",
+                  "/ts/0/items/1"
+                ],
+                "name": "count of items whose w is at least $params.n",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/ts/0/items/0",
+                  "/ts/0/items/1"
+                ],
+                "name": "items[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "w": {
+                      "a": 1
+                    }
+                  },
+                  {
+                    "w": null
+                  }
+                ]
+              }
+            ],
+            "message": "$params.n is missing; item 1 of items: w is {\"a\": 1}, which isn't a number; item 2 of items: w is null",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": {
+                "id": "a",
+                "items": [
+                  {
+                    "w": {
+                      "a": 1
+                    }
+                  },
+                  {
+                    "w": null
+                  }
+                ]
               },
               "type": "t"
             }

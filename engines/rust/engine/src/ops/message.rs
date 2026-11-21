@@ -1661,35 +1661,6 @@ pub fn for_empty(items: &[ForItem], ctx: &Ctx, cause: Cause) -> String {
     }
 }
 
-pub fn subject_key_fault(check: &Check, ctx: &Ctx, cause: Cause) -> Option<String> {
-    check
-        .paths()
-        .into_iter()
-        .filter(|path| !stops_at_a_null(path, ctx))
-        .flat_map(|path| path.steps.iter())
-        .find_map(|step| {
-            let Step::Field(field) = step else {
-                return None;
-            };
-            if !path::names_the_subject(&field.start) {
-                return None;
-            }
-            let read = path::read(field, ctx);
-            match (read.outcome, read.value) {
-                (Outcome::Found, Some(value)) if !value.is_string() && cause == Cause::Unusable => {
-                    Some(isnt(&name::name(field), value, "text"))
-                }
-                (Outcome::Found, _) => None,
-                (outcome @ (Outcome::Absent | Outcome::Null), _)
-                    if outcome.cause() == Some(cause) =>
-                {
-                    Some(format!("{} is {}", name::name(field), state_word(outcome)))
-                }
-                _ => None,
-            }
-        })
-}
-
 pub fn reads_from_a_root(path: &Path) -> bool {
     matches!(
         path.start,
@@ -1768,41 +1739,6 @@ pub fn root_text(path: &Path, ctx: &Ctx, cause: Cause) -> String {
     }
 }
 
-pub fn root_fault(check: &Check, ctx: &Ctx, cause: Cause) -> Option<String> {
-    if let Some(fault) = subject_key_fault(check, ctx, cause) {
-        return Some(fault);
-    }
-    if !matches!(cause, Cause::Absent | Cause::Null | Cause::Unusable) {
-        return None;
-    }
-    let mut paths = check.paths();
-    paths.extend(super::walk::listed_refs(check));
-    paths.into_iter().find_map(|path| {
-        if !reads_from_a_root(path) {
-            return None;
-        }
-        if lists::right_paths(check).contains(&path) && lists::walked_in(check, path, ctx).is_some()
-        {
-            return lists::walked_root_fault(check, path, ctx)
-                .filter(|(found, _)| *found == cause)
-                .map(|(_, text)| text);
-        }
-        if let Check::Tally(tally) = check
-            && tally.counted_paths().contains(&path)
-            && (lists::starts_at_a_list(path, ctx) || lists::walked(path, ctx).is_some())
-        {
-            return super::tally::counted_faults(tally, path, ctx)
-                .into_iter()
-                .find(|(found, _)| *found == cause)
-                .map(|(_, text)| text);
-        }
-        if path::read(path, ctx).outcome.cause() != Some(cause) {
-            return None;
-        }
-        Some(root_text(path, ctx, cause))
-    })
-}
-
 fn first_null_step(root: &Path, ctx: &Ctx) -> Option<(Cause, String)> {
     for at in 0..root.steps.len() {
         let prefix = Path {
@@ -1867,6 +1803,11 @@ fn root_kind_text(check: &Check, root: &Path, ctx: &Ctx) -> Option<String> {
 
 pub fn root_flaw(checks: &[&Check], ctx: &Ctx) -> Option<(Cause, String)> {
     root_flaw_ordered(checks, ctx, &[], &[])
+}
+
+/// What [`root_flaw`] says, one text for each root.
+pub fn root_texts(checks: &[&Check], ctx: &Ctx) -> Option<(Cause, Vec<String>)> {
+    root_texts_with(checks, ctx, &[], &[], true)
 }
 
 pub fn root_flaw_ordered(

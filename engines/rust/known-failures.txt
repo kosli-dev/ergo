@@ -35,6 +35,8 @@ derived / a count whose whose reads a root outside the item through a key the it
 derived / a count whose whose reads a root outside the item through a key the item holds says the root once and first / a root further back is null and the items have no key
 derived / a count whose whose reads a root outside the item through a key the item holds says the root once and first / the root is missing and the first item is null
 derived / a count whose whose reads a root outside the item through a key the item holds says the root once and first / the root is null and the first item's key isn't text
+derived / a count whose whose reads a root outside the item through a key the item holds, compared with is, says the root once and first / the root isn't an object and an item has neither the field nor the key, so the row takes the root's cause
+derived / a count whose whose reads a root outside the item through a key the item holds, compared with is, says the root once and first / the root isn't an object and the list is empty, so the root still fails the row
 derived / a count whose whose reads a root with a named by key from the item, problems inside an item in the order the sentence reads them / names a null root and then a missing key inside the item
 derived / a count whose whose reads a root with a named by key from the item, problems inside an item in the order the sentence reads them / names a null root and then a null key inside the item
 derived / a count whose whose reads a root with a named by key from the item, problems inside an item in the order the sentence reads them / names the item's own field before the root that is text
@@ -194,7 +196,6 @@ for / a part that holds a list is walked in the whose of a for line and in a who
 for / a part that holds a list is walked in the whose of a for line and in a whose under it / an empty part leaves every item out
 for / a part that holds a list is walked on the right of is in on a for line / an item without the name fails as absent and names the item
 for / a root a for sentence can't use is said once, on the assertion, beside items that read fine / one item that reads fine and one whose v is null
-for / a root in a for line's relative clause doesn't hide an item's own problem / names the root once, then the item's own problem
 for / a root in one of two relative clauses, in either order / gives the same report in either order, the root first, then the item's own problem
 for / a second for item picking from a list read through the first alias, which ties for one first item and is missing for another / one first item fails as ambiguous and the other as absent, each with its own second list failure
 for / a second for item that picks with sorted by, under a first item that sorts by another key / names the second item's key when its items tie
@@ -218,7 +219,6 @@ for / a whose on the second for item with first of that reads $input after is in
 for / a whose on the second for item with last of that reads $input after is in says the root once, with no item of its list / fails as unusable with the root once when it is an object, and then the item that can't be read on its own
 for / a whose on the second for item with some that reads $input after is in says the root once, with no item of its list / fails as unusable with the root once when it is an object, and then the item that can't be read on its own
 for / a whose on the second for item with some that reads $input after is in says the root once, with no item of its list / fails as unusable with the root once when it is text
-for / a whose that reads a $params list that isn't a list / fails as unusable, whatever the items hold, and lists the items it couldn't decide
 for / an alias that a pick on an empty list leaves without a value, read on a later line / names the alias as the policy writes it, with no $
 for / an every on a for line that walks a $params list / the row lists the $params list it walked, as the every does on its own
 for / an every or some on a for line that walks a $params list that is missing, null or not a list / the check fails with the list's cause, and the row lists the $params list with no items
@@ -380,7 +380,6 @@ messages / a root and the list it is read beside that both can't be read are bot
 messages / a root and the list it is read beside that both can't be read are both said, roots first, with the worst cause / a root that is null and a list that is text fail as unusable
 messages / a root and the list it is read beside that both can't be read are both said, roots first, with the worst cause / an empty list is said only where it fails on its own
 messages / a root in a count of beside a list that is missing, when the params aren't an object / says the params, or the root, once, and then the list, and a check that doesn't read the params fails with the worst cause of what it says
-messages / a root in a whose that is missing, beside a list in a list whose inner lists can't be read, is said first and then each item / an inner list that is null and one that is missing
 messages / a root name after is in inside a relative clause that isn't a list, on a list with items / names the root once, with no item, on a for line too
 messages / a root name after is in inside a relative clause that isn't a list, on an empty list / fails as unusable and names the root, because the list it looks in is read before any item, then the empty list
 messages / a root name after is in inside a whose that isn't a list is named once, with no item / each name's problem is said once, whatever item is read
@@ -471,7 +470,6 @@ sentences / a named by key on the right of every, after a part, a parent, an ali
 sentences / a named by key on the right of every, after a part, a parent, an alias, $params or $input / fails as null once when the subject's key is null
 sentences / a named by key on the right of every, after a part, a parent, an alias, $params or $input / fails as unusable once when the subject's key isn't text
 sentences / a named by on the right of every that can't be read / names the key that is null, as the plain check does, when m is null too
-sentences / a root name of the wrong type on the left of a compare inside a relative clause / says its problem once, with no item named, as on the right, even on an empty list
 sentences / a root name on the right of some in a from line's condition, read up front / fails the candidate once, with no item named, even when its list is empty
 sentences / a second for item whose whose takes its key from the subject / names pr.k alone, and keeps the first item when the name depends on it
 sentences / a sum of whose that or whose reads a named by key against the focus / is written wrong naming the key, and a key from the subject or a count of is fine
@@ -565,7 +563,6 @@ walks / a for line whose whose reads a named by key from $params that isn't text
 walks / a for line with a walk next to a parent / lists the for line's list and the parent's value, and never the alias's value
 walks / a one-line every whose whose reads a named by key from $params that is missing / says the key once and then an item whose value before the key isn't an object, which makes the row worse
 walks / a one-line walk whose whose reads a named by key from $params that is missing says the key once and each item's own problem / an item without m and an item whose m is null
-walks / a one-line walk whose whose reads a named by key from $params that isn't text says the key once, with no item in front / two items whose m is an object get no entry
 walks / a one-line walk whose whose reads a named by key from $params that isn't text says the key once, with no item in front / two items without m
 walks / a parent's list that a phrase walks fails a check on an empty list when an item of it can't be read / fails, with an empty rows, when it holds names of more than one kind
 walks / a parent's part that a phrase walks fails a check on an empty list when an item of it can't be read / fails, with an empty rows, when it holds names of more than one kind
@@ -590,8 +587,6 @@ walks / a walk through a for name, read from a parent on its right side / fails 
 walks / a walk whose parent path is named by a bare name, read from the subject / fails as absent when the subject has no such field, even when each item has one
 walks / a walk whose parent path is named by a bare name, read from the subject / fails as absent when the subject has no such field, whatever the parent and the items hold
 walks / a walked path whose named by key from $params is missing, with a value partway that isn't an object / names the step that isn't an object
-walks / a whose key from $params that is missing is said before a list that can't be walked, and the row takes the worst cause / the list is missing
-walks / a whose key from $params that is missing is said before a list that can't be walked, and the row takes the worst cause / the list is null
 walks / a whose key from $params that is missing, beside conditions on the same items that read $params and $input / an item without m, beside conditions that read $params and $input fine
 walks / a whose key from $params that is missing, in a walk beside another sentence or option, a for line beside a sentence that doesn't read the alias, and a count of that, is said wherever the walk is said / the list holds an item the whose leaves out
 walks / a whose key from $params that is missing, in a walk beside another sentence or option, a for line beside a sentence that doesn't read the alias, and a count of that, is said wherever the walk is said / the list holds text
@@ -605,8 +600,6 @@ walks / a whose key from $params that is null, in a walk beside another sentence
 walks / a whose key from $params that is null, in a walk beside another sentence or option, a for line beside a sentence that doesn't read the alias, and a count of that, is said wherever the walk is said / the list is empty
 walks / a whose key from $params that is null, in a walk beside another sentence or option, a for line beside a sentence that doesn't read the alias, and a count of that, is said wherever the walk is said / the list is missing
 walks / a whose key from $params that isn't text is said before a list that can't be walked, and the row takes the worst cause / the list is empty
-walks / a whose key from $params that isn't text is said before a list that can't be walked, and the row takes the worst cause / the list is missing
-walks / a whose key from $params that isn't text is said before a list that can't be walked, and the row takes the worst cause / the list is null
 walks / a whose key from $params that isn't text, beside items that fail on their own fields, says the key in each item / five mixed items say the key in each item and the item that isn't an object
 walks / a whose key from $params that isn't text, beside items that fail on their own fields, says the key in each item / two items without zz or m say the key in each item
 walks / a whose key from $params that isn't text, in a walk beside another sentence or option, a for line beside a sentence that doesn't read the alias, and a count of that, is said wherever the walk is said / the list holds an item the whose leaves out
@@ -621,11 +614,7 @@ walks / an empty list before a named by key from $params that is missing / fails
 walks / an every, a some or a for item that reads a named by key from $input reads the key before any item, on an empty list too / the key is a list
 walks / an every, a some or a for item that reads a named by key from $input reads the key before any item, on an empty list too / the key is a number
 walks / an every, a some or a for item that reads a named by key from $input reads the key before any item, on an empty list too / the key is an object
-walks / an every, a some or a for item that reads a named by key from $input reads the key before any item, on an empty list too / the key is missing
-walks / an every, a some or a for item that reads a named by key from $input reads the key before any item, on an empty list too / the key is null
 walks / an every, a some or a for item that reads a named by key from $input reads the key before any item, on an empty list too / the key is true
-walks / an every, a some or a for item that reads a named by key from $params that is missing reads the key before any item, on an empty list too / the list is empty
-walks / an every, a some or a for item that reads a named by key from $params that is null reads the key before any item, on an empty list too / the list is empty
 walks / an every, a some, a for item or a count whose whose reads two named by keys on an empty list fails with the worse cause, and names each key that can't be read, worst cause first / neither key is text
 walks / an every, a some, a for item or a count whose whose reads two named by keys on an empty list fails with the worse cause, and names each key that can't be read, worst cause first / one key is missing and the other isn't text
 walks / an every, a some, a for item or a count whose whose reads two named by keys on an empty list fails with the worse cause, and names each key that can't be read, worst cause first / one key is null and the other isn't text
@@ -637,5 +626,3 @@ walks / two whose keys from $params, the second one not text, beside an item tha
 walks / whose under every / fails as value with no failed items when whose leaves no items
 walks / whose under some / fails as value with no failed items when whose keeps nothing
 walks / with params that aren't an object, an every, a some or a for item on an empty list still names the named by key it reads from $input / the key is a number
-walks / with params that aren't an object, an every, a some or a for item on an empty list still names the named by key it reads from $input / the key is missing
-walks / with params that aren't an object, an every, a some or a for item on an empty list still names the named by key it reads from $input / the key is null
