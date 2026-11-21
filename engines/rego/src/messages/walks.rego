@@ -549,7 +549,11 @@ _m_tally_walked(c, w) := _m_cond_walked_texts(c) if array.concat(w.fails, _walk_
 
 else := []
 
-_m_positions(path) := [x | some x in path; is_number(x)]
+_m_positions(path) := [_m_position(x) | some x in path; _item_step(x)]
+
+_m_position(x) := x.member if _member_step(x)
+
+else := x
 
 _m_tally_items(subj, side) := [x[2] | some x in _m_tally_items_at(subj, side)]
 
