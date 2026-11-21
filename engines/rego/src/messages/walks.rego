@@ -777,14 +777,28 @@ _m_cond_base_texts(item, c) := _once([_m_key_list_text(_input_name(f.prefix), f)
 	some f in _key_base_flaws(item, p, mode)
 ])
 
-_m_item_tallies(item, c, "unusable") := [_m_isnt(_input_name(p), v, "a list") |
+_m_item_tallies(item, c, "unusable") := [_m_isnt(_input_name(p), v, _m_tally_wants(side)) |
 	some side in _m_tally_sides(c)
 	p := side[_basic_form(side)]
 	not _m_off_path(p)
 	v := _value_at(item, p)
-	not is_array(v)
+	not _m_tally_fits(side, v)
 	v != null
 ]
+
+_m_tally_wants(side) := "an object" if side.member == true
+
+else := "a list"
+
+_m_tally_fits(side, v) if {
+	side.member == true
+	is_object(v)
+}
+
+_m_tally_fits(side, v) if {
+	not side.member
+	is_array(v)
+}
 
 _m_item_tallies(item, c, cause) := [concat("", [_input_name(array.slice(p, 0, i)), " is ", _m_state_word(cause)]) |
 	some side in _m_tally_sides(c)
