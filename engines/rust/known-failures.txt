@@ -380,7 +380,6 @@ messages / a root and the list it is read beside that both can't be read are bot
 messages / a root and the list it is read beside that both can't be read are both said, roots first, with the worst cause / a root that is null and a list that is text fail as unusable
 messages / a root and the list it is read beside that both can't be read are both said, roots first, with the worst cause / an empty list is said only where it fails on its own
 messages / a root in a count of beside a list that is missing, when the params aren't an object / says the params, or the root, once, and then the list, and a check that doesn't read the params fails with the worst cause of what it says
-messages / a root in a whose that is missing, beside a list in a list whose inner lists can't be read, is said first and then each item / an inner list that is null and one that is missing
 messages / a root name after is in inside a relative clause that isn't a list, on a list with items / names the root once, with no item, on a for line too
 messages / a root name after is in inside a relative clause that isn't a list, on an empty list / fails as unusable and names the root, because the list it looks in is read before any item, then the empty list
 messages / a root name after is in inside a whose that isn't a list is named once, with no item / each name's problem is said once, whatever item is read
