@@ -3223,3 +3223,27 @@ fn a_walk_over_the_second_list_under_the_first_item_gives_its_items_beside_the_p
     assert_eq!(said(&["every w.items.m is 1", "i.k is 1"]), want);
     assert_eq!(said(&["i.k is 1", "every w.items.m is 1"]), want);
 }
+
+#[test]
+fn a_sentence_that_reads_only_the_first_alias_is_said_before_a_second_list_that_fails() {
+    let said = |assertion: &str, items: Value| {
+        for_tree(
+            "every ws as w, every w.items as i",
+            &[assertion, "i.k is 1"],
+            json!({"ws": [{"items": items, "zs": [{}]}]}),
+            json!({}),
+        )
+    };
+    assert_eq!(
+        said("w.n is 1", json!(null)),
+        "item 1 of ws: w.n is missing; item 1 of ws: w.items is null"
+    );
+    assert_eq!(
+        said("every w.zs.m is 1", json!({})),
+        "item 1 of ws: item 1 of w.zs: m is missing; item 1 of ws: w.items is {}, which isn't a list"
+    );
+    assert_eq!(
+        said("every w.zs.m is 1", json!([])),
+        "item 1 of ws: item 1 of w.zs: m is missing; item 1 of ws: w.items is []"
+    );
+}
