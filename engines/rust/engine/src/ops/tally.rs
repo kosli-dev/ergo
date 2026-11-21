@@ -679,7 +679,7 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
         }
         match item.end {
             Some(end) => numbers.push(end.clone()),
-            None => causes.push(item.miss),
+            None => causes.push(item_miss(item, &at)),
         }
     }
     if any_undecided {
@@ -709,6 +709,14 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
         entries,
         located,
         result,
+    }
+}
+
+fn item_miss(item: &walk::WalkItem, at: &Ctx) -> Cause {
+    if item.miss == Cause::Absent && walk::lost_verdict(item, at).cause == Cause::Null {
+        Cause::Null
+    } else {
+        item.miss
     }
 }
 
@@ -1761,12 +1769,13 @@ pub fn counted_said(counted: &Counted, ctx: &Ctx) -> (Vec<Clause>, Vec<Value>) {
                     Value::Null,
                 ))
             } else {
+                let miss = item_miss(item, &at);
                 match item.end {
-                    None if item.miss == Cause::Unusable => Some((
-                        item.miss,
+                    None if matches!(miss, Cause::Unusable | Cause::Null) => Some((
+                        miss,
                         told(
                             &name,
-                            item.miss,
+                            miss,
                             &super::message::message(
                                 &walk::focus_check(item),
                                 &at,
