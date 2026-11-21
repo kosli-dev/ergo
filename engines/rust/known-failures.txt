@@ -56,15 +56,12 @@ derived / two paths on the left / fails as absent before null
 distinct / a child of a subject read with every distinct / the child's rows list the location under every copy of the parent
 distinct / a grandchild of a subject read with every distinct / its rows list the location under every copy of the grandparent
 distinct / a value that holds a key called locations / only the locations of the row are listed for every copy, never the value
-distinct / distinct with a list read on a parent subject / it reads, in a check and in the from line
 distinct / distinct with a list read through an alias or a part / the list is outside the item, so it reads even when copies differ in their own ok
 distinct / distinct with a list that is the subject / the subject's name reads the subject, outside the item, so it reads
 distinct / distinct with a phrase that also reads a bare name / it reads the subject's lo, so it reads whatever the dropped copy's lo is: higher
 distinct / distinct with a phrase that also reads a bare name / it reads the subject's lo, so it reads whatever the dropped copy's lo is: missing
 distinct / distinct with a phrase that also reads a bare name / it reads the subject's lo, so it reads whatever the dropped copy's lo is: null
 distinct / distinct with a phrase that also reads a bare name / it reads the subject's lo, so it reads whatever the dropped copy's lo is: text
-distinct / every and some distinct / copies that fail are one entry of failed_items with the location of every copy
-distinct / every and some distinct / copies that pass pass
 distinct / every distinct with conditions / copies a condition can't decide fail one $applies row with every copy's location
 distinct / locations read through the subject and read from the input / a read through the subject lists every copy, and a path from the input lists only the location it names
 for / a $params list that a for line reads fails it when the line's whose leaves nothing and an item of the list can't be read / fails, when the whose leaves nothing
