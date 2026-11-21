@@ -97,6 +97,13 @@ test_a_count_gives_its_roots_then_its_items_as_clauses if {
 	ergo._m_clauses_text(ergo._m_clauses_shown(_tally_records("count of ms whose v is at least $params.r is 0", {"ms": [{}, {}, {}, {}]}, "absent"))) == "$params.r is missing; item 1 of ms: v is missing; item 2 of ms: v is missing; item 3 of ms: v is missing; and 1 more" with data.ergo_params as {}
 }
 
+test_a_count_says_a_root_before_a_key_from_the_item_once_and_each_item_only_its_own_paths if {
+	_tally_records("count of xs whose v is $params.m named by key is 1", {"xs": [{"key": "a", "v": 1}, {}]}, "absent") == [
+		ergo._m_clause("root", "$params.m", "null", "$params.m is null"),
+		ergo._m_item_clause("item 2 of xs", "absent", [ergo._m_clause("root", "v", "absent", "v is missing, and key is missing")]),
+	] with data.ergo_params as {"m": null}
+}
+
 test_an_items_cause_comes_from_its_record_not_its_last_words if {
 	side := ergo._m_tally_parts(ergo._s_written_check("count of xs whose v is 1 is 0"))[0]
 	e := {"i": ["xs", 0], "c": ["xs", 0], "iv": {}, "r": [], "v": {}}
