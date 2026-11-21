@@ -22,9 +22,9 @@ _tally_decided_causes := {"satisfied", "value", "missing"}
 
 _holding_statuses := {"met", "not_applicable"}
 
-_list_expected_msgs := {"a list", "a list or an object"}
+_list_expected_msgs := {"a list", "a list or an object", "an object"}
 
-_blank_or_list_expected_msgs := {"", "a list", "a list or an object"}
+_blank_or_list_expected_msgs := {"", "a list", "a list or an object", "an object"}
 
 _list_or_object_types := {"array", "object"}
 

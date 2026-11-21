@@ -1026,7 +1026,7 @@ fn lower_counted(
     let path = match scope.counted_path(&derived.path) {
         Ok(path) => {
             problems.extend(crate::lower::walk_too_long(&path));
-            Some(path)
+            Some(crate::lower::with_members(path, derived.member))
         }
         Err(found) => {
             problems.extend(found);

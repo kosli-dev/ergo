@@ -576,3 +576,16 @@ fn is_ignoring_case_says_each_side_that_isnt_text() {
         "x is \"  Blocked \""
     );
 }
+
+#[test]
+fn joined_counts_members_as_items_and_says_how_many_more_after_three() {
+    let parts: Vec<String> = ["a", "b", "c", "d"]
+        .iter()
+        .map(|k| format!("member {k} of xs is 1"))
+        .chain(["$params.m is missing".to_string()])
+        .collect();
+    assert_eq!(
+        super::joined(parts),
+        "member a of xs is 1; member b of xs is 1; member c of xs is 1; $params.m is missing; and 1 more"
+    );
+}

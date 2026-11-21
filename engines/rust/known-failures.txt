@@ -331,6 +331,7 @@ list_starts / every, some, count of and sum of walk a subject that is a list / a
 list_starts / every, some, count of and sum of walk a subject that is a list / an item that isn't an object fails as not_an_object, and a missing field as absent
 list_starts / every, some, count of and sum of walk a subject that is a list / an object subject reads as before
 list_starts / every, some, count of and sum of walk a subject that is a list / only the list the path starts at is walked, so a list inside it is an item that isn't an object
+members / every member of on a for line whose whose reads a named by key from $params that isn't text, beside a member that fails on its own field / says the key in each member, the member that has its field too, in key order
 messages / a clause that an earlier sentence of the row already gave / is left out of the row's message and of the option's, and each sentence keeps its whole message
 messages / a count of a field in a position of a field that holds objects / fails as unusable and names the item once
 messages / a count of a key in a position of the input that holds objects / fails as unusable and names the item once
@@ -351,7 +352,6 @@ messages / a for alias after is in that isn't a list, missing or null, on an emp
 messages / a for item with a whose that reads a part over items that aren't all objects / names the part first, once, then each item in turn
 messages / a for item with a whose that reads a part over items that aren't all objects / names the part first, once, then the inner items
 messages / a for line over a list of lists whose values spell the alias / a list that holds the alias in its items is printed as the input had it
-messages / a for line over a list of lists whose values spell the alias / a value that holds the alias before a semicolon is printed as the input had it
 messages / a for line over two lists, with a sentence on the second item before a walk under the first / the parts follow the items, not the sentences
 messages / a for line over two lists, with a sentence that walks a list of the subject / names each item of the subject's list once, with no item of the for line in front, because the sentence doesn't read the for line's items
 messages / a for line over two lists, with a walk under the first item before a sentence on the second / the parts follow the items, not the sentences

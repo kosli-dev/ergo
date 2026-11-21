@@ -66,7 +66,7 @@ _s_pattern_set(tail) := {
 	pos := `(?:item +[1-9][0-9]*(?: +from +last)?|first|last) +of +`
 	plain := concat("", [`(?:`, start, `)(?:`, step, `)*`])
 	path := concat("", [`(?:`, pos, `)?`, plain])
-	qpath := concat("", [`(?:distinct +)?`, path])
+	qpath := concat("", [`(?:distinct +)?(?:member +of +)?`, path])
 	rpath := concat("", [`(?:`, pos, `)?(?:`, rstart, `)(?:`, step, `)*`])
 	elapsed := concat("", [`(?:seconds|minutes|hours|days|weeks) +elapsed +from +`, path, ` +to +`, path])
 	derived := concat("", [`(?:(?:count|sum) +of +`, qpath, `|`, elapsed, `)`])
@@ -156,7 +156,7 @@ _sentence(raw) := {"assertions": [assertion]} if {
 } else := {"assertions": [assertion]} if {
 	pat := _s_patterns_for(raw)
 	m := regex.find_all_string_submatch_n(pat.quantified, trim_space(raw), 1)[0]
-	assertion := object.union({m[1]: _s_qpath_of(m[2], pat), "phrase": _s_phrase_of(m[3], pat)}, _s_distinct_of(m[2]))
+	assertion := object.union({m[1]: _s_qpath_of(m[2], pat), "phrase": _s_phrase_of(m[3], pat)}, _s_list_words_of(m[2]))
 	count(_s_sentence_problems({"assertions": [assertion]}, pat)) == 0
 	count(_s_text_names(trim_space(raw))) == 0
 } else := {"assertions": assertions} if {
@@ -270,7 +270,7 @@ _s_after_member(text) := rest if {
 	rest != ""
 }
 
-_s_from_path_line(text, pat) := object.union(object.union({"path": _s_qpath_of(m[1], pat)}, _s_distinct_of(m[1])), object.union(_s_each_of(m[2], pat), _s_from_where_of(m[3], pat))) if {
+_s_from_path_line(text, pat) := object.union(object.union({"path": _s_qpath_of(m[1], pat)}, _s_list_words_of(m[1])), object.union(_s_each_of(m[2], pat), _s_from_where_of(m[3], pat))) if {
 	m := regex.find_all_string_submatch_n(pat.from, text, 1)[0]
 }
 
@@ -286,7 +286,7 @@ _s_assertion_of(text, pat) := out if {
 	m := regex.find_all_string_submatch_n(pat.assertion, text, 1)[0]
 	m[1] != ""
 	out := object.union(
-		object.union({m[1]: _s_qpath_of(m[2], pat), "phrase": _s_phrase_of(m[6], pat)}, _s_distinct_of(m[2])),
+		object.union({m[1]: _s_qpath_of(m[2], pat), "phrase": _s_phrase_of(m[6], pat)}, _s_list_words_of(m[2])),
 		object.union(_s_where_of(m[4], pat), _s_if_any(m[5])),
 	)
 }
@@ -301,7 +301,7 @@ _s_assertion_of(text, pat) := out if {
 _s_for_item_of(text, pat) := out if {
 	m := regex.find_all_string_submatch_n(pat.for_item, text, 1)[0]
 	out := object.union(
-		object.union({_s_item_word(m[1]): _s_item_path_of(m[1], _s_undistinct(m[2]), pat), "as": m[7]}, _s_distinct_of(m[2])),
+		object.union({_s_item_word(m[1]): _s_item_path_of(m[1], _s_unmember(_s_undistinct(m[2])), pat), "as": m[7]}, _s_list_words_of(m[2])),
 		object.union(object.union(_s_where_of(m[3], pat), _s_if_any(m[6])), _s_sorted_by(m[4], m[5], pat)),
 	)
 }
@@ -349,7 +349,7 @@ _s_from_where_of(text, pat) := {"where": conds} if {
 	count(conds) == count(pieces)
 }
 
-_s_from_cond_of(text, pat) := object.union(object.union({m[1]: _s_qpath_of(m[2], pat), "phrase": _s_phrase_of(m[5], pat)}, _s_distinct_of(m[2])), _s_if_any(m[3])) if {
+_s_from_cond_of(text, pat) := object.union(object.union({m[1]: _s_qpath_of(m[2], pat), "phrase": _s_phrase_of(m[5], pat)}, _s_list_words_of(m[2])), _s_if_any(m[3])) if {
 	m := regex.find_all_string_submatch_n(pat.from_cond, text, 1)[0]
 	m[1] != ""
 }
@@ -394,7 +394,7 @@ _s_terms_of(text, pat) := terms if {
 
 _s_term_of(text, pat) := _s_number(text) if {
 	regex.match(pat.number, text)
-} else := object.union({m[1]: _s_qpath_of(m[2], pat)}, _s_distinct_of(m[2])) if {
+} else := object.union({m[1]: _s_qpath_of(m[2], pat)}, _s_list_words_of(m[2])) if {
 	m := regex.find_all_string_submatch_n(pat.derived, text, 1)[0]
 } else := {"unit": m[1], "elapsed_from": _s_path_of(m[2], pat), "elapsed_to": _s_path_of(m[3], pat)} if {
 	m := regex.find_all_string_submatch_n(pat.elapsed, text, 1)[0]
@@ -402,7 +402,17 @@ _s_term_of(text, pat) := _s_number(text) if {
 
 _s_path_of(text, pat) := _s_lifted(_s_unlifted_path_of(text, pat))
 
-_s_qpath_of(text, pat) := _s_path_of(_s_undistinct(text), pat)
+_s_qpath_of(text, pat) := _s_path_of(_s_unmember(_s_undistinct(text)), pat)
+
+_s_unmember(text) := m[1] if {
+	startswith(text, "member ")
+	m := regex.find_all_string_submatch_n(`^member +of +(\S.*)$`, text, 1)[0]
+} else := text
+
+_s_list_words_of(text) := object.union(_s_distinct_of(text), {"member": true}) if {
+	contains(text, "member ")
+	_s_unmember(_s_undistinct(text)) != _s_undistinct(text)
+} else := _s_distinct_of(text)
 
 _s_undistinct(text) := m[1] if {
 	m := regex.find_all_string_submatch_n(`^distinct +(\S.*)$`, text, 1)[0]
@@ -415,6 +425,8 @@ else := {}
 _s_distinct_of_node(a) := {"distinct": true} if object.get(a, "distinct", false) == true
 
 else := {}
+
+_s_list_words_of_node(a) := object.union(_s_distinct_of_node(a), {"member": true | object.get(a, "member", false) == true})
 
 _s_distinct_text(a) := "distinct " if object.get(a, "distinct", false) == true
 

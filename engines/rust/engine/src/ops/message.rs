@@ -686,7 +686,7 @@ pub fn option_line_said(line: &Check, ctx: &Ctx, said: Option<String>, verdict: 
     self::said(line, ctx, &verdict)
 }
 
-fn split_outside_quotes<'t>(text: &'t str, by: &str) -> Vec<&'t str> {
+pub(crate) fn split_outside_quotes<'t>(text: &'t str, by: &str) -> Vec<&'t str> {
     let mut out = Vec::new();
     let mut from = 0;
     let mut quoted = false;
@@ -1119,7 +1119,7 @@ pub fn params_break(path: &Path, params: &Value, ctx: &Ctx) -> Option<String> {
             Step::Key(key) => Resolved::Key(key.clone()),
             Step::Index(index) => Resolved::Index(*index),
             Step::Ref(_) => path::resolve(step, ctx).ok()?,
-            Step::Field(_) => return None,
+            Step::Field(_) | Step::Members => return None,
         };
         let next = match (&key, at) {
             (Resolved::Key(key), Value::Object(map)) => map.get(key),
@@ -1248,7 +1248,10 @@ pub fn joined(parts: Vec<String>) -> String {
             fresh.push(true);
         }
     }
-    let items = once.iter().filter(|part| part.starts_with("item ")).count();
+    let items = once
+        .iter()
+        .filter(|part| crate::parts::is_item(part))
+        .count();
     let counted = if items == 0 { once.len() } else { items };
     if counted + hidden <= 3 {
         once.join("; ")
@@ -1257,7 +1260,7 @@ pub fn joined(parts: Vec<String>) -> String {
         let mut left = 3;
         let mut shown: Vec<String> = Vec::new();
         for part in once {
-            if items > 0 && !part.starts_with("item ") {
+            if items > 0 && !crate::parts::is_item(&part) {
                 shown.push(part);
             } else if left > 0 {
                 left -= 1;
