@@ -477,6 +477,25 @@ fn a_lone_path_after_every_or_some_says_nothing_follows_it_whatever_it_holds() {
 }
 
 #[test]
+fn a_lone_path_after_member_of_says_nothing_follows_it() {
+    for (line, column) in [
+        ("every member of xs", 19),
+        ("some  member of xs.y", 21),
+        ("member of xs", 13),
+        ("every distinct member of xs", 28),
+        ("distinct member of xs", 22),
+    ] {
+        assert_eq!(
+            check_failure(line),
+            [format!(
+                "nothing after the path at column {column}: expected a phrase, like \"is\" or \"exists\""
+            )],
+            "{line}"
+        );
+    }
+}
+
+#[test]
 fn a_for_item_given_as_a_from_line_says_an_item_starts_with_every_or_some() {
     for line in [
         "every pull_requests.commits as commit",
