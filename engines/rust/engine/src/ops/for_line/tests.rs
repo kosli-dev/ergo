@@ -2380,46 +2380,93 @@ fn for_line_cases() -> Vec<(String, Value, Value, Value)> {
     out
 }
 
-const ROWS_THE_CLAUSES_DONT_SAY_YET: [&str; 2] = [
-    "for / two items over sibling lists, with two assertions / an approver who breaks both sentences lists both, in the order written",
-    "for / a for line runs the sentences that don't read the alias of an empty list it tolerates on an item that isn't an object only when one of them reads the item / fails an approver that isn't an object with the sentence that reads it, and passes it when every sentence reads commit",
-];
+const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 0] = [];
+
+const ROWS_COMPARED: usize = 0;
+
+const ROWS_LISTED: usize = 0;
+
+fn item_entries(failures: &Value, out: &mut Vec<(String, String)>) {
+    for failure in failures.as_array().into_iter().flatten() {
+        if failure["kind"] == "item" {
+            out.push((
+                failure["name"].as_str().unwrap_or("").to_string(),
+                failure["cause"].as_str().unwrap_or("").to_string(),
+            ));
+        }
+        item_entries(&failure["failures"], out);
+    }
+}
+
+fn item_causes(clauses: &[crate::ops::clause::Clause], out: &mut Vec<(String, String)>) {
+    for clause in clauses {
+        if clause.kind == crate::ops::clause::Kind::Item {
+            out.push((clause.name.clone(), clause.cause.name().to_string()));
+        }
+        item_causes(&clause.said, out);
+    }
+}
 
 #[test]
-fn the_items_clauses_say_what_the_row_says_today() {
+fn the_clauses_of_every_for_row_say_what_the_row_and_its_entries_say_today() {
     let mut differ: Vec<String> = Vec::new();
     let mut compared = 0;
+    let mut listed: Vec<&str> = Vec::new();
     for (id, input, policy, params) in for_line_cases() {
-        if ROWS_THE_CLAUSES_DONT_SAY_YET.contains(&id.as_str()) {
-            continue;
-        }
         super::RAN.with(|ran| ran.borrow_mut().clear());
-        crate::report(&input, &policy, &params);
+        let report = crate::report(&input, &policy, &params);
+        let mut entries: Vec<(String, String)> = Vec::new();
+        for result in report["results"].as_array().into_iter().flatten() {
+            item_entries(&result["failures"], &mut entries);
+        }
         for (message, roots, items) in super::RAN.with(|ran| ran.take()) {
-            let Some(message) = message.filter(|_| !items.is_empty()) else {
-                continue;
-            };
-            compared += 1;
+            let message = message.unwrap_or_default();
             let clauses: Vec<crate::ops::clause::Clause> = roots.into_iter().chain(items).collect();
-            let said = crate::ops::clause::text(&crate::ops::clause::shown(&clauses));
-            if said != message {
-                differ.push(format!("{id}\n  row:   {message}\n  items: {said}"));
+            let shown = crate::ops::clause::shown(&clauses);
+            let said = crate::ops::clause::text(&shown);
+            let mut causes: Vec<(String, String)> = Vec::new();
+            item_causes(&shown, &mut causes);
+            let wrong: Vec<String> = causes
+                .iter()
+                .filter(|(name, cause)| {
+                    let same: Vec<&String> = entries
+                        .iter()
+                        .filter(|(entry, _)| entry == name)
+                        .map(|(_, cause)| cause)
+                        .collect();
+                    !same.is_empty() && !same.contains(&cause)
+                })
+                .map(|(name, cause)| format!("{name} is {cause}"))
+                .collect();
+            if said == message && wrong.is_empty() {
+                compared += 1;
+                continue;
+            }
+            match ROWS_THE_CLAUSES_DONT_SAY_YET
+                .iter()
+                .find(|(listed, _)| *listed == id)
+            {
+                Some((listed_id, _)) => listed.push(listed_id),
+                None => differ.push(format!(
+                    "{id}\n  row:   {message}\n  items: {said}\n  causes: {}",
+                    wrong.join(", ")
+                )),
             }
         }
     }
-    assert!(compared > 500, "only {compared} rows compared");
-    for id in ROWS_THE_CLAUSES_DONT_SAY_YET {
-        assert!(
-            for_line_cases().iter().any(|(case, ..)| case == id),
-            "no passing case {id}"
-        );
-    }
     assert!(
         differ.is_empty(),
-        "{} of {compared} rows differ:\n{}",
+        "{} rows differ, {compared} say what the row says:\n{}",
         differ.len(),
         differ.join("\n")
     );
+    for (id, reason) in ROWS_THE_CLAUSES_DONT_SAY_YET {
+        assert!(
+            listed.contains(&id),
+            "{id} is listed ({reason}) but says what the row says"
+        );
+    }
+    assert_eq!((compared, listed.len()), (ROWS_COMPARED, ROWS_LISTED));
 }
 
 fn for_items(
