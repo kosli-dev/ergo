@@ -697,6 +697,9 @@ pub struct FromLine {
     /// True when `distinct` is written before the path, so that items exactly the same make one subject.
     #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "is_false"))]
     pub distinct: bool,
+    /// True when `member of` is written before the path, so that each member of the object at its end is an item.
+    #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "is_false"))]
+    pub member: bool,
     /// The path to the items.
     pub path: Path,
     /// The path of the names, if `named by each of` is written.

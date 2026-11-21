@@ -151,6 +151,9 @@ pub fn print_from(line: &FromLine, aliases: &[&str], parents: &[&str]) -> String
         out.push_str("every ");
     }
     out.push_str(distinct_text(line.distinct));
+    if line.member {
+        out.push_str("member of ");
+    }
     out.push_str(&path_text(&line.path, Side::Left, aliases, false));
     if let Some(each) = &line.named_by_each_of {
         out.push_str(" named by each of ");
