@@ -2641,3 +2641,16 @@ fn an_item_whose_path_goes_through_a_key_that_cant_be_read_takes_the_keys_cause(
         ["item 1 of rs: unusable", "r.x.y is missing: unusable"]
     );
 }
+
+#[test]
+fn a_sentence_that_reads_no_alias_is_a_clause_on_an_empty_list_the_line_tolerates() {
+    assert_eq!(
+        for_tree(
+            "every xs, if any, as x",
+            &["x.w is 1", "z is 3"],
+            json!({"xs": [], "z": 2}),
+            json!({}),
+        ),
+        "z is 2"
+    );
+}
