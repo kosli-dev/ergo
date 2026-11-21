@@ -2700,7 +2700,13 @@ impl For {
                 let mut run = run;
                 run.verdict.cause = cause;
                 run.message = Some(super::message::joined(texts.clone()));
-                run.items = self.free_clauses(ctx);
+                let lines = super::clause::lines(&self.root_clauses(ctx));
+                let roots: Vec<&str> = lines.iter().map(String::as_str).collect();
+                run.items = self
+                    .free_clauses(ctx)
+                    .into_iter()
+                    .filter_map(|clause| unrooted(clause, &roots))
+                    .collect();
                 return RunItems {
                     run,
                     free: texts,
