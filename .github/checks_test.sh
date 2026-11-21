@@ -42,7 +42,7 @@ with_all_tools() {
 with_all_tools
 
 run() {
-  (cd "$repo" && env PATH="$dir/all:$tools" "$@" bash .github/checks.sh "${FLAGS[@]}") 2>&1
+  (cd "$repo" && env PATH="$dir/all:$tools" "$@" bash .github/checks.sh ${FLAGS[@]+"${FLAGS[@]}"}) 2>&1
 }
 
 expect_in() {
