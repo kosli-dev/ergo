@@ -656,6 +656,45 @@ and the `$applies` entry's `expression` is the conditions as written, `environme
   - Items that share an id but differ in anything else, like a third `click` with version `8.2`, are all kept, and `$unique_ids` fails on them and lists the location of every copy's id. Ergo never picks one of two pieces of evidence that disagree, so there's no `distinct by` a field.
   - Copies are merged before the `whose` is read, so they get one `$applies` row, and the rows of a child subject, like `from: every component.licenses`, list the location under every copy too. A path that starts at `$input`, like `version is $input.sbom.components[2].version`, lists only the location it names.
   - `distinct` goes after `every` on a `from` line. Without `every`, like `from: distinct sbom.components`, it is written wrong.
+- `every member of` makes each member of an object a subject, whatever its key, so a policy can pick evidence by a field of it. With this input:
+
+  ```json
+  {"records": [{"id": "r1", "evidence": {
+    "build-7": {"kind": "scan", "status": "DONE"},
+    "sign-off": {"kind": "approval", "status": "COMPLETE"}}}]}
+  ```
+
+  and this policy:
+
+  ```yaml
+  subjects:
+    record:
+      from: records
+      identified_by: id
+    approval:
+      from: every member of record.evidence whose kind is "approval"
+  requirements:
+    approved:
+      subject: approval
+      checks:
+        complete: status is "COMPLETE"
+  ```
+
+  `sign-off` is the one approval, and `build-7` is out of scope:
+
+  ```json
+  {"check": "$min_subjects", "subject": {"type": "approval", "id": null, "in": {"record": "r1"}}, "passed": true, "cause": "satisfied",
+   "inputs": [{"name": "in-scope approval count", "value": 1, "locations": ["/records/0/evidence/sign-off"]}]}
+  {"check": "$applies", "subject": {"type": "approval", "id": "build-7", "in": {"record": "r1"}}, "passed": false, "cause": "value", "message": "kind is \"scan\""}
+  {"check": "complete", "subject": {"type": "approval", "id": "sign-off", "in": {"record": "r1"}}, "passed": true, "cause": "satisfied",
+   "inputs": [{"name": "status", "value": "COMPLETE", "locations": ["/records/0/evidence/sign-off/status"]}]}
+  ```
+
+  - The path is read as after `every`, lists along it included, but no list is read at its end. The members come in key order, and each one is handled as an item of a list: `{}` gives no subject, so `$min_subjects` fails as `value`, and two members that match are two subjects.
+  - The id is the member's key, unless the subject has `identified_by`, which is then read inside the member. `every member of records.evidence` with `sign-off` in two records fails `$unique_ids` with `repeated evidence ids is ["sign-off"]`.
+  - A value at the end that isn't an object, a list included, fails `$min_subjects` as `unusable`, like `item 3 of records: evidence is [{"kind": "approval"}], which isn't an object`, and the members of the other records are still checked. A missing or `null` value fails as `absent` or `null`.
+  - `every member of record` reads the members of each record, as a child subject, and `every member of $input` reads the members of the input.
+  - `member` isn't a word of the grammar, so a field called `member` is written as before. `member of` without `every`, `every distinct member of` and `every member of … named by each of` are written wrong. For now `every member of` only goes on a `from` line: a check like `every member of xs is 1`, a `count of member of` or a `for` line with it is written wrong, with `every member of only goes on a from line for now`.
 - A `from` or `identified_by` that can't be read is written wrong, and the `$well_formed` row says why, like `{"name": "subjects.x.from", "value": ["doesn't parse"], "locations": []}`.
 - A `from` that can't be read fails `$min_subjects`, and its `message` says where the read stopped: `item 2 of things is missing`, or `things is 5, which isn't a list or an object`. A child subject names the path inside its parent, without the parent's name, like `ws is missing` or `item 1 of ws is missing`. When the read stops before its first step, the message names `$input`, like `$input is null`, or the parent, like `artifact is null`, `artifact is "x", which isn't an object` or `item 1 of artifact is missing` for a child of `artifact`. The row's `inputs` hold the read after the count, and a `named by` key that can't be read too. With `every`, the list that can't be read is also a `list` entry in `failures`, named as the message names it.
 
