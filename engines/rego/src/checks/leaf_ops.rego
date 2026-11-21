@@ -306,6 +306,7 @@ _at_most_max(check, l, subj) if {
 
 _compared(check, l, r, subj) if {
 	not "within" in object.keys(check)
+	not check.ignoring
 	check.cmp in _list_cmps
 	not "max" in object.keys(check)
 	_cmp(check.cmp, l, r, check, subj)
