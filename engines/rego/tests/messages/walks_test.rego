@@ -177,3 +177,12 @@ test_a_row_keeps_the_items_of_a_list_after_is_in_ignoring_case_in_list_order if 
 	field := {"op": "compare", "left": ["x"], "cmp": "in", "right": ["ys"], "ignoring": "case"}
 	ergo._m_row_text(field, {"x": "a", "ys": [null, 3]}, "unusable") == "item 1 of ys is null; item 2 of ys is 3, which isn't text"
 }
+
+test_a_root_list_after_is_in_ignoring_case_that_holds_null_names_each_null_item_and_not_the_list if {
+	ref := {"op": "in", "path": ["v"], "values": {"ref": ["$$params[]", "l"]}, "ignoring": "case"}
+	ergo._m_root_texts({}, ref, "null") == ["item 2 of $params.l is null"] with data.ergo_params as {"l": ["a", null]}
+	ergo._m_root_texts({}, ref, "null") == ["item 1 of $params.l is null"] with data.ergo_params as {"l": [null]}
+	ergo._m_root_texts({}, ref, "absent") == ["$params.l is missing"] with data.ergo_params as {}
+	field := {"op": "compare", "cmp": "in", "left": ["v"], "right": [`${"alias":"","n":-1,"of":null,"old":true}`, "ys"], "ignoring": "case"}
+	ergo._m_root_texts({"ys": ["a", null]}, field, "null") == ["item 2 of ys is null"]
+}
