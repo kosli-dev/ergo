@@ -2421,3 +2421,82 @@ fn the_items_clauses_say_what_the_row_says_today() {
         differ.join("\n")
     );
 }
+
+fn for_items(
+    for_line: &str,
+    assertions: &[&str],
+    subject: Value,
+    params: Value,
+) -> Vec<crate::ops::clause::Clause> {
+    let line = ergo_policy_sentences::parse_for(for_line).unwrap();
+    let parsed: Vec<_> = assertions
+        .iter()
+        .flat_map(|assertion| {
+            ergo_policy_sentences::parse_check(assertion)
+                .unwrap()
+                .assertions
+        })
+        .collect();
+    let places: Vec<String> = assertions.iter().map(|_| "p".to_string()).collect();
+    let checked = super::lower_for(&line, &parsed, &places, &crate::lower::Scope::new()).unwrap();
+    let crate::ops::Check::For(line) = checked else {
+        panic!("{for_line} is not a for line");
+    };
+    let input = json!({"things": [subject]});
+    let ctx = crate::path::Ctx {
+        label: None,
+        item_by_item: false,
+        subject: crate::path::Located {
+            value: &input["things"][0],
+            location: crate::path::Location::input_root().key("things").index(0),
+        },
+        input: &input,
+        params: Some(&params),
+        aliases: std::collections::BTreeMap::new(),
+    };
+    line.run(&ctx).items
+}
+
+fn tree(clauses: &[crate::ops::clause::Clause]) -> Vec<String> {
+    clauses
+        .iter()
+        .map(|clause| {
+            let said = tree(&clause.said);
+            if said.is_empty() {
+                format!("{}|{}", clause.name, clause.text)
+            } else {
+                format!("{}[{}]", clause.name, said.join(", "))
+            }
+        })
+        .collect()
+}
+
+#[test]
+fn a_sentence_of_the_first_list_rides_with_the_first_pair() {
+    let items = for_items(
+        "every prs as pr, every pr.as as ap",
+        &["ap.state is 1", "ap.user is 1", "pr.ok is true"],
+        json!({"prs": [{"ok": false, "as": [{"state": 2, "user": 1}, {"state": 1, "user": 3}]}]}),
+        json!({}),
+    );
+    assert_eq!(
+        tree(&items),
+        [
+            "item 1 of prs[item 1 of pr.as[ap.state is 2|ap.state is 2, pr.ok is false|pr.ok is false], item 2 of pr.as[ap.user is 3|ap.user is 3]]"
+        ]
+    );
+}
+
+#[test]
+fn two_sentences_walking_one_list_merge_by_item() {
+    let items = for_items(
+        "every xs as x",
+        &["every x.ys.n is 1", "every x.ys.m is 1"],
+        json!({"xs": [{"ys": [{"n": 1, "m": 2}, {"m": 1}]}]}),
+        json!({}),
+    );
+    assert_eq!(
+        tree(&items),
+        ["item 1 of xs[item 1 of x.ys[m is 2|m is 2], item 2 of x.ys[n is missing|n is missing]]"]
+    );
+}
