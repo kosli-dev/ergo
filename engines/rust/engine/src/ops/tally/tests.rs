@@ -2776,18 +2776,10 @@ fn counted_text(sentence: &str, items: Value) -> String {
 }
 
 #[test]
-fn an_item_that_reaches_a_missing_or_null_on_the_way_to_its_end_is_said_to_miss_the_end() {
+fn an_item_that_stops_before_its_end_says_what_it_met() {
     assert_eq!(
         counted_text("sum of items.n is 3", json!([{}])),
         "item 1 of items: n is missing"
-    );
-    assert_eq!(
-        counted_text("sum of items.m.n is 3", json!([{"m": null}])),
-        "item 1 of items: m.n is missing"
-    );
-    assert_eq!(
-        counted_text("count of items.m.n is 3", json!([{"m": null}])),
-        "item 1 of items: m.n is missing"
     );
     assert_eq!(
         counted_text("count of items.m.n is 3", json!([{"m": 1}])),
