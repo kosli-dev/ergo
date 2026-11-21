@@ -20,3 +20,21 @@ test_a_clause_holds_its_kind_name_cause_text_and_what_it_says if {
 	}
 	ergo._m_clause_more(2) == {"kind": "more", "count": 2, "name": "", "cause": "value", "text": "", "said": []}
 }
+
+_root(name, cause, text) := ergo._m_clause("root", name, cause, text)
+
+_missing(name) := _root(name, "absent", concat("", [name, " is missing"]))
+
+_null(name) := _root(name, "null", concat("", [name, " is null"]))
+
+_unread(name, cause, text) := ergo._m_clause("item", name, cause, text)
+
+_item(name, cause, said) := ergo._m_item_clause(name, cause, said)
+
+test_roots_lists_and_and_n_more_are_joined_with_a_semicolon if {
+	ergo._m_clauses_text([
+		_root("$params", "not_an_object", "$params is 3, which isn't an object"),
+		ergo._m_clause("list", "es", "absent", "es is missing"),
+		ergo._m_clause_more(2),
+	]) == "$params is 3, which isn't an object; es is missing; and 2 more"
+}
