@@ -359,10 +359,17 @@ impl Tally {
 
 pub fn run(check: &Tally, ctx: &Ctx) -> Verdict {
     let numbers = numbers_verdict(check, ctx);
+    let roots = root_causes(check, ctx);
+    let mut inputs = numbers.inputs;
+    if equals_a_root(check)
+        && roots.iter().any(|root| root.is_failure())
+        && let Some(count) = inputs.first_mut().filter(|count| count.worked)
+    {
+        count.value = Value::Null;
+    }
     Verdict {
-        cause: Cause::worst(std::iter::once(numbers.cause).chain(root_causes(check, ctx)))
-            .unwrap_or(numbers.cause),
-        inputs: numbers.inputs,
+        cause: Cause::worst(std::iter::once(numbers.cause).chain(roots)).unwrap_or(numbers.cause),
+        inputs,
     }
 }
 
