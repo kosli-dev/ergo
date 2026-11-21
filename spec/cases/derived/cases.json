@@ -3558,6 +3558,84 @@
     ]
   },
   {
+    "description": "count of a path that ends at null counts it",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "release": {
+          "from": "releases",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": "count of items.m.n is 1"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "passes when the last step of an item's path is null, because null is a value that counts",
+        "rules": [
+          "sentence.derived.count",
+          "tally.walk",
+          "tally.count",
+          "tally.inputs",
+          "path.null",
+          "sentence.phrase.is",
+          "location.read"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "items": [
+                {
+                  "m": {
+                    "n": null
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/items/0/m/n"
+                ],
+                "name": "count of items.m.n",
+                "value": 1
+              },
+              {
+                "locations": [
+                  "/releases/0/items/0/m/n"
+                ],
+                "name": "items[].m.n",
+                "value": [
+                  null
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
     "description": "sum over no items is 0",
     "policy": {
       "ergo_spec": "{{spec}}",

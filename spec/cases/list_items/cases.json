@@ -35841,7 +35841,7 @@
       },
       {
         "description": "a null part fails as null",
-        "rules": ["walk.start", "parts.swap"],
+        "rules": ["walk.start", "parts.swap", "tally.walk", "path.null"],
         "input": {"things": [[{"c": null}]]},
         "results": [
           {

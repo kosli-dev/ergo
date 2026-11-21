@@ -1623,6 +1623,12 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
+        "count of items.m.n is 1",
+        "count of items.m.n is 1",
+        &[],
+        &[],
+    ),
+    (
         "count of items whose k is 1 equals x1",
         "count of items whose k is 1 equals x1",
         &[],
