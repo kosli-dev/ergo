@@ -3,6 +3,8 @@ set -eu
 here=$(cd "$(dirname "$0")/.." && pwd)
 opa=${DOCS_RUN_OPA:-opa}
 ergo=${DOCS_RUN_ERGO_REGO:-$here/dist/ergo.rego}
+release=${DOCS_RUN_RELEASE_ERGO_REGO:-}
+require_release=${DOCS_RUN_REQUIRE_RELEASE:-0}
 export DOCS_RUN_OPA="$opa"
 
 if [ "$#" -eq 0 ]; then
@@ -23,9 +25,12 @@ for file in "$@"; do
     function fail(line, text) {
       print file ":" line ": " text >> (work "/errors")
     }
-    function finish() {
+    function emit() {
       close(out)
-      printf "%s\t%s\t%d\t%s\t%s\t%s\t%s\t%s\n", out, file, mline, names, role, path, ergo, normalise >> (work "/index")
+      printf "%s\t%s\t%d\t%s\t%s\t%s\t%s\t%s\t%s\n", out, file, mline, names, role, path, ergo, normalise, use >> (work "/index")
+    }
+    function finish() {
+      emit()
       open = 0
     }
     {
@@ -53,13 +58,21 @@ for file in "$@"; do
         line = $0
         sub(/^<!-- ergo-run: /, "", line)
         sub(/[ \t]*-->[ \t]*$/, "", line)
+        runcmd = ""
+        if (match(line, /run=`[^`]*`/)) {
+          runcmd = substr(line, RSTART + 5, RLENGTH - 6)
+          line = substr(line, 1, RSTART - 1) substr(line, RSTART + RLENGTH)
+        }
+        sub(/[ \t]+$/, "", line)
         count = split(line, parts, / +/)
         names = parts[1]
         role = "-"
         path = "-"
         ergo = "-"
         normalise = "-"
+        use = "-"
         for (i = 2; i <= count; i++) {
+          if (parts[i] == "") continue
           eq = index(parts[i], "=")
           if (eq == 0) {
             fail(NR, "the ergo-run attribute " parts[i] " has no =")
@@ -72,11 +85,26 @@ for file in "$@"; do
           else if (key == "path") path = value
           else if (key == "ergo") ergo = value
           else if (key == "normalise") normalise = value
+          else if (key == "use") use = value
+          else if (key == "run") {
+            fail(NR, "the run attribute is written run=`COMMAND`")
+            role = "bad-attribute"
+          }
           else fail(NR, "unknown ergo-run attribute " key)
         }
         mline = NR
-        pending = 1
         markers++
+        if (runcmd != "") {
+          if (role != "command") {
+            fail(NR, "a run attribute goes on a command marker")
+          } else {
+            out = work "/block." k "." (++n)
+            print runcmd > out
+            emit()
+          }
+        } else {
+          pending = 1
+        }
       } else if (tolower($0) ~ /ergo[-_ ]?run/) {
         stray[++nstray] = NR
       }
@@ -128,7 +156,7 @@ while IFS= read -r name; do
   noutput=0
   run="$work/run.$gi"
   mkdir -p "$run"
-  while IFS="$tab" read -r _ block bfile bline _ role path attr_ergo normalise; do
+  while IFS="$tab" read -r _ block bfile bline _ role path attr_ergo normalise use; do
     [ -n "$block" ] || continue
     case $role in
       file)
@@ -151,7 +179,14 @@ while IFS= read -r name; do
         ;;
       command)
         ncommand=$((ncommand + 1))
-        command_row="$block${tab}$attr_ergo${tab}$bfile:$bline"
+        command_row="$block${tab}$attr_ergo${tab}$bfile:$bline${tab}$use"
+        case $use in
+          - | release) ;;
+          *)
+            echo "$bfile:$bline: group $name: unknown use=$use" >&2
+            bad=1
+            ;;
+        esac
         ;;
       output)
         noutput=$((noutput + 1))
@@ -183,11 +218,30 @@ ROWS
   command_block=$(printf '%s' "$command_row" | cut -f1)
   command_ergo=$(printf '%s' "$command_row" | cut -f2)
   command_at=$(printf '%s' "$command_row" | cut -f3)
+  command_use=$(printf '%s' "$command_row" | cut -f4)
+  group_ergo=$ergo
+  if [ "$command_use" = release ]; then
+    if [ -z "$release" ]; then
+      if [ "$require_release" = 1 ]; then
+        echo "group $name: the command at $command_at needs the latest release's ergo.rego, and DOCS_RUN_RELEASE_ERGO_REGO is not set" >&2
+        status=1
+      else
+        echo "skip group $name ($command_at): DOCS_RUN_RELEASE_ERGO_REGO is not set, so it is not checked against the latest release"
+      fi
+      continue
+    fi
+    if [ ! -f "$release" ]; then
+      echo "group $name: the release file $release does not exist" >&2
+      status=1
+      continue
+    fi
+    group_ergo=$release
+  fi
   output_block=$(printf '%s' "$output_row" | cut -f1)
   output_at=$(printf '%s' "$output_row" | cut -f2)
   [ "$command_ergo" != - ] || command_ergo=ergo.rego
   mkdir -p "$run/$(dirname "$command_ergo")"
-  cp -f "$ergo" "$run/$command_ergo"
+  cp -f "$group_ergo" "$run/$command_ergo"
   if (cd "$run" && sh -c 'opa() { command "$DOCS_RUN_OPA" "$@"; }; . "$1"' sh "$command_block" > "$work/actual.$gi" 2> "$work/stderr.$gi"); then
     :
   else
