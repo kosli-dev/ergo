@@ -38,6 +38,24 @@ test_a_root_list_after_is_in_ignoring_case_stands_in_for_text_so_an_item_whose_o
 	ergo._leaf_cause(ergo._root_stand_in(field), {"v": 5}) == "unusable"
 }
 
+test_a_list_after_is_in_ignoring_case_in_a_one_line_every_is_a_root_read_before_any_item if {
+	field := {"op": "compare", "cmp": "in", "left": ["x"], "right": [`${"alias":"","n":-1,"of":null,"old":true}`, "ys"], "ignoring": "case"}
+	every_field := {"op": "every", "path": ["xs", "x"], "check": field, "whose": [], "if_any": true}
+	ergo._walk_root_flaw(every_field, {"xs": [], "ys": ["a", null]}) == "null"
+	ergo._walk_root_flaw(every_field, {"xs": [], "ys": [1, "a"]}) == "unusable"
+	ergo._walk_root_flaw(every_field, {"xs": [], "ys": ["a"]}) == ""
+	ergo._walk_root_flaw(object.union(every_field, {"check": object.remove(field, ["ignoring"])}), {"xs": [], "ys": ["a", null]}) == ""
+	ergo._walk_root_msgs(every_field, {"xs": [], "ys": ["a", null]}) == ["item 2 of ys is null"]
+	ergo._walk_root_msgs(every_field, {"xs": [], "ys": [1, "a"]}) == ["item 1 of ys is 1, which isn't text"]
+	ergo._items_judged_alone({"xs": [], "ys": [3]}, every_field)
+	not ergo._items_judged_alone({"xs": [], "ys": ["a"]}, every_field)
+	ergo._whose_alone({"xs": [], "ys": [3]}, every_field).check == {"op": "compare", "cmp": "eq", "left": ["x"], "right": ["x"], "ignoring": "case"}
+	ref := {"op": "in", "path": ["x"], "values": {"ref": ["$$params[]", "l"]}, "ignoring": "case"}
+	every_ref := {"op": "every", "path": ["xs", "x"], "check": ref, "whose": [], "if_any": true}
+	ergo._walk_root_flaw(every_ref, {"xs": []}) == "null" with data.ergo_params as {"l": [null]}
+	ergo._walk_root_msgs(every_ref, {"xs": []}) == ["item 1 of $params.l is null"] with data.ergo_params as {"l": [null]}
+}
+
 test_a_root_a_whose_cant_read_has_no_stand_in_after_a_key_or_a_phrase_b9_leaves_out if {
 	keyed := {"op": "compare", "cmp": "eq", "left": ["v"], "right": ["$$params", "m", {"ref": ["$$params", "k"]}]}
 	ergo._root_stand_in(keyed) == keyed
