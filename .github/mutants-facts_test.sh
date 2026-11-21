@@ -15,7 +15,7 @@ printf 'fn t() {}\n' > "$repo/engines/rust/engine/tests/it.rs"
 printf 'fn u() {}\n' > "$repo/engines/rust/engine/src/tests.rs"
 git -C "$repo" add .
 git -C "$repo" commit --quiet -m base
-git -C "$repo" tag base
+git -C "$repo" branch base
 
 mkdir "$dir/bin"
 cat > "$dir/bin/cargo" <<'SH'
@@ -59,10 +59,12 @@ echo "mutants-facts.sh counts mutants and lists the missed ones, and gives cargo
 printf 'fn a() { 1; }\n' > "$repo/engines/rust/engine/src/lib.rs"
 git -C "$repo" commit --quiet -am "source"
 out=$(run base)
-case $out in
-  *"| caught | 2 |"*"| missed | 1 |"*"| unviable | 2 |"*"| timeout | 1 |"*) ;;
-  *) fail "count the four outcomes" ;;
-esac
+for row in "| caught   | 2 |" "| missed   | 1 |" "| unviable | 2 |" "| timeout  | 1 |"; do
+  case $out in
+    *"$row"*) ;;
+    *) fail "count the four outcomes, with $row" ;;
+  esac
+done
 case $out in
   *"engine/src/lib.rs:7:5: replace a with ()"*) ;;
   *) fail "list the missed mutant" ;;
