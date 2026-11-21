@@ -3419,7 +3419,12 @@ impl For {
         let name = child.entry.shown();
         let Some(outcome) = child.failed.as_ref() else {
             let cause = Cause::worst(child.rooted.iter().map(|clause| clause.cause))?;
-            return Some(Clause::item(name, cause, String::new(), child.rooted.clone()));
+            return Some(Clause::item(
+                name,
+                cause,
+                String::new(),
+                child.rooted.clone(),
+            ));
         };
         if bare_item(outcome, &child.entry) {
             let bare = child.entry.bare.as_deref().unwrap_or(name);
@@ -3734,7 +3739,10 @@ fn listed_roots(clauses: Vec<Clause>) -> Vec<Clause> {
             continue;
         }
         let last = clause.name.rsplit(": ").next().unwrap_or(&clause.name);
-        let list = last.split_once(" of ").map_or(last, |(_, list)| list).to_string();
+        let list = last
+            .split_once(" of ")
+            .map_or(last, |(_, list)| list)
+            .to_string();
         match lists
             .iter_mut()
             .find(|(group, name, _)| *group == clause.group && *name == list)

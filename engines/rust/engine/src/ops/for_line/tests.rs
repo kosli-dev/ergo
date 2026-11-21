@@ -3207,7 +3207,8 @@ fn a_walk_over_the_second_list_under_the_first_item_gives_its_items_beside_the_p
             json!({}),
         )
     };
-    let want = "item 1 of ws: item 1 of w.items: i.k is 2; item 1 of ws: item 2 of w.items: m is missing";
+    let want =
+        "item 1 of ws: item 1 of w.items: i.k is 2; item 1 of ws: item 2 of w.items: m is missing";
     assert_eq!(said(&["every w.items.m is 1", "i.k is 1"]), want);
     assert_eq!(said(&["i.k is 1", "every w.items.m is 1"]), want);
 }
