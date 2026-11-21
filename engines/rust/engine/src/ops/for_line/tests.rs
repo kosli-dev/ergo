@@ -3772,3 +3772,31 @@ fn a_root_list_whose_name_holds_a_colon_is_named_whole() {
         "item 1 of $params.\"x: y\": n is missing; $params.a is missing"
     );
 }
+
+#[test]
+fn a_whose_item_says_only_its_own_read_beside_a_root() {
+    let items = for_items(
+        "every xs whose v is at least $params.min as x",
+        &["x.w is 1"],
+        json!({"xs": [{"v": 1}, {}]}),
+        json!({"min": "s"}),
+    );
+    assert_eq!(
+        crate::ops::clause::text(&items),
+        "item 2 of xs: v is missing"
+    );
+}
+
+#[test]
+fn a_whose_item_says_each_own_read_beside_a_key_that_isnt_text() {
+    let items = for_items(
+        "every es whose zz is m named by $params.k as e",
+        &["e.v exists"],
+        json!({"es": [{"v": 1}, {"v": 2, "zz": 1, "m": {"a": 1}}, {"v": 3, "m": null}]}),
+        json!({"k": 3}),
+    );
+    assert_eq!(
+        crate::ops::clause::text(&items),
+        "item 1 of es: zz is missing, and m is missing; item 3 of es: zz is missing, and m is null"
+    );
+}
