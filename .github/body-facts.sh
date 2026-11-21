@@ -23,9 +23,18 @@ count_from() {
   sed -n "$2" "$1" | head -n 1
 }
 
+cargo_line=
+passed_now_fail=
+if [ -f "$reports_file" ]; then
+  cargo_line=$(grep -m 1 '^cargo test exited with' "$reports_file" || true)
+  passed_now_fail=$(sed -n 's/^CASES THAT PASSED ON .* AND FAIL OR ARE GONE NOW: \([0-9][0-9]*\)$/\1/p' "$reports_file" | head -n 1)
+fi
+
 reports=$(count_from "$reports_file" 's/^\([0-9][0-9]*\) case reports\{0,1\} changed between.*/\1/p')
 if [ -z "$reports" ]; then
-  if [ -f "$reports_file" ] && grep -q '^No case report changed between' "$reports_file"; then
+  if [ -n "$cargo_line" ]; then
+    reports=unknown
+  elif [ -f "$reports_file" ] && grep -q '^No case report changed between' "$reports_file"; then
     reports=0
   else
     reports=unknown
@@ -64,6 +73,13 @@ echo "## Report facts for the pull request body"
 echo
 echo "- Rust case reports changed: $reports"
 echo "- Pairs whose Rust output changed: $pairs, of them moved away from Rego or their want: $away"
+if [ -n "$passed_now_fail" ]; then
+  echo "- Cases that passed and now fail or are gone: $passed_now_fail"
+fi
+if [ -n "$cargo_line" ]; then
+  echo
+  echo "WARNING: $cargo_line The report counts could not be read because cargo failed, so the report counts above are not known."
+fi
 
 if [ "$changed" = yes ]; then
   parts=
