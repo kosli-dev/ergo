@@ -405,9 +405,9 @@ _m_joined_once(ms) := concat("; ", array.concat([m | some m in ms; _m_shown_clau
 	shown := array.slice(leads, 0, 3)
 }
 
-_m_item_leads(ms) := _once([_m_item_lead(m) | some m in ms; startswith(m, "item ")])
+_m_item_leads(ms) := _once([_m_item_lead(m) | some m in ms; _walk_kind(m) == "item"])
 
-_m_shown_clause(m, _) if not startswith(m, "item ")
+_m_shown_clause(m, _) if _walk_kind(m) == "list"
 
 _m_shown_clause(m, shown) if _m_item_lead(m) in shown
 

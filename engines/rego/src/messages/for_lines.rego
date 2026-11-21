@@ -409,7 +409,7 @@ _m_item_lead(t) := concat(": ", [_m_item_head(p) | some i, p in ps; i < n]) if {
 
 _m_items_up_to(ps, i) if {
 	every j in numbers.range(0, i) {
-		startswith(ps[j], "item ")
+		_walk_kind(ps[j]) == "item"
 	}
 }
 
