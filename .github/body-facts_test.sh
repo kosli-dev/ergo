@@ -96,6 +96,12 @@ expect_in "Rust case reports changed: unknown" "$out"
 expect_in "WARNING: cargo test exited with 2 on the working tree." "$out"
 expect_not_in "Cases that passed and now fail" "$out"
 
+echo "body-facts.sh warnings say the body is read at the last push"
+out=$(run "Fixes a thing." "$dir/reports-changed.md" "$dir/pairs-same.md")
+expect_in "(the body is read at the last push: push or re-run after editing it)" "$out"
+out=$(run "Fixes a thing." "$dir/reports-cargo-failed.md" "$dir/pairs-same.md")
+expect_in "tree. So the report counts could not be read because cargo failed (the body is read at the last push: push or re-run after editing it)." "$out"
+
 echo "body-facts.sh reads the body from a file"
 printf 'Changes the report: yes.\n' > "$dir/body.md"
 out=$(BODY_FACTS_BODY_FILE=$dir/body.md sh "$script" "$dir/reports-changed.md" "$dir/pairs-same.md")
