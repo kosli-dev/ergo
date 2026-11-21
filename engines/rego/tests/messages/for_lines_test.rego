@@ -68,3 +68,8 @@ test_message_groups_items_by_their_list_in_the_order_the_lists_come_and_then_by_
 	leads := ["item 10 of xs", "item 1 of ys", "item 2 of xs", "item 10 of xs", ""]
 	ergo._m_list_leads(leads) == ["item 2 of xs", "item 10 of xs", "item 1 of ys", ""]
 }
+
+test_the_lead_of_a_clause_goes_through_items_and_members_alike if {
+	ergo._m_item_lead("item 1 of rs: member b of statuses is 1, which isn't text") == "item 1 of rs: member b of statuses"
+	ergo._m_item_lead("member y of evidence: item 2 of ks is 1") == "member y of evidence: item 2 of ks"
+}

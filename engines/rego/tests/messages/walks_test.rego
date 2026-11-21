@@ -97,3 +97,10 @@ test_a_member_walk_that_finds_no_object_says_what_is_there if {
 	ergo._m_fail({"path": ["statuses"], "item": ["statuses"], "cause": "null", "value": null, "msg": "an object"}, set()) == "statuses is null"
 	ergo._m_fail({"path": ["statuses"], "item": ["statuses"], "cause": "unusable", "value": ["DONE"], "msg": "an object"}, set()) == `statuses is ["DONE"], which isn't an object`
 }
+
+test_members_count_toward_and_n_more_like_items if {
+	ms := ["member a of xs is 1", "member b of xs is 1", "member c of xs is 1", `member "d e" of xs is 1`]
+	ergo._m_joined_once(ms) == "member a of xs is 1; member b of xs is 1; member c of xs is 1; and 1 more"
+	ergo._m_item_leads(ms) == ["member a of xs", "member b of xs", "member c of xs", `member "d e" of xs`]
+	not ergo._m_shown_clause(`member "d e" of xs is 1`, ["member a of xs"])
+}
