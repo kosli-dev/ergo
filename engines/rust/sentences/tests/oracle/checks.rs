@@ -24,6 +24,12 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
+        "every member of xs is at least y",
+        "every member of xs is at least y",
+        &[],
+        &[],
+    ),
+    (
         "sum of member of costs is at most 3",
         "sum of member of costs is at most 3",
         &[],
