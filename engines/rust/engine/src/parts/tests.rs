@@ -379,3 +379,254 @@ fn walk_entries_read_each_records_clause_kind_and_not_its_text() {
         ]
     );
 }
+
+#[test]
+fn a_null_value_that_was_found_has_no_outcome_whether_or_not_the_check_can_use_it() {
+    let found = read("x", Value::Null, Outcome::Found);
+    assert_eq!(outcome(&found, false), None);
+    assert_eq!(outcome(&found, true), None);
+}
+
+#[test]
+fn an_item_or_list_entry_belongs_to_the_list_before_its_position_and_its_field() {
+    assert_eq!(list_base("item 2 of xs"), "xs");
+    assert_eq!(list_base("item 1 of xs[0].v"), "xs");
+    assert_eq!(list_base("xs[3].v"), "xs");
+    assert_eq!(list_base("xs"), "xs");
+    assert_eq!(list_base("item x"), "item x");
+}
+
+#[test]
+fn a_row_input_is_in_a_list_only_when_it_reads_inside_that_list() {
+    let lists = vec!["xs".to_string()];
+    assert!(item_input("xs[].v", &lists));
+    assert!(!item_input("ys[].v", &lists));
+    assert!(!item_input("xs", &lists));
+}
+
+#[test]
+fn an_item_text_that_names_another_item_is_kept_whole() {
+    use crate::ops::clause::Kind;
+    let clause = said_clause("item 1 of xs", Cause::Value, "item 2 of ys: w is 1");
+    assert_eq!(
+        (clause.kind, clause.text.as_str(), clause.said.is_empty()),
+        (Kind::Item, "item 2 of ys: w is 1", true)
+    );
+}
+
+#[test]
+fn an_item_outcome_follows_its_cause_and_falls_back_on_its_value() {
+    assert_eq!(item_outcome("absent", &json!(1)), "absent");
+    assert_eq!(item_outcome("null", &json!(1)), "null");
+    assert_eq!(item_outcome("unusable", &json!(1)), "unusable");
+    assert_eq!(item_outcome("not_an_object", &json!(1)), "not_an_object");
+    assert_eq!(item_outcome("value", &json!(1)), "usable");
+    assert_eq!(item_outcome("value", &Value::Null), "null");
+}
+
+fn failed_item(name: &str, place: &str, message: &str) -> Failure {
+    Failure::Item {
+        part: Part {
+            name: name.to_string(),
+            cause: Cause::Value,
+            inputs: Vec::new(),
+            failures: Vec::new(),
+            message: message.to_string(),
+        },
+        value: json!(1),
+        locations: vec![place.to_string()],
+    }
+}
+
+fn failed_list(name: &str, cause: Cause, place: &str, message: &str) -> Failure {
+    Failure::List(Part {
+        name: name.to_string(),
+        cause,
+        inputs: vec![json!({"name": name, "locations": [place]})],
+        failures: Vec::new(),
+        message: message.to_string(),
+    })
+}
+
+fn names_and_places(entries: &[Failure]) -> Vec<(String, Vec<String>)> {
+    entries
+        .iter()
+        .map(|entry| {
+            let places = match entry {
+                Failure::Item { locations, .. } => locations.clone(),
+                other => other
+                    .part()
+                    .inputs
+                    .iter()
+                    .flat_map(|i| i["locations"].as_array().cloned().unwrap_or_default())
+                    .filter_map(|l| l.as_str().map(str::to_string))
+                    .collect(),
+            };
+            (entry.part().name.clone(), places)
+        })
+        .collect()
+}
+
+fn pair(name: &str, place: &str) -> (String, Vec<String>) {
+    (name.to_string(), vec![place.to_string()])
+}
+
+#[test]
+fn an_item_nested_two_levels_deep_sits_under_each_outer_item_with_dotted_names() {
+    let input = json!({"xs": [{"p": {"ys": [{"w": [1, 2, 3, 4]}, {"w": [1]}]}}]});
+    let out = nest(
+        vec![failed_item(
+            "item 4 of xs[0].p.ys[0].w",
+            "/xs/0/p/ys/0/w/3",
+            "item 1 of xs: item 1 of p.ys: item 4 of w: x is 4",
+        )],
+        &input,
+    );
+    assert_eq!(names_and_places(&out), [pair("item 1 of xs", "/xs/0")]);
+    assert_eq!(out[0].part().message, "");
+    assert_eq!(out[0].part().cause, Cause::Value);
+    let middle = &out[0].part().failures;
+    assert_eq!(
+        names_and_places(middle),
+        [pair("item 1 of p.ys", "/xs/0/p/ys/0")]
+    );
+    let leaf = &middle[0].part().failures;
+    assert_eq!(
+        names_and_places(leaf),
+        [pair("item 4 of w", "/xs/0/p/ys/0/w/3")]
+    );
+    assert_eq!(leaf[0].part().message, "x is 4");
+}
+
+#[test]
+fn a_list_that_stopped_short_is_said_under_the_item_it_was_in() {
+    let out = nest(
+        vec![failed_list(
+            "xs[0].ys[1].w",
+            Cause::Absent,
+            "/xs/0/ys/1",
+            "item 1 of xs: item 2 of ys: w is missing",
+        )],
+        &json!({"xs": [{"ys": [{}, {}]}]}),
+    );
+    assert_eq!(names_and_places(&out), [pair("item 1 of xs", "/xs/0")]);
+    let inner = &out[0].part().failures;
+    assert_eq!(
+        names_and_places(inner),
+        [pair("item 2 of ys", "/xs/0/ys/1")]
+    );
+    let leaf = &inner[0].part().failures;
+    assert_eq!(leaf.len(), 1);
+    assert!(matches!(leaf[0], Failure::List(_)));
+    assert_eq!(leaf[0].part().name, "w");
+    assert_eq!(leaf[0].part().message, "w is missing");
+}
+
+#[test]
+fn a_list_message_that_starts_with_a_colon_is_kept_as_it_is() {
+    let out = nest(
+        vec![failed_list("xs[0].ys", Cause::Value, "/xs/0/ys", ": foo")],
+        &json!({"xs": [{"ys": []}]}),
+    );
+    assert_eq!(out[0].part().failures[0].part().message, ": foo");
+}
+
+#[test]
+fn an_item_in_lists_four_deep_is_left_as_it_is() {
+    let out = nest(
+        vec![failed_item(
+            "item 1 of a[0].b[0].c[0].d[0].e",
+            "/a/0/b/0/c/0/d/0/e/0",
+            "item 1 of a: m",
+        )],
+        &json!({}),
+    );
+    assert_eq!(
+        names_and_places(&out),
+        [pair(
+            "item 1 of a[0].b[0].c[0].d[0].e",
+            "/a/0/b/0/c/0/d/0/e/0"
+        )]
+    );
+    assert_eq!(out[0].part().message, "item 1 of a: m");
+}
+
+#[test]
+fn items_of_the_same_outer_item_are_grouped_in_the_order_they_first_appear() {
+    let out = nest(
+        vec![
+            failed_item(
+                "item 1 of xs[0].ys",
+                "/xs/0/ys/0",
+                "item 1 of xs: item 1 of ys: v is 1",
+            ),
+            failed_item(
+                "item 2 of xs[1].ys",
+                "/xs/1/ys/1",
+                "item 2 of xs: item 2 of ys: v is 2",
+            ),
+            failed_item(
+                "item 2 of xs[0].ys",
+                "/xs/0/ys/1",
+                "item 1 of xs: item 2 of ys: v is 3",
+            ),
+        ],
+        &json!({"xs": [{"ys": [1, 2]}, {"ys": [1, 2]}]}),
+    );
+    assert_eq!(
+        names_and_places(&out),
+        [pair("item 1 of xs", "/xs/0"), pair("item 2 of xs", "/xs/1")]
+    );
+    assert_eq!(
+        names_and_places(&out[0].part().failures),
+        [
+            pair("item 1 of ys", "/xs/0/ys/0"),
+            pair("item 2 of ys", "/xs/0/ys/1")
+        ]
+    );
+    assert_eq!(
+        names_and_places(&out[1].part().failures),
+        [pair("item 2 of ys", "/xs/1/ys/1")]
+    );
+}
+
+#[test]
+fn two_entries_for_the_same_item_beside_nested_ones_merge_and_keep_each_input_once() {
+    let mut first = failed_item("item 1 of ws", "/ws/0", "item 1 of ws: q");
+    let mut second = failed_item("item 1 of ws", "/ws/0", "item 1 of ws: r");
+    for entry in [&mut first, &mut second] {
+        if let Failure::Item { part, .. } = entry {
+            part.inputs = vec![json!({"name": "ws[0]"})];
+        }
+    }
+    let out = nest(
+        vec![
+            failed_item(
+                "item 1 of xs[0].ys",
+                "/xs/0/ys/0",
+                "item 1 of xs: item 1 of ys: v is 1",
+            ),
+            first,
+            second,
+        ],
+        &json!({"xs": [{"ys": [1]}], "ws": [1]}),
+    );
+    assert_eq!(names_and_places(&out).len(), 2);
+    assert_eq!(out[1].part().name, "item 1 of ws");
+    assert_eq!(out[1].part().inputs, [json!({"name": "ws[0]"})]);
+}
+
+#[test]
+fn a_list_entry_keeps_its_own_name_in_its_message_when_the_text_says_it() {
+    let out = nest(
+        vec![failed_list(
+            "xs[0].ys[1].w",
+            Cause::Absent,
+            "/xs/0/ys/1",
+            "item 1 of xs: item 2 of ys: w: is missing",
+        )],
+        &json!({"xs": [{"ys": [{}, {}]}]}),
+    );
+    let leaf = &out[0].part().failures[0].part().failures;
+    assert_eq!(leaf[0].part().message, "w: is missing");
+}
