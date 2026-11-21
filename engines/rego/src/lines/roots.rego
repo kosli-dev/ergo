@@ -694,7 +694,7 @@ else := side
 
 _root_stand_in(c) := object.union(c, {"cmp": "eq", f: c[g]}) if {
 	c.op == "compare"
-	c.cmp in {"eq", "ne", "in", "includes"}
+	_stands_in_as_eq(c)
 	some f in _compare_side_list
 	is_array(c[f])
 	_walk_outside(c[f])
@@ -714,7 +714,7 @@ _root_stand_in(c) := object.union(c, {"cmp": "eq", f: c[g]}) if {
 	is_array(c[g])
 	not _walk_outside(c[g])
 } else := object.union({"op": "compare", "cmp": "eq", "left": c.path, "right": c.path}, object.filter(c, {"ignoring"})) if {
-	c.op == "in"
+	_stands_in_as_in(c)
 	_is_ref(c.values)
 	is_array(c.path)
 	not _walk_outside(c.path)
@@ -723,6 +723,20 @@ _root_stand_in(c) := object.union(c, {"cmp": "eq", f: c[g]}) if {
 _text_stand_in(c) := {"op": "in", "path": c.left, "values": [""], "ignoring": c.ignoring} if c.op == "compare"
 
 else := {"op": "in", "path": c.path, "values": [""], "ignoring": c.ignoring}
+
+_stands_in_as_eq(c) if c.cmp in {"eq", "ne", "in", "includes"}
+
+_stands_in_as_eq(c) if {
+	c.ignoring
+	c.cmp == "not_in"
+}
+
+_stands_in_as_in(c) if c.op == "in"
+
+_stands_in_as_in(c) if {
+	c.ignoring
+	c.op == "not_in"
+}
 
 _stand_in_keyed(p) if {
 	some step in p
