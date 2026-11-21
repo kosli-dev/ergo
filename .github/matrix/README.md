@@ -9,6 +9,11 @@ The pairs run through `ergo.rego` and the Rust engine, and a pair is interesting
 | `matrix-a.py` | One `count of xs whose ... is 1` or `count of xs.f that ... is 1` check for each operator, with the other side read from `$params` or `$input`, on the left or the right, and with items that are missing, `null`, of the wrong type or not objects. About 590 pairs. |
 | `matrix-b.py` | Many check forms (`count of ... whose`, `that`, `sum of`, `every`, `some`, `plus`, `for` lines, `named by` keys, lists that are missing or the wrong type) with each operator, a random but fixed mix of root and item states, and parts of the subject. About 570 pairs. |
 | `walk.py`     | `every` and `some` on a list with each operator, with a keyed read (`m named by $params.k`) and with `whose`, on lists of 0 to 5 items. About 180 pairs.                                              |
+| `for.py`      | `for` lines, `every xs as x` and `every xs whose ... as x`, with one sentence of six kinds (a comparison, `is in`, `starts with`, `every`, `count of ... whose`, a keyed read), the other side read from `$params`, from `$input`, from a field of the item or written in the sentence, in each of the states fine, wrong type, missing and `null`, with items that are fine, wrong, missing, `null` or hold `; `, on 2 or 5 items, and lines with two sentences. About 540 pairs. |
+
+## The `for` generator
+
+`for.py` writes the shapes of a `for` line that the report builds from clauses (issue #694): the kind of sentence, where the other side is read, the state of that side, and the state of the items. It adds 60 lines with two sentences, picked with a fixed seed, so the order of their roots shows. It has no `want`: it shows where the engines differ and, with `matrix-facts.sh`, what a change moved. The pairs with a `want` for `for` lines are in `.github/sweep-pairs.json`, and their names start with `for r5/`.
 
 ## Run one by hand
 
@@ -29,7 +34,7 @@ PATH=engines/rust/target/debug:$PATH python3 spec/sweep.py --pairs /tmp/pairs.js
 
 ## See what a change did to one generator
 
-`.github/matrix-facts.sh BASE NAME...` runs each generator `NAME` (`matrix-a`, `matrix-b`, `walk`) on `BASE` (a ref, like `origin/main`) and on the working tree, and prints a Markdown summary with one heading per generator and three lists. Each list is about the pairs where the working tree's Rust row differs from `BASE`'s Rust row, one pair on each line with the pair's name and the values:
+`.github/matrix-facts.sh BASE NAME...` runs each generator `NAME` (`matrix-a`, `matrix-b`, `walk`, `for`) on `BASE` (a ref, like `origin/main`) and on the working tree, and prints a Markdown summary with one heading per generator and three lists. Each list is about the pairs where the working tree's Rust row differs from `BASE`'s Rust row, one pair on each line with the pair's name and the values:
 
 - Cause went down (usually a bug): the cause comes later in the order of [Causes](../../REFERENCE.md#causes) than on `BASE`, or than the one `ergo.rego` gives on the working tree. A pair that was already lower than Rego's on `BASE` says `already on base`.
 - Says less than `BASE` (usually a bug): the `BASE` row failed and a problem it said is gone from the whole report. It splits every message of the row and of its `failures`, at every depth, into its problems, at `; ` and at `, and ` (leaving out `and N more`), and drops the `item N of x: ` prefix to know which item a problem is about. A problem counts as gone when no message of the working tree's row says it for that item, or once for all items, or for no item. When the working tree's row cuts a message with `and N more` and has no entry for any item, nothing is listed, because the problem may be in the part that was cut. A row that has no `failures` is read from its message alone. A row that is gone, or a report that now gives an error, counts too. A message that is cut at another place is not a problem that is gone.
@@ -37,4 +42,4 @@ PATH=engines/rust/target/debug:$PATH python3 spec/sweep.py --pairs /tmp/pairs.js
 
 The order is `not_an_object`, `ambiguous`, `unusable`, `absent`, `null`, `value`, and a passed row comes after all of them. The rule `problems.all_said` takes the worst cause of all, so a cause that goes up is usually the rule and one that goes down is usually a bug. Rows are compared by requirement, check and subject. A list with nothing in it says `None.`
 
-It builds both Rust commands with `cargo`, so it needs Rust and `opa` on your machine, and it only informs: it fails only when a tool fails. The `matrix-facts` job runs it on pull requests for all three generators, `matrix-a`, `matrix-b` and `walk`, in one run that builds `BASE` and the working tree once, with one heading for each generator in the job summary.
+It builds both Rust commands with `cargo`, so it needs Rust and `opa` on your machine, and it only informs: it fails only when a tool fails. The `matrix-facts` job runs it on pull requests for all four generators, `matrix-a`, `matrix-b`, `walk` and `for`, in one run that builds `BASE` and the working tree once, with one heading for each generator in the job summary.

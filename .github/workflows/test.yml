@@ -344,14 +344,14 @@ jobs:
         run: |
           cd engines/rust
           rustup toolchain install
-      - name: Write what the change did to the pairs of matrix-a, matrix-b and walk in the job summary
+      - name: Write what the change did to the pairs of matrix-a, matrix-b, walk and for in the job summary
         env:
           BASE: origin/${{ github.base_ref }}
         run: |
           if git diff --quiet "$BASE...HEAD" -- engines/rust engines/rego spec .github/matrix .github/matrix-facts.sh; then
             echo "No file under engines/rust, engines/rego or spec changed." >> "$GITHUB_STEP_SUMMARY"
           else
-            .github/matrix-facts.sh "$BASE" matrix-a matrix-b walk >> "$GITHUB_STEP_SUMMARY"
+            .github/matrix-facts.sh "$BASE" matrix-a matrix-b walk for >> "$GITHUB_STEP_SUMMARY"
           fi
 
   body-facts:
