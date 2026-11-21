@@ -1224,3 +1224,77 @@ fn in_ignoring_case_names_the_field_that_isnt_text() {
     assert_eq!(faults(json!({"x": "a"})), vec![]);
     assert_eq!(faults(json!({"x": null})), vec![]);
 }
+
+fn list_fault(sentence: &str, subject: Value, params: Value) -> Option<(Cause, String)> {
+    let check = lowered_check(sentence);
+    let input = json!({"things": [subject], "cs": [{"name": "A"}, {"name": 3}, {"name": null}]});
+    let ctx = Ctx {
+        label: None,
+        item_by_item: false,
+        subject: Located {
+            value: &input["things"][0],
+            location: Location::input_root().key("things").index(0),
+        },
+        input: &input,
+        params: Some(&params),
+        aliases: BTreeMap::new(),
+    };
+    walk_fault(&check, &ctx)
+}
+
+#[test]
+fn a_list_after_is_in_ignoring_case_names_each_item_that_isnt_text_in_list_order() {
+    let said = |cause: Cause, text: &str| Some((cause, text.to_string()));
+    for (sentence, subject, params, want) in [
+        (
+            "x is in ys ignoring case",
+            json!({"x": "a", "ys": ["A", 3]}),
+            json!({}),
+            said(Cause::Unusable, "item 2 of ys is 3, which isn't text"),
+        ),
+        (
+            "x is not one of ys ignoring surrounding spaces",
+            json!({"ys": [null]}),
+            json!({}),
+            said(Cause::Null, "item 1 of ys is null"),
+        ),
+        (
+            "x is in ys ignoring case",
+            json!({"x": 3, "ys": ["a", null, {"a": 1}]}),
+            json!({}),
+            said(
+                Cause::Unusable,
+                "item 2 of ys is null; item 3 of ys is {\"a\": 1}, which isn't text",
+            ),
+        ),
+        (
+            "x is in $params.l ignoring case",
+            json!({"x": "a"}),
+            json!({"l": [1, "a"]}),
+            said(Cause::Unusable, "item 1 of $params.l is 1, which isn't text"),
+        ),
+        (
+            "x is in $input.cs.name ignoring case",
+            json!({"x": "a"}),
+            json!({}),
+            said(
+                Cause::Unusable,
+                "item 2 of $input.cs: name is 3, which isn't text; item 3 of $input.cs: name is null",
+            ),
+        ),
+        (
+            "x is in ys ignoring case",
+            json!({"x": "a", "ys": ["A", "b"]}),
+            json!({}),
+            None,
+        ),
+        (
+            "x is in ys",
+            json!({"x": "a", "ys": ["A", null]}),
+            json!({}),
+            None,
+        ),
+    ] {
+        assert_eq!(list_fault(sentence, subject, params), want, "{sentence}");
+    }
+}
