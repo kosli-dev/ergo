@@ -1132,14 +1132,66 @@ fn in_ignoring_case_fails_on_a_field_that_isnt_text() {
                 "{subject} {not}"
             );
         }
-        for list in [json!(["a", null]), json!(["a", 3])] {
+        for (list, cause) in [
+            (json!(["a", null]), Cause::Null),
+            (json!(["a", 3]), Cause::Unusable),
+        ] {
             assert_eq!(
                 in_ignoring(json!({"x": "a"}), None, written(list.clone()), not).cause,
-                Cause::Unusable,
+                cause,
                 "{list} {not}"
             );
         }
     }
+}
+
+#[test]
+fn in_ignoring_case_fails_on_a_list_from_the_input_with_an_item_that_isnt_text_whatever_the_field_holds() {
+    let field = Right::Field(key_path(Start::Subject, &["ys"]));
+    let params = Right::Ref(key_path(Start::Params, &["l"]));
+    for not in [false, true] {
+        for (list, cause) in [
+            (json!(["A", 3]), Cause::Unusable),
+            (json!([1, "a"]), Cause::Unusable),
+            (json!([null]), Cause::Null),
+            (json!(["a", null]), Cause::Null),
+            (json!(["a", null, 3]), Cause::Unusable),
+            (json!(["a", ["a"]]), Cause::Unusable),
+            (json!(["a", {"a": 1}]), Cause::Unusable),
+            (json!([true]), Cause::Unusable),
+        ] {
+            for x in [json!("a"), json!(3), json!(null)] {
+                let subject = json!({"x": x, "ys": list});
+                assert_eq!(
+                    in_ignoring(subject, None, field.clone(), not).cause,
+                    cause,
+                    "{list} {x} {not}"
+                );
+                let subject = json!({ "x": x });
+                assert_eq!(
+                    in_ignoring(subject, Some(json!({ "l": list })), params.clone(), not).cause,
+                    cause,
+                    "{list} {x} {not}"
+                );
+            }
+            assert_eq!(
+                in_ignoring(json!({"ys": list}), None, field.clone(), not).cause,
+                cause,
+                "{list} missing x {not}"
+            );
+        }
+    }
+}
+
+#[test]
+fn in_ignoring_case_compares_with_a_list_from_the_input_once_both_sides_are_prepared() {
+    let field = Right::Field(key_path(Start::Subject, &["ys"]));
+    let subject = json!({"x": " Bug ", "ys": ["incident", "BUG"]});
+    assert_eq!(in_ignoring(subject.clone(), None, field.clone(), false).cause, Cause::Satisfied);
+    assert_eq!(in_ignoring(subject, None, field.clone(), true).cause, Cause::Value);
+    let subject = json!({"x": "bug", "ys": []});
+    assert_eq!(in_ignoring(subject.clone(), None, field.clone(), false).cause, Cause::Value);
+    assert_eq!(in_ignoring(subject, None, field, true).cause, Cause::Satisfied);
 }
 
 #[test]
