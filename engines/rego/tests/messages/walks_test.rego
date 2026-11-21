@@ -186,3 +186,9 @@ test_a_root_list_after_is_in_ignoring_case_that_holds_null_names_each_null_item_
 	field := {"op": "compare", "cmp": "in", "left": ["v"], "right": [`${"alias":"","n":-1,"of":null,"old":true}`, "ys"], "ignoring": "case"}
 	ergo._m_root_texts({"ys": ["a", null]}, field, "null") == ["item 2 of ys is null"]
 }
+
+test_a_row_keeps_the_items_of_a_list_walked_from_the_input_after_is_in_ignoring_case_in_list_order if {
+	ref := {"op": "in", "path": ["x"], "values": {"ref": ["$$input[]", "cs", "name"]}, "ignoring": "case"}
+	ergo._m_row_text(ref, {"x": "a"}, "unusable") == "item 1 of $input.cs: name is null; item 3 of $input.cs: name is true, which isn't text" with data.ergo_document as {"cs": [{"name": null}, {"name": "a"}, {"name": true}]}
+}
+
