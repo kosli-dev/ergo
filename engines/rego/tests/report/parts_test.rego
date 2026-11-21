@@ -63,3 +63,10 @@ test_an_item_two_conditions_of_a_count_cant_decide_is_one_entry_that_says_both i
 	parts := ergo._tally_item_parts(check, {"es": [{}]}, "absent", "/things/0", "item 1 of es: v is missing; item 1 of es: w is missing")
 	[[p.name, p.cause, p.message] | some p in parts] == [["item 1 of es", "absent", "v is missing; w is missing"]]
 }
+
+test_a_counted_list_named_by_a_key_is_never_an_input_of_the_assertion_even_with_no_failed_items if {
+	field := ergo._s_written_check("count of m named by p is at least 3")
+	ergo._tally_own_read({"name": "m named by p[]", "value": [1, 2]}, field, set(), [])
+	param := ergo._s_written_check("q is sum of m named by $params.k")
+	ergo._tally_own_read({"name": "m named by $params.k[]", "value": [1, 2]}, param, set(), [])
+}
