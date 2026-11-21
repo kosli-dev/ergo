@@ -59,3 +59,10 @@ test_a_walk_reads_member_of_only_when_the_check_says_member if {
 	ergo._walk_keys({"path": ["a", "b"], "member": false}, {}) == ["a", "b"]
 	ergo._walk_keys({"path": ["a", "b"], "member": true}, {}) == ["a", "b", ergo._fm_mark]
 }
+
+test_a_tally_of_member_of_walks_each_member_of_the_object_as_an_item if {
+	side := {"sum_of": ["costs"], "whose": [], "text": "sum of member of costs", "member": true}
+	w := ergo._tally_walk({"costs": {"b": 5, "a": 1}}, side)
+	[e.v | some e in w.items] == [1, 5]
+	[e.i | some e in w.items] == [["costs", {"member": "a"}], ["costs", {"member": "b"}]]
+}

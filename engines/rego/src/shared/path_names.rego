@@ -29,7 +29,7 @@ _visible_path_name(path, root) := concat("", ["item ", _literal_text(path[count(
 	is_array(path)
 	count(path) == 1
 	_index_step(path[0])
-} else := concat("", ["member ", _s_key_text(path[count(path) - 1].member), " of ", _rooted_steps_name(array.slice(path, 0, count(path) - 1), root)]) if {
+} else := concat("", ["member ", substring(_plain_step_name(1, path[count(path) - 1]), 1, -1), " of ", _rooted_steps_name(array.slice(path, 0, count(path) - 1), root)]) if {
 	is_array(path)
 	count(path) > 1
 	_member_step(path[count(path) - 1])

@@ -18,13 +18,10 @@ test_sum_of_and_plus_add_numbers_as_decimals if {
 
 test_a_count_or_sum_of_member_of_walks_each_member_of_the_object_as_an_item if {
 	side := {"sum_of": ["costs"], "whose": [], "text": "sum of member of costs", "member": true}
-	w := ergo._tally_walk({"costs": {"b": 5, "a": 1}}, side)
-	[e.v | some e in w.items] == [1, 5]
-	[e.i | some e in w.items] == [["costs", {"member": "a"}], ["costs", {"member": "b"}]]
 	t := ergo._tally({"costs": {"b": 5, "a": 1, "c": "x"}}, side)
 	t.values == [1, 5, "x"]
 	t.list == "costs"
 	t.states == {"unusable"}
-	count := {"count_of": ["evidence"], "whose": [{"op": "equals", "path": ["kind"], "value": "approval"}], "text": "count of member of evidence", "member": true}
-	ergo._tally({"evidence": {"x": {"kind": "scan"}, "y": {"kind": "approval"}}}, count).value == 1
+	approvals := {"count_of": ["evidence"], "whose": [{"op": "equals", "path": ["kind"], "value": "approval"}], "text": "count of member of evidence", "member": true}
+	ergo._tally({"evidence": {"x": {"kind": "scan"}, "y": {"kind": "approval"}}}, approvals).value == 1
 }

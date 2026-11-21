@@ -228,6 +228,8 @@ _walk_keys(check, subj) := _walk_member_keys(check, ks) if {
 	ks := _keys_in(subj, check.path)
 }
 
+_tally_walk(subj, side) := _walk(_walk_start({"path": p}, subj), _walk_keys(_tally_walked(side, p), subj), true) if p := side[_basic_form(side)]
+
 _walk_member_keys(check, ks) := array.concat(ks, [_fm_mark]) if check.member == true
 
 else := ks
