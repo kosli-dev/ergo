@@ -3350,6 +3350,7 @@ impl For {
                 }
             }
         }
+        in_list_order(&mut said);
         if !said.is_empty() || !text.is_empty() {
             return Some(Clause::item(name, outcome.cause, text, said));
         }
@@ -3557,6 +3558,36 @@ fn unrooted(clause: Clause, roots: &[&str]) -> Option<Clause> {
 
 fn tie_clause(text: String) -> Clause {
     Clause::item(&text.clone(), Cause::Ambiguous, text, Vec::new())
+}
+
+fn in_list_order(said: &mut [Clause]) {
+    let mut lists: Vec<&str> = Vec::new();
+    let mut keyed: Vec<(usize, u64, Clause)> = Vec::new();
+    for clause in said.iter() {
+        if clause.kind != super::clause::Kind::Item {
+            continue;
+        }
+        let (number, list) = clause
+            .name
+            .strip_prefix("item ")
+            .and_then(|rest| rest.split_once(" of "))
+            .and_then(|(number, list)| Some((number.parse::<u64>().ok()?, list)))
+            .unwrap_or((0, clause.name.as_str()));
+        let rank = lists.iter().position(|seen| *seen == list).unwrap_or_else(|| {
+            lists.push(list);
+            lists.len() - 1
+        });
+        keyed.push((rank, number, clause.clone()));
+    }
+    keyed.sort_by_key(|(rank, number, _)| (*rank, *number));
+    let mut sorted = keyed.into_iter().map(|(_, _, clause)| clause);
+    for slot in said.iter_mut() {
+        if slot.kind == super::clause::Kind::Item
+            && let Some(clause) = sorted.next()
+        {
+            *slot = clause;
+        }
+    }
 }
 
 fn merge_clause(said: &mut Vec<Clause>, clause: &Clause) {
