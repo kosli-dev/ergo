@@ -309,7 +309,7 @@ _m_item_name(path, _) := _input_name(_as_subject_part(array.slice(path, k, count
 }
 
 _m_item_name(path, roots) := _m_unreached_or(path, roots) if {
-	count([j | some j, step in path; is_number(step)]) == 0
+	count([j | some j, step in path; _item_step(step)]) == 0
 	not _m_off_item_path(path)
 }
 
@@ -318,13 +318,17 @@ _m_unreached_or(path, roots) := _m_part_name(path) if _m_part_unreached(path)
 else := _failed_name(path, roots)
 
 _m_item_name(path, roots) := concat(": ", array.concat(
-	array.concat([_failed_name(array.slice(path, 0, idx[0] + 1), roots)], [concat("", ["item ", _literal_text(path[idx[k]] + 1), " of ", _m_inner_name(array.slice(path, idx[k - 1] + 1, idx[k]))]) | some k in numbers.range(1, count(idx) - 1)]),
+	array.concat([_failed_name(array.slice(path, 0, idx[0] + 1), roots)], [_m_position_name(path[idx[k]], _m_inner_name(array.slice(path, idx[k - 1] + 1, idx[k]))) | some k in numbers.range(1, count(idx) - 1)]),
 	[_plain_steps_name(tail) | tail := array.slice(path, idx[count(idx) - 1] + 1, count(path)); tail != []],
 )) if {
-	idx := [j | some j, step in path; is_number(step)]
+	idx := [j | some j, step in path; _item_step(step)]
 	count(idx) > 0
 	not _m_off_item_path(path)
 }
+
+_m_position_name(step, list) := concat("", ["member ", _s_key_text(step.member), " of ", list]) if _member_step(step)
+
+else := concat("", ["item ", _literal_text(step + 1), " of ", list])
 
 _m_inner_name([]) := "it"
 
