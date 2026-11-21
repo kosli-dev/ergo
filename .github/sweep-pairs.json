@@ -9536,7 +9536,7 @@
     }
    ]
   },
-  "note": "walk.member: \"`every member of <path>`, `some member of <path>`, and `member of` on a `for` line, walk the path as `every` does\". walk.member.not_an_object: \"A value the path of `member of` ends at that is there but isn't an object, a list, text, a number or true or false, fails as `unusable`, named with the message a check gives where it needs an object, like `statuses is [\\\"DONE\\\"], which isn't an object`\". No root is read, so problems.all_said adds nothing, and the same message on a for line is pinned by spec/cases/members: `evidence is [{\"kind\": \"approval\"}], which isn't an object`. decided from walk.member.not_an_object + for.walk.",
+  "note": "walk.member: \"`every member of <path>`, `some member of <path>`, and `member of` on a `for` line, walk the path as `every` does\". walk.member.not_an_object: \"A value the path of `member of` ends at that is there but isn't an object, a list, text, a number or true or false, fails as `unusable`, named with the message a check gives where it needs an object, like `statuses is [\\\"DONE\\\"], which isn't an object`\". No root is read, so problems.all_said adds nothing, and the same message on a for line is pinned by spec/cases/members: `evidence is [{\"kind\": \"approval\"}], which isn't an object`. derived from walk.member.not_an_object + for.walk.",
   "want": "ms is [\"x\"], which isn't an object"
  },
  {
@@ -9575,8 +9575,8 @@
     }
    ]
   },
-  "note": "walk.member: \"On a `for` line the member is named with the alias's list, like `item 1 of records: member x of r.evidence: e.status is \\\"NO\\\"`. After three members the message ends with `and N more`, as for items.\" message.items: \"After three items, the message ends with `; and N more`, where N counts items\". Bare alias form `d is []` pinned by a for case (`item 1 of deps: d is []`). Five members, three said, 2 more.",
-  "want": "member a of ms: m is 0; member b of ms: m is 0; member c of ms: m is 0; and 2 more"
+  "note": "walk.member: \"On a `for` line the member is named with the alias's list, like `item 1 of records: member x of r.evidence: e.status is \\\"NO\\\"`. After three members the message ends with `and N more`, as for items.\" message.items: \"After three items, the message ends with `; and N more`, where N counts items\". message.alias: \"The alias on its own becomes the item, when it's the only thing a sentence read: `item 1 of commits is null`.\" `m is 1` reads only the alias, so there is no colon and no `m`; the list form is pinned by the spec/cases/messages case `each item is named as the value`. Five members, three said, 2 more.",
+  "want": "member a of ms is 0; member b of ms is 0; member c of ms is 0; and 2 more"
  },
  {
   "name": "member r5/M7 [walk.member] some member, none passing",
@@ -9647,7 +9647,7 @@
     }
    ]
   },
-  "note": "for.roots: \"An alias of an earlier line is named with that line's item in front, like `item 1 of approvers: approver.state is missing`\". walk.member.not_an_object: a list where an object is expected \"fails as `unusable`, named with the message a check gives where it needs an object\". for.walk: \"The second item's path and its `whose` checks can start at the first item's alias\". Naming the value as written, `w.ms`, follows message.items (`item 1 of prs: item 1 of pr.meta.cs`); no case pins this exact form, so it is derived by combining the rules.",
+  "note": "for.second_failures and row.parts give the `item 1 of ws: ` lead (row.parts: `item 2 of ws: w.o is missing`); problems.where_said rules out the same message without the item, because `w.ms` depends on the item. walk.member.not_an_object: a list where an object is expected \"fails as `unusable`, named with the message a check gives where it needs an object\". for.walk: \"The second item's path and its `whose` checks can start at the first item's alias\". Naming the value as written, `w.ms`, follows message.items (`item 1 of prs: item 1 of pr.meta.cs`); no case pins this exact form, so it is derived by combining the rules.",
   "want": "item 1 of ws: w.ms is [1], which isn't an object"
  }
 ]
