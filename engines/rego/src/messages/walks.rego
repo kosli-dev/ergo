@@ -281,7 +281,7 @@ _m_named_fail(f) := _m_is(f.path, f.value) if f.cause == "value"
 
 _m_named_fail(f) := concat("", [f.path, " is ", _m_state_word(f.cause)]) if f.cause in _no_value_states
 
-_m_named_fail(f) := _m_isnt(f.path, f.value, _m_walk_kind(f.value)) if f.cause == "unusable"
+_m_named_fail(f) := _m_isnt(f.path, f.value, object.get(f, "wants", _m_walk_kind(f.value))) if f.cause == "unusable"
 
 _m_named_fail(f) := _m_isnt(f.path, f.value, "an object") if f.cause == "not_an_object"
 
