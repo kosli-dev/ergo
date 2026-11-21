@@ -199,6 +199,19 @@ out=$(run "$(printf '```\n7 Rust case reports changed\n```\n')" "$dir/reports-ch
 expect_not_in "MISMATCH" "$out"
 expect_in "NOTE: no number in the body was checked" "$out"
 
+echo "body-facts.sh says number when it checked one"
+out=$(run "1 Rust case report changed." "$dir/reports-one-known.md" "$dir/pairs-one.md")
+expect_in "Checked 1 number in the body" "$out"
+expect_not_in "1 numbers" "$out"
+
+echo "body-facts.sh checks every sentence when two are on one line"
+fails_with "6 Rust case reports changed, and 9 Rust case reports changed." "$dir/reports-changed.md" "$dir/pairs-same.md"
+expect_in "the body says 9 case reports changed" "$out"
+out=$(run "6 Rust case reports changed, and 6 case reports changed." "$dir/reports-changed.md" "$dir/pairs-same.md")
+expect_in "Checked 2 numbers" "$out"
+fails_with "Rust output changed on 3 pairs, and Rust output changed on 4 pairs." "$dir/reports-same.md" "$dir/pairs-changed.md"
+expect_in "the body says Rust output changed on 4 pairs" "$out"
+
 echo "body-facts.sh fails with usage on the wrong arguments"
 if sh "$script" one > /dev/null 2>&1; then
   echo "body-facts.sh should fail with one argument" >&2
