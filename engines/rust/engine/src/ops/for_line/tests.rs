@@ -2341,11 +2341,6 @@ fn a_sentence_says_an_item_once_when_two_of_its_whose_clauses_cant_read_it() {
 
 fn for_line_cases() -> Vec<(String, Value, Value, Value)> {
     let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("..");
-    let known: Vec<String> = std::fs::read_to_string(root.join("known-failures.txt"))
-        .unwrap()
-        .lines()
-        .map(str::to_string)
-        .collect();
     let mut topics: Vec<std::path::PathBuf> = std::fs::read_dir(root.join("../../spec/cases"))
         .unwrap()
         .map(|entry| entry.unwrap().path())
@@ -2369,9 +2364,6 @@ fn for_line_cases() -> Vec<(String, Value, Value, Value)> {
                     group["description"].as_str().unwrap(),
                     case["description"].as_str().unwrap()
                 );
-                if known.contains(&id) {
-                    continue;
-                }
                 let params = group.get("params").cloned().unwrap_or_else(|| json!({}));
                 out.push((id, case["input"].clone(), group["policy"].clone(), params));
             }
@@ -2392,17 +2384,89 @@ const ITEMS_BY_SENTENCE: &str = "the case says item 2 before item 1, which spec/
 
 const PAIR_LEAD_INSIDE: &str = "the case says the pair's lead after a sentence that doesn't read the second item, which spec/OPEN.md lists under message.join, and no R5 step changes it until that line is decided";
 
-const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 20] = [
+const WHOSE_ROOT: &str = "an item the line's whose can't decide says the whose's root again in its own clause, until R5-5 gives it only its own read through walk::item_own";
+
+const TREE_IS_THE_CASE: &str = "the tree says what the case says and Rust's row doesn't, until R5-6 builds the row from the tree";
+
+const SORT_KEY: &str = "a key that sorts the line's list isn't a root clause, so each item says it, and no step of the R5 design makes it one";
+
+const SENTENCE_KEY: &str = "a sentence's path named by a key that can't be read says the path again under each item, as m named by p is missing, and no step of the R5 design leaves it out";
+
+const CAPPED_ROOT: &str = "an item says the capped list of a name read outside the item, with its and N more, as a clause of its own, so the tree counts one more item, and no step of the R5 design takes it out";
+
+const WALKED_ROOT_UNDER_ITEM: &str = "a name read outside the item by a sentence that walks a list under the item, like pos.name in every m.ys.v is in pos.name, isn't a root clause, so the item says it, and no step of the R5 design makes it one";
+
+const FREE_JOIN: &str = "the row joins two sentences that read no alias with , and and the tree with ; and no step of the R5 design says which one is right";
+
+const NESTED_PAIR: &str = "a walk under the first item over the list the second item walks puts the second list's item under the walk's item, and no step of the R5 design keeps them apart";
+
+const WALK_ITEMS_JOINED: &str = "the row joins two items of a list walked under a walked item with , and and the tree gives each its own part, and no step of the R5 design says which one is right";
+
+const DUPLICATE_CLAUSE: &str = "the tree says again, under the item, a clause an earlier sentence of the item gave, and no step of the R5 design leaves it out";
+
+const FREE_BEFORE_KEY: &str = "the tree says a sentence that reads no alias before the key of the line's whose, where the case says the key first, and no step of the R5 design moves it";
+
+const ENTRY_CAUSE: &str = "the tree gives an item the cause the case gives its entry and Rust's entry doesn't, until R5-7 builds the entries from the clauses";
+
+const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 109] = [
+    (
+        "compare / a for line whose sentence can't be read in different ways, with a named by key from $input, the key is null / the key is null",
+        SENTENCE_KEY,
+    ),
     (
         "distinct / distinct under a for line that is written wrong for another reason, part 4 of 4 / each check lists only its own problems, and none is about distinct",
         KEY_FROM_A_FIELD,
+    ),
+    (
+        "for / a $params list that a for line reads fails it when the line's whose leaves nothing and an item of the list can't be read / fails, when the whose leaves nothing",
+        SAID_OUTSIDE,
+    ),
+    (
+        "for / a $params list that a for line walks fails it on an empty list when an item of it can't be read / fails, with an empty rows, when an item of it has no name",
+        SAID_OUTSIDE,
+    ),
+    (
+        "for / a $params list that a for line walks fails it on an empty list when an item of it is null / fails, with an empty rows",
+        SAID_OUTSIDE,
+    ),
+    (
+        "for / a count or sum of a name read from outside the item on a for line says how many more of its items can't be read / 5 items without the name",
+        CAPPED_ROOT,
+    ),
+    (
+        "for / a count or sum of a name read from outside the item on a for line says how many more of its items can't be read / 5 items without the name, and items of the line without their own",
+        CAPPED_ROOT,
+    ),
+    (
+        "for / a count or sum of a name read from outside the item on a for line says how many more of its items can't be read / 7 items without the name",
+        CAPPED_ROOT,
+    ),
+    (
+        "for / a failed sentence on a for line lists its inputs in the order of its kind / a walk lists what starts at an alias first, both in name order, and a comparison or a count lists its left side and then its right side",
+        FREE_JOIN,
     ),
     (
         "for / a for line runs the sentences that don't read the alias of an empty list it tolerates on an item that isn't an object only when one of them reads the item / fails an approver that isn't an object with the sentence that reads it, and passes it when every sentence reads commit",
         ITEMS_BY_SENTENCE,
     ),
     (
+        "for / a for line runs the sentences that don't read the alias of an empty list it tolerates, for each item of the list before it / fails each approver that didn't approve when there are no commits, and skips the sentences that read commit",
+        ITEMS_BY_SENTENCE,
+    ),
+    (
+        "for / a for line sorted by a key from $params that is missing says the key once and gives an item an entry only for its own problem / an item whose m is a list and an item without m",
+        SORT_KEY,
+    ),
+    (
+        "for / a for line sorted by a path named by a key from $params / a key that isn't a string fails as unusable, even on a list where a number could be a position, a null key as null and a missing one as absent, and a string key sorts by that field",
+        SORT_KEY,
+    ),
+    (
         "for / a for line that starts with some fails when the only items that pass have an alias the sentence can't read, even when nothing comes after them to check / fails when the only approver has no u for the sentence to read, even though there are no commits",
+        EARLIER_ALIAS,
+    ),
+    (
+        "for / a for line that starts with some passes when one of its items passes, whatever item comes after it / fails when the approver who approved has an empty list of commits to go with it",
         EARLIER_ALIAS,
     ),
     (
@@ -2410,12 +2474,80 @@ const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 20] = [
         EARLIER_ALIAS,
     ),
     (
+        "for / a for line's own whose lists a list it walks, as a check without a for line does / an item without the name is listed as null",
+        WHOSE_ROOT,
+    ),
+    (
         "for / a for line's sentence whose root reads the first item's alias, on the second item / fails when the second list is empty too",
         EARLIER_ALIAS,
     ),
     (
+        "for / a name read from outside the item and walked on a for line is said once, before what each item says on its own / an item without the name it reads is named after the root, without the root",
+        WHOSE_ROOT,
+    ),
+    (
+        "for / a name read from outside the item and walked on a for line is said once, before what each item says on its own / with more than three items without the name, the name's own list says how many more once",
+        WHOSE_ROOT,
+    ),
+    (
+        "for / a name read from outside the item and walked on the right of is in on a for line is said once, with no item / a list of names of more than one kind fails as unusable and is said once",
+        WHOSE_ROOT,
+    ),
+    (
+        "for / a name read from outside the item and walked on the right of is in on a for line is said once, with no item / an item whose name is null fails as null and is said once",
+        WHOSE_ROOT,
+    ),
+    (
+        "for / a name read from outside the item and walked on the right of is in on a for line is said once, with no item / an item without the name fails as absent and is said once",
+        WHOSE_ROOT,
+    ),
+    (
+        "for / a name read from outside the item and walked on the right of is in on a for line is said once, with no item / items that aren't objects fail as unusable and are said once",
+        WALKED_ROOT_UNDER_ITEM,
+    ),
+    (
+        "for / a parent's part that a for line's sentence walks fails it on an empty list when an item of it can't be read / fails, with an empty rows, when an item of it has no name",
+        SAID_OUTSIDE,
+    ),
+    (
+        "for / a parent's part that a for line's sentence walks fails it on an empty list when an item of it can't be read / fails, with an empty rows, when an item of it is null",
+        SAID_OUTSIDE,
+    ),
+    (
+        "for / a parent's part that a for line's sentence walks fails it on an empty list when an item of it can't be read / fails, with an empty rows, when it holds names of more than one kind",
+        SAID_OUTSIDE,
+    ),
+    (
         "for / a part that a for line reads fails it when the line's whose leaves nothing and an item of the part can't be read / fails, when the whose leaves nothing, when an item of it has no name",
         SAID_OUTSIDE,
+    ),
+    (
+        "for / a part that a for line walks as a list fails it on an empty list when an item of it can't be read / fails, with an empty rows, when an item of it has no name",
+        SAID_OUTSIDE,
+    ),
+    (
+        "for / a part that a for line walks as a list fails it on an empty list when an item of it can't be read / fails, with an empty rows, when an item of it is null",
+        SAID_OUTSIDE,
+    ),
+    (
+        "for / a part that a for line walks as a list fails it on an empty list when an item of it can't be read / fails, with an empty rows, when it holds names of more than one kind",
+        SAID_OUTSIDE,
+    ),
+    (
+        "for / a part that holds a list is walked in the whose of a for line and in a whose under it / an empty part leaves every item out",
+        NO_LIST,
+    ),
+    (
+        "for / a part that holds a list is walked on the right of is in on a for line / an item without the name fails as absent and names the item",
+        WALKED_ROOT_UNDER_ITEM,
+    ),
+    (
+        "for / a root in a for line's relative clause doesn't hide an item's own problem / names the root once, then the item's own problem",
+        WHOSE_ROOT,
+    ),
+    (
+        "for / a root in one of two relative clauses, in either order / gives the same report in either order, the root first, then the item's own problem",
+        WHOSE_ROOT,
     ),
     (
         "for / a second for item picking after the first alias lists nothing when it picks nothing / a first item that matches nothing fails as absent and lists no failed item",
@@ -2430,6 +2562,10 @@ const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 20] = [
         NO_LIST,
     ),
     (
+        "for / a whose that reads a $params list that isn't a list / fails as unusable, whatever the items hold, and lists the items it couldn't decide",
+        WHOSE_ROOT,
+    ),
+    (
         "for / an alias of an earlier line that walks a list fails a second line on an empty list when an item of it can't be read / fails, with an empty rows, when an item of it has no name",
         EARLIER_ALIAS,
     ),
@@ -2440,6 +2576,46 @@ const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 20] = [
     (
         "for / an alias of an earlier line that walks a list fails a second line on an empty list when an item of it can't be read / fails, with an empty rows, when it holds names of more than one kind",
         EARLIER_ALIAS,
+    ),
+    (
+        "for / an alias that a pick on an empty list leaves without a value, read on a later line / names the alias as the policy writes it, with no $",
+        EARLIER_ALIAS,
+    ),
+    (
+        "for / an item's own problem on a for line is said after a $params or $input root of its whose that can't be read / an item without v, with $input.os that is text",
+        WHOSE_ROOT,
+    ),
+    (
+        "for / an item's own problem on a for line is said after a $params or $input root of its whose that can't be read / an item without v, with an item of the list without the name",
+        WHOSE_ROOT,
+    ),
+    (
+        "for / an item's own problem on a for line is said after a parent's root of its whose that can't be read / an item without v, with an item of the parent list without the name",
+        WHOSE_ROOT,
+    ),
+    (
+        "for / an item's own problem on a for line is said after a root of its whose that can't be read, even when it fails no worse than the root / an item that is null, with an item of the part without the name",
+        WHOSE_ROOT,
+    ),
+    (
+        "for / an item's own problem on a for line is said after a root of its whose that can't be read, even when it fails no worse than the root / an item without v, with an item of the part without the name",
+        WHOSE_ROOT,
+    ),
+    (
+        "for / an item's own problem on a for line is said after a root of its whose that can't be read, even when it fails no worse than the root / an item without v, with names of more than one kind",
+        WHOSE_ROOT,
+    ),
+    (
+        "for / and N more counts each problem of a part of a subject that is a list once / four items that aren't objects are three shown and one more",
+        CAPPED_ROOT,
+    ),
+    (
+        "for / first of and last of an empty second for list whose whose reads params that are an object, not a list, say the params, then the empty list / ys is empty",
+        NO_LIST,
+    ),
+    (
+        "for / first of and last of an empty second for list whose whose reads params that are text, not a list, say the params, then the empty list / ys is empty",
+        NO_LIST,
     ),
     (
         "for / the latest commit picked on a for line / fails as absent on an empty list, since there's nothing to pick",
@@ -2462,6 +2638,46 @@ const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 20] = [
         NO_LIST,
     ),
     (
+        "list_items / a missing $params name and a walked part in one whose are each named, with the $params name first only in a count / an item of the part has no name",
+        WHOSE_ROOT,
+    ),
+    (
+        "list_items / a missing $params name and a walked part in one whose are each named, with the $params name first only in a count / the part holds more than one kind of value",
+        WHOSE_ROOT,
+    ),
+    (
+        "list_items / two names read from outside the item in a whose, one with an item without the name, are each named once, worst cause first and then by name / an item of the part has no name too",
+        WHOSE_ROOT,
+    ),
+    (
+        "list_items / two names read from outside the item in a whose, one with an item without the name, are each named once, worst cause first and then by name / the part holds more than one kind of value",
+        WHOSE_ROOT,
+    ),
+    (
+        "messages / a clause that an earlier sentence of the row already gave / is left out of the row's message and of the option's, and each sentence keeps its whole message",
+        DUPLICATE_CLAUSE,
+    ),
+    (
+        "messages / a count of in a for line, and the order of its roots / names the $params root first and each root once",
+        TREE_IS_THE_CASE,
+    ),
+    (
+        "messages / a for item with a whose that reads a part over items that aren't all objects / names the part first, once, then each item in turn",
+        ENTRY_CAUSE,
+    ),
+    (
+        "messages / a for line over a list of lists whose values spell the alias / a list that holds the alias in its items is printed as the input had it",
+        WALK_ITEMS_JOINED,
+    ),
+    (
+        "messages / a for line over two lists, with a sentence on the second item before a walk under the first / the parts follow the items, not the sentences",
+        NESTED_PAIR,
+    ),
+    (
+        "messages / a for line over two lists, with a walk under the first item before a sentence on the second / the parts follow the items, not the sentences",
+        NESTED_PAIR,
+    ),
+    (
         "messages / a for line that picks nothing prints the list it read / a whose that leaves no item prints the list",
         NO_LIST,
     ),
@@ -2470,14 +2686,170 @@ const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 20] = [
         NO_LIST,
     ),
     (
+        "messages / a parent's part read in a that on a for line / names a part of the wrong type once, before what each item says",
+        WHOSE_ROOT,
+    ),
+    (
+        "messages / a parent's part read in a whose, on a for line and in a count of / names a part of the wrong type once with no item",
+        WHOSE_ROOT,
+    ),
+    (
+        "messages / a root name after is in inside a relative clause that isn't a list, on a list with items / names the root once, with no item, on a for line too",
+        WHOSE_ROOT,
+    ),
+    (
+        "messages / a root of a for line and a root that reads the alias in one message / names the root first, then the alias root of each first item",
+        EARLIER_ALIAS,
+    ),
+    (
+        "messages / a root of a for line, said once / names the root once, with no item, whatever the list holds",
+        WHOSE_ROOT,
+    ),
+    (
+        "messages / a root that reads the alias of the first item of a for line, in the second item / fails before any item of the second list, naming each first item, on an empty list too",
+        EARLIER_ALIAS,
+    ),
+    (
+        "messages / a whose that leaves no item of a part prints the part's list / the part's list is printed",
+        NO_LIST,
+    ),
+    (
+        "messages / two roots after is in that aren't lists, in one relative clause / names both, worst cause first and then by name, on a list with items",
+        WHOSE_ROOT,
+    ),
+    (
+        "messages / two roots in a whose that fail in different ways, beside a list that can be read, take the worst cause / a root that is null and one that is missing fail as absent",
+        TREE_IS_THE_CASE,
+    ),
+    (
+        "messages / two roots in one relative clause that fail in different ways / names every root that failed, whatever its cause, worst cause first and then by name",
+        TREE_IS_THE_CASE,
+    ),
+    (
+        "messages / two roots in one relative clause that fail in different ways / names them in front of what the items say when an item fails in a worse way",
+        TREE_IS_THE_CASE,
+    ),
+    (
+        "row_parts / a count of and a sum of on a for line name the items they can't read under the item of the for line / items named through the alias, an inner list that is missing, a sentence that doesn't read the alias, and a second list",
+        TREE_IS_THE_CASE,
+    ),
+    (
+        "row_parts / two sentences on a for line that walk the same list under the item say its items in list order, and a check with several sentences keeps their order / two sentences that walk the same inner list say its items in list order on a for line, and in the order of the sentences outside one",
+        TREE_IS_THE_CASE,
+    ),
+    (
+        "sentences / a for alias that holds anything but a string, after named by / fails as null when it holds null and as unusable otherwise, in an assertion, in a second item and in a one-line every or some, a number never read as a position, and the failed item shows what it held",
+        SENTENCE_KEY,
+    ),
+    (
+        "sentences / a for line item that reads a null before a named by field / fails as null whatever the field holds, and failed_items names the null, as the item does without the field, whether it reads the first alias or not",
+        NO_LIST,
+    ),
+    (
+        "sentences / a for line that walks a path with a named by field / fails as the field says when it's missing, null or not a string, and lists the field",
+        KEY_FROM_A_FIELD,
+    ),
+    (
         "sentences / a for line that walks a path with a named by field / that is null fails as null whatever the field holds, as the walk does without the field",
         NO_LIST,
     ),
+    (
+        "sentences / a for line whose check reads a path with named by a field of the subject / lists the whole path and the field among the row's inputs, sorted by name, and after the path in each failed assertion",
+        SENTENCE_KEY,
+    ),
+    (
+        "sentences / a named by key from the subject after a parent or an alias, inside a relative clause / fails as absent once when the subject has no k",
+        TREE_IS_THE_CASE,
+    ),
+    (
+        "sentences / a root name of the wrong type on the left of a compare inside a relative clause / says its problem once, with no item named, as on the right, even on an empty list",
+        WHOSE_ROOT,
+    ),
+    (
+        "sentences / the path before a named by field that can't be read, in a count, a sum, a plus, an elapsed time, a some and a for line / ends unusable when the path goes through a string, whatever the field holds",
+        SENTENCE_KEY,
+    ),
+    (
+        "walks / a for line whose whose reads a named by key from $params that isn't text says only the items whose own value can't take the key, the last one fine / an item without m before an item whose m is an object",
+        WHOSE_ROOT,
+    ),
+    (
+        "walks / a one-line walk whose whose reads a named by key from $params that isn't text says the key once, with no item in front / two items whose m is an object get no entry",
+        WHOSE_ROOT,
+    ),
+    (
+        "walks / a one-line walk whose whose reads a named by key from $params that isn't text says the key once, with no item in front / two items without m",
+        WHOSE_ROOT,
+    ),
+    (
+        "walks / a path whose named by key from $params isn't text and whose value before the key can't take a key, in a plain check, a count, a sum, an every, a for line and a for line's whose / says the key and then the value before it that is missing, with the worst cause",
+        WHOSE_ROOT,
+    ),
+    (
+        "walks / a path whose named by key from $params isn't text and whose value before the key can't take a key, in a plain check, a count, a sum, an every, a for line and a for line's whose / says the key and then the value before it that is null, with the worst cause",
+        WHOSE_ROOT,
+    ),
+    (
+        "walks / a path whose named by key from $params isn't text and whose value before the key can't take a key, in a plain check, a count, a sum, an every, a for line and a for line's whose / says the key and then the value before it that is text, with the worst cause",
+        WHOSE_ROOT,
+    ),
+    (
+        "walks / a whose key from $params that isn't text is said before a list that can't be walked, and the row takes the worst cause / the list is missing",
+        TREE_IS_THE_CASE,
+    ),
+    (
+        "walks / a whose key from $params that isn't text is said before a list that can't be walked, and the row takes the worst cause / the list is null",
+        TREE_IS_THE_CASE,
+    ),
+    (
+        "walks / a whose key from $params that isn't text, beside items that fail on their own fields, says the key in each item / five mixed items say the key in each item and the item that isn't an object",
+        WHOSE_ROOT,
+    ),
+    (
+        "walks / a whose key from $params that isn't text, beside items that fail on their own fields, says the key in each item / two items without zz or m say the key in each item",
+        WHOSE_ROOT,
+    ),
+    (
+        "walks / a whose key from $params that isn't text, in a walk beside another sentence or option, a for line beside a sentence that doesn't read the alias, and a count of that, is said wherever the walk is said / the list holds an item the whose leaves out",
+        WHOSE_ROOT,
+    ),
+    (
+        "walks / a whose key from $params that isn't text, in a walk beside another sentence or option, a for line beside a sentence that doesn't read the alias, and a count of that, is said wherever the walk is said / the list holds text",
+        WHOSE_ROOT,
+    ),
+    (
+        "walks / a whose key from $params that isn't text, in a walk beside another sentence or option, a for line beside a sentence that doesn't read the alias, and a count of that, is said wherever the walk is said / the list is missing",
+        FREE_BEFORE_KEY,
+    ),
+    (
+        "walks / a whose key from $params that isn't text, said once before the items, doesn't count as one of the three items the message shows / five items without m show three and count two more",
+        WHOSE_ROOT,
+    ),
+    (
+        "walks / a whose key from $params that isn't text, said once before the items, doesn't count as one of the three items the message shows / four items without m show three and count one more",
+        WHOSE_ROOT,
+    ),
+    (
+        "walks / a whose key from $params that isn't text, said once before the items, doesn't count as one of the three items the message shows / three items without m show all three",
+        WHOSE_ROOT,
+    ),
+    (
+        "walks / an every, a some, a for item or a count whose whose reads two named by keys on an empty list fails with the worse cause, and names each key that can't be read, worst cause first / neither key is text",
+        TREE_IS_THE_CASE,
+    ),
+    (
+        "walks / an every, a some, a for item or a count whose whose reads two named by keys on an empty list fails with the worse cause, and names each key that can't be read, worst cause first / one key is missing and the other isn't text",
+        TREE_IS_THE_CASE,
+    ),
+    (
+        "walks / an every, a some, a for item or a count whose whose reads two named by keys on an empty list fails with the worse cause, and names each key that can't be read, worst cause first / one key is null and the other isn't text",
+        TREE_IS_THE_CASE,
+    ),
 ];
 
-const ROWS_COMPARED: usize = 670;
+const ROWS_COMPARED: usize = 1411;
 
-const ROWS_LISTED: usize = 30;
+const ROWS_LISTED: usize = 171;
 
 fn item_entries(failures: &Value, out: &mut Vec<(String, String)>) {
     for failure in failures.as_array().into_iter().flatten() {
