@@ -501,6 +501,15 @@ _unusable(leaf, x) if {
 	not _fits_list(l, r)
 }
 
+_unusable(leaf, x) if {
+	leaf.ignoring
+	_list_cmp(leaf)
+	leaf.cmp in _membership_ops
+	l := _found(x, leaf.left)
+	l != null
+	not is_string(l)
+}
+
 _fits_list(v, vals) if {
 	every w in vals {
 		_fits(v, w)
