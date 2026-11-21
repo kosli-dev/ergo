@@ -69,3 +69,13 @@ test_is_in_ignoring_case_compares_with_a_list_from_the_input_once_both_sides_are
 	ergo._leaf_cause(ref, {"x": "BUG"}) == "satisfied" with data.ergo_params as {"l": ["bug"]}
 	ergo._leaf_cause(ref, {"x": 3}) == "unusable" with data.ergo_params as {"l": ["bug"]}
 }
+
+test_is_in_ignoring_case_with_a_list_walked_from_the_input_fails_with_the_worst_cause_of_its_reads_and_its_values if {
+	ref := {"op": "in", "path": ["x"], "values": {"ref": ["$$input[]", "cs", "name"]}, "ignoring": "case"}
+	ergo._leaf_cause(ref, {"x": "a"}) == "unusable" with data.ergo_document as {"cs": [{"name": null}, {"name": "a"}, {"name": true}]}
+	ergo._leaf_cause(ref, {"x": "a"}) == "unusable" with data.ergo_document as {"cs": [{"name": "a"}, {"name": 3}]}
+	ergo._leaf_cause(ref, {"x": "a"}) == "unusable" with data.ergo_document as {"cs": [{}, {"name": 3}]}
+	ergo._leaf_cause(ref, {"x": "a"}) == "null" with data.ergo_document as {"cs": [{"name": null}]}
+	ergo._leaf_cause(ref, {"x": "a"}) == "absent" with data.ergo_document as {"cs": [{"name": "a"}, {}]}
+	ergo._leaf_cause(ref, {"x": "A"}) == "satisfied" with data.ergo_document as {"cs": [{"name": "a"}]}
+}

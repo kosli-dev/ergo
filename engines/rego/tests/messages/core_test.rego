@@ -68,3 +68,10 @@ test_a_list_after_is_in_ignoring_case_names_each_item_that_isnt_text_in_list_ord
 	ergo._message(object.union(ref, {"ergo/row": true}), {}, "null") == "x is missing, and item 1 of $params.l is null" with data.ergo_params as {"l": [null]}
 	ergo._message(ref, {"x": "a"}, "unusable") == `$params.l is "s", which isn't a list` with data.ergo_params as {"l": "s"}
 }
+
+test_a_list_walked_from_the_input_after_is_in_ignoring_case_names_each_item_it_cant_use_as_the_walk_names_it if {
+	ref := {"op": "in", "path": ["x"], "values": {"ref": ["$$input[]", "cs", "name"]}, "ignoring": "case"}
+	ergo._message(ref, {"x": "a"}, "unusable") == "item 1 of $input.cs: name is null; item 3 of $input.cs: name is true, which isn't text" with data.ergo_document as {"cs": [{"name": null}, {"name": "a"}, {"name": true}]}
+	ergo._message(ref, {"x": "a"}, "unusable") == "item 2 of $input.cs: name is 3, which isn't text" with data.ergo_document as {"cs": [{"name": "a"}, {"name": 3}]}
+	ergo._message(ref, {"x": "a"}, "unusable") == "item 1 of $input.cs: name is missing; item 2 of $input.cs: name is 3, which isn't text" with data.ergo_document as {"cs": [{}, {"name": 3}]}
+}
