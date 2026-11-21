@@ -183,6 +183,9 @@ impl Walked<'_> {
     }
 
     pub fn name_of(&self, segs: &[Seg], unaliased: bool) -> String {
+        if let Some((Seg::Member(key), before)) = segs.split_last() {
+            return member::named(key, &self.name_of(before, unaliased));
+        }
         self.name_of_steps(segs.iter().map(Seg::to_step).collect(), unaliased)
     }
 

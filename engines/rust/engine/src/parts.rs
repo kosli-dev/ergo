@@ -394,11 +394,15 @@ fn level_bits(path: &str) -> Option<(Vec<u64>, Vec<String>)> {
 
 fn levels_of(entry: Failure, input: &Value) -> Leveled {
     let name = entry.part().name.clone();
-    let (lead, path) = match name
-        .strip_prefix("item ")
-        .and_then(|rest| rest.split_once(" of "))
-    {
-        Some((position, path)) => (Some(position.to_string()), path.to_string()),
+    let lead_of = match member_of(&name) {
+        Some((key, list)) => Some((format!("member {key}"), list.to_string())),
+        None => name
+            .strip_prefix("item ")
+            .and_then(|rest| rest.split_once(" of "))
+            .map(|(position, path)| (format!("item {position}"), path.to_string())),
+    };
+    let (lead, path) = match lead_of {
+        Some((lead, path)) => (Some(lead), path),
         None => (None, name.clone()),
     };
     let Some((idx, fields)) = level_bits(&path).filter(|(idx, _)| !idx.is_empty() && idx.len() < 4)
@@ -413,7 +417,7 @@ fn levels_of(entry: Failure, input: &Value) -> Leveled {
         .map(|j| format!("item {} of {}", idx[j] + 1, level_field(&fields[j])))
         .collect();
     let leaf = match &lead {
-        Some(position) => format!("item {position} of {}", level_field(&fields[m])),
+        Some(lead) => format!("{lead} of {}", level_field(&fields[m])),
         None => fields[m].clone(),
     };
     names.push(leaf.clone());
