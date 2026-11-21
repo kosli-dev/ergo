@@ -390,8 +390,9 @@ jobs:
       - name: Write the report counts in the job summary, warn when the body lacks Changes the report, and fail when a number in the body differs from them
         env:
           BODY_FACTS_BODY: ${{ github.event.pull_request.body }}
+        shell: bash
         run: |
-          .github/body-facts.sh "$RUNNER_TEMP/pr-facts.md" "$RUNNER_TEMP/pairs-facts.md" | tee -a "$GITHUB_STEP_SUMMARY"
+          .github/body-facts.sh "$RUNNER_TEMP/pr-facts.md" "$RUNNER_TEMP/pairs-facts.md" 2>&1 | tee -a "$GITHUB_STEP_SUMMARY"
 
   red-check:
     if: github.event_name == 'pull_request'
