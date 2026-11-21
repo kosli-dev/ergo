@@ -312,3 +312,35 @@ if sh "$script" use.md > out.txt 2>&1; then
   echo "docs-run.sh should fail on an unknown use, and passed" >&2
   exit 1
 fi
+
+echo "docs-run.sh prints the release note when a use=release group fails"
+if DOCS_RUN_RELEASE_NOTE="note about the release" DOCS_RUN_RELEASE_ERGO_REGO="$dir/release-ergo.rego" sh "$script" release-bad.md > out.txt 2>&1; then
+  echo "docs-run.sh should fail on a release mismatch, and passed" >&2
+  exit 1
+fi
+grep -qF 'note about the release' out.txt || {
+  echo "docs-run.sh should print the release note on a release failure, and said: $(cat out.txt)" >&2
+  exit 1
+}
+
+echo "docs-run.sh leaves the release note out when a group that is not use=release fails"
+sed 's|use=release||' release-bad.md > plain-bad.md
+if DOCS_RUN_RELEASE_NOTE="note about the release" sh "$script" plain-bad.md > out.txt 2>&1; then
+  echo "docs-run.sh should fail on a mismatch, and passed" >&2
+  exit 1
+fi
+if grep -qF 'note about the release' out.txt; then
+  echo "docs-run.sh should not print the release note for a group that is not use=release" >&2
+  exit 1
+fi
+
+echo "docs-run.sh says a run attribute cannot contain a backtick"
+inline_group "" | sed 's|run=`opa eval policy.yaml`|run=`echo `date``|' > tick.md
+if sh "$script" tick.md > out.txt 2>&1; then
+  echo "docs-run.sh should fail on a backtick in run=, and passed" >&2
+  exit 1
+fi
+grep -qF 'run= cannot contain a backtick' out.txt || {
+  echo "docs-run.sh should say run= cannot contain a backtick, and said: $(cat out.txt)" >&2
+  exit 1
+}
