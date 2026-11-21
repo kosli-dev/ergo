@@ -108,6 +108,12 @@ _m_for_root_text(subj, c, p, st) := f.msg if {
 	f := _tally_root_fault(subj, c, p)
 } else := _m_isnt(_root_label(p), _root_value(subj, p), k) if k := _root_kind(subj, c, p)
 
+else := _m_text_items(_root_label(p), v) if {
+	_text_list_root(c, p)
+	v := _root_value(subj, p)
+	_text_items_state(v) == st
+}
+
 else := _message({"op": "present", "path": _as_subject_part(p)}, subj, st)
 
 _root_reads(c) := {x |
@@ -197,6 +203,9 @@ _root_state(subj, c, p, lists) := "not_an_object" if {
 	f := _tally_root_fault(subj, c, p)
 } else := "unusable" if {
 	_root_kind(subj, c, p)
+} else := "null" if {
+	_text_list_root(c, p)
+	_text_items_state(_root_value(subj, p)) == "null"
 } else := _any_read_state(subj, _as_subject_part(p)) if {
 	object.get(c, "ergo/for", false) == true
 	not _builtin(p)
@@ -205,8 +214,11 @@ _root_state(subj, c, p, lists) := "not_an_object" if {
 	_has_field_step(p)
 } else := _root_list_state(subj, p, lists)
 
-_root_kind(subj, c, p) := "text" if {
+_root_kind(subj, c, p) := _m_text_list_kind(_root_value(subj, p)) if {
+	_text_list_root(c, p)
+} else := "text" if {
 	c.ignoring
+	not _text_list_root(c, p)
 	_side_root(c, p)
 	not is_string(_root_value(subj, p))
 } else := _m_right_kind(cmp, v) if {
@@ -304,6 +316,20 @@ _key_conds(check, r) := array.concat(object.get(check, "whose", []), [x | x := o
 } else := [c | some item in object.get(check, "items", []); some c in object.get(item, "whose", [])] if {
 	not "empty" in object.keys(r)
 } else := []
+
+_text_list_root(c, p) if {
+	c.ignoring
+	c.op in _membership_ops
+	c.values == {"ref": p}
+	not _ref_walks(p)
+}
+
+_text_list_root(c, p) if {
+	c.ignoring
+	_list_cmp(c)
+	c.cmp in _membership_ops
+	_rpath(c.right) == p
+}
 
 _side_root(c, p) if c.right == p
 
