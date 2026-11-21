@@ -304,3 +304,18 @@ test_two_clauses_for_one_item_count_as_one_item_in_the_cap if {
 		"and 1 more",
 	])
 }
+
+test_roots_and_lists_with_the_same_text_are_said_once_whatever_their_names if {
+	ergo._m_clauses_shown([
+		_clause_root("$input.os.name", "absent", "item 2 of $input.os: name is missing"),
+		ergo._m_clause("list", "es", "absent", "es is missing"),
+		_clause_root("$input.os", "absent", "item 2 of $input.os: name is missing"),
+		_clause_missing("es"),
+		ergo._m_clause("list", "ws", "value", "ws is []"),
+		ergo._m_clause("list", "x.ws", "value", "ws is []"),
+	]) == [
+		_clause_root("$input.os", "absent", "item 2 of $input.os: name is missing"),
+		_clause_missing("es"),
+		ergo._m_clause("list", "ws", "value", "ws is []"),
+	]
+}
