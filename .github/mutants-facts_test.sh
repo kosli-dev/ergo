@@ -1,0 +1,84 @@
+#!/bin/sh
+set -eu
+script=$(cd "$(dirname "$0")" && pwd)/mutants-facts.sh
+dir=$(mktemp -d)
+trap 'rm -rf "$dir"' EXIT
+
+repo=$dir/repo
+mkdir -p "$repo/.github" "$repo/engines/rust/engine/src" "$repo/engines/rust/engine/tests"
+cp "$script" "$repo/.github/mutants-facts.sh"
+git -C "$repo" init --quiet
+git -C "$repo" config user.email t@example.com
+git -C "$repo" config user.name t
+printf 'fn a() {}\n' > "$repo/engines/rust/engine/src/lib.rs"
+printf 'fn t() {}\n' > "$repo/engines/rust/engine/tests/it.rs"
+printf 'fn u() {}\n' > "$repo/engines/rust/engine/src/tests.rs"
+git -C "$repo" add .
+git -C "$repo" commit --quiet -m base
+git -C "$repo" tag base
+
+mkdir "$dir/bin"
+cat > "$dir/bin/cargo" <<'SH'
+#!/bin/sh
+echo "$@" > "$FAKE_ARGS"
+while [ $# -gt 0 ]; do
+  case $1 in
+    --output) out=$2; shift ;;
+    --in-diff) cp "$2" "$FAKE_DIFF"; shift ;;
+  esac
+  shift
+done
+mkdir -p "$out/mutants.out"
+printf 'a.rs:1:1: caught one\na.rs:2:1: caught two\n' > "$out/mutants.out/caught.txt"
+printf 'engine/src/lib.rs:7:5: replace a with ()\n' > "$out/mutants.out/missed.txt"
+printf 'a.rs:3:1: slow\n' > "$out/mutants.out/timeout.txt"
+printf 'a.rs:4:1: no build\na.rs:5:1: no build\n' > "$out/mutants.out/unviable.txt"
+if [ -n "${FAKE_SLEEP:-}" ]; then sleep "$FAKE_SLEEP"; fi
+exit "${FAKE_EXIT:-2}"
+SH
+chmod +x "$dir/bin/cargo"
+
+run() {
+  (cd "$repo" && FAKE_ARGS=$dir/args FAKE_DIFF=$dir/diff MUTANTS_FACTS_CARGO=$dir/bin/cargo sh .github/mutants-facts.sh "$@")
+}
+
+fail() {
+  echo "mutants-facts.sh should $1, and printed: $out" >&2
+  exit 1
+}
+
+echo "mutants-facts.sh says so and runs nothing when no Rust source line changed"
+printf 'fn t() { 1; }\n' > "$repo/engines/rust/engine/tests/it.rs"
+printf 'fn u() { 1; }\n' > "$repo/engines/rust/engine/src/tests.rs"
+git -C "$repo" commit --quiet -am "tests only"
+out=$(run base)
+[ "$out" = "No line of Rust source changed, so there is nothing to mutate." ] || fail "say no source changed"
+[ ! -e "$dir/args" ] || fail "not run cargo"
+
+echo "mutants-facts.sh counts mutants and lists the missed ones, and gives cargo only the source lines"
+printf 'fn a() { 1; }\n' > "$repo/engines/rust/engine/src/lib.rs"
+git -C "$repo" commit --quiet -am "source"
+out=$(run base)
+case $out in
+  *"| caught | 2 |"*"| missed | 1 |"*"| unviable | 2 |"*"| timeout | 1 |"*) ;;
+  *) fail "count the four outcomes" ;;
+esac
+case $out in
+  *"engine/src/lib.rs:7:5: replace a with ()"*) ;;
+  *) fail "list the missed mutant" ;;
+esac
+grep -q 'engines/rust/engine/src/lib.rs' "$dir/diff" || fail "pass the source file in the diff"
+if grep -q 'tests' "$dir/diff"; then echo "mutants-facts.sh should leave test files out of the diff" >&2; exit 1; fi
+
+echo "mutants-facts.sh stops at the time limit and says so"
+out=$(FAKE_SLEEP=30 MUTANTS_FACTS_TIMEOUT=1 run base)
+case $out in
+  *"Stopped after 1 seconds"*) ;;
+  *) fail "say it stopped at the limit" ;;
+esac
+
+echo "mutants-facts.sh fails when cargo-mutants itself fails"
+if FAKE_EXIT=4 run base > /dev/null 2>&1; then
+  echo "mutants-facts.sh should exit non-zero when cargo-mutants exits 4" >&2
+  exit 1
+fi
