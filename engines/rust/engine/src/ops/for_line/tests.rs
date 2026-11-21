@@ -3734,7 +3734,7 @@ fn an_item_whose_second_list_reads_a_missing_name_through_its_alias_fails_as_abs
 }
 
 #[test]
-fn a_root_list_walked_through_a_list_in_its_items_is_named_by_the_list_it_starts_at() {
+fn a_root_list_walked_through_a_list_in_its_items_sorts_by_the_path_it_starts_at() {
     assert_eq!(
         for_roots(
             "every rows whose n is count of $params.os.tags.n and whose m is $params.ot as r",
@@ -3747,7 +3747,7 @@ fn a_root_list_walked_through_a_list_in_its_items_is_named_by_the_list_it_starts
 }
 
 #[test]
-fn two_root_lists_whose_inner_lists_have_the_same_name_are_two_roots() {
+fn two_root_lists_whose_inner_lists_have_the_same_name_are_two_roots_named_by_their_paths() {
     let names: Vec<String> = for_root_clauses(
         "every rows whose n is count of $params.os.tags.n and whose m is count of $params.ps.tags.n as r",
         &["r.n is 1"],
@@ -3757,7 +3757,7 @@ fn two_root_lists_whose_inner_lists_have_the_same_name_are_two_roots() {
     .into_iter()
     .map(|clause| clause.name)
     .collect();
-    assert_eq!(names, ["$params.os", "$params.ps"]);
+    assert_eq!(names, ["$params.os.tags.n", "$params.ps.tags.n"]);
 }
 
 #[test]
