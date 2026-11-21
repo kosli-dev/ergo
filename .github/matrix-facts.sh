@@ -115,7 +115,6 @@ def rank(verdict):
 SPLIT = r"; |, and (?!\d+ more)"
 MORE = re.compile(r"(and )?\d+ more")
 PREFIX = re.compile(r"^(?:item \d+ of [^:;]+?: |[\w.$\[\]]+: )+")
-ITEM = re.compile(r"item \d+ of [^:;]+?: ")
 
 
 def parts(text):
@@ -125,25 +124,29 @@ def parts(text):
 def problems(row):
     found = set()
 
-    def collect(node, item):
+    def collect(node, path):
         if isinstance(node, dict):
-            if node.get("kind") == "item" and item is None:
-                item = node.get("name")
+            if node.get("kind") == "item" and node.get("name") and node["name"] not in path:
+                path = path + (node["name"],)
             if isinstance(node.get("message"), str):
                 for part in parts(node["message"]):
-                    named = ITEM.match(part)
-                    found.add((named.group(0)[:-2] if named else item or "", PREFIX.sub("", part)))
+                    here = path
+                    lead = PREFIX.match(part)
+                    for named in re.findall(r"item \d+ of [^:;]+?(?=: )", lead.group(0) if lead else ""):
+                        if named not in here:
+                            here = here + (named,)
+                    found.add((here, PREFIX.sub("", part)))
             for key, value in node.items():
                 if key != "message":
-                    collect(value, item)
+                    collect(value, path)
         elif isinstance(node, list):
             for value in node:
-                collect(value, item)
+                collect(value, path)
 
-    collect(row.get("failures"), None)
+    collect(row.get("failures"), ())
     if not row.get("failures"):
         for part in parts(row.get("message") or ""):
-            found.add(("", PREFIX.sub("", part)))
+            found.add(((), PREFIX.sub("", part)))
     return found
 
 
@@ -191,16 +194,14 @@ def missing(base_row, head_row):
     if base_row is None or base_row.get("passed"):
         return []
     have = problems(head_row) if head_row is not None else set()
-    texts = {text for _, text in have}
-    truncated = head_row is not None and cut(head_row)
-    shown = names(head_row) if head_row is not None else set()
+    truncated = head_row is not None and cut(head_row) and not any(name.startswith("item ") for name in names(head_row))
     lost = []
-    for item, text in sorted(problems(base_row)):
-        if (item, text) in have or ("", text) in have or (item == "" and text in texts):
+    for path, text in sorted(problems(base_row)):
+        if any(said == text and (set(there) <= set(path) or set(path) <= set(there)) for there, said in have):
             continue
-        if truncated and item not in shown:
+        if truncated:
             continue
-        lost.append(f"{item}: {text}" if item else text)
+        lost.append(f"{': '.join(path)}: {text}" if path else text)
     return lost
 
 

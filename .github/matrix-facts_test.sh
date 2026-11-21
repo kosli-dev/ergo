@@ -13,7 +13,8 @@ cat > "$dir/pairs.json" <<'JSON'
  {"name": "says_less", "policy": {}, "input": {}},
  {"name": "passes_now", "policy": {}, "input": {}},
  {"name": "cut_elsewhere", "policy": {}, "input": {}},
- {"name": "really_gone", "policy": {}, "input": {}}
+ {"name": "really_gone", "policy": {}, "input": {}},
+ {"name": "cut_summary", "policy": {}, "input": {}}
 ]
 JSON
 
@@ -45,11 +46,13 @@ node() {
 cut_base=$(tree "item 1 of es: p is bad; item 2 of es: p is bad; and 1 more" "item 1 of es: p is bad; item 2 of es: p is bad; item 3 of es: p is bad" "")
 cut_head=$(tree "item 1 of es: p is bad; and 2 more" "" "$(node 'item 1 of es' 'p is bad'),$(node 'item 2 of es' 'p is bad'),$(node 'item 3 of es' 'p is bad')")
 gone_base=$(tree "item 1 of es: p is bad; item 2 of es: q is bad" "" "$(node 'item 1 of es' 'p is bad'),$(node 'item 2 of es' 'q is bad')")
+sum_base=$(tree "item 1 of es: p is bad; item 2 of es: p is bad" "item 1 of es: p is bad; item 2 of es: p is bad" "")
+sum_head=$(tree "item 1 of es: p is bad; and 1 more" "item 1 of es: p is bad; and 1 more" "")
 gone_head=$(tree "item 1 of es: p is bad" "" "$(node 'item 1 of es' 'p is bad')")
 
-many "$(report value)" "$(report absent)" "$(report absent)" "$(report absent)" "$(report value 'a is 1, and b is 2')" "$(report value)" "$cut_base" "$gone_base" > "$dir/rego.json"
-many "$(report value)" "$(report unusable)" "$(report value)" "$(report value)" "$(report value 'a is 1')" "$(report satisfied)" "$cut_head" "$gone_head" > "$dir/head.json"
-many "$(report value)" "$(report absent)" "$(report absent)" "$(report null)" "$(report value 'a is 1, and b is 2')" "$(report value)" "$cut_base" "$gone_base" > "$dir/base.json"
+many "$(report value)" "$(report absent)" "$(report absent)" "$(report absent)" "$(report value 'a is 1, and b is 2')" "$(report value)" "$cut_base" "$gone_base" "$sum_base" > "$dir/rego.json"
+many "$(report value)" "$(report unusable)" "$(report value)" "$(report value)" "$(report value 'a is 1')" "$(report satisfied)" "$cut_head" "$gone_head" "$sum_head" > "$dir/head.json"
+many "$(report value)" "$(report absent)" "$(report absent)" "$(report null)" "$(report value 'a is 1, and b is 2')" "$(report value)" "$cut_base" "$gone_base" "$sum_base" > "$dir/base.json"
 
 run() {
   MATRIX_FACTS_PAIRS=$dir/pairs.json MATRIX_FACTS_REGO=$dir/rego.json \
