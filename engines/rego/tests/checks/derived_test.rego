@@ -24,3 +24,18 @@ test_a_count_takes_the_worst_cause_of_a_root_it_cant_read_and_of_its_items if {
 	ergo._tally({"ms": [{"v": 1}]}, _count_of_ms("gte")).states == {"absent"} with data.ergo_params as {}
 	ergo._tally({"ms": [{}, {"v": 1}]}, _count_of_ms("in")).states == {"null", "absent"} with data.ergo_params as {"r": null}
 }
+
+_count_keyed_by_item(root) := ergo._m_tally_parts(ergo._s_written_check(concat("", ["count of xs whose v is ", root, " named by key is 1"])))[0]
+
+test_a_count_takes_the_cause_of_the_root_a_key_from_the_item_is_read_in if {
+	ergo._tally({"xs": [{}]}, _count_keyed_by_item("$params.m")).states == {"absent", "unusable"} with data.ergo_params as {"m": 3}
+	ergo._tally({"xs": [{"v": 1}]}, _count_keyed_by_item("$params.m")).states == {"absent", "unusable"} with data.ergo_params as {"m": "s"}
+	ergo._tally({"xs": [{}]}, _count_keyed_by_item("$input.m")).states == {"absent", "unusable"} with data.ergo_document as {"m": true}
+}
+
+test_a_count_fails_on_the_root_a_key_from_the_item_is_read_in_even_when_the_list_is_empty if {
+	ergo._tally({"xs": []}, _count_keyed_by_item("$params.m")).states == {"absent"} with data.ergo_params as {}
+	ergo._tally({"xs": []}, _count_keyed_by_item("$params.m")).states == {"null"} with data.ergo_params as {"m": null}
+	ergo._tally({"xs": []}, _count_keyed_by_item("$params.m")).states == {"unusable"} with data.ergo_params as {"m": 3}
+	ergo._tally({"xs": []}, _count_keyed_by_item("$input.m")).states == {"absent"} with data.ergo_document as {}
+}
