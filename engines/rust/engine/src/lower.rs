@@ -1001,6 +1001,13 @@ pub fn walk_steps(path: &path::Path) -> usize {
     start + path.steps.len()
 }
 
+pub fn with_members(mut path: path::Path, member: bool) -> path::Path {
+    if member {
+        path.steps.push(Step::Members);
+    }
+    path
+}
+
 pub fn walk_too_long(path: &path::Path) -> Option<String> {
     (walk_steps(path) > MOST_WALK_STEPS)
         .then(|| "every and some over more than ten steps aren't supported yet".to_string())
@@ -1015,7 +1022,9 @@ pub fn lower_quantified(
     scope: &Scope,
 ) -> Result<Check, Vec<String>> {
     let s::ListOptions {
-        distinct, if_any, ..
+        distinct,
+        member,
+        if_any,
     } = options;
     let mut problems = argument_problems(phrase);
     problems.extend(after_quantifier_problems(phrase));
@@ -1024,7 +1033,7 @@ pub fn lower_quantified(
     let walk_path = match scope.left_path(path) {
         Ok(found) => {
             problems.extend(walk_too_long(&found));
-            Some(found)
+            Some(with_members(found, member))
         }
         Err(found) => {
             problems.extend(found);

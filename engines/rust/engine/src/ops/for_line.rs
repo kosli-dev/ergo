@@ -313,7 +313,10 @@ pub fn lower_for(
         let walk_path = match here.path(path) {
             Ok(found) => {
                 problems.extend(lower::walk_too_long(&found));
-                Some(found)
+                Some(lower::with_members(
+                    found,
+                    matches!(item, s::ForItem::Walk { member: true, .. }),
+                ))
             }
             Err(found) => {
                 problems.extend(found);
