@@ -1794,6 +1794,11 @@ pub fn root_flaw(checks: &[&Check], ctx: &Ctx) -> Option<(Cause, String)> {
     root_flaw_ordered(checks, ctx, &[], &[])
 }
 
+/// What [`root_flaw`] says, one text for each root.
+pub fn root_texts(checks: &[&Check], ctx: &Ctx) -> Option<(Cause, Vec<String>)> {
+    root_texts_with(checks, ctx, &[], &[], true)
+}
+
 pub fn root_flaw_ordered(
     checks: &[&Check],
     ctx: &Ctx,

@@ -2533,7 +2533,10 @@ impl For {
             bound.aliases.insert(first.alias.clone(), live.at.clone());
             let bound = outer_ctx(&bound);
             for cond in second.whose.iter().chain(nested.iter().copied()) {
-                let Some((cause, text)) = super::message::root_flaw(&[cond], &bound) else {
+                let flaw = super::message::root_texts(&[cond], &bound);
+                let Some((cause, text)) =
+                    super::key_base::with_alias_keys(flaw, cond, &first.alias, &bound)
+                else {
                     continue;
                 };
                 if cause == Cause::NotAnObject {
