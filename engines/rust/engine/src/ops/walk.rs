@@ -1567,6 +1567,7 @@ fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
         inputs.dedup();
         with_fields(&mut inputs, &walked.name, &walk.path, ctx);
         let mut cause = outcome.cause().unwrap_or(Cause::Unusable);
+        let mut key_root = Vec::new();
         let texts: Vec<String> = if walked.failures.is_empty() {
             let keyed = super::key_base::of_path(&walk.path, true, &outer).is_some();
             let said = match cause {
@@ -1578,7 +1579,8 @@ fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
             match said {
                 Some(said) => match super::key_base::of_path(&walk.path, true, &outer) {
                     Some(kb) => {
-                        let mut found = vec![kb.key.clone()];
+                        key_root.push(Clause::root(&kb.key_name, kb.key_cause, kb.key.clone()));
+                        let mut found = Vec::new();
                         if let Some((text, base_cause, _)) = &kb.base {
                             found.push(text.clone());
                             cause = Cause::worst([cause, *base_cause]).unwrap_or(cause);
@@ -1611,7 +1613,10 @@ fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
             .iter()
             .map(|f| walked_clause(&walked, f))
             .collect();
-        let (cause, mut parts) = row_clauses(whose_roots(walk, &outer, true), list, items);
+        let mut roots = key_root;
+        once(&mut roots, whose_roots(walk, &outer, true));
+        once(&mut roots, message::root_clauses(&[&*walk.check], &outer));
+        let (cause, mut parts) = row_clauses(roots, list, items);
         and_walked_roots(walk, &outer, &mut parts);
         return Run {
             verdict: Verdict { cause, inputs },

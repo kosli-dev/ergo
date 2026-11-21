@@ -420,7 +420,6 @@ messages / a subject read from a key named by a param that the object lacks / na
 messages / a subject read from the first item of a list of the input / says the first item is missing when the list is empty
 messages / a subject read from the first item of a list of the input / says the list is missing
 messages / a sum of or a count of beside a plus names what it couldn't read / a summed list that is an object says it isn't a list or an object
-messages / a walk whose ref step can't be read, with a phrase that can't read its root either / names the path and then the root, whatever the root's cause
 messages / a whose that leaves no item of a part prints the part's list / the part's list is printed
 messages / both sides of a comparison that can't be read / names the missing side and the null one
 messages / contains with text on the left and a key of a number in the input on the right / fails as unusable and names the left side first, then the input
