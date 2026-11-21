@@ -666,6 +666,23 @@ fn an_item_says_its_own_value_beside_a_compare_root_it_cant_use() {
     );
 }
 
+#[test]
+fn an_item_says_its_own_value_beside_a_count_of_a_root_it_cant_read() {
+    assert_eq!(
+        own_said(
+            "every items whose n is count of $params.os.name exists",
+            json!([{"n": 1}, {}, {"n": null}]),
+            json!({"os": [{"name": "bob"}, {}]}),
+            json!({}),
+        ),
+        [
+            None,
+            Some((Cause::Absent, "item 2 of items: n is missing".to_string())),
+            Some((Cause::Null, "item 3 of items: n is null".to_string())),
+        ]
+    );
+}
+
 fn judged(sentence: &str, items: Value, params: Value) -> Vec<Option<(Cause, String)>> {
     let Check::Walk(walk_check) = lowered(sentence) else {
         panic!("{sentence} is not every or some");
