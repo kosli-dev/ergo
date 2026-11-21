@@ -422,6 +422,8 @@ _s_distinct_of_node(a) := {"distinct": true} if object.get(a, "distinct", false)
 
 else := {}
 
+_s_list_words_of_node(a) := object.union(_s_distinct_of_node(a), {"member": true | object.get(a, "member", false) == true})
+
 _s_distinct_text(a) := "distinct " if object.get(a, "distinct", false) == true
 
 else := ""
