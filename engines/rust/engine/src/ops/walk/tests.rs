@@ -1626,3 +1626,68 @@ fn an_item_a_whose_that_doesnt_read_it_leaves_undecided_says_nothing_of_its_own(
         vec![None, None, None]
     );
 }
+
+#[test]
+fn a_whose_root_that_isnt_a_list_is_said_first_and_keeps_the_lists_own_problem() {
+    let root = "$params.z is \"s\", which isn't a list";
+    for form in ["every", "some"] {
+        let sentence = format!("{form} es whose v is in $params.z exists");
+        for (subject, list) in [
+            (json!({}), "es is missing"),
+            (json!({"es": null}), "es is null"),
+            (json!({"es": []}), "es is []"),
+            (json!({"es": 3}), "es is 3, which isn't a list or an object"),
+        ] {
+            assert_eq!(
+                said_row(&sentence, subject, json!({"z": "s"})),
+                (Cause::Unusable, format!("{root}; {list}")),
+                "{sentence}"
+            );
+        }
+    }
+}
+
+#[test]
+fn a_whose_root_that_isnt_a_list_keeps_what_each_item_says_on_another_condition() {
+    assert_eq!(
+        said_row(
+            "every xs whose v is at least $params.x and whose w is in $params.y exists",
+            json!({"xs": [{"v": "s", "w": 1}, {"w": 1}, null]}),
+            json!({"x": 2, "y": 3}),
+        ),
+        (
+            Cause::NotAnObject,
+            "$params.y is 3, which isn't a list; item 1 of xs: v is \"s\", which isn't a number; item 2 of xs: v is missing; item 3 of xs is null, which isn't an object".to_string()
+        )
+    );
+}
+
+#[test]
+fn an_item_says_nothing_of_its_own_for_a_condition_whose_list_root_isnt_a_list() {
+    assert_eq!(
+        said_row(
+            "every xs.v whose kind is not in $params.l, if any, is 1",
+            json!({"xs": [{"v": 2, "kind": "a"}]}),
+            json!({"l": "text"}),
+        ),
+        (
+            Cause::Unusable,
+            "$params.l is \"text\", which isn't a list".to_string()
+        )
+    );
+}
+
+#[test]
+fn a_walk_row_takes_the_worst_cause_of_a_list_root_said_beside_its_items() {
+    assert_eq!(
+        said_row(
+            "every rows whose v is in $params.a.name and whose v is in $params.os.name exists",
+            json!({"rows": [{"v": "bob"}]}),
+            json!({"a": [{"name": "bob"}, {}], "os": [{"name": "bob"}, {"name": 3}]}),
+        ),
+        (
+            Cause::Unusable,
+            "$params.os[].name is [\"bob\", 3], which isn't a list of one kind of value; item 2 of $params.a: name is missing".to_string()
+        )
+    );
+}
