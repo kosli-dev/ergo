@@ -2394,7 +2394,7 @@ const SECOND_KEY: &str = "the tree says the sentence that reads only the first a
 
 const OTHER_SUBJECTS_CAUSE: &str = "the tree gives item 1 of ys its own cause, absent, as for.try says, in a subject where neither engine gives it an entry, and this test compares it with the entries of the same name in the case's other subjects, which are unusable and null";
 
-const CASE_AGAINST_FOR_PASS: &str = "the case fails an item of the first list that isn't an object, a value read whole as a named by key or a list walked through its alias, when nothing is checked for it on an empty second list, where for.pass says an item that isn't an object passes when nothing is checked for it, and the tree follows the rule";
+const READ_WHOLE_FAILS: &str = "the case fails an item of the first list on an empty second list for an alias read whole as a named by key, as for.roots says, or for a member it walks through its alias that can't be read, as walk.right.fail says, and Rust's row does too, but the tree doesn't say it yet, so R5-6 must make the row fail from the tree and never pass";
 
 const SAID_NOWHERE: &str = "the row fails from something it says nowhere, a subject that isn't an object or an item of the first list that picks nothing, as for.pick says, so no clause of the tree carries that cause, and R5-6 must take the row's cause from the line as well as from the tree";
 
@@ -2544,7 +2544,7 @@ const ROWS_THE_CLAUSES_DONT_SAY_YET: &[(&str, usize, &str)] = &[
     (
         "for / a for line whose sentence reads a key from an alias of an earlier line / names a key of the wrong type once under its first item, on an empty list too",
         1,
-        CASE_AGAINST_FOR_PASS,
+        READ_WHOLE_FAILS,
     ),
     (
         "for / a for line's own whose lists a list it walks, as a check without a for line does / an item without the name is listed as null",
@@ -2754,32 +2754,32 @@ const ROWS_THE_CLAUSES_DONT_SAY_YET: &[(&str, usize, &str)] = &[
     (
         "for / an alias of an earlier line that walks a list fails a second line on an empty list when an item of it can't be read / fails, with an empty rows, when an item of it has no name",
         2,
-        CASE_AGAINST_FOR_PASS,
+        READ_WHOLE_FAILS,
     ),
     (
         "for / an alias of an earlier line that walks a list fails a second line on an empty list when an item of it can't be read / fails, with an empty rows, when an item of it has no name",
         4,
-        CASE_AGAINST_FOR_PASS,
+        READ_WHOLE_FAILS,
     ),
     (
         "for / an alias of an earlier line that walks a list fails a second line on an empty list when an item of it can't be read / fails, with an empty rows, when an item of it is null",
         2,
-        CASE_AGAINST_FOR_PASS,
+        READ_WHOLE_FAILS,
     ),
     (
         "for / an alias of an earlier line that walks a list fails a second line on an empty list when an item of it can't be read / fails, with an empty rows, when an item of it is null",
         4,
-        CASE_AGAINST_FOR_PASS,
+        READ_WHOLE_FAILS,
     ),
     (
         "for / an alias of an earlier line that walks a list fails a second line on an empty list when an item of it can't be read / fails, with an empty rows, when it holds names of more than one kind",
         2,
-        CASE_AGAINST_FOR_PASS,
+        READ_WHOLE_FAILS,
     ),
     (
         "for / an alias of an earlier line that walks a list fails a second line on an empty list when an item of it can't be read / fails, with an empty rows, when it holds names of more than one kind",
         4,
-        CASE_AGAINST_FOR_PASS,
+        READ_WHOLE_FAILS,
     ),
     (
         "for / an alias that a pick on an empty list leaves without a value, read on a later line / names the alias as the policy writes it, with no $",
