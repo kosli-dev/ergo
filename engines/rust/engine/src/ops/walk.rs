@@ -1674,7 +1674,7 @@ fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
                     .collect();
             }
         } else if up_front && said.iter().all(|(_, item)| item.cause == Cause::Value) {
-            said.clear();
+            said.retain(|(failure, _)| own_read_of_a_reached_item(&walked, failure));
         }
         once(&mut roots, leaf);
         roots
@@ -1777,6 +1777,10 @@ fn once(roots: &mut Vec<Clause>, more: Vec<Clause>) {
             roots.push(root);
         }
     }
+}
+
+fn own_read_of_a_reached_item(walked: &Walked, failure: &Failure) -> bool {
+    !walked.items.is_empty() && walked.failures.iter().any(|own| std::ptr::eq(own, failure))
 }
 
 fn params_unreadable(ctx: &Ctx) -> bool {
