@@ -50,7 +50,6 @@ impl Clause {
         }
     }
 
-    #[cfg_attr(not(test), expect(dead_code))]
     pub fn in_group(self, group: usize) -> Clause {
         Clause { group, ..self }
     }
