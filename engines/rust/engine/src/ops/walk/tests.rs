@@ -1691,3 +1691,51 @@ fn a_walk_row_takes_the_worst_cause_of_a_list_root_said_beside_its_items() {
         )
     );
 }
+
+#[test]
+fn a_list_root_after_the_phrase_that_isnt_a_list_is_said_alone_whatever_the_list_holds() {
+    let root = "$params.z is \"s\", which isn't a list".to_string();
+    for sentence in [
+        "every es.v is in $params.z",
+        "some es.v is not in $params.z",
+        "every es.v, if any, matches $params.z",
+    ] {
+        for subject in [
+            json!({}),
+            json!({"es": null}),
+            json!({"es": []}),
+            json!({"es": [{"v": "a"}, {}, null]}),
+        ] {
+            assert_eq!(
+                said_row(sentence, subject, json!({"z": "s"})),
+                (Cause::Unusable, root.clone()),
+                "{sentence}"
+            );
+        }
+        assert_eq!(
+            said_row(sentence, json!({"es": "t"}), json!({"z": "s"})),
+            (
+                Cause::Unusable,
+                format!("{root}; es is \"t\", which isn't an object")
+            ),
+            "{sentence}"
+        );
+    }
+}
+
+#[test]
+fn a_list_root_after_the_phrase_is_said_with_the_roots_of_a_whose_and_the_list() {
+    for (subject, list) in [(json!({}), "es is missing"), (json!({"es": null}), "es is null")] {
+        assert_eq!(
+            said_row(
+                "some es whose v is in $params.z is in $params.y",
+                subject,
+                json!({"y": "s"}),
+            ),
+            (
+                Cause::Unusable,
+                format!("$params.y is \"s\", which isn't a list; $params.z is missing; {list}")
+            )
+        );
+    }
+}
