@@ -135,6 +135,8 @@ CI also fails when a line of Rego isn't reached by any test. It runs the tests o
 
 When a change touches how a message or a cause is worked out, run `python3 spec/sweep.py` too, as `spec/README.md` says, on `main` and on your branch, and compare the cells that differ. It isn't a required check, and it never fails on a difference, but review has found message differences in odd shapes that nobody had probed.
 
+`engines/rust/known-failures.txt` merges with its own driver, so two branches that add or delete lines in it merge without a conflict (the result is the base minus every deleted line plus every added line, sorted). Git's own `merge=union` would bring deleted lines back. The driver is set once per clone (its worktrees share it) with `.github/setup-merge-drivers.sh`; CI doesn't need it, because it never merges, and without it git reports the conflict as usual. The changelogs have no driver, because two entries under the same heading need a person to order them.
+
 ## Tests
 
 Every change needs tests: new behaviour, bug fixes and changes to existing behaviour alike. A bug fix starts with a test that fails because of the bug. A change without tests isn't finished.
