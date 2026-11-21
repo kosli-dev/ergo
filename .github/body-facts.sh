@@ -69,6 +69,8 @@ if grep -q '^Changes the report:' "$work/body"; then
   has_line=yes
 fi
 
+snapshot='(the body is read at the last push: push or re-run after editing it)'
+
 echo "## Report facts for the pull request body"
 echo
 echo "- Rust case reports changed: $reports"
@@ -78,7 +80,7 @@ if [ -n "$passed_now_fail" ]; then
 fi
 if [ -n "$cargo_line" ]; then
   echo
-  echo "WARNING: $cargo_line So the report counts could not be read because cargo failed."
+  echo "WARNING: $cargo_line So the report counts could not be read because cargo failed $snapshot."
 fi
 
 if [ "$changed" = yes ]; then
@@ -103,7 +105,7 @@ fi
 
 if [ "$changed" = yes ] && [ "$has_line" = no ]; then
   echo
-  echo 'WARNING: reports or pairs changed, and the body has no line starting with `Changes the report:`.'
+  echo 'WARNING: reports or pairs changed, and the body has no line starting with `Changes the report:`. '"$snapshot"
 fi
 if [ "$changed" = no ] && [ "$has_line" = yes ] && [ "$reports" != unknown ] && [ "$pairs" != unknown ]; then
   echo
