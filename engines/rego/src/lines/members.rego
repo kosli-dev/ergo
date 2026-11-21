@@ -62,6 +62,10 @@ _fm_object(v) if {
 	not _walk_marked(v)
 }
 
+_fm_entries_of(entries, req) := _fm_entries(entries, _id_of(req)) if _member_from(req)
+
+else := entries
+
 _fm_entries(entries, []) := entries
 
 _fm_entries(entries, ids) := [object.remove(e, ["key"]) | some e in entries] if ids != []

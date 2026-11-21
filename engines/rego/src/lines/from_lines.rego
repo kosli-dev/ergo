@@ -627,7 +627,7 @@ _raw_entries(doc, req) := [entry | some entry in _listed_subjects(doc, req)] if 
 	not _every_from(req)
 }
 
-_raw_entries(doc, req) := _fm_entries(_distinct_entries(_fl_walk(doc, _fl_keys(req)).subjects, req), _id_of(req)) if {
+_raw_entries(doc, req) := _fm_entries_of(_distinct_entries(_fl_walk(doc, _fl_keys(req)).subjects, req), req) if {
 	_from_well_formed(req)
 	_every_from(req)
 	_walkable(doc)
