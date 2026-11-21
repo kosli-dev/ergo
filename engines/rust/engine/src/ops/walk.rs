@@ -74,6 +74,7 @@ pub struct Options {
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Failure {
+    pub wants_object: bool,
     pub order: Vec<Seg>,
     pub path: String,
     pub item: String,
@@ -616,6 +617,7 @@ pub fn walk<'a>(path: &Path, ctx: &Ctx<'a>, options: Options) -> Walked<'a> {
     let mut failures: Vec<Failure> = raws
         .into_iter()
         .map(|raw| Failure {
+            wants_object: raw.kind == member::WANTS,
             path: walked_all.name_of(&raw.segs, raw.unaliased),
             item: walked_all.name_of(&raw.segs, raw.unaliased),
             said: walked_all.item_name_dotted(&raw.segs),
@@ -1450,6 +1452,7 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
             let failure = if let Some((_, true, said)) = own {
                 Some((
                     Failure {
+                        wants_object: false,
                         msg: clause::text(std::slice::from_ref(&said)),
                         order: item.end_segs.clone(),
                         said: walked.item_name_dotted(&item.end_segs),
@@ -1486,6 +1489,7 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
                 let name = walked.name_of_steps(named_steps, item.unaliased);
                 Some((
                     Failure {
+                        wants_object: false,
                         msg: clause::text(std::slice::from_ref(&said)),
                         order,
                         path: name,
@@ -1525,6 +1529,7 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
                     )
                 };
                 let failure = Failure {
+                    wants_object: false,
                     msg,
                     order: item.end_segs.clone(),
                     said: walked.item_name_dotted(&item.end_segs),

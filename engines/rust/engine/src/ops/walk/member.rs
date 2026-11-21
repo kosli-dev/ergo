@@ -3,26 +3,18 @@ use crate::name;
 use crate::path::{Located, Path, Step};
 use serde_json::{Value, json};
 
+pub(super) const WANTS: &str = "an object";
+
 pub(super) fn expand<'a>(entries: Vec<Entry<'a>>, empty_ok: bool) -> (Vec<Entry<'a>>, Vec<Raw>) {
     let mut next = Vec::new();
     let mut raws = Vec::new();
     for entry in entries {
         let Val::Found(Value::Object(map)) = entry.val else {
-            raws.push(failed(
-                &entry,
-                entry.val.cause(),
-                entry.val.shown(),
-                "an object",
-            ));
+            raws.push(failed(&entry, entry.val.cause(), entry.val.shown(), WANTS));
             continue;
         };
         if map.is_empty() && !empty_ok {
-            raws.push(failed(
-                &entry,
-                crate::cause::Cause::Value,
-                json!({}),
-                "an object",
-            ));
+            raws.push(failed(&entry, crate::cause::Cause::Value, json!({}), WANTS));
         }
         let mut keys: Vec<&String> = map.keys().collect();
         keys.sort();
