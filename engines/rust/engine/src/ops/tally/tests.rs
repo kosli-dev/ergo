@@ -2851,3 +2851,81 @@ fn the_refs_a_whose_walks_are_the_refs_the_count_walks() {
     );
     assert!(walking("count of xs whose v is 1 is 2").is_empty());
 }
+
+fn list_state(sentence: &str, subject: Value) -> crate::path::Outcome {
+    let Check::Tally(tally) = lowered(sentence) else {
+        panic!("{sentence} is not a count or a sum");
+    };
+    let input = json!({"things": [subject]});
+    let ctx = Ctx {
+        label: None,
+        item_by_item: false,
+        subject: Located {
+            value: &input["things"][0],
+            location: Location::input_root().key("things").index(0),
+        },
+        input: &input,
+        params: None,
+        aliases: BTreeMap::new(),
+    };
+    let outer = outer_ctx(&ctx);
+    let path = tally.counted_paths()[0].clone();
+    let walked = walk::walk(
+        &path,
+        &outer,
+        Options {
+            if_any: false,
+            empty_adds_nothing: true,
+        },
+    );
+    walked_list(&walked, &path, &outer).state
+}
+
+#[test]
+fn a_walked_list_is_absent_when_the_object_it_walks_has_no_such_field() {
+    assert_eq!(
+        list_state("count of xs.ys is 1", json!({"xs": {"a": {}}})),
+        crate::path::Outcome::Absent
+    );
+}
+
+#[test]
+fn a_walked_list_is_found_when_only_an_item_of_it_lacks_the_field() {
+    assert_eq!(
+        list_state("count of xs.ys is 1", json!({"xs": [{"ys": [1]}, {}]})),
+        crate::path::Outcome::Found
+    );
+}
+
+#[test]
+fn half_a_microsecond_rounds_up_and_less_rounds_down_whatever_its_length() {
+    for (from, to, wanted) in [
+        (0.0, 0.0000005, "0.000001"),
+        (0.0, 0.0000004, "0"),
+        (0.0, 0.00000004, "0"),
+        (0.0, 0.00000005, "0"),
+    ] {
+        assert_eq!(
+            cause(
+                &format!("seconds elapsed from x to y is {wanted}"),
+                json!({"x": from, "y": to})
+            ),
+            Cause::Satisfied,
+            "{from} {to}"
+        );
+    }
+}
+
+#[test]
+fn a_sum_of_one_number_with_fifteen_decimals_is_that_number() {
+    assert_eq!(sum_text(&["1e-15"]), "0.000000000000001");
+    assert_eq!(sum_text(&["1e-15", "1e-15"]), "0.000000000000002");
+}
+
+#[test]
+fn text_that_is_not_digits_has_no_parts() {
+    for text in ["", ".", "-", "e5", "1x", "1.5y", "x"] {
+        assert!(Parts::of(text).is_none(), "{text}");
+    }
+    assert!(Parts::of("1.5").is_some());
+}
