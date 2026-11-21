@@ -45,3 +45,18 @@ test_an_item_says_its_clauses_after_its_name_joined_with_and if {
 		_unread("item 2 of xs", "unusable", "item 2 of xs is null, which isn't an object"),
 	]) == "item 1 of xs: x.v is missing, and x.w is missing; item 2 of xs is null, which isn't an object"
 }
+
+test_a_nested_item_says_each_leaf_after_every_name_above_it if {
+	ergo._m_clauses_text([_item("item 1 of ws", "unusable", [
+		_missing("w.a"),
+		_unread("item 2 of items", "unusable", "item 2 of items is null, which isn't an object"),
+		_missing("cov.x"),
+		_null("cov.y"),
+		_item("item 3 of ys", "absent", [_item("item 1 of y.zs", "absent", [_missing("n")])]),
+	])]) == concat("; ", [
+		"item 1 of ws: w.a is missing",
+		"item 1 of ws: item 2 of items is null, which isn't an object",
+		"item 1 of ws: cov.x is missing, and cov.y is null",
+		"item 1 of ws: item 3 of ys: item 1 of y.zs: n is missing",
+	])
+}
