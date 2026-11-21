@@ -85,6 +85,21 @@ test_roots_come_worst_cause_first_then_by_name_before_the_lists_and_the_items if
 	]
 }
 
+_items_of(list, from, to, said) := [_item(concat("", ["item ", format_int(n, 10), " of ", list]), "absent", said) | some n in numbers.range(from, to)]
+
+test_and_n_more_comes_after_the_roots_and_the_lists_in_a_count if {
+	ergo._m_clauses_text(ergo._m_clauses_shown(array.concat(
+		_items_of("xs", 1, 5, [_missing("v")]),
+		[_root("$params.min", "unusable", `$params.min is "s", which isn't a number`)],
+	))) == concat("; ", [
+		`$params.min is "s", which isn't a number`,
+		"item 1 of xs: v is missing",
+		"item 2 of xs: v is missing",
+		"item 3 of xs: v is missing",
+		"and 2 more",
+	])
+}
+
 test_a_clause_given_twice_is_shown_once if {
 	ergo._m_clauses_shown([
 		_missing("$params.k"),
