@@ -1303,6 +1303,9 @@ fn stood_in(check: &Check, focus: &Ctx, blocked: impl Fn(&Path) -> bool) -> Opti
             .collect();
         kinds.len() > 1
     };
+    if let Some(stand_in) = super::lists::text_stand_in(check, focus) {
+        return Some(stand_in);
+    }
     let side_blocked = |side: &Side| side.paths().into_iter().any(&blocked);
     let own_side = |left: &Side, right: &Side| match (side_blocked(left), side_blocked(right)) {
         (false, true) => Some(left.clone()),
@@ -1510,6 +1513,31 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
                     },
                     said,
                 ))
+            } else if let Some((verdict, stand_in)) = alone
+                .and_then(|_| super::lists::text_stand_in(&leaf_check, &at))
+                .map(|stand_in| (run_check(&stand_in, &at), stand_in))
+                .filter(|(verdict, _)| verdict.cause.is_failure())
+            {
+                let failure = Failure {
+                    wants_object: false,
+                    msg: message::prefixed(
+                        &walked.item_name(&item.item_segs),
+                        &message::message(&stand_in, &at, &verdict),
+                    ),
+                    order: item.end_segs.clone(),
+                    said: walked.item_name_dotted(&item.end_segs),
+                    rank: rank_of(&walk.path.start, &item.end_segs),
+                    path: walked.name_of(&item.end_segs, item.unaliased),
+                    item: walked.name_of(&item.item_segs, item.unaliased),
+                    cause: verdict.cause,
+                    value: item.shown(),
+                    location: Some(item.end_location.clone()),
+                    copies: Vec::new(),
+                    seen: Some((item.item.value.clone(), item.item.location.clone())),
+                    outcome: None,
+                };
+                let said = failure_clause(&failure);
+                Some((failure, said))
             } else if !reached || alone.is_some() {
                 None
             } else {

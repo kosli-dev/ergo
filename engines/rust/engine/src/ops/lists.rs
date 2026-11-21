@@ -318,6 +318,22 @@ pub(super) fn text_fault(check: &super::Check, path: &Path, ctx: &Ctx) -> Option
     text_walk(check, path, ctx).and_then(|walk| walk.cause.map(|cause| (cause, walk.text)))
 }
 
+pub(super) fn text_stand_in(check: &super::Check, ctx: &Ctx) -> Option<super::Check> {
+    let super::Check::In(within) = check else {
+        return None;
+    };
+    let list = text_right(check)?;
+    text_fault(check, list, ctx)?;
+    let own = super::compare::Side::Path(within.path.clone());
+    Some(super::Check::Compare(super::compare::Compare {
+        left: own.clone(),
+        right: own,
+        cmp: super::compare::Cmp::Eq,
+        within: None,
+        ignoring: within.ignoring,
+    }))
+}
+
 fn fault_walk(check: &super::Check, path: &Path, ctx: &Ctx) -> Option<Walked> {
     text_walk(check, path, ctx).or_else(|| walked(path, ctx))
 }
@@ -592,10 +608,7 @@ fn usable_patterns(patterns: &Value) -> bool {
 
 impl In {
     pub fn flawed(&self, ctx: &Ctx) -> bool {
-        ref_read(&self.values, ctx).is_some_and(|v| match (self.ignoring, &v) {
-            (Some(_), Value::Array(items)) => text_items_cause(items).is_some(),
-            _ => !usable_values(&v, false),
-        })
+        self.ignoring.is_none() && ref_read(&self.values, ctx).is_some_and(|v| !usable_values(&v, false))
     }
 }
 
