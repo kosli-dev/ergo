@@ -13,7 +13,7 @@ root=$(git -C "$here" rev-parse --show-toplevel)
 work=$(mktemp -d)
 trap '/bin/rm -rf "$work"' EXIT
 
-git -C "$root" diff -U0 "$base...HEAD" -- 'engines/rust/*.rs' ':(exclude)*/tests.rs' ':(exclude)*/tests/*' > "$work/diff"
+git -C "$root" diff -U0 --relative=engines/rust "$base...HEAD" -- 'engines/rust/*.rs' ':(exclude)*/tests.rs' ':(exclude)*/tests/*' > "$work/diff"
 if [ ! -s "$work/diff" ]; then
   echo "No line of Rust source changed, so there is nothing to mutate."
   exit 0
@@ -25,7 +25,7 @@ if [ -z "${MUTANTS_FACTS_CARGO:-}" ]; then
 fi
 
 cd "$root/engines/rust"
-"$cargo" mutants --in-diff "$work/diff" --output "$work/out" --timeout "$per" --minimum-test-timeout 20 -j 2 > "$work/log" 2>&1 &
+"$cargo" mutants --workspace --in-diff "$work/diff" --output "$work/out" --timeout "$per" --minimum-test-timeout 20 -j 2 > "$work/log" 2>&1 &
 pid=$!
 waited=0
 stopped=
