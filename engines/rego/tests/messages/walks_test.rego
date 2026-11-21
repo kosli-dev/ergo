@@ -104,6 +104,12 @@ test_a_count_says_a_root_before_a_key_from_the_item_once_and_each_item_only_its_
 	] with data.ergo_params as {"m": null}
 }
 
+test_a_count_on_an_empty_list_says_the_root_a_key_from_the_item_is_read_in if {
+	_tally_records("count of xs whose v is $params.m named by key is 0", {"xs": []}, "absent") == [ergo._m_clause("root", "$params.m", "absent", "$params.m is missing")] with data.ergo_params as {}
+	_tally_records("count of xs whose v is $params.m named by key is 0", {"xs": []}, "null") == [ergo._m_clause("root", "$params.m", "null", "$params.m is null")] with data.ergo_params as {"m": null}
+	_tally_records("count of xs whose v is $params.m named by key is 0", {"xs": []}, "unusable") == [ergo._m_clause("root", "$params.m", "unusable", "$params.m is 3, which isn't an object")] with data.ergo_params as {"m": 3}
+}
+
 test_an_items_cause_comes_from_its_record_not_its_last_words if {
 	side := ergo._m_tally_parts(ergo._s_written_check("count of xs whose v is 1 is 0"))[0]
 	e := {"i": ["xs", 0], "c": ["xs", 0], "iv": {}, "r": [], "v": {}}
