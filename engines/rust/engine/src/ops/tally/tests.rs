@@ -1942,7 +1942,11 @@ fn a_count_on_an_empty_list_says_a_null_root_before_an_item_key_and_then_that_it
 fn a_count_on_an_empty_list_whose_field_is_a_root_through_an_item_key_says_only_the_root() {
     let sentence = "count of xs whose v is $input.m named by key is 1";
     for (m, cause, said) in [
-        (json!(3), Cause::Unusable, "$input.m is 3, which isn't an object"),
+        (
+            json!(3),
+            Cause::Unusable,
+            "$input.m is 3, which isn't an object",
+        ),
         (json!(null), Cause::Null, "$input.m is null"),
     ] {
         let input = json!({"things": [{"xs": []}], "m": m});
