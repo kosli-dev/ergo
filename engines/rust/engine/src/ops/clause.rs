@@ -1,4 +1,5 @@
 use crate::cause::Cause;
+use serde_json::Value;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Kind {
@@ -184,6 +185,16 @@ fn leaves(item: &Clause) -> usize {
         .map(leaves)
         .sum();
     usize::from(!item.text.is_empty()) + usize::from(own) + under
+}
+
+#[cfg_attr(not(test), expect(dead_code))]
+pub fn to_value(_clauses: &[Clause]) -> Value {
+    Value::Null
+}
+
+#[cfg_attr(not(test), expect(dead_code))]
+pub fn of_value(_value: &Value) -> Option<Vec<Clause>> {
+    None
 }
 
 #[cfg(test)]

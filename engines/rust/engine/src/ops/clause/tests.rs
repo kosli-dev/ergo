@@ -460,3 +460,58 @@ fn an_items_own_part_beside_the_items_under_it_isnt_counted() {
         "item 1 of cs: item 2 of c.reviews: ok is false; item 1 of cs: c.a is 2; item 2 of cs: item 1 of c.reviews: ok is false; item 2 of cs: c.a is 2; item 3 of cs: item 1 of c.reviews: ok is false; item 3 of cs: c.a is 2; and 2 more"
     );
 }
+
+#[test]
+fn clauses_come_back_whole_from_a_record() {
+    let clauses = vec![
+        root(
+            "w.z",
+            Cause::Unusable,
+            "w.z is \"p; q\", which isn't a number",
+        )
+        .in_group(2),
+        read(Kind::List, "ys", Cause::Absent, "ys is missing"),
+        item(
+            "item 1 of ws",
+            Cause::Null,
+            vec![
+                unread(
+                    "item 2 of items",
+                    Cause::NotAnObject,
+                    "item 2 of items is null, which isn't an object",
+                ),
+                null("cov.x"),
+            ],
+        ),
+        Clause {
+            kind: Kind::More(2),
+            ..read(Kind::Root, "", Cause::Value, "")
+        },
+    ];
+    let record = serde_json::json!({ "ergo/clauses": to_value(&clauses) });
+    assert_eq!(of_value(&record["ergo/clauses"]), Some(clauses));
+}
+
+#[test]
+fn clauses_that_cant_be_read_back_give_nothing() {
+    let whole = to_value(&[missing("v").in_group(1)]);
+    let mut wrong_cause = whole.clone();
+    wrong_cause[0]["cause"] = serde_json::json!("lost");
+    let mut no_group = whole.clone();
+    no_group[0]
+        .as_object_mut()
+        .map(|clause| clause.remove("group"));
+    let mut said_not_a_list = whole.clone();
+    said_not_a_list[0]["said"] = serde_json::json!("v is missing");
+    for value in [
+        serde_json::Value::Null,
+        serde_json::json!({}),
+        serde_json::json!(["v is missing"]),
+        wrong_cause,
+        no_group,
+        said_not_a_list,
+    ] {
+        assert_eq!(of_value(&value), None, "{value}");
+    }
+    assert!(of_value(&whole).is_some());
+}
