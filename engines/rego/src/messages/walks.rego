@@ -518,7 +518,7 @@ _m_tally_fail_state(side, x) := concat("", ["root ", x.cause]) if {
 
 _m_tally_key_items(subj, side) := array.concat(
 	[[concat("", ["root ", x[0]]), x[1]] | some x in _once([x | some c in side.whose; some [p, _] in _key_base_reads(c); some x in _m_key_said(p)])],
-	[[concat("", ["root ", f.cause]), _m_leaf_in(e.i, _key_focus_text(array.concat(e.c, f.prefix), e.i, f.prefix, _m_key_list_text(_input_name(f.prefix), f)), roots), {"key": e}] |
+	[[concat("", ["root ", f.cause]), _m_leaf_in(e.i, _key_focus_text(array.concat(e.c, f.prefix), e.i, f.prefix, _m_key_list_text(_input_name(f.prefix), f)), roots), {"key": e, "flaw": f, "steps": p}] |
 		some e in w.items
 		some c in side.whose
 		some [p, mode] in _key_base_reads(c)

@@ -738,7 +738,7 @@ _key_item_row(check, subj) := {"cause": cause, "inputs": raw.inputs, "failed": _
 	w.items != []
 	w.fails == []
 	_key_items_clean(w, _key_item_conds(check))
-	fails := [{"path": array.concat(e.c, f.prefix), "item": e.i, "cause": f.cause, "value": _key_list_value(f.value), "at": _item_read_at(w, e, array.concat(object.get(e, "r", []), f.prefix)), "iv": e.iv, "iat": _item_at(w, e), "lv": _item_levels(w, e), "msg": "", "ergo/base": f, "read_outcome": _worst_of({f.cause} | {x | some seg in p; x := _ref_step_flaw(seg); x in _value_fault_causes})} |
+	fails := [{"path": array.concat(e.c, f.prefix), "item": e.i, "cause": f.cause, "value": _key_list_value(f.value), "at": _item_read_at(w, e, array.concat(object.get(e, "r", []), f.prefix)), "iv": e.iv, "iat": _item_at(w, e), "lv": _item_levels(w, e), "msg": "", "ergo/base": f, "read_outcome": _key_flaw_outcome(f, p)} |
 		some e in w.items
 		some c in _key_item_conds(check)
 		some [p, mode] in _key_base_reads(c)
@@ -749,6 +749,8 @@ _key_item_row(check, subj) := {"cause": cause, "inputs": raw.inputs, "failed": _
 	raw := _walk_read_row(check, subj)
 	cause := _worst_of(flaws | {f.cause | some f in fails})
 }
+
+_key_flaw_outcome(f, p) := _worst_of({f.cause} | {x | some seg in p; x := _ref_step_flaw(seg); x in _value_fault_causes})
 
 _key_list_fail_row(check, subj) := raw if {
 	check.op in _walk_ops

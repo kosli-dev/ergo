@@ -1479,8 +1479,12 @@ _tally_word_cause(c, cause) := "unusable" if {
 }
 
 _tally_record_entry([state, text, src], side, w, roots, at, subj) := _tally_leveled(_tally_item_entry(e, _m_src_cause(state), text, side, w, roots, subj), e.i, w, at) if {
-	some k in ["item", "key"]
-	e := src[k]
+	e := src.item
+	_m_positions(e.i) != []
+}
+
+_tally_record_entry([state, text, src], _, w, roots, at, _) := _tally_leveled(object.union(_entry("item", _m_item_name(e.i, roots), _m_src_cause(state), [_tally_key_read(src, w)], [], text), {"value": e.iv, "locations": [_item_at(w, e)]}), e.i, w, at) if {
+	e := src.key
 	_m_positions(e.i) != []
 }
 
@@ -1489,6 +1493,8 @@ _tally_record_entry([state, text, src], _, w, roots, at, _) := _tally_leveled(_e
 	_m_positions(x.path) != []
 	_ = state
 }
+
+_tally_key_read(src, w) := {"name": _input_name(array.concat(src.key.c, src.flaw.prefix)), "value": _key_list_value(src.flaw.value), "locations": [_item_read_at(w, src.key, array.concat(object.get(src.key, "r", []), src.flaw.prefix))], "outcome": _key_flaw_outcome(src.flaw, src.steps)}
 
 _tally_record_cause(state) := substring(state, 6, -1) if startswith(state, "focus ")
 
