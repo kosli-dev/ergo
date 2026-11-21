@@ -177,20 +177,29 @@ test_ignoring_words_after_another_phrase_or_in_another_order_are_written_wrong i
 	ergo._s_self_problems(_read(`x equals x ignoring case`).assertions) == {"x is compared with itself"}
 }
 
-test_ignoring_words_after_a_list_from_a_path_are_written_wrong if {
-	every pair in [
-		[`x is in $params.l ignoring case`, `"is in" can't take ignoring case yet`],
-		[`x is in ys ignoring surrounding spaces`, `"is in" can't take ignoring surrounding spaces yet`],
-		[`x is not in $params.l ignoring case`, `"is not in" can't take ignoring case yet`],
-		[`count of xs whose v is in ys ignoring case is 1`, `"is in" can't take ignoring case yet`],
+test_ignoring_words_after_a_list_from_a_path_are_read if {
+	every line in [
+		`x is in $params.l ignoring case`,
+		`x is one of $params.l ignoring case`,
+		`x is in ys ignoring surrounding spaces`,
+		`x is one of $input.ys ignoring case and surrounding spaces`,
+		`x is not in $params.l ignoring case`,
+		`x is not one of ys ignoring case`,
+		`x is in $input.cs.name ignoring case`,
+		`every xs.v is in $params.l ignoring case`,
+		`some xs.v is not in ys ignoring case`,
+		`count of xs whose v is in ys ignoring case is 1`,
+		`every xs whose v is in thing.ys ignoring case, if any, exists`,
 	] {
-		_read(pair[0]) == {"problems": [pair[1]]}
+		not "problems" in object.keys(_read(line))
 	}
-	ergo._for_line(`every xs whose v is not in $params.l ignoring case as x`) == {"problems": [`"is not in" can't take ignoring case yet`]}
-	_read(`x is in ys ignoring surrounding spaces and case`) == {"problems": [
-		`"ignoring surrounding spaces and case" is written "ignoring case and surrounding spaces"`,
-		`"is in" can't take ignoring surrounding spaces and case yet`,
-	]}
+	not "problems" in object.keys(ergo._for_line(`every xs whose v is not in $params.l ignoring case as x`))
+	_read(`x is in ys ignoring surrounding spaces and case`) == {"problems": [`"ignoring surrounding spaces and case" is written "ignoring case and surrounding spaces"`]}
+}
+
+test_a_list_read_from_a_field_keeps_the_ignoring_words_in_its_model if {
+	ergo._s_plain_model(_read(`x is in ys ignoring case`).assertions[0]) == {"op": "compare", "left": ["x"], "cmp": "in", "right": ["ys"], "ignoring": "case"}
+	ergo._s_plain_model(_read(`x is not one of ys ignoring surrounding spaces`).assertions[0]) == {"op": "compare", "left": ["x"], "cmp": "not_in", "right": ["ys"], "ignoring": "surrounding spaces"}
 }
 
 test_ignoring_words_dont_read_after_contains_or_starts_with_yet if {

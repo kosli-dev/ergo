@@ -1070,57 +1070,32 @@ fn ignoring_words_go_after_is_and_is_one_of() {
 }
 
 #[test]
-fn ignoring_words_after_a_list_read_from_a_path_are_written_wrong_for_now() {
-    for (line, problem) in [
-        (
-            "x is in $params.l ignoring case",
-            "\"is in\" can't take ignoring case yet",
-        ),
-        (
-            "x is one of $params.l ignoring case",
-            "\"is in\" can't take ignoring case yet",
-        ),
-        (
-            "x is in ys ignoring surrounding spaces",
-            "\"is in\" can't take ignoring surrounding spaces yet",
-        ),
-        (
-            "x is one of $input.ys ignoring case and surrounding spaces",
-            "\"is in\" can't take ignoring case and surrounding spaces yet",
-        ),
-        (
-            "x is not in $params.l ignoring case",
-            "\"is not in\" can't take ignoring case yet",
-        ),
-        (
-            "x is not one of ys ignoring case",
-            "\"is not in\" can't take ignoring case yet",
-        ),
-        (
-            "every xs.v is in $params.l ignoring case",
-            "\"is in\" can't take ignoring case yet",
-        ),
-        (
-            "count of xs whose v is in ys ignoring case is 1",
-            "\"is in\" can't take ignoring case yet",
-        ),
+fn ignoring_words_after_a_list_read_from_a_path_are_read() {
+    for line in [
+        "x is in $params.l ignoring case",
+        "x is one of $params.l ignoring case",
+        "x is in ys ignoring surrounding spaces",
+        "x is one of $input.ys ignoring case and surrounding spaces",
+        "x is not in $params.l ignoring case",
+        "x is not one of ys ignoring case",
+        "x is in $input.cs.name ignoring case",
+        "every xs.v is in $params.l ignoring case",
+        "some xs.v is not in ys ignoring case",
+        "count of xs whose v is in ys ignoring case is 1",
+        "every xs whose v is in thing.ys ignoring case, if any, exists",
     ] {
-        assert_eq!(problems(line), one(problem), "{line}");
+        assert_eq!(problems(line), none(), "{line}");
     }
     assert_eq!(
         for_problems(
             &for_line("every xs whose v is not in $params.l ignoring case as x"),
             &[]
         ),
-        one("\"is not in\" can't take ignoring case yet")
+        none()
     );
     assert_eq!(
         problems("x is in ys ignoring surrounding spaces and case"),
-        vec![
-            "\"ignoring surrounding spaces and case\" is written \"ignoring case and surrounding spaces\""
-                .to_string(),
-            "\"is in\" can't take ignoring surrounding spaces and case yet".to_string(),
-        ]
+        one("\"ignoring surrounding spaces and case\" is written \"ignoring case and surrounding spaces\"")
     );
 }
 
