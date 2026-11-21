@@ -125,3 +125,48 @@ test_an_items_cause_comes_from_its_record_not_its_last_words if {
 	ergo._m_record_clause(["root unusable", `$params.k is 3, which isn't text`], side) == ergo._m_clause("root", "$params.k", "unusable", `$params.k is 3, which isn't text`)
 	ergo._m_record_clause(["absent", "xs is missing"], side) == ergo._m_clause("list", "xs", "absent", "xs is missing")
 }
+
+test_a_member_is_named_like_an_item_with_its_key_in_place_of_its_position if {
+	ergo._m_item_name(["statuses", {"member": "sign-off"}], set()) == "member sign-off of statuses"
+	ergo._m_item_name(["rs", 0, "statuses", {"member": "b"}], set()) == "item 1 of rs: member b of statuses"
+	ergo._m_item_name(["evidence", {"member": "y"}, "kind"], set()) == "member y of evidence: kind"
+	ergo._m_item_name(["evidence", {"member": "a.b"}], set()) == `member "a.b" of evidence`
+}
+
+test_a_member_walk_that_finds_no_object_says_what_is_there if {
+	ergo._m_fail({"path": ["statuses"], "item": ["statuses"], "cause": "absent", "value": null, "msg": "an object"}, set()) == "statuses is missing"
+	ergo._m_fail({"path": ["statuses"], "item": ["statuses"], "cause": "null", "value": null, "msg": "an object"}, set()) == "statuses is null"
+	ergo._m_fail({"path": ["statuses"], "item": ["statuses"], "cause": "unusable", "value": ["DONE"], "msg": "an object"}, set()) == `statuses is ["DONE"], which isn't an object`
+}
+
+test_members_count_toward_and_n_more_like_items if {
+	ms := ["member a of xs is 1", "member b of xs is 1", "member c of xs is 1", `member "d e" of xs is 1`]
+	ergo._m_joined_once(ms) == "member a of xs is 1; member b of xs is 1; member c of xs is 1; and 1 more"
+	ergo._m_item_leads(ms) == ["member a of xs", "member b of xs", "member c of xs", `member "d e" of xs`]
+	not ergo._m_shown_clause(`member "d e" of xs is 1`, ["member a of xs"])
+}
+
+test_members_whose_keys_hold_a_colon_count_toward_and_n_more_one_each if {
+	ms := [`member "a: b" of statuses is 1, which isn't text`, `member "a; b: c" of statuses is 1, which isn't text`, "member p of statuses is 1, which isn't text", "member q of statuses is 1, which isn't text"]
+	ergo._m_joined_once(ms) == `member "a: b" of statuses is 1, which isn't text; member "a; b: c" of statuses is 1, which isn't text; member p of statuses is 1, which isn't text; and 1 more`
+}
+
+test_a_member_is_placed_among_the_items_of_a_tally_by_its_key if {
+	ergo._m_positions(["costs", {"member": "c"}]) == ["c"]
+	ergo._m_positions(["rs", 0, "statuses", {"member": "b"}]) == [0, "b"]
+	ergo._m_positions(["xs", 2, "v"]) == [2]
+}
+
+test_an_item_whose_count_of_member_of_ends_at_no_object_says_it_isnt_one if {
+	c := {"op": "compare", "cmp": "eq", "left": {"count_of": ["s"], "whose": [], "text": "count of member of s", "member": true}, "right": {"literal": 1}}
+	ergo._m_item_tallies({"s": [1]}, c, "unusable") == ["s is [1], which isn't an object"]
+	ergo._m_item_tallies({"s": {"x": 1}}, c, "unusable") == []
+	l := {"op": "compare", "cmp": "eq", "left": {"count_of": ["s"], "whose": [], "text": "count of s"}, "right": {"literal": 1}}
+	ergo._m_item_tallies({"s": {"x": 1}}, l, "unusable") == [`s is {"x": 1}, which isn't a list`]
+	ergo._m_item_tallies({"s": [1]}, l, "unusable") == []
+}
+
+test_a_named_failure_a_member_walk_wanted_as_an_object_says_it_isnt_one if {
+	ergo._m_named_fail({"path": "r.s", "cause": "unusable", "value": [1], "wants": "an object"}) == "r.s is [1], which isn't an object"
+	ergo._m_named_fail({"path": "r.s", "cause": "unusable", "value": [1]}) == "r.s is [1], which isn't a list or an object"
+}

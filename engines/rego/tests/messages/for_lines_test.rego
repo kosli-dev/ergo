@@ -75,3 +75,54 @@ test_message_an_and_more_goes_with_the_root_problems_it_counts_though_the_root_c
 	ergo._m_unskipped(p, roots) == "r.v is missing"
 	ergo._m_unskipped("v is missing; and 2 more", roots) == "v is missing; and 2 more"
 }
+
+test_the_lead_of_a_clause_goes_through_items_and_members_alike if {
+	ergo._m_item_lead("item 1 of rs: member b of statuses is 1, which isn't text") == "item 1 of rs: member b of statuses"
+	ergo._m_item_lead("member y of evidence: item 2 of ks is 1") == "member y of evidence: item 2 of ks"
+}
+
+test_the_lead_of_a_clause_reads_a_member_key_whole_whatever_it_holds if {
+	ergo._m_item_lead(`member "a: b" of statuses is 1, which isn't text`) == `member "a: b" of statuses`
+	ergo._m_item_lead(`member "a; b: c" of statuses is 1`) == `member "a; b: c" of statuses`
+	ergo._m_item_lead(`member "a\" of b" of statuses is 1`) == `member "a\" of b" of statuses`
+	ergo._m_item_lead(`member "x of y" of statuses is 1`) == `member "x of y" of statuses`
+	ergo._m_item_lead(`item 1 of records: member "a: b" of r.evidence: e.status is 1`) == `item 1 of records: member "a: b" of r.evidence`
+}
+
+test_an_item_a_member_walk_wanted_as_an_object_says_it_isnt_one if {
+	ergo._m_named_item({"item": "evidence", "cause": "unusable", "value": [1], "wants": "an object"}) == "evidence is [1], which isn't an object"
+	ergo._m_named_item({"item": "evidence", "cause": "unusable", "value": [1]}) == "evidence is [1], which isn't a list or an object"
+}
+
+test_a_for_line_cuts_a_text_said_once_out_of_a_member_clause_as_out_of_an_item_clause if {
+	said := ["$params.k is missing"]
+	ergo._m_for_unled(said, "member a of xs: $params.k is missing") == ["$params.k is missing"]
+	ergo._m_for_unled(said, "member a of xs: v is 1, and $params.k is missing") == ["$params.k is missing", "member a of xs: v is 1"]
+	ergo._m_for_unled(said, "member a of xs: $params.k is missing, and v is 1") == ["$params.k is missing", "member a of xs: v is 1"]
+	ergo._m_for_unled(said, "member a of xs: v is 1, and $params.k is missing, and w is 2") == ["$params.k is missing", "member a of xs: v is 1, and w is 2"]
+}
+
+test_a_for_line_counts_and_cuts_members_toward_and_n_more_like_items if {
+	ents := [{"t": "member a of xs: v is 1", "x": false}, {"t": "member b of xs: v is 1", "x": false}, {"t": "$params.k is missing", "x": false}]
+	ergo._m_for_counted(ents) == ["member a of xs", "member b of xs"]
+	ergo._m_cut_item("member d of xs: v is 1", ["member a of xs"])
+	not ergo._m_cut_item("member a of xs: v is 1", ["member a of xs"])
+}
+
+test_a_for_line_reads_the_lead_and_the_list_of_a_member_clause if {
+	ergo._m_lead_of(`member x of r.evidence: e.status is "NO"`) == "member x of r.evidence"
+	ergo._m_lead_of(`member "a: b" of r.evidence: e.status is "NO"`) == `member "a: b" of r.evidence`
+	ergo._m_lead_list("member x of r.evidence") == "r.evidence"
+	ergo._m_lead_list(`member "x of y" of r.evidence`) == "r.evidence"
+	ergo._m_releaded("item 1 of rs", "member b of r.e: v is 1") == "item 1 of rs: member b of r.e: v is 1"
+}
+
+_unclean_key_whose := {"cmp": "eq", "left": ["kind"], "op": "compare", "right": ["m", {"ref": ["$$params", "k"]}]}
+
+test_message_for_item_reads_each_member_when_it_asks_whether_an_item_cant_take_the_key if {
+	ergo._for_list_unclean({"path": ["ev"], "member": true}, {"ev": {"a": {"kind": "a", "m": {}}, "b": {"m": {}}}}, _unclean_key_whose) with data.ergo_params as {"k": 3}
+	ergo._for_list_unclean({"path": ["ev"]}, {"ev": [{"kind": "a", "m": {}}, {"m": {}}]}, _unclean_key_whose) with data.ergo_params as {"k": 3}
+	not ergo._for_list_unclean({"path": ["ev"], "member": true}, {"ev": {"a": {"kind": "a", "m": {}}, "b": {"kind": "b", "m": {}}}}, _unclean_key_whose) with data.ergo_params as {"k": 3}
+	not ergo._for_list_unclean({"path": ["ev"], "member": true}, {"ev": [{"m": {}}]}, _unclean_key_whose) with data.ergo_params as {"k": 3}
+	not ergo._for_list_unclean({"path": ["ev"]}, {"ev": {"b": {"m": {}}}}, _unclean_key_whose) with data.ergo_params as {"k": 3}
+}

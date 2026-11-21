@@ -58,11 +58,9 @@ _walked_state_of(x, w, states) := "unusable" if {
 	_m_leaf_needs(x, [_walk_value(e.v, e, w) | some e in w.items])
 }
 
-_walked_tally_walk(subj, y) := _walk(_walk_start({"path": p}, subj), _walk_keys({"path": p}, subj), true) if p := y[_basic_form(y)]
-
 _walked_tally_states(subj, y) := (({x.cause | some x in w.fails} | {x.cause | some x in _walk_stop(w)}) | {st | some e in w.items; some st in _tally_mark(true, e)}) | _tally_number_states(f, _tally_distinct(y, [e.v | some e in w.items], subj, "read")) if {
 	f := _basic_form(y)
-	w := _walked_tally_walk(subj, y)
+	w := _tally_walk(subj, y)
 }
 
 _walked_tallies(c) := {y |
@@ -81,7 +79,7 @@ _m_walked_tally_texts(subj, ys, st) := [x[1] |
 	some y in sort(ys)
 	_worst_of(_walked_tally_states(subj, y) & _failed_read_states) == st
 	f := _basic_form(y)
-	w := _walked_tally_walk(subj, y)
+	w := _tally_walk(subj, y)
 	roots := _dotted_roots([y[f]])
 	some x in array.concat([[z.cause, _m_fail(z, roots)] | some z in array.concat(w.fails, _walk_stop(w))], [z | some e in w.items; some z in _m_tally_item(f, e, roots)])
 	x[0] == st

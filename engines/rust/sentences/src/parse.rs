@@ -601,15 +601,6 @@ impl Parser {
         self.path(i, Side::Left)
     }
 
-    pub(crate) fn distinct_path(&self, i: usize, side: Side) -> Reads<(bool, Path)> {
-        let mut out = Vec::new();
-        if let Some(j) = self.lead(i, "distinct") {
-            out.extend(self.path(j, side).into_iter().map(|(p, k)| ((true, p), k)));
-        }
-        out.extend(self.path(i, side).into_iter().map(|(p, k)| ((false, p), k)));
-        out
-    }
-
     fn derived(&self, i: usize) -> Reads<Derived> {
         let mut out = Vec::new();
         for (spelling, kind) in [
@@ -617,12 +608,13 @@ impl Parser {
             ("sum of", DerivedKind::Sum),
         ] {
             if let Some(j) = self.lead(i, spelling) {
-                for ((distinct, path), end) in self.distinct_path(j, Side::Left) {
+                for (((distinct, member), path), end) in self.member_path(j) {
                     out.push((
                         Derived {
                             kind,
                             path,
                             distinct,
+                            member,
                             whose: Vec::new(),
                         },
                         end,
@@ -1130,7 +1122,7 @@ impl Parser {
             && let Some((quantifier, j)) = self.quantifier(w)
             && let Some(k) = self.ws(j)
         {
-            for ((distinct, path), m) in self.distinct_path(k, Side::Left) {
+            for (((distinct, member), path), m) in self.member_path(k) {
                 let mut ends = Vec::new();
                 if let Some(n) = self.if_any(m) {
                     ends.push((true, n));
@@ -1143,7 +1135,11 @@ impl Parser {
                                 FromCondition::Quantified {
                                     quantifier,
                                     path: path.clone(),
-                                    options: ListOptions { distinct, if_any },
+                                    options: ListOptions {
+                                        distinct,
+                                        member,
+                                        if_any,
+                                    },
                                     phrase,
                                 },
                                 end,
@@ -1170,7 +1166,7 @@ impl Parser {
         )
     }
 
-    fn member_path(&self, i: usize) -> Reads<((bool, bool), Path)> {
+    pub(crate) fn member_path(&self, i: usize) -> Reads<((bool, bool), Path)> {
         let mut starts = Vec::new();
         if let Some(j) = self.lead(i, "distinct") {
             starts.push((true, j));

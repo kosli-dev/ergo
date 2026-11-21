@@ -124,11 +124,18 @@ _s_text_names(text) := {concat("", ["unknown name ", m[1]]) |
 
 else := set()
 
-_s_base_problems(parsed) := ((((((((((((((((({concat("", [node.bare_word, " is a word of the grammar: write .", node.bare_word]) |
+_s_base_problems(parsed) := (((((((((((((((((({concat("", [node.bare_word, " is a word of the grammar: write .", node.bare_word]) |
 	some node in _s_nodes(parsed)
 	is_object(node)
 	"bare_word" in object.keys(node)
-} | {concat("", [node.bad_name, " can't be an alias"]) |
+} | {"distinct can't go with every member of" |
+	some node in _s_nodes(parsed)
+	is_object(node)
+	object.get(node, "member", false) == true
+	object.get(node, "distinct", false) == true
+	some k in {"every", "some", "count", "sum"}
+	is_object(object.get(node, k, null))
+}) | {concat("", [node.bad_name, " can't be an alias"]) |
 	some node in _s_nodes(parsed)
 	is_object(node)
 	"bad_name" in object.keys(node)
@@ -407,8 +414,6 @@ _s_problems(text, pat) := [concat("", ["unclosed quote at column ", _json_text(c
 		not regex.match(pat.string, token)
 	]
 	count(invalid) > 0
-} else := [_s_member_misplaced] if {
-	_s_member_after_a_word(text, pat)
 } else := sort(problems) if {
 	problems := _s_sentence_problems(_s_parsed_anyway(text, pat), pat) | _s_text_names(text)
 	count(problems) > 0
@@ -427,32 +432,6 @@ _s_problems(text, pat) := [concat("", ["unclosed quote at column ", _json_text(c
 } else := ["doesn't parse"]
 
 _s_distinct_misplaced := "distinct goes after every, some, count of or sum of"
-
-_s_member_misplaced := "every member of only goes on a from line for now"
-
-_s_member_after_a_word(text, pat) if {
-	tokens := [m[0] | some m in regex.find_all_string_submatch_n(concat("", [`(?:`, pat.strings, `|[^ ])+`]), trim_space(text), -1)]
-	some i, word in tokens
-	word == "member"
-	tokens[i + 1] == "of"
-	_s_member_after(_s_before_member(tokens, i))
-}
-
-_s_before_member(tokens, i) := array.slice(tokens, max([0, i - 3]), i - 1) if {
-	i > 1
-	tokens[i - 1] == "distinct"
-} else := array.slice(tokens, max([0, i - 2]), i)
-
-_s_member_after(before) if {
-	count(before) > 0
-	before[count(before) - 1] in _quantifier_words
-}
-
-_s_member_after(before) if {
-	count(before) == 2
-	before[0] in _term_tally_keys
-	before[1] == "of"
-}
 
 _s_distinct_misplaced_in(text, pat) if {
 	tokens := [m[0] | some m in regex.find_all_string_submatch_n(concat("", [`(?:`, pat.strings, `|[^ ])+`]), trim_space(text), -1)]

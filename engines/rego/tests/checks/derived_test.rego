@@ -39,3 +39,13 @@ test_a_count_fails_on_the_root_a_key_from_the_item_is_read_in_even_when_the_list
 	ergo._tally({"xs": []}, _count_keyed_by_item("$params.m")).states == {"unusable"} with data.ergo_params as {"m": 3}
 	ergo._tally({"xs": []}, _count_keyed_by_item("$input.m")).states == {"absent"} with data.ergo_document as {}
 }
+
+test_a_count_or_sum_of_member_of_walks_each_member_of_the_object_as_an_item if {
+	side := {"sum_of": ["costs"], "whose": [], "text": "sum of member of costs", "member": true}
+	t := ergo._tally({"costs": {"b": 5, "a": 1, "c": "x"}}, side)
+	t.values == [1, 5, "x"]
+	t.list == "costs"
+	t.states == {"unusable"}
+	approvals := {"count_of": ["evidence"], "whose": [{"op": "equals", "path": ["kind"], "value": "approval"}], "text": "count of member of evidence", "member": true}
+	ergo._tally({"evidence": {"x": {"kind": "scan"}, "y": {"kind": "approval"}}}, approvals).value == 1
+}
