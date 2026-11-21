@@ -103,7 +103,7 @@ test_a_root_read_fine_by_every_assertion_stays_usable_on_the_row if {
 	[[i.name, i.outcome] | some i in ergo._said_outcomes(row).inputs] == [["z", "usable"], ["y", "unusable"]]
 }
 
-_tag_each(inputs, _, _, _) := [object.union(i, {"part": {"id": null, "name": "lock"}}) | some i in inputs]
+_tag_each(inputs, check, req, subj) := [object.union(i, {"part": {"id": null, "name": "lock"}}) | some i in inputs]
 
 test_a_walk_in_an_option_or_among_several_assertions_tags_the_parts_it_reads_and_a_for_line_is_left_as_it_was if {
 	c := ergo._s_written_check("every xs.k is 1")
