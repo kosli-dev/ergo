@@ -435,3 +435,28 @@ fn a_root_two_sentences_say_is_said_once_in_the_first() {
         "zz is missing; $params.c is 3, which isn't text; $params.a is null"
     );
 }
+
+#[test]
+fn an_items_own_part_beside_the_items_under_it_isnt_counted() {
+    let clauses: Vec<Clause> = (1..=5)
+        .map(|n| {
+            let review = if n == 1 { 2 } else { 1 };
+            item(
+                &format!("item {n} of cs"),
+                Cause::Value,
+                vec![
+                    item(
+                        &format!("item {review} of c.reviews"),
+                        Cause::Value,
+                        vec![root("ok", Cause::Value, "ok is false")],
+                    ),
+                    root("c.a", Cause::Value, "c.a is 2"),
+                ],
+            )
+        })
+        .collect();
+    assert_eq!(
+        text(&shown(&clauses)),
+        "item 1 of cs: item 2 of c.reviews: ok is false; item 1 of cs: c.a is 2; item 2 of cs: item 1 of c.reviews: ok is false; item 2 of cs: c.a is 2; item 3 of cs: item 1 of c.reviews: ok is false; item 3 of cs: c.a is 2; and 2 more"
+    );
+}
