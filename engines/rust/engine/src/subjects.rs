@@ -2209,14 +2209,14 @@ fn located_below<'a>(base: &Located<'a>, segs: &[walk::Seg]) -> Located<'a> {
     for seg in segs {
         let value = match (seg, at.value) {
             (walk::Seg::Index(i), Value::Array(items)) => items.get(*i as usize),
-            (walk::Seg::Key(key), Value::Object(map)) => map.get(key),
+            (walk::Seg::Key(key) | walk::Seg::Member(key), Value::Object(map)) => map.get(key),
             _ => None,
         };
         at = Located {
             value: value.unwrap_or(&Value::Null),
             location: match seg {
                 walk::Seg::Index(i) => at.location.index(*i),
-                walk::Seg::Key(key) => at.location.key(key),
+                walk::Seg::Key(key) | walk::Seg::Member(key) => at.location.key(key),
             },
         };
     }
@@ -2829,7 +2829,7 @@ fn walk_part(
             .iter()
             .filter(|i| {
                 let n = i.get("name").and_then(Value::as_str).unwrap_or("");
-                !parts::item_input(n, &lists)
+                !walked_list_input(n, &lists, walk, ctx)
                     && ((failures.is_empty() && !keyed) || !own.iter().any(|o| o == n))
             })
             .cloned()
@@ -2838,6 +2838,14 @@ fn walk_part(
         failures,
         message: clause::text(&said),
     }
+}
+
+fn walked_list_input(name: &str, lists: &[String], walk: &ops::walk::Walk, ctx: &Ctx) -> bool {
+    parts::item_input(name, lists)
+        || (matches!(walk.path.steps.last(), Some(Step::Members))
+            && walk::walked_names(walk, ctx)
+                .first()
+                .is_some_and(|n| n == name))
 }
 
 fn line_of(said: &Clause) -> String {

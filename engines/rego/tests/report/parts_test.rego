@@ -103,7 +103,11 @@ test_a_root_read_fine_by_every_assertion_stays_usable_on_the_row if {
 	[[i.name, i.outcome] | some i in ergo._said_outcomes(row).inputs] == [["z", "usable"], ["y", "unusable"]]
 }
 
-_tag_each(inputs, check, req, subj) := [object.union(i, {"part": {"id": null, "name": "lock"}}) | some i in inputs]
+_tag_each(inputs, check, req, subj) := [object.union(i, {"part": {"id": null, "name": "lock"}}) | some i in inputs] if {
+	is_object(check)
+	is_object(req)
+	is_object(subj)
+}
 
 test_a_walk_in_an_option_or_among_several_assertions_tags_the_parts_it_reads_and_a_for_line_is_left_as_it_was if {
 	c := ergo._s_written_check("every xs.k is 1")
@@ -120,4 +124,50 @@ test_a_counted_list_written_with_a_dot_is_never_an_input_of_an_assertion_in_an_o
 	e := {"kind": "assertion", "name": "count of .lock.pkgs is 1", "cause": "value", "inputs": [{"name": "count of .lock.pkgs", "value": 2}, {"name": ".lock.pkgs[]", "outcome": "usable", "value": [{"n": 1}, {"n": 2}]}], "failures": [], "message": "count of .lock.pkgs is 2"}
 	row := {"ergo/subj": {"id": "t1", "lock": {"pkgs": [{"n": 1}, {"n": 2}]}}, "ergo/req": {}}
 	[i.name | some i in ergo._tallied_entry(e, c, {"cause": "value"}, "/repos/0", {"check": {"op": "sentence_any_of"}}, row).inputs] == ["count of .lock.pkgs"]
+}
+
+test_a_member_nests_under_the_items_of_the_lists_before_it_like_an_item if {
+	ergo._level_names("member b of rs[0].statuses", 1) == ["item 1 of rs", "member b of statuses"]
+	ergo._level_names(`member "a; b" of rs[1].statuses`, 1) == ["item 2 of rs", `member "a; b" of statuses`]
+	ergo._level_names("item 2 of rs[0].statuses", 1) == ["item 1 of rs", "item 2 of statuses"]
+}
+
+test_a_tally_entry_keeps_a_member_name_whole_when_its_key_holds_a_colon if {
+	e := {"kind": "item", "name": `member "a: b" of statuses`, "cause": "unusable", "inputs": [], "locations": ["~~/statuses/a: b"], "message": `member "a: b" of statuses is "x", which isn't a number`}
+	x := ergo._tally_leveled(e, ["statuses", {"member": "a: b"}], {"trail": []}, "/things/0")
+	[x.name, x.message] == [`member "a: b" of statuses`, `member "a: b" of statuses is "x", which isn't a number`]
+	not x["ergo/levels"]
+	y := ergo._tally_leveled(object.union(e, {"name": `member "a; b: c" of statuses`, "message": "kind is missing"}), ["statuses", {"member": "a; b: c"}], {"trail": []}, "/things/0")
+	[y.name, y.message] == [`member "a; b: c" of statuses`, "kind is missing"]
+}
+
+test_the_list_of_a_member_is_what_follows_its_key if {
+	ergo._list_base("member b of statuses") == "statuses"
+	ergo._list_base(`member "x of y" of r.evidence`) == "r.evidence"
+	ergo._list_base("item 2 of xs[0].ys") == "xs"
+	ergo._list_base("xs") == "xs"
+}
+
+test_a_text_beside_a_member_that_names_no_item_is_a_root_text if {
+	ergo._root_text("member b of xs", "$params.k is missing")
+	not ergo._root_text("member b of xs", "member b of xs is 1")
+	not ergo._root_text("member b of xs", "")
+}
+
+test_a_member_read_by_its_key_is_its_list_and_its_key if {
+	ergo._whose_item_name({"item": "member b of xs"}) == "xs.b"
+	ergo._whose_item_name({"item": `member "a b" of r.evidence`}) == `r.evidence."a b"`
+	ergo._whose_item_name({"item": "item 2 of xs"}) == "xs[1]"
+}
+
+test_the_object_a_count_of_member_of_reads_is_its_own_read_as_a_walked_list_is if {
+	members := ergo._s_written_check("sum of member of costs is at most 3")
+	ergo._tally_own_read({"name": "costs", "value": [1, 5]}, members, set(), [{"kind": "item"}])
+	ergo._tally_own_read({"name": "costs", "value": []}, members, set(), [])
+	not ergo._tally_own_read({"name": "costs", "value": 5}, members, set(), [])
+	not ergo._tally_own_read({"name": "costs.x", "value": [1]}, members, set(), [])
+	ergo._tally_own_read({"name": "costs[]", "value": [1]}, members, set(), [{"kind": "item"}])
+	items := ergo._s_written_check("sum of costs is at most 3")
+	ergo._tally_own_read({"name": "costs[]"}, items, set(), [{"kind": "item"}])
+	ergo._tally_own_read({"name": "costs"}, items, set(), [{"kind": "item"}])
 }

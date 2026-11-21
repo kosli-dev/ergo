@@ -350,7 +350,9 @@ _whose_read_name(p, f) := concat("", [_whose_item_name(f), ".", _path_name(array
 
 else := _whose_item_name(f)
 
-_whose_item_name(f) := concat("", [_list_base(f.item), "[", format_int(to_number(substring(f.item, 5, indexof(f.item, " of ") - 5)) - 1, 10), "]"])
+_whose_item_name(f) := concat("", [p[1], ".", substring(p[0], 7, -1)]) if p := _member_parts(f.item)
+
+else := concat("", [_list_base(f.item), "[", format_int(to_number(substring(f.item, 5, indexof(f.item, " of ") - 5)) - 1, 10), "]"])
 
 _whose_read(_, p, f, st) := {"name": _whose_read_name(p, f), "value": null, "locations": f.locations, "outcome": _worst_of({st} | {x | some seg in p; x := _ref_step_flaw(seg); x in _value_fault_causes})} if st in _no_value_states
 
@@ -530,6 +532,17 @@ _tally_own_read(i, c, _, _) if {
 _tally_own_read(i, c, _, items) if {
 	items != []
 	some side in _m_tally_parts(c)
+	not side.member
+	p := side[_basic_form(side)]
+	is_array(p)
+	_m_aliased(i.name) == _m_aliased(_input_name(p))
+}
+
+_tally_own_read(i, c, _, _) if {
+	is_array(i.value)
+	not contains(i.name, "[]")
+	some side in _m_tally_parts(c)
+	side.member == true
 	p := side[_basic_form(side)]
 	is_array(p)
 	_m_aliased(i.name) == _m_aliased(_input_name(p))
@@ -935,11 +948,9 @@ _list_base(name) := substring(n, 0, indexof(n, "[")) if {
 	contains(n, "[")
 } else := _unitemed(name)
 
-_unitemed(name) := concat(" of ", array.slice(ps, 1, count(ps))) if {
-	startswith(name, "item ")
-	ps := split(name, " of ")
-	count(ps) > 1
-} else := name
+_unitemed(name) := p[1] if p := _item_parts(name)
+
+else := name
 
 _walk_entries(_, [], _) := []
 
@@ -957,8 +968,8 @@ _root_texts(row, texts) := [t | some k, t in texts; _root_text(row.failed_items[
 
 _root_text(name, t) if {
 	t != ""
-	startswith(name, "item ")
-	not startswith(t, "item ")
+	_walk_kind(name) == "item"
+	_walk_kind(t) == "list"
 }
 
 _walk_entries(row, texts, at) := _nested_items([_leveled(_walk_entry(row, texts, name, at), row, name, at) |
@@ -1004,14 +1015,13 @@ _item_levels_of(row, name) := ls[0] if {
 	count(ls) > 0
 } else := []
 
-_level_names(name, m) := array.concat(_outer_level_names(b, m), [concat("", ["item ", substring(name, 5, at - 5), " of ", _level_field(b.fields[m])])]) if {
-	startswith(name, "item ")
-	at := indexof(name, " of ")
-	b := _level_bits(substring(name, at + 4, -1), m)
+_level_names(name, m) := array.concat(_outer_level_names(b, m), [concat("", [p[0], " of ", _level_field(b.fields[m])])]) if {
+	p := _item_parts(name)
+	b := _level_bits(p[1], m)
 }
 
 _level_names(name, m) := array.concat(_outer_level_names(b, m), [b.fields[m]]) if {
-	not startswith(name, "item ")
+	_walk_kind(name) == "list"
 	b := _level_bits(name, m)
 }
 
@@ -1096,10 +1106,6 @@ else := []
 _reads_inside(f, name) if f.path != name
 
 _reads_inside(_, name) if _walk_kind(name) == "list"
-
-_walk_kind(name) := "item" if startswith(name, "item ")
-
-else := "list"
 
 _item_seen(row, name, at) := {"value": item.value, "locations": _anchored_all([item], at)[0].locations} if {
 	_walk_kind(name) == "item"
@@ -1446,7 +1452,7 @@ _tally_keyed_found(c, subj, m) := [{"side": side, "w": w, "roots": roots, "e": e
 	every seg in side[f] {
 		is_string(seg)
 	}
-	w := _walk(_walk_start({"path": side[f]}, subj), _walk_keys({"path": side[f]}, subj), true)
+	w := _tally_walk(subj, side)
 	roots := _dotted_roots([side[f]])
 	some clause in _m_top_split(m, "; ")
 	lead := _m_lead_of(clause)
@@ -1468,7 +1474,7 @@ _tally_item_records(c, subj, cause, at, m) := [x |
 	mc := object.union(_m_with_sides(_m_walked(c, subj)), {"ergo/row": true})
 	some side in _m_tally_parts(mc)
 	f := _basic_form(side)
-	w := _walk(_walk_start({"path": side[f]}, subj), _walk_keys({"path": side[f]}, subj), true)
+	w := _tally_walk(subj, side)
 	roots := _dotted_roots([side[f]])
 	rs := _m_tally_said(subj, side, cause)
 	some r0 in rs
@@ -1659,7 +1665,7 @@ _tally_leveled(e, path, w, at) := object.union(e, object.union(
 	_levels_key([_tally_level(path, idx[j], names[j], w, at) | some j, _ in array.slice(names, 0, count(names) - 1)]),
 )) if {
 	e.kind == "list"
-	names := split(e.name, ": ")
+	names := _m_quote_split(e.name, ": ")
 	idx := [j | some j, step in path; is_number(step)]
 } else := object.union(e, object.union(
 	{
@@ -1670,7 +1676,7 @@ _tally_leveled(e, path, w, at) := object.union(e, object.union(
 	},
 	_levels_key([_tally_level(path, idx[j], names[j], w, at) | some j, _ in array.slice(names, 0, count(names) - 1)]),
 )) if {
-	names := split(e.name, ": ")
+	names := _m_quote_split(e.name, ": ")
 	idx := [j | some j, step in path; is_number(step)]
 }
 
