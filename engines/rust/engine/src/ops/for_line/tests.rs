@@ -3469,3 +3469,52 @@ fn a_second_lines_whose_key_that_is_the_first_alias_fails_the_row_on_an_empty_li
         assert_eq!(row["message"], message, "{for_line}");
     }
 }
+
+#[test]
+fn a_sentence_that_reads_only_the_first_alias_says_each_items_own_read_beside_a_root_on_two_lists()
+{
+    let items = "item 1 of xs: x.v is \"s\", which isn't a number; item 2 of xs: x.v is null; item 3 of xs: x.v is missing";
+    for (for_line, assertion, root, params) in [
+        (
+            "every xs as x, every es as e",
+            "x.v is at least z",
+            "z is missing",
+            json!({}),
+        ),
+        (
+            "every xs as x, every x.ys, if any, as y",
+            "x.v is at least z",
+            "z is missing",
+            json!({}),
+        ),
+        (
+            "some xs as x, every es, if any, as e",
+            "x.v is at least z",
+            "z is missing",
+            json!({}),
+        ),
+        (
+            "every xs as x, every es as e",
+            "x.v is at least $params.min",
+            "$params.min is missing",
+            json!({}),
+        ),
+        (
+            "every xs as x, every es as e",
+            "x.v is at least $params.min",
+            "$params.min is null",
+            json!({"min": null}),
+        ),
+    ] {
+        assert_eq!(
+            for_row(
+                for_line,
+                &[assertion],
+                json!({"xs": [{"v": "s", "ys": [1]}, {"v": null, "ys": [1]}, {"ys": [1]}], "es": [{"n": 1}]}),
+                params,
+            ),
+            ("unusable".to_string(), format!("{root}; {items}")),
+            "{for_line} {assertion}"
+        );
+    }
+}
