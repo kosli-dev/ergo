@@ -590,6 +590,9 @@ fn phrase_text(phrase: &Phrase, aliases: &[&str]) -> String {
             };
             operand(words, o)
         }
+        Phrase::Ignoring { phrase, ignoring } => {
+            format!("{} {}", phrase_text(phrase, aliases), ignoring.words())
+        }
     }
 }
 

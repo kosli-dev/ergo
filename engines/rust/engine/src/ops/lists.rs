@@ -37,6 +37,7 @@ pub struct In {
     pub path: Path,
     pub values: Right,
     pub not: bool,
+    pub ignoring: Option<super::compare::Ignoring>,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -536,6 +537,28 @@ impl Matches {
     }
 }
 
+fn in_text(
+    check: &In,
+    ignoring: super::compare::Ignoring,
+    values: &[Value],
+    outcome: &Outcome,
+    found: Option<&Value>,
+) -> Cause {
+    let text = match left_cause(outcome, found) {
+        Ok(Value::String(text)) => text,
+        Ok(_) => return Cause::Unusable,
+        Err(cause) => return cause,
+    };
+    if !values.iter().all(Value::is_string) {
+        return Cause::Unusable;
+    }
+    let text = ignoring.prepare(&text);
+    let hit = values
+        .iter()
+        .any(|v| v.as_str().is_some_and(|w| ignoring.prepare(w) == text));
+    verdict(hit != check.not)
+}
+
 pub fn run_in(check: &In, ctx: &Ctx) -> Verdict {
     judged(
         &check.path,
@@ -546,6 +569,9 @@ pub fn run_in(check: &In, ctx: &Ctx) -> Verdict {
             let Value::Array(values) = values else {
                 return Cause::Unusable;
             };
+            if let Some(ignoring) = check.ignoring {
+                return in_text(check, ignoring, values, outcome, found);
+            }
             let Ok(kind) = one_type(values.iter()) else {
                 return Cause::Unusable;
             };
@@ -716,8 +742,25 @@ pub fn lower_phrase(
                     path,
                     values,
                     not: *not,
+                    ignoring: None,
                 })
             }),
+        tree::Phrase::Ignoring {
+            phrase: inner,
+            ignoring,
+        } => match &**inner {
+            tree::Phrase::OneOf { not, list } => {
+                joined(left(), list_right(list, scope)).map(|(path, values)| {
+                    Check::In(In {
+                        path,
+                        values,
+                        not: *not,
+                        ignoring: Some(super::compare::Ignoring::of(*ignoring)),
+                    })
+                })
+            }
+            _ => return None,
+        },
         tree::Phrase::Contains { not, operand } => {
             contains(operand_right(operand, scope)?.map(Wanted::One), *not)
         }
@@ -1089,7 +1132,18 @@ fn left_found(path: &Path, ctx: &Ctx) -> Option<(String, Value)> {
     }
 }
 
+fn in_text_faults(check: &In, ctx: &Ctx) -> Vec<(String, String)> {
+    left_found(&check.path, ctx)
+        .filter(|(_, found)| !found.is_string())
+        .map(|(name, found)| super::message::fault(&name, &found, "text"))
+        .into_iter()
+        .collect()
+}
+
 pub fn in_faults(check: &In, ctx: &Ctx) -> Vec<(String, String)> {
+    if check.ignoring.is_some() {
+        return in_text_faults(check, ctx);
+    }
     let mut out = Vec::new();
     if let (Some((name, found)), Some(Value::Array(values))) = (
         left_found(&check.path, ctx),

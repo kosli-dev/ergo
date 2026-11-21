@@ -226,7 +226,7 @@ _s_number_problem -> _too_long_problem
 _s_option_messages -> _written_name_problems
 _s_option_written_text -> _option_text
 _s_parent_key -> _s_key_text
-_s_parent_key -> _s_words
+_s_parent_key -> _s_word
 _s_time_value -> _date_shaped
 _s_time_value -> _rfc3339_shaped
 _s_walk_too_long -> _walk_steps

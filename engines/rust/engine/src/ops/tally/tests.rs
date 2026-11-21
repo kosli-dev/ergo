@@ -2276,3 +2276,14 @@ fn two_sums_in_a_row_each_say_their_own_items_joined_with_and() {
         "item 1 of items: n is \"y\", which isn't a number, and item 1 of items: m is \"z\", which isn't a number"
     );
 }
+
+#[test]
+fn a_root_compared_ignoring_case_stands_in_as_text_so_each_item_is_read_on_its_own() {
+    let check = lowered("v is $input.r ignoring case");
+    let Some(Check::Compare(alone)) = without_roots(&check) else {
+        panic!("no stand-in for {check:?}");
+    };
+    assert_eq!(alone.right, compare::Side::Value(json!("")));
+    assert!(alone.ignoring.is_some());
+    assert!(without_roots(&lowered("v is $input.r")).is_none());
+}

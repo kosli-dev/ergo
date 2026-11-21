@@ -4,6 +4,10 @@ This file is about `ergo.rego` only. The Rust engine's changes are in [engines/r
 
 ## 0.7.0
 
+### New
+
+- `is`, `equals`, `is equal to`, `is not`, `does not equal`, and `is one of` and `is not one of` with written values, can end with `ignoring case`, `ignoring surrounding spaces` or `ignoring case and surrounding spaces`, as spec 0.7 says ([text.ignoring](spec/semantics.md#text-ignoring-case-and-surrounding-spaces)). `status is one of "in progress", "done" ignoring case and surrounding spaces` passes on `"  IN Progress "`. `is in` and `is one of` with a path, like `type is in $params.states ignoring case`, are written wrong for now, with `"is in" can't take ignoring case yet`, until [#712](https://github.com/kosli-dev/ergo/issues/712) adds them. `ignoring` is a word of the grammar now, so a field with that name is written `.ignoring`. Changes the report of a policy that uses `ignoring` as a name: a bare `ignoring` is written wrong everywhere a name can stand, like a check `ignoring is an object` on a subject called `ignoring`, a child's `from: every ignoring.xs`, `sum of ignoring` or `sorted by ignoring`, and `.ignoring is "b"` names its input `.ignoring` where it said `ignoring`.
+
 ### Changed
 
 - Every subject must have an id, as spec 0.7 says ([unique_ids](spec/semantics.md#requirements)). With `from: ds`, `identified_by: id` and `ds` holding `[{"id": "a"}, {}, {"id": null}, {"id": "a"}]`, the `$unique_ids` row fails as `absent` with `repeated d ids is ["a"]; item 2 of ds: id is missing; item 3 of ds: id is null`, where it failed as `value` with `repeated d ids is ["a", null]`, and one subject without an id, which passed, fails too. `$unique_ancestor_ids` does the same for ancestors, each subject without an id is an `item` entry in `failures`, and every failed id row has `failures`, `[]` when only an id repeats. The checks' entries say `Every d has a unique id` and `count(missing(ids(ds))) + count(repeated(ids(ds))) == 0`. A subject read from inside an item, like one of `every xs.meta`, is named by that item, `item 1 of xs: meta.id is missing`, and the whole input from `$input`, `$input.id is missing`. Changes every report.

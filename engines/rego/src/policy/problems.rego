@@ -495,7 +495,9 @@ _wording_problem(node) := (({"invalid description" |
 }
 
 _op_fields := object.union(_required_fields, {
-	"compare": {"left", "right", "cmp", "within"},
+	"compare": {"left", "right", "cmp", "within", "ignoring"},
+	"in": {"path", "values", "ignoring"},
+	"not_in": {"path", "values", "ignoring"},
 	"excludes": {"path", "value", "values"},
 	"includes": {"path", "value", "values"},
 	"includes_some": {"path", "values"},

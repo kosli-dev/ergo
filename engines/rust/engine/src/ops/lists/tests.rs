@@ -36,6 +36,7 @@ fn is_in(subject: Value, values: Right, not: bool) -> Cause {
         path: x(),
         values,
         not,
+        ignoring: None,
     };
     on(subject, None, |ctx| run_in(&check, ctx)).cause
 }
@@ -123,6 +124,7 @@ fn a_field_and_a_ref_on_the_right_are_both_inputs() {
         path: x(),
         values: Right::Field(key_path(Start::Subject, &["ys"])),
         not: false,
+        ignoring: None,
     };
     let names = |v: Verdict| v.inputs.into_iter().map(|i| i.name).collect::<Vec<_>>();
     assert_eq!(
@@ -135,6 +137,7 @@ fn a_field_and_a_ref_on_the_right_are_both_inputs() {
         path: x(),
         values: Right::Ref(key_path(Start::Params, &["k"])),
         not: false,
+        ignoring: None,
     };
     let v = on(json!({"x": "a"}), Some(json!({"k": ["a"]})), |ctx| {
         run_in(&reference, ctx)
@@ -149,6 +152,7 @@ fn a_ref_that_is_missing_or_null_fails_with_its_outcome_whatever_the_field_holds
         path: x(),
         values: Right::Ref(key_path(Start::Params, &["k"])),
         not: false,
+        ignoring: None,
     };
     assert_eq!(
         on(json!({}), Some(json!({})), |ctx| run_in(&check, ctx)).cause,
@@ -180,6 +184,7 @@ fn a_ref_after_in_contains_and_matches_is_listed_after_the_field_whatever_the_ca
             path: x(),
             values: ref_k(),
             not: false,
+            ignoring: None,
         };
         let contains_check = Contains {
             path: x(),
@@ -842,6 +847,7 @@ fn a_ref_that_walks_a_list_of_objects_reads_the_params_the_same_way() {
         path: x(),
         values: params_deps_name(),
         not: false,
+        ignoring: None,
     };
     let params = Some(json!({"deps": [{"name": "click"}, {"name": "jinja2"}]}));
     assert_eq!(
@@ -1055,4 +1061,120 @@ fn a_key_read_from_a_list_input_says_the_input_isnt_an_object_whatever_the_sente
             );
         }
     }
+}
+
+const BOTH: super::super::compare::Ignoring = super::super::compare::Ignoring {
+    case: true,
+    spaces: true,
+};
+
+fn in_ignoring(subject: Value, params: Option<Value>, values: Right, not: bool) -> Verdict {
+    let check = In {
+        path: x(),
+        values,
+        not,
+        ignoring: Some(BOTH),
+    };
+    on(subject, params, |ctx| run_in(&check, ctx))
+}
+
+#[test]
+fn one_of_ignoring_case_reads_into_in_with_the_words_and_no_equals() {
+    match lowered_check(
+        "x is one of \"In Progress\", \"Done\" ignoring case and surrounding spaces",
+    ) {
+        Check::In(c) => {
+            assert_eq!(c.ignoring, Some(BOTH));
+            assert_eq!(c.values, written(json!(["In Progress", "Done"])));
+        }
+        other => panic!("{other:?}"),
+    }
+    assert!(matches!(
+        lowered_check("x is not in \"a\" ignoring case"),
+        Check::In(In {
+            not: true,
+            ignoring: Some(_),
+            ..
+        })
+    ));
+}
+
+#[test]
+fn in_ignoring_case_compares_the_prepared_texts() {
+    let values = written(json!(["in progress", "done"]));
+    for (x, hit) in [
+        (" IN Progress\u{a0}", true),
+        ("Done", true),
+        ("blocked", false),
+    ] {
+        let subject = json!({ "x": x });
+        assert_eq!(
+            in_ignoring(subject.clone(), None, values.clone(), false).cause,
+            if hit { Cause::Satisfied } else { Cause::Value },
+            "{x}"
+        );
+        assert_eq!(
+            in_ignoring(subject, None, values.clone(), true).cause,
+            if hit { Cause::Value } else { Cause::Satisfied },
+            "{x}"
+        );
+    }
+}
+
+#[test]
+fn in_ignoring_case_fails_on_a_field_that_isnt_text() {
+    let values = written(json!(["a"]));
+    for not in [false, true] {
+        for (subject, cause) in [
+            (json!({"x": 3}), Cause::Unusable),
+            (json!({"x": ["a"]}), Cause::Unusable),
+            (json!({"x": null}), Cause::Null),
+            (json!({}), Cause::Absent),
+        ] {
+            assert_eq!(
+                in_ignoring(subject.clone(), None, values.clone(), not).cause,
+                cause,
+                "{subject} {not}"
+            );
+        }
+        for list in [json!(["a", null]), json!(["a", 3])] {
+            assert_eq!(
+                in_ignoring(json!({"x": "a"}), None, written(list.clone()), not).cause,
+                Cause::Unusable,
+                "{list} {not}"
+            );
+        }
+    }
+}
+
+#[test]
+fn in_ignoring_case_names_the_field_that_isnt_text() {
+    let check = In {
+        path: x(),
+        values: written(json!(["Bug"])),
+        not: false,
+        ignoring: Some(BOTH),
+    };
+    let faults = |subject: Value| {
+        let input = json!({"things": [subject]});
+        let ctx = Ctx {
+            label: None,
+            item_by_item: false,
+            in_option: false,
+            subject: Located {
+                value: &input["things"][0],
+                location: Location::input_root().key("things").index(0),
+            },
+            input: &input,
+            params: None,
+            aliases: BTreeMap::new(),
+        };
+        in_faults(&check, &ctx)
+    };
+    assert_eq!(
+        faults(json!({"x": 3})),
+        vec![("x".to_string(), "x is 3, which isn't text".to_string())]
+    );
+    assert_eq!(faults(json!({"x": "a"})), vec![]);
+    assert_eq!(faults(json!({"x": null})), vec![]);
 }

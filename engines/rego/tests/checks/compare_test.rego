@@ -308,3 +308,14 @@ test_for_lines_keep_and_sort_items_by_every_digit_in_any_order if {
 		["b", "distinct", "value"], ["b", "first", "satisfied"],
 	})
 }
+
+test_ignoring_case_lowers_and_surrounding_spaces_trims_as_opa_does if {
+	ergo._prepared("In Progress", "case") == "in progress"
+	ergo._prepared(" A ", "case") == " a "
+	ergo._prepared("\u0130", "case") == "i"
+	ergo._prepared("\u1e9e", "case") == "\u00df"
+	ergo._prepared("STRASSE", "case") != concat("", ["stra", "\u00df", "e"])
+	ergo._prepared(concat("", ["\u00a0", "A b", "\u0085"]), "surrounding spaces") == "A b"
+	ergo._prepared(concat("", ["\u200b", "a", "\ufeff"]), "surrounding spaces") == concat("", ["\u200b", "a", "\ufeff"])
+	ergo._prepared("  IN Progress ", "case and surrounding spaces") == "in progress"
+}

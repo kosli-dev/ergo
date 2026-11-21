@@ -414,6 +414,7 @@ fn decide(test: &Test, left: &Value, right: Option<Value>, ctx: &Ctx) -> Cause {
                 right: compare::Side::Value(right),
                 cmp: *cmp,
                 within: within.clone(),
+                ignoring: None,
             };
             compare::run(&compare, ctx).cause
         }
@@ -1431,7 +1432,7 @@ pub fn without_roots(check: &Check) -> Option<Check> {
         Check::Compare(c) if root(&c.left) != root(&c.right) => {
             let value = match c.cmp {
                 Cmp::Gt | Cmp::Gte | Cmp::Lt | Cmp::Lte => Value::from(0),
-                Cmp::Eq | Cmp::Ne => return None,
+                Cmp::Eq | Cmp::Ne if c.ignoring.is_none() => return None,
                 _ => Value::from(""),
             };
             Some(Check::Compare(Compare {
@@ -1439,6 +1440,7 @@ pub fn without_roots(check: &Check) -> Option<Check> {
                 right: fill(&c.right, &value),
                 cmp: c.cmp,
                 within: c.within.clone(),
+                ignoring: c.ignoring,
             }))
         }
         Check::CompareTime(c) if root(&c.left) != root(&c.right) => {

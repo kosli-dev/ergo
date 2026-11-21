@@ -389,8 +389,13 @@ _m_fault_6(subj, check) := [[check.path, _m_kind(w)]] if {
 	type_name(v) != type_name(w)
 } else := []
 
-_m_fault_7(subj, check) := [[check.path, _m_kinds(vals)]] if {
+_m_fault_7(subj, check) := [[check.path, "text"]] if {
 	check.op in _membership_ops
+	check.ignoring
+	not is_string(_found(subj, check.path))
+} else := [[check.path, _m_kinds(vals)]] if {
+	check.op in _membership_ops
+	not check.ignoring
 	v := _found(subj, check.path)
 	vals := _wants(check.values)
 	_value_list(vals)
@@ -519,6 +524,8 @@ _m_parts_fault(subj, side) := [[p, "text"] | some p in side.join; v := _found(su
 
 _m_side_kind(_, check, _) := "a number" if "within" in object.keys(check)
 
+_m_side_kind(_, check, _) := "text" if check.ignoring
+
 _m_side_kind(_, check, _) := "text" if {
 	not "within" in object.keys(check)
 	check.cmp in _text_cmps
@@ -544,6 +551,7 @@ _m_contain_kind(v) := _m_list_of([""]) if {
 
 _m_side_kind(subj, check, side) := _m_kind(o) if {
 	not "within" in object.keys(check)
+	not check.ignoring
 	check.cmp in _equality_cmps
 	side == check.left
 	_basic_form(check.left) != "literal"
@@ -552,6 +560,7 @@ _m_side_kind(subj, check, side) := _m_kind(o) if {
 
 _m_side_kind(subj, check, side) := _m_kind(o) if {
 	not "within" in object.keys(check)
+	not check.ignoring
 	check.cmp in _equality_cmps
 	side == check.right
 	_basic_form(check.left) == "literal"

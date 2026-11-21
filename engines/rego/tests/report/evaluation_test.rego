@@ -95,3 +95,8 @@ test_a_row_that_fails_as_ambiguous_gets_its_unusable_inputs_marked_like_one_that
 test_a_check_with_no_written_policy_to_read_has_no_written_form if {
 	ergo._written_check({"req": "r", "name": "c"}) == null
 }
+
+test_a_side_of_is_ignoring_case_read_from_a_ref_needs_text_whatever_the_comparison if {
+	ergo._ref_side_kind({"op": "compare", "cmp": "eq", "left": ["x"], "right": {"ref": ["$$params", "v"]}, "ignoring": "case"}) == "text"
+	ergo._ref_side_kind({"op": "compare", "cmp": "ne", "left": ["x"], "right": {"ref": ["$$params", "v"]}, "ignoring": "surrounding spaces"}) == "text"
+}
