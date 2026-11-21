@@ -447,6 +447,10 @@ pub(super) fn named_refs(check: &Check) -> Vec<&Path> {
 }
 
 fn read_right(right: &Right, ctx: &Ctx, walks: bool) -> RightRead {
+    read_right_as(right, ctx, walks, false)
+}
+
+fn read_right_as(right: &Right, ctx: &Ctx, walks: bool, text: bool) -> RightRead {
     match right {
         Right::Written(value) => RightRead {
             outcome: Outcome::Found,
@@ -454,7 +458,7 @@ fn read_right(right: &Right, ctx: &Ctx, walks: bool) -> RightRead {
             inputs: Vec::new(),
             forced: None,
         },
-        Right::Ref(path) | Right::Field(path) => match walked(path, ctx).filter(|_| walks) {
+        Right::Ref(path) | Right::Field(path) => match walked_from(path, ctx, true, text).filter(|_| walks) {
             Some(walk) => {
                 let input = walk.input();
                 walked_read(walk, vec![input])
@@ -530,7 +534,14 @@ fn judged<F>(path: &Path, right: &Right, ctx: &Ctx, walks: bool, decide: F) -> V
 where
     F: FnOnce(&Value, &Outcome, Option<&Value>) -> Cause,
 {
-    let read = read_right(right, ctx, walks);
+    judged_as(path, right, ctx, walks, false, decide)
+}
+
+fn judged_as<F>(path: &Path, right: &Right, ctx: &Ctx, walks: bool, text: bool, decide: F) -> Verdict
+where
+    F: FnOnce(&Value, &Outcome, Option<&Value>) -> Cause,
+{
+    let read = read_right_as(right, ctx, walks, text);
     let left = read_path(path, ctx);
     let inputs = left.inputs.into_iter().chain(read.inputs).collect();
     let cause = match (read.forced.or(read.outcome.cause()), &read.value) {
@@ -636,11 +647,12 @@ fn in_text(
 }
 
 pub fn run_in(check: &In, ctx: &Ctx) -> Verdict {
-    judged(
+    judged_as(
         &check.path,
         &check.values,
         ctx,
         true,
+        check.ignoring.is_some(),
         |values, outcome, found| {
             let Value::Array(values) = values else {
                 return Cause::Unusable;
@@ -1208,11 +1220,15 @@ fn left_found(path: &Path, ctx: &Ctx) -> Option<(String, Value)> {
 }
 
 fn in_text_faults(check: &In, ctx: &Ctx) -> Vec<(String, String)> {
-    left_found(&check.path, ctx)
+    let mut out: Vec<(String, String)> = left_found(&check.path, ctx)
         .filter(|(_, found)| !found.is_string())
         .map(|(name, found)| super::message::fault(&name, &found, "text"))
         .into_iter()
-        .collect()
+        .collect();
+    out.extend(ref_fault(&check.values, ctx, Value::is_array, |_| {
+        "a list".to_string()
+    }));
+    out
 }
 
 pub fn in_faults(check: &In, ctx: &Ctx) -> Vec<(String, String)> {
