@@ -1628,7 +1628,7 @@ _tally_leveled(e, path, w, at) := object.union(e, object.union(
 	_levels_key([_tally_level(path, idx[j], names[j], w, at) | some j, _ in array.slice(names, 0, count(names) - 1)]),
 )) if {
 	e.kind == "list"
-	names := split(e.name, ": ")
+	names := _m_quote_split(e.name, ": ")
 	idx := [j | some j, step in path; is_number(step)]
 } else := object.union(e, object.union(
 	{
@@ -1639,7 +1639,7 @@ _tally_leveled(e, path, w, at) := object.union(e, object.union(
 	},
 	_levels_key([_tally_level(path, idx[j], names[j], w, at) | some j, _ in array.slice(names, 0, count(names) - 1)]),
 )) if {
-	names := split(e.name, ": ")
+	names := _m_quote_split(e.name, ": ")
 	idx := [j | some j, step in path; is_number(step)]
 }
 
