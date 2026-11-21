@@ -2382,17 +2382,15 @@ fn for_line_cases() -> Vec<(String, Value, Value, Value)> {
 
 const NO_LIST: &str = "the tree has no clause for the list itself until R5-6";
 
-const EARLIER_ALIAS: &str = "the tree has no item for a root read through an earlier line's alias when no item of the second list is checked";
+const EARLIER_ALIAS: &str = "the tree has no item for a root read through an earlier line's alias when no item of the second list is checked, and no step of the R5 design adds it before R5-6 builds the row from the tree";
 
-const KEY_FROM_A_FIELD: &str =
-    "a key read from a field on the line, like zz in ts named by zz, isn't a root clause";
+const KEY_FROM_A_FIELD: &str = "a key read from a field on the line, like zz in ts named by zz, isn't a root clause, and no step of the R5 design makes it one before R5-6 builds the row from the tree";
 
-const SAID_OUTSIDE: &str = "the row's message comes from message::row_said after the check runs again to read its walked roots, not from the for line";
+const SAID_OUTSIDE: &str = "the row's message comes from message::row_said after the check runs again to read its walked roots, not from the for line, until R5-6 gives the for line the message its clauses say";
 
-const ITEMS_BY_SENTENCE: &str =
-    "the case says item 2 before item 1, which spec/OPEN.md lists under problems.item_order";
+const ITEMS_BY_SENTENCE: &str = "the case says item 2 before item 1, which spec/OPEN.md lists under problems.item_order, and no R5 step changes it until that line is decided";
 
-const PAIR_LEAD_INSIDE: &str = "the case says the pair's lead after a sentence that doesn't read the second item, which spec/OPEN.md lists under message.join";
+const PAIR_LEAD_INSIDE: &str = "the case says the pair's lead after a sentence that doesn't read the second item, which spec/OPEN.md lists under message.join, and no R5 step changes it until that line is decided";
 
 const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 20] = [
     (
@@ -2477,7 +2475,7 @@ const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 20] = [
     ),
 ];
 
-const ROWS_COMPARED: usize = 1244;
+const ROWS_COMPARED: usize = 670;
 
 const ROWS_LISTED: usize = 30;
 
@@ -2514,7 +2512,7 @@ fn the_clauses_of_every_for_row_say_what_the_row_and_its_entries_say_today() {
         for result in report["results"].as_array().into_iter().flatten() {
             item_entries(&result["failures"], &mut entries);
         }
-        for (message, roots, items) in super::RAN.with(|ran| ran.take()) {
+        for (cause, message, roots, items) in super::RAN.with(|ran| ran.take()) {
             let message = message.unwrap_or_default();
             let clauses: Vec<crate::ops::clause::Clause> = roots.into_iter().chain(items).collect();
             let shown = crate::ops::clause::shown(&clauses);
@@ -2534,7 +2532,9 @@ fn the_clauses_of_every_for_row_say_what_the_row_and_its_entries_say_today() {
                 .map(|(name, cause)| format!("{name} is {cause}"))
                 .collect();
             if said == message && wrong.is_empty() {
-                compared += 1;
+                if cause != crate::cause::Cause::Satisfied {
+                    compared += 1;
+                }
                 continue;
             }
             match ROWS_THE_CLAUSES_DONT_SAY_YET
@@ -2674,7 +2674,7 @@ fn an_item_beside_a_root_takes_only_its_own_cause() {
 fn for_tree(for_line: &str, assertions: &[&str], subject: Value, params: Value) -> String {
     super::RAN.with(|ran| ran.borrow_mut().clear());
     for_items(for_line, assertions, subject, params);
-    let (_, roots, items) = super::RAN
+    let (_, _, roots, items) = super::RAN
         .with(|ran| ran.take())
         .pop()
         .expect("the line ran");

@@ -92,7 +92,7 @@ pub struct Run {
 }
 
 #[cfg(test)]
-type Ran = (Option<String>, Vec<Clause>, Vec<Clause>);
+type Ran = (Cause, Option<String>, Vec<Clause>, Vec<Clause>);
 
 #[cfg(test)]
 thread_local! {
@@ -1992,6 +1992,7 @@ impl For {
         #[cfg(test)]
         RAN.with(|ran| {
             ran.borrow_mut().push((
+                run.verdict.cause,
                 run.message.clone(),
                 self.root_clauses(ctx),
                 run.items.clone(),
