@@ -1362,6 +1362,9 @@ fn read_entries<'a>(
         return Read::Failed(Cause::worst([cause].into_iter().chain(base)).unwrap_or(cause));
     }
     match &lowered.source {
+        Source::Root { member: true, .. } | Source::Child { member: true, .. } => {
+            member::member_entries(env, empty, lowered, anc)
+        }
         Source::Root {
             path,
             every: true,

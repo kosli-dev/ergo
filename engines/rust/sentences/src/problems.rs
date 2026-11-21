@@ -100,7 +100,9 @@ fn member_after_a_word(c: &[char]) -> bool {
             before -= 1;
         }
         ["every", "some"].contains(&tokens[before])
-            || (before > 0 && ["count", "sum"].contains(&tokens[before - 1]) && tokens[before] == "of")
+            || (before > 0
+                && ["count", "sum"].contains(&tokens[before - 1])
+                && tokens[before] == "of")
     })
 }
 

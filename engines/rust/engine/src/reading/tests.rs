@@ -341,7 +341,11 @@ fn every_member_of_a_subjects_name_is_a_child_that_reads_the_members_of_each_par
         "t": {"from": "every member of records.evidence"}
     }));
     for name in ["m", "e", "i", "t"] {
-        assert!(!r.infos[name].problems.contains_key(&format!("subjects.{name}.from")));
+        assert!(
+            !r.infos[name]
+                .problems
+                .contains_key(&format!("subjects.{name}.from"))
+        );
     }
     assert_eq!(r.infos["m"].relation, Relation::Child("rec".into()));
     assert!(matches!(
@@ -360,10 +364,7 @@ fn every_member_of_a_subjects_name_is_a_child_that_reads_the_members_of_each_par
             ..
         }
     ));
-    assert_eq!(
-        r.lowered("m").unwrap().from_text,
-        "every member of rec"
-    );
+    assert_eq!(r.lowered("m").unwrap().from_text, "every member of rec");
     assert_eq!(
         r.lowered("t").unwrap().from_text,
         "every member of records.evidence"

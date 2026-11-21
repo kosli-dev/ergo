@@ -39,7 +39,10 @@ fn each_member_of_the_object_at_the_end_is_an_item_in_key_order_with_its_key() {
     );
     assert_eq!(
         locations(&w),
-        ["/records/0/evidence/build-7", "/records/0/evidence/sign-off"]
+        [
+            "/records/0/evidence/build-7",
+            "/records/0/evidence/sign-off"
+        ]
     );
     assert_eq!(
         keys(&w),
@@ -127,14 +130,20 @@ fn a_missing_or_null_end_keeps_absent_or_null() {
 
 #[test]
 fn an_empty_object_gives_no_member_and_fails_nothing() {
-    let w = walked(&json!({"records": [{"evidence": {}}]}), &["records", "evidence"]);
+    let w = walked(
+        &json!({"records": [{"evidence": {}}]}),
+        &["records", "evidence"],
+    );
     assert!(w.entries.is_empty());
     assert!(w.broken.is_empty());
 }
 
 #[test]
 fn a_null_member_is_still_an_item() {
-    let w = walked(&json!({"records": [{"evidence": {"a": null}}]}), &["records", "evidence"]);
+    let w = walked(
+        &json!({"records": [{"evidence": {"a": null}}]}),
+        &["records", "evidence"],
+    );
     assert_eq!(locations(&w), ["/records/0/evidence/a"]);
     assert_eq!(w.entries[0].at.value, &Value::Null);
     assert!(w.broken.is_empty());
