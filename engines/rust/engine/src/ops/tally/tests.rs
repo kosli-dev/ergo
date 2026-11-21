@@ -1954,6 +1954,17 @@ fn a_count_on_an_empty_list_whose_field_is_a_root_through_an_item_key_says_only_
 }
 
 #[test]
+fn a_count_on_an_empty_list_whose_field_is_a_root_through_an_item_key_has_no_number() {
+    let sentence = "count of xs whose v is $input.m named by key is 1";
+    for m in [json!(3), json!(null)] {
+        let input = json!({"things": [{"xs": []}], "m": m});
+        assert_eq!(entries_on_input(sentence, input)[0]["value"], json!(null));
+    }
+    let input = json!({"things": [{"xs": []}], "m": {}});
+    assert_eq!(entries_on_input(sentence, input)[0]["value"], json!(0));
+}
+
+#[test]
 fn a_count_whose_row_fails_for_params_it_walks_doesnt_say_its_number() {
     let check = lowered("count of $params.a is 1");
     let Check::Tally(tally) = &check else {
