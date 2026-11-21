@@ -66,3 +66,13 @@ test_a_tally_of_member_of_walks_each_member_of_the_object_as_an_item if {
 	[e.v | some e in w.items] == [1, 5]
 	[e.i | some e in w.items] == [["costs", {"member": "a"}], ["costs", {"member": "b"}]]
 }
+
+test_a_broken_text_list_after_is_in_ignoring_case_hides_an_empty_list_as_any_root_after_every_does if {
+	field := {"op": "compare", "cmp": "in", "left": ["x"], "right": [`${"alias":"","n":-1,"of":null,"old":true}`, "ys"], "ignoring": "case"}
+	every_field := {"op": "every", "path": ["xs", "x"], "check": field, "whose": [], "if_any": false}
+	row := ergo._walk_row(every_field, {"xs": [], "ys": [3]})
+	row.cause == "unusable"
+	row.failed == []
+	row.root_msgs == ["item 1 of ys is 3, which isn't text"]
+}
+
