@@ -87,13 +87,22 @@ _m_item_clause(name, cause, said) := {"kind": "item", "name": name, "cause": cau
 
 _m_clause_more(n) := {"kind": "more", "count": n, "name": "", "cause": "value", "text": "", "said": []}
 
-_m_clauses_shown(clauses) := array.concat(
-	array.concat(
-		[x[3] | some x in sort([[object.get(_m_clause_ranks, c.cause, 6), c.name, c.text, c] | some c in once; c.kind == "root"])],
-		[c | some c in once; c.kind == "list"],
-	),
-	[c | some c in once; c.kind == "item"],
-) if once := _once(clauses)
+_m_clauses_shown(clauses) := array.concat(_m_clauses_ahead(once), items) if {
+	once := _once(clauses)
+	items := [c | some c in once; c.kind == "item"]
+	count(items) <= 3
+}
+
+_m_clauses_shown(clauses) := array.concat(array.concat(_m_clauses_ahead(once), array.slice(items, 0, 3)), [_m_clause_more(count(items) - 3)]) if {
+	once := _once(clauses)
+	items := [c | some c in once; c.kind == "item"]
+	count(items) > 3
+}
+
+_m_clauses_ahead(once) := array.concat(
+	[x[3] | some x in sort([[object.get(_m_clause_ranks, c.cause, 6), c.name, c.text, c] | some c in once; c.kind == "root"])],
+	[c | some c in once; c.kind == "list"],
+)
 
 _m_clause_ranks := {"not_an_object": 1, "ambiguous": 2, "unusable": 3, "absent": 4, "null": 5}
 
