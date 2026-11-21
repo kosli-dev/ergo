@@ -2847,7 +2847,7 @@ const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 109] = [
     ),
 ];
 
-const ROWS_COMPARED: usize = 1411;
+const ROWS_COMPARED: usize = 1416;
 
 const ROWS_LISTED: usize = 171;
 
