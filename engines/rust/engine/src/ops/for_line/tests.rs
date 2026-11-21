@@ -2396,6 +2396,10 @@ const OTHER_SUBJECTS_CAUSE: &str = "the tree gives item 1 of ys its own cause, a
 
 const CASE_AGAINST_FOR_PASS: &str = "the case fails an item of the first list that isn't an object, a value read whole as a named by key or a list walked through its alias, when nothing is checked for it on an empty second list, where for.pass says an item that isn't an object passes when nothing is checked for it, and the tree follows the rule";
 
+const SAID_NOWHERE: &str = "the row fails from something it says nowhere, a subject that isn't an object or an item of the first list that picks nothing, as for.pick says, so no clause of the tree carries that cause, and R5-6 must take the row's cause from the line as well as from the tree";
+
+const ROW_LEAVES_OUT_AN_ITEM: &str = "the row and the tree leave out the item of the second list that the whose can't read, which the case says and which gives the row its cause, and the case is in known-failures.txt until the Rust engine says that item";
+
 const ROWS_THE_CLAUSES_DONT_SAY_YET: &[(&str, usize, &str)] = &[
     (
         "for / a $params list that a for line reads fails it when the line's whose leaves nothing and an item of the list can't be read / fails, when the whose leaves nothing",
@@ -2426,6 +2430,16 @@ const ROWS_THE_CLAUSES_DONT_SAY_YET: &[(&str, usize, &str)] = &[
         "for / a $params list that a for line walks fails it on an empty list when an item of it is null / fails, with an empty rows",
         3,
         SAID_OUTSIDE,
+    ),
+    (
+        "for / a for line on a subject that isn't an object / fails as not_an_object when the first path starts at the subject",
+        1,
+        SAID_NOWHERE,
+    ),
+    (
+        "for / a for line on a subject that isn't an object names the subject / the message names thing, never the subject",
+        1,
+        SAID_NOWHERE,
     ),
     (
         "for / a for line runs the sentences that don't read the alias of an empty list it tolerates on an item that isn't an object only when one of them reads the item / fails an approver that isn't an object with the sentence that reads it, and passes it when every sentence reads commit",
@@ -2481,6 +2495,41 @@ const ROWS_THE_CLAUSES_DONT_SAY_YET: &[(&str, usize, &str)] = &[
         "for / a for line sorted by a path named by a key from $params / a key that isn't a string fails as unusable, even on a list where a number could be a position, a null key as null and a missing one as absent, and a string key sorts by that field",
         11,
         TREE_IS_THE_CASE,
+    ),
+    (
+        "for / a for line walks a subject that is a list / an empty list fails as value, and a null subject as not_an_object",
+        2,
+        SAID_NOWHERE,
+    ),
+    (
+        "for / a for line walks a subject that is a list / an empty list fails as value, and a null subject as not_an_object",
+        5,
+        SAID_NOWHERE,
+    ),
+    (
+        "for / a for line walks a subject that is a list / an empty list fails as value, and a null subject as not_an_object",
+        6,
+        SAID_NOWHERE,
+    ),
+    (
+        "for / a for line walks a subject that is a list / an empty list fails as value, and a null subject as not_an_object",
+        7,
+        SAID_NOWHERE,
+    ),
+    (
+        "for / a for line walks a subject that is a list / an empty list fails as value, and a null subject as not_an_object",
+        8,
+        SAID_NOWHERE,
+    ),
+    (
+        "for / a for line walks a subject that is a list / every and some walk the stages, and an item with a position fails as not_an_object",
+        2,
+        SAID_NOWHERE,
+    ),
+    (
+        "for / a for line whose item path is the subject's own name walks a subject that is a list, and fails one that isn't an object / a text subject is not an object",
+        1,
+        SAID_NOWHERE,
     ),
     (
         "for / a for line whose second list fails for an item, with sentences that don't read the second alias / runs the sentences that don't read y for each item and says them before the list",
@@ -2678,6 +2727,11 @@ const ROWS_THE_CLAUSES_DONT_SAY_YET: &[(&str, usize, &str)] = &[
         WHOSE_ROOT,
     ),
     (
+        "for / a second for item picking after the first alias lists nothing when it picks nothing / a first item that fails its check is listed and one that matches nothing is not",
+        1,
+        SAID_NOWHERE,
+    ),
+    (
         "for / a second for item picking after the first alias lists nothing when it picks nothing / a first item that matches nothing fails as absent and lists no failed item",
         1,
         NO_LIST,
@@ -2736,6 +2790,16 @@ const ROWS_THE_CLAUSES_DONT_SAY_YET: &[(&str, usize, &str)] = &[
         "for / an alias that a pick on an empty list leaves without a value, read on a later line / names the alias as the policy writes it, with no $",
         2,
         NO_LIST,
+    ),
+    (
+        "for / an item of a second list that the whose can't read is said beside an item that fails the sentence / one deploy and one approver fail the sentence, and one of each has no key",
+        1,
+        ROW_LEAVES_OUT_AN_ITEM,
+    ),
+    (
+        "for / an item of a second list that the whose can't read is said beside an item that fails the sentence / one deploy and one approver fail the sentence, and one of each has no key",
+        2,
+        ROW_LEAVES_OUT_AN_ITEM,
     ),
     (
         "for / an item's own problem on a for line is said after a $params or $input root of its whose that can't be read / an item without v, with $input.os that is text",
@@ -3135,6 +3199,13 @@ fn item_causes(clauses: &[crate::ops::clause::Clause], out: &mut Vec<(String, St
     }
 }
 
+fn tree_causes(clauses: &[crate::ops::clause::Clause]) -> Vec<crate::cause::Cause> {
+    clauses
+        .iter()
+        .flat_map(|clause| std::iter::once(clause.cause).chain(tree_causes(&clause.said)))
+        .collect()
+}
+
 #[test]
 fn the_clauses_of_every_for_row_say_what_the_row_and_its_entries_say_today() {
     let mut differ: Vec<String> = Vec::new();
@@ -3157,7 +3228,7 @@ fn the_clauses_of_every_for_row_say_what_the_row_and_its_entries_say_today() {
             let said = crate::ops::clause::text(&shown);
             let mut causes: Vec<(String, String)> = Vec::new();
             item_causes(&shown, &mut causes);
-            let wrong: Vec<String> = causes
+            let mut wrong: Vec<String> = causes
                 .iter()
                 .filter(|(name, cause)| {
                     let same: Vec<&String> = entries
@@ -3169,6 +3240,15 @@ fn the_clauses_of_every_for_row_say_what_the_row_and_its_entries_say_today() {
                 })
                 .map(|(name, cause)| format!("{name} is {cause}"))
                 .collect();
+            let worst = crate::cause::Cause::worst(tree_causes(&clauses))
+                .unwrap_or(crate::cause::Cause::Satisfied);
+            if worst != cause {
+                wrong.push(format!(
+                    "the clauses fail as {} and the row as {}",
+                    worst.name(),
+                    cause.name()
+                ));
+            }
             if said == message && wrong.is_empty() {
                 if cause != crate::cause::Cause::Satisfied {
                     compared += 1;
@@ -3181,8 +3261,9 @@ fn the_clauses_of_every_for_row_say_what_the_row_and_its_entries_say_today() {
             {
                 Some((listed_id, listed_row, _)) => listed.push((*listed_id, *listed_row)),
                 None => differ.push(format!(
-                    "{id}, row {row}\n  row:   {message}\n  items: {said}\n  causes: {}",
-                    wrong.join(", ")
+                    "{id}, row {row}\n  row:   {message}\n  items: {said}\n  causes: {}\n  tree: {}",
+                    wrong.join(", "),
+                    self::causes(&clauses).join(", ")
                 )),
             }
         }
