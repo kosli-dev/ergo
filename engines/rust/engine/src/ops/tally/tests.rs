@@ -2441,3 +2441,52 @@ fn a_root_compared_ignoring_case_stands_in_as_text_so_each_item_is_read_on_its_o
     assert!(alone.ignoring.is_some());
     assert!(without_roots(&lowered("v is $input.r")).is_none());
 }
+
+fn lowered_in(scope: &Scope, sentence: &str) -> Check {
+    let tree = s::parse_check(sentence).unwrap();
+    crate::lower::lower_assertion(&tree.assertions[0], scope).unwrap()
+}
+
+fn derived_left(check: &Check) -> &Derived {
+    let Check::Tally(tally) = check else {
+        panic!("not a count or a sum");
+    };
+    let Side::Derived(derived) = &tally.left else {
+        panic!("no count or sum on the left");
+    };
+    derived
+}
+
+#[test]
+fn a_count_reads_a_hidden_alias_when_a_ref_step_of_its_list_names_it() {
+    let scope = Scope::new().with_for_alias("g");
+    let check = lowered_in(&scope, "count of xs named by g.k is 1");
+    assert!(reads_derived(derived_left(&check), &["g"]));
+    assert!(!reads_derived(derived_left(&check), &["h"]));
+}
+
+#[test]
+fn a_whose_that_reads_no_hidden_alias_does_not_make_its_count_read_one() {
+    let scope = Scope::new().with_for_alias("g");
+    let check = lowered_in(&scope, "count of rs whose v is \"a\" is 1");
+    assert!(!reads_derived(derived_left(&check), &["g"]));
+}
+
+#[test]
+fn a_whose_that_reads_a_hidden_alias_makes_its_count_read_it() {
+    let scope = Scope::new().with_for_alias("g");
+    let check = lowered_in(&scope, "count of rs whose n is count of g is 1");
+    assert!(reads_derived(derived_left(&check), &["g"]));
+    assert!(!reads_derived(derived_left(&check), &["h"]));
+}
+
+#[test]
+fn an_elapsed_term_reads_a_hidden_alias_named_on_either_end() {
+    let scope = Scope::new().with_for_alias("g");
+    let from = lowered_in(&scope, "days elapsed from g.a to y plus 1 is 2");
+    let to = lowered_in(&scope, "days elapsed from x to g.b plus 1 is 2");
+    let neither = lowered_in(&scope, "days elapsed from x to y plus 1 is 2");
+    assert!(reads_derived(derived_left(&from), &["g"]));
+    assert!(reads_derived(derived_left(&to), &["g"]));
+    assert!(!reads_derived(derived_left(&neither), &["g"]));
+}
