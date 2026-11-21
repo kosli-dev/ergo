@@ -1071,8 +1071,6 @@ struct Sfail {
     clauses: Vec<Clause>,
 }
 
-type Said = (Vec<Seg>, String, bool);
-
 struct Child {
     order: Vec<Seg>,
     entry: Dead,
@@ -1103,8 +1101,6 @@ struct Level {
 struct Collect {
     lists: Vec<(usize, Input)>,
     seen: Vec<bool>,
-    skip: Vec<String>,
-    free: Vec<String>,
 }
 
 fn is_empty_list(list: &Input) -> bool {
@@ -1256,13 +1252,13 @@ impl For {
                     Vec::new(),
                 )
             } else if last {
-                self.try_sentences(&bound, collect, false)
+                self.try_sentences(&bound, false)
             } else {
                 let mut nested = self.level(depth + 1, &bound, collect);
                 if nested.cause == Cause::Satisfied
                     && nested.children.is_empty()
                     && matches!(self.items[depth + 1].how, How::Every { if_any: true })
-                    && let (Some(failed), sfails) = self.try_sentences(&bound, collect, true)
+                    && let (Some(failed), sfails) = self.try_sentences(&bound, true)
                 {
                     nested = Level {
                         cause: failed.cause,
@@ -1284,7 +1280,7 @@ impl For {
                     let assertions = self.aggregate(&nested.children);
                     let mut leaf: Vec<(String, bool)> = Vec::new();
                     let mut parts: Vec<String> =
-                        match self.two_list_parts(&nested.children, &collect.skip) {
+                        match self.two_list_parts(&nested.children) {
                             Some(grouped) => {
                                 leaf = grouped;
                                 Vec::new()
@@ -1431,7 +1427,6 @@ impl For {
     fn try_sentences(
         &self,
         ctx: &Ctx,
-        collect: &mut Collect,
         skip_last: bool,
     ) -> (Option<Outcome>, Vec<Sfail>) {
         let alias = self.last_alias();
@@ -1523,7 +1518,6 @@ impl For {
                 } else {
                     line.clone()
                 };
-                let text = unskipped(&text, &collect.skip);
                 if !text.is_empty() {
                     push_new(&mut own, text);
                 }
@@ -1549,21 +1543,12 @@ impl For {
                 &f.parts
             };
             let prior = clauses.clone();
-            let free = !f.reads_last
-                && !self
-                    .items
-                    .iter()
-                    .any(|item| reads_alias(&self.sentences[f.idx].check, &item.alias));
             for line in lines {
                 let text = if all_own {
                     own_text(line, alias, f.one)
                 } else {
                     line.clone()
                 };
-                if free {
-                    collect.free.extend(text.split("; ").map(str::to_string));
-                }
-                let text = unskipped(&text, &collect.skip);
                 let mut seen = prior.clone();
                 let text = if two {
                     text
@@ -2228,8 +2213,6 @@ impl For {
         let mut collect = Collect {
             lists: Vec::new(),
             seen: vec![false; self.items.len()],
-            skip: Vec::new(),
-            free: Vec::new(),
         };
         let level = self.level(0, ctx, &mut collect);
         let mut inputs: Vec<Input> = collect.lists.into_iter().map(|(_, list)| list).collect();
@@ -2305,7 +2288,7 @@ impl For {
         } else if cause == Cause::Satisfied || flawed {
             Vec::new()
         } else {
-            self.failed_items(level).0
+            self.failed_items(level)
         };
         let walked = self.walked_root_clauses(ctx);
         if flawed && !walked.is_empty() {
@@ -2458,7 +2441,7 @@ impl For {
         })
     }
 
-    fn two_list_parts(&self, children: &[Child], skip: &[String]) -> Option<Vec<(String, bool)>> {
+    fn two_list_parts(&self, children: &[Child]) -> Option<Vec<(String, bool)>> {
         let failing: Vec<&Child> = children.iter().filter(|c| c.failed.is_some()).collect();
         if self.items.len() != 2
             || failing.is_empty()
@@ -2491,7 +2474,6 @@ impl For {
                     } else {
                         unmarked(&said)
                     };
-                    let text = unskipped(&text, skip);
                     if !text.is_empty() && !texts.contains(&text) {
                         texts.push(text);
                     }
@@ -2607,21 +2589,12 @@ impl For {
         })
     }
 
-    fn failed_items(&self, level: Level) -> (Vec<Value>, Vec<Said>, Vec<String>) {
-        let mut said: Vec<Said> = level
-            .dead
-            .iter()
-            .filter(|d| d.cause != Cause::Ambiguous)
-            .map(|d| (d.order.clone(), self.dead_text(d).replace(FREE, ""), false))
-            .collect();
+    fn failed_items(&self, level: Level) -> Vec<Value> {
         let ties: Vec<&Dead> = level
             .dead
             .iter()
             .filter(|d| d.cause == Cause::Ambiguous)
             .collect();
-        if let Some(first) = ties.first() {
-            said.push((first.order.clone(), self.tie_text(&ties, 0), false));
-        }
         let tie = ties.first().map(|_| self.tie_text(&ties, 0));
         let mut failed: Vec<(Vec<Seg>, Value)> = level
             .dead
@@ -2636,11 +2609,11 @@ impl For {
             .collect();
         let mut hoisted: Vec<Dead> = Vec::new();
         for child in level.children {
-            let mut own_said: Vec<String> = Vec::new();
-            for (text, extra) in self.child_texts(&child) {
-                own_said.push(text.clone());
-                said.push((child.order.clone(), text, extra));
-            }
+            let own_said: Vec<String> = self
+                .child_texts(&child)
+                .into_iter()
+                .map(|(text, _)| text)
+                .collect();
             let Child {
                 order,
                 mut entry,
@@ -2706,34 +2679,11 @@ impl For {
             }
             failed.push((order, json));
         }
-        let hoisted_ties: Vec<&Dead> = hoisted
-            .iter()
-            .filter(|d| d.cause == Cause::Ambiguous)
-            .collect();
-        let mut first_said: Vec<Said> = Vec::new();
-        if let Some(first) = hoisted_ties.first() {
-            first_said.push((first.order.clone(), self.tie_text(&hoisted_ties, 1), false));
-        }
         for entry in hoisted {
-            if entry.cause != Cause::Ambiguous {
-                first_said.push((
-                    entry.order.clone(),
-                    self.dead_text(&entry).replace(FREE, ""),
-                    false,
-                ));
-            }
             failed.push((entry.order.clone(), self.dead_json(&entry)));
         }
         failed.sort_by(|a, b| a.0.cmp(&b.0));
-        said.sort_by(|a, b| a.0.cmp(&b.0));
-        first_said.sort_by(|a, b| a.0.cmp(&b.0));
-        let hoisted: Vec<String> = first_said.iter().map(|s| s.1.clone()).collect();
-        first_said.extend(said);
-        (
-            failed.into_iter().map(|(_, v)| v).collect(),
-            first_said,
-            hoisted,
-        )
+        failed.into_iter().map(|(_, v)| v).collect()
     }
 
     fn is_free(&self, fail: &Sfail) -> bool {
@@ -3412,35 +3362,6 @@ fn under(name: &str, text: &str) -> String {
         Some((_, after)) => format!("{name}{after}"),
         None => format!("{name}: {text}"),
     }
-}
-
-fn unskipped(text: &str, skip: &[String]) -> String {
-    if skip.is_empty() {
-        return text.to_string();
-    }
-    let skipped = |part: &str| skip.iter().any(|s| s == part);
-    let dropped = |part: &str| {
-        let lead = lead_of(part);
-        let after = if lead.is_empty() {
-            part
-        } else {
-            part.strip_prefix(&format!("{lead}: ")).unwrap_or(part)
-        };
-        skipped(part) || skipped(after)
-    };
-    let more = regex::Regex::new(r"^and [0-9]+ more$").expect("a valid pattern");
-    let any_dropped = text.split("; ").any(dropped);
-    text.split("; ")
-        .filter(|part| !dropped(part) && !(any_dropped && more.is_match(part)))
-        .map(|part| {
-            part.split(", and ")
-                .filter(|piece| !skipped(piece))
-                .collect::<Vec<_>>()
-                .join(", and ")
-        })
-        .filter(|part| !part.is_empty())
-        .collect::<Vec<_>>()
-        .join("; ")
 }
 
 fn unmarked(text: &str) -> String {
