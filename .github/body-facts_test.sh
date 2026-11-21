@@ -205,4 +205,10 @@ if sh "$script" one > /dev/null 2>&1; then
   exit 1
 fi
 
+echo "the body-facts job step that pipes into tee runs under bash so that pipefail makes it go red"
+workflow=$(cd "$(dirname "$script")/.." && pwd)/.github/workflows/test.yml
+step=$(awk '/^      - name: Write the report counts in the job summary/ { on = 1; print; next } on && /^      - / { exit } on { print }' "$workflow")
+expect_in "shell: bash" "$step"
+expect_in '2>&1' "$step"
+
 echo "body-facts.sh tests passed"
