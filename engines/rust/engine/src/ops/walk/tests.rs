@@ -1782,6 +1782,60 @@ fn an_empty_list_root_after_the_phrase_is_said_once_and_not_inside_each_item() {
 }
 
 #[test]
+fn an_item_whose_own_list_is_empty_is_said_after_a_root_that_cant_be_used() {
+    use crate::ops::clause::Kind;
+    let out = thing_row(
+        "every pkgs.licenses is in $params.allowed",
+        json!({"pkgs": [{"licenses": ["MIT"]}, {"licenses": []}]}),
+        json!({}),
+    );
+    assert_eq!(out.verdict.cause, Cause::Absent);
+    assert_eq!(
+        out.message.as_deref(),
+        Some("$params.allowed is missing; item 2 of pkgs: licenses is []")
+    );
+    let kinds: Vec<Kind> = out.parts.iter().map(|part| part.kind).collect();
+    assert_eq!(kinds, [Kind::Root, Kind::Item]);
+    assert_eq!(out.parts[1].name, "item 2 of pkgs");
+    assert_eq!(out.failed_items.len(), 1);
+}
+
+#[test]
+fn a_some_says_an_item_whose_own_list_is_empty_after_a_root_that_cant_be_used() {
+    assert_eq!(
+        said_row(
+            "some pkgs.licenses is in $params.allowed",
+            json!({"pkgs": [{"licenses": ["MIT"]}, {"licenses": []}]}),
+            json!({}),
+        ),
+        (
+            Cause::Absent,
+            "$params.allowed is missing; item 2 of pkgs: licenses is []".to_string()
+        )
+    );
+}
+
+#[test]
+fn an_item_that_fails_only_because_of_a_root_that_cant_be_used_says_nothing() {
+    for quantifier in ["every", "some"] {
+        for pkgs in [
+            json!([{"licenses": ["MIT"]}, {"licenses": ["GPL"]}]),
+            json!([{"licenses": []}, {"licenses": []}]),
+        ] {
+            assert_eq!(
+                said_row(
+                    &format!("{quantifier} pkgs.licenses is in $params.allowed"),
+                    json!({"pkgs": pkgs}),
+                    json!({}),
+                ),
+                (Cause::Absent, "$params.allowed is missing".to_string()),
+                "{quantifier} {pkgs}"
+            );
+        }
+    }
+}
+
+#[test]
 fn a_root_compared_ignoring_case_needs_text_so_it_is_said_once_before_the_items() {
     let check = Check::Compare(crate::ops::compare::Compare {
         left: crate::ops::compare::Side::Path(at(Start::Subject, &["v"])),
