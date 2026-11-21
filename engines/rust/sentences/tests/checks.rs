@@ -14,6 +14,7 @@ fn is(value: Value) -> Phrase {
 fn count(path: Path) -> Derived {
     Derived {
         distinct: false,
+        member: false,
         kind: DerivedKind::Count,
         path,
         whose: vec![],
@@ -45,6 +46,7 @@ fn a_quantified_assertion_keeps_its_whose_and_if_any() {
         Assertion::Quantified {
             options: ListOptions {
                 distinct: false,
+                member: false,
                 if_any: true
             },
             quantifier: Quantifier::Every,
@@ -147,6 +149,7 @@ fn a_count_with_a_whose_is_a_derived_assertion() {
         Assertion::Derived {
             terms: vec![Term::Derived(Derived {
                 distinct: false,
+                member: false,
                 kind: DerivedKind::Count,
                 path: key("items"),
                 whose: vec![Condition {
@@ -374,7 +377,7 @@ fn member_of_prints_after_distinct_and_before_the_path() {
     );
     assert_eq!(
         printed_check("x is count of member of xs"),
-        "x is count of member of xs"
+        "x equals count of member of xs"
     );
     assert_eq!(
         printed_check("count of member of xs whose k is 1 is 1"),

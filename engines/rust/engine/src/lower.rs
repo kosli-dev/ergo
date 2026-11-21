@@ -1014,7 +1014,9 @@ pub fn lower_quantified(
     phrase: &s::Phrase,
     scope: &Scope,
 ) -> Result<Check, Vec<String>> {
-    let s::ListOptions { distinct, if_any } = options;
+    let s::ListOptions {
+        distinct, if_any, ..
+    } = options;
     let mut problems = argument_problems(phrase);
     problems.extend(after_quantifier_problems(phrase));
     problems.extend(elapsed_after_quantifier_problems(phrase));

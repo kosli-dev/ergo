@@ -1,4 +1,46 @@
 pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
+    (
+        "every member of xs is 1",
+        "every member of xs is 1",
+        &[],
+        &[],
+    ),
+    (
+        "some member of xs.y whose k is 1 exists",
+        "some member of xs.y whose k is 1 exists",
+        &[],
+        &[],
+    ),
+    (
+        "count of member of xs is 1",
+        "count of member of xs is 1",
+        &[],
+        &[],
+    ),
+    (
+        "sum of member of xs is at most 2",
+        "sum of member of xs is at most 2",
+        &[],
+        &[],
+    ),
+    (
+        "x is count of member of xs",
+        "x equals count of member of xs",
+        &[],
+        &[],
+    ),
+    (
+        "every member of xs, if any, is 1",
+        "every member of xs, if any, is 1",
+        &[],
+        &[],
+    ),
+    (
+        "every member of member is 1",
+        "every member of member is 1",
+        &[],
+        &[],
+    ),
     ("m is 1", "m is 1", &[], &[]),
     ("status is \"COMPLETE\"", "status is \"COMPLETE\"", &[], &[]),
     (
@@ -10535,14 +10577,6 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
     (
-        "every member of xs is 1",
-        &["every member of only goes on a from line for now"],
-    ),
-    (
-        "count of member of xs is 1",
-        &["every member of only goes on a from line for now"],
-    ),
-    (
         "every ws.x whose x is 1 and 'a' is 'a' is not empty",
         &["doesn't parse"],
     ),
@@ -11668,6 +11702,14 @@ pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
 ];
 
 pub const CHECK_WRITTEN_WRONG: &[(&str, &[&str])] = &[
+    (
+        "every distinct member of xs is 1",
+        &["distinct can't go with every member of"],
+    ),
+    (
+        "count of distinct member of xs is 1",
+        &["distinct can't go with every member of"],
+    ),
     (
         "count of items whose k is 1 is between 12345678901234567891 and 12345678901234567890",
         &[
@@ -12914,6 +12956,18 @@ pub const CHECK_WRITTEN_WRONG: &[(&str, &[&str])] = &[
 ];
 
 pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
+    (
+        "every member of xs as m",
+        "every member of xs as m",
+        &[],
+        &[],
+    ),
+    (
+        "every rs as r, some member of r.e whose k is 1 as m",
+        "every rs as r, some member of r.e whose k is 1 as m",
+        &[],
+        &[],
+    ),
     (
         "every es whose v is in pl.z and whose v is in $input.y as e",
         "every es whose v is in pl.z and whose v is in $input.y as e",
@@ -15244,10 +15298,6 @@ pub const FOR_ERRORS: &[(&str, &[&str])] = &[
         &["distinct goes after every, some, count of or sum of"],
     ),
     (
-        "every member of xs as m",
-        &["every member of only goes on a from line for now"],
-    ),
-    (
         "every ts whose distinct is 1 as t",
         &["distinct is a word of the grammar: write .distinct"],
     ),
@@ -15687,6 +15737,10 @@ pub const FOR_ERRORS: &[(&str, &[&str])] = &[
 ];
 
 pub const FOR_WRITTEN_WRONG: &[(&str, &[&str])] = &[
+    (
+        "every distinct member of xs as m",
+        &["distinct can't go with every member of"],
+    ),
     ("every ts as every", &["every can't be an alias"]),
     ("every ts as t, every t.fs as t", &["t is given twice"]),
     ("every ts as t, every ts as t", &["t is given twice"]),
