@@ -1725,7 +1725,10 @@ fn a_list_root_after_the_phrase_that_isnt_a_list_is_said_alone_whatever_the_list
 
 #[test]
 fn a_list_root_after_the_phrase_is_said_with_the_roots_of_a_whose_and_the_list() {
-    for (subject, list) in [(json!({}), "es is missing"), (json!({"es": null}), "es is null")] {
+    for (subject, list) in [
+        (json!({}), "es is missing"),
+        (json!({"es": null}), "es is null"),
+    ] {
         assert_eq!(
             said_row(
                 "some es whose v is in $params.z is in $params.y",
@@ -1756,7 +1759,10 @@ fn a_walk_whose_key_step_cant_be_read_says_the_key_then_each_root_after_the_phra
         );
         assert_eq!(
             said_row("some xs named by $params.k equals q", subject, json!({})),
-            (Cause::Absent, format!("$params.k is missing; {root}; xs is []"))
+            (
+                Cause::Absent,
+                format!("$params.k is missing; {root}; xs is []")
+            )
         );
     }
 }
