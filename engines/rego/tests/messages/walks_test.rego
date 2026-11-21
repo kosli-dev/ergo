@@ -33,7 +33,7 @@ test_message_of_a_walk_whose_path_is_not_a_path_names_no_blocked_parent if {
 
 test_message_of_a_walk_that_failed_without_a_list_to_show_repeats_its_expression if {
 	check := {"path": ["xs"], "expression": "every xs.ok is true"}
-	ergo._walk_parts(check, {}, {"cause": "value"}, {"failed": []}) == [ergo._m_clause("root", "every xs.ok is true is false", "value", "every xs.ok is true is false")]
+	ergo._walk_parts(check, {}, {"cause": "value"}, {"failed": []}) == [ergo._m_clause("root", "every xs.ok", "value", "every xs.ok is true is false")]
 }
 
 test_a_walk_part_is_a_clause_whose_kind_and_cause_come_from_where_it_was_found if {

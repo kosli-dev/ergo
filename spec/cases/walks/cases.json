@@ -39731,7 +39731,7 @@
                 ]
               }
             ],
-            "message": "item 1 of es: zz is missing; $params.k is null",
+            "message": "$params.k is null; item 1 of es: zz is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -39902,7 +39902,7 @@
                 ]
               }
             ],
-            "message": "item 1 of es: zz is missing; $params.k is null",
+            "message": "$params.k is null; item 1 of es: zz is missing",
             "passed": false,
             "requirement": "s",
             "subject": {

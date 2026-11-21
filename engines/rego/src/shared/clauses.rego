@@ -86,15 +86,34 @@ _m_item_clause(name, cause, said) := {"kind": "item", "name": name, "cause": cau
 
 _m_clause_more(n) := {"kind": "more", "count": n, "name": "", "cause": "value", "text": "", "said": []}
 
-_m_clauses_shown(clauses) := array.concat(_m_clauses_ahead(once), items) if {
-	once := _once(clauses)
-	items := [c | some c in once; c.kind == "item"]
-	count(_m_clause_counted_names(_m_clause_units(items))) <= 3
+_m_said_clauses(said) := [_m_clause("root", _m_clause_name(x[1]), x[0], x[1]) | some x in said]
+
+_m_said_sorted(said) := [x[3] | some i, x in ys; not x[2] in {y[2] | some y in array.slice(ys, 0, i)}] if {
+	ys := sort([[_m_clause_rank(x[1]), _m_clause_name(x[1]), x[1], x] | some x in said])
 }
 
-_m_clauses_shown(clauses) := array.concat(array.concat(_m_clauses_ahead(once), [u.clause | some u in pieces; _m_clause_kept(u, pieces, kept)]), [_m_clause_more(count(names) - 3)]) if {
-	once := _once(clauses)
-	pieces := _m_clause_units([c | some c in once; c.kind == "item"])
+_clause_text(x) := x.text if is_object(x)
+
+else := x
+
+_m_row_texts(rr) := object.union(rr, {k: [_clause_text(c) | some c in rr[k]] | some k in ["root_msgs", "other_roots"]; is_array(object.get(rr, k, null))})
+
+_m_clause_texts(clauses) := [t | some c in clauses; some t in _m_clause_lines(c)]
+
+_m_clauses_shown(clauses) := _m_clauses_cut(_m_clauses_order(clauses))
+
+_m_clauses_order(clauses) := array.concat(array.concat(_m_clauses_ahead(once), [c | some c in once; c.kind == "item"]), [c | some c in once; c.kind == "more"]) if once := _once(clauses)
+
+_m_walk_said(clauses, items) := {
+	"message": _m_clauses_text(_m_clauses_cut(ordered)),
+	"ergo/own": [t | some t in _m_clause_texts(ordered); not t in items],
+	"ergo/texts": items,
+} if ordered := _m_clauses_order(clauses)
+
+_m_clauses_cut(ordered) := ordered if count(_m_clause_counted_names(_m_clause_units([c | some c in ordered; c.kind == "item"]))) <= 3
+
+_m_clauses_cut(ordered) := array.concat(array.concat([c | some c in ordered; c.kind != "item"], [u.clause | some u in pieces; _m_clause_kept(u, pieces, kept)]), [_m_clause_more(count(names) - 3)]) if {
+	pieces := _m_clause_units([c | some c in ordered; c.kind == "item"])
 	names := _m_clause_counted_names(pieces)
 	count(names) > 3
 	kept := {n | some n in array.slice(names, 0, 3)}
@@ -125,13 +144,20 @@ _m_clauses_ahead(once) := [c | some i, c in ahead; not c.text in {a.text | some 
 
 _m_clause_ranks := {"not_an_object": 1, "ambiguous": 2, "unusable": 3, "absent": 4, "null": 5}
 
-_m_clauses_text(clauses) := concat("; ", [t | some c in clauses; some t in _m_clause_lines(c)])
+_m_clauses_text(clauses) := concat("; ", _m_clause_texts(clauses))
 
-_m_clause_lines(c) := [c.text] if c.kind in {"root", "list"}
+_m_clause_lines(c) := [c.text] if {
+	c.kind != "more"
+	c.said == []
+	c.text != ""
+}
 
 _m_clause_lines(c) := [concat("", ["and ", _literal_text(c.count), " more"])] if c.kind == "more"
 
-_m_clause_lines(c) := [_m_clause_unit_text(u.clause) | some u in _m_clause_units([c])] if c.kind == "item"
+_m_clause_lines(c) := [_m_clause_unit_text(u.clause) | some u in _m_clause_units([c])] if {
+	c.kind == "item"
+	c.said != []
+}
 
 _m_clause_unit_text(c) := c.text if c.said == []
 
@@ -139,7 +165,9 @@ _m_clause_unit_text(c) := concat(": ", [c.name, concat(", and ", [s.text | some 
 
 _m_clause_units(items) := [x[1] | some x in sort([[u.key, u] | some t, c in items; some u in _m_clause_item_units(t, c)])]
 
-_m_clause_item_units(t, c) := {u |
+_m_clause_item_units(t, c) := {{"key": [t], "counted": true, "clause": c} | c.text != ""} if c.said == []
+
+else := {u |
 	nodes := {p: v | walk(c, [p, v]); _m_clause_item_node(v)}
 	some p, n in nodes
 	some u in _m_clause_node_units(array.concat([t], p), [nodes[q].name | some k in numbers.range(0, count(p)); k < count(p); k % 2 == 0; q := array.slice(p, 0, k)], n)

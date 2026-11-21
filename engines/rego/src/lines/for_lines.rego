@@ -112,10 +112,16 @@ _flawed_root_msgs(check, subj, said) := _with_roots(split(said, "; "), roots) if
 } else := []
 
 _with_roots(said, roots) := roots if {
+	texts := {_clause_text(m) | some m in roots}
 	every part in said {
-		part in roots
+		_clause_text(part) in texts
 	}
-} else := array.concat([m | some m in roots; not _m_said_in(m, said)], said)
+} else := array.concat([m | some m in roots; not _m_said_in(_clause_text(m), [_clause_text(p) | some p in said])], [_root_or_part(p, roots) | some p in said])
+
+_root_or_part(p, roots) := ms[0] if {
+	ms := [m | some m in roots; _clause_text(m) == _clause_text(p)]
+	ms != []
+} else := p
 
 _for_alias_list(item, v) if {
 	is_array(v)
@@ -177,7 +183,7 @@ _for_rooted_row(check, subj, r) := object.union(r, {"cause": "unusable", "other_
 	flaw != ""
 	ms := _walk_root_msgs(check, subj)
 	ms != []
-} else := _worse_root(check, subj, _rooted_row(check, subj, r))
+} else := _m_row_texts(_worse_root(check, subj, _rooted_row(check, subj, r)))
 
 _worse_root(check, subj, rr) := object.union(rr, {"cause": _worst_of({rr.cause, flaw})}) if {
 	"other_roots" in object.keys(rr)
