@@ -69,7 +69,7 @@ case $out in
   *"engine/src/lib.rs:7:5: replace a with ()"*) ;;
   *) fail "list the missed mutant" ;;
 esac
-grep -q 'engines/rust/engine/src/lib.rs' "$dir/diff" || fail "pass the source file in the diff"
+grep -q '^+++ b/engine/src/lib.rs' "$dir/diff" || fail "pass the source file in the diff, with its path from engines/rust"
 if grep -q 'tests' "$dir/diff"; then echo "mutants-facts.sh should leave test files out of the diff" >&2; exit 1; fi
 
 echo "mutants-facts.sh stops at the time limit and says so"
