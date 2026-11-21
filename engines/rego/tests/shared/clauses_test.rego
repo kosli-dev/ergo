@@ -84,3 +84,20 @@ test_roots_come_worst_cause_first_then_by_name_before_the_lists_and_the_items if
 		_item("item 1 of xs", "absent", [_missing("v")]),
 	]
 }
+
+test_a_clause_given_twice_is_shown_once if {
+	ergo._m_clauses_shown([
+		_missing("$params.k"),
+		_item("item 1 of es", "absent", [_missing("m")]),
+		ergo._m_clause("list", "es", "value", "es is []"),
+		_missing("$params.k"),
+		_item("item 2 of es", "absent", [_missing("m")]),
+		ergo._m_clause("list", "es", "value", "es is []"),
+		_item("item 1 of es", "absent", [_missing("m")]),
+	]) == [
+		_missing("$params.k"),
+		ergo._m_clause("list", "es", "value", "es is []"),
+		_item("item 1 of es", "absent", [_missing("m")]),
+		_item("item 2 of es", "absent", [_missing("m")]),
+	]
+}
