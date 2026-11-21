@@ -38,3 +38,18 @@ test_a_root_a_whose_cant_read_has_no_stand_in_after_a_key_or_a_phrase_b9_leaves_
 	includes := {"op": "includes", "path": ["tags"], "value": {"ref": ["$$params", "t"]}}
 	ergo._root_stand_in(includes) == includes
 }
+
+test_a_root_list_after_is_in_ignoring_case_fails_with_the_worst_cause_of_its_items_and_names_each if {
+	ref := {"op": "in", "path": ["v"], "values": {"ref": ["$$params[]", "l"]}, "ignoring": "case"}
+	p := ["$$params[]", "l"]
+	ergo._root_state({"v": "a"}, ref, p, set()) == "unusable" with data.ergo_params as {"l": ["a", 3]}
+	ergo._root_state({"v": "a"}, ref, p, set()) == "null" with data.ergo_params as {"l": ["a", null]}
+	ergo._root_state({"v": "a"}, ref, p, set()) == "value" with data.ergo_params as {"l": ["a"]}
+	ergo._m_for_root_text({"v": "a"}, ref, p, "unusable") == "item 2 of $params.l is 3, which isn't text" with data.ergo_params as {"l": ["a", 3]}
+	ergo._m_for_root_text({"v": "a"}, ref, p, "null") == "item 2 of $params.l is null" with data.ergo_params as {"l": ["a", null]}
+	field := {"op": "compare", "left": ["v"], "cmp": "in", "right": ["$$ergo/root", "ys"], "ignoring": "case"}
+	q := ["$$ergo/root", "ys"]
+	ergo._root_state({"v": "a"}, field, q, set()) == "unusable" with input as {"ergo/names": {"ergo/subject": {"ys": [3]}}}
+	ergo._root_state({"v": "a"}, field, q, set()) == "null" with input as {"ergo/names": {"ergo/subject": {"ys": ["a", null]}}}
+	ergo._m_for_root_text({"v": "a"}, field, q, "unusable") == "item 1 of ys is 3, which isn't text" with input as {"ergo/names": {"ergo/subject": {"ys": [3]}}}
+}
