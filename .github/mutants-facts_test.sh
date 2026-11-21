@@ -21,6 +21,7 @@ mkdir "$dir/bin"
 cat > "$dir/bin/cargo" <<'SH'
 #!/bin/sh
 echo "$@" > "$FAKE_ARGS"
+if [ engine/src/lib.rs -nt "$FAKE_MARK" ]; then echo yes > "$FAKE_TOUCHED"; fi
 while [ $# -gt 0 ]; do
   case $1 in
     --output) out=$2; shift ;;
@@ -39,7 +40,7 @@ SH
 chmod +x "$dir/bin/cargo"
 
 run() {
-  (cd "$repo" && FAKE_ARGS=$dir/args FAKE_DIFF=$dir/diff MUTANTS_FACTS_CARGO=$dir/bin/cargo sh .github/mutants-facts.sh "$@")
+  (cd "$repo" && FAKE_MARK=$dir/mark FAKE_TOUCHED=$dir/touched FAKE_ARGS=$dir/args FAKE_DIFF=$dir/diff MUTANTS_FACTS_CARGO=$dir/bin/cargo sh .github/mutants-facts.sh "$@")
 }
 
 fail() {
@@ -55,9 +56,12 @@ out=$(run base)
 [ "$out" = "No line of Rust source changed, so there is nothing to mutate." ] || fail "say no source changed"
 [ ! -e "$dir/args" ] || fail "not run cargo"
 
+touch -t 200101010000 "$dir/mark"
+
 echo "mutants-facts.sh counts mutants and lists the missed ones, and gives cargo only the source lines"
 printf 'fn a() { 1; }\n' > "$repo/engines/rust/engine/src/lib.rs"
 git -C "$repo" commit --quiet -am "source"
+touch -t 200001010000 "$repo/engines/rust/engine/src/lib.rs"
 out=$(run base)
 for row in "| caught   | 2 |" "| missed   | 1 |" "| unviable | 2 |" "| timeout  | 1 |"; do
   case $out in
@@ -69,6 +73,7 @@ case $out in
   *"engine/src/lib.rs:7:5: replace a with ()"*) ;;
   *) fail "list the missed mutant" ;;
 esac
+[ -e "$dir/touched" ] || fail "touch the sources so that cargo rebuilds them in place"
 grep -q '^+++ b/engine/src/lib.rs' "$dir/diff" || fail "pass the source file in the diff, with its path from engines/rust"
 if grep -q 'tests' "$dir/diff"; then echo "mutants-facts.sh should leave test files out of the diff" >&2; exit 1; fi
 
