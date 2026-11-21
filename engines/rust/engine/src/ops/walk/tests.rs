@@ -1936,3 +1936,51 @@ fn a_list_after_is_in_ignoring_case_with_an_item_that_isnt_text_is_said_once_bef
         );
     }
 }
+
+#[test]
+fn a_list_after_is_in_ignoring_case_that_cant_be_used_doesnt_hide_the_items_whose_own_value_isnt_text() {
+    for (sentence, subject, params, cause, message) in [
+        (
+            "every xs.v is in $params.l ignoring case",
+            json!({"xs": [{"v": "a"}, {"v": 2}]}),
+            json!({"l": [null]}),
+            Cause::Unusable,
+            "item 1 of $params.l is null; item 2 of xs: v is 2, which isn't text",
+        ),
+        (
+            "every xs whose v is in $params.l ignoring case, if any, exists",
+            json!({"xs": [{"v": "a"}, {"v": 2}]}),
+            json!({"l": [null]}),
+            Cause::Unusable,
+            "item 1 of $params.l is null; item 2 of xs: v is 2, which isn't text",
+        ),
+        (
+            "some xs.v is not in $params.l ignoring case",
+            json!({"xs": [{"v": null}, {"v": "b"}]}),
+            json!({"l": ["a", 3]}),
+            Cause::Unusable,
+            "item 2 of $params.l is 3, which isn't text; item 1 of xs: v is null",
+        ),
+        (
+            "every xs.v is in ys ignoring case",
+            json!({"xs": [{"v": "a"}, {"v": 1}, {}], "ys": ["A", 3]}),
+            json!({}),
+            Cause::Unusable,
+            "item 2 of ys is 3, which isn't text; item 2 of xs: v is 1, which isn't text; item 3 of xs: v is missing",
+        ),
+        (
+            "every xs whose v is in $params.l ignoring case, if any, exists",
+            json!({"xs": [{"v": 1}, {"v": "b"}]}),
+            json!({"l": ["A", 3]}),
+            Cause::Unusable,
+            "item 2 of $params.l is 3, which isn't text; item 1 of xs: v is 1, which isn't text",
+        ),
+    ] {
+        let out = row_of(sentence, subject, params);
+        assert_eq!(
+            (out.verdict.cause, out.message.as_deref()),
+            (cause, Some(message)),
+            "{sentence}"
+        );
+    }
+}
