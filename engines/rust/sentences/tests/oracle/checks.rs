@@ -10616,6 +10616,84 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    (
+        "type is in $params.states ignoring case",
+        "type is in $params.states ignoring case",
+        &[],
+        &[],
+    ),
+    (
+        "type is not in $params.states ignoring case",
+        "type is not in $params.states ignoring case",
+        &[],
+        &[],
+    ),
+    (
+        "x is in ys ignoring case and surrounding spaces",
+        "x is in ys ignoring case and surrounding spaces",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose v is in $params.l ignoring case is 1",
+        "count of xs whose v is in $params.l ignoring case is 1",
+        &[],
+        &[],
+    ),
+    (
+        "every xs whose v is in $params.l ignoring case, if any, exists",
+        "every xs whose v is in $params.l ignoring case, if any, exists",
+        &[],
+        &[],
+    ),
+    (
+        "every xs.v is in $params.l ignoring case",
+        "every xs.v is in $params.l ignoring case",
+        &[],
+        &[],
+    ),
+    (
+        "some xs.v is in $params.l ignoring case",
+        "some xs.v is in $params.l ignoring case",
+        &[],
+        &[],
+    ),
+    (
+        "x is in $params.l ignoring surrounding spaces",
+        "x is in $params.l ignoring surrounding spaces",
+        &[],
+        &[],
+    ),
+    (
+        "x is in ys ignoring case",
+        "x is in ys ignoring case",
+        &[],
+        &[],
+    ),
+    (
+        "x is not in ys ignoring case",
+        "x is not in ys ignoring case",
+        &[],
+        &[],
+    ),
+    (
+        "x is one of ys ignoring case",
+        "x is in ys ignoring case",
+        &[],
+        &[],
+    ),
+    (
+        "x is in $params.l ignoring case",
+        "x is in $params.l ignoring case",
+        &[],
+        &[],
+    ),
+    (
+        "x is not one of ys ignoring surrounding spaces",
+        "x is not in ys ignoring surrounding spaces",
+        &[],
+        &[],
+    ),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -12943,58 +13021,6 @@ pub const CHECK_WRITTEN_WRONG: &[(&str, &[&str])] = &[
     (
         "count of xs is \"a\" ignoring case",
         &["\"ignoring case\" can't follow a count of, a sum of or a plus"],
-    ),
-    (
-        "type is in $params.states ignoring case",
-        &["\"is in\" can't take ignoring case yet"],
-    ),
-    (
-        "type is not in $params.states ignoring case",
-        &["\"is not in\" can't take ignoring case yet"],
-    ),
-    (
-        "x is in ys ignoring case and surrounding spaces",
-        &["\"is in\" can't take ignoring case and surrounding spaces yet"],
-    ),
-    (
-        "count of xs whose v is in $params.l ignoring case is 1",
-        &["\"is in\" can't take ignoring case yet"],
-    ),
-    (
-        "every xs whose v is in $params.l ignoring case, if any, exists",
-        &["\"is in\" can't take ignoring case yet"],
-    ),
-    (
-        "every xs.v is in $params.l ignoring case",
-        &["\"is in\" can't take ignoring case yet"],
-    ),
-    (
-        "some xs.v is in $params.l ignoring case",
-        &["\"is in\" can't take ignoring case yet"],
-    ),
-    (
-        "x is in $params.l ignoring surrounding spaces",
-        &["\"is in\" can't take ignoring surrounding spaces yet"],
-    ),
-    (
-        "x is in ys ignoring case",
-        &["\"is in\" can't take ignoring case yet"],
-    ),
-    (
-        "x is not in ys ignoring case",
-        &["\"is not in\" can't take ignoring case yet"],
-    ),
-    (
-        "x is one of ys ignoring case",
-        &["\"is in\" can't take ignoring case yet"],
-    ),
-    (
-        "x is in $params.l ignoring case",
-        &["\"is in\" can't take ignoring case yet"],
-    ),
-    (
-        "x is not one of ys ignoring surrounding spaces",
-        &["\"is not in\" can't take ignoring surrounding spaces yet"],
     ),
 ];
 
