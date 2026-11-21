@@ -79,6 +79,8 @@ jobs:
         run: .github/mutants-facts_test.sh
       - name: Check the script that lists what a change did to the matrix pairs
         run: .github/matrix-facts_test.sh
+      - name: Check the script that compares the pull request body with the report facts
+        run: .github/body-facts_test.sh
       - name: Check the script that runs the common checks
         run: .github/checks_test.sh
       - name: Check the release workflow's latest flag, release notes and tag checks
@@ -351,6 +353,35 @@ jobs:
           else
             .github/matrix-facts.sh "$BASE" matrix-a matrix-b walk >> "$GITHUB_STEP_SUMMARY"
           fi
+
+  body-facts:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: open-policy-agent/setup-opa@v2
+        with:
+          version: 1.22.0
+      - name: Install the Rust version in rust-toolchain.toml
+        run: |
+          cd engines/rust
+          rustup toolchain install
+      - name: Write the report counts and a warning when the body lacks Changes the report in the job summary
+        env:
+          BASE: origin/${{ github.base_ref }}
+          BODY_FACTS_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          .github/pr-facts.sh "$BASE" > "$RUNNER_TEMP/pr-facts.md"
+          if git diff --quiet "$BASE...HEAD" -- engines/rust engines/rego spec .github/pairs-facts.sh; then
+            echo "No file under engines/rust, engines/rego or spec changed." > "$RUNNER_TEMP/pairs-facts.md"
+          else
+            .github/pairs-facts.sh "$BASE" > "$RUNNER_TEMP/pairs-facts.md"
+          fi
+          .github/body-facts.sh "$RUNNER_TEMP/pr-facts.md" "$RUNNER_TEMP/pairs-facts.md" >> "$GITHUB_STEP_SUMMARY"
 
   red-check:
     if: github.event_name == 'pull_request'
