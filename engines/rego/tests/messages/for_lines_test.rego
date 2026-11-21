@@ -68,3 +68,10 @@ test_message_groups_items_by_their_list_in_the_order_the_lists_come_and_then_by_
 	leads := ["item 10 of xs", "item 1 of ys", "item 2 of xs", "item 10 of xs", ""]
 	ergo._m_list_leads(leads) == ["item 2 of xs", "item 10 of xs", "item 1 of ys", ""]
 }
+
+test_message_an_and_more_goes_with_the_root_problems_it_counts_though_the_root_counts_them_differently if {
+	roots := ["item 2 of pos: name is missing", "item 3 of pos: name is missing", "item 4 of pos: name is missing", "item 5 of pos: name is missing", "item 6 of pos: name is missing"]
+	p := "r.v is missing, and item 2 of pos: name is missing; item 3 of pos: name is missing; item 4 of pos: name is missing; and 2 more"
+	ergo._m_unskipped(p, roots) == "r.v is missing"
+	ergo._m_unskipped("v is missing; and 2 more", roots) == "v is missing; and 2 more"
+}
