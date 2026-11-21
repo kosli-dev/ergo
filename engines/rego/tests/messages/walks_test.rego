@@ -117,6 +117,7 @@ test_an_item_whose_count_of_member_of_ends_at_no_object_says_it_isnt_one if {
 	ergo._m_item_tallies({"s": {"x": 1}}, c, "unusable") == []
 	l := {"op": "compare", "cmp": "eq", "left": {"count_of": ["s"], "whose": [], "text": "count of s"}, "right": {"literal": 1}}
 	ergo._m_item_tallies({"s": {"x": 1}}, l, "unusable") == [`s is {"x": 1}, which isn't a list`]
+	ergo._m_item_tallies({"s": [1]}, l, "unusable") == []
 }
 
 test_a_named_failure_a_member_walk_wanted_as_an_object_says_it_isnt_one if {
