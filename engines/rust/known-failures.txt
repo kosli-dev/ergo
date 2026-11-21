@@ -336,6 +336,7 @@ list_starts / every, some, count of and sum of walk a subject that is a list / a
 list_starts / every, some, count of and sum of walk a subject that is a list / an item that isn't an object fails as not_an_object, and a missing field as absent
 list_starts / every, some, count of and sum of walk a subject that is a list / an object subject reads as before
 list_starts / every, some, count of and sum of walk a subject that is a list / only the list the path starts at is walked, so a list inside it is an item that isn't an object
+members / every member of on a for line whose whose reads a named by key from $params that isn't text, beside a member that fails on its own field / says the key in each member, the member that has its field too, in key order
 messages / a clause that an earlier sentence of the row already gave / is left out of the row's message and of the option's, and each sentence keeps its whole message
 messages / a count of a field in a position of a field that holds objects / fails as unusable and names the item once
 messages / a count of a key in a position of the input that holds objects / fails as unusable and names the item once

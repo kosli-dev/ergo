@@ -3780,6 +3780,163 @@
     ]
   },
   {
+    "description": "every member of on a for line whose whose reads a named by key from $params that isn't text, beside a member that fails on its own field",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "for": "every member of ev whose kind is m named by $params.k as e",
+              "assert": "e.v is 1"
+            }
+          }
+        }
+      }
+    },
+    "params": {
+      "k": 3
+    },
+    "cases": [
+      {
+        "description": "says the key in each member, the member that has its field too, in key order",
+        "rules": [
+          "walk.member",
+          "walk.flaws",
+          "message.items",
+          "row.parts",
+          "problems.all_said"
+        ],
+        "input": {
+          "things": [
+            {
+              "ev": {
+                "a": {
+                  "kind": "a",
+                  "m": {},
+                  "v": 1
+                },
+                "b": {
+                  "m": {},
+                  "v": 1
+                }
+              },
+              "id": "t1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "type": "thing",
+              "id": "t1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "name": "ev",
+                "value": [
+                  {
+                    "kind": "a",
+                    "m": {},
+                    "v": 1
+                  },
+                  {
+                    "m": {},
+                    "v": 1
+                  }
+                ],
+                "locations": [
+                  "/things/0/ev/a",
+                  "/things/0/ev/b"
+                ],
+                "outcome": "usable"
+              },
+              {
+                "name": "$params.k",
+                "value": 3,
+                "locations": [
+                  "$params:/k"
+                ],
+                "outcome": "unusable"
+              }
+            ],
+            "message": "member a of ev: $params.k is 3, which isn't text; member b of ev: $params.k is 3, which isn't text",
+            "failures": [
+              {
+                "kind": "item",
+                "name": "member a of ev",
+                "cause": "unusable",
+                "message": "$params.k is 3, which isn't text",
+                "inputs": [
+                  {
+                    "name": "ev.a.m",
+                    "value": null,
+                    "locations": [
+                      "/things/0/ev/a"
+                    ],
+                    "outcome": "unusable"
+                  }
+                ],
+                "failures": [],
+                "value": {
+                  "kind": "a",
+                  "m": {},
+                  "v": 1
+                },
+                "locations": [
+                  "/things/0/ev/a"
+                ]
+              },
+              {
+                "kind": "item",
+                "name": "member b of ev",
+                "cause": "unusable",
+                "message": "$params.k is 3, which isn't text",
+                "inputs": [
+                  {
+                    "name": "ev.b.kind",
+                    "value": null,
+                    "locations": [
+                      "/things/0/ev/b"
+                    ],
+                    "outcome": "absent"
+                  },
+                  {
+                    "name": "ev.b.m",
+                    "value": null,
+                    "locations": [
+                      "/things/0/ev/b"
+                    ],
+                    "outcome": "unusable"
+                  }
+                ],
+                "failures": [],
+                "value": {
+                  "m": {},
+                  "v": 1
+                },
+                "locations": [
+                  "/things/0/ev/b"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
     "description": "every member of as the second item of a for line",
     "policy": {
       "ergo_spec": "{{spec}}",
