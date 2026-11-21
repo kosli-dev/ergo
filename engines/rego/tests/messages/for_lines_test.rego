@@ -74,6 +74,14 @@ test_the_lead_of_a_clause_goes_through_items_and_members_alike if {
 	ergo._m_item_lead("member y of evidence: item 2 of ks is 1") == "member y of evidence: item 2 of ks"
 }
 
+test_the_lead_of_a_clause_reads_a_member_key_whole_whatever_it_holds if {
+	ergo._m_item_lead(`member "a: b" of statuses is 1, which isn't text`) == `member "a: b" of statuses`
+	ergo._m_item_lead(`member "a; b: c" of statuses is 1`) == `member "a; b: c" of statuses`
+	ergo._m_item_lead(`member "a\" of b" of statuses is 1`) == `member "a\" of b" of statuses`
+	ergo._m_item_lead(`member "x of y" of statuses is 1`) == `member "x of y" of statuses`
+	ergo._m_item_lead(`item 1 of records: member "a: b" of r.evidence: e.status is 1`) == `item 1 of records: member "a: b" of r.evidence`
+}
+
 test_an_item_a_member_walk_wanted_as_an_object_says_it_isnt_one if {
 	ergo._m_named_item({"item": "evidence", "cause": "unusable", "value": [1], "wants": "an object"}) == "evidence is [1], which isn't an object"
 	ergo._m_named_item({"item": "evidence", "cause": "unusable", "value": [1]}) == "evidence is [1], which isn't a list or an object"
