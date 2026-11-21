@@ -63,3 +63,11 @@ test_an_item_two_conditions_of_a_count_cant_decide_is_one_entry_that_says_both i
 	parts := ergo._tally_item_parts(check, {"es": [{}]}, "absent", "/things/0", "item 1 of es: v is missing; item 1 of es: w is missing")
 	[[p.name, p.cause, p.message] | some p in parts] == [["item 1 of es", "absent", "v is missing; w is missing"]]
 }
+
+test_a_count_gives_an_item_entry_for_each_item_beside_a_key_it_cant_read if {
+	check := ergo._s_written_check("count of es whose zz is m named by $params.k is 0")
+	m := "$params.k is missing; item 1 of es: m is missing; item 2 of es: m is missing; item 3 of es: m is missing; and 1 more"
+	parts := ergo._tally_item_parts(check, {"es": [{"zz": 1}, {"zz": 1}, {"zz": 1}, {"zz": 1}]}, "absent", "/things/0", m) with data.ergo_params as {}
+	[[p.name, p.cause, p.message] | some p in parts] == [["item 1 of es", "absent", "m is missing"], ["item 2 of es", "absent", "m is missing"], ["item 3 of es", "absent", "m is missing"], ["item 4 of es", "absent", "m is missing"]]
+	ergo._tally_rest_of(m, set(), ergo._tally_item_texts(check, {"es": [{"zz": 1}, {"zz": 1}, {"zz": 1}, {"zz": 1}]}, "absent", m)) == "$params.k is missing" with data.ergo_params as {}
+}
