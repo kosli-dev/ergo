@@ -2018,14 +2018,20 @@ impl For {
             .into_iter()
             .flat_map(|root| [Clause::said(Cause::Value, root.text.clone()), root])
             .collect();
-        let mut clauses: Vec<Clause> = super::message::unsaid_clauses(&said, &mut seen)
+        let mut clauses: Vec<Clause> = Vec::new();
+        for piece in super::message::unsaid_clauses(&said, &mut seen)
             .into_iter()
             .flatten()
-            .flat_map(|piece| match piece {
-                Piece::Said(text) => vec![Clause::said(cause, text)],
-                Piece::Counted(clauses) => clauses,
-            })
-            .collect();
+        {
+            match piece {
+                Piece::Said(text) => push_new(&mut clauses, Clause::said(cause, text)),
+                Piece::Counted(counted) => {
+                    for clause in counted {
+                        push_new(&mut clauses, clause);
+                    }
+                }
+            }
+        }
         if !walks
             && let Some((key, base, worse)) = sentence
                 .check
