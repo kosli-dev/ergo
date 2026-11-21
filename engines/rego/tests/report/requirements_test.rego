@@ -130,3 +130,13 @@ test_the_ids_message_keeps_each_text_once_in_the_order_it_first_comes_like_the_o
 	ergo._id_joined(texts) == "repeated d ids is [\"a\"]; item 2 of ds: id is missing; b.id is missing; item 1 of ds: id is null; item 4 of ds is null; and 1 more"
 	ergo._id_joined(array.slice(texts, 0, 3)) == ergo._m_joined(array.slice(texts, 0, 3))
 }
+
+test_two_clauses_about_one_item_of_a_min_subjects_row_join_as_any_two_problems_do if {
+	own := [{"kind": "item", "name": "item 1 of records", "cause": "unusable", "inputs": [], "failures": [], "message": "evidence.a is an object"}, {"kind": "item", "name": "item 1 of records", "cause": "unusable", "inputs": [], "failures": [], "message": "evidence.b is text"}]
+	ergo._ms_join(own, [], []).message == "evidence.a is an object; evidence.b is text"
+}
+
+test_a_note_about_a_value_not_in_a_list_item_reads_that_value_as_usable if {
+	ergo._ms_list_outcome({"note": true, "cause": "unusable"}) == "usable"
+	ergo._ms_list_outcome({"note": false, "cause": "absent"}) == ergo._key_list_outcome("absent")
+}
