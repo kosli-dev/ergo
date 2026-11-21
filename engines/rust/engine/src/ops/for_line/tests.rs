@@ -2396,7 +2396,7 @@ const OTHER_SUBJECTS_CAUSE: &str = "the tree gives item 1 of ys its own cause, a
 
 const CASE_AGAINST_FOR_PASS: &str = "the case fails an item of the first list that isn't an object, a value read whole as a named by key or a list walked through its alias, when nothing is checked for it on an empty second list, where for.pass says an item that isn't an object passes when nothing is checked for it, and the tree follows the rule";
 
-const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 96] = [
+const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 97] = [
     (
         "for / a $params list that a for line reads fails it when the line's whose leaves nothing and an item of the list can't be read / fails, when the whose leaves nothing",
         SAID_OUTSIDE,
@@ -2611,6 +2611,10 @@ const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 96] = [
     ),
     (
         "list_items / two names read from outside the item in a whose, one with an item without the name, are each named once, worst cause first and then by name / the part holds more than one kind of value",
+        WHOSE_ROOT,
+    ),
+    (
+        "members / every member of on a for line whose whose reads a named by key from $params that isn't text, beside a member that fails on its own field / says the key in each member, the member that has its field too, in key order",
         WHOSE_ROOT,
     ),
     (
