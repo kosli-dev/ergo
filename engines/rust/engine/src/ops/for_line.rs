@@ -3311,6 +3311,7 @@ impl For {
         let alias = self.last_alias();
         let all_own = child.sfails.iter().all(|fail| fail.own);
         let mut marked: Option<&Clause> = None;
+        let mut marked_causes: Vec<Cause> = Vec::new();
         let taken: Vec<usize> = riders
             .as_deref()
             .map(|riders| riders.iter().map(|(idx, _)| *idx).collect())
@@ -3337,6 +3338,7 @@ impl For {
                 {
                     Some(rest) => {
                         text = format!("{name}{rest}");
+                        marked_causes.push(clause.cause);
                         marked = Some(clause);
                     }
                     None => match riders.as_deref_mut() {
@@ -3352,7 +3354,13 @@ impl For {
         }
         in_list_order(&mut said);
         if !said.is_empty() || !text.is_empty() {
-            return Some(Clause::item(name, outcome.cause, text, said));
+            let cause = Cause::worst(
+                marked_causes
+                    .into_iter()
+                    .chain(said.iter().map(|clause| clause.cause)),
+            )
+            .unwrap_or(outcome.cause);
+            return Some(Clause::item(name, cause, text, said));
         }
         let picks_second =
             matches!(self.items.get(1), Some(item) if matches!(item.how, How::Pick { .. }));
@@ -3573,10 +3581,13 @@ fn in_list_order(said: &mut [Clause]) {
             .and_then(|rest| rest.split_once(" of "))
             .and_then(|(number, list)| Some((number.parse::<u64>().ok()?, list)))
             .unwrap_or((0, clause.name.as_str()));
-        let rank = lists.iter().position(|seen| *seen == list).unwrap_or_else(|| {
-            lists.push(list);
-            lists.len() - 1
-        });
+        let rank = lists
+            .iter()
+            .position(|seen| *seen == list)
+            .unwrap_or_else(|| {
+                lists.push(list);
+                lists.len() - 1
+            });
         keyed.push((rank, number, clause.clone()));
     }
     keyed.sort_by_key(|(rank, number, _)| (*rank, *number));
