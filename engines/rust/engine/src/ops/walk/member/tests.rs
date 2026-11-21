@@ -86,6 +86,49 @@ fn each_member_of_the_object_the_path_ends_at_is_an_item_in_key_order_named_by_i
 }
 
 #[test]
+fn every_member_of_an_object_with_no_list_on_the_path_passes_when_each_member_passes() {
+    let subject = json!({"e": {"a": 1, "b": 1}});
+    let input = json!({});
+    let ctx = Ctx {
+        label: None,
+        item_by_item: false,
+        subject: Located {
+            value: &subject,
+            location: Location::input_root().key("s"),
+        },
+        input: &input,
+        params: None,
+        aliases: BTreeMap::new(),
+    };
+    let walk = Walk {
+        quantifier: Quantifier::Every,
+        path: Path {
+            start: Start::Subject,
+            steps: vec![Step::Key("e".to_string()), Step::Members],
+        },
+        distinct: false,
+        whose: Vec::new(),
+        if_any: false,
+        check: Box::new(Check::Equals(crate::ops::equals::Equals {
+            path: Path {
+                start: Start::Subject,
+                steps: Vec::new(),
+            },
+            value: json!(1),
+        })),
+        for_aliases: Vec::new(),
+    };
+    assert_eq!(run(&walk, &ctx).verdict.cause, Cause::Satisfied);
+    let walked = walk_of(&walk, &ctx);
+    assert_eq!(walked.name, "e");
+    assert!(walked.walked_last());
+}
+
+fn walk_of<'a>(walk: &Walk, ctx: &Ctx<'a>) -> Walked<'a> {
+    super::super::walk(&walk.path, ctx, Options::default())
+}
+
+#[test]
 fn a_list_along_the_path_is_walked_but_the_one_it_ends_at_is_not() {
     let (items, failures, name) = members(
         json!({"rs": [{"e": {"k": 1}}, {"e": [{"k": 2}]}]}),
