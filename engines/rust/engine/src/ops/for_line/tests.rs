@@ -2338,3 +2338,72 @@ fn a_sentence_says_an_item_once_when_two_of_its_whose_clauses_cant_read_it() {
         "item 2 of x.es: v is missing"
     );
 }
+
+fn for_line_cases() -> Vec<(String, Value, Value, Value)> {
+    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("..");
+    let known: Vec<String> = std::fs::read_to_string(root.join("known-failures.txt"))
+        .unwrap()
+        .lines()
+        .map(str::to_string)
+        .collect();
+    let mut topics: Vec<std::path::PathBuf> = std::fs::read_dir(root.join("../../spec/cases"))
+        .unwrap()
+        .map(|entry| entry.unwrap().path())
+        .filter(|path| path.is_dir())
+        .collect();
+    topics.sort();
+    let mut out = Vec::new();
+    for topic in topics {
+        let name = topic.file_name().unwrap().to_string_lossy().into_owned();
+        let text = std::fs::read_to_string(topic.join("cases.json"))
+            .unwrap()
+            .replace("{{spec}}", SPEC);
+        let groups: Value = serde_json::from_str(&text).unwrap();
+        for group in groups.as_array().unwrap() {
+            if !group["policy"].to_string().contains("\"for\"") {
+                continue;
+            }
+            for case in group["cases"].as_array().unwrap() {
+                let id = format!(
+                    "{name} / {} / {}",
+                    group["description"].as_str().unwrap(),
+                    case["description"].as_str().unwrap()
+                );
+                if known.contains(&id) {
+                    continue;
+                }
+                let params = group.get("params").cloned().unwrap_or_else(|| json!({}));
+                out.push((id, case["input"].clone(), group["policy"].clone(), params));
+            }
+        }
+    }
+    out
+}
+
+#[test]
+fn the_items_clauses_say_what_the_row_says_today() {
+    let mut differ: Vec<String> = Vec::new();
+    let mut compared = 0;
+    for (id, input, policy, params) in for_line_cases() {
+        super::RAN.with(|ran| ran.borrow_mut().clear());
+        crate::report(&input, &policy, &params);
+        for (message, roots, items) in super::RAN.with(|ran| ran.take()) {
+            let Some(message) = message.filter(|_| !items.is_empty()) else {
+                continue;
+            };
+            compared += 1;
+            let clauses: Vec<crate::ops::clause::Clause> = roots.into_iter().chain(items).collect();
+            let said = crate::ops::clause::text(&crate::ops::clause::shown(&clauses));
+            if said != message {
+                differ.push(format!("{id}\n  row:   {message}\n  items: {said}"));
+            }
+        }
+    }
+    assert!(compared > 500, "only {compared} rows compared");
+    assert!(
+        differ.is_empty(),
+        "{} of {compared} rows differ:\n{}",
+        differ.len(),
+        differ.join("\n")
+    );
+}
