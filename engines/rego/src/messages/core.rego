@@ -495,7 +495,18 @@ _m_message(check, subj, "not_an_object") := m if {
 	m := concat(", and ", clauses)
 } else := _m_fallback(check) if is_object(subj)
 
-_m_list_names(check) := {_input_name(array.slice(p, 0, i)) |
+_m_list_names(check) := _m_tally_list_names(check) | _m_text_list_names(check)
+
+_m_text_list_names(check) := {_input_name(check.right)} if {
+	check.ignoring
+	_list_cmp(check)
+	is_array(check.right)
+} else := {_ref_label(check.values.ref)} if {
+	check.ignoring
+	_is_ref(check.values)
+} else := set()
+
+_m_tally_list_names(check) := {_input_name(array.slice(p, 0, i)) |
 	some side in _m_tally_parts(check)
 	p := side[_basic_form(side)]
 	is_array(p)
