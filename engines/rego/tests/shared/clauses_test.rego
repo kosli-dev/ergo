@@ -38,3 +38,10 @@ test_roots_lists_and_and_n_more_are_joined_with_a_semicolon if {
 		ergo._m_clause_more(2),
 	]) == "$params is 3, which isn't an object; es is missing; and 2 more"
 }
+
+test_an_item_says_its_clauses_after_its_name_joined_with_and if {
+	ergo._m_clauses_text([
+		_item("item 1 of xs", "absent", [_missing("x.v"), _missing("x.w")]),
+		_unread("item 2 of xs", "unusable", "item 2 of xs is null, which isn't an object"),
+	]) == "item 1 of xs: x.v is missing, and x.w is missing; item 2 of xs is null, which isn't an object"
+}
