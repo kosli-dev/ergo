@@ -84,3 +84,24 @@ test_an_item_two_conditions_cant_read_for_the_same_reason_is_named_once if {
 	])
 	[x[1] | some x in ergo._m_tally_items({"es": [null]}, side)] == ["item 1 of es is null, which isn't an object"]
 }
+
+_tally_records(sentence, subj, cause) := ergo._m_tally_said(subj, ergo._m_tally_parts(ergo._s_written_check(sentence))[0], cause)
+
+test_a_count_gives_its_roots_then_its_items_as_clauses if {
+	_tally_records("count of ms whose v is at least $params.r is 0", {"ms": [{"v": "s"}, {}, "x"]}, "not_an_object") == [
+		ergo._m_clause("root", "$params.r", "absent", "$params.r is missing"),
+		ergo._m_item_clause("item 1 of ms", "unusable", [ergo._m_clause("root", "v", "unusable", `v is "s", which isn't a number`)]),
+		ergo._m_item_clause("item 2 of ms", "absent", [ergo._m_clause("root", "v", "absent", "v is missing")]),
+		ergo._m_clause("item", "item 3 of ms", "not_an_object", `item 3 of ms is "x", which isn't an object`),
+	] with data.ergo_params as {}
+	ergo._m_clauses_text(ergo._m_clauses_shown(_tally_records("count of ms whose v is at least $params.r is 0", {"ms": [{}, {}, {}, {}]}, "absent"))) == "$params.r is missing; item 1 of ms: v is missing; item 2 of ms: v is missing; item 3 of ms: v is missing; and 1 more" with data.ergo_params as {}
+}
+
+test_an_items_cause_comes_from_its_record_not_its_last_words if {
+	side := ergo._m_tally_parts(ergo._s_written_check("count of xs whose v is 1 is 0"))[0]
+	e := {"i": ["xs", 0], "c": ["xs", 0], "iv": {}, "r": [], "v": {}}
+	ergo._m_record_clause(["focus unusable", "item 1 of xs: v is missing", {"item": e}], side) == ergo._m_item_clause("item 1 of xs", "unusable", [ergo._m_clause("root", "v", "unusable", "v is missing")])
+	ergo._m_record_clause(["absent", `item 1 of xs: v is "a", which isn't text`, {"item": e}], side) == ergo._m_item_clause("item 1 of xs", "absent", [ergo._m_clause("root", "v", "absent", `v is "a", which isn't text`)])
+	ergo._m_record_clause(["root unusable", `$params.k is 3, which isn't text`], side) == ergo._m_clause("root", "$params.k", "unusable", `$params.k is 3, which isn't text`)
+	ergo._m_record_clause(["absent", "xs is missing"], side) == ergo._m_clause("list", "xs", "absent", "xs is missing")
+}
