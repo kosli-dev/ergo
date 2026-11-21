@@ -143,6 +143,12 @@ test_two_clauses_about_one_item_of_a_plain_every_row_join_with_a_semicolon_as_in
 	ergo._ms_join2(own, [], []).message == "p1 is 3, which isn't an object; p1 is a number"
 }
 
+test_the_from_text_of_every_member_of_says_member_of_as_written if {
+	ergo._every_word({"subject": "e"}) == "every member of " with data.ergo_subject_sentences as {"every": {"e"}, "member": {"e"}, "narrowing": {}} with data.ergo_resolved as {"e": {}}
+	ergo._every_word({"subject": "n"}) == "every member of " with data.ergo_subject_sentences as {"every": {"e"}, "member": {"e"}, "narrowing": {"n": ["e"]}} with data.ergo_resolved as {"e": {}, "n": {}}
+	ergo._every_word({"subject": "e"}) == "every " with data.ergo_subject_sentences as {"every": {"e"}, "member": set(), "narrowing": {}} with data.ergo_resolved as {"e": {}}
+}
+
 test_a_note_about_a_value_not_in_a_list_item_reads_that_value_as_usable if {
 	ergo._ms_list_outcome({"note": true, "cause": "unusable"}) == "usable"
 	ergo._ms_list_outcome({"note": false, "cause": "absent"}) == ergo._key_list_outcome("absent")
