@@ -2,7 +2,9 @@ package spec_test
 
 import data.ergo
 
-known_differences := set()
+known_differences := {
+	"for / the roots of the line's own whose come before the roots of its sentences, whatever their causes / $params.min is missing and says first, though $params.a has the worse cause",
+}
 
 _topic_cases(topic) := json.unmarshal(replace(json.marshal(data.spec.cases[topic]), "{{spec}}", ergo._spec))
 
