@@ -53,6 +53,15 @@ The image is `rust:1.99.0`, the version in `rust-toolchain.toml`, with rustfmt, 
 
 The build goes to the `ergo-rust-target` volume and not to `engines/rust/target`, so the build stays out of your checkout. When several sessions or people run the checks at the same time, each should give the target volume their own name, like `ergo-rust-target-<name>`, because two builds sharing one volume can fail with "Permission denied". Change the `-v ergo-rust-target:/target` part of the command and keep the rest.
 
+## Mutation testing the changed lines
+
+`cargo-mutants` changes the source one small way at a time, like returning `true` where a function returned a condition, and runs the tests on each change. A change no test notices is a missed mutant, which points at a line the tests don't pin down. `.github/mutants-facts.sh BASE` runs it only on the lines of Rust source that `git diff BASE...HEAD` changes, and prints how many mutants were caught, missed, unviable or timed out, and the missed ones. It runs in your checkout, because the engine tests read `spec/cases`, and `cargo-mutants` puts each file back after it mutates it. When `engines/rust` has no uncommitted changes at the start, the script also runs `git checkout -- engines/rust` when it ends or is stopped, so a killed `cargo-mutants` leaves nothing mutated. When it has some, the script warns and restores nothing. It stops after `MUTANTS_FACTS_TIMEOUT` seconds (900 by default), says so, and counts the mutants that ran. It only informs, and the `mutants-facts` job writes it in the summary of a pull request.
+
+```sh
+cargo install cargo-mutants --locked
+.github/mutants-facts.sh origin/main
+```
+
 ## Building the CLI
 
 `ergo` is documented in [CLI.md](../../CLI.md): how to install it, how to run it, its exit codes and how it reads YAML. This section builds it from the repo.

@@ -54,6 +54,10 @@ python3 .github/rego-layers.py
 .github/matrix-facts_test.sh
 .github/spec-placeholder.sh
 .github/spec-placeholder_test.sh
+.github/docs-run.sh
+.github/docs-run_test.sh
+.github/docs-run-release_test.sh
+.github/mutants-facts_test.sh
 python3 spec/check_rules.py
 python3 spec/sweep_test.py
 python3 spec/sentences_corpus.py --check
@@ -69,6 +73,8 @@ Run them from the repo root. The last three lines use a virtual environment that
 `.github/pr-facts_test.sh` tests `.github/pr-facts.sh`, which prints how many Rust case reports a change moved, which known failures it added or removed, and whether a case that passed now fails or is gone; put its output in the body of a pull request that changes Rust reports.
 
 `.github/pairs-facts_test.sh` tests `.github/pairs-facts.sh`, which runs the pairs in `.github/sweep-pairs.json` through both engines and prints how many the engines differ on, how many say their `want`, and which pairs the Rust output of a change moved, first and in capitals any that moved away from Rego or from their `want`; it only informs, and the `pairs-facts` job writes it in the summary of a pull request.
+
+`.github/mutants-facts_test.sh` tests `.github/mutants-facts.sh`, which runs `cargo-mutants` on the lines of Rust source a change touches, stops at a time limit (`MUTANTS_FACTS_TIMEOUT`, 900 seconds by default) and prints how many mutants were caught, missed, unviable or timed out, and the missed ones; it only informs, and the `mutants-facts` job writes it in the summary of a pull request.
 
 `.github/matrix-facts_test.sh` tests `.github/matrix-facts.sh`, which runs one of the generators in `.github/matrix` (`matrix-a` by default) on a base and on the working tree and prints the pairs that got worse than the base and the Rust causes that are lower than `ergo.rego`'s; it only informs, and the `matrix-facts` job writes it in the summary of a pull request. `.github/matrix/README.md` says what each generator makes and how to run one by hand.
 
@@ -220,6 +226,8 @@ The report must stay byte-identical for the same policy and input, whatever orde
 When behaviour changes, update its rule in `spec/` and add or change cases for it, so `spec_test.rego` fails when one no longer matches. When a policy or a report changes shape, update `spec/policy/schema.json` or `spec/report/schema.json` too. Update `REFERENCE.md` in the same change. When it affects the first policy or its report, update `README.md` too, when it changes how `ergo.rego` runs, `OPA.md`, and when it changes the `ergo` command, `CLI.md`.
 
 Every output shown in the docs must come from actually running it, not from memory.
+
+To have CI run an example, put a line like `<!-- ergo-run: NAME role=file path=policy.yaml -->` right before the code block (readers don't see it). The roles are `file` (written to `path`; `normalise=ergo_spec` swaps its `ergo_spec:` line for the version of `dist/ergo.rego`), `command` (the `opa` command, run in that folder with `dist/ergo.rego` copied to `ergo.rego`, or to `ergo=PATH`) and `output` (what it prints, compared word for word). Blocks with the same NAME are one group, and may be in different files. Run `.github/docs-run.sh [FILE...]` after `.github/build-ergo.sh`; it lists every group that differs, with a diff. `README.md` follows the latest release, so CI checks its example against the `ergo.rego` of the latest `rego-v*` release, with `.github/docs-run-release.sh`. To mark such a group, add `use=release` to its `command` marker, and when the group has no command block that readers see, put the command in the marker as ``run=`COMMAND` ``, which runs in that folder and is allowed only when the group has no command block. A `run=` command, like any command block marked this way, runs as shell in CI, like any script in a pull request, and `run=` cannot contain a backtick. While a release is being prepared (`_spec` or `version` in `basics.rego` has no `-dev`), `docs-run-release.sh` checks against `dist/ergo.rego` and not the latest release, because `README.md` has already moved. Without `DOCS_RUN_RELEASE_ERGO_REGO` set, `docs-run.sh` prints `skip` for these groups, and `DOCS_RUN_REQUIRE_RELEASE=1` makes a skip fail.
 
 ## Writing
 

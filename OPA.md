@@ -282,6 +282,7 @@ The [reference](REFERENCE.md#policies-written-before-01) says what spec 0.1 stop
 
 `ergo.as_sentences(policy)` rewrites a policy written the old way into sentences, wherever a sentence reads back as exactly what was written. It always sets `ergo_spec: v0.7-dev` on what it returns. Anything it can't rewrite stays as it was, and under 0.1 that is written wrong, so you rewrite those parts by hand. With this `policy.yaml`:
 
+<!-- ergo-run: as-sentences role=file path=policy.yaml -->
 ```yaml
 subjects:
   deployment:
@@ -303,6 +304,7 @@ requirements:
 
 this command:
 
+<!-- ergo-run: as-sentences role=command -->
 ```sh
 opa eval -d ergo.rego -d policy.yaml --format raw \
   'yaml.marshal(data.ergo.as_sentences({"subjects": data.subjects, "requirements": data.requirements}))'
@@ -310,6 +312,7 @@ opa eval -d ergo.rego -d policy.yaml --format raw \
 
 prints:
 
+<!-- ergo-run: as-sentences role=output -->
 ```yaml
 ergo_spec: v0.7-dev
 requirements:

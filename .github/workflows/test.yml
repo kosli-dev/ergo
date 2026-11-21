@@ -39,6 +39,13 @@ jobs:
           .github/build-ergo_test.sh
           .github/build-ergo.sh
       - run: opa check --strict engines/rego dist spec:spec examples:examples --ignore src
+      - name: Check the marked policy, input and output blocks in the docs by running them
+        run: |
+          .github/docs-run_test.sh
+          .github/docs-run-release_test.sh
+          .github/docs-run-release.sh
+        env:
+          GH_TOKEN: ${{ github.token }}
       - name: Check Ergo compiles where input is checked against a closed schema
         run: opa check --strict --schema .github/closed-input-schema.json dist/ergo.rego
       - name: Check Ergo compiles without built-ins whose answer depends on the machine
@@ -68,6 +75,8 @@ jobs:
         run: .github/red-check_test.sh
       - name: Check the script that lists what a change did to the policy and input pairs
         run: .github/pairs-facts_test.sh
+      - name: Check the script that lists what cargo-mutants misses on the changed Rust lines
+        run: .github/mutants-facts_test.sh
       - name: Check the script that lists what a change did to the matrix pairs
         run: .github/matrix-facts_test.sh
       - name: Check the script that runs the common checks
@@ -296,6 +305,26 @@ jobs:
           else
             .github/pairs-facts.sh "$BASE" >> "$GITHUB_STEP_SUMMARY"
           fi
+
+  mutants-facts:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Install the Rust version in rust-toolchain.toml
+        run: |
+          cd engines/rust
+          rustup toolchain install
+      - name: Install cargo-mutants
+        run: cargo install cargo-mutants --locked --version 27.1.0
+      - name: Write what cargo-mutants misses on the changed Rust lines in the job summary
+        env:
+          BASE: origin/${{ github.base_ref }}
+        run: .github/mutants-facts.sh "$BASE" >> "$GITHUB_STEP_SUMMARY"
 
   matrix-facts:
     if: github.event_name == 'pull_request'
