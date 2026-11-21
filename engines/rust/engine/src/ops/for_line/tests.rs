@@ -2931,6 +2931,11 @@ const ROWS_THE_CLAUSES_DONT_SAY_YET: &[(&str, usize, &str)] = &[
         WHOSE_ROOT,
     ),
     (
+        "members / every member of on a for line whose whose reads a named by key from $params that isn't text, beside a member that fails on its own field / says the key in each member, the member that has its field too, in key order",
+        1,
+        WHOSE_ROOT,
+    ),
+    (
         "messages / a count of in a for line, and the order of its roots / names the $params root first and each root once",
         2,
         TREE_IS_THE_CASE,

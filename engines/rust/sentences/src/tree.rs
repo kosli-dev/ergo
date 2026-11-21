@@ -136,6 +136,9 @@ pub struct Derived {
     /// True when `distinct` is written before the path, so that values exactly the same count once.
     #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "is_false"))]
     pub distinct: bool,
+    /// True when `member of` is written before the path, so that each member of the object at its end is an item.
+    #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "is_false"))]
+    pub member: bool,
     /// The `whose` conditions that pick items.
     pub whose: Vec<Condition>,
 }
@@ -648,6 +651,9 @@ pub enum ForItem {
         /// True when `distinct` is written before the path, so that items exactly the same count once.
         #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "is_false"))]
         distinct: bool,
+        /// True when `member of` is written before the path, so that each member of the object at its end is an item.
+        #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "is_false"))]
+        member: bool,
         /// The `whose` conditions that pick items.
         whose: Vec<Condition>,
         /// True when `if any` is written.
@@ -733,22 +739,26 @@ pub enum FromCondition {
     },
 }
 
-/// The two words that change how a list is walked: `distinct` before the path and `if any` after it.
+/// The words that change how a list is walked: `distinct` and `member of` before the path and `if any` after it.
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ListOptions {
     /// True when `distinct` is written before the path, so that items exactly the same count once.
     #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "is_false"))]
     pub distinct: bool,
+    /// True when `member of` is written before the path, so that each member of the object at its end is an item.
+    #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "is_false"))]
+    pub member: bool,
     /// True when `if any` is written.
     #[cfg_attr(feature = "serde", serde(default))]
     pub if_any: bool,
 }
 
 impl ListOptions {
-    /// Neither word is written.
+    /// None of the words is written.
     pub const PLAIN: ListOptions = ListOptions {
         distinct: false,
+        member: false,
         if_any: false,
     };
 }
