@@ -1904,5 +1904,7 @@ fn walk_faults(walk: &Walk, outer_ctx: &Ctx) -> Vec<String> {
     }
 }
 
+mod member;
+
 #[cfg(test)]
 mod tests;
