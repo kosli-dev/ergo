@@ -1,0 +1,1827 @@
+[
+  {
+    "description": "every member of reads each member of the object a from line ends at",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"record": {"from": "records", "identified_by": "id"}, "approval": {"from": "every member of record.evidence whose kind is \"approval\""}}, "requirements": {"approved": {"subject": "approval", "checks": {"complete": "status is \"COMPLETE\""}}}},
+    "cases": [
+      {
+        "description": "picks the member whose field has the value, whatever its key, in key order",
+        "rules": ["subjects.every.member", "sentence.subject.member"],
+        "input": {"records": [{"id": "r1", "evidence": {"sign-off": {"kind": "approval", "status": "COMPLETE"}, "build-7": {"kind": "scan", "status": "DONE"}}}]},
+        "compliant": true,
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [
+                  "/records/0/evidence/sign-off"
+                ],
+                "name": "in-scope approval count",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "approved",
+            "subject": {
+              "id": null,
+              "type": "approval",
+              "in": {
+                "record": "r1"
+              }
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated approval ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "approved",
+            "subject": {
+              "id": null,
+              "type": "approval",
+              "in": {
+                "record": "r1"
+              }
+            }
+          },
+          {
+            "cause": "value",
+            "check": "$applies",
+            "inputs": [
+              {
+                "locations": [
+                  "/records/0/evidence/build-7/kind"
+                ],
+                "name": "kind",
+                "value": "scan",
+                "outcome": "usable"
+              }
+            ],
+            "message": "kind is \"scan\"",
+            "passed": false,
+            "requirement": "approved",
+            "subject": {
+              "id": "build-7",
+              "type": "approval",
+              "in": {
+                "record": "r1"
+              }
+            },
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/records/0/evidence/build-7/kind"
+                    ],
+                    "name": "kind",
+                    "value": "scan",
+                    "outcome": "usable"
+                  }
+                ],
+                "kind": "assertion",
+                "message": "kind is \"scan\"",
+                "name": "kind is \"approval\"",
+                "locations": [
+                  "$policy:/subjects/approval/from"
+                ]
+              }
+            ]
+          },
+          {
+            "cause": "satisfied",
+            "check": "$applies",
+            "inputs": [
+              {
+                "locations": [
+                  "/records/0/evidence/sign-off/kind"
+                ],
+                "name": "kind",
+                "value": "approval"
+              }
+            ],
+            "passed": true,
+            "requirement": "approved",
+            "subject": {
+              "id": "sign-off",
+              "type": "approval",
+              "in": {
+                "record": "r1"
+              }
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "complete",
+            "inputs": [
+              {
+                "locations": [
+                  "/records/0/evidence/sign-off/status"
+                ],
+                "name": "status",
+                "value": "COMPLETE"
+              }
+            ],
+            "passed": true,
+            "requirement": "approved",
+            "subject": {
+              "id": "sign-off",
+              "type": "approval",
+              "in": {
+                "record": "r1"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "description": "an empty object gives no subject and fails min_subjects as value, and two matches are two subjects",
+        "rules": ["subjects.every.member"],
+        "input": {"records": [{"id": "r1", "evidence": {"sign-off": {"kind": "approval", "status": "COMPLETE"}}}, {"id": "r2", "evidence": {}}, {"id": "r3", "evidence": {"b": {"kind": "approval", "status": "PENDING"}, "a": {"kind": "approval", "status": "COMPLETE"}}}]},
+        "compliant": false,
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [
+                  "/records/0/evidence/sign-off"
+                ],
+                "name": "in-scope approval count",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "approved",
+            "subject": {
+              "id": null,
+              "type": "approval",
+              "in": {
+                "record": "r1"
+              }
+            }
+          },
+          {
+            "cause": "value",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope approval count",
+                "value": 0
+              }
+            ],
+            "message": "in-scope approval count is 0",
+            "passed": false,
+            "requirement": "approved",
+            "subject": {
+              "id": null,
+              "type": "approval",
+              "in": {
+                "record": "r2"
+              }
+            },
+            "failures": []
+          },
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [
+                  "/records/2/evidence/a",
+                  "/records/2/evidence/b"
+                ],
+                "name": "in-scope approval count",
+                "value": 2
+              }
+            ],
+            "passed": true,
+            "requirement": "approved",
+            "subject": {
+              "id": null,
+              "type": "approval",
+              "in": {
+                "record": "r3"
+              }
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated approval ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "approved",
+            "subject": {
+              "id": null,
+              "type": "approval",
+              "in": {
+                "record": "r1"
+              }
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated approval ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "approved",
+            "subject": {
+              "id": null,
+              "type": "approval",
+              "in": {
+                "record": "r2"
+              }
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated approval ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "approved",
+            "subject": {
+              "id": null,
+              "type": "approval",
+              "in": {
+                "record": "r3"
+              }
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$applies",
+            "inputs": [
+              {
+                "locations": [
+                  "/records/0/evidence/sign-off/kind"
+                ],
+                "name": "kind",
+                "value": "approval"
+              }
+            ],
+            "passed": true,
+            "requirement": "approved",
+            "subject": {
+              "id": "sign-off",
+              "type": "approval",
+              "in": {
+                "record": "r1"
+              }
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$applies",
+            "inputs": [
+              {
+                "locations": [
+                  "/records/2/evidence/a/kind"
+                ],
+                "name": "kind",
+                "value": "approval"
+              }
+            ],
+            "passed": true,
+            "requirement": "approved",
+            "subject": {
+              "id": "a",
+              "type": "approval",
+              "in": {
+                "record": "r3"
+              }
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$applies",
+            "inputs": [
+              {
+                "locations": [
+                  "/records/2/evidence/b/kind"
+                ],
+                "name": "kind",
+                "value": "approval"
+              }
+            ],
+            "passed": true,
+            "requirement": "approved",
+            "subject": {
+              "id": "b",
+              "type": "approval",
+              "in": {
+                "record": "r3"
+              }
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "complete",
+            "inputs": [
+              {
+                "locations": [
+                  "/records/0/evidence/sign-off/status"
+                ],
+                "name": "status",
+                "value": "COMPLETE"
+              }
+            ],
+            "passed": true,
+            "requirement": "approved",
+            "subject": {
+              "id": "sign-off",
+              "type": "approval",
+              "in": {
+                "record": "r1"
+              }
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "complete",
+            "inputs": [
+              {
+                "locations": [
+                  "/records/2/evidence/a/status"
+                ],
+                "name": "status",
+                "value": "COMPLETE"
+              }
+            ],
+            "passed": true,
+            "requirement": "approved",
+            "subject": {
+              "id": "a",
+              "type": "approval",
+              "in": {
+                "record": "r3"
+              }
+            }
+          },
+          {
+            "cause": "value",
+            "check": "complete",
+            "inputs": [
+              {
+                "locations": [
+                  "/records/2/evidence/b/status"
+                ],
+                "name": "status",
+                "value": "PENDING",
+                "outcome": "usable"
+              }
+            ],
+            "message": "status is \"PENDING\"",
+            "passed": false,
+            "requirement": "approved",
+            "subject": {
+              "id": "b",
+              "type": "approval",
+              "in": {
+                "record": "r3"
+              }
+            },
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/records/2/evidence/b/status"
+                    ],
+                    "name": "status",
+                    "value": "PENDING",
+                    "outcome": "usable"
+                  }
+                ],
+                "kind": "assertion",
+                "message": "status is \"PENDING\"",
+                "name": "status is \"COMPLETE\"",
+                "locations": [
+                  "$policy:/requirements/approved/checks/complete"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "the id of a member is its key, or its identified_by",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"evidence": {"from": "every member of records.evidence"}, "attested": {"from": "every member of records.evidence", "identified_by": "attestation_id"}}, "requirements": {"by id": {"subject": "attested", "checks": {"done": "status exists"}}, "by key": {"subject": "evidence", "checks": {"done": "status exists"}}}},
+    "cases": [
+      {
+        "description": "the same key in two records clashes, and identified_by reads the id inside each member",
+        "rules": ["subjects.every.member.id"],
+        "input": {"records": [{"id": "r1", "evidence": {"sign-off": {"attestation_id": "a-11", "status": "COMPLETE"}}}, {"id": "r2", "evidence": {"sign-off": {"attestation_id": "a-12", "status": "PENDING"}}}]},
+        "compliant": false,
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated attested ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "by id",
+            "subject": {
+              "id": null,
+              "type": "attested"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "locations": [
+                  "/records/0/evidence/sign-off",
+                  "/records/1/evidence/sign-off"
+                ],
+                "name": "repeated evidence ids",
+                "value": [
+                  "sign-off"
+                ]
+              }
+            ],
+            "message": "repeated evidence ids is [\"sign-off\"]",
+            "passed": false,
+            "requirement": "by key",
+            "subject": {
+              "id": null,
+              "type": "evidence"
+            },
+            "failures": []
+          },
+          {
+            "cause": "satisfied",
+            "check": "done",
+            "inputs": [
+              {
+                "locations": [
+                  "/records/0/evidence/sign-off/status"
+                ],
+                "name": "status",
+                "value": "COMPLETE"
+              }
+            ],
+            "passed": true,
+            "requirement": "by id",
+            "subject": {
+              "id": "a-11",
+              "type": "attested"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "done",
+            "inputs": [
+              {
+                "locations": [
+                  "/records/1/evidence/sign-off/status"
+                ],
+                "name": "status",
+                "value": "PENDING"
+              }
+            ],
+            "passed": true,
+            "requirement": "by id",
+            "subject": {
+              "id": "a-12",
+              "type": "attested"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "done",
+            "inputs": [
+              {
+                "locations": [
+                  "/records/0/evidence/sign-off/status"
+                ],
+                "name": "status",
+                "value": "COMPLETE"
+              }
+            ],
+            "passed": true,
+            "requirement": "by key",
+            "subject": {
+              "id": "sign-off",
+              "type": "evidence"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "done",
+            "inputs": [
+              {
+                "locations": [
+                  "/records/1/evidence/sign-off/status"
+                ],
+                "name": "status",
+                "value": "PENDING"
+              }
+            ],
+            "passed": true,
+            "requirement": "by key",
+            "subject": {
+              "id": "sign-off",
+              "type": "evidence"
+            }
+          }
+        ]
+      },
+      {
+        "description": "a member whose identified_by is missing or null has no id",
+        "rules": ["subjects.every.member.id"],
+        "input": {"records": [{"evidence": {"x": {"status": 1}}}, {"evidence": {"y": {"attestation_id": null, "status": 2}}}]},
+        "compliant": false,
+        "results": [
+          {
+            "cause": "absent",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated attested ids",
+                "value": []
+              }
+            ],
+            "message": "item 1 of records: evidence.x.attestation_id is missing; item 2 of records: evidence.y.attestation_id is null",
+            "passed": false,
+            "requirement": "by id",
+            "subject": {
+              "id": null,
+              "type": "attested"
+            },
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/records/0/evidence/x"
+                    ],
+                    "name": "records[0].evidence.x.attestation_id",
+                    "value": null,
+                    "outcome": "absent"
+                  }
+                ],
+                "kind": "item",
+                "message": "evidence.x.attestation_id is missing",
+                "name": "item 1 of records",
+                "locations": [
+                  "/records/0"
+                ],
+                "value": {
+                  "evidence": {
+                    "x": {
+                      "status": 1
+                    }
+                  }
+                }
+              },
+              {
+                "cause": "null",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/records/1/evidence/y/attestation_id"
+                    ],
+                    "name": "records[1].evidence.y.attestation_id",
+                    "value": null,
+                    "outcome": "null"
+                  }
+                ],
+                "kind": "item",
+                "message": "evidence.y.attestation_id is null",
+                "name": "item 2 of records",
+                "locations": [
+                  "/records/1"
+                ],
+                "value": {
+                  "evidence": {
+                    "y": {
+                      "attestation_id": null,
+                      "status": 2
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated evidence ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "by key",
+            "subject": {
+              "id": null,
+              "type": "evidence"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "done",
+            "inputs": [
+              {
+                "locations": [
+                  "/records/0/evidence/x/status"
+                ],
+                "name": "status",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "by id",
+            "subject": {
+              "id": null,
+              "type": "attested"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "done",
+            "inputs": [
+              {
+                "locations": [
+                  "/records/1/evidence/y/status"
+                ],
+                "name": "status",
+                "value": 2
+              }
+            ],
+            "passed": true,
+            "requirement": "by id",
+            "subject": {
+              "id": null,
+              "type": "attested"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "done",
+            "inputs": [
+              {
+                "locations": [
+                  "/records/0/evidence/x/status"
+                ],
+                "name": "status",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "by key",
+            "subject": {
+              "id": "x",
+              "type": "evidence"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "done",
+            "inputs": [
+              {
+                "locations": [
+                  "/records/1/evidence/y/status"
+                ],
+                "name": "status",
+                "value": 2
+              }
+            ],
+            "passed": true,
+            "requirement": "by key",
+            "subject": {
+              "id": "y",
+              "type": "evidence"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a value the path ends at that isn't an object",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"evidence": {"from": "every member of records.evidence"}}, "requirements": {"done": {"subject": "evidence", "min_subjects": 0, "checks": {"done": "status exists"}}}},
+    "cases": [
+      {
+        "description": "fails min_subjects as unusable, names every place that broke, and still checks the members it read",
+        "rules": ["subjects.every.member.not_an_object", "subjects.every.member"],
+        "input": {"records": [{"evidence": {"a": {"status": 1}}}, {"evidence": [{"status": 2}]}, {"evidence": "x"}, {}, {"evidence": null}, {"evidence": {}}]},
+        "compliant": false,
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [
+                  "/records/0/evidence/a"
+                ],
+                "name": "in-scope evidence count",
+                "value": 1
+              }
+            ],
+            "message": "item 2 of records: evidence is [{\"status\": 2}], which isn't an object; item 3 of records: evidence is \"x\", which isn't an object; item 4 of records: evidence is missing; item 5 of records: evidence is null",
+            "passed": false,
+            "requirement": "done",
+            "subject": {
+              "id": null,
+              "type": "evidence"
+            },
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/records/1/evidence"
+                    ],
+                    "name": "records[1].evidence",
+                    "value": [
+                      {
+                        "status": 2
+                      }
+                    ],
+                    "outcome": "unusable"
+                  }
+                ],
+                "kind": "item",
+                "message": "evidence is [{\"status\": 2}], which isn't an object",
+                "name": "item 2 of records",
+                "locations": [
+                  "/records/1"
+                ],
+                "value": {
+                  "evidence": [
+                    {
+                      "status": 2
+                    }
+                  ]
+                }
+              },
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/records/2/evidence"
+                    ],
+                    "name": "records[2].evidence",
+                    "value": "x",
+                    "outcome": "unusable"
+                  }
+                ],
+                "kind": "item",
+                "message": "evidence is \"x\", which isn't an object",
+                "name": "item 3 of records",
+                "locations": [
+                  "/records/2"
+                ],
+                "value": {
+                  "evidence": "x"
+                }
+              },
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/records/3"
+                    ],
+                    "name": "records[3].evidence",
+                    "value": null,
+                    "outcome": "absent"
+                  }
+                ],
+                "kind": "item",
+                "message": "evidence is missing",
+                "name": "item 4 of records",
+                "locations": [
+                  "/records/3"
+                ],
+                "value": {}
+              },
+              {
+                "cause": "null",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/records/4/evidence"
+                    ],
+                    "name": "records[4].evidence",
+                    "value": null,
+                    "outcome": "null"
+                  }
+                ],
+                "kind": "item",
+                "message": "evidence is null",
+                "name": "item 5 of records",
+                "locations": [
+                  "/records/4"
+                ],
+                "value": {
+                  "evidence": null
+                }
+              }
+            ]
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated evidence ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "done",
+            "subject": {
+              "id": null,
+              "type": "evidence"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "done",
+            "inputs": [
+              {
+                "locations": [
+                  "/records/0/evidence/a/status"
+                ],
+                "name": "status",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "done",
+            "subject": {
+              "id": "a",
+              "type": "evidence"
+            }
+          }
+        ]
+      },
+      {
+        "description": "members of different types fail min_subjects and are still checked",
+        "rules": ["subjects.every.member"],
+        "input": {"records": [{"evidence": {"a": {"status": 1}}}, {"evidence": {"b": "x"}}]},
+        "compliant": false,
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [
+                  "/records/0/evidence/a",
+                  "/records/1/evidence/b"
+                ],
+                "name": "in-scope evidence count",
+                "value": 2
+              }
+            ],
+            "message": "item 1 of records: evidence.a is an object, item 2 of records: evidence.b is text",
+            "passed": false,
+            "requirement": "done",
+            "subject": {
+              "id": null,
+              "type": "evidence"
+            },
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/records/0/evidence/a"
+                    ],
+                    "name": "records[0].evidence.a",
+                    "value": {
+                      "status": 1
+                    },
+                    "outcome": "usable"
+                  }
+                ],
+                "kind": "item",
+                "message": "evidence.a is an object",
+                "name": "item 1 of records",
+                "locations": [
+                  "/records/0"
+                ],
+                "value": {
+                  "evidence": {
+                    "a": {
+                      "status": 1
+                    }
+                  }
+                }
+              },
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/records/1/evidence/b"
+                    ],
+                    "name": "records[1].evidence.b",
+                    "value": "x",
+                    "outcome": "usable"
+                  }
+                ],
+                "kind": "item",
+                "message": "evidence.b is text",
+                "name": "item 2 of records",
+                "locations": [
+                  "/records/1"
+                ],
+                "value": {
+                  "evidence": {
+                    "b": "x"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated evidence ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "done",
+            "subject": {
+              "id": null,
+              "type": "evidence"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "done",
+            "inputs": [
+              {
+                "locations": [
+                  "/records/0/evidence/a/status"
+                ],
+                "name": "status",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "done",
+            "subject": {
+              "id": "a",
+              "type": "evidence"
+            }
+          },
+          {
+            "cause": "not_an_object",
+            "check": "done",
+            "inputs": [
+              {
+                "locations": [
+                  "/records/1/evidence/b"
+                ],
+                "name": "status",
+                "value": null,
+                "outcome": "not_an_object"
+              }
+            ],
+            "message": "evidence is \"x\", which isn't an object",
+            "passed": false,
+            "requirement": "done",
+            "subject": {
+              "id": "b",
+              "type": "evidence"
+            },
+            "failures": [
+              {
+                "cause": "not_an_object",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/records/1/evidence/b"
+                    ],
+                    "name": "status",
+                    "value": null,
+                    "outcome": "not_an_object"
+                  }
+                ],
+                "kind": "assertion",
+                "message": "evidence is \"x\", which isn't an object",
+                "name": "status exists",
+                "locations": [
+                  "$policy:/requirements/done/checks/done"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "every member of with no list along the path",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"e": {"from": "every member of evidence"}, "q": {"from": "every member of p.q"}}, "requirements": {"re": {"subject": "e", "checks": {"done": "status exists"}}, "rq": {"subject": "q", "min_subjects": 0, "checks": {"done": "status exists"}}}},
+    "cases": [
+      {
+        "description": "reads the members of the one object it ends at, and an empty object gives none",
+        "rules": ["subjects.every.member"],
+        "input": {"evidence": {"b": {"status": 1}, "a": {"status": 2}}, "p": {"q": {}}},
+        "compliant": true,
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [
+                  "/evidence/a",
+                  "/evidence/b"
+                ],
+                "name": "in-scope e count",
+                "value": 2
+              }
+            ],
+            "passed": true,
+            "requirement": "re",
+            "subject": {
+              "id": null,
+              "type": "e"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope q count",
+                "value": 0
+              }
+            ],
+            "passed": true,
+            "requirement": "rq",
+            "subject": {
+              "id": null,
+              "type": "q"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "done",
+            "inputs": [
+              {
+                "locations": [
+                  "/evidence/a/status"
+                ],
+                "name": "status",
+                "value": 2
+              }
+            ],
+            "passed": true,
+            "requirement": "re",
+            "subject": {
+              "id": "a",
+              "type": "e"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "done",
+            "inputs": [
+              {
+                "locations": [
+                  "/evidence/b/status"
+                ],
+                "name": "status",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "re",
+            "subject": {
+              "id": "b",
+              "type": "e"
+            }
+          }
+        ]
+      },
+      {
+        "description": "a list at the end isn't read, and a read that stops before the end fails as every does",
+        "rules": ["subjects.every.member.not_an_object", "subjects.every.member"],
+        "input": {"evidence": [{"status": 1}], "p": null},
+        "compliant": false,
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope e count",
+                "value": 0
+              },
+              {
+                "locations": [
+                  "/evidence"
+                ],
+                "name": "evidence",
+                "value": [
+                  {
+                    "status": 1
+                  }
+                ],
+                "outcome": "unusable"
+              }
+            ],
+            "message": "evidence is [{\"status\": 1}], which isn't an object",
+            "passed": false,
+            "requirement": "re",
+            "subject": {
+              "id": null,
+              "type": "e"
+            },
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/evidence"
+                    ],
+                    "name": "evidence",
+                    "value": [
+                      {
+                        "status": 1
+                      }
+                    ],
+                    "outcome": "unusable"
+                  }
+                ],
+                "kind": "list",
+                "message": "evidence is [{\"status\": 1}], which isn't an object",
+                "name": "evidence"
+              }
+            ]
+          },
+          {
+            "cause": "null",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope q count",
+                "value": 0
+              },
+              {
+                "locations": [
+                  "/p"
+                ],
+                "name": "p",
+                "value": null,
+                "outcome": "null"
+              }
+            ],
+            "message": "p is null",
+            "passed": false,
+            "requirement": "rq",
+            "subject": {
+              "id": null,
+              "type": "q"
+            },
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/p"
+                    ],
+                    "name": "p",
+                    "value": null,
+                    "outcome": "null"
+                  }
+                ],
+                "kind": "list",
+                "message": "p is null",
+                "name": "p"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "text at the end fails as unusable, and a missing name fails as absent",
+        "rules": ["subjects.every.member.not_an_object"],
+        "input": {"evidence": "x"},
+        "compliant": false,
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope e count",
+                "value": 0
+              },
+              {
+                "locations": [
+                  "/evidence"
+                ],
+                "name": "evidence",
+                "value": "x",
+                "outcome": "unusable"
+              }
+            ],
+            "message": "evidence is \"x\", which isn't an object",
+            "passed": false,
+            "requirement": "re",
+            "subject": {
+              "id": null,
+              "type": "e"
+            },
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/evidence"
+                    ],
+                    "name": "evidence",
+                    "value": "x",
+                    "outcome": "unusable"
+                  }
+                ],
+                "kind": "list",
+                "message": "evidence is \"x\", which isn't an object",
+                "name": "evidence"
+              }
+            ]
+          },
+          {
+            "cause": "absent",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope q count",
+                "value": 0
+              },
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "p",
+                "value": null,
+                "outcome": "absent"
+              }
+            ],
+            "message": "p is missing",
+            "passed": false,
+            "requirement": "rq",
+            "subject": {
+              "id": null,
+              "type": "q"
+            },
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "p",
+                    "value": null,
+                    "outcome": "absent"
+                  }
+                ],
+                "kind": "list",
+                "message": "p is missing",
+                "name": "p"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "every member of $input",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"top": {"from": "every member of $input"}}, "requirements": {"t": {"subject": "top", "checks": {"done": "status exists"}}}},
+    "cases": [
+      {
+        "description": "reads the members of the input",
+        "rules": ["subjects.every.member"],
+        "input": {"b": {"status": 1}, "a": {"status": 2}},
+        "compliant": true,
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [
+                  "/a",
+                  "/b"
+                ],
+                "name": "in-scope top count",
+                "value": 2
+              }
+            ],
+            "passed": true,
+            "requirement": "t",
+            "subject": {
+              "id": null,
+              "type": "top"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "done",
+            "inputs": [
+              {
+                "locations": [
+                  "/a/status"
+                ],
+                "name": "status",
+                "value": 2
+              }
+            ],
+            "passed": true,
+            "requirement": "t",
+            "subject": {
+              "id": "a",
+              "type": "top"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "done",
+            "inputs": [
+              {
+                "locations": [
+                  "/b/status"
+                ],
+                "name": "status",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "t",
+            "subject": {
+              "id": "b",
+              "type": "top"
+            }
+          }
+        ]
+      },
+      {
+        "description": "an input that is a list fails as unusable",
+        "rules": ["subjects.every.member.not_an_object"],
+        "input": [{"status": 1}],
+        "compliant": false,
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope top count",
+                "value": 0
+              },
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "$input",
+                "value": [
+                  {
+                    "status": 1
+                  }
+                ],
+                "outcome": "unusable"
+              }
+            ],
+            "message": "$input is [{\"status\": 1}], which isn't an object",
+            "passed": false,
+            "requirement": "t",
+            "subject": {
+              "id": null,
+              "type": "top"
+            },
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input",
+                    "value": [
+                      {
+                        "status": 1
+                      }
+                    ],
+                    "outcome": "unusable"
+                  }
+                ],
+                "kind": "list",
+                "message": "$input is [{\"status\": 1}], which isn't an object",
+                "name": "$input"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "every member of a parent subject",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"record": {"from": "records", "identified_by": "x.n"}, "kid": {"from": "every member of record"}}, "requirements": {"k": {"subject": "kid", "checks": {"done": "n exists"}}}},
+    "cases": [
+      {
+        "description": "reads the members of each parent, and a parent that isn't an object fails as not_an_object",
+        "rules": ["subjects.every.member", "subjects.chain.not_an_object"],
+        "input": {"records": [{"y": {"n": "b"}, "x": {"n": "r1"}}, [1], "t"]},
+        "compliant": false,
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [
+                  "/records/0/x",
+                  "/records/0/y"
+                ],
+                "name": "in-scope kid count",
+                "value": 2
+              }
+            ],
+            "passed": true,
+            "requirement": "k",
+            "subject": {
+              "id": null,
+              "type": "kid",
+              "in": {
+                "record": "r1"
+              }
+            }
+          },
+          {
+            "cause": "not_an_object",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope kid count",
+                "value": 0
+              }
+            ],
+            "message": "record is [1], which isn't an object",
+            "passed": false,
+            "requirement": "k",
+            "subject": {
+              "id": null,
+              "type": "kid",
+              "in": {
+                "record": [
+                  1
+                ]
+              }
+            },
+            "failures": []
+          },
+          {
+            "cause": "not_an_object",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope kid count",
+                "value": 0
+              }
+            ],
+            "message": "record is \"t\", which isn't an object",
+            "passed": false,
+            "requirement": "k",
+            "subject": {
+              "id": null,
+              "type": "kid",
+              "in": {
+                "record": "t"
+              }
+            },
+            "failures": []
+          },
+          {
+            "cause": "satisfied",
+            "check": "done",
+            "inputs": [
+              {
+                "locations": [
+                  "/records/0/x/n"
+                ],
+                "name": "n",
+                "value": "r1"
+              }
+            ],
+            "passed": true,
+            "requirement": "k",
+            "subject": {
+              "id": "x",
+              "type": "kid",
+              "in": {
+                "record": "r1"
+              }
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "done",
+            "inputs": [
+              {
+                "locations": [
+                  "/records/0/y/n"
+                ],
+                "name": "n",
+                "value": "b"
+              }
+            ],
+            "passed": true,
+            "requirement": "k",
+            "subject": {
+              "id": "y",
+              "type": "kid",
+              "in": {
+                "record": "r1"
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "every member of written in the wrong place",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"s": {}, "a": {"from": "member of records.evidence"}, "b": {"from": "every distinct member of records.evidence"}, "c": {"from": "every member of records named by each of $params.l"}}, "requirements": {"a": {"subject": "a", "checks": {"c": "status exists"}}, "b": {"subject": "b", "checks": {"c": "status exists"}}, "c": {"subject": "c", "checks": {"c": "status exists"}}, "d": {"subject": "s", "checks": {"c": "every member of xs is 1"}}, "e": {"subject": "s", "checks": {"c": "count of member of xs is 1"}}, "f": {"subject": "s", "checks": {"c": {"for": "every member of xs as m", "assert": "m is 1"}}}}},
+    "cases": [
+      {
+        "description": "goes right after every on a from line, without distinct or named by each of, and nowhere else for now",
+        "rules": ["sentence.subject.member"],
+        "input": {},
+        "compliant": false,
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "locations": [],
+                "name": "subjects.a.from",
+                "value": [
+                  "on a from line, member of goes after every, like \"every member of record.evidence\""
+                ]
+              }
+            ],
+            "message": "subjects.a.from: on a from line, member of goes after every, like \"every member of record.evidence\"",
+            "passed": false,
+            "requirement": "a",
+            "subject": {
+              "id": null,
+              "type": "a"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "locations": [],
+                "name": "subjects.b.from",
+                "value": [
+                  "distinct can't go with every member of"
+                ]
+              }
+            ],
+            "message": "subjects.b.from: distinct can't go with every member of",
+            "passed": false,
+            "requirement": "b",
+            "subject": {
+              "id": null,
+              "type": "b"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "locations": [],
+                "name": "subjects.c.from",
+                "value": [
+                  "every can't go with named by each of: start the from line at a subject to read its names one subject at a time"
+                ]
+              }
+            ],
+            "message": "subjects.c.from: every can't go with named by each of: start the from line at a subject to read its names one subject at a time",
+            "passed": false,
+            "requirement": "c",
+            "subject": {
+              "id": null,
+              "type": "c"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "locations": [],
+                "name": "checks.c",
+                "value": [
+                  "every member of only goes on a from line for now"
+                ]
+              }
+            ],
+            "message": "checks.c: every member of only goes on a from line for now",
+            "passed": false,
+            "requirement": "d",
+            "subject": {
+              "id": null,
+              "type": "s"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "locations": [],
+                "name": "checks.c",
+                "value": [
+                  "every member of only goes on a from line for now"
+                ]
+              }
+            ],
+            "message": "checks.c: every member of only goes on a from line for now",
+            "passed": false,
+            "requirement": "e",
+            "subject": {
+              "id": null,
+              "type": "s"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "locations": [],
+                "name": "checks.c",
+                "value": [
+                  "for: every member of only goes on a from line for now"
+                ]
+              }
+            ],
+            "message": "checks.c: for: every member of only goes on a from line for now",
+            "passed": false,
+            "requirement": "f",
+            "subject": {
+              "id": null,
+              "type": "s"
+            }
+          }
+        ]
+      }
+    ]
+  }
+]
