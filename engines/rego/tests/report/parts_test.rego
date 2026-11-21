@@ -86,6 +86,18 @@ test_a_counted_list_that_failed_with_no_entry_of_its_own_stays_on_the_assertion 
 	not ergo._tally_own_read({"name": "xs.n", "value": null}, c, set(), [])
 }
 
+_tag_each(inputs, _, _, _) := [object.union(i, {"part": {"id": null, "name": "lock"}}) | some i in inputs]
+
+test_a_walk_in_an_option_or_among_several_assertions_tags_the_parts_it_reads_and_a_for_line_is_left_as_it_was if {
+	c := ergo._s_written_check("every xs.k is 1")
+	subj := {"id": "t1", "xs": [{"k": 5}]}
+	scope := {"ergo/names": {"$at": {"names": {}}}}
+	option := ergo._scoped_walk_outcome(c, {}, subj, "sentence_any_of") with ergo._scoped as true with ergo._scope_of as scope with ergo._tagged as _tag_each
+	[[i.name, i.part] | some i in option.inputs] == [["xs[].k", {"id": null, "name": "lock"}]]
+	line := ergo._scoped_walk_outcome(c, {}, subj, "for") with ergo._scoped as true with ergo._scope_of as scope with ergo._tagged as _tag_each
+	[i.name | some i in line.inputs; not i.part] == ["xs[].k"]
+}
+
 test_a_counted_list_written_with_a_dot_is_never_an_input_of_an_assertion_in_an_option_or_among_several if {
 	c := {"cmp": "eq", "left": {"count_of": [{"literal": "lock"}, "pkgs"], "text": "count of .lock.pkgs", "whose": []}, "op": "compare", "right": {"literal": 1}}
 	e := {"kind": "assertion", "name": "count of .lock.pkgs is 1", "cause": "value", "inputs": [{"name": "count of .lock.pkgs", "value": 2}, {"name": ".lock.pkgs[]", "outcome": "usable", "value": [{"n": 1}, {"n": 2}]}], "failures": [], "message": "count of .lock.pkgs is 2"}
