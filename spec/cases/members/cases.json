@@ -1829,5 +1829,51 @@
         ]
       }
     ]
+  },
+  {
+    "description": "distinct and member of on a from line without every",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"g": {"from": "distinct member of records.evidence"}}, "requirements": {"g": {"subject": "g", "checks": {"c": "status exists"}}}},
+    "cases": [
+      {
+        "description": "says each of its three problems: distinct with member of, distinct without every and member of without every",
+        "rules": ["sentence.subject.member", "problems.all_said"],
+        "input": {"records": [{"evidence": {"a": {"status": "ok"}}}]},
+        "requirements": {"g": {"status": "not_met"}},
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "locations": [],
+                "name": "subjects.g.from",
+                "value": [
+                  "distinct can't go with every member of",
+                  "on a from line, distinct goes after every, like \"every distinct sbom.components\"",
+                  "on a from line, member of goes after every, like \"every member of record.evidence\""
+                ]
+              }
+            ],
+            "message": "subjects.g.from: distinct can't go with every member of; subjects.g.from: on a from line, distinct goes after every, like \"every distinct sbom.components\"; subjects.g.from: on a from line, member of goes after every, like \"every member of record.evidence\"",
+            "passed": false,
+            "requirement": "g",
+            "subject": {
+              "id": null,
+              "type": "g"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]

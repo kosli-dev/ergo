@@ -107,6 +107,10 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "every distinct member of records.evidence",
     ),
     (
+        "distinct member of records.evidence",
+        "distinct member of records.evidence",
+    ),
+    (
         "every member of records named by each of $params.l",
         "every member of records named by each of $params.l",
     ),
@@ -2120,6 +2124,7 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "every build named by $params.k",
     ),
     ("every builds.tags", "every builds.tags"),
+    ("every p0.p1.p2", "every p0.p1.p2"),
     (
         "$input.build named by each of $params.kinds",
         "$input.build named by each of $params.kinds",
