@@ -324,15 +324,41 @@ _m_walk_ref_faults(subj, check) := [] if {
 	count(_m_tally_parts(check)) > 0
 } else := _m_walk_ref_faults_of(subj, check)
 
-_m_walk_ref_faults_of(subj, check) := array.concat(array.concat(_m_ref_blocked(check), _m_unusable_ref_walks(check)), _m_unusable_side_walks(subj, check))
+_m_walk_ref_faults_of(subj, check) := array.concat(array.concat(array.concat(_m_ref_blocked(check), _m_unusable_ref_walks(check)), _m_unusable_side_walks(subj, check)), _m_text_ref_walks(check))
 
-_m_unusable_ref_walks(check) := [_ref_walk_text(r) | some r in sort(_check_refs(check)); _ref_failed_walk(r); _ref_state(r) == "unusable"]
+_m_text_ref_walks(check) := [_m_text_walk_text(r)] if {
+	r := check.values.ref
+	_text_walked(check, r)
+	_text_ref_state(r)
+} else := []
+
+_text_walked(check, r) if {
+	check.ignoring
+	check.op in _membership_ops
+	check.values == {"ref": r}
+	_ref_walks(r)
+}
+
+_m_text_walk_text(r) := _m_joined(_m_fail_parts("unusable", fails, roots)) if {
+	roots := _dotted_roots([r])
+	w := _rwalk_run(null, r)
+	fails := array.concat(array.concat([_rwalk_broken(null, r, f) | some f in w.fails], [f | some e in w.items; some f in _m_text_item_fails(e, roots)]), _walk_stop(w))
+}
+
+_m_text_item_fails(e, roots) := [{"path": e.c, "item": e.i, "cause": "unusable", "value": e.v, "msg": _m_isnt(_m_item_name(e.c, roots), e.v, "text")}] if {
+	not _walk_marked(e.v)
+	e.v != null
+	not is_string(e.v)
+} else := _rwalk_item_fails(e, roots)
+
+_m_unusable_ref_walks(check) := [_ref_walk_text(r) | some r in sort(_check_refs(check)); _ref_failed_walk(r); _ref_state(r) == "unusable"; not _text_walked(check, r)]
 
 _m_unusable_side_walks(subj, check) := [t | some side in _m_sides(check); _walked_side(side); s := _m_shown(subj, side); s.state == "unusable"; t := s.text]
 
 _m_ref_list_fault(check) := [[check.values, k]] if {
 	check.ignoring
 	_is_ref(check.values)
+	not _ref_walks(check.values.ref)
 	_ref_state(check.values.ref) == "value"
 	k := _text_list_kind(_ref_shown(check.values.ref))
 } else := [[check[f], _m_right_kind(cmp, v)]] if {

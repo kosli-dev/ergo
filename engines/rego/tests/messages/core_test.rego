@@ -74,4 +74,5 @@ test_a_list_walked_from_the_input_after_is_in_ignoring_case_names_each_item_it_c
 	ergo._message(ref, {"x": "a"}, "unusable") == "item 1 of $input.cs: name is null; item 3 of $input.cs: name is true, which isn't text" with data.ergo_document as {"cs": [{"name": null}, {"name": "a"}, {"name": true}]}
 	ergo._message(ref, {"x": "a"}, "unusable") == "item 2 of $input.cs: name is 3, which isn't text" with data.ergo_document as {"cs": [{"name": "a"}, {"name": 3}]}
 	ergo._message(ref, {"x": "a"}, "unusable") == "item 1 of $input.cs: name is missing; item 2 of $input.cs: name is 3, which isn't text" with data.ergo_document as {"cs": [{}, {"name": 3}]}
+	ergo._message(ref, {"x": "a"}, "unusable") == "item 1 of $input.cs is 3, which isn't an object; item 2 of $input.cs: name is 5, which isn't text" with data.ergo_document as {"cs": [3, {"name": 5}]}
 }

@@ -327,8 +327,17 @@ _list_flaw(leaf, _) := {st} if {
 	leaf.op in _membership_ops
 	leaf.ignoring
 	_is_ref(leaf.values)
-	_ref_state(leaf.values.ref) == "value"
-	st := _list_text_state(_ref_read(leaf.values.ref))
+	st := _text_ref_state(leaf.values.ref)
+}
+
+_text_ref_state(r) := _worst_of(states) if {
+	_ref_walks(r)
+	w := _ref_walk(r)
+	states := {w.state | w.failed} | {"unusable" | some v in w.value; v != null; not is_string(v)}
+	count(states) > 0
+} else := _list_text_state(_ref_read(r)) if {
+	not _ref_walks(r)
+	_ref_state(r) == "value"
 }
 
 _list_text_state(r) := "unusable" if not is_array(r)

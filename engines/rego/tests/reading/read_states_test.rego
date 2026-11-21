@@ -79,3 +79,12 @@ test_is_in_ignoring_case_with_a_list_walked_from_the_input_fails_with_the_worst_
 	ergo._leaf_cause(ref, {"x": "a"}) == "absent" with data.ergo_document as {"cs": [{"name": "a"}, {}]}
 	ergo._leaf_cause(ref, {"x": "A"}) == "satisfied" with data.ergo_document as {"cs": [{"name": "a"}]}
 }
+
+test_a_list_walked_from_the_input_after_is_in_ignoring_case_is_a_ref_used_with_the_worst_cause_of_its_reads_and_its_values if {
+	r := ["$$input[]", "cs", "name"]
+	ref := {"op": "in", "path": ["x"], "values": {"ref": r}, "ignoring": "case"}
+	ergo._used_ref_state(ref, r) == "unusable" with data.ergo_document as {"cs": [{"name": null}, {"name": "a"}, {"name": true}]}
+	ergo._used_ref_state(ref, r) == "null" with data.ergo_document as {"cs": [{"name": null}, {"name": "a"}]}
+	ergo._used_ref_state(object.remove(ref, ["ignoring"]), r) == "null" with data.ergo_document as {"cs": [{"name": null}, {"name": "a"}, {"name": true}]}
+}
+
