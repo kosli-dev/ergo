@@ -246,6 +246,13 @@ fn after_distinct(c: &[char], i: usize) -> Option<usize> {
     word_at(c, i, "distinct").and_then(|j| spaces(c, j))
 }
 
+fn after_member_of(c: &[char], i: usize) -> Option<usize> {
+    word_at(c, i, "member")
+        .and_then(|j| spaces(c, j))
+        .and_then(|j| word_at(c, j, "of"))
+        .and_then(|j| spaces(c, j))
+}
+
 fn lone_path(text: &str) -> Option<(Path, bool)> {
     let parser = Parser::new(text, true);
     let c: Vec<char> = text.chars().collect();
@@ -259,6 +266,11 @@ fn lone_path(text: &str) -> Option<(Path, bool)> {
             starts.push((j, false));
         }
     }
+    let members: Vec<(usize, bool)> = starts
+        .iter()
+        .filter_map(|&(i, leading)| after_member_of(&c, i).map(|j| (j, leading)))
+        .collect();
+    starts.extend(members);
     starts.into_iter().find_map(|(i, leading)| {
         parser
             .path(i, Side::Left)
