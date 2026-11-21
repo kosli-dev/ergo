@@ -89,11 +89,11 @@ _m_clause_more(n) := {"kind": "more", "count": n, "name": "", "cause": "value", 
 
 _m_clauses_shown(clauses) := array.concat(
 	array.concat(
-		[x[3] | some x in sort([[object.get(_m_clause_ranks, c.cause, 6), c.name, c.text, c] | some c in clauses; c.kind == "root"])],
-		[c | some c in clauses; c.kind == "list"],
+		[x[3] | some x in sort([[object.get(_m_clause_ranks, c.cause, 6), c.name, c.text, c] | some c in once; c.kind == "root"])],
+		[c | some c in once; c.kind == "list"],
 	),
-	[c | some c in clauses; c.kind == "item"],
-)
+	[c | some c in once; c.kind == "item"],
+) if once := _once(clauses)
 
 _m_clause_ranks := {"not_an_object": 1, "ambiguous": 2, "unusable": 3, "absent": 4, "null": 5}
 
