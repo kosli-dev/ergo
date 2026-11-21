@@ -3211,3 +3211,16 @@ fn a_clause_an_earlier_sentence_gave_for_the_item_is_left_out() {
         "item 1 of xs: x.e is missing, and x.a is missing"
     );
 }
+
+#[test]
+fn a_sentence_that_reads_no_alias_keeps_its_message_whole() {
+    assert_eq!(
+        for_tree(
+            "every xs as x",
+            &["count of rows is at least m"],
+            json!({"m": 3, "rows": [{"n": 1}], "xs": [{"v": 5}]}),
+            json!({}),
+        ),
+        "count of rows is 1, and m is 3"
+    );
+}
