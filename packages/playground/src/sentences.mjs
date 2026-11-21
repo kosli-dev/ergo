@@ -134,7 +134,8 @@ const listOps = (list, out, scope) => {
 
 const phraseOps = (phrase, out, scope) => {
   const [type, body] = variant(phrase);
-  if (type === "Is") {
+  if (type === "Ignoring") phraseOps(body.phrase, out, scope);
+  else if (type === "Is") {
     operandOps(body.operand, out, scope);
     if (body.within !== null) out.push(N(body.within));
   } else if (["Order", "Contains", "Alphabetically", "Time"].includes(type)) operandOps(body.operand, out, scope);
@@ -351,8 +352,11 @@ const TIME = { Before: "before", After: "after", OnOrAfter: "on or after", OnOrB
 const TYPE = { List: "a list", String: "a string", Number: "a number", Boolean: "a boolean", Object: "an object" };
 const not = (flag, yes, no) => (flag ? no : yes);
 
+const IGNORING = { Case: "ignoring case", SurroundingSpaces: "ignoring surrounding spaces", CaseAndSurroundingSpaces: "ignoring case and surrounding spaces", SurroundingSpacesAndCase: "ignoring surrounding spaces and case" };
+
 const phraseText = (phrase) => {
   const [type, b] = variant(phrase);
+  if (type === "Ignoring") return `${phraseText(b.phrase)}, ${IGNORING[b.ignoring]}`;
   if (type === "Is") return b.within === null ? `is ${not(b.not, "", "not ")}${operandText(b.operand)}` : `is ${not(b.not, "", "not ")}within ${b.within} of ${operandText(b.operand)}`;
   if (type === "Order") return `is ${ORDER[b.order]} ${operandText(b.operand)}`;
   if (type === "Between") return b.not ? `is not between ${b.min} and ${b.max}, so below ${b.min} or above ${b.max}` : `is between ${b.min} and ${b.max}, both included`;
@@ -391,6 +395,11 @@ const withOther = (subject, operand) => (isValue(operand) ? subject : `${subject
 
 const failText = (subject, phrase, nested) => {
   const [type, b] = variant(phrase);
+  if (type === "Ignoring") {
+    const [inner, ib] = variant(b.phrase);
+    if (inner === "OneOf" || isValue(ib.operand)) return missingOr(subject, "not a string");
+    return missingOr(withOther(subject, ib.operand), "not a string");
+  }
   if (type === "Is") {
     if (b.within !== null) return missingOr(withOther(subject, b.operand), "not a number");
     if (isValue(b.operand)) {
@@ -488,7 +497,8 @@ const collectPaths = (kind, tree) => {
       const [t, body] = variant(l);
       if (t === "Path") paths.push(body);
     };
-    if (["Is", "Order", "Contains", "Alphabetically", "Time"].includes(type)) operand(b.operand);
+    if (type === "Ignoring") fromPhrase(b.phrase);
+    else if (["Is", "Order", "Contains", "Alphabetically", "Time"].includes(type)) operand(b.operand);
     else if (type === "OneOf" || type === "Matches") list(b.list);
     else if (["ContainsAll", "ContainsNone", "ContainsSome", "NotContainsAll"].includes(type)) list(b);
     else if (["StartsWith", "EndsWith", "NotStartsWith", "NotEndsWith"].includes(type)) operand(b);

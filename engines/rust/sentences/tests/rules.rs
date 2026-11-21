@@ -1052,3 +1052,156 @@ fn followed_by_takes_text_and_goes_where_text_goes() {
         one("\"followed by\" can't take a count of, a sum of or a plus")
     );
 }
+
+#[test]
+fn ignoring_words_go_after_is_and_is_one_of() {
+    for line in [
+        "x is \"a\" ignoring case",
+        "x is not \"a\" ignoring surrounding spaces",
+        "x equals y ignoring case and surrounding spaces",
+        "x does not equal y ignoring case",
+        "x is \"a\" followed by y ignoring case",
+        "x is one of \"a\", \"b\" ignoring case",
+        "x is in \"a\", \"b\" ignoring case",
+        "every xs is \"a\" ignoring case",
+    ] {
+        assert_eq!(problems(line), none(), "{line}");
+    }
+}
+
+#[test]
+fn ignoring_words_after_a_list_read_from_a_path_are_written_wrong_for_now() {
+    for (line, problem) in [
+        (
+            "x is in $params.l ignoring case",
+            "\"is in\" can't take ignoring case yet",
+        ),
+        (
+            "x is one of $params.l ignoring case",
+            "\"is in\" can't take ignoring case yet",
+        ),
+        (
+            "x is in ys ignoring surrounding spaces",
+            "\"is in\" can't take ignoring surrounding spaces yet",
+        ),
+        (
+            "x is one of $input.ys ignoring case and surrounding spaces",
+            "\"is in\" can't take ignoring case and surrounding spaces yet",
+        ),
+        (
+            "x is not in $params.l ignoring case",
+            "\"is not in\" can't take ignoring case yet",
+        ),
+        (
+            "x is not one of ys ignoring case",
+            "\"is not in\" can't take ignoring case yet",
+        ),
+        (
+            "every xs.v is in $params.l ignoring case",
+            "\"is in\" can't take ignoring case yet",
+        ),
+        (
+            "count of xs whose v is in ys ignoring case is 1",
+            "\"is in\" can't take ignoring case yet",
+        ),
+    ] {
+        assert_eq!(problems(line), one(problem), "{line}");
+    }
+    assert_eq!(
+        for_problems(
+            &for_line("every xs whose v is not in $params.l ignoring case as x"),
+            &[]
+        ),
+        one("\"is not in\" can't take ignoring case yet")
+    );
+    assert_eq!(
+        problems("x is in ys ignoring surrounding spaces and case"),
+        vec![
+            "\"ignoring surrounding spaces and case\" is written \"ignoring case and surrounding spaces\""
+                .to_string(),
+            "\"is in\" can't take ignoring surrounding spaces and case yet".to_string(),
+        ]
+    );
+}
+
+#[test]
+fn ignoring_words_in_the_wrong_order_are_written_wrong() {
+    assert_eq!(
+        problems("x is \"a\" ignoring surrounding spaces and case"),
+        one(
+            "\"ignoring surrounding spaces and case\" is written \"ignoring case and surrounding spaces\""
+        )
+    );
+}
+
+#[test]
+fn other_phrases_cant_take_ignoring_words() {
+    for (line, op) in [
+        ("x is at least 3 ignoring case", "is at least"),
+        ("x is before \"2020-01-01\" ignoring case", "is before"),
+        ("x is between 1 and 2 ignoring case", "is between"),
+        ("x matches \"a\" ignoring case", "matches"),
+        ("x is empty ignoring case", "is empty"),
+        ("x exists ignoring case", "exists"),
+        ("x is a string ignoring case", "is a"),
+        (
+            "x is a non-empty string ignoring case",
+            "is a non-empty string",
+        ),
+    ] {
+        assert_eq!(
+            problems(line),
+            one(&format!("\"{op}\" can't take ignoring case")),
+            "{line}"
+        );
+    }
+    assert_eq!(
+        problems("x is 1 within 2 ignoring surrounding spaces"),
+        one("\"within\" can't take ignoring surrounding spaces")
+    );
+}
+
+#[test]
+fn ignoring_words_take_text() {
+    for line in [
+        "x is 1 ignoring case",
+        "x is null ignoring case",
+        "x is not true ignoring case",
+        "x is one of \"a\", 1 ignoring case",
+        "x is one of \"a\", null ignoring case",
+    ] {
+        assert!(
+            problems(line).contains(&"\"ignoring case\" takes text".to_string()),
+            "{line}"
+        );
+    }
+    assert_eq!(
+        problems("x is y plus 1 ignoring case"),
+        one("\"ignoring case\" can't take a count of, a sum of or a plus")
+    );
+    assert_eq!(
+        problems("count of xs is \"a\" ignoring case"),
+        one("\"ignoring case\" can't follow a count of, a sum of or a plus")
+    );
+    assert_eq!(
+        problems("x is y ignoring case and y is 1 ignoring surrounding spaces"),
+        one("\"ignoring surrounding spaces\" takes text")
+    );
+}
+
+#[test]
+fn ignoring_is_a_word_of_the_grammar() {
+    assert_eq!(
+        check_failure("ignoring is 1"),
+        one("ignoring is a word of the grammar: write .ignoring")
+    );
+    assert_eq!(problems(".ignoring is 1"), none());
+}
+
+#[test]
+fn a_field_compared_with_itself_ignoring_case_is_written_wrong() {
+    assert_eq!(
+        problems("x equals x ignoring case"),
+        one("x is compared with itself")
+    );
+}

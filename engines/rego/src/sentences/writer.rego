@@ -115,7 +115,7 @@ _s_start_key(p) := _json_text(p.steps[0]) if _s_quoted_start(p)
 else := _s_key_text(p.steps[0])
 
 _s_quoted_start(p) if {
-	p.steps[0] in _s_words
+	_s_word(p.steps[0])
 	object.get(p, "dot", false) != true
 	object.get(p, "field", false) != true
 	not _s_itself(p)
@@ -123,13 +123,13 @@ _s_quoted_start(p) if {
 }
 
 _s_quoted_start(p) if {
-	p.steps[0] in _s_words
+	_s_word(p.steps[0])
 	object.get(p, "dot", false) != true
 	object.get(p, "quoted", false) == true
 }
 
 _s_quoted_start(p) if {
-	p.steps[0] in _s_words
+	_s_word(p.steps[0])
 	object.get(p, "dot", false) != true
 	object.get(p, "field", false) == true
 	object.get(p, "own", false) == true
@@ -152,7 +152,7 @@ _s_dot(key, side) := "." if {
 	_s_needs_dot(key, side)
 } else := ""
 
-_s_needs_dot(key, _) if key in _s_words
+_s_needs_dot(key, _) if _s_word(key)
 
 _s_needs_dot(key, "right") if not _s_bare_key(key)
 
@@ -178,9 +178,13 @@ _s_ref_text(r) := concat("", ["$", r.start, ".", _s_key_text(r.steps[0])]) if "s
 
 _s_ref_text(r) := r.steps[0] if not "start" in object.keys(r)
 
-_s_phrase_text(ph) := concat(" ", [_s_phrase_words(ph), _s_args_text(ph)]) if _s_args_text(ph) != ""
+_s_phrase_text(ph) := concat(" ", [_s_bare_phrase_text(ph), "ignoring", ph.ignoring]) if ph.ignoring
 
-_s_phrase_text(ph) := _s_phrase_words(ph) if _s_args_text(ph) == ""
+else := _s_bare_phrase_text(ph)
+
+_s_bare_phrase_text(ph) := concat(" ", [_s_phrase_words(ph), _s_args_text(ph)]) if _s_args_text(ph) != ""
+
+_s_bare_phrase_text(ph) := _s_phrase_words(ph) if _s_args_text(ph) == ""
 
 _s_phrase_words(ph) := "equals" if {
 	ph.op == "is"

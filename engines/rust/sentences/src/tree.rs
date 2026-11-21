@@ -301,6 +301,73 @@ pub enum Phrase {
         /// The value compared with.
         operand: Operand,
     },
+    /// A phrase followed by `ignoring` words, like `is "a" ignoring case`.
+    Ignoring {
+        /// The phrase the words follow.
+        phrase: Box<Phrase>,
+        /// Which words.
+        ignoring: Ignoring,
+    },
+}
+
+/// The `ignoring` rule: what a comparison of text leaves out.
+///
+/// ```text
+/// ignoring case
+/// ignoring surrounding spaces
+/// ignoring case and surrounding spaces
+/// ```
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub enum Ignoring {
+    /// `ignoring case`.
+    Case,
+    /// `ignoring surrounding spaces`.
+    SurroundingSpaces,
+    /// `ignoring case and surrounding spaces`.
+    CaseAndSurroundingSpaces,
+    /// `ignoring surrounding spaces and case`, which is read only to say it is written wrong.
+    SurroundingSpacesAndCase,
+}
+
+impl Ignoring {
+    /// The words as written, like `ignoring case`.
+    ///
+    /// ```
+    /// use ergo_policy_sentences::Ignoring;
+    ///
+    /// assert_eq!(Ignoring::Case.words(), "ignoring case");
+    /// ```
+    #[must_use]
+    pub fn words(self) -> &'static str {
+        match self {
+            Ignoring::Case => "ignoring case",
+            Ignoring::SurroundingSpaces => "ignoring surrounding spaces",
+            Ignoring::CaseAndSurroundingSpaces => "ignoring case and surrounding spaces",
+            Ignoring::SurroundingSpacesAndCase => "ignoring surrounding spaces and case",
+        }
+    }
+}
+
+impl Phrase {
+    /// The phrase without its `ignoring` words.
+    ///
+    /// ```
+    /// use ergo_policy_sentences::{Ignoring, Phrase};
+    ///
+    /// let phrase = Phrase::Ignoring {
+    ///     phrase: Box::new(Phrase::Exists { not: false }),
+    ///     ignoring: Ignoring::Case,
+    /// };
+    /// assert_eq!(phrase.bare(), &Phrase::Exists { not: false });
+    /// ```
+    #[must_use]
+    pub fn bare(&self) -> &Phrase {
+        match self {
+            Phrase::Ignoring { phrase, .. } => phrase,
+            other => other,
+        }
+    }
 }
 
 /// The `order-phrase` rule: a comparison of numbers.

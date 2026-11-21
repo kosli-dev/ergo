@@ -135,7 +135,7 @@ _plain_step_form(p) if {
 	is_string(p.plain)
 }
 
-_s_parent_key(key) := _json_text(key) if key in _s_words
+_s_parent_key(key) := _json_text(key) if _s_word(key)
 
 else := _s_key_text(key)
 

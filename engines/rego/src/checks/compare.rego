@@ -336,3 +336,41 @@ _list_right_usable(cmp, r) if {
 }
 
 _leaf_ops := {"range", "excludes", "includes", "in", "equals", "present", "missing", "non_empty_string", "matches_any", "not_matches_any", "compare", "compare_time"}
+
+_prepared(text, ignoring) := _cased(_trimmed(text, ignoring), ignoring)
+
+_trimmed(text, ignoring) := trim_space(text) if contains(ignoring, "spaces")
+
+else := text
+
+_cased(text, ignoring) := lower(text) if contains(ignoring, "case")
+
+else := text
+
+_text_cmp("eq", a, b) if a == b
+
+_text_cmp("ne", a, b) if a != b
+
+_text_cmp("in", a, b) if a in b
+
+_text_cmp("not_in", a, b) if not a in b
+
+_texts(vs) if {
+	every v in vs {
+		is_string(v)
+	}
+}
+
+_text_compared(cmp, l, r, ignoring) if {
+	cmp in {"eq", "ne"}
+	_texts([l, r])
+	_text_cmp(cmp, _prepared(l, ignoring), _prepared(r, ignoring))
+}
+
+_text_compared(cmp, l, r, ignoring) if {
+	cmp in _membership_ops
+	is_string(l)
+	is_array(r)
+	_texts(r)
+	_text_cmp(cmp, _prepared(l, ignoring), {_prepared(v, ignoring) | some v in r})
+}

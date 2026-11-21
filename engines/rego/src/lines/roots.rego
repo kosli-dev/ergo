@@ -207,7 +207,11 @@ _root_state(subj, c, p, lists) := "not_an_object" if {
 	_has_field_step(p)
 } else := _root_list_state(subj, p, lists)
 
-_root_kind(subj, c, p) := _m_right_kind(cmp, v) if {
+_root_kind(subj, c, p) := "text" if {
+	c.ignoring
+	_side_root(c, p)
+	not is_string(_root_value(subj, p))
+} else := _m_right_kind(cmp, v) if {
 	some f in _list_argument_keys
 	object.get(c, f, null) == {"ref": p}
 	not _ref_walks(p)

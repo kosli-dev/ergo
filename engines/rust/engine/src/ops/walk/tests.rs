@@ -426,6 +426,7 @@ fn a_path_read_from_outside_the_item_is_listed_once_and_params_are_not() {
         right: crate::ops::compare::Side::Path(at(Start::Input, &["staff"])),
         cmp: crate::ops::compare::Cmp::Eq,
         within: None,
+        ignoring: None,
     });
     let walk = every(&["xs", "n"], vec![], outside, false);
     let out = run(&walk, &context);
@@ -444,6 +445,7 @@ fn the_inputs_of_a_walk_are_sorted_by_name_so_a_parent_that_sorts_first_comes_fi
         right: crate::ops::compare::Side::Path(at(Start::Input, &["a"])),
         cmp: crate::ops::compare::Cmp::Eq,
         within: None,
+        ignoring: None,
     });
     let walk = every(&["xs", "n"], vec![], outside, false);
     let out = run(&walk, &context);
@@ -1777,4 +1779,21 @@ fn an_empty_list_root_after_the_phrase_is_said_once_and_not_inside_each_item() {
         ),
         (Cause::Value, "$params.d is []".to_string())
     );
+}
+
+#[test]
+fn a_root_compared_ignoring_case_needs_text_so_it_is_said_once_before_the_items() {
+    let check = Check::Compare(crate::ops::compare::Compare {
+        left: crate::ops::compare::Side::Path(at(Start::Subject, &["v"])),
+        right: crate::ops::compare::Side::Path(at(Start::Input, &["r"])),
+        cmp: crate::ops::compare::Cmp::Eq,
+        within: None,
+        ignoring: Some(crate::ops::compare::Ignoring {
+            case: true,
+            spaces: false,
+        }),
+    });
+    assert_eq!(right_needs(&check, &json!(3)), Some("text"));
+    assert_eq!(right_needs(&check, &json!({"a": 1})), Some("text"));
+    assert_eq!(right_needs(&check, &json!("A")), None);
 }

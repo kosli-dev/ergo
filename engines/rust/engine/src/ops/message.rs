@@ -606,7 +606,9 @@ fn compare_faults(compare: &super::compare::Compare, ctx: &Ctx) -> Vec<(String, 
         (&compare.right, read_side(&compare.right, ctx)),
     ];
     let wanted = |other: &Value| -> &'static str {
-        if compare.within.is_some() {
+        if compare.ignoring.is_some() {
+            "text"
+        } else if compare.within.is_some() {
             "a number"
         } else {
             match compare.cmp {
@@ -641,7 +643,9 @@ fn compare_faults(compare: &super::compare::Compare, ctx: &Ctx) -> Vec<(String, 
         let (Some(value), Some(first)) = (&read.value, read.inputs.first()) else {
             continue;
         };
-        let eq_like = compare.within.is_none() && matches!(compare.cmp, Cmp::Eq | Cmp::Ne);
+        let eq_like = compare.within.is_none()
+            && compare.ignoring.is_none()
+            && matches!(compare.cmp, Cmp::Eq | Cmp::Ne);
         let left_literal = matches!(compare.left, Side::Value(_));
         if eq_like && ((index == 1) != left_literal) {
             continue;
@@ -1817,6 +1821,7 @@ pub(super) fn root_kind_fault(check: &Check, root: &Path, ctx: &Ctx) -> Option<S
             right: super::compare::Side::Path(right.clone()),
             cmp: *cmp,
             within: within.clone(),
+            ignoring: None,
         });
         return root_kind_fault(&compare, root, ctx);
     }

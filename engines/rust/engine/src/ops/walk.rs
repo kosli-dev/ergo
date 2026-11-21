@@ -1009,6 +1009,9 @@ fn from_a_root(path: &Path) -> bool {
 pub(super) fn right_needs(check: &Check, value: &Value) -> Option<&'static str> {
     use super::compare::Cmp;
     match check {
+        Check::Compare(compare) if compare.ignoring.is_some() => {
+            (!value.is_string()).then_some("text")
+        }
         Check::Compare(compare) => match compare.cmp {
             Cmp::Gt | Cmp::Gte | Cmp::Lt | Cmp::Lte => (!value.is_number()).then_some("a number"),
             Cmp::StartsWith
@@ -1298,6 +1301,7 @@ fn stood_in(check: &Check, focus: &Ctx, blocked: impl Fn(&Path) -> bool) -> Opti
                     right: own,
                     cmp: super::compare::Cmp::Eq,
                     within: None,
+                    ignoring: None,
                 }))
             }
             Wanted::All(list) | Wanted::Some(list) => own_list(list),

@@ -512,3 +512,67 @@ fn params_that_arent_an_object_follow_a_list_input_only_in_a_count_of_a_sum_of_o
         );
     }
 }
+
+fn compare_said(subject: Value, right: crate::ops::compare::Side) -> String {
+    use crate::ops::compare::{Cmp, Compare, Ignoring, Side};
+    use crate::path::{Located, Location, Path, Start, Step};
+    let check = crate::ops::Check::Compare(Compare {
+        left: Side::Path(Path {
+            start: Start::Subject,
+            steps: vec![Step::Key("x".to_string())],
+        }),
+        right,
+        cmp: Cmp::Eq,
+        within: None,
+        ignoring: Some(Ignoring {
+            case: true,
+            spaces: true,
+        }),
+    });
+    let input = json!({"things": [subject]});
+    let ctx = crate::path::Ctx {
+        label: None,
+        item_by_item: false,
+        subject: Located {
+            value: &input["things"][0],
+            location: Location::input_root().key("things").index(0),
+        },
+        input: &input,
+        params: None,
+        aliases: std::collections::BTreeMap::new(),
+    };
+    let verdict = crate::ops::run(&check, &ctx);
+    super::message(&check, &ctx, &verdict)
+}
+
+#[test]
+fn is_ignoring_case_says_each_side_that_isnt_text() {
+    use crate::ops::compare::Side;
+    use crate::path::{Path, Start, Step};
+    let y = || {
+        Side::Path(Path {
+            start: Start::Subject,
+            steps: vec![Step::Key("y".to_string())],
+        })
+    };
+    assert_eq!(
+        compare_said(json!({"x": "a", "y": 3}), y()),
+        "y is 3, which isn't text"
+    );
+    assert_eq!(
+        compare_said(json!({"x": 3, "y": "a"}), y()),
+        "x is 3, which isn't text"
+    );
+    assert_eq!(
+        compare_said(json!({"x": [1], "y": true}), y()),
+        "x is [1], which isn't text, and y is true, which isn't text"
+    );
+    assert_eq!(
+        compare_said(json!({"x": 3}), Side::Value(json!("a"))),
+        "x is 3, which isn't text"
+    );
+    assert_eq!(
+        compare_said(json!({"x": "  Blocked "}), Side::Value(json!("done"))),
+        "x is \"  Blocked \""
+    );
+}

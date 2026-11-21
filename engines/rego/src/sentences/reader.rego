@@ -8,7 +8,20 @@ _assertion_kinds(kinds) if {
 	}
 }
 
-_s_patterns := {
+_s_patterns := _s_pattern_set("")
+
+_s_ignoring_words := `case(?: +and +surrounding +spaces)?|surrounding +spaces(?: +and +case)?`
+
+_s_ignoring_patterns := object.union(
+	_s_pattern_set(concat("", [`(?: +ignoring +(?:`, _s_ignoring_words, `))?`])),
+	{"ignoring": concat("", [`^(.*\S) +ignoring +(`, _s_ignoring_words, `)$`])},
+)
+
+_s_patterns_for(raw) := _s_ignoring_patterns if contains(raw, "ignoring")
+
+else := _s_patterns
+
+_s_pattern_set(tail) := {
 	"assertions": concat("", [`(`, assertion, `)(?: +and +|$)`]),
 	"assertion": concat("", [`^(?:(every|some) +(`, qpath, `)|(`, left, `))(?: +(`, conds, `))?(, +if +any,)? +(`, phrase, `)$`]),
 	"for_items": concat("", [`(`, for_item, `)(?:, +|$)`]),
@@ -109,7 +122,7 @@ _s_patterns := {
 		["operand", operand],
 		["operand_within", concat("", [operand, `(?:`, roughly, `)*(?: +within +`, num, `)?`])],
 	]
-	phrase := concat("", [`(?:`, concat("|", [concat("", [`(?:`, concat("|", [ph[1] | some ph in phrases; ph[3] == kind[0]]), `)`, kind[1]]) | some kind in kinds]), `)(?:`, roughly, `)*`])
+	phrase := concat("", [`(?:`, concat("|", [concat("", [`(?:`, concat("|", [ph[1] | some ph in phrases; ph[3] == kind[0]]), `)`, kind[1]]) | some kind in kinds]), `)(?:`, roughly, `)*`, tail])
 	cond := concat("", [`(?:whose +(?:`, derived, `|`, path, `) +|that +)(?:`, phrase, `)`])
 	conds := concat("", [cond, `(?: +and +`, cond, `)*`])
 	from_cond := concat("", [`(?:whose +(?:(?:every|some) +`, qpath, `(?:, +if +any,)?|(?:`, derived, `|`, path, `)) +|that +)(?:`, phrase, `)`])
@@ -117,6 +130,10 @@ _s_patterns := {
 	assertion := concat("", [`(?:(?:every|some) +`, qpath, `|`, left, `)(?: +`, conds, `)?(?:, +if +any,)? +(?:`, phrase, `)`])
 	for_item := concat("", [`(?:(?:every|some) +)?`, qpath, `(?: +`, conds, `)?(?: +sorted +by +`, path, `(?: +alphabetically)?)?(?:, +if +any,)? +as +`, key])
 }
+
+_s_word(key) if key in _s_words
+
+_s_word("ignoring")
 
 _s_words := {
 	"a", "after", "alphabetically", "an", "and", "as", "at", "before", "between", "count", "days", "distinct",
@@ -131,39 +148,39 @@ _s_pieces(pattern, text) := [m[1] | some m in matches] if {
 }
 
 _sentence(raw) := {"assertions": [assertion]} if {
-	pat := _s_patterns
+	pat := _s_patterns_for(raw)
 	m := regex.find_all_string_submatch_n(pat.plain, trim_space(raw), 1)[0]
 	assertion := {"path": _s_path_of(m[1], pat), "phrase": _s_phrase_of(m[2], pat)}
-	count(_s_sentence_problems({"assertions": [assertion]})) == 0
+	count(_s_sentence_problems({"assertions": [assertion]}, pat)) == 0
 	count(_s_text_names(trim_space(raw))) == 0
 } else := {"assertions": [assertion]} if {
-	pat := _s_patterns
+	pat := _s_patterns_for(raw)
 	m := regex.find_all_string_submatch_n(pat.quantified, trim_space(raw), 1)[0]
 	assertion := object.union({m[1]: _s_qpath_of(m[2], pat), "phrase": _s_phrase_of(m[3], pat)}, _s_distinct_of(m[2]))
-	count(_s_sentence_problems({"assertions": [assertion]})) == 0
+	count(_s_sentence_problems({"assertions": [assertion]}, pat)) == 0
 	count(_s_text_names(trim_space(raw))) == 0
 } else := {"assertions": assertions} if {
-	pat := _s_patterns
+	pat := _s_patterns_for(raw)
 	text := trim_space(raw)
 	pieces := _s_pieces(pat.assertions, text)
 	assertions := [_s_assertion_of(a, pat) | some a in pieces]
 	count(assertions) == count(pieces)
 	count(pieces) > 0
-	count(_s_sentence_problems({"assertions": assertions})) == 0
+	count(_s_sentence_problems({"assertions": assertions}, pat)) == 0
 	count(_s_text_names(text)) == 0
-} else := {"problems": _s_problems(trim_space(raw), _s_patterns)}
+} else := {"problems": _s_problems(trim_space(raw), _s_patterns_for(raw))}
 
 _for_line(raw) := {"items": items} if {
-	pat := _s_patterns
+	pat := _s_patterns_for(raw)
 	text := trim_space(raw)
 	pieces := _s_pieces(pat.for_items, text)
 	items := [_s_for_item_of(a, pat) | some a in pieces]
 	count(items) == count(pieces)
 	count(pieces) in {1, 2}
-	count(_s_sentence_problems({"items": items})) == 0
+	count(_s_sentence_problems({"items": items}, pat)) == 0
 	count(_s_text_names(text)) == 0
 } else := {"problems": sort(names)} if {
-	pat := _s_patterns
+	pat := _s_patterns_for(raw)
 	text := trim_space(raw)
 	names := _s_text_names(text)
 	count(names) > 0
@@ -171,8 +188,8 @@ _for_line(raw) := {"items": items} if {
 	items := [_s_for_item_of(a, pat) | some a in pieces]
 	count(items) == count(pieces)
 	count(pieces) in {1, 2}
-	count(_s_sentence_problems({"items": items})) == 0
-} else := {"problems": _for_line_problems(trim_space(raw), _s_patterns)}
+	count(_s_sentence_problems({"items": items}, pat)) == 0
+} else := {"problems": _for_line_problems(trim_space(raw), _s_patterns_for(raw))}
 
 _for_line_problems(text, pat) := ["a for line holds two items at most"] if {
 	pieces := _s_pieces(pat.for_items, text)
@@ -185,16 +202,17 @@ _for_line_problems(text, pat) := ["a for line holds two items at most"] if {
 } else := _s_problems(text, pat)
 
 _from_line(raw) := line if {
-	pat := _s_patterns
+	pat := _s_patterns_for(raw)
 	line := _s_from_of(trim_space(raw), pat)
-	count(_s_sentence_problems(line)) == 0
+	count(_s_sentence_problems(line, pat)) == 0
 	count(_s_text_names(trim_space(raw))) == 0
 } else := {"problems": sort(names), "parsed": line} if {
-	line := _s_from_of(trim_space(raw), _s_patterns)
-	count(_s_sentence_problems(line)) == 0
+	pat := _s_patterns_for(raw)
+	line := _s_from_of(trim_space(raw), pat)
+	count(_s_sentence_problems(line, pat)) == 0
 	names := _s_text_names(trim_space(raw))
 	count(names) > 0
-} else := {"problems": _from_problems(_s_after_every(trim_space(raw)), _s_patterns)}
+} else := {"problems": _from_problems(_s_after_every(trim_space(raw)), _s_patterns_for(raw))}
 
 _from_problems(text, pat) := ["a condition after whose can't have a whose of its own"] if {
 	_s_problems(text, pat) in [["doesn't parse"], [_s_bare_and]]
@@ -414,11 +432,11 @@ _s_start_of(key, steps) := {"start": key, "steps": steps} if {
 }
 
 _s_start_of(key, steps) := {"steps": array.concat([key], steps), "bare_word": key} if {
-	key in _s_words
+	_s_word(key)
 }
 
 _s_start_of(key, steps) := {"steps": array.concat([_s_key_of(key)], steps)} if {
-	not key in _s_words
+	not _s_word(key)
 	not startswith(key, "$")
 	not startswith(key, ".")
 }
@@ -468,7 +486,20 @@ _s_ref_of(text) := {"steps": [text]} if {
 
 _s_ref_of(text) := {"steps": [text], "bad_name": text} if _s_bad_name(text)
 
-_s_phrase_of(text, pat) := object.union({"op": _s_op_of(pat.phrases[hit[0]], text, hit[1])}, _s_args_of(pat.phrases[hit[0]][3], hit[1], pat)) if {
+_s_phrase_of(text, pat) := object.union(bare, {"ignoring": concat(" ", [w | some w in split(m[2], " "); w != ""])}) if {
+	contains(text, " ignoring ")
+	m := regex.find_all_string_submatch_n(pat.ignoring, text, 1)[0]
+	bare := _s_bare_phrase_of(m[1], pat)
+	not bare.op in _s_text_phrase_ops
+} else := _s_bare_phrase_of(text, pat)
+
+_s_text_phrase_ops := {
+	"contains", "does not contain", "contains all of", "contains none of", "contains some of", "does not contain all of",
+	"starts with", "ends with", "does not start with", "does not end with",
+	"is alphabetically before", "is alphabetically after", "is alphabetically on or before", "is alphabetically on or after",
+}
+
+_s_bare_phrase_of(text, pat) := object.union({"op": _s_op_of(pat.phrases[hit[0]], text, hit[1])}, _s_args_of(pat.phrases[hit[0]][3], hit[1], pat)) if {
 	hits := [[i, m[1]] |
 		some i, ph in pat.phrases
 		m := regex.find_all_string_submatch_n(concat("", [`^(?:`, ph[1], `)(.*)$`]), text, 1)[0]

@@ -64,6 +64,8 @@ jobs:
         run: .github/dump-diff_test.sh
       - name: Check the script that lists what a change did to the Rust engine's reports
         run: .github/pr-facts_test.sh
+      - name: Check the script that lists the new tests that pass on the old source
+        run: .github/red-check_test.sh
       - name: Check the script that lists what a change did to the policy and input pairs
         run: .github/pairs-facts_test.sh
       - name: Check the script that runs the common checks
@@ -292,6 +294,27 @@ jobs:
           else
             .github/pairs-facts.sh "$BASE" >> "$GITHUB_STEP_SUMMARY"
           fi
+
+  red-check:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: open-policy-agent/setup-opa@v2
+        with:
+          version: 1.22.0
+      - name: Install the Rust version in rust-toolchain.toml
+        run: |
+          cd engines/rust
+          rustup toolchain install
+      - name: Write the new tests that already pass on the old source in the job summary
+        env:
+          BASE: origin/${{ github.base_ref }}
+        run: .github/red-check.sh "$BASE" >> "$GITHUB_STEP_SUMMARY"
 
   playground:
     needs: tests-rust
