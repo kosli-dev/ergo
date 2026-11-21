@@ -34,3 +34,10 @@ test_a_for_line_keeps_that_a_member_walk_wanted_an_object if {
 	not ergo._for_failed_flags({"msg": "a list"}).wants
 	not ergo._for_failed_flags({}).wants
 }
+
+test_a_for_line_drops_a_member_clause_that_only_repeats_a_text_or_says_how_many_more if {
+	not ergo._for_led_once("member a of xs: $params.k is missing", ["member b of ys: $params.k is missing"])
+	ergo._for_led_once("member a of xs: member b of ys is 1", ["member b of ys is 1"])
+	ergo._for_led_more("member a of xs: and 2 more")
+	not ergo._for_led_more("member a of xs: v is 1")
+}
