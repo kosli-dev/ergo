@@ -660,12 +660,20 @@ _item_keyed(p) if {
 }
 
 _items_judged_alone(subj, side) if {
-	some c in array.concat(object.get(side, "whose", []), _text_leaf_conds(side))
+	some c in object.get(side, "whose", [])
 	_root_read_flaw(subj, c) != ""
 	_root_stand_in(c) != c
 }
 
-_whose_alone(subj, side) := object.union(object.union(side, {"whose": [_root_stand_in(c) | some c in side.whose]}), {"check": _root_stand_in(c) | some c in _text_leaf_conds(side)}) if _items_judged_alone(subj, side)
+_items_judged_alone(subj, side) if {
+	some c in _text_leaf_conds(side)
+	_root_read_flaw(subj, c) != ""
+}
+
+_whose_alone(subj, side) := object.union(side, {"whose": [_root_stand_in(c) | some c in side.whose]}) if {
+	_items_judged_alone(subj, side)
+	_text_leaf_conds(side) == []
+} else := object.union(object.remove(side, ["check"]), {"whose": [_root_stand_in(c) | some c in side.whose], "check": _text_stand_in(side.check)}) if _items_judged_alone(subj, side)
 
 else := side
 
@@ -696,6 +704,10 @@ _root_stand_in(c) := object.union(c, {"cmp": "eq", f: c[g]}) if {
 	is_array(c.path)
 	not _walk_outside(c.path)
 } else := c
+
+_text_stand_in(c) := {"op": "in", "path": c.left, "values": [""], "ignoring": c.ignoring} if c.op == "compare"
+
+else := {"op": "in", "path": c.path, "values": [""], "ignoring": c.ignoring}
 
 _stand_in_keyed(p) if {
 	some step in p
