@@ -36,6 +36,9 @@ test_a_root_list_after_is_in_ignoring_case_stands_in_for_text_so_an_item_whose_o
 	ergo._leaf_cause(ergo._root_stand_in(listed), {"v": 5}) == "unusable"
 	field := {"op": "compare", "cmp": "in", "left": ["v"], "right": [`${"alias":"thing","n":0,"of":null,"old":true}`, "ys"], "ignoring": "case"}
 	ergo._leaf_cause(ergo._root_stand_in(field), {"v": 5}) == "unusable"
+	ergo._root_stand_in(object.union(listed, {"op": "not_in"})) == {"op": "compare", "cmp": "eq", "left": ["v"], "right": ["v"], "ignoring": "case"}
+	ergo._leaf_cause(ergo._root_stand_in(object.union(field, {"cmp": "not_in"})), {"v": 5}) == "unusable"
+	ergo._root_stand_in(object.union(field, {"cmp": "not_in"})).cmp == "eq"
 }
 
 test_a_list_after_is_in_ignoring_case_in_a_one_line_every_is_a_root_read_before_any_item if {
