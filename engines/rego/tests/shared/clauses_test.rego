@@ -143,6 +143,107 @@ test_a_clause_given_twice_is_shown_once if {
 	]
 }
 
+_parity_rows := [
+	[
+		[
+			_root("$params.min", "unusable", `$params.min is "s", which isn't a number`),
+			_item("item 2 of xs", "absent", [_missing("v")]),
+		],
+		[`$params.min is "s", which isn't a number`, "item 2 of xs: v is missing"],
+		{"xs"},
+	],
+	[
+		_items_of("cs", 1, 2, _items_of("rs", 1, 2, [_missing("ok")])),
+		[
+			"item 1 of cs: item 1 of rs: ok is missing",
+			"item 1 of cs: item 2 of rs: ok is missing",
+			"item 2 of cs: item 1 of rs: ok is missing",
+			"item 2 of cs: item 2 of rs: ok is missing",
+		],
+		{"cs"},
+	],
+	[
+		_items_of("xs", 1, 5, [_missing("x.v"), _missing("x.w")]),
+		[
+			"item 1 of xs: x.v is missing, and x.w is missing",
+			"item 2 of xs: x.v is missing, and x.w is missing",
+			"item 3 of xs: x.v is missing, and x.w is missing",
+			"item 4 of xs: x.v is missing, and x.w is missing",
+			"item 5 of xs: x.v is missing, and x.w is missing",
+		],
+		{"xs"},
+	],
+	[
+		[
+			_item("item 1 of xs", "absent", [_missing("w")]),
+			_root("pr.l", "unusable", `pr.l is "s", which isn't a list`),
+			_null("$params.l"),
+		],
+		["item 1 of xs: w is missing", `pr.l is "s", which isn't a list`, "$params.l is null"],
+		{"xs"},
+	],
+	[
+		[
+			_unread("item 2 of $params.envs", "unusable", "item 2 of $params.envs is null, which isn't an object"),
+			_item("item 3 of $params.envs", "absent", [_missing("name")]),
+			_unread("item 4 of $params.envs", "unusable", "item 4 of $params.envs is 3, which isn't an object"),
+			_item("item 5 of $params.envs", "absent", [_missing("name")]),
+			_item("item 6 of $params.envs", "absent", [_missing("name")]),
+		],
+		[
+			"item 2 of $params.envs is null, which isn't an object",
+			"item 3 of $params.envs: name is missing",
+			"item 4 of $params.envs is 3, which isn't an object",
+			"item 5 of $params.envs: name is missing",
+			"item 6 of $params.envs: name is missing",
+		],
+		{"$params.envs"},
+	],
+	[
+		[
+			ergo._m_clause("list", "es", "absent", "es is missing"),
+			_root("$params", "not_an_object", "$params is 3, which isn't an object"),
+		],
+		["es is missing", "$params is 3, which isn't an object"],
+		{"es"},
+	],
+	[
+		array.concat([_missing("$params.k"), _missing("$params.k")], _items_of("es", 1, 5, [_missing("m")])),
+		[
+			"$params.k is missing",
+			"$params.k is missing",
+			"item 1 of es: m is missing",
+			"item 2 of es: m is missing",
+			"item 3 of es: m is missing",
+			"item 4 of es: m is missing",
+			"item 5 of es: m is missing",
+		],
+		{"es"},
+	],
+	[
+		[_root("x", "value", `x is "a; y is 1, which isn't b"`)],
+		[`x is "a; y is 1, which isn't b"`],
+		set(),
+	],
+	[
+		[_null("x"), _missing("zz"), _root("zb", "unusable", `zb is "s", which isn't a list or an object`)],
+		["x is null", "zz is missing", `zb is "s", which isn't a list or an object`],
+		set(),
+	],
+	[
+		[_item("item 1 of xs", "value", [_unread("item 1 of x.ns", "value", "item 1 of x.ns is 2"), _unread("item 2 of x.ns", "value", "item 2 of x.ns is 3"), _unread("item 3 of x.ns", "value", "item 3 of x.ns is 4"), _unread("item 4 of x.ns", "value", "item 4 of x.ns is 5")])],
+		["item 1 of xs: item 1 of x.ns is 2", "item 1 of xs: item 2 of x.ns is 3", "item 1 of xs: item 3 of x.ns is 4", "item 1 of xs: item 4 of x.ns is 5"],
+		{"xs"},
+	],
+]
+
+test_shown_and_text_give_what_roots_then_lists_and_joined_give if {
+	count(_parity_rows) == 10
+	every row in _parity_rows {
+		ergo._m_clauses_text(ergo._m_clauses_shown(row[0])) == ergo._m_joined(ergo._roots_then_lists(row[1], row[2]))
+	}
+}
+
 test_no_clauses_give_no_text if {
 	ergo._m_clauses_shown([]) == []
 	ergo._m_clauses_text(ergo._m_clauses_shown([])) == ""
