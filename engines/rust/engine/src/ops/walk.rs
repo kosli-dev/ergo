@@ -1205,6 +1205,8 @@ fn own_list_fault(
     })
 }
 
+const STAND_IN_TIME: &str = "1970-01-01T00:00:00Z";
+
 fn stood_in(check: &Check, focus: &Ctx, blocked: impl Fn(&Path) -> bool) -> Option<Check> {
     use super::compare::{Compare, Side};
     use super::lists::{Contains, In, Matches, Right, Wanted};
@@ -1264,8 +1266,8 @@ fn stood_in(check: &Check, focus: &Ctx, blocked: impl Fn(&Path) -> bool) -> Opti
         Check::CompareTime(compare) => {
             let own = own_side(&compare.left, &compare.right)?;
             Some(Check::CompareTime(super::time::CompareTime {
-                left: own.clone(),
-                right: own,
+                left: own,
+                right: Side::Value(Value::from(STAND_IN_TIME)),
                 ..compare.clone()
             }))
         }
