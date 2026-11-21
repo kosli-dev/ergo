@@ -2396,13 +2396,11 @@ const NESTED_PAIR: &str = "a walk under the first item over the list the second 
 
 const WALK_ITEMS_JOINED: &str = "the row joins two items of a list walked under a walked item with , and and the tree gives each its own part, and no step of the R5 design says which one is right";
 
-const DUPLICATE_CLAUSE: &str = "the tree says again, under the item, a clause an earlier sentence of the item gave, and no step of the R5 design leaves it out";
-
 const FREE_BEFORE_KEY: &str = "the tree says a sentence that reads no alias first and then the key of the line's whose, as for.pass says, where Rust's row leaves the key out and the case says it first, until R5-6 builds the row from the tree and moves the case";
 
 const ENTRY_CAUSE: &str = "the tree gives an item the cause the case gives its entry and Rust's entry doesn't, until R5-7 builds the entries from the clauses";
 
-const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 103] = [
+const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 102] = [
     (
         "for / a $params list that a for line reads fails it when the line's whose leaves nothing and an item of the list can't be read / fails, when the whose leaves nothing",
         SAID_OUTSIDE,
@@ -2640,10 +2638,6 @@ const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 103] = [
         WHOSE_ROOT,
     ),
     (
-        "messages / a clause that an earlier sentence of the row already gave / is left out of the row's message and of the option's, and each sentence keeps its whole message",
-        DUPLICATE_CLAUSE,
-    ),
-    (
         "messages / a count of in a for line, and the order of its roots / names the $params root first and each root once",
         TREE_IS_THE_CASE,
     ),
@@ -2817,9 +2811,9 @@ const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 103] = [
     ),
 ];
 
-const ROWS_COMPARED: usize = 1422;
+const ROWS_COMPARED: usize = 1423;
 
-const ROWS_LISTED: usize = 160;
+const ROWS_LISTED: usize = 159;
 
 fn item_entries(failures: &Value, out: &mut Vec<(String, String)>) {
     for failure in failures.as_array().into_iter().flatten() {

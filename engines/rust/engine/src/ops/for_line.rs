@@ -3752,18 +3752,23 @@ fn in_list_order(said: &mut [Clause]) {
 }
 
 fn merge_clause(said: &mut Vec<Clause>, clause: &Clause) {
+    let item = clause.kind == super::clause::Kind::Item;
     let same = said.iter_mut().find(|seen| {
-        clause.kind == super::clause::Kind::Item
-            && seen.kind == super::clause::Kind::Item
-            && seen.name == clause.name
+        seen.kind == clause.kind
+            && if item {
+                seen.name == clause.name
+            } else {
+                seen.text == clause.text
+            }
     });
     match same {
-        Some(seen) => {
+        Some(seen) if item => {
             for inner in &clause.said {
                 push_new(&mut seen.said, inner.clone());
             }
         }
-        None => push_new(said, clause.clone()),
+        Some(seen) => seen.cause = Cause::worst([seen.cause, clause.cause]).unwrap_or(seen.cause),
+        None => said.push(clause.clone()),
     }
 }
 
