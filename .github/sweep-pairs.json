@@ -9382,5 +9382,263 @@
     }
    ]
   }
+ },
+ {
+  "name": "member r5/M1 [walk.member.not_an_object]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every member of statuses is \"DONE\""
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "statuses": [
+      "DONE"
+     ]
+    }
+   ]
+  },
+  "want": "statuses is [\"DONE\"], which isn't an object"
+ },
+ {
+  "name": "member r5/M2 [walk.member.not_an_object, tally.member]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "sum of member of costs is at most 3"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "costs": [
+      1
+     ]
+    }
+   ]
+  },
+  "want": "costs is [1], which isn't an object"
+ },
+ {
+  "name": "member r5/M3 [walk.member.not_an_object] missing, as any path does",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every member of statuses is \"DONE\""
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t"
+    }
+   ]
+  },
+  "want": "statuses is missing"
+ },
+ {
+  "name": "member r5/M4 [walk.member.not_an_object] null, as any path does",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every member of statuses is \"DONE\""
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "statuses": null
+    }
+   ]
+  },
+  "want": "statuses is null"
+ },
+ {
+  "name": "member r5/M5 [walk.member.not_an_object] on a for line, the message a check gives",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every member of ms as m",
+       "assert": "m is 1"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "ms": [
+      "x"
+     ]
+    }
+   ]
+  },
+  "want": "ms is [\"x\"], which isn't an object"
+ },
+ {
+  "name": "member r5/M6 [walk.member] a for line, five failing members",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every member of ms as m",
+       "assert": "m is 1"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "ms": {
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "d": 0,
+      "e": 0
+     }
+    }
+   ]
+  }
+ },
+ {
+  "name": "member r5/M7 [walk.member] some member, none passing",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "some member of statuses is \"DONE\""
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "statuses": {
+      "a": "x",
+      "b": "y"
+     }
+    }
+   ]
+  }
+ },
+ {
+  "name": "member r5/M8 [walk.member] second item of a for line, the member's list holds a list",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every ws as w, every member of w.ms as m",
+       "assert": "m is 1"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "ws": [
+      {
+       "ms": [
+        1
+       ]
+      }
+     ]
+    }
+   ]
+  }
  }
 ]
