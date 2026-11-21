@@ -12546,22 +12546,6 @@
                     ],
                     "name": "count of .lock.pkgs",
                     "value": 3
-                  },
-                  {
-                    "locations": [
-                      "/repos/0/lock/pkgs/0",
-                      "/repos/0/lock/pkgs/1",
-                      "/repos/0/lock/pkgs/2"
-                    ],
-                    "name": ".lock.pkgs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": 1
-                      },
-                      {},
-                      "t"
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -12666,20 +12650,6 @@
                     ],
                     "name": "sum of .lock.pkgs.n",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/repos/0/lock/pkgs/0/n",
-                      "/repos/0/lock/pkgs/1",
-                      "/repos/0/lock/pkgs/2"
-                    ],
-                    "name": ".lock.pkgs[].n",
-                    "outcome": "usable",
-                    "value": [
-                      1,
-                      null,
-                      null
-                    ]
                   }
                 ],
                 "kind": "assertion",

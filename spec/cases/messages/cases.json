@@ -16028,12 +16028,6 @@
                     "locations": [],
                     "name": "count of y[0].v",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "y[0].v",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -16123,12 +16117,6 @@
                     "locations": [],
                     "name": "count of $input.y[0].v",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "$input.y[0].v",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",

@@ -70,3 +70,18 @@ test_a_counted_list_named_by_a_key_is_never_an_input_of_the_assertion_even_with_
 	param := ergo._s_written_check("q is sum of m named by $params.k")
 	ergo._tally_own_read({"name": "m named by $params.k[]", "value": [1, 2]}, param, set(), [])
 }
+
+test_a_summed_field_of_each_item_is_never_an_input_of_the_assertion if {
+	c := ergo._s_written_check("sum of xs.n is 1")
+	ergo._tally_own_read({"name": "xs[].n", "value": [1, 2]}, c, set(), [])
+}
+
+test_a_counted_list_that_failed_under_an_item_is_never_an_input_of_the_assertion if {
+	c := ergo._s_written_check("count of y[0].v is 1")
+	ergo._tally_own_read({"name": "y[0].v", "value": 1}, c, set(), [{"kind": "item", "name": "item 1 of y"}])
+}
+
+test_a_counted_list_that_failed_with_no_entry_of_its_own_stays_on_the_assertion if {
+	c := ergo._s_written_check("count of xs.n is 1")
+	not ergo._tally_own_read({"name": "xs.n", "value": null}, c, set(), [])
+}
