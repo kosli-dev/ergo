@@ -2384,7 +2384,7 @@ const WHOSE_ROOT: &str = "an item the line's whose can't decide says the whose's
 
 const TREE_IS_THE_CASE: &str = "the tree says what the case says and Rust's row doesn't, until R5-6 builds the row from the tree";
 
-const WALK_ITEMS_JOINED: &str = "the row joins two items of a list walked under a walked item with , and and the tree gives each its own part, and no step of the R5 design says which one is right";
+const WALK_ITEMS_JOINED: &str = "the tree gives each item of a list walked under a walked item its own part, as message.items and message.join say and as the plain walk every zs.k is 9 does, where the case and both engines' rows join two items of k with , and";
 
 const FREE_BEFORE_KEY: &str = "the tree says a sentence that reads no alias first and then the key of the line's whose, as for.pass says, where Rust's row leaves the key out and the case says it first, until R5-6 builds the row from the tree and moves the case";
 
