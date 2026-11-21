@@ -2098,10 +2098,13 @@ fn tally_clauses(sentence: &str, items: Value, params: Value) -> Vec<Clause> {
 }
 
 fn tally_clauses_on(sentence: &str, subject: Value, params: Value) -> Vec<Clause> {
+    tally_clauses_in(sentence, json!({"things": [subject]}), params)
+}
+
+fn tally_clauses_in(sentence: &str, input: Value, params: Value) -> Vec<Clause> {
     let Check::Tally(tally) = lowered(sentence) else {
         panic!("{sentence} is not a count or a sum");
     };
-    let input = json!({"things": [subject]});
     let ctx = Ctx {
         label: None,
         item_by_item: false,
@@ -2114,6 +2117,118 @@ fn tally_clauses_on(sentence: &str, subject: Value, params: Value) -> Vec<Clause
         aliases: BTreeMap::new(),
     };
     tally.counted_clauses(&ctx)
+}
+
+fn kinds_causes_and_texts(clauses: &[Clause]) -> Vec<(clause::Kind, Cause, String)> {
+    clauses
+        .iter()
+        .map(|said| {
+            (
+                said.kind,
+                said.cause,
+                clause::text(std::slice::from_ref(said)),
+            )
+        })
+        .collect()
+}
+
+fn mixed_list_root(name: &str) -> (clause::Kind, Cause, String) {
+    (
+        clause::Kind::Root,
+        Cause::Unusable,
+        format!("{name} is [1, \"a\", null, and 1 more], which isn't a list of one kind of value"),
+    )
+}
+
+fn item_said(cause: Cause, text: &str) -> (clause::Kind, Cause, String) {
+    (clause::Kind::Item, cause, text.to_string())
+}
+
+#[test]
+fn a_count_says_each_items_own_value_beside_a_root_list_that_isnt_one_kind_of_value() {
+    let clauses = tally_clauses_in(
+        "count of es whose v is not in $input.x is 0",
+        json!({
+            "things": [{"es": [{"v": 3}, {"v": "abc"}, {"v": [1, "a", null]}, {"v": null}, {"v": []}]}],
+            "x": [1, "a", null, {"b": 2}],
+        }),
+        json!({}),
+    );
+    assert_eq!(
+        kinds_causes_and_texts(&clauses),
+        [
+            mixed_list_root("$input.x"),
+            item_said(
+                Cause::Unusable,
+                "item 1 of es: v is 3, which isn't a number or an object or text"
+            ),
+            item_said(
+                Cause::Unusable,
+                "item 2 of es: v is \"abc\", which isn't a number or an object or text"
+            ),
+            item_said(
+                Cause::Unusable,
+                "item 3 of es: v is [1, \"a\", null], which isn't a number or an object or text"
+            ),
+            item_said(Cause::Null, "item 4 of es: v is null"),
+            item_said(
+                Cause::Unusable,
+                "item 5 of es: v is [], which isn't a number or an object or text"
+            ),
+        ]
+    );
+}
+
+#[test]
+fn a_count_says_each_items_own_list_beside_a_root_list_of_some_of_that_isnt_one_kind_of_value() {
+    let clauses = tally_clauses_in(
+        "count of es whose v contains some of $input.x is 0",
+        json!({
+            "things": [{"es": [{"v": ["a", "b"]}, {"v": null}]}],
+            "x": [1, "a", null, {"b": 2}],
+        }),
+        json!({}),
+    );
+    assert_eq!(
+        kinds_causes_and_texts(&clauses),
+        [
+            mixed_list_root("$input.x"),
+            item_said(
+                Cause::Unusable,
+                "item 1 of es: v is [\"a\", \"b\"], which isn't a list of numbers or objects or text"
+            ),
+            item_said(Cause::Null, "item 2 of es: v is null"),
+        ]
+    );
+}
+
+#[test]
+fn a_count_after_plus_says_each_items_own_value_beside_a_root_list_that_isnt_one_kind_of_value() {
+    let clauses = tally_clauses_on(
+        "count of fs plus count of es whose v is in $params.x is 0",
+        json!({"fs": null, "es": [{}, {"v": []}, {"v": "abc"}, {"v": []}]}),
+        json!({"x": [1, "a", null, {"b": 2}]}),
+    );
+    assert_eq!(
+        kinds_causes_and_texts(&clauses),
+        [
+            (clause::Kind::List, Cause::Null, "fs is null".to_string()),
+            mixed_list_root("$params.x"),
+            item_said(Cause::Absent, "item 1 of es: v is missing"),
+            item_said(
+                Cause::Unusable,
+                "item 2 of es: v is [], which isn't a number or an object or text"
+            ),
+            item_said(
+                Cause::Unusable,
+                "item 3 of es: v is \"abc\", which isn't a number or an object or text"
+            ),
+            item_said(
+                Cause::Unusable,
+                "item 4 of es: v is [], which isn't a number or an object or text"
+            ),
+        ]
+    );
 }
 
 fn kinds_and_names(clauses: &[Clause]) -> Vec<(clause::Kind, &str)> {
