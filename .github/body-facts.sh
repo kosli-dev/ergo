@@ -146,44 +146,44 @@ while read -r n; do
   [ -n "$n" ] || continue
   compare "$n case reports changed" "$n" "$reports" "$reports"
 done <<EOT
-$(sed -n -E 's/(^|.*[^0-9])([0-9]+) (Rust )?case reports? changed.*/\2/p' "$work/body-open")
+$(grep -oE '[0-9]+ (Rust )?case reports? changed' "$work/body-open" | sed -E 's/^([0-9]+) .*/\1/')
 EOT
 
 while read -r n; do
   [ -n "$n" ] || continue
   compare "Rust output changed on $n pairs" "$n" "$pairs" "$pairs"
 done <<EOT
-$(sed -n -E 's/.*Rust output changed on ([0-9]+) pairs?.*/\1/p' "$work/body-open")
+$(grep -oE 'Rust output changed on [0-9]+ pairs?' "$work/body-open" | sed -E 's/[^0-9]*([0-9]+).*/\1/')
 EOT
 
 while read -r a b; do
   [ -n "$a" ] || continue
   compare "known-failures.txt had $a and has $b" "$a $b" "$known_facts" "$(echo "$known_facts" | awk '{ if (NF == 2) print "had " $1 " and has " $2; else print "unknown" }')"
 done <<EOT
-$(sed -n -E 's/.*known-failures\.txt had ([0-9]+) lines? and has ([0-9]+) now.*/\1 \2/p' "$work/body-open")
+$(grep -oE 'known-failures\.txt had [0-9]+ lines? and has [0-9]+ now' "$work/body-open" | sed -E 's/known-failures\.txt had ([0-9]+) lines? and has ([0-9]+) now/\1 \2/')
 EOT
 
 while read -r a b; do
   [ -n "$a" ] || continue
   compare "$a of $b pairs differ" "$a $b" "$differ_facts" "$(echo "$differ_facts" | awk '{ if (NF == 2) print $1 " of " $2; else print "unknown" }')"
 done <<EOT
-$(sed -n -E 's/(^|.*[^0-9])([0-9]+) of ([0-9]+) pairs differ between Rego and Rust.*/\2 \3/p' "$work/body-open")
+$(grep -oE '[0-9]+ of [0-9]+ pairs differ between Rego and Rust' "$work/body-open" | sed -E 's/^([0-9]+) of ([0-9]+) .*/\1 \2/')
 EOT
 
 while read -r a b c d; do
   [ -n "$a" ] || continue
   compare "pairs that say their want message: Rego $a of $b, Rust $c of $d" "$a $b $c $d" "$want_facts" "$(echo "$want_facts" | awk '{ if (NF == 4) print "Rego " $1 " of " $2 ", Rust " $3 " of " $4; else print "unknown" }')"
 done <<EOT
-$(sed -n -E 's/.*Pairs that say their want message: Rego ([0-9]+) of ([0-9]+), Rust ([0-9]+) of ([0-9]+).*/\1 \2 \3 \4/p' "$work/body-open")
+$(grep -oE 'Pairs that say their want message: Rego [0-9]+ of [0-9]+, Rust [0-9]+ of [0-9]+' "$work/body-open" | sed -E 's/[^0-9]*([0-9]+) of ([0-9]+), Rust ([0-9]+) of ([0-9]+)/\1 \2 \3 \4/')
 EOT
 
 echo
 if [ "$checked" = 0 ]; then
   echo "NOTE: no number in the body was checked: it has no line that repeats a sentence of the facts."
 else
-  echo "Checked $checked numbers in the body against the facts: $mismatches differ."
+  echo "Checked $checked $(plural "$checked" number numbers) in the body against the facts: $mismatches differ."
 fi
 if [ "$mismatches" != 0 ]; then
-  echo "FAILED: $mismatches numbers in the body differ from the facts $snapshot." >&2
+  echo "FAILED: $mismatches $(plural "$mismatches" number numbers) in the body differ from the facts $snapshot." >&2
   exit 1
 fi
