@@ -15,3 +15,12 @@ test_sum_of_and_plus_add_numbers_as_decimals if {
 	ergo._decimal_sum([0.123456789012345]) == 0.123456789012345
 	ergo._decimal_sum([0.1, 0.2, 100]) == 100.3
 }
+
+_count_of_ms(cmp) := {"count_of": ["ms"], "text": "count of ms", "whose": [{"op": "compare", "cmp": cmp, "left": ["v"], "right": ["$$params", "r"]}]}
+
+test_a_count_takes_the_worst_cause_of_a_root_it_cant_read_and_of_its_items if {
+	ergo._tally({"ms": [{"v": "s"}, {}]}, _count_of_ms("gte")).states == {"absent", "unusable"} with data.ergo_params as {}
+	ergo._tally({"ms": [{"v": "s"}, {}]}, _count_of_ms("gte")).states == {"null", "absent", "unusable"} with data.ergo_params as {"r": null}
+	ergo._tally({"ms": [{"v": 1}]}, _count_of_ms("gte")).states == {"absent"} with data.ergo_params as {}
+	ergo._tally({"ms": [{}, {"v": 1}]}, _count_of_ms("in")).states == {"null", "absent"} with data.ergo_params as {"r": null}
+}
