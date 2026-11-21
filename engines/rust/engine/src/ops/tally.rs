@@ -394,6 +394,13 @@ fn numbers_verdict(check: &Tally, ctx: &Ctx) -> Verdict {
 }
 
 fn root_causes(check: &Tally, ctx: &Ctx) -> Vec<Cause> {
+    whose_roots(check, ctx)
+        .into_iter()
+        .map(|root| root.cause)
+        .collect()
+}
+
+fn whose_roots(check: &Tally, ctx: &Ctx) -> Vec<Clause> {
     let outer = outer_ctx(ctx);
     check
         .counted_terms()
@@ -402,7 +409,17 @@ fn root_causes(check: &Tally, ctx: &Ctx) -> Vec<Cause> {
             let whose: Vec<&Check> = counted.whose.iter().collect();
             super::message::root_clauses(&whose, &outer)
         })
-        .map(|root| root.cause)
+        .collect()
+}
+
+/// The names of the roots the `whose` of `check` reads that fail it as
+/// `unusable`, like `$input.m` holding `3` in
+/// `count of xs whose v is $input.m named by key is 1`.
+pub fn unusable_whose_roots(check: &Tally, ctx: &Ctx) -> Vec<String> {
+    whose_roots(check, ctx)
+        .into_iter()
+        .filter(|root| root.cause == Cause::Unusable)
+        .map(|root| root.name)
         .collect()
 }
 
