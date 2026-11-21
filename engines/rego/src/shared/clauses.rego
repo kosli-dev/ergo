@@ -80,3 +80,9 @@ _clause_quotes_shut(s) if count(split(replace(replace(s, "\\\\", ""), "\\\"", ""
 _clause_last_cut(ends, n) := ends if ends[count(ends) - 1] == n
 
 else := array.concat(ends, [n])
+
+_m_clause(kind, name, cause, text) := {"kind": kind, "name": name, "cause": cause, "text": text, "said": []}
+
+_m_item_clause(name, cause, said) := {"kind": "item", "name": name, "cause": cause, "text": "", "said": said}
+
+_m_clause_more(n) := {"kind": "more", "count": n, "name": "", "cause": "value", "text": "", "said": []}
