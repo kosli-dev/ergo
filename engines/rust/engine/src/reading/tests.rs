@@ -332,6 +332,64 @@ fn every_reads_a_list_in_each_parent_but_never_stands_for_the_subject_itself() {
 }
 
 #[test]
+fn every_member_of_a_subjects_name_is_a_child_that_reads_the_members_of_each_parent() {
+    let (_, r) = reading(json!({
+        "rec": {"from": "records"},
+        "m": {"from": "every member of rec whose kind is \"approval\""},
+        "e": {"from": "every member of rec.evidence"},
+        "i": {"from": "every member of $input"},
+        "t": {"from": "every member of records.evidence"}
+    }));
+    for name in ["m", "e", "i", "t"] {
+        assert!(!r.infos[name].problems.contains_key(&format!("subjects.{name}.from")));
+    }
+    assert_eq!(r.infos["m"].relation, Relation::Child("rec".into()));
+    assert!(matches!(
+        r.lowered("m").unwrap().source,
+        Source::Child {
+            every: true,
+            member: true,
+            ..
+        }
+    ));
+    assert!(matches!(
+        r.lowered("t").unwrap().source,
+        Source::Root {
+            every: true,
+            member: true,
+            ..
+        }
+    ));
+    assert_eq!(
+        r.lowered("m").unwrap().from_text,
+        "every member of rec whose kind is \"approval\""
+    );
+}
+
+#[test]
+fn member_of_goes_after_every_and_never_with_distinct_or_named_by_each_of() {
+    let (_, r) = reading(json!({
+        "a": {"from": "member of records.evidence"},
+        "b": {"from": "every distinct member of records.evidence"},
+        "c": {"from": "every member of records named by each of $params.l"}
+    }));
+    assert_eq!(
+        texts(&r, "a", "subjects.a.from"),
+        [r#"on a from line, member of goes after every, like "every member of record.evidence""#]
+    );
+    assert_eq!(
+        texts(&r, "b", "subjects.b.from"),
+        ["distinct can't go with every member of"]
+    );
+    assert_eq!(
+        texts(&r, "c", "subjects.c.from"),
+        [
+            "every can't go with named by each of: start the from line at a subject to read its names one subject at a time"
+        ]
+    );
+}
+
+#[test]
 fn every_cannot_go_with_named_by_each_of() {
     let (_, r) = reading(json!({"s": {"from": "every art.b named by each of $params.l"}}));
     assert_eq!(
