@@ -695,7 +695,11 @@ fn a_list_after_is_in_ignoring_case_with_an_item_that_isnt_text_is_unfit() {
     ] {
         let params = json!({ "q": list });
         let ctx = ctx_of(&subject, &params);
-        assert_eq!(ref_unfit(&[&check], &param("q"), &list, &ctx), unfit, "{list}");
+        assert_eq!(
+            ref_unfit(&[&check], &param("q"), &list, &ctx),
+            unfit,
+            "{list}"
+        );
     }
     let check = first_check(one(json!({"c": "x is in ys ignoring case"})));
     for (list, unfit) in [
@@ -720,7 +724,7 @@ fn a_list_after_is_in_ignoring_case_with_an_item_that_isnt_text_is_unfit() {
 }
 
 #[test]
-fn a_ref_list_after_is_in_ignoring_case_with_an_item_that_isnt_text_is_unfit_in_a_walk_as_in_a_plain_check() {
+fn a_param_list_after_is_in_ignoring_case_with_a_bad_item_is_unfit_in_a_walk() {
     for sentence in [
         "every xs.v is in $params.q ignoring case",
         "every xs whose v is in $params.q ignoring case, if any, exists",
@@ -757,7 +761,7 @@ fn found_input(name: &str, value: &Value) -> crate::ops::Input {
 }
 
 #[test]
-fn a_list_after_is_in_ignoring_case_with_an_item_that_isnt_text_is_unfit_in_a_walk_as_in_a_plain_check() {
+fn an_input_list_after_is_in_ignoring_case_with_a_bad_item_is_unfit_in_a_walk() {
     for sentence in [
         "every xs.v is in $params.q ignoring case",
         "every xs whose v is in $params.q ignoring case, if any, exists",

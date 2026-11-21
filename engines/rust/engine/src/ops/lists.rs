@@ -482,27 +482,29 @@ fn read_right_as(right: &Right, ctx: &Ctx, walks: bool, text: bool) -> RightRead
             inputs: Vec::new(),
             forced: None,
         },
-        Right::Ref(path) | Right::Field(path) => match walked_from(path, ctx, true, text).filter(|_| walks) {
-            Some(walk) => {
-                let input = walk.input();
-                walked_read(walk, vec![input])
-            }
-            None => {
-                let read = read_path(path, ctx);
-                let outcome =
-                    if matches!(right, Right::Ref(_)) && !walks && input_one_path(path, ctx) {
-                        Outcome::NotAnObject
-                    } else {
-                        read.outcome
-                    };
-                RightRead {
-                    outcome,
-                    value: read.value,
-                    inputs: read.inputs,
-                    forced: None,
+        Right::Ref(path) | Right::Field(path) => {
+            match walked_from(path, ctx, true, text).filter(|_| walks) {
+                Some(walk) => {
+                    let input = walk.input();
+                    walked_read(walk, vec![input])
+                }
+                None => {
+                    let read = read_path(path, ctx);
+                    let outcome =
+                        if matches!(right, Right::Ref(_)) && !walks && input_one_path(path, ctx) {
+                            Outcome::NotAnObject
+                        } else {
+                            read.outcome
+                        };
+                    RightRead {
+                        outcome,
+                        value: read.value,
+                        inputs: read.inputs,
+                        forced: None,
+                    }
                 }
             }
-        },
+        }
         Right::Join(pieces) => {
             let reads: Vec<RightRead> = pieces.iter().map(|p| read_right(p, ctx, walks)).collect();
             let inputs = reads
@@ -561,7 +563,14 @@ where
     judged_as(path, right, ctx, walks, false, decide)
 }
 
-fn judged_as<F>(path: &Path, right: &Right, ctx: &Ctx, walks: bool, text: bool, decide: F) -> Verdict
+fn judged_as<F>(
+    path: &Path,
+    right: &Right,
+    ctx: &Ctx,
+    walks: bool,
+    text: bool,
+    decide: F,
+) -> Verdict
 where
     F: FnOnce(&Value, &Outcome, Option<&Value>) -> Cause,
 {
@@ -616,7 +625,8 @@ fn usable_patterns(patterns: &Value) -> bool {
 
 impl In {
     pub fn flawed(&self, ctx: &Ctx) -> bool {
-        self.ignoring.is_none() && ref_read(&self.values, ctx).is_some_and(|v| !usable_values(&v, false))
+        self.ignoring.is_none()
+            && ref_read(&self.values, ctx).is_some_and(|v| !usable_values(&v, false))
     }
 }
 
@@ -1226,8 +1236,9 @@ pub(super) fn field_walk_fault(check: &super::Check, ctx: &Ctx) -> Option<(Cause
 
 pub fn walk_fault(check: &super::Check, ctx: &Ctx) -> Option<(Cause, String)> {
     rights_of(check).into_iter().find_map(|right| match right {
-        Right::Ref(path) | Right::Field(path) => fault_walk(check, path, ctx)
-            .and_then(|walk| walk.cause.map(|cause| (cause, walk.text))),
+        Right::Ref(path) | Right::Field(path) => {
+            fault_walk(check, path, ctx).and_then(|walk| walk.cause.map(|cause| (cause, walk.text)))
+        }
         _ => None,
     })
 }

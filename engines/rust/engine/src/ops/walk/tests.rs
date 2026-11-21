@@ -1876,7 +1876,8 @@ fn the_item_entry_of_copies_lists_the_location_of_each_item_not_the_end_of_its_p
 }
 
 #[test]
-fn a_list_after_is_in_ignoring_case_with_an_item_that_isnt_text_is_said_once_before_the_items_on_an_empty_list_too() {
+fn a_list_after_is_in_ignoring_case_with_an_item_that_isnt_text_is_said_once_before_the_items_on_an_empty_list_too()
+ {
     for (sentence, subject, params, cause, message) in [
         (
             "every xs.v is in ys ignoring case",
@@ -1938,7 +1939,8 @@ fn a_list_after_is_in_ignoring_case_with_an_item_that_isnt_text_is_said_once_bef
 }
 
 #[test]
-fn a_list_after_is_in_ignoring_case_that_cant_be_used_doesnt_hide_the_items_whose_own_value_isnt_text() {
+fn a_list_after_is_in_ignoring_case_that_cant_be_used_doesnt_hide_the_items_whose_own_value_isnt_text()
+ {
     for (sentence, subject, params, cause, message) in [
         (
             "every xs.v is in $params.l ignoring case",

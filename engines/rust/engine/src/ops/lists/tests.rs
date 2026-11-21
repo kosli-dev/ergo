@@ -1146,7 +1146,8 @@ fn in_ignoring_case_fails_on_a_field_that_isnt_text() {
 }
 
 #[test]
-fn in_ignoring_case_fails_on_a_list_from_the_input_with_an_item_that_isnt_text_whatever_the_field_holds() {
+fn in_ignoring_case_fails_on_a_list_from_the_input_with_an_item_that_isnt_text_whatever_the_field_holds()
+ {
     let field = Right::Field(key_path(Start::Subject, &["ys"]));
     let params = Right::Ref(key_path(Start::Params, &["l"]));
     for not in [false, true] {
@@ -1187,11 +1188,23 @@ fn in_ignoring_case_fails_on_a_list_from_the_input_with_an_item_that_isnt_text_w
 fn in_ignoring_case_compares_with_a_list_from_the_input_once_both_sides_are_prepared() {
     let field = Right::Field(key_path(Start::Subject, &["ys"]));
     let subject = json!({"x": " Bug ", "ys": ["incident", "BUG"]});
-    assert_eq!(in_ignoring(subject.clone(), None, field.clone(), false).cause, Cause::Satisfied);
-    assert_eq!(in_ignoring(subject, None, field.clone(), true).cause, Cause::Value);
+    assert_eq!(
+        in_ignoring(subject.clone(), None, field.clone(), false).cause,
+        Cause::Satisfied
+    );
+    assert_eq!(
+        in_ignoring(subject, None, field.clone(), true).cause,
+        Cause::Value
+    );
     let subject = json!({"x": "bug", "ys": []});
-    assert_eq!(in_ignoring(subject.clone(), None, field.clone(), false).cause, Cause::Value);
-    assert_eq!(in_ignoring(subject, None, field, true).cause, Cause::Satisfied);
+    assert_eq!(
+        in_ignoring(subject.clone(), None, field.clone(), false).cause,
+        Cause::Value
+    );
+    assert_eq!(
+        in_ignoring(subject, None, field, true).cause,
+        Cause::Satisfied
+    );
 }
 
 #[test]
@@ -1259,13 +1272,17 @@ fn on_input(subject: Value, cs: Value, params: Value, run: impl Fn(&Ctx) -> Verd
 }
 
 #[test]
-fn in_ignoring_case_takes_the_worst_cause_of_a_walked_list_with_a_null_and_an_item_that_isnt_text() {
+fn in_ignoring_case_takes_the_worst_cause_of_a_walked_list_with_a_null_and_an_item_that_isnt_text()
+{
     let Check::In(check) = lowered_check("x is in $input.cs.name ignoring case") else {
         panic!("not in");
     };
     let cs = json!([{"name": "A"}, {"name": 3}, {"name": null}]);
     assert_eq!(
-        on_input(json!({"x": "a"}), cs.clone(), json!({}), |ctx| run_in(&check, ctx)).cause,
+        on_input(json!({"x": "a"}), cs.clone(), json!({}), |ctx| run_in(
+            &check, ctx
+        ))
+        .cause,
         Cause::Unusable
     );
     let cs = json!([{"name": "A"}, {"name": null}]);
@@ -1334,7 +1351,10 @@ fn a_list_after_is_in_ignoring_case_names_each_item_that_isnt_text_in_list_order
             "x is in $params.l ignoring case",
             json!({"x": "a"}),
             json!({"l": [1, "a"]}),
-            said(Cause::Unusable, "item 1 of $params.l is 1, which isn't text"),
+            said(
+                Cause::Unusable,
+                "item 1 of $params.l is 1, which isn't text",
+            ),
         ),
         (
             "x is in $input.cs.name ignoring case",

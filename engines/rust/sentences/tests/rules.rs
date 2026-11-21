@@ -1095,7 +1095,9 @@ fn ignoring_words_after_a_list_read_from_a_path_are_read() {
     );
     assert_eq!(
         problems("x is in ys ignoring surrounding spaces and case"),
-        one("\"ignoring surrounding spaces and case\" is written \"ignoring case and surrounding spaces\"")
+        one(
+            "\"ignoring surrounding spaces and case\" is written \"ignoring case and surrounding spaces\""
+        )
     );
 }
 
