@@ -161,7 +161,12 @@ _walk_parts(check, subj, raw, r) := _m_root_sorted(_once([t |
 	ls != []
 } else := _walk_parts_of(check, subj, raw, r)
 
-_m_key_texts(path) := array.concat(_walk_key_ref_texts(path), [_m_isnt(_ref_label(seg.ref), _ref_read(seg.ref), "text") | some seg in path; _ref_step_flaw(seg) == "unusable"])
+_m_key_texts(path) := [x[1] | some x in _m_key_said(path)]
+
+_m_key_said(path) := array.concat(
+	[[f, concat("", [_ref_label(seg.ref), " is ", _key_ref_word[f]])] | some seg in path; f := _ref_step_flaw(seg); f in _no_value_states],
+	[["unusable", _m_isnt(_ref_label(seg.ref), _ref_read(seg.ref), "text")] | some seg in path; _ref_step_flaw(seg) == "unusable"],
+)
 
 _m_key_list_texts(subj, path, if_any) := [_m_key_list_text(_input_name(f.prefix), f) | some f in _key_list_flaws(subj, path, if_any)]
 
@@ -409,18 +414,48 @@ _m_shown_clause(m, shown) if _m_item_lead(m) in shown
 
 _m_tally_shown(state, cause) if state == cause
 
-_m_tally_shown("root", _)
+_m_tally_shown(state, _) if startswith(state, "root ")
+
+_m_tally_shown(state, _) if startswith(state, "list ")
 
 _m_tally_shown(state, _) if startswith(state, "focus ")
 
 _m_tallies(subj, check, cause) := [c |
 	some side in _m_tally_parts(check)
-	cs := [x[1] | some x in _m_tally_said(subj, side, cause)]
+	cs := _m_tally_said(subj, side, cause)
 	count(cs) > 0
-	c := _m_joined(cs)
+	c := _m_clauses_text(_m_clauses_shown(cs))
 ]
 
-_m_tally_said(subj, side, cause) := [x | some x in _m_tally(subj, side); _m_record_shown(x, cause); not _m_tally_dropped(subj, side, cause, x)]
+_m_tally_said(subj, side, cause) := [_m_record_clause(x, side) | some x in _m_tally_records(subj, side, cause)]
+
+_m_tally_records(subj, side, cause) := [x | some x in _m_tally(subj, side); _m_record_shown(x, cause); not _m_tally_dropped(subj, side, cause, x)]
+
+_m_record_clause([state, text], _) := _m_clause("root", _m_clause_name(text), substring(state, 5, -1), text) if startswith(state, "root ")
+
+_m_record_clause([state, text], _) := _m_clause("list", _m_clause_name(text), substring(state, 5, -1), text) if startswith(state, "list ")
+
+_m_record_clause([state, text], _) := _m_clause("list", _m_clause_name(text), state, text) if state in _failed_read_states
+
+_m_record_clause([state, text, src], side) := _m_item_text_clause(_m_item_name(_m_src_path(src), _dotted_roots([side[_basic_form(side)]])), _m_src_cause(state), text)
+
+_m_src_path(src) := src.item.i
+
+_m_src_path(src) := src.fail.path
+
+_m_src_path(src) := src.key.i
+
+_m_src_cause(state) := substring(state, 5, -1) if startswith(state, "root ")
+
+else := _tally_record_cause(state)
+
+_m_item_text_clause(name, cause, text) := _m_item_clause(name, cause, [_m_clause("root", _m_clause_name(rest), cause, rest)]) if {
+	lead := concat("", [name, ": "])
+	startswith(text, lead)
+	rest := substring(text, count(lead), -1)
+} else := _m_clause("item", name, cause, text) if startswith(text, concat("", [name, " "]))
+
+else := _m_clause("root", _m_clause_name(text), cause, text)
 
 _m_key_flawed(c) if {
 	some r in _step_refs(c)
@@ -474,14 +509,14 @@ _m_tally(subj, side) := ts if {
 	ts := _m_tally_key_items(subj, side)
 } else := _m_tally_walked_side(subj, side)
 
-_m_tally_fail_state(side, x) := "root" if {
+_m_tally_fail_state(side, x) := concat("", ["root ", x.cause]) if {
 	count(_key_item_flaws(side)) > 0
 	not _path_through_item(x.item)
 } else := x.cause
 
 _m_tally_key_items(subj, side) := array.concat(
-	[["root", t] | some t in _m_root_sorted(_once([t | some c in side.whose; some [p, _] in _key_base_reads(c); some t in _m_key_texts(p)]))],
-	[["root", _m_leaf_in(e.i, _key_focus_text(array.concat(e.c, f.prefix), e.i, f.prefix, _m_key_list_text(_input_name(f.prefix), f)), roots)] |
+	[[concat("", ["root ", x[0]]), x[1]] | some x in _once([x | some c in side.whose; some [p, _] in _key_base_reads(c); some x in _m_key_said(p)])],
+	[[concat("", ["root ", f.cause]), _m_leaf_in(e.i, _key_focus_text(array.concat(e.c, f.prefix), e.i, f.prefix, _m_key_list_text(_input_name(f.prefix), f)), roots), {"key": e}] |
 		some e in w.items
 		some c in side.whose
 		some [p, mode] in _key_base_reads(c)
@@ -503,7 +538,7 @@ _m_tally_key_items(subj, side) := array.concat(
 _m_tally_walked_side(subj, side) := array.concat(
 	array.concat(
 		_m_tally_heads(said, side, w),
-		[["root", _m_fail(x, roots)] | some x in fs; _m_tally_list_said(side, said, x)],
+		[[concat("", ["list ", x.cause]), _m_fail(x, roots)] | some x in fs; _m_tally_list_said(side, said, x)],
 	),
 	[x[2] | some x in sort(array.concat(
 		[[_m_positions(x.path), 0, [_m_tally_fail_state(side, x), _m_fail(x, roots), {"fail": x}]] | some x in fs; not _m_tally_list_said(side, said, x)],
@@ -514,17 +549,16 @@ _m_tally_walked_side(subj, side) := array.concat(
 	w := _walk(_walk_start({"path": side[f]}, subj), _walk_keys({"path": side[f]}, subj), true)
 	roots := _dotted_roots([side[f]])
 	fs := array.concat(w.fails, _walk_stop(w))
-	said := array.concat(
-		[["root", m] | some m in sort([m | some c in side.whose; some m in array.concat(_m_root_texts_all(subj, c), _m_tally_walked(c, w)); _m_ref_first(m)])],
-		[["root", m] | some c in side.whose; some m in array.concat(_m_root_texts_all(subj, c), _m_tally_walked(c, w)); not _m_ref_first(m)],
-	)
+	said := _m_said_once([[concat("", ["root ", x[0]]), x[1]] | some c in side.whose; some x in array.concat(_m_root_said_all(subj, c), _m_tally_walked(c, w))])
 }
+
+_m_said_once(xs) := [x | some i, x in xs; not x[1] in {y[1] | some y in array.slice(xs, 0, i)}]
 
 _m_tally_heads(said, side, w) := said if {
 	w.items != []
 } else := said if {
 	[t | some c in side.whose; some t in _key_root_texts(c)] == []
-} else := [["root", m] | some m in _m_root_sorted(_once(array.concat([x[1] | some x in said], [t | some c in side.whose; some t in _key_root_texts(c)])))]
+} else := _m_said_once(array.concat(said, [["root unusable", t] | some c in side.whose; some t in _key_root_texts(c)]))
 
 _m_tally_list_said(side, said, x) if {
 	said != []
@@ -541,7 +575,7 @@ _m_tally_keyed(side) if {
 	_key_step(step)
 }
 
-_m_tally_walked(c, w) := _m_cond_walked_texts(c) if array.concat(w.fails, _walk_stop(w)) == []
+_m_tally_walked(c, w) := _m_cond_walked_said(c) if array.concat(w.fails, _walk_stop(w)) == []
 
 else := []
 

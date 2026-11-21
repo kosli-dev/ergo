@@ -488,7 +488,7 @@ _tally_record_texts(c, subj, cause, m) := {_m_aliased(r[1]) |
 	is_object(c)
 	mc := object.union(_m_with_sides(_m_walked(c, subj)), {"ergo/row": true})
 	some side in _m_tally_parts(mc)
-	rs := _m_tally_said(subj, side, cause)
+	rs := _m_tally_records(subj, side, cause)
 	some r0 in rs
 	count(r0) == 3
 	not _tally_root_said(r0, rs)
@@ -1433,7 +1433,7 @@ _tally_item_records(c, subj, cause, at, m) := [x |
 	f := _basic_form(side)
 	w := _walk(_walk_start({"path": side[f]}, subj), _walk_keys({"path": side[f]}, subj), true)
 	roots := _dotted_roots([side[f]])
-	rs := _m_tally_said(subj, side, cause)
+	rs := _m_tally_records(subj, side, cause)
 	some r0 in rs
 	count(r0) == 3
 	not _tally_root_said(r0, rs)
