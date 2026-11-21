@@ -109,6 +109,23 @@ test_the_cap_counts_leaf_items_not_outer_items if {
 	])
 }
 
+test_an_items_own_part_beside_the_items_under_it_isnt_counted if {
+	ergo._m_clauses_text(ergo._m_clauses_shown([_item(concat("", ["item ", format_int(n, 10), " of cs"]), "value", [
+		_item(concat("", ["item ", format_int(min({n, 2}), 10), " of c.reviews"]), "value", [_root("ok", "value", "ok is false")]),
+		_root("c.a", "value", "c.a is 2"),
+	]) |
+		some n in numbers.range(1, 5)
+	])) == concat("; ", [
+		"item 1 of cs: item 1 of c.reviews: ok is false",
+		"item 1 of cs: c.a is 2",
+		"item 2 of cs: item 2 of c.reviews: ok is false",
+		"item 2 of cs: c.a is 2",
+		"item 3 of cs: item 2 of c.reviews: ok is false",
+		"item 3 of cs: c.a is 2",
+		"and 2 more",
+	])
+}
+
 test_a_clause_given_twice_is_shown_once if {
 	ergo._m_clauses_shown([
 		_missing("$params.k"),
