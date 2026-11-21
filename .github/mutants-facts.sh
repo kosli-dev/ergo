@@ -11,7 +11,16 @@ cargo=${MUTANTS_FACTS_CARGO:-cargo}
 here=$(cd "$(dirname "$0")" && pwd)
 root=$(git -C "$here" rev-parse --show-toplevel)
 work=$(mktemp -d)
-trap '/bin/rm -rf "$work"' EXIT
+restore=
+cleanup() {
+  /bin/rm -rf "$work"
+  if [ -n "$restore" ]; then
+    git -C "$root" checkout -- engines/rust
+  fi
+}
+trap cleanup EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
 
 git -C "$root" diff -U0 --relative=engines/rust "$base...HEAD" -- 'engines/rust/*.rs' ':(exclude)*/tests.rs' ':(exclude)*/tests/*' > "$work/diff"
 if [ ! -s "$work/diff" ]; then
@@ -22,6 +31,12 @@ fi
 if [ -z "${MUTANTS_FACTS_CARGO:-}" ]; then
   ASDF_RUST_VERSION=$(sed -n 's/^channel *= *"\(.*\)"/\1/p' "$root/engines/rust/rust-toolchain.toml")
   export ASDF_RUST_VERSION
+fi
+
+if [ -z "$(git -C "$root" status --porcelain engines/rust)" ]; then
+  restore=1
+else
+  echo "engines/rust has uncommitted changes, so cargo-mutants may leave a mutated file in them and this script will not restore them" >&2
 fi
 
 find "$root/engines/rust" -name '*.rs' -exec touch {} +

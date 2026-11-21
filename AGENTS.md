@@ -54,6 +54,10 @@ python3 .github/rego-layers.py
 .github/matrix-facts_test.sh
 .github/spec-placeholder.sh
 .github/spec-placeholder_test.sh
+.github/docs-run.sh
+.github/docs-run_test.sh
+.github/docs-run-release_test.sh
+.github/mutants-facts_test.sh
 python3 spec/check_rules.py
 python3 spec/sweep_test.py
 python3 spec/sentences_corpus.py --check
@@ -223,7 +227,7 @@ When behaviour changes, update its rule in `spec/` and add or change cases for i
 
 Every output shown in the docs must come from actually running it, not from memory.
 
-To have CI run an example, put a line like `<!-- ergo-run: NAME role=file path=policy.yaml -->` right before the code block (readers don't see it). The roles are `file` (written to `path`; `normalise=ergo_spec` swaps its `ergo_spec:` line for the version of `dist/ergo.rego`), `command` (the `opa` command, run in that folder with `dist/ergo.rego` copied to `ergo.rego`, or to `ergo=PATH`) and `output` (what it prints, compared word for word). Blocks with the same NAME are one group, and may be in different files. Run `.github/docs-run.sh [FILE...]` after `.github/build-ergo.sh`; it lists every group that differs, with a diff. `README.md` follows the latest release, so CI checks its example against the `ergo.rego` of the latest `rego-v*` release, with `.github/docs-run-release.sh`. To mark such a group, add `use=release` to its `command` marker, and when the group has no command block that readers see, put the command in the marker as ``run=`COMMAND` ``, which runs in that folder and is allowed only when the group has no command block. Without `DOCS_RUN_RELEASE_ERGO_REGO` set, `docs-run.sh` prints `skip` for these groups, and `DOCS_RUN_REQUIRE_RELEASE=1` makes a skip fail.
+To have CI run an example, put a line like `<!-- ergo-run: NAME role=file path=policy.yaml -->` right before the code block (readers don't see it). The roles are `file` (written to `path`; `normalise=ergo_spec` swaps its `ergo_spec:` line for the version of `dist/ergo.rego`), `command` (the `opa` command, run in that folder with `dist/ergo.rego` copied to `ergo.rego`, or to `ergo=PATH`) and `output` (what it prints, compared word for word). Blocks with the same NAME are one group, and may be in different files. Run `.github/docs-run.sh [FILE...]` after `.github/build-ergo.sh`; it lists every group that differs, with a diff. `README.md` follows the latest release, so CI checks its example against the `ergo.rego` of the latest `rego-v*` release, with `.github/docs-run-release.sh`. To mark such a group, add `use=release` to its `command` marker, and when the group has no command block that readers see, put the command in the marker as ``run=`COMMAND` ``, which runs in that folder and is allowed only when the group has no command block. A `run=` command, like any command block marked this way, runs as shell in CI, like any script in a pull request, and `run=` cannot contain a backtick. While a release is being prepared (`_spec` or `version` in `basics.rego` has no `-dev`), `docs-run-release.sh` checks against `dist/ergo.rego` and not the latest release, because `README.md` has already moved. Without `DOCS_RUN_RELEASE_ERGO_REGO` set, `docs-run.sh` prints `skip` for these groups, and `DOCS_RUN_REQUIRE_RELEASE=1` makes a skip fail.
 
 ## Writing
 

@@ -86,13 +86,13 @@ case $out in
 esac
 
 echo "mutants-facts.sh fails when cargo-mutants itself fails"
-if FAKE_EXIT=4 run base > /dev/null 2>&1; then
+if (FAKE_EXIT=4 run base > /dev/null 2>&1); then
   echo "mutants-facts.sh should exit non-zero when cargo-mutants exits 4" >&2
   exit 1
 fi
 
 echo "mutants-facts.sh puts the Rust sources back when cargo-mutants leaves one mutated, even when it fails"
-FAKE_MUTATE=1 FAKE_EXIT=4 run base > /dev/null 2>&1 || true
+(FAKE_MUTATE=1 FAKE_EXIT=4 run base > /dev/null 2>&1) || true
 [ -z "$(git -C "$repo" status --porcelain engines/rust)" ] || {
   echo "mutants-facts.sh should restore engines/rust after a failed run, and git says: $(git -C "$repo" status --porcelain engines/rust)" >&2
   exit 1
@@ -104,9 +104,9 @@ out=$(FAKE_MUTATE=1 run base)
 
 echo "mutants-facts.sh warns and leaves the Rust sources alone when they were changed before it started"
 echo dirty >> "$repo/engines/rust/engine/src/lib.rs"
-FAKE_MUTATE=1 run base > out.txt 2> err.txt
-grep -qF 'uncommitted' err.txt || {
-  echo "mutants-facts.sh should warn about uncommitted changes in engines/rust, and said: $(cat err.txt)" >&2
+FAKE_MUTATE=1 run base > "$dir/out.txt" 2> "$dir/err.txt"
+grep -qF 'uncommitted' "$dir/err.txt" || {
+  echo "mutants-facts.sh should warn about uncommitted changes in engines/rust, and said: $(cat "$dir/err.txt")" >&2
   exit 1
 }
 grep -qx dirty "$repo/engines/rust/engine/src/lib.rs" || {
