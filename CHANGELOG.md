@@ -58,6 +58,10 @@ This file is about `ergo.rego` only. The Rust engine's changes are in [engines/r
 
 ### Fixed
 
+- The assertion of a `count of` or a `sum of` no longer lists the list it walks in any form, as spec 0.7 says ([row.parts](spec/semantics.md#what-a-row-shows)) and the Rust engine already did. With `m` holding `{"k": [1, 2]}` and `p` holding `"k"`, `count of m named by p is at least 3` listed `m named by p[]` there, `sum of .lock.pkgs.n is 1`, beside a part called `lock`, listed `.lock.pkgs[].n`, and `count of y[0].v is 1` with `y` holding `[{"v": 1}]` listed `y[0].v`. The row's `inputs` still list them.
+
+- A walk among other sentences of a check says a field the subject doesn't hold once on its assertion, with no `item` entry, as it does alone in its check, as spec 0.7 says ([row.parts](spec/semantics.md#what-a-row-shows), [message.items](spec/semantics.md#messages)) and the Rust engine already did. With `xs` holding `[{"k": 5}, {"k": 6}]` and no `lo`, a check with the assertions `xs exists` and `every xs.k is lo` gave the second assertion the message `""` and an entry for each item, each with its `k` marked `absent`, and it now has the message `lo is missing` and no entries.
+
 - An item of a `$min_subjects` row that the walk breaks in and that `subjects.every.same` names too joins its two clauses with `; `, as the row's message does and as spec 0.7 says ([subjects.failed_items](spec/semantics.md#requirements), [message.join](spec/semantics.md#messages)), where it joined them with `, `. With `from: every p0.p1.p2` on `{"p0": [{"p1": [{"p2": [{"status": "ok"}]}]}, {"p1": 3}]}`, the entry `item 2 of p0` says `p1 is 3, which isn't an object; p1 is a number`, where it said `p1 is 3, which isn't an object, p1 is a number`. The row's message doesn't change. Changes the report of such policies.
 
 - An `identified_by` that starts at `$input` or `$params`, like `$input.x`, is written wrong with `identified_by is a path, like "id" or "build.number"`, as spec 0.7 says ([subjects.id](spec/semantics.md#requirements)) and the Rust engine already did, where `ergo.rego` read it and named the input `ds[0]."$$input".x`.
