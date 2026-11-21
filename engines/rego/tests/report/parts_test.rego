@@ -85,3 +85,10 @@ test_a_counted_list_that_failed_with_no_entry_of_its_own_stays_on_the_assertion 
 	c := ergo._s_written_check("count of xs.n is 1")
 	not ergo._tally_own_read({"name": "xs.n", "value": null}, c, set(), [])
 }
+
+test_a_counted_list_written_with_a_dot_is_never_an_input_of_an_assertion_in_an_option_or_among_several if {
+	c := {"cmp": "eq", "left": {"count_of": [{"literal": "lock"}, "pkgs"], "text": "count of .lock.pkgs", "whose": []}, "op": "compare", "right": {"literal": 1}}
+	e := {"kind": "assertion", "name": "count of .lock.pkgs is 1", "cause": "value", "inputs": [{"name": "count of .lock.pkgs", "value": 2}, {"name": ".lock.pkgs[]", "outcome": "usable", "value": [{"n": 1}, {"n": 2}]}], "failures": [], "message": "count of .lock.pkgs is 2"}
+	row := {"ergo/subj": {"id": "t1", "lock": {"pkgs": [{"n": 1}, {"n": 2}]}}, "ergo/req": {}}
+	[i.name | some i in ergo._tallied_entry(e, c, {"cause": "value"}, "/repos/0", {"check": {"op": "sentence_any_of"}}, row).inputs] == ["count of .lock.pkgs"]
+}
