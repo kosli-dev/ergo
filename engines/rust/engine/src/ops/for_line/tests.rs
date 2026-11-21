@@ -2616,3 +2616,28 @@ fn a_sentence_that_reads_no_alias_comes_before_a_key_that_cant_be_read() {
         "z is 2; $params.k is missing; o is \"s\", which isn't a list or an object"
     );
 }
+
+#[test]
+fn an_item_takes_no_cause_from_a_root_a_later_line_reads_through_its_alias() {
+    let items = for_items(
+        "every items as i, every $params.l whose v is at least i.t as x",
+        &["x.v is 1"],
+        json!({"items": [{"t": "s"}]}),
+        json!({"l": [{"w": 1}]}),
+    );
+    assert_eq!(causes(&items)[0], "item 1 of items: absent");
+}
+
+#[test]
+fn an_item_whose_path_goes_through_a_key_that_cant_be_read_takes_the_keys_cause() {
+    let items = for_items(
+        "every rs as r",
+        &["r.x.y named by $params.i does not exist"],
+        json!({"rs": [{}]}),
+        json!({"i": [1]}),
+    );
+    assert_eq!(
+        causes(&items),
+        ["item 1 of rs: unusable", "r.x.y is missing: unusable"]
+    );
+}
