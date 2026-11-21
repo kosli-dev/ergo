@@ -83,6 +83,10 @@ jobs:
         run: .github/matrix/for_test.sh
       - name: Check the script that compares the pull request body with the report facts
         run: .github/body-facts_test.sh
+      - name: Check the script that counts the places that cut a message as text
+        run: .github/message-cuts_test.sh
+      - name: Check that engine code cuts no more messages as text than the baseline allows
+        run: .github/message-cuts.sh
       - name: Check the script that runs the common checks
         run: .github/checks_test.sh
       - name: Check the release workflow's latest flag, release notes and tag checks
