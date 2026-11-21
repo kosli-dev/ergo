@@ -30,15 +30,23 @@ export MATRIX_FACTS_NAME=$name
 export MATRIX_FACTS_BASE_NAME=$base
 
 if [ -z "${MATRIX_FACTS_RUST:-}" ]; then
-  export ASDF_RUST_VERSION=1.99.0
+  ASDF_RUST_VERSION=$(sed -n 's/^channel = "\(.*\)"/\1/p' "$root/engines/rust/rust-toolchain.toml")
+  export ASDF_RUST_VERSION
+  if ! git -C "$root" rev-parse --verify --quiet "$base^{commit}" > /dev/null; then
+    echo "cannot find BASE $base" >&2
+    exit 1
+  fi
   tree=$work/base
-  git -C "$root" worktree add --detach "$tree" "$base" > /dev/null 2>&1
+  git -C "$root" worktree add --detach "$tree" "$base" > /dev/null
   build() {
     find "$1/engines/rust" -name '*.rs' -exec touch {} +
-    (cd "$1/engines/rust" && CARGO_TARGET_DIR=$2 cargo build -q -j 4 -p ergo-policy-cli)
+    (cd "$1/engines/rust" && CARGO_TARGET_DIR=$2 ${MATRIX_FACTS_CARGO:-cargo} build -q -j 4 -p ergo-policy-cli) || {
+      echo "the build failed on $3" >&2
+      exit 1
+    }
   }
-  build "$tree" "${MATRIX_FACTS_BASE_TARGET:-$work/base-target}"
-  build "$root" "${MATRIX_FACTS_HEAD_TARGET:-$work/head-target}"
+  build "$tree" "${MATRIX_FACTS_BASE_TARGET:-$work/base-target}" "BASE $base"
+  build "$root" "${MATRIX_FACTS_HEAD_TARGET:-$work/head-target}" "the working tree"
   export MATRIX_FACTS_BASE_BIN=${MATRIX_FACTS_BASE_TARGET:-$work/base-target}/debug
   export MATRIX_FACTS_HEAD_BIN=${MATRIX_FACTS_HEAD_TARGET:-$work/head-target}/debug
   export MATRIX_FACTS_BASE_TREE=$tree
