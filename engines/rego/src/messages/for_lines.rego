@@ -1248,10 +1248,18 @@ _m_whose_said_in(spec, names, c, iv, cause) := _m_unclean_said(c, iv, cause) if 
 } else := _m_whose_said(c, iv, cause)
 
 _for_list_unclean(spec, subj, c) if {
-	xs := _value_at(subj, spec.path)
-	is_array(xs)
-	some x in xs
+	some x in _for_listed_values(spec, _value_at(subj, spec.path))
 	not _key_items_clean({"items": [{"iv": x}]}, [c])
+}
+
+_for_listed_values(spec, xs) := xs if {
+	object.get(spec, "member", false) != true
+	is_array(xs)
+}
+
+_for_listed_values(spec, xs) := [v | some v in xs] if {
+	spec.member == true
+	is_object(xs)
 }
 
 _key_item_unclean(e) if object.get(e, "ergo/unclean", false) == true
