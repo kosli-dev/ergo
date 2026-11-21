@@ -1894,3 +1894,139 @@ fn a_part_that_is_text_null_missing_or_an_object_with_a_list_is_read_as_before_i
         assert_eq!(message.as_str().unwrap_or(""), said);
     }
 }
+
+fn for_roots(for_line: &str, assertions: &[&str], subject: Value, params: Value) -> String {
+    let line = ergo_policy_sentences::parse_for(for_line).unwrap();
+    let parsed: Vec<_> = assertions
+        .iter()
+        .flat_map(|assertion| {
+            ergo_policy_sentences::parse_check(assertion)
+                .unwrap()
+                .assertions
+        })
+        .collect();
+    let places: Vec<String> = assertions.iter().map(|_| "p".to_string()).collect();
+    let checked = super::lower_for(&line, &parsed, &places, &crate::lower::Scope::new()).unwrap();
+    let crate::ops::Check::For(line) = checked else {
+        panic!("{for_line} is not a for line");
+    };
+    let input = json!({"things": [subject]});
+    let ctx = crate::path::Ctx {
+        label: None,
+        item_by_item: false,
+        subject: crate::path::Located {
+            value: &input["things"][0],
+            location: crate::path::Location::input_root().key("things").index(0),
+        },
+        input: &input,
+        params: Some(&params),
+        aliases: std::collections::BTreeMap::new(),
+    };
+    let clauses = line.root_clauses(&ctx);
+    crate::ops::clause::text(&crate::ops::clause::shown(&clauses))
+}
+
+#[test]
+fn root_clauses_say_each_sentences_roots_in_turn() {
+    assert_eq!(
+        for_roots(
+            "every xs as x",
+            &["x.v is at least $params.b", "x.w is at least $params.a"],
+            json!({"xs": [{"v": 1, "w": 1}]}),
+            json!({"a": "s"}),
+        ),
+        "$params.b is missing; $params.a is \"s\", which isn't a number"
+    );
+}
+
+#[test]
+fn root_clauses_say_the_lines_whose_roots_first() {
+    assert_eq!(
+        for_roots(
+            "every xs whose v is at least $params.min as x",
+            &["x.w is at least $params.a"],
+            json!({"xs": [{"v": 1, "w": 1}]}),
+            json!({"a": "s"}),
+        ),
+        "$params.min is missing; $params.a is \"s\", which isn't a number"
+    );
+}
+
+#[test]
+fn the_lists_unreadable_key_comes_before_the_roots_of_the_sentences() {
+    assert_eq!(
+        for_roots(
+            "every xs named by $params.k as x",
+            &["x.w is at least $params.a"],
+            json!({"xs": [{"w": 1}]}),
+            json!({"a": "s"}),
+        ),
+        "$params.k is missing; $params.a is \"s\", which isn't a number"
+    );
+}
+
+#[test]
+fn a_root_whose_value_holds_a_semicolon_is_one_clause() {
+    let line = ergo_policy_sentences::parse_for("every xs as x").unwrap();
+    let tree = ergo_policy_sentences::parse_check("x.v is at least $params.min").unwrap();
+    let crate::ops::Check::For(line) = super::lower_for(
+        &line,
+        &tree.assertions,
+        &["p".to_string()],
+        &crate::lower::Scope::new(),
+    )
+    .unwrap() else {
+        panic!("not a for line");
+    };
+    let input = json!({"things": [{"xs": [{"v": "a; b"}]}]});
+    let params = json!({"min": "s; t"});
+    let ctx = crate::path::Ctx {
+        label: None,
+        item_by_item: false,
+        subject: crate::path::Located {
+            value: &input["things"][0],
+            location: crate::path::Location::input_root().key("things").index(0),
+        },
+        input: &input,
+        params: Some(&params),
+        aliases: std::collections::BTreeMap::new(),
+    };
+    let clauses = crate::ops::clause::shown(&line.root_clauses(&ctx));
+    assert_eq!(clauses.len(), 1);
+    assert_eq!(
+        clauses[0].text,
+        "$params.min is \"s; t\", which isn't a number"
+    );
+}
+
+#[test]
+fn root_clauses_give_the_roots_the_row_says_today() {
+    for (for_line, assertions, subject, params) in [
+        (
+            "every xs as x",
+            vec!["x.v is at least $params.b"],
+            json!({"xs": [{"v": 1}]}),
+            json!({}),
+        ),
+        (
+            "every xs whose v is at least $params.min as x",
+            vec!["x.w is at least $params.a"],
+            json!({"xs": [{"v": 1, "w": 1}]}),
+            json!({"a": "s"}),
+        ),
+        (
+            "every xs named by $params.k as x",
+            vec!["x.w is at least $params.a"],
+            json!({"xs": [{"w": 1}]}),
+            json!({"a": "s"}),
+        ),
+    ] {
+        let roots = for_roots(for_line, &assertions, subject.clone(), params.clone());
+        let message = for_row_message(for_line, assertions[0], subject, params);
+        assert!(!roots.is_empty(), "{for_line}: no roots");
+        assert!(
+            message.starts_with(&roots),
+            "{for_line}: {message} does not start with {roots}"
+        );
+    }
+}

@@ -1,3 +1,4 @@
+use super::clause::Clause;
 use super::tally::{Side, Tally, Term};
 use super::time::{self, Time};
 use super::walk::{self, Failure, Options, Seg, WalkItem};
@@ -1969,6 +1970,12 @@ impl For {
         super::key_base::for_list(&first.path, if_any, ctx)
     }
 
+    #[cfg_attr(not(test), expect(dead_code))]
+    pub fn root_clauses(&self, ctx: &Ctx) -> Vec<Clause> {
+        let _ = ctx;
+        Vec::new()
+    }
+
     fn whose_keys_first(&self, run: &mut Run, ctx: &Ctx) {
         let outer = outer_ctx(ctx);
         let keys: Vec<(Cause, String)> = self
@@ -3825,6 +3832,12 @@ fn bound_alias(root: &Path, ctx: &Ctx) -> bool {
         Start::Alias(name) => ctx.aliases.contains_key(name),
         _ => true,
     }
+}
+
+#[cfg_attr(not(test), expect(dead_code))]
+fn sentence_root_clauses(forms: &[(Check, bool)], ctx: &Ctx) -> Vec<Clause> {
+    let _ = (forms, ctx);
+    Vec::new()
 }
 
 fn sentence_root_flaw(forms: &[(Check, bool)], ctx: &Ctx) -> Option<(Cause, Vec<String>)> {
