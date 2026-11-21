@@ -74,5 +74,8 @@ test_a_broken_text_list_after_is_in_ignoring_case_hides_an_empty_list_as_any_roo
 	row.cause == "unusable"
 	row.failed == []
 	row.root_msgs == ["item 1 of ys is 3, which isn't text"]
+	ref := {"op": "in", "path": ["x"], "values": {"ref": ["$$params[]", "l"]}, "ignoring": "case"}
+	mixed := ergo._walk_row({"op": "every", "path": ["xs", "x"], "check": ref, "whose": [], "if_any": false}, {"xs": []}) with data.ergo_params as {"l": ["A", 3]}
+	mixed.cause == "unusable"
+	mixed.root_msgs == ["item 2 of $params.l is 3, which isn't text"]
 }
-
