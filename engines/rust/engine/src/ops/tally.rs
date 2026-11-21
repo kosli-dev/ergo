@@ -1376,7 +1376,18 @@ pub fn row_said(check: &Tally, ctx: &Ctx, cause: Cause, said: Said) -> Said {
     out
 }
 
+fn equals_a_root(check: &Tally) -> bool {
+    let whose: Vec<&Check> = check.counted_whose().collect();
+    matches!(whose.as_slice(), [Check::Compare(c)]
+        if c.cmp == Cmp::Eq
+            && matches!(&c.right, compare::Side::Path(p)
+                if matches!(p.start, path::Start::Input | path::Start::Params)))
+}
+
 fn numbers_said(check: &Tally, ctx: &Ctx, cause: Cause) -> Option<Said> {
+    if equals_a_root(check) {
+        return None;
+    }
     let rooted = root_causes(check, ctx).iter().any(|root| root.is_failure());
     let numbers = numbers_verdict(check, ctx);
     (rooted && cause.is_failure() && numbers.cause == Cause::Value).then(|| {
