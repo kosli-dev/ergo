@@ -83,6 +83,27 @@ test_members_of_mixed_types_name_the_first_member_of_each_type if {
 	[n.types | some n in w.notes] == [[["an object", ["records", 0, "evidence", "a"], {}], ["text", ["records", 0, "evidence", "b"], "x"]]]
 }
 
+test_the_from_walk_reads_members_when_its_keys_end_with_the_member_mark if {
+	doc := {"records": [{"evidence": {"a": 1}}, {"evidence": [1]}]}
+	ergo._fl_walk(doc, ["records", "evidence", ergo._fm_mark]) == ergo._fm_walk(doc, ["records", "evidence"])
+	ergo._fl_broken(doc, ["records", "evidence", ergo._fm_mark]) == {"fails": ergo._fm_walk(doc, ["records", "evidence"]).fails, "notes": []}
+}
+
+test_a_member_keeps_its_key_as_its_id_only_without_identified_by if {
+	entries := [{"subject": 1, "at": "/o/a", "c": ["o", "a"], "key": "a"}]
+	ergo._fm_entries(entries, []) == entries
+	ergo._fm_entries(entries, ["id"]) == [{"subject": 1, "at": "/o/a", "c": ["o", "a"]}]
+}
+
+_fm_kid_data := {"chains": {"kid": "record"}, "every": {"kid"}, "member": {"kid"}, "narrowing": {}}
+
+test_a_parent_that_is_a_list_with_no_path_after_it_is_not_an_object_and_is_named if {
+	req := {"subject": "kid", "from": []}
+	ergo._every_cause([1], req) == "not_an_object" with data.ergo_subject_sentences as _fm_kid_data with data.ergo_resolved as {"kid": {}, "record": {}} with data.ergo_parent as {"record": [1]}
+	ergo._fl_parent_unread([1], req) with data.ergo_subject_sentences as _fm_kid_data with data.ergo_resolved as {"kid": {}, "record": {}}
+	ergo._every_cause("t", req) == "not_an_object" with data.ergo_subject_sentences as _fm_kid_data with data.ergo_resolved as {"kid": {}, "record": {}} with data.ergo_parent as {"record": "t"}
+}
+
 test_a_list_in_the_middle_is_walked_as_every_walks_it if {
 	_fm_ats(ergo._fm_walk({"records": [{"evidence": {"a": 1}}, {"evidence": {"b": 2}}]}, ["records", "evidence"])) == ["/records/0/evidence/a", "/records/1/evidence/b"]
 }
