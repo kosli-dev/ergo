@@ -36,4 +36,4 @@ PATH=engines/rust/target/debug:$PATH python3 spec/sweep.py --pairs /tmp/pairs.js
 
 A row's cause is lower when it comes later in the order of [Causes](../../REFERENCE.md#causes): `not_an_object`, `ambiguous`, `unusable`, `absent`, `null`, `value`. A pair that was already lower on `BASE` says `already on BASE`. Rows are compared by requirement, check and subject.
 
-It builds both Rust commands with `cargo`, so it needs Rust and `opa` on your machine, and it only informs: it fails only when a tool fails. The `matrix-facts` job runs it on pull requests.
+It builds both Rust commands with `cargo`, so it needs Rust and `opa` on your machine, and it only informs: it fails only when a tool fails. The `matrix-facts` job runs it on pull requests for all three generators, `matrix-a`, `matrix-b` and `walk`, each in its own step and under its own heading in the job summary.
