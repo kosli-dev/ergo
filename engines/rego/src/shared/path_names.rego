@@ -254,3 +254,10 @@ _plain_number(t) := t if regex.match(`^(?:0|-?[1-9][0-9]*|-?(?:0|[1-9][0-9]*)\.[
 else := t if not _fits_a_float(json.unmarshal(t))
 
 else := _number_text(t)
+
+_walk_kind(name) := "item" if startswith(name, "item ")
+
+else := "item" if {
+	startswith(name, "member ")
+	regex.match(`^member (?:[A-Za-z_][A-Za-z0-9_-]*|"(?:[^"\\]|\\.)*") of `, name)
+} else := "list"

@@ -1081,10 +1081,6 @@ _reads_inside(f, name) if f.path != name
 
 _reads_inside(_, name) if _walk_kind(name) == "list"
 
-_walk_kind(name) := "item" if startswith(name, "item ")
-
-else := "list"
-
 _item_seen(row, name, at) := {"value": item.value, "locations": _anchored_all([item], at)[0].locations} if {
 	_walk_kind(name) == "item"
 	some f in row.failed_items
