@@ -3620,3 +3620,25 @@ fn a_root_walked_by_a_sentence_that_walks_a_list_under_the_item_is_said_once_wit
         "item 2 of $params.os: name is missing"
     );
 }
+
+#[test]
+fn an_item_whose_second_list_reads_a_missing_name_through_its_alias_fails_as_absent_on_an_empty_list()
+ {
+    let items = for_items(
+        "some approvers as approver, every commits whose author does not equal approver.u as commit",
+        &["commit.signed is true"],
+        json!({
+            "approvers": [{"username": "ada"}, {"username": "grace", "u": "grace", "state": "APPROVED"}],
+            "commits": []
+        }),
+        json!({}),
+    );
+    assert_eq!(
+        causes(&items),
+        [
+            "commits: value",
+            "item 1 of approvers: absent",
+            "approver.u is missing: absent"
+        ]
+    );
+}
