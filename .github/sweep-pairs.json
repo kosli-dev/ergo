@@ -7565,5 +7565,223 @@
    ]
   },
   "params": {}
+ },
+ {
+  "name": "count rows/whose is not in a root list that isn't one kind of value, beside items that fail on their own",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id",
+     "has": {
+      "p": "pp"
+     }
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of es whose v is not in $input.x is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": 3
+      },
+      {
+       "v": "abc"
+      },
+      {
+       "v": [
+        1,
+        "a",
+        null
+       ]
+      },
+      {
+       "v": null
+      },
+      {
+       "v": []
+      }
+     ]
+    }
+   ],
+   "x": [
+    1,
+    "a",
+    null,
+    {
+     "b": 2
+    }
+   ]
+  },
+  "params": {}
+ },
+ {
+  "name": "count rows/whose contains some of a root list that isn't one kind of value, beside items that fail on their own",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id",
+     "has": {
+      "p": "pp"
+     }
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of es whose v contains some of $input.x is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": [
+        "a",
+        "b"
+       ]
+      },
+      {
+       "v": null
+      }
+     ]
+    }
+   ],
+   "x": [
+    1,
+    "a",
+    null,
+    {
+     "b": 2
+    }
+   ]
+  },
+  "params": {}
+ },
+ {
+  "name": "count rows/that is on or after a root list that isn't one kind of value, beside items that fail on their own",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id",
+     "has": {
+      "p": "pp"
+     }
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of es.v that is on or after $input.x is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": [
+        1,
+        "a",
+        null
+       ]
+      },
+      {
+       "v": "nope"
+      },
+      {},
+      {
+       "v": null
+      },
+      {
+       "v": 3
+      }
+     ]
+    }
+   ],
+   "x": [
+    1,
+    "a",
+    null,
+    {
+     "b": 2
+    }
+   ]
+  },
+  "params": {},
+  "want": "$input.x is [1, \"a\", null, and 1 more], which isn't a time; item 1 of es: item 1 of v is 1, which isn't a time written like \"1970-01-01T00:00:00Z\"; item 1 of es: item 2 of v is \"a\", which isn't a time; item 1 of es: item 3 of v is null; and 4 more"
+ },
+ {
+  "name": "count rows/plus whose is in a params list that isn't one kind of value, beside items that fail on their own",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id",
+     "has": {
+      "p": "pp"
+     }
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of fs plus count of es whose v is in $params.x is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {},
+      {
+       "v": []
+      },
+      {
+       "v": "abc"
+      },
+      {
+       "v": []
+      }
+     ],
+     "fs": null
+    }
+   ]
+  },
+  "params": {
+   "x": [
+    1,
+    "a",
+    null,
+    {
+     "b": 2
+    }
+   ]
+  }
  }
 ]

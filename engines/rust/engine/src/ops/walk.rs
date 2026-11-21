@@ -1197,8 +1197,19 @@ fn own_list_fault(
     blocked: impl Fn(&Path) -> bool,
 ) -> Option<(Cause, String)> {
     let lists = super::lists::right_paths(check);
-    if lists.is_empty() || lists.into_iter().any(blocked) {
+    if lists.is_empty() {
         return None;
+    }
+    if lists.into_iter().any(&blocked) {
+        let faults = match roots_written_in(check, focus, blocked)? {
+            Check::In(within) => super::lists::in_faults(&within, focus),
+            Check::Contains(contains) => super::lists::contains_faults(&contains, focus),
+            _ => Vec::new(),
+        };
+        return faults
+            .into_iter()
+            .next()
+            .map(|(_, text)| (Cause::Unusable, text));
     }
     super::lists::field_walk_fault(check, focus).or_else(|| {
         super::lists::ref_faults(check, focus)
@@ -1206,6 +1217,38 @@ fn own_list_fault(
             .next()
             .map(|text| (Cause::Unusable, text))
     })
+}
+
+fn roots_written_in(check: &Check, focus: &Ctx, blocked: impl Fn(&Path) -> bool) -> Option<Check> {
+    use super::lists::{Contains, In, Right, Wanted};
+    let written = |right: &Right| match right {
+        Right::Ref(list) if blocked(list) => {
+            let read = path::read(list, focus);
+            read.value
+                .filter(|_| read.outcome == Outcome::Found)
+                .filter(|value| value.as_array().is_some_and(|items| !items.is_empty()))
+                .map(|value| Right::Written(value.clone()))
+        }
+        _ => None,
+    };
+    match check {
+        Check::In(within) => Some(Check::In(In {
+            values: written(&within.values)?,
+            ..within.clone()
+        })),
+        Check::Contains(contains) => {
+            let wanted = match &contains.wanted {
+                Wanted::All(right) => Wanted::All(written(right)?),
+                Wanted::Some(right) => Wanted::Some(written(right)?),
+                Wanted::One(_) => return None,
+            };
+            Some(Check::Contains(Contains {
+                wanted,
+                ..contains.clone()
+            }))
+        }
+        _ => None,
+    }
 }
 
 const STAND_IN_TIME: &str = "1970-01-01T00:00:00Z";
