@@ -2024,3 +2024,265 @@ fn root_clauses_give_the_roots_the_row_says_today() {
         );
     }
 }
+
+fn item_clauses(
+    for_line: &str,
+    assertions: &[&str],
+    subject: Value,
+    params: Value,
+    item: usize,
+    sentence: usize,
+) -> (crate::cause::Cause, Vec<crate::ops::clause::Clause>) {
+    let line = ergo_policy_sentences::parse_for(for_line).unwrap();
+    let parsed: Vec<_> = assertions
+        .iter()
+        .flat_map(|assertion| {
+            ergo_policy_sentences::parse_check(assertion)
+                .unwrap()
+                .assertions
+        })
+        .collect();
+    let places: Vec<String> = assertions.iter().map(|_| "p".to_string()).collect();
+    let checked = super::lower_for(&line, &parsed, &places, &crate::lower::Scope::new()).unwrap();
+    let crate::ops::Check::For(line) = checked else {
+        panic!("{for_line} is not a for line");
+    };
+    let input = json!({"things": [subject]});
+    let list = crate::name::name(&line.items[0].path);
+    let mut ctx = crate::path::Ctx {
+        label: None,
+        item_by_item: false,
+        subject: crate::path::Located {
+            value: &input["things"][0],
+            location: crate::path::Location::input_root().key("things").index(0),
+        },
+        input: &input,
+        params: Some(&params),
+        aliases: std::collections::BTreeMap::new(),
+    };
+    ctx.aliases.insert(
+        line.items[0].alias.clone(),
+        crate::path::Located {
+            value: &input["things"][0][&list][item],
+            location: crate::path::Location::input_root()
+                .key("things")
+                .index(0)
+                .key(&list)
+                .index(item as u64),
+        },
+    );
+    line.sentence_clauses(sentence, &ctx)
+}
+
+fn item_text(
+    for_line: &str,
+    assertions: &[&str],
+    subject: Value,
+    params: Value,
+    item: usize,
+    sentence: usize,
+) -> String {
+    let (_, clauses) = item_clauses(for_line, assertions, subject, params, item, sentence);
+    crate::ops::clause::text(&clauses)
+}
+
+#[test]
+fn a_sentence_says_its_own_read_without_the_root() {
+    let subject = json!({"xs": [{"v": "a"}, {}]});
+    let params = json!({"min": "s"});
+    let said = |item| {
+        item_text(
+            "every xs as x",
+            &["x.v is at least $params.min"],
+            subject.clone(),
+            params.clone(),
+            item,
+            0,
+        )
+    };
+    assert_eq!(said(0), "x.v is \"a\", which isn't a number");
+    assert_eq!(said(1), "x.v is missing");
+}
+
+#[test]
+fn a_sentence_keeps_a_value_that_holds_a_semicolon_whole() {
+    let (_, clauses) = item_clauses(
+        "every xs as x",
+        &["x.v is at least $params.min"],
+        json!({"xs": [{"v": "a; b"}, {}]}),
+        json!({"min": "s; t"}),
+        0,
+        0,
+    );
+    let texts: Vec<&str> = clauses.iter().map(|clause| clause.text.as_str()).collect();
+    assert_eq!(texts, ["x.v is \"a; b\", which isn't a number"]);
+}
+
+#[test]
+fn a_count_under_the_line_gives_its_items_as_clauses() {
+    let (_, clauses) = item_clauses(
+        "every gs as g",
+        &["count of g.es whose v is at least $params.min is 0"],
+        json!({"gs": [{"es": [{}, {}]}, {"es": [{}, {"v": 2}]}]}),
+        json!({"min": "s"}),
+        0,
+        0,
+    );
+    let items: Vec<(crate::ops::clause::Kind, &str)> = clauses
+        .iter()
+        .map(|clause| (clause.kind, clause.name.as_str()))
+        .collect();
+    assert_eq!(
+        items,
+        [
+            (crate::ops::clause::Kind::Item, "item 1 of g.es"),
+            (crate::ops::clause::Kind::Item, "item 2 of g.es"),
+        ]
+    );
+    assert_eq!(
+        crate::ops::clause::text(&clauses),
+        "item 1 of g.es: v is missing; item 2 of g.es: v is missing"
+    );
+}
+
+#[test]
+fn a_sum_under_the_line_gives_its_items_as_clauses() {
+    let subject = json!({"gs": [{"rs": [{"n": "a"}, {}]}, {"rs": [{"n": null}]}]});
+    let said = |item| {
+        item_text(
+            "every gs as g",
+            &["sum of g.rs.n is 3"],
+            subject.clone(),
+            json!({}),
+            item,
+            0,
+        )
+    };
+    assert_eq!(
+        said(0),
+        "item 1 of g.rs: n is \"a\", which isn't a number; item 2 of g.rs: n is missing"
+    );
+    assert_eq!(said(1), "item 1 of g.rs: n is null");
+}
+
+#[test]
+fn a_key_from_params_is_left_out_of_the_items_of_a_count_under_the_line() {
+    assert_eq!(
+        item_text(
+            "every gs as g",
+            &["count of g.es.v that is m named by $params.k is 0"],
+            json!({"gs": [{"es": [{"v": {}}]}, {"es": [{"v": {}}]}]}),
+            json!({}),
+            0,
+            0,
+        ),
+        "item 1 of g.es: v: m is missing"
+    );
+}
+
+#[test]
+fn two_sentences_walking_one_list_give_their_own_items_as_clauses() {
+    let assertions = ["every x.ys.n is 1", "every x.ys.m is 1"];
+    let subject = json!({"xs": [{"ys": [{"n": 1, "m": 2}, {"m": 1}]}]});
+    let said = |sentence| {
+        item_text(
+            "every xs as x",
+            &assertions,
+            subject.clone(),
+            json!({}),
+            0,
+            sentence,
+        )
+    };
+    assert_eq!(said(0), "item 2 of x.ys: n is missing");
+    assert_eq!(said(1), "item 1 of x.ys: m is 2");
+}
+
+#[test]
+fn a_sentence_whose_only_problems_are_roots_says_nothing_for_the_item() {
+    let assertions = [
+        "x.v is at least $params.a",
+        "x.v is at most $params.b",
+        "x.w is $params.c",
+        "x.u is in $params.d",
+    ];
+    for sentence in 0..assertions.len() {
+        let (cause, clauses) = item_clauses(
+            "every xs as x",
+            &assertions,
+            json!({"xs": [{"v": 1, "w": 1, "u": 1}]}),
+            json!({}),
+            0,
+            sentence,
+        );
+        assert_eq!(
+            cause,
+            crate::cause::Cause::Absent,
+            "{}",
+            assertions[sentence]
+        );
+        assert!(clauses.is_empty(), "{}: {clauses:?}", assertions[sentence]);
+    }
+}
+
+#[test]
+fn a_sentence_says_what_it_says_as_a_check_of_its_own() {
+    let subject = json!({"xs": [{"v": 2, "es": [{"v": 2}, {}, {"v": 1}]}]});
+    for assertion in [
+        "x.v is 1",
+        "count of x.es whose v is 1 is 3",
+        "sum of x.es.v is 1",
+        "every x.es.v is 1",
+    ] {
+        let line = ergo_policy_sentences::parse_for("every xs as x").unwrap();
+        let tree = ergo_policy_sentences::parse_check(assertion).unwrap();
+        let crate::ops::Check::For(line) = super::lower_for(
+            &line,
+            &tree.assertions,
+            &["p".to_string()],
+            &crate::lower::Scope::new(),
+        )
+        .unwrap() else {
+            panic!("not a for line");
+        };
+        let input = json!({"things": [subject.clone()]});
+        let params = json!({});
+        let mut ctx = crate::path::Ctx {
+            label: None,
+            item_by_item: false,
+            subject: crate::path::Located {
+                value: &input["things"][0],
+                location: crate::path::Location::input_root().key("things").index(0),
+            },
+            input: &input,
+            params: Some(&params),
+            aliases: std::collections::BTreeMap::new(),
+        };
+        ctx.aliases.insert(
+            "x".to_string(),
+            crate::path::Located {
+                value: &input["things"][0]["xs"][0],
+                location: crate::path::Location::input_root()
+                    .key("things")
+                    .index(0)
+                    .key("xs")
+                    .index(0),
+            },
+        );
+        let check = &line.sentences[0].check;
+        let ran = crate::ops::run_full(check, &ctx);
+        let own = match &ran.parts {
+            Some(parts) if !parts.is_empty() => {
+                crate::ops::clause::text(&crate::ops::clause::shown(parts))
+            }
+            _ => crate::ops::message::said_text(&crate::ops::message::row_said(
+                check,
+                &ctx,
+                &ran.verdict,
+            )),
+        };
+        let (cause, clauses) = line.sentence_clauses(0, &ctx);
+        assert_eq!(cause, ran.verdict.cause, "{assertion}");
+        assert_eq!(crate::ops::clause::text(&clauses), own, "{assertion}");
+    }
+}

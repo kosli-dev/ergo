@@ -1998,6 +1998,11 @@ impl For {
         clauses
     }
 
+    #[cfg_attr(not(test), expect(dead_code))]
+    pub fn sentence_clauses(&self, _idx: usize, _ctx: &Ctx) -> (Cause, Vec<Clause>) {
+        (Cause::Satisfied, Vec::new())
+    }
+
     fn whose_keys_first(&self, run: &mut Run, ctx: &Ctx) {
         let outer = outer_ctx(ctx);
         let keys: Vec<(Cause, String)> = self
