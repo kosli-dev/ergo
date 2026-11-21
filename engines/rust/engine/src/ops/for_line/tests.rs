@@ -2958,7 +2958,7 @@ fn for_items(
     };
     let input = json!({"things": [subject]});
     let ctx = crate::path::Ctx {
-        label: None,
+        label: Some("thing".to_string()),
         item_by_item: false,
         subject: crate::path::Located {
             value: &input["things"][0],
@@ -3132,5 +3132,40 @@ fn a_root_that_a_sentence_reading_no_alias_gives_is_said_once_on_an_empty_list()
             json!({}),
         ),
         "za is 3, which isn't a list or an object; zb is \"s\", which isn't a list or an object"
+    );
+}
+
+#[test]
+fn a_path_whose_key_cant_be_read_isnt_said_again_after_the_key() {
+    let said = |assertion: &str, subject: Value, params: Value| {
+        for_tree("every rs as r", &[assertion], subject, params)
+    };
+    let things = json!({"m": {"a": "a"}, "rs": [{"v": "a"}, {"v": 4}]});
+    assert_eq!(
+        said("r.zz is m named by $params.k", things.clone(), json!({"k": null})),
+        "$params.k is null; item 1 of rs: r.zz is missing; item 2 of rs: r.zz is missing"
+    );
+    assert_eq!(
+        said("k is m named by $params.k", things, json!({"k": null})),
+        "k is missing; $params.k is null"
+    );
+    let rows = json!({"m": {"k": [1]}, "rs": [{"v": [1]}, {"v": "no"}]});
+    assert_eq!(said("r.v is m named by p", rows, json!({})), "p is missing");
+    assert_eq!(
+        said(
+            "r.v is zz.x named by p",
+            json!({"zz": "str", "p": 3, "rs": [{"v": 1}]}),
+            json!({})
+        ),
+        "p is 3, which isn't text, and zz is \"str\", which isn't an object"
+    );
+    assert_eq!(
+        for_tree(
+            "every ks as k",
+            &["count of n named by k is at most 5"],
+            json!({"ks": [null], "n": {"q": [1]}}),
+            json!({}),
+        ),
+        "item 1 of ks: k is null"
     );
 }
