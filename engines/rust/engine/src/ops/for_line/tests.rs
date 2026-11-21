@@ -3265,3 +3265,25 @@ fn a_sentence_that_reads_only_the_first_alias_is_said_before_a_second_list_that_
         "item 1 of ws: item 1 of w.zs: m is missing; item 1 of ws: w.items is []"
     );
 }
+
+#[test]
+fn a_root_read_through_the_first_alias_fails_the_item_when_nothing_is_checked_for_it() {
+    assert_eq!(
+        for_tree(
+            "every ks as k, every xs, if any, as m",
+            &["m.t named by k is 1"],
+            json!({"ks": [{}], "xs": []}),
+            json!({}),
+        ),
+        "item 1 of ks: k is {}, which isn't text"
+    );
+    assert_eq!(
+        for_tree(
+            "every ys as m, every xs whose w is in m.q and whose v is in $params.l, if any, as n",
+            &["n.v is 1"],
+            json!({"xs": [], "ys": [{"q": 1}, {}]}),
+            json!({}),
+        ),
+        "$params.l is missing; item 1 of ys: m.q is 1, which isn't a list; item 2 of ys: m.q is missing"
+    );
+}
