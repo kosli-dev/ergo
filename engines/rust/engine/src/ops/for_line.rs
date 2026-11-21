@@ -2026,6 +2026,17 @@ impl For {
                 clauses.push(Clause::root(&input.name, cause, text));
             }
         }
+        if let Some(first) = self.items.first()
+            && matches!(first.path.start, Start::Subject | Start::Own)
+            && let Some((outcome, text, input)) =
+                first.path.steps.iter().find_map(|step| match step {
+                    Step::Field(key) => super::key_base::key_flaw(key, &outer),
+                    _ => None,
+                })
+        {
+            let cause = outcome.cause().unwrap_or(Cause::Unusable);
+            clauses.push(Clause::root(&input.name, cause, text));
+        }
         if let Some(found) = self.first_key(ctx) {
             let cause = found.key.state.cause().unwrap_or(Cause::Unusable);
             clauses.push(Clause::root(&found.key.name, cause, found.key_text));

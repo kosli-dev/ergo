@@ -2376,8 +2376,6 @@ const NO_LIST: &str = "the tree has no clause for the list itself until R5-6";
 
 const EARLIER_ALIAS: &str = "the tree has no item for a root read through an earlier line's alias when no item of the second list is checked, and no step of the R5 design adds it before R5-6 builds the row from the tree";
 
-const KEY_FROM_A_FIELD: &str = "a key read from a field on the line, like zz in ts named by zz, isn't a root clause, and no step of the R5 design makes it one before R5-6 builds the row from the tree";
-
 const SAID_OUTSIDE: &str = "the row's message comes from message::row_said after the check runs again to read its walked roots, not from the for line, until R5-6 gives the for line the message its clauses say";
 
 const ITEMS_BY_SENTENCE: &str = "the case says item 2 before item 1, which spec/OPEN.md lists under problems.item_order, and no R5 step changes it until that line is decided";
@@ -2404,11 +2402,7 @@ const FREE_BEFORE_KEY: &str = "the tree says a sentence that reads no alias befo
 
 const ENTRY_CAUSE: &str = "the tree gives an item the cause the case gives its entry and Rust's entry doesn't, until R5-7 builds the entries from the clauses";
 
-const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 105] = [
-    (
-        "distinct / distinct under a for line that is written wrong for another reason, part 4 of 4 / each check lists only its own problems, and none is about distinct",
-        KEY_FROM_A_FIELD,
-    ),
+const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 103] = [
     (
         "for / a $params list that a for line reads fails it when the line's whose leaves nothing and an item of the list can't be read / fails, when the whose leaves nothing",
         SAID_OUTSIDE,
@@ -2734,10 +2728,6 @@ const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 105] = [
         NO_LIST,
     ),
     (
-        "sentences / a for line that walks a path with a named by field / fails as the field says when it's missing, null or not a string, and lists the field",
-        KEY_FROM_A_FIELD,
-    ),
-    (
         "sentences / a for line that walks a path with a named by field / that is null fails as null whatever the field holds, as the walk does without the field",
         NO_LIST,
     ),
@@ -2827,9 +2817,9 @@ const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 105] = [
     ),
 ];
 
-const ROWS_COMPARED: usize = 1418;
+const ROWS_COMPARED: usize = 1422;
 
-const ROWS_LISTED: usize = 164;
+const ROWS_LISTED: usize = 160;
 
 fn item_entries(failures: &Value, out: &mut Vec<(String, String)>) {
     for failure in failures.as_array().into_iter().flatten() {
