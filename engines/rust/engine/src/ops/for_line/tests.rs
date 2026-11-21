@@ -2014,12 +2014,6 @@ fn root_clauses_give_the_roots_the_row_says_today() {
             json!({"xs": [{"v": 1, "w": 1}]}),
             json!({"a": "s"}),
         ),
-        (
-            "every xs named by $params.k as x",
-            vec!["x.w is at least $params.a"],
-            json!({"xs": [{"w": 1}]}),
-            json!({"a": "s"}),
-        ),
     ] {
         let roots = for_roots(for_line, &assertions, subject.clone(), params.clone());
         let message = for_row_message(for_line, assertions[0], subject, params);

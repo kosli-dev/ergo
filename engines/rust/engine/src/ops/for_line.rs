@@ -1972,8 +1972,30 @@ impl For {
 
     #[cfg_attr(not(test), expect(dead_code))]
     pub fn root_clauses(&self, ctx: &Ctx) -> Vec<Clause> {
-        let _ = ctx;
-        Vec::new()
+        let outer = outer_ctx(ctx);
+        let whose: Vec<&Check> = self
+            .items
+            .iter()
+            .flat_map(|item| item.whose.iter())
+            .collect();
+        let mut clauses = super::message::root_clauses(&whose, &outer);
+        clauses.extend(super::message::walked_root_clauses(&whose, &outer));
+        if let Some(found) = self.first_key(ctx) {
+            let cause = found.key.state.cause().unwrap_or(Cause::Unusable);
+            clauses.push(Clause::root(&found.key.name, cause, found.key_text));
+            if let Some((text, cause, input)) = found.base {
+                clauses.push(Clause::root(&input.name, cause, text));
+            }
+        }
+        for (at, sentence) in self.sentences.iter().enumerate() {
+            let group = at + 1;
+            let nested = nested_whose(&sentence.check, false);
+            let mut said = sentence_root_clauses(&root_forms(&sentence.check), &outer);
+            said.extend(super::message::side_root_clauses(&nested, &outer));
+            said.extend(super::message::walked_root_clauses(&nested, &outer));
+            clauses.extend(said.into_iter().map(|clause| clause.in_group(group)));
+        }
+        clauses
     }
 
     fn whose_keys_first(&self, run: &mut Run, ctx: &Ctx) {
@@ -3836,8 +3858,40 @@ fn bound_alias(root: &Path, ctx: &Ctx) -> bool {
 
 #[cfg_attr(not(test), expect(dead_code))]
 fn sentence_root_clauses(forms: &[(Check, bool)], ctx: &Ctx) -> Vec<Clause> {
-    let _ = (forms, ctx);
-    Vec::new()
+    forms
+        .iter()
+        .flat_map(|form| {
+            let Some((cause, texts)) = sentence_root_flaw(std::slice::from_ref(form), ctx) else {
+                return Vec::new();
+            };
+            let (check, _) = form;
+            let mut named: Vec<String> = check
+                .paths()
+                .into_iter()
+                .chain(walk::listed_refs(check))
+                .flat_map(|root| {
+                    std::iter::once(crate::name::name(root)).chain(root.steps.iter().filter_map(
+                        |step| match step {
+                            Step::Ref(key) => Some(crate::name::name(key)),
+                            _ => None,
+                        },
+                    ))
+                })
+                .collect();
+            named.sort_by_key(|name| std::cmp::Reverse(name.len()));
+            texts
+                .into_iter()
+                .map(|text| {
+                    let name = named
+                        .iter()
+                        .find(|name| text.starts_with(name.as_str()))
+                        .cloned()
+                        .unwrap_or_else(|| text.clone());
+                    Clause::root(&name, cause, text)
+                })
+                .collect()
+        })
+        .collect()
 }
 
 fn sentence_root_flaw(forms: &[(Check, bool)], ctx: &Ctx) -> Option<(Cause, Vec<String>)> {
