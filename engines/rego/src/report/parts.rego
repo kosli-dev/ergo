@@ -417,6 +417,10 @@ else := object.remove(i, _input_stash_keys) if i["ergo/worked"] == true
 else := object.union(i, {"outcome": "unusable"}) if {
 	i.value != null
 	i.name in data.ergo_unfit
+} else := object.union(i, {"outcome": "unusable"}) if {
+	i.name in data.ergo_text_lists
+	is_array(i.value)
+	_text_items_state(i.value)
 } else := object.union(i, {"outcome": "usable"}) if i.value != null
 
 else := i
@@ -1125,7 +1129,26 @@ _where(req_name, name, check) := object.union(w, {
 	"ats": object.union({"": a | a := _assertion_ats(w, null)}, {nm: a | some nm in _option_names(check); a := _assertion_ats(w, nm)}),
 	"option_ats": {nm: _option_at(w, nm) | some nm in _option_names(check)},
 	"unfit": _unfit_refs(check),
+	"text_lists": _text_list_names(check),
 }) if w := {"check": check, "req": req_name, "name": name}
+
+_text_list_names(check) := {n |
+	walk(check, [_, x])
+	is_object(x)
+	x.ignoring
+	n := _text_list_name(x)
+}
+
+_text_list_name(x) := _ref_label(x.values.ref) if {
+	x.op in _membership_ops
+	_is_ref(x.values)
+}
+
+_text_list_name(x) := _input_name(_as_subject_part(x.right)) if {
+	x.op == "compare"
+	x.cmp in _membership_ops
+	is_array(x.right)
+}
 
 _option_names(check) := {n | some n in check.option_of}
 
@@ -1138,7 +1161,7 @@ _assertion_at(where, null, k) := where.ats[""][k]
 
 _assertion_at(where, option, k) := where.ats[option][k] if option != null
 
-_condition_of(req, name, c) := object.union({"expression": e | e := _expression_of(c)}, object.union({"at": a | a := _condition_at(req, name)}, {"unfit": _unfit_refs(c)}))
+_condition_of(req, name, c) := object.union({"expression": e | e := _expression_of(c)}, object.union({"at": a | a := _condition_at(req, name)}, {"unfit": _unfit_refs(c), "text_lists": _text_list_names(c)}))
 
 _option_at(where, nm) := _joined("$policy:", ["requirements", where.req, "checks", where.name, "any_of", nm])
 
@@ -1297,8 +1320,8 @@ _parted_in(raw, at, where) := _said_outcomes(_parted_in_of(raw, at, where))
 
 _parted_in_of(raw, at, where) := p if {
 	raw.passed == false
-	count(where.unfit) > 0
-	p := _parted(raw, at, where) with data.ergo_unfit as where.unfit
+	count(where.unfit) + count(where.text_lists) > 0
+	p := _parted(raw, at, where) with data.ergo_unfit as where.unfit with data.ergo_text_lists as where.text_lists
 } else := _parted(raw, at, where)
 
 _said_outcomes(row) := row if row.passed == true
@@ -1361,8 +1384,9 @@ _unfit_refs(check) := {_ref_label(r) | some r in _listed_refs(check); _ref_use(c
 _parted_applies_in(raw, at, evals, req, conds, subj) := p if {
 	raw.passed == false
 	unfit := {u | some n, _ in evals; some u in conds[n].unfit}
-	count(unfit) > 0
-	p := _parted_applies(_applies_deduped(raw), at, evals, req, conds, subj) with data.ergo_unfit as unfit
+	lists := {u | some n, _ in evals; some u in conds[n].text_lists}
+	count(unfit) + count(lists) > 0
+	p := _parted_applies(_applies_deduped(raw), at, evals, req, conds, subj) with data.ergo_unfit as unfit with data.ergo_text_lists as lists
 } else := _parted_applies(_applies_deduped(raw), at, evals, req, conds, subj) if {
 	_m_marked_cause(raw.cause)
 } else := _parted_applies(raw, at, evals, req, conds, subj)
