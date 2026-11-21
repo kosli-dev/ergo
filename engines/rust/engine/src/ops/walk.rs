@@ -1357,6 +1357,7 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
             let failing = || verdicts.iter().filter(|(_, v, _)| v.cause.is_failure());
             let undecided = failing().next().is_some();
             let own = failing()
+                .filter(|(check, _, _)| !check.flawed(ctx))
                 .find_map(|(check, _, lost)| {
                     item_own(check, item, walked, ctx).map(|said| (*check, *lost, said))
                 })
@@ -1649,7 +1650,9 @@ fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
         let leaf = leaf_roots(walk, &outer, &items, &alone, reached);
         let mut roots = whose_roots(walk, &outer, settled != Cause::Satisfied);
         let up_front = !leaf.is_empty() || params_unreadable(&outer) && !roots.is_empty();
-        if walk.flawed(ctx) || up_front && items.iter().all(|item| item.cause == Cause::Value) {
+        if walk.check.flawed(&outer)
+            || up_front && items.iter().all(|item| item.cause == Cause::Value)
+        {
             said.clear();
         }
         once(&mut roots, leaf);
@@ -1659,11 +1662,14 @@ fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
     let (cause, parts) = if settled == Cause::Satisfied && roots.is_empty() {
         (settled, Vec::new())
     } else {
+        let items_said = sorted
+            .iter()
+            .any(|f| !walked.failures.iter().any(|w| std::ptr::eq(w, *f)));
         let (cause, mut parts) = row_clauses(roots, Vec::new(), items);
         let said_nothing = parts.is_empty();
         and_walked_roots(walk, &outer, &mut parts);
         match Cause::worst(parts.iter().map(|part| part.cause)) {
-            Some(worst) if said_nothing => (worst, parts),
+            Some(worst) if said_nothing || items_said => (worst, parts),
             Some(_) => (cause, parts),
             None => {
                 let list = first_list(&walk.path, &outer);

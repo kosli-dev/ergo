@@ -381,8 +381,6 @@ messages / a key read from a field after a null / names the null step, then the 
 messages / a param after the phrase, a root in a whose and the list beside them that can't be read are all said, roots first / with the list empty, said only where it fails on its own
 messages / a param after the phrase, a root in a whose and the list beside them that can't be read are all said, roots first / with the list missing
 messages / a param after the phrase, a root in a whose and the list beside them that can't be read are all said, roots first / with the list null
-messages / a param that isn't a list and the list it is read beside that can't be read are both said, the param first / with the list missing
-messages / a param that isn't a list and the list it is read beside that can't be read are both said, the param first / with the list null
 messages / a parent's part read in a that on a for line / names a part of the wrong type once, before what each item says
 messages / a parent's part read in a that on a plain check, next to a list that can't be read / names a part of the wrong type before a list that is text
 messages / a parent's part read in a whose inside an any_of option, next to a list that can't be read / names the part that has the wrong type, then the list that is text
