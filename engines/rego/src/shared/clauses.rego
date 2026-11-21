@@ -117,10 +117,12 @@ _m_clause_kept(u, pieces, kept) if {
 	array.slice(p.key, 0, count(under)) == under
 }
 
-_m_clauses_ahead(once) := array.concat(
-	[x[3] | some x in sort([[object.get(_m_clause_ranks, c.cause, 6), c.name, c.text, c] | some c in once; c.kind == "root"])],
-	[c | some c in once; c.kind == "list"],
-)
+_m_clauses_ahead(once) := [c | some i, c in ahead; not c.text in {a.text | some a in array.slice(ahead, 0, i)}] if {
+	ahead := array.concat(
+		[x[3] | some x in sort([[object.get(_m_clause_ranks, c.cause, 6), c.name, c.text, c] | some c in once; c.kind == "root"])],
+		[c | some c in once; c.kind == "list"],
+	)
+}
 
 _m_clause_ranks := {"not_an_object": 1, "ambiguous": 2, "unusable": 3, "absent": 4, "null": 5}
 
