@@ -24,6 +24,7 @@ _walk_row(check, subj) := object.union(r, {"other_roots": _walk_parts(check, sub
 	not _unreadable_input
 	raw := _walk_read_row(check, subj)
 	_walk_list_fails(raw)
+	not _empty_beside_text_leaf(check, raw)
 	not _walk_keyed(check)
 	_m_walk_blocked(subj, check) == []
 	_walk_root_flaw(check, subj) != ""
