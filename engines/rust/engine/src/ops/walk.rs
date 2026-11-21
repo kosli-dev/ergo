@@ -1226,11 +1226,7 @@ fn roots_written_in(check: &Check, focus: &Ctx, blocked: impl Fn(&Path) -> bool)
             let read = path::read(list, focus);
             read.value
                 .filter(|_| read.outcome == Outcome::Found)
-                .filter(|value| {
-                    value
-                        .as_array()
-                        .is_some_and(|items| items.iter().any(|item| !item.is_null()))
-                })
+                .filter(|value| value.as_array().is_some_and(|items| !items.is_empty()))
                 .map(|value| Right::Written(value.clone()))
         }
         _ => None,

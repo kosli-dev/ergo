@@ -2232,6 +2232,19 @@ fn a_count_after_plus_says_each_items_own_value_beside_a_root_list_that_isnt_one
 }
 
 #[test]
+fn test_root_list_of_only_nulls_names_no_kind_so_the_item_says_nothing() {
+    let clauses = tally_clauses_in(
+        "count of es whose v is in $input.x is 0",
+        json!({"things": [{"es": [{"v": 3}, {"v": null}]}], "x": [null, null]}),
+        json!({}),
+    );
+    assert_eq!(
+        kinds_causes_and_texts(&clauses),
+        [item_said(Cause::Null, "item 2 of es: v is null")]
+    );
+}
+
+#[test]
 fn a_count_names_no_kind_for_an_items_own_list_beside_an_empty_root_list() {
     let clauses = tally_clauses_in(
         "count of es whose v contains some of $input.x is 0",
