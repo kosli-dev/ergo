@@ -1,5 +1,35 @@
 pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
+        "count of member of evidence whose kind is \"approval\" is 1",
+        "count of member of evidence whose kind is \"approval\" is 1",
+        &[],
+        &[],
+    ),
+    (
+        "e.status is \"COMPLETE\"",
+        "e.status is \"COMPLETE\"",
+        &[],
+        &[],
+    ),
+    (
+        "every member of rs.statuses is \"DONE\"",
+        "every member of rs.statuses is \"DONE\"",
+        &[],
+        &[],
+    ),
+    (
+        "every member of statuses is \"DONE\"",
+        "every member of statuses is \"DONE\"",
+        &[],
+        &[],
+    ),
+    (
+        "sum of member of costs is at most 3",
+        "sum of member of costs is at most 3",
+        &[],
+        &[],
+    ),
+    (
         "every member of xs is 1",
         "every member of xs is 1",
         &[],
@@ -12956,6 +12986,18 @@ pub const CHECK_WRITTEN_WRONG: &[(&str, &[&str])] = &[
 ];
 
 pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
+    (
+        "every member of evidence whose kind is \"approval\" as e",
+        "every member of evidence whose kind is \"approval\" as e",
+        &[],
+        &[],
+    ),
+    (
+        "every records as r, every member of r.evidence as e",
+        "every records as r, every member of r.evidence as e",
+        &[],
+        &[],
+    ),
     (
         "every member of xs as m",
         "every member of xs as m",

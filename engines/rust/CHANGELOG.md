@@ -6,11 +6,15 @@ Each release names the version of the spec it follows. The spec's own changes ar
 
 ### New
 
-- `from: every member of <path>` makes each member of the object the path ends at a subject, whatever its key, as in `ergo.rego` 0.7.0 and spec 0.7 ([subjects.every.member](../../spec/semantics.md#requirements)). The id is the key unless `identified_by` is written, and a value at the end that isn't an object fails `$min_subjects` as `unusable`. Elsewhere it is written wrong with `every member of only goes on a from line for now`.
+- `from: every member of <path>` makes each member of the object the path ends at a subject, whatever its key, as in `ergo.rego` 0.7.0 and spec 0.7 ([subjects.every.member](../../spec/semantics.md#requirements)). The id is the key unless `identified_by` is written, and a value at the end that isn't an object fails `$min_subjects` as `unusable`.
+
+- `member of` also goes after `every`, `some`, `count of` and `sum of` in checks and on `for` lines, and reads each member of the object the path ends at as an item, named by its key ([walk.member](../../spec/semantics.md#every-and-some), [walk.member.not_an_object](../../spec/semantics.md#every-and-some), [tally.member](../../spec/semantics.md#counts-and-sums-in-sentences)). With `{"statuses": {"build": "DONE", "sign-off": "FAILED"}}`, `every member of statuses is "DONE"` fails as `value` with `member sign-off of statuses is "FAILED"`, and the entry under the assertion is the item `member sign-off of statuses` with the input `statuses.sign-off`. `count of member of evidence whose kind is "approval" is 1` counts the members that pass the `whose`, and `for: every member of evidence as e` checks each member with `e`. A value at the end that isn't an object fails as `unusable`, like `statuses is ["DONE"], which isn't an object`. `distinct` with `member of` is written wrong everywhere, with `distinct can't go with every member of`. As in `ergo.rego` 0.7.0 and spec 0.7. Changes the report of a check or `for` line with `member of` right after `every`, `some`, `count of` or `sum of`, which was written wrong.
 
 - `is`, `equals`, `is equal to`, `is not`, `does not equal`, and `is one of` and `is not one of` with written values, can end with `ignoring case`, `ignoring surrounding spaces` or `ignoring case and surrounding spaces`, as in `ergo.rego` 0.7.0 and spec 0.7 ([text.ignoring](../../spec/semantics.md#text-ignoring-case-and-surrounding-spaces)). `status is one of "in progress", "done" ignoring case and surrounding spaces` passes on `"  IN Progress "`. A value that isn't text fails as `unusable`, on either side. `is in` and `is one of` with a path, like `type is in $params.states ignoring case`, are written wrong for now, with `"is in" can't take ignoring case yet`, until [#712](https://github.com/kosli-dev/ergo/issues/712) adds them.
 
 ### Changed
+
+- `ergo-policy-sentences` reads `member of` after `every`, `some`, `count of` and `sum of` and on `for` lines into new public fields, `ListOptions::member`, `Derived::member` and `ForItem::Walk`'s `member`, so a struct literal of them outside the crate no longer compiles until it sets the field.
 
 - `ergo-policy-sentences` reads `member of` into a new public field of `FromLine`, `member`, so a struct literal of `FromLine` outside the crate no longer compiles until it sets the field.
 
