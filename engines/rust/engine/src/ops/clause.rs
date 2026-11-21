@@ -1,4 +1,5 @@
 use crate::cause::Cause;
+use serde_json::{Value, json};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Kind {
@@ -15,6 +16,7 @@ pub struct Clause {
     pub cause: Cause,
     pub text: String,
     pub said: Vec<Clause>,
+    pub group: usize,
 }
 
 impl Clause {
@@ -25,6 +27,7 @@ impl Clause {
             cause,
             text,
             said: Vec::new(),
+            group: 0,
         }
     }
 
@@ -46,27 +49,28 @@ impl Clause {
             ..Clause::root(name, cause, text)
         }
     }
+
+    pub fn in_group(self, group: usize) -> Clause {
+        Clause { group, ..self }
+    }
 }
 
 const SHOWN_ITEMS: usize = 3;
 
 pub fn shown(clauses: &[Clause]) -> Vec<Clause> {
-    let mut once: Vec<&Clause> = Vec::new();
+    let mut once: Vec<Clause> = Vec::new();
     for clause in clauses {
-        if !once.contains(&clause) {
-            once.push(clause);
+        match once.iter_mut().find(|seen| same_but_group(seen, clause)) {
+            Some(seen) => seen.group = seen.group.min(clause.group),
+            None => once.push(clause.clone()),
         }
     }
-    let of_kind = |kind: Kind| {
-        once.iter()
-            .copied()
-            .filter(move |clause| clause.kind == kind)
-    };
+    let of_kind = |kind: Kind| once.iter().filter(move |clause| clause.kind == kind);
     let mut out: Vec<Clause> = of_kind(Kind::Root).cloned().collect();
-    out.sort_by(|a, b| (a.cause, &a.name).cmp(&(b.cause, &b.name)));
+    out.sort_by(|a, b| (a.group, a.cause, &a.name).cmp(&(b.group, b.cause, &b.name)));
     out.extend(of_kind(Kind::List).cloned());
     let items: Vec<&Clause> = of_kind(Kind::Item).collect();
-    let leaves: usize = items.iter().map(|item| pieces(item).len()).sum();
+    let leaves: usize = items.iter().map(|item| leaves(item)).sum();
     if leaves <= SHOWN_ITEMS {
         out.extend(items.into_iter().cloned());
         return out;
@@ -79,8 +83,13 @@ pub fn shown(clauses: &[Clause]) -> Vec<Clause> {
         cause: Cause::Value,
         text: String::new(),
         said: Vec::new(),
+        group: 0,
     });
     out
+}
+
+fn same_but_group(a: &Clause, b: &Clause) -> bool {
+    (a.kind, &a.name, a.cause, &a.text, &a.said) == (b.kind, &b.name, b.cause, &b.text, &b.said)
 }
 
 pub fn text(clauses: &[Clause]) -> String {
@@ -142,23 +151,92 @@ fn cut(item: &Clause, left: &mut usize) -> Option<Clause> {
         }
         *left = left.saturating_sub(1);
     }
-    let mut run_kept: Option<bool> = None;
-    for clause in &item.said {
-        if clause.kind == Kind::Item {
-            run_kept = None;
-            kept.said.extend(cut(clause, left));
-        } else {
-            let keep = *run_kept.get_or_insert_with(|| {
-                let keep = *left > 0;
-                *left = left.saturating_sub(1);
-                keep
-            });
-            if keep {
+    if has_items(item) {
+        for clause in &item.said {
+            if clause.kind == Kind::Item {
+                kept.said.extend(cut(clause, left));
+            } else {
                 kept.said.push(clause.clone());
             }
         }
+        if !has_items(&kept) {
+            kept.said.clear();
+        }
+    } else if !item.said.is_empty() {
+        if *left > 0 {
+            kept.said = item.said.clone();
+        }
+        *left = left.saturating_sub(1);
     }
     (!kept.text.is_empty() || !kept.said.is_empty()).then_some(kept)
+}
+
+fn has_items(item: &Clause) -> bool {
+    item.said.iter().any(|clause| clause.kind == Kind::Item)
+}
+
+fn leaves(item: &Clause) -> usize {
+    let own = !item.said.is_empty() && !has_items(item);
+    let under: usize = item
+        .said
+        .iter()
+        .filter(|clause| clause.kind == Kind::Item)
+        .map(leaves)
+        .sum();
+    usize::from(!item.text.is_empty()) + usize::from(own) + under
+}
+
+#[cfg_attr(not(test), expect(dead_code))]
+pub fn to_value(clauses: &[Clause]) -> Value {
+    Value::Array(
+        clauses
+            .iter()
+            .map(|clause| {
+                let (kind, count) = match clause.kind {
+                    Kind::Root => ("root", 0),
+                    Kind::List => ("list", 0),
+                    Kind::Item => ("item", 0),
+                    Kind::More(count) => ("more", count),
+                };
+                json!({
+                    "kind": kind,
+                    "count": count,
+                    "name": clause.name,
+                    "cause": clause.cause.name(),
+                    "text": clause.text,
+                    "said": to_value(&clause.said),
+                    "group": clause.group,
+                })
+            })
+            .collect(),
+    )
+}
+
+#[cfg_attr(not(test), expect(dead_code))]
+pub fn of_value(value: &Value) -> Option<Vec<Clause>> {
+    let number = |clause: &Value, key: &str| usize::try_from(clause.get(key)?.as_u64()?).ok();
+    let text = |clause: &Value, key: &str| clause.get(key)?.as_str().map(str::to_string);
+    value
+        .as_array()?
+        .iter()
+        .map(|clause| {
+            let kind = match clause.get("kind")?.as_str()? {
+                "root" => Kind::Root,
+                "list" => Kind::List,
+                "item" => Kind::Item,
+                "more" => Kind::More(number(clause, "count")?),
+                _ => return None,
+            };
+            Some(Clause {
+                kind,
+                name: text(clause, "name")?,
+                cause: Cause::from_name(clause.get("cause")?.as_str()?)?,
+                text: text(clause, "text")?,
+                said: of_value(clause.get("said")?)?,
+                group: number(clause, "group")?,
+            })
+        })
+        .collect()
 }
 
 #[cfg(test)]
