@@ -43496,6 +43496,132 @@
     ]
   },
   {
+    "description": "an item that a walk breaks in and that every.same names too",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"e": {"from": "every p0.p1.p2"}}, "requirements": {"r": {"subject": "e", "checks": {"c": "status exists"}}}},
+    "cases": [
+      {
+        "description": "has one entry, whose message joins its two clauses with ; in the order the row says them",
+        "rules": ["subjects.failed_items", "subjects.every.broken", "message.join", "row.parts"],
+        "input": {"p0": [{"p1": [{"p2": [{"status": "ok"}]}]}, {"p1": 3}]},
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/p0/0/p1"
+                    ],
+                    "name": "p0[0].p1",
+                    "outcome": "usable",
+                    "value": [
+                      {
+                        "p2": [
+                          {
+                            "status": "ok"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "kind": "item",
+                "locations": [
+                  "/p0/0"
+                ],
+                "message": "p1 is a list",
+                "name": "item 1 of p0",
+                "value": {
+                  "p1": [
+                    {
+                      "p2": [
+                        {
+                          "status": "ok"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/p0/1/p1"
+                    ],
+                    "name": "p0[1].p1.p2",
+                    "outcome": "unusable",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "/p0/1/p1"
+                    ],
+                    "name": "p0[1].p1",
+                    "outcome": "usable",
+                    "value": 3
+                  }
+                ],
+                "kind": "item",
+                "locations": [
+                  "/p0/1"
+                ],
+                "message": "p1 is 3, which isn't an object; p1 is a number",
+                "name": "item 2 of p0",
+                "value": {
+                  "p1": 3
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/p0/0/p1/0/p2/0"
+                ],
+                "name": "in-scope e count",
+                "value": 1
+              }
+            ],
+            "message": "item 2 of p0: p1 is 3, which isn't an object; item 1 of p0: p1 is a list, item 2 of p0: p1 is a number",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "e"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/p0/0/p1/0/p2/0/status"
+                ],
+                "name": "status",
+                "value": "ok"
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": {
+                "status": "ok"
+              },
+              "type": "e"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
     "description": "a from line that starts at a list input and goes on to named by each of",
     "policy": {
       "ergo_spec": "{{spec}}",

@@ -710,6 +710,7 @@ subjects / a subject that narrows a parent read with every, over a list that can
 subjects / a subject that narrows a parent read with every, over a list that can't be walked, with min_subjects 0 / fails min_subjects as unusable when a name read as a list isn't one in every item, and still checks the value
 subjects / a subject with nothing under it / fails $min_subjects as absent when the input has no such field
 subjects / a whose filter with a ref step after a field, and the param is null / fails with the ref's cause when the parent field is missing
+subjects / an item that a walk breaks in and that every.same names too / has one entry, whose message joins its two clauses with ; in the order the row says them
 subjects / every in a from line that meets text where it needs an object / fails min_subjects as unusable, names the value where the read stopped as a check does, and lists each place
 that / a for line with that and whose gives the same cause in either order / an item that isn't an object is not_an_object, with that first
 that / a for line with that and whose gives the same cause in either order, with whose first / an item that isn't an object is not_an_object, with whose first
