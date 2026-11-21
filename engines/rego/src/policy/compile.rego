@@ -55,7 +55,7 @@ _read_ahead(policy) := object.union(rd, {"ahead": ahead}) if {
 
 _to_compiled(rd) := {
 	"subjects": rd.subjects,
-	"subject_sentences": object.union(object.remove(rd.subject_sentences, ["lines", "distinct"]), object.union({"distinct": sort(rd.subject_sentences.distinct) | count(rd.subject_sentences.distinct) > 0}, {
+	"subject_sentences": object.union(object.remove(rd.subject_sentences, ["lines", "distinct", "member"]), object.union(object.union({"distinct": sort(rd.subject_sentences.distinct) | count(rd.subject_sentences.distinct) > 0}, {"member": sort(rd.subject_sentences.member) | count(rd.subject_sentences.member) > 0}), {
 		"every": sort(rd.subject_sentences.every),
 		"narrowed": sort(rd.subject_sentences.narrowed),
 		"filters": sort(rd.subject_sentences.filters),
@@ -72,6 +72,7 @@ _from_compiled(c) := {
 	"subject_sentences": object.union(c.subject_sentences, {
 		"every": {x | some x in c.subject_sentences.every},
 		"distinct": {x | some x in object.get(c.subject_sentences, "distinct", [])},
+		"member": {x | some x in object.get(c.subject_sentences, "member", [])},
 		"narrowed": {x | some x in c.subject_sentences.narrowed},
 		"filters": {x | some x in c.subject_sentences.filters},
 		"has_problems": {n: {p | some p in ps} | some n, ps in c.subject_sentences.has_problems},
