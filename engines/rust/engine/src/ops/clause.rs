@@ -1,5 +1,5 @@
 use crate::cause::Cause;
-use serde_json::Value;
+use serde_json::{Value, json};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Kind {
@@ -188,13 +188,56 @@ fn leaves(item: &Clause) -> usize {
 }
 
 #[cfg_attr(not(test), expect(dead_code))]
-pub fn to_value(_clauses: &[Clause]) -> Value {
-    Value::Null
+pub fn to_value(clauses: &[Clause]) -> Value {
+    Value::Array(
+        clauses
+            .iter()
+            .map(|clause| {
+                let (kind, count) = match clause.kind {
+                    Kind::Root => ("root", 0),
+                    Kind::List => ("list", 0),
+                    Kind::Item => ("item", 0),
+                    Kind::More(count) => ("more", count),
+                };
+                json!({
+                    "kind": kind,
+                    "count": count,
+                    "name": clause.name,
+                    "cause": clause.cause.name(),
+                    "text": clause.text,
+                    "said": to_value(&clause.said),
+                    "group": clause.group,
+                })
+            })
+            .collect(),
+    )
 }
 
 #[cfg_attr(not(test), expect(dead_code))]
-pub fn of_value(_value: &Value) -> Option<Vec<Clause>> {
-    None
+pub fn of_value(value: &Value) -> Option<Vec<Clause>> {
+    let number = |clause: &Value, key: &str| usize::try_from(clause.get(key)?.as_u64()?).ok();
+    let text = |clause: &Value, key: &str| clause.get(key)?.as_str().map(str::to_string);
+    value
+        .as_array()?
+        .iter()
+        .map(|clause| {
+            let kind = match clause.get("kind")?.as_str()? {
+                "root" => Kind::Root,
+                "list" => Kind::List,
+                "item" => Kind::Item,
+                "more" => Kind::More(number(clause, "count")?),
+                _ => return None,
+            };
+            Some(Clause {
+                kind,
+                name: text(clause, "name")?,
+                cause: Cause::from_name(clause.get("cause")?.as_str()?)?,
+                text: text(clause, "text")?,
+                said: of_value(clause.get("said")?)?,
+                group: number(clause, "group")?,
+            })
+        })
+        .collect()
 }
 
 #[cfg(test)]
