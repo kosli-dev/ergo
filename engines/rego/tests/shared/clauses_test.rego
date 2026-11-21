@@ -142,3 +142,47 @@ test_a_clause_given_twice_is_shown_once if {
 		_item("item 2 of es", "absent", [_missing("m")]),
 	]
 }
+
+test_no_clauses_give_no_text if {
+	ergo._m_clauses_shown([]) == []
+	ergo._m_clauses_text(ergo._m_clauses_shown([])) == ""
+}
+
+test_two_clauses_of_one_item_join_with_and if {
+	ergo._m_clauses_text(ergo._m_clauses_shown(_items_of("xs", 1, 5, [_missing("x.v"), _missing("x.w")]))) == concat("; ", [
+		"item 1 of xs: x.v is missing, and x.w is missing",
+		"item 2 of xs: x.v is missing, and x.w is missing",
+		"item 3 of xs: x.v is missing, and x.w is missing",
+		"and 2 more",
+	])
+}
+
+test_a_root_whose_value_holds_a_semicolon_stays_one_clause if {
+	clauses := [
+		_root("w.z", "unusable", `w.z is "p; q", which isn't a number`),
+		_item("item 1 of ws", "absent", [_missing("w.v")]),
+	]
+	ergo._m_clauses_shown(clauses) == clauses
+	ergo._m_clauses_text(clauses) == `w.z is "p; q", which isn't a number; item 1 of ws: w.v is missing`
+}
+
+test_roots_that_tie_on_their_cause_sort_by_their_name_not_their_text if {
+	ergo._m_clauses_text(ergo._m_clauses_shown([
+		_missing("$params.z"),
+		_root("$input.os.name", "absent", "item 2 of $input.os: name is missing"),
+	])) == "item 2 of $input.os: name is missing; $params.z is missing"
+}
+
+test_an_items_own_text_counts_as_one_leaf_of_the_cap if {
+	ergo._m_clauses_text(ergo._m_clauses_shown([_item("item 1 of ws", "unusable", [
+		_unread("item 1 of w.items", "unusable", "item 1 of w.items is null, which isn't an object"),
+		_unread("item 2 of w.items", "unusable", "item 2 of w.items is 3, which isn't an object"),
+		_item("item 3 of w.items", "absent", [_missing("n")]),
+		_unread("item 4 of w.items", "unusable", "item 4 of w.items is 4, which isn't an object"),
+	])])) == concat("; ", [
+		"item 1 of ws: item 1 of w.items is null, which isn't an object",
+		"item 1 of ws: item 2 of w.items is 3, which isn't an object",
+		"item 1 of ws: item 3 of w.items: n is missing",
+		"and 1 more",
+	])
+}
