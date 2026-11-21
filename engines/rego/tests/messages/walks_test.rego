@@ -110,3 +110,11 @@ test_a_member_is_placed_among_the_items_of_a_tally_by_its_key if {
 	ergo._m_positions(["rs", 0, "statuses", {"member": "b"}]) == [0, "b"]
 	ergo._m_positions(["xs", 2, "v"]) == [2]
 }
+
+test_an_item_whose_count_of_member_of_ends_at_no_object_says_it_isnt_one if {
+	c := {"op": "compare", "cmp": "eq", "left": {"count_of": ["s"], "whose": [], "text": "count of member of s", "member": true}, "right": {"literal": 1}}
+	ergo._m_item_tallies({"s": [1]}, c, "unusable") == ["s is [1], which isn't an object"]
+	ergo._m_item_tallies({"s": {"x": 1}}, c, "unusable") == []
+	l := {"op": "compare", "cmp": "eq", "left": {"count_of": ["s"], "whose": [], "text": "count of s"}, "right": {"literal": 1}}
+	ergo._m_item_tallies({"s": {"x": 1}}, l, "unusable") == [`s is {"x": 1}, which isn't a list`]
+}
