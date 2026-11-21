@@ -29,6 +29,7 @@ for file in "$@"; do
       open = 0
     }
     {
+      sub(/\r$/, "")
       if (open) {
         if ($0 ~ /^```/) {
           finish()
@@ -60,6 +61,11 @@ for file in "$@"; do
         normalise = "-"
         for (i = 2; i <= count; i++) {
           eq = index(parts[i], "=")
+          if (eq == 0) {
+            fail(NR, "the ergo-run attribute " parts[i] " has no =")
+            role = "bad-attribute"
+            continue
+          }
           key = substr(parts[i], 1, eq - 1)
           value = substr(parts[i], eq + 1)
           if (key == "role") role = value
@@ -70,11 +76,17 @@ for file in "$@"; do
         }
         mline = NR
         pending = 1
+        markers++
+      } else if (tolower($0) ~ /ergo[-_ ]?run/) {
+        stray[++nstray] = NR
       }
     }
     END {
       if (pending) fail(mline, "the ergo-run marker is not followed by a code block")
       if (open) fail(mline, "the code block after the ergo-run marker is never closed")
+      if (markers == 0) {
+        for (i = 1; i <= nstray; i++) fail(stray[i], "this ergo-run text is not a marker")
+      }
     }
   ' "$file"
 done
@@ -102,6 +114,12 @@ gi=0
 while IFS= read -r name; do
   gi=$((gi + 1))
   rows=$(awk -F'\t' -v n="$name" '$1 == n' "$work/by-name")
+  files=$(printf '%s\n' "$rows" | awk -F'\t' '$6 == "command" { print $3 }' | sort -u)
+  if [ "$(printf '%s\n' "$files" | wc -l)" -gt 1 ]; then
+    echo "group $name is used in more than one file: $(printf '%s' "$files" | tr '\n' ' ')" >&2
+    status=1
+    continue
+  fi
   where=$(printf '%s\n' "$rows" | head -n 1 | cut -f3,4 | tr "$tab" ':')
   bad=0
   command_row=
@@ -138,6 +156,9 @@ while IFS= read -r name; do
       output)
         noutput=$((noutput + 1))
         output_row="$block${tab}$bfile:$bline"
+        ;;
+      bad-attribute)
+        bad=1
         ;;
       *)
         echo "$bfile:$bline: group $name: unknown role '$role'" >&2
