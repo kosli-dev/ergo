@@ -319,3 +319,31 @@ test_roots_and_lists_with_the_same_text_are_said_once_whatever_their_names if {
 		ergo._m_clause("list", "ws", "value", "ws is []"),
 	]
 }
+
+test_a_cut_item_keeps_its_own_clauses_apart_like_an_uncut_one if {
+	review := _clause_item("item 1 of c.reviews", "value", [_clause_root("ok", "value", "ok is false")])
+	third := _clause_item("item 3 of cs", "value", [
+		review,
+		_clause_root("c.a", "value", "c.a is 2"),
+		_clause_item("item 2 of c.reviews", "value", [_clause_root("ok", "value", "ok is false")]),
+		_clause_root("c.b", "value", "c.b is 3"),
+	])
+	ergo._m_clauses_text(ergo._m_clauses_shown([third])) == concat("; ", [
+		"item 3 of cs: item 1 of c.reviews: ok is false",
+		"item 3 of cs: c.a is 2",
+		"item 3 of cs: item 2 of c.reviews: ok is false",
+		"item 3 of cs: c.b is 3",
+	])
+	ergo._m_clauses_text(ergo._m_clauses_shown([
+		_clause_item("item 1 of cs", "value", [review]),
+		_clause_item("item 2 of cs", "value", [review]),
+		third,
+	])) == concat("; ", [
+		"item 1 of cs: item 1 of c.reviews: ok is false",
+		"item 2 of cs: item 1 of c.reviews: ok is false",
+		"item 3 of cs: item 1 of c.reviews: ok is false",
+		"item 3 of cs: c.a is 2",
+		"item 3 of cs: c.b is 3",
+		"and 1 more",
+	])
+}
