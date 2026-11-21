@@ -55,7 +55,7 @@ The build goes to the `ergo-rust-target` volume and not to `engines/rust/target`
 
 ## Mutation testing the changed lines
 
-`cargo-mutants` changes the source one small way at a time, like returning `true` where a function returned a condition, and runs the tests on each change. A change no test notices is a missed mutant, which points at a line the tests don't pin down. `.github/mutants-facts.sh BASE` runs it only on the lines of Rust source that `git diff BASE...HEAD` changes, and prints how many mutants were caught, missed, unviable or timed out, and the missed ones. It stops after `MUTANTS_FACTS_TIMEOUT` seconds (900 by default), says so, and counts the mutants that ran. It only informs, and the `mutants-facts` job writes it in the summary of a pull request.
+`cargo-mutants` changes the source one small way at a time, like returning `true` where a function returned a condition, and runs the tests on each change. A change no test notices is a missed mutant, which points at a line the tests don't pin down. `.github/mutants-facts.sh BASE` runs it only on the lines of Rust source that `git diff BASE...HEAD` changes, and prints how many mutants were caught, missed, unviable or timed out, and the missed ones. It runs in your checkout, because the engine tests read `spec/cases`, and `cargo-mutants` puts each file back after it mutates it. It stops after `MUTANTS_FACTS_TIMEOUT` seconds (900 by default), says so, and counts the mutants that ran. It only informs, and the `mutants-facts` job writes it in the summary of a pull request.
 
 ```sh
 cargo install cargo-mutants --locked
