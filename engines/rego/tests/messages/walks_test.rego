@@ -84,3 +84,16 @@ test_an_item_two_conditions_cant_read_for_the_same_reason_is_named_once if {
 	])
 	[x[1] | some x in ergo._m_tally_items({"es": [null]}, side)] == ["item 1 of es is null, which isn't an object"]
 }
+
+test_a_member_is_named_like_an_item_with_its_key_in_place_of_its_position if {
+	ergo._m_item_name(["statuses", {"member": "sign-off"}], set()) == "member sign-off of statuses"
+	ergo._m_item_name(["rs", 0, "statuses", {"member": "b"}], set()) == "item 1 of rs: member b of statuses"
+	ergo._m_item_name(["evidence", {"member": "y"}, "kind"], set()) == "member y of evidence: kind"
+	ergo._m_item_name(["evidence", {"member": "a.b"}], set()) == `member "a.b" of evidence`
+}
+
+test_a_member_walk_that_finds_no_object_says_what_is_there if {
+	ergo._m_fail({"path": ["statuses"], "item": ["statuses"], "cause": "absent", "value": null, "msg": "an object"}, set()) == "statuses is missing"
+	ergo._m_fail({"path": ["statuses"], "item": ["statuses"], "cause": "null", "value": null, "msg": "an object"}, set()) == "statuses is null"
+	ergo._m_fail({"path": ["statuses"], "item": ["statuses"], "cause": "unusable", "value": ["DONE"], "msg": "an object"}, set()) == `statuses is ["DONE"], which isn't an object`
+}

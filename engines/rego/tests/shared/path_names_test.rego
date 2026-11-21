@@ -39,3 +39,13 @@ test_a_path_with_no_name_is_called_the_subject_and_never_it if {
 test_the_input_path_of_nothing_is_the_input if {
 	ergo._input_path_name([]) == "$input"
 }
+
+test_a_member_step_is_named_by_its_key_written_as_a_path_writes_it if {
+	ergo._input_name(["statuses", {"member": "sign-off"}]) == "member sign-off of statuses"
+	ergo._input_name(["statuses", {"member": "a; b"}]) == `member "a; b" of statuses`
+	ergo._input_name(["rs", 0, "statuses", {"member": "1"}]) == `member "1" of rs[0].statuses`
+	ergo._input_name(["evidence", {"member": "y"}, "kind"]) == "evidence.y.kind"
+	ergo._steps_name(["statuses", {"member": "sign-off"}]) == "statuses.sign-off"
+	ergo._steps_name(["statuses", {"member": ""}]) == `statuses.""`
+	ergo._steps_name(["rs", 0, "statuses", {"member": "b"}]) == "rs[0].statuses.b"
+}
