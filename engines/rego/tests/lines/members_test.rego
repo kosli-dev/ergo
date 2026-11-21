@@ -70,6 +70,13 @@ test_no_list_along_the_path_and_a_read_that_stops_before_the_end_fails_as_every_
 	w.fails == ergo._every_walk({"p": null}, ["p", "q"]).fails
 }
 
+test_a_start_that_is_not_an_object_fails_unusable_with_no_step_read if {
+	w := ergo._fm_walk([1], [])
+	w.subjects == []
+	_fm_said(w) == [[[], "unusable"]]
+	w.fails[0].why == {"path": [], "value": [1], "kind": "an object"}
+}
+
 test_members_of_mixed_types_name_the_first_member_of_each_type if {
 	w := ergo._fm_walk({"records": [{"evidence": {"a": {}, "b": "x", "c": "y"}}]}, ["records", "evidence"])
 	count(w.subjects) == 3
