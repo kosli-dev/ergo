@@ -1208,6 +1208,7 @@ struct Outcome {
     assertions: Vec<Value>,
     inner: Vec<Dead>,
     clauses: Vec<Clause>,
+    lifted: usize,
 }
 
 struct Level {
@@ -1368,6 +1369,7 @@ impl For {
                         assertions: Vec::new(),
                         inner: Vec::new(),
                         clauses: Vec::new(),
+                        lifted: 0,
                     }),
                     Vec::new(),
                 )
@@ -1458,6 +1460,7 @@ impl For {
                             assertions,
                             inner: nested.dead,
                             clauses,
+                            lifted: lifted.len(),
                         }),
                         Vec::new(),
                     )
@@ -1689,6 +1692,7 @@ impl For {
             assertions,
             inner: Vec::new(),
             clauses: Vec::new(),
+            lifted: 0,
         };
         if groups.len() > 1 {
             let leaf = groups
@@ -2099,7 +2103,7 @@ impl For {
             && super::message::said_text(&said) == key
         {
             cause = Cause::worst([cause, worse]).unwrap_or(worse);
-            clauses.push(Clause::said(worse, base));
+            clauses.push(Clause::said(cause, base));
         }
         (cause, clauses)
     }
@@ -3361,7 +3365,7 @@ impl For {
             let cause = Cause::worst(
                 marked_causes
                     .into_iter()
-                    .chain(said.iter().map(|clause| clause.cause)),
+                    .chain(said.iter().skip(outcome.lifted).map(|clause| clause.cause)),
             )
             .unwrap_or(outcome.cause);
             return Some(Clause::item(name, cause, text, said));
