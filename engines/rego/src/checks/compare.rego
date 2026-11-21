@@ -309,9 +309,39 @@ _list_flaw(leaf, x) := {"value"} if {
 
 _list_flaw(leaf, x) := {"unusable"} if {
 	_list_cmp(leaf)
+	not leaf.ignoring
 	_lstate(leaf, x) == "value"
 	not _lfailed(leaf, x)
 	not _list_right_usable(leaf.cmp, _lvalue(leaf, x))
+}
+
+_list_flaw(leaf, x) := {st} if {
+	_list_cmp(leaf)
+	leaf.ignoring
+	_lstate(leaf, x) == "value"
+	not _lfailed(leaf, x)
+	st := _list_text_state(_lvalue(leaf, x))
+}
+
+_list_flaw(leaf, _) := {st} if {
+	leaf.op in _membership_ops
+	leaf.ignoring
+	_is_ref(leaf.values)
+	_ref_state(leaf.values.ref) == "value"
+	st := _list_text_state(_ref_read(leaf.values.ref))
+}
+
+_list_text_state(r) := "unusable" if not is_array(r)
+
+else := _text_items_state(r)
+
+_text_items_state(r) := "unusable" if {
+	some v in r
+	v != null
+	not is_string(v)
+} else := "null" if {
+	some v in r
+	v == null
 }
 
 _list_flawed(leaf, x) if count(_list_flaw(leaf, x)) > 0
