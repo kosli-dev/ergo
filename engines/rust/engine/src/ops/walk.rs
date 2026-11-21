@@ -1370,7 +1370,12 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
             let leaf_check = walk.check.with_left(item.rest_path());
             let leaf = run_check(&leaf_check, &at);
             let passed = !undecided && kept && leaf.passed();
-            let reached = !undecided && kept && !passed;
+            let reached = kept
+                && !leaf.passed()
+                && (!undecided
+                    || own.is_none()
+                        && leaf.cause.is_failure()
+                        && failing().all(|(check, _, _)| reads_focus(check)));
             let alone = reached.then_some(leaf.cause).filter(|cause| {
                 leaf_roots.iter().any(|root| root.cause == *cause)
                     && !leaf_walked.iter().any(|root| root.cause == *cause)
@@ -1432,7 +1437,7 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
                     },
                     said,
                 ))
-            } else if undecided || passed || !kept || alone.is_some() {
+            } else if !reached || alone.is_some() {
                 None
             } else {
                 let off = message::off_item(&leaf_check, ctx, leaf.cause);
