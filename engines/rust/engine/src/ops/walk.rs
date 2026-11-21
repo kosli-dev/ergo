@@ -547,7 +547,13 @@ pub fn walk<'a>(path: &Path, ctx: &Ctx<'a>, options: Options) -> Walked<'a> {
             });
         }
     }
+    if member && !stops_early {
+        walked.insert(total);
+    }
     let mut marks = walked.clone();
+    if member {
+        marks.remove(&total);
+    }
     let shown_path = match &path.start {
         Start::Part(part) => {
             let inside = part.steps.len();
@@ -559,7 +565,7 @@ pub fn walk<'a>(path: &Path, ctx: &Ctx<'a>, options: Options) -> Walked<'a> {
             } else {
                 marks = walked
                     .iter()
-                    .filter(|at| **at >= inside)
+                    .filter(|at| **at >= inside && !(member && **at == total))
                     .map(|at| at - inside)
                     .collect();
                 path.clone()
