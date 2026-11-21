@@ -26,7 +26,7 @@ for name in pip python; do
 done
 export ERGO_CHECKS_VENV="$dir/venv"
 
-for name in build-ergo build-ergo_test dump-diff_test pr-facts_test pairs-facts_test matrix-facts_test mutants-facts_test clean-worktrees_test red-check_test no-array-data no-array-data_test docs-run docs-run_test docs-run-release_test no-inline-tests no-inline-tests_test rego-folders rego-folders_test rego-layers_test spec-placeholder spec-placeholder_test; do
+for name in build-ergo build-ergo_test dump-diff_test pr-facts_test pairs-facts_test body-facts_test matrix-facts_test mutants-facts_test clean-worktrees_test red-check_test no-array-data no-array-data_test docs-run docs-run_test docs-run-release_test no-inline-tests no-inline-tests_test rego-folders rego-folders_test rego-layers_test spec-placeholder spec-placeholder_test; do
   printf '#!/bin/sh\n[ ! -e "%s/fail-%s" ]\n' "$dir" "$name" > "$repo/.github/$name.sh"
   chmod +x "$repo/.github/$name.sh"
 done
@@ -42,7 +42,7 @@ with_all_tools() {
 with_all_tools
 
 run() {
-  (cd "$repo" && env PATH="$dir/all:$tools" "$@" bash .github/checks.sh "${FLAGS[@]}") 2>&1
+  (cd "$repo" && env PATH="$dir/all:$tools" "$@" bash .github/checks.sh ${FLAGS[@]+"${FLAGS[@]}"}) 2>&1
 }
 
 expect_in() {
