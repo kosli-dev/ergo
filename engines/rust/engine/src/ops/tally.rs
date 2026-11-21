@@ -113,7 +113,7 @@ fn once<'a>(locations: impl IntoIterator<Item = &'a String>) -> Vec<String> {
     out
 }
 
-fn side_paths(side: &Side) -> Vec<&Path> {
+pub(super) fn side_paths(side: &Side) -> Vec<&Path> {
     match side {
         Side::Plain(plain) => plain.paths(),
         Side::Derived(derived) => {

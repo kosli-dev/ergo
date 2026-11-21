@@ -526,11 +526,13 @@ pub fn for_failures(
     let mut owned: Vec<Vec<String>> = vec![Vec::new(); line.sentences.len()];
     let mut walk_texts: Vec<String> = Vec::new();
     let first_key = line.first_key(ctx);
+    let whose_keys = line.whose_keys(ctx);
     let key_said: Vec<&str> = first_key
         .iter()
         .flat_map(|k| {
             std::iter::once(k.key_text.as_str()).chain(k.base.iter().map(|(t, _, _)| t.as_str()))
         })
+        .chain(whose_keys.iter().map(|(_, text, _)| text.as_str()))
         .collect();
     let first_reads: Option<String> = (line.items.len() == 2
         && matches!(line.items[0].how, for_line::How::Some { .. }))
@@ -751,8 +753,28 @@ pub fn for_failures(
         );
     }
     out.extend(lists);
-    out.extend(rest);
+    out.extend(rest.into_iter().filter_map(said_item));
     out
+}
+
+fn said_item(entry: Failure) -> Option<Failure> {
+    let Failure::Item {
+        mut part,
+        value,
+        locations,
+    } = entry
+    else {
+        return Some(entry);
+    };
+    part.failures = std::mem::take(&mut part.failures)
+        .into_iter()
+        .filter_map(said_item)
+        .collect();
+    (!part.message.is_empty() || !part.failures.is_empty()).then_some(Failure::Item {
+        part,
+        value,
+        locations,
+    })
 }
 
 fn list_label(line: &For, said: &str) -> String {

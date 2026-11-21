@@ -130,23 +130,29 @@ fn a_path_from_an_alias_says_a_null_alias_and_a_missing_field_past_it() {
 }
 
 #[test]
-fn a_whose_says_a_missing_or_null_key_once_unless_another_key_isnt_text() {
+fn a_whose_says_a_missing_or_null_key_or_one_that_isnt_text_once() {
     let tree = ergo_policy_sentences::parse_check("v is m named by $params.k").unwrap();
     let read =
         crate::lower::lower_assertion(&tree.assertions[0], &crate::lower::Scope::new()).unwrap();
     let subject = json!({"v": 1});
     let params = json!({});
     assert_eq!(
-        missing_keys(&read, &ctx(&subject, &params, &[])),
+        unreadable_keys(&read, &ctx(&subject, &params, &[])),
         vec![(Cause::Absent, "$params.k is missing".to_string())]
     );
     let params = json!({"k": null});
     assert_eq!(
-        missing_keys(&read, &ctx(&subject, &params, &[])),
+        unreadable_keys(&read, &ctx(&subject, &params, &[])),
         vec![(Cause::Null, "$params.k is null".to_string())]
     );
     let params = json!({"k": 3});
-    assert!(missing_keys(&read, &ctx(&subject, &params, &[])).is_empty());
+    assert_eq!(
+        unreadable_keys(&read, &ctx(&subject, &params, &[])),
+        vec![(
+            Cause::Unusable,
+            "$params.k is 3, which isn't text".to_string()
+        )]
+    );
     assert_eq!(
         unusable_keys(&read, &ctx(&subject, &params, &[])),
         vec!["$params.k is 3, which isn't text".to_string()]
@@ -453,7 +459,7 @@ fn a_whose_says_each_missing_key_once_and_every_different_one() {
     let subject = json!({});
     let params = json!({});
     assert_eq!(
-        missing_keys(&read, &ctx(&subject, &params, &[])),
+        unreadable_keys(&read, &ctx(&subject, &params, &[])),
         vec![
             (Cause::Absent, "$params.k is missing".to_string()),
             (Cause::Absent, "$params.j is missing".to_string())
