@@ -306,7 +306,7 @@ _tally(subj, side) := {"states": {"not_an_object"}, "list": _path_name(path), "v
 	judged_states := {c | some j in judged; some c in j.states}
 	flaw_states := {fl | some fl in flaws; fl != ""}
 	root_flaw_states := {fl | some c in side.whose; fl := _root_read_flaw(subj, c); fl != ""}
-	states := ((((walk_states | judged_states) | _tally_number_states(f, _tally_distinct(side, read, subj, "read"))) | flaw_states) | root_flaw_states) | _tally_alone_states(subj, side, w)
+	states := (((((walk_states | judged_states) | _tally_number_states(f, _tally_distinct(side, read, subj, "read"))) | flaw_states) | root_flaw_states) | _tally_alone_states(subj, side, w)) | _tally_keyed_root_states(subj, side)
 	r := object.union(object.union({"states": states, "list": _walk_name(side[f], w.walked), "values": [_walk_value(e.v, e, w) | some e in w.items], "locations": _walk_locations(w)}, _tally_value(f, _tally_distinct(side, kept, subj, "kept"), states)), _tally_stop_outcome(stop))
 }
 
@@ -320,6 +320,10 @@ _tally_alone_states(subj, side, w) := {s |
 } if _items_judged_alone(subj, side)
 
 else := set()
+
+_tally_keyed_root_states(subj, side) := {b.fault.cause} if {
+	b := _m_tally_keyed_base(subj, side)
+} else := set()
 
 _tally_stop_outcome(stop) := {"ergo/outcome": stop[0].cause} if {
 	stop != []
