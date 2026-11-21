@@ -3656,5 +3656,7 @@ fn none_found(env: &Env) -> Evaluation {
     }
 }
 
+mod member;
+
 #[cfg(test)]
 mod tests;
