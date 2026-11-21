@@ -756,6 +756,13 @@ _id_fault_place(entry, req, doc) := object.union(object.remove(place, ["item"]),
 	text := concat("", [_m_from_item_name(req, ec), " is null"])
 }
 
+_id_fault_place(entry, req, doc) := object.union(object.remove(place, ["item"]), {"c": ec, "at": entry.at, "cause": "null", "value": null, "text": concat("", [_ms_read_name(req, ec), " is null"]), "note": false, "plain": false}) if {
+	entry.subject == null
+	ec := _entry_c(entry, req)
+	not _id_listed(ec)
+	place := _id_place(entry, req, doc)
+}
+
 _id_said_on(req, ec, subject, item, id, doc) := _id_present(item, array.concat(_id_tail(ec), id)) if _id_listed(ec)
 
 else := _id_present(subject, array.concat(["$$input"], id)) if {
