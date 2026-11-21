@@ -2323,3 +2323,18 @@ fn each_root_of_one_sentence_keeps_its_own_cause() {
         "$params.b is \"s\", which isn't a number; $params.a is missing"
     );
 }
+
+#[test]
+fn a_sentence_says_an_item_once_when_two_of_its_whose_clauses_cant_read_it() {
+    assert_eq!(
+        item_text(
+            "every xs as x",
+            &["count of x.es whose v is at least $params.a and whose v is at most $params.b is 0"],
+            json!({"xs": [{"es": [{"v": 1}, {}]}]}),
+            json!({"a": "s"}),
+            0,
+            0,
+        ),
+        "item 2 of x.es: v is missing"
+    );
+}
