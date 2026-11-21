@@ -2679,3 +2679,94 @@ fn params_that_are_a_list_are_not_said_first_when_the_count_reads_a_key_of_them(
         "$params is [1, 2], which isn't an object"
     );
 }
+
+const ROOT_NOT_AN_OBJECT: &str = "item 1 of $input.rs is 1, which isn't an object";
+
+fn with_roots_said(said: Said) -> String {
+    let check = lowered(IN_ROOT_LIST);
+    let Check::Tally(tally) = &check else {
+        panic!("not a count");
+    };
+    let input = json!({"rs": [1], "things": [{"xs": []}]});
+    let ctx = Ctx {
+        label: None,
+        item_by_item: false,
+        subject: Located {
+            value: &input["things"][0],
+            location: Location::input_root().key("things").index(0),
+        },
+        input: &input,
+        params: None,
+        aliases: BTreeMap::new(),
+    };
+    super::super::message::said_text(&with_walked_roots(tally, &ctx, said))
+}
+
+#[test]
+fn a_walked_root_the_row_already_says_is_said_once_and_first() {
+    assert_eq!(
+        with_roots_said(vec![
+            vec![Piece::Said("other".to_string())],
+            vec![Piece::Said(ROOT_NOT_AN_OBJECT.to_string())],
+        ]),
+        format!("{ROOT_NOT_AN_OBJECT}; other")
+    );
+}
+
+#[test]
+fn a_root_clause_of_the_row_that_is_not_a_walked_root_stays() {
+    let missing = Clause::root("$input.q", Cause::Absent, "$input.q is missing".to_string());
+    let walked = Clause::root("$input.rs", Cause::Unusable, ROOT_NOT_AN_OBJECT.to_string());
+    assert_eq!(
+        with_roots_said(vec![vec![Piece::Counted(vec![missing, walked])]]),
+        format!("{ROOT_NOT_AN_OBJECT}; $input.q is missing")
+    );
+}
+
+#[test]
+fn a_walked_root_is_not_added_again_when_the_roots_already_have_it() {
+    let check = lowered(IN_ROOT_LIST);
+    let Check::Tally(tally) = &check else {
+        panic!("not a count");
+    };
+    let input = json!({"rs": [1], "things": [{"xs": []}]});
+    let ctx = Ctx {
+        label: None,
+        item_by_item: false,
+        subject: Located {
+            value: &input["things"][0],
+            location: Location::input_root().key("things").index(0),
+        },
+        input: &input,
+        params: None,
+        aliases: BTreeMap::new(),
+    };
+    let outer = outer_ctx(&ctx);
+    let whose: Vec<&Check> = tally.counted_whose().collect();
+    let roots = super::super::message::walked_root_clauses(&whose, &outer);
+    assert_eq!(roots.len(), 1);
+    assert_eq!(and_walked_roots(roots.clone(), &whose, &outer).len(), 1);
+    assert_eq!(and_walked_roots(Vec::new(), &whose, &outer).len(), 1);
+}
+
+fn item_clause(name: &str) -> Clause {
+    Clause::item(name, Cause::Absent, String::new(), Vec::new())
+}
+
+#[test]
+fn an_item_is_its_own_when_it_is_the_item_or_one_of_its_parts() {
+    assert!(own_item(&item_clause("item 1 of xs"), "item 1 of xs"));
+    assert!(own_item(&item_clause("item 1 of xs: ys"), "item 1 of xs"));
+    assert!(own_item(&item_clause("item 1 of xs ys"), "item 1 of xs"));
+}
+
+#[test]
+fn an_item_is_not_its_own_when_another_item_starts_with_the_same_text() {
+    assert!(!own_item(&item_clause("item 10 of xs"), "item 1 of xs"));
+}
+
+#[test]
+fn a_list_with_the_name_of_an_item_is_not_that_item() {
+    let list = Clause::list("item 1 of xs", Cause::Absent, String::new());
+    assert!(!own_item(&list, "item 1 of xs"));
+}
