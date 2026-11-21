@@ -104,3 +104,9 @@ test_members_count_toward_and_n_more_like_items if {
 	ergo._m_item_leads(ms) == ["member a of xs", "member b of xs", "member c of xs", `member "d e" of xs`]
 	not ergo._m_shown_clause(`member "d e" of xs is 1`, ["member a of xs"])
 }
+
+test_a_member_is_placed_among_the_items_of_a_tally_by_its_key if {
+	ergo._m_positions(["costs", {"member": "c"}]) == ["c"]
+	ergo._m_positions(["rs", 0, "statuses", {"member": "b"}]) == [0, "b"]
+	ergo._m_positions(["xs", 2, "v"]) == [2]
+}
