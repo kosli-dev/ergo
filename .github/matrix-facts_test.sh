@@ -172,3 +172,39 @@ if [ "$(git -C "$repo" worktree list | wc -l)" != "$trees" ]; then
   echo "matrix-facts.sh should remove its worktree" >&2
   exit 1
 fi
+
+echo "every generator in .github/matrix is deterministic, writes only the file it is given and is named in the README and in test.yml"
+before=$(git -C "$repo" status --porcelain)
+for generator in "$repo"/.github/matrix/*.py; do
+  name=$(basename "$generator" .py)
+  python3 "$generator" "$dir/$name-1.json" > /dev/null
+  python3 "$generator" "$dir/$name-2.json" > /dev/null
+  if ! cmp -s "$dir/$name-1.json" "$dir/$name-2.json"; then
+    echo "$name.py should write the same file every time" >&2
+    exit 1
+  fi
+  if grep -q "$dir\|/Users/\|/home/" "$dir/$name-1.json"; then
+    echo "$name.py should write no machine path" >&2
+    exit 1
+  fi
+  if ! jq -e 'type == "array" and length > 0 and all(.[]; has("name") and has("policy") and has("input") and has("params")) and (map(.name) | unique | length) == length' "$dir/$name-1.json" > /dev/null; then
+    echo "$name.py should write a list of pairs with different names" >&2
+    exit 1
+  fi
+  if ! grep -q "\`$name.py\`" "$repo/.github/matrix/README.md"; then
+    echo "$name.py should be named in .github/matrix/README.md" >&2
+    exit 1
+  fi
+  if ! grep -q "matrix-facts.sh \"\$BASE\".* $name\( \|\$\)" "$repo/.github/workflows/test.yml"; then
+    echo "$name should be in the generator list of the matrix-facts job in test.yml" >&2
+    exit 1
+  fi
+done
+if [ "$(git -C "$repo" status --porcelain)" != "$before" ]; then
+  echo "the generators should write only the file they are given" >&2
+  exit 1
+fi
+if [ ! -f "$repo/.github/matrix/for.py" ]; then
+  echo "there should be a generator for the for lines" >&2
+  exit 1
+fi

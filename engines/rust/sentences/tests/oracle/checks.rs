@@ -10603,6 +10603,12 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    (
+        "x.w is at least $params.a",
+        "x.w is at least $params.a",
+        &[],
+        &[],
+    ),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -15329,6 +15335,12 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "every envs as e, every deploys whose env is e as d",
         "every envs as e, every deploys whose env equals e as d",
+        &[],
+        &[],
+    ),
+    (
+        "every xs whose v is at least $params.min as x",
+        "every xs whose v is at least $params.min as x",
         &[],
         &[],
     ),
