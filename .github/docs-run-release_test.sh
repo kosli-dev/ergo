@@ -13,7 +13,7 @@ case $2 in
     if [ -n "${FAKE_TAGS:-}" ]; then printf '%s\n' "$FAKE_TAGS"; fi
     ;;
   download)
-    if [ "${FAKE_EMPTY:-}" = 1 ]; then : > "$8/ergo.rego"; else printf '_spec := "v7.7"\n' > "$8/ergo.rego"; fi
+    if [ "${FAKE_EMPTY:-}" = 1 ]; then : > "$9/ergo.rego"; else printf '_spec := "v7.7"\n' > "$9/ergo.rego"; fi
     ;;
 esac
 GH
