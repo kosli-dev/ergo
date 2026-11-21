@@ -399,3 +399,39 @@ fn two_clauses_of_one_item_join_with_and() {
         "item 1 of xs: x.v is missing, and x.w is missing; item 2 of xs: x.v is missing, and x.w is missing; item 3 of xs: x.v is missing, and x.w is missing; and 2 more"
     );
 }
+
+#[test]
+fn roots_of_a_later_sentence_come_after_the_roots_of_an_earlier_one() {
+    let clauses = vec![
+        missing("$params.b").in_group(1),
+        root(
+            "$params.a",
+            Cause::Unusable,
+            "$params.a is \"s\", which isn't a number",
+        )
+        .in_group(2),
+    ];
+    assert_eq!(
+        text(&shown(&clauses)),
+        "$params.b is missing; $params.a is \"s\", which isn't a number"
+    );
+}
+
+#[test]
+fn a_root_two_sentences_say_is_said_once_in_the_first() {
+    let clauses = vec![
+        missing("zz").in_group(1),
+        null("$params.a").in_group(2),
+        missing("zz").in_group(2),
+        root(
+            "$params.c",
+            Cause::Unusable,
+            "$params.c is 3, which isn't text",
+        )
+        .in_group(2),
+    ];
+    assert_eq!(
+        text(&shown(&clauses)),
+        "zz is missing; $params.c is 3, which isn't text; $params.a is null"
+    );
+}
