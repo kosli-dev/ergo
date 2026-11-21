@@ -403,7 +403,7 @@ _m_for_joined(ents) := concat("; ", array.concat(_once([e.t | some e in ents; _m
 _m_for_counted(ents) := _once([_m_item_lead(e.t) | some e in ents; e.x == false; _walk_kind(e.t) == "item"])
 
 _m_item_lead(t) := concat(": ", [_m_item_head(p) | some i, p in ps; i < n]) if {
-	ps := split(t, ": ")
+	ps := _m_quote_split(t, ": ")
 	n := count([i | some i, _ in ps; _m_items_up_to(ps, i)])
 }
 
@@ -413,11 +413,9 @@ _m_items_up_to(ps, i) if {
 	}
 }
 
-_m_item_head(p) := substring(p, 0, o + s) if {
-	o := indexof(p, " of ") + 4
-	s := indexof(substring(p, o, -1), " ")
-	s >= 0
-} else := p
+_m_item_head(p) := concat("", [x[0], " of ", split(x[1], " ")[0]]) if x := _item_parts(p)
+
+else := p
 
 _m_kept(e, shown, _) if {
 	e.x == false
