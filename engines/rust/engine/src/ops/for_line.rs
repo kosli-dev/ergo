@@ -1988,19 +1988,45 @@ impl For {
             }
         }
         for (at, sentence) in self.sentences.iter().enumerate() {
-            let group = at + 1;
-            let nested = nested_whose(&sentence.check, false);
-            let mut said = sentence_root_clauses(&root_forms(&sentence.check), &outer);
-            said.extend(super::message::side_root_clauses(&nested, &outer));
-            said.extend(super::message::walked_root_clauses(&nested, &outer));
-            clauses.extend(said.into_iter().map(|clause| clause.in_group(group)));
+            let said = sentence_roots_said(&sentence.check, &outer);
+            clauses.extend(said.into_iter().map(|clause| clause.in_group(at + 1)));
         }
         clauses
     }
 
     #[cfg_attr(not(test), expect(dead_code))]
-    pub fn sentence_clauses(&self, _idx: usize, _ctx: &Ctx) -> (Cause, Vec<Clause>) {
-        (Cause::Satisfied, Vec::new())
+    pub fn sentence_clauses(&self, idx: usize, ctx: &Ctx) -> (Cause, Vec<Clause>) {
+        use super::message::Piece;
+        let Some(sentence) = self.sentences.get(idx) else {
+            return (Cause::Satisfied, Vec::new());
+        };
+        let ran = run_full(&sentence.check, ctx);
+        let cause = ran.verdict.cause;
+        if ran.verdict.passed() {
+            return (cause, Vec::new());
+        }
+        let walks = matches!(sentence.check, Check::Walk(_));
+        let said = match ran.parts {
+            Some(parts) if walks && !parts.is_empty() => vec![vec![Piece::Counted(parts)]],
+            _ => super::message::row_said(&sentence.check, ctx, &ran.verdict),
+        };
+        let mut line = ctx.clone();
+        for item in &self.items {
+            line.aliases.remove(&item.alias);
+        }
+        let mut seen: Vec<Clause> = sentence_roots_said(&sentence.check, &outer_ctx(&line))
+            .into_iter()
+            .flat_map(|root| [Clause::said(Cause::Value, root.text.clone()), root])
+            .collect();
+        let clauses: Vec<Clause> = super::message::unsaid_clauses(&said, &mut seen)
+            .into_iter()
+            .flatten()
+            .flat_map(|piece| match piece {
+                Piece::Said(text) => vec![Clause::said(cause, text)],
+                Piece::Counted(clauses) => clauses,
+            })
+            .collect();
+        (cause, clauses)
     }
 
     fn whose_keys_first(&self, run: &mut Run, ctx: &Ctx) {
@@ -3861,7 +3887,14 @@ fn bound_alias(root: &Path, ctx: &Ctx) -> bool {
     }
 }
 
-#[cfg_attr(not(test), expect(dead_code))]
+fn sentence_roots_said(check: &Check, ctx: &Ctx) -> Vec<Clause> {
+    let nested = nested_whose(check, false);
+    let mut said = sentence_root_clauses(&root_forms(check), ctx);
+    said.extend(super::message::side_root_clauses(&nested, ctx));
+    said.extend(super::message::walked_root_clauses(&nested, ctx));
+    said
+}
+
 fn sentence_root_clauses(forms: &[(Check, bool)], ctx: &Ctx) -> Vec<Clause> {
     forms
         .iter()
