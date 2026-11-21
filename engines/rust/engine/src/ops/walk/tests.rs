@@ -1565,3 +1565,30 @@ fn a_walk_row_says_the_roots_then_the_lists_own_problem_then_the_items_with_the_
         "$params.a is 3, which isn't text; $params.b is null; ys is []; item 1 of xs: v is missing"
     );
 }
+
+#[test]
+fn an_item_that_isnt_a_time_says_so_beside_a_time_root_that_cant_be_read() {
+    let items = json!([{"v": 2}, {"v": "2024-01-01T00:00:00Z"}, {}]);
+    let not_a_time = (
+        Cause::Unusable,
+        "item 1 of items: v is 2, which isn't a time written like \"1970-01-01T00:00:00Z\""
+            .to_string(),
+    );
+    for sentence in [
+        "every items whose v is before $params.x exists",
+        "every items whose v is on or after $params.x exists",
+        "some items whose v is before $params.x exists",
+    ] {
+        for params in [json!({}), json!({"x": null}), json!({"x": "s"})] {
+            assert_eq!(
+                own_said(sentence, items.clone(), params, json!({})),
+                vec![
+                    Some(not_a_time.clone()),
+                    None,
+                    Some((Cause::Absent, "item 3 of items: v is missing".to_string())),
+                ],
+                "{sentence}"
+            );
+        }
+    }
+}
