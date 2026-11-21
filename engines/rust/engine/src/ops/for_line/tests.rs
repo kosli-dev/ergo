@@ -3610,3 +3610,24 @@ fn a_second_lines_whose_names_a_key_that_isnt_text_once_and_each_item_its_own_re
         }
     }
 }
+
+#[test]
+fn a_first_item_whose_second_items_fail_only_on_a_whose_key_has_no_entry() {
+    let row = row_with(
+        "every ms as m, every m.es whose zz is m named by $params.k as e",
+        json!("e.n is 2"),
+        json!({"ms": [{"es": [{"n": 2, "zz": 1}]}, {"es": [{"n": 2}]}]}),
+        json!({"k": 3}),
+    );
+    assert_eq!(
+        row["message"],
+        "$params.k is 3, which isn't text; item 2 of ms: item 1 of m.es: zz is missing"
+    );
+    assert_eq!(
+        entries(&row["failures"]),
+        [
+            "item item 2 of ms absent: ",
+            "  item item 1 of m.es absent: zz is missing"
+        ]
+    );
+}
