@@ -432,6 +432,7 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("w is not empty", "w is not empty", &[], &[]),
     (".y.k is 9", "y.k is 9", &[], &[]),
     (".zz is 1", "zz is 1", &[], &[]),
+    ("zz is 1", "zz is 1", &[], &[]),
     ("count of .round is 1", "count of round is 1", &[], &[]),
     ("cov is 1", "cov is 1", &[], &[]),
     ("cov.k is 0", "cov.k is 0", &[], &[]),
