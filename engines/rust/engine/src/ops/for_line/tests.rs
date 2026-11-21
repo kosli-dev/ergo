@@ -2380,11 +2380,106 @@ fn for_line_cases() -> Vec<(String, Value, Value, Value)> {
     out
 }
 
-const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 0] = [];
+const NO_LIST: &str = "the tree has no clause for the list itself until R5-6";
 
-const ROWS_COMPARED: usize = 0;
+const EARLIER_ALIAS: &str = "the tree has no item for a root read through an earlier line's alias when no item of the second list is checked";
 
-const ROWS_LISTED: usize = 0;
+const KEY_FROM_A_FIELD: &str =
+    "a key read from a field on the line, like zz in ts named by zz, isn't a root clause";
+
+const SAID_OUTSIDE: &str = "the row's message comes from message::row_said after the check runs again to read its walked roots, not from the for line";
+
+const ITEMS_BY_SENTENCE: &str =
+    "the case says item 2 before item 1, which spec/OPEN.md lists under problems.item_order";
+
+const PAIR_LEAD_INSIDE: &str = "the case says the pair's lead after a sentence that doesn't read the second item, which spec/OPEN.md lists under message.join";
+
+const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 20] = [
+    (
+        "distinct / distinct under a for line that is written wrong for another reason, part 4 of 4 / each check lists only its own problems, and none is about distinct",
+        KEY_FROM_A_FIELD,
+    ),
+    (
+        "for / a for line runs the sentences that don't read the alias of an empty list it tolerates on an item that isn't an object only when one of them reads the item / fails an approver that isn't an object with the sentence that reads it, and passes it when every sentence reads commit",
+        ITEMS_BY_SENTENCE,
+    ),
+    (
+        "for / a for line that starts with some fails when the only items that pass have an alias the sentence can't read, even when nothing comes after them to check / fails when the only approver has no u for the sentence to read, even though there are no commits",
+        EARLIER_ALIAS,
+    ),
+    (
+        "for / a for line whose sentence reads a key from an alias of an earlier line / names a key of the wrong type once under its first item, on an empty list too",
+        EARLIER_ALIAS,
+    ),
+    (
+        "for / a for line's sentence whose root reads the first item's alias, on the second item / fails when the second list is empty too",
+        EARLIER_ALIAS,
+    ),
+    (
+        "for / a part that a for line reads fails it when the line's whose leaves nothing and an item of the part can't be read / fails, when the whose leaves nothing, when an item of it has no name",
+        SAID_OUTSIDE,
+    ),
+    (
+        "for / a second for item picking after the first alias lists nothing when it picks nothing / a first item that matches nothing fails as absent and lists no failed item",
+        NO_LIST,
+    ),
+    (
+        "for / a second for item picking after the first alias lists nothing when it picks nothing / an empty second list fails as absent and lists no failed item",
+        NO_LIST,
+    ),
+    (
+        "for / a second item with a position lists its failed list / lists no entry for an empty list, which a position allows",
+        NO_LIST,
+    ),
+    (
+        "for / an alias of an earlier line that walks a list fails a second line on an empty list when an item of it can't be read / fails, with an empty rows, when an item of it has no name",
+        EARLIER_ALIAS,
+    ),
+    (
+        "for / an alias of an earlier line that walks a list fails a second line on an empty list when an item of it can't be read / fails, with an empty rows, when an item of it is null",
+        EARLIER_ALIAS,
+    ),
+    (
+        "for / an alias of an earlier line that walks a list fails a second line on an empty list when an item of it can't be read / fails, with an empty rows, when it holds names of more than one kind",
+        EARLIER_ALIAS,
+    ),
+    (
+        "for / the latest commit picked on a for line / fails as absent on an empty list, since there's nothing to pick",
+        NO_LIST,
+    ),
+    (
+        "for / the second latest approval, filtered before it is sorted / fails as absent when fewer items are left than the position",
+        NO_LIST,
+    ),
+    (
+        "for / two items over sibling lists, with two assertions / an approver who breaks both sentences lists both, in the order written",
+        PAIR_LEAD_INSIDE,
+    ),
+    (
+        "for / two items over sibling lists, with two assertions / fails as value when no approver is left, and the commits are not read as a failure",
+        NO_LIST,
+    ),
+    (
+        "for / whose on a for item / when whose leaves no item in, every and some fail as value and if any passes",
+        NO_LIST,
+    ),
+    (
+        "messages / a for line that picks nothing prints the list it read / a whose that leaves no item prints the list",
+        NO_LIST,
+    ),
+    (
+        "messages / a for line that picks nothing prints the list it read / an empty list prints as empty",
+        NO_LIST,
+    ),
+    (
+        "sentences / a for line that walks a path with a named by field / that is null fails as null whatever the field holds, as the walk does without the field",
+        NO_LIST,
+    ),
+];
+
+const ROWS_COMPARED: usize = 1244;
+
+const ROWS_LISTED: usize = 30;
 
 fn item_entries(failures: &Value, out: &mut Vec<(String, String)>) {
     for failure in failures.as_array().into_iter().flatten() {
