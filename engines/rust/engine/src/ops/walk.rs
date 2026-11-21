@@ -1387,6 +1387,25 @@ fn stood_in(check: &Check, focus: &Ctx, blocked: impl Fn(&Path) -> bool) -> Opti
             }))
         }
         Check::Matches(matches) => own_list(&matches.patterns),
+        Check::Tally(tally) => {
+            let right = tally.right.as_ref()?;
+            let blocked_side = |side: &super::tally::Side| {
+                super::tally::side_paths(side).into_iter().any(&blocked)
+            };
+            let own = match (blocked_side(&tally.left), blocked_side(right)) {
+                (false, true) => tally.left.clone(),
+                (true, false) => right.clone(),
+                _ => return None,
+            };
+            Some(Check::Tally(super::tally::Tally {
+                left: own.clone(),
+                right: Some(own),
+                test: super::tally::Test::Compare {
+                    cmp: super::compare::Cmp::Eq,
+                    within: None,
+                },
+            }))
+        }
         _ => None,
     }
 }

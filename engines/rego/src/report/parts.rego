@@ -490,7 +490,7 @@ _tally_record_texts(c, subj, cause, m) := {_m_aliased(r[1]) |
 	is_object(c)
 	mc := object.union(_m_with_sides(_m_walked(c, subj)), {"ergo/row": true})
 	some side in _m_tally_parts(mc)
-	rs := _m_tally_said(subj, side, cause)
+	rs := _m_tally_records(subj, side, cause)
 	some r0 in rs
 	count(r0) == 3
 	not _tally_root_said(r0, rs)
@@ -507,6 +507,8 @@ _tally_root_said(r, rs) if {
 }
 
 _tally_record_listed(src) if _m_positions(src.item.i) != []
+
+_tally_record_listed(src) if _m_positions(src.key.i) != []
 
 _tally_record_listed(src) if _m_positions(src.fail.path) != []
 
@@ -1476,7 +1478,7 @@ _tally_item_records(c, subj, cause, at, m) := [x |
 	f := _basic_form(side)
 	w := _tally_walk(subj, side)
 	roots := _dotted_roots([side[f]])
-	rs := _m_tally_said(subj, side, cause)
+	rs := _m_tally_records(subj, side, cause)
 	some r0 in rs
 	count(r0) == 3
 	not _tally_root_said(r0, rs)
@@ -1501,7 +1503,7 @@ else := null if kept == []
 
 else := [_worst_of({_tally_clause_cause(c, r[0]) | some c in kept}), concat("", [lead, concat("; ", kept)]), r[2]]
 
-_tally_clause_cause(c, state) := _tally_word_cause(c, _tally_record_cause(state))
+_tally_clause_cause(c, state) := _tally_word_cause(c, _m_src_cause(state))
 
 _tally_word_cause(c, _) := "absent" if endswith(c, " is missing")
 
@@ -1519,8 +1521,13 @@ _tally_word_cause(c, cause) := "unusable" if {
 	cause in {"absent", "null"}
 }
 
-_tally_record_entry([state, text, src], side, w, roots, at, subj) := _tally_leveled(_tally_item_entry(e, _tally_record_cause(state), text, side, w, roots, subj), e.i, w, at) if {
+_tally_record_entry([state, text, src], side, w, roots, at, subj) := _tally_leveled(_tally_item_entry(e, _m_src_cause(state), text, side, w, roots, subj), e.i, w, at) if {
 	e := src.item
+	_m_positions(e.i) != []
+}
+
+_tally_record_entry([state, text, src], _, w, roots, at, _) := _tally_leveled(object.union(_entry("item", _m_item_name(e.i, roots), _m_src_cause(state), [_tally_key_read(src, w)], [], text), {"value": e.iv, "locations": [_item_at(w, e)]}), e.i, w, at) if {
+	e := src.key
 	_m_positions(e.i) != []
 }
 
@@ -1530,9 +1537,7 @@ _tally_record_entry([state, text, src], _, w, roots, at, _) := _tally_leveled(_e
 	_ = state
 }
 
-_tally_record_cause(state) := substring(state, 6, -1) if startswith(state, "focus ")
-
-else := state
+_tally_key_read(src, w) := {"name": _input_name(array.concat(src.key.c, src.flaw.prefix)), "value": _key_list_value(src.flaw.value), "locations": [_item_read_at(w, src.key, array.concat(object.get(src.key, "r", []), src.flaw.prefix))], "outcome": _key_flaw_outcome(src.flaw, src.steps)}
 
 _tally_item_entry(e, cause, text, side, w, roots, subj) := object.union(
 	_entry("item", _m_item_name(e.i, roots), cause, _tally_item_reads(e, cause, side, w, text, subj), [], text),

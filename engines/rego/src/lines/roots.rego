@@ -96,13 +96,15 @@ _m_cond_root_texts(subj, c) := _once([m |
 
 else := _m_root_texts_all(subj, c)
 
-_m_root_texts_all(subj, c) := _once([m |
+_m_root_texts_all(subj, c) := _once([x[1] | some x in _m_root_said_all(subj, c)])
+
+_m_root_said_all(subj, c) := [[st, m] |
 	states := _named_root_states(subj, c)
 	ys := _walked_tallies(c)
 	some st in _cause_precedence
 	st in states
 	some m in array.concat(_m_root_texts(subj, c, st), _m_walked_tally_texts(subj, ys, st))
-])
+]
 
 _m_for_root_text(subj, c, p, st) := f.msg if {
 	f := _tally_root_fault(subj, c, p)
@@ -491,7 +493,9 @@ _walk_root_msgs(check, subj) := _m_root_sorted(_once(array.concat(
 	),
 )))
 
-_m_cond_walked_texts(c) := [t |
+_m_cond_walked_texts(c) := [x[1] | some x in _m_cond_walked_said(c)]
+
+_m_cond_walked_said(c) := [[cause, t] |
 	walk(c, [_, x])
 	is_object(x)
 	_list_phrase(x)

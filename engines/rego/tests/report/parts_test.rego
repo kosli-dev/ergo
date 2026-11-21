@@ -15,6 +15,15 @@ test_a_tally_word_that_is_neither_missing_nor_null_turns_absent_and_null_into_un
 	ergo._tally_word_cause("xs is missing", "absent") == "absent"
 }
 
+test_a_clause_kept_from_a_record_takes_its_cause_from_the_record_state_without_its_focus_or_root_mark if {
+	ergo._tally_clause_cause("v is missing", "focus unusable") == "absent"
+	ergo._tally_clause_cause(`v is "a", which isn't text`, "focus absent") == "unusable"
+	ergo._tally_clause_cause(`v is "a", which isn't text`, "focus not_an_object") == "not_an_object"
+	ergo._tally_clause_cause(`v is "a", which isn't text`, "root absent") == "unusable"
+	ergo._tally_clause_cause(`v is "a", which isn't text`, "root not_an_object") == "not_an_object"
+	ergo._tally_clause_cause(`v is "a", which isn't text`, "not_an_object") == "not_an_object"
+}
+
 test_a_check_without_a_checks_list_in_its_where_is_its_own_text if {
 	ergo._sub_mcheck({"check": {"checks": []}}, "c", {}) == "c"
 }
@@ -124,6 +133,25 @@ test_a_counted_list_written_with_a_dot_is_never_an_input_of_an_assertion_in_an_o
 	e := {"kind": "assertion", "name": "count of .lock.pkgs is 1", "cause": "value", "inputs": [{"name": "count of .lock.pkgs", "value": 2}, {"name": ".lock.pkgs[]", "outcome": "usable", "value": [{"n": 1}, {"n": 2}]}], "failures": [], "message": "count of .lock.pkgs is 2"}
 	row := {"ergo/subj": {"id": "t1", "lock": {"pkgs": [{"n": 1}, {"n": 2}]}}, "ergo/req": {}}
 	[i.name | some i in ergo._tallied_entry(e, c, {"cause": "value"}, "/repos/0", {"check": {"op": "sentence_any_of"}}, row).inputs] == ["count of .lock.pkgs"]
+}
+
+test_a_count_gives_an_item_entry_for_each_item_beside_a_key_it_cant_read if {
+	check := ergo._s_written_check("count of es whose zz is m named by $params.k is 0")
+	m := "$params.k is missing; item 1 of es: m is missing; item 2 of es: m is missing; item 3 of es: m is missing; and 1 more"
+	parts := ergo._tally_item_parts(check, {"es": [{"zz": 1}, {"zz": 1}, {"zz": 1}, {"zz": 1}]}, "absent", "/things/0", m) with data.ergo_params as {}
+	[[p.name, p.cause, p.message] | some p in parts] == [["item 1 of es", "absent", "m is missing"], ["item 2 of es", "absent", "m is missing"], ["item 3 of es", "absent", "m is missing"], ["item 4 of es", "absent", "m is missing"]]
+	ergo._tally_rest_of(m, set(), ergo._tally_item_texts(check, {"es": [{"zz": 1}, {"zz": 1}, {"zz": 1}, {"zz": 1}]}, "absent", m)) == "$params.k is missing" with data.ergo_params as {}
+}
+
+test_a_count_item_beside_a_key_it_cant_read_reads_the_value_before_the_key_as_an_every_item_does if {
+	check := ergo._s_written_check("count of es whose zz is m named by $params.k is 0")
+	m := "$params.k is missing; item 1 of es: m is missing; item 2 of es: m is null; item 3 of es: m is 3, which isn't an object"
+	parts := ergo._tally_item_parts(check, {"es": [{"zz": 1}, {"zz": 1, "m": null}, {"zz": 1, "m": 3}]}, "unusable", "/things/0", m) with data.ergo_params as {}
+	[[p.name, p.cause, p.inputs] | some p in parts] == [
+		["item 1 of es", "absent", [{"name": "es[0].m", "value": null, "locations": ["/things/0/es/0"], "outcome": "absent"}]],
+		["item 2 of es", "null", [{"name": "es[1].m", "value": null, "locations": ["/things/0/es/1/m"], "outcome": "absent"}]],
+		["item 3 of es", "unusable", [{"name": "es[2].m", "value": 3, "locations": ["/things/0/es/2/m"], "outcome": "unusable"}]],
+	]
 }
 
 test_a_member_nests_under_the_items_of_the_lists_before_it_like_an_item if {
