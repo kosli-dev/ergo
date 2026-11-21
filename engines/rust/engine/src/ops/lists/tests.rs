@@ -1242,6 +1242,69 @@ fn list_fault(sentence: &str, subject: Value, params: Value) -> Option<(Cause, S
     walk_fault(&check, &ctx)
 }
 
+fn on_input(subject: Value, cs: Value, params: Value, run: impl Fn(&Ctx) -> Verdict) -> Verdict {
+    let input = json!({"things": [subject], "cs": cs});
+    let ctx = Ctx {
+        label: None,
+        item_by_item: false,
+        subject: Located {
+            value: &input["things"][0],
+            location: Location::input_root().key("things").index(0),
+        },
+        input: &input,
+        params: Some(&params),
+        aliases: BTreeMap::new(),
+    };
+    run(&ctx)
+}
+
+#[test]
+fn in_ignoring_case_takes_the_worst_cause_of_a_walked_list_with_a_null_and_an_item_that_isnt_text() {
+    let Check::In(check) = lowered_check("x is in $input.cs.name ignoring case") else {
+        panic!("not in");
+    };
+    let cs = json!([{"name": "A"}, {"name": 3}, {"name": null}]);
+    assert_eq!(
+        on_input(json!({"x": "a"}), cs.clone(), json!({}), |ctx| run_in(&check, ctx)).cause,
+        Cause::Unusable
+    );
+    let cs = json!([{"name": "A"}, {"name": null}]);
+    assert_eq!(
+        on_input(json!({"x": "a"}), cs, json!({}), |ctx| run_in(&check, ctx)).cause,
+        Cause::Null
+    );
+}
+
+#[test]
+fn in_ignoring_case_says_a_list_from_the_params_that_isnt_a_list() {
+    let Check::In(check) = lowered_check("x is in $params.n ignoring case") else {
+        panic!("not in");
+    };
+    let faults = |params: Value| {
+        let input = json!({"things": [{"x": "a"}]});
+        let ctx = Ctx {
+            label: None,
+            item_by_item: false,
+            subject: Located {
+                value: &input["things"][0],
+                location: Location::input_root().key("things").index(0),
+            },
+            input: &input,
+            params: Some(&params),
+            aliases: BTreeMap::new(),
+        };
+        in_faults(&check, &ctx)
+    };
+    assert_eq!(
+        faults(json!({"n": "s"})),
+        vec![(
+            "$params.n".to_string(),
+            "$params.n is \"s\", which isn't a list".to_string()
+        )]
+    );
+    assert_eq!(faults(json!({"n": ["a", 3]})), vec![]);
+}
+
 #[test]
 fn a_list_after_is_in_ignoring_case_names_each_item_that_isnt_text_in_list_order() {
     let said = |cause: Cause, text: &str| Some((cause, text.to_string()));
