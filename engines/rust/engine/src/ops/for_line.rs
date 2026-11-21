@@ -2001,7 +2001,7 @@ impl For {
             return (Cause::Satisfied, Vec::new());
         };
         let ran = run_full(&sentence.check, ctx);
-        let cause = ran.verdict.cause;
+        let mut cause = ran.verdict.cause;
         if ran.verdict.passed() {
             return (cause, Vec::new());
         }
@@ -2018,7 +2018,7 @@ impl For {
             .into_iter()
             .flat_map(|root| [Clause::said(Cause::Value, root.text.clone()), root])
             .collect();
-        let clauses: Vec<Clause> = super::message::unsaid_clauses(&said, &mut seen)
+        let mut clauses: Vec<Clause> = super::message::unsaid_clauses(&said, &mut seen)
             .into_iter()
             .flatten()
             .flat_map(|piece| match piece {
@@ -2026,6 +2026,17 @@ impl For {
                 Piece::Counted(clauses) => clauses,
             })
             .collect();
+        if !walks
+            && let Some((key, base, worse)) = sentence
+                .check
+                .paths()
+                .into_iter()
+                .find_map(|path| super::key_base::alias_base(path, ctx))
+            && super::message::said_text(&said) == key
+        {
+            cause = Cause::worst([cause, worse]).unwrap_or(worse);
+            clauses.push(Clause::said(worse, base));
+        }
         (cause, clauses)
     }
 
