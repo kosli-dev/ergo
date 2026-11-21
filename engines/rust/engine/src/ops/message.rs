@@ -686,7 +686,7 @@ pub fn option_line_said(line: &Check, ctx: &Ctx, said: Option<String>, verdict: 
     self::said(line, ctx, &verdict)
 }
 
-fn split_outside_quotes<'t>(text: &'t str, by: &str) -> Vec<&'t str> {
+pub(crate) fn split_outside_quotes<'t>(text: &'t str, by: &str) -> Vec<&'t str> {
     let mut out = Vec::new();
     let mut from = 0;
     let mut quoted = false;

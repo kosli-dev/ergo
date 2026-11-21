@@ -94,7 +94,7 @@ fn item(
 }
 
 fn clauses(text: &str) -> Vec<&str> {
-    text.split("; ").collect()
+    ops::message::split_outside_quotes(text, "; ")
 }
 
 fn without_roots(message: &str, roots: &[String], moved: &mut Vec<String>) -> String {
