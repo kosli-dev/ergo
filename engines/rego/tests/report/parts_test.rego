@@ -86,6 +86,23 @@ test_a_counted_list_that_failed_with_no_entry_of_its_own_stays_on_the_assertion 
 	not ergo._tally_own_read({"name": "xs.n", "value": null}, c, set(), [])
 }
 
+test_a_root_an_option_cant_use_is_unusable_on_the_row_as_on_the_assertion if {
+	z := {"name": "art.cov.z", "value": "s", "locations": ["/arts/0/c/z"]}
+	x := {"name": "x", "value": null, "locations": ["/arts/0/xs/0"], "outcome": "absent"}
+	assertion := {"kind": "assertion", "name": "every ys whose n is at least art.cov.z, if any, exists", "cause": "unusable", "inputs": [object.union(z, {"outcome": "unusable"})], "failures": [], "message": "art.cov.z is \"s\", which isn't a number"}
+	option := {"kind": "option", "name": "a", "cause": "unusable", "inputs": [], "failures": [assertion], "message": ""}
+	row := {"passed": false, "cause": "unusable", "message": "a: art.cov.z is \"s\", which isn't a number; b: x is missing", "inputs": [object.union(z, {"outcome": "usable"}), x], "failures": [option]}
+	[[i.name, i.outcome] | some i in ergo._said_outcomes(row).inputs] == [["art.cov.z", "unusable"], ["x", "absent"]]
+}
+
+test_a_root_read_fine_by_every_assertion_stays_usable_on_the_row if {
+	z := {"name": "z", "value": 1, "locations": ["/z"], "outcome": "usable"}
+	assertion := {"kind": "assertion", "name": "z is 2", "cause": "value", "inputs": [z], "failures": [], "message": "z is 1"}
+	other := {"kind": "assertion", "name": "y is at least 1", "cause": "unusable", "inputs": [{"name": "y", "value": "s", "locations": ["/y"], "outcome": "unusable"}], "failures": [], "message": "y is \"s\", which isn't a number"}
+	row := {"passed": false, "cause": "unusable", "message": "z is 1; y is \"s\", which isn't a number", "inputs": [z, {"name": "y", "value": "s", "locations": ["/y"], "outcome": "usable"}], "failures": [assertion, other]}
+	[[i.name, i.outcome] | some i in ergo._said_outcomes(row).inputs] == [["z", "usable"], ["y", "unusable"]]
+}
+
 _tag_each(inputs, _, _, _) := [object.union(i, {"part": {"id": null, "name": "lock"}}) | some i in inputs]
 
 test_a_walk_in_an_option_or_among_several_assertions_tags_the_parts_it_reads_and_a_for_line_is_left_as_it_was if {
