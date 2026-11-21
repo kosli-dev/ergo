@@ -2374,8 +2374,6 @@ fn for_line_cases() -> Vec<(String, Value, Value, Value)> {
 
 const NO_LIST: &str = "the tree has no clause for the list itself until R5-6";
 
-const EARLIER_ALIAS: &str = "the tree has no item for a root read through an earlier line's alias when no item of the second list is checked, and no step of the R5 design adds it before R5-6 builds the row from the tree";
-
 const SAID_OUTSIDE: &str = "the row's message comes from message::row_said after the check runs again to read its walked roots, not from the for line, until R5-6 gives the for line the message its clauses say";
 
 const ITEMS_BY_SENTENCE: &str = "the case says item 2 before item 1, which spec/OPEN.md lists under problems.item_order, and no R5 step changes it until that line is decided";
@@ -2400,7 +2398,7 @@ const SECOND_KEY: &str = "the tree says the sentence that reads only the first a
 
 const OTHER_SUBJECTS_CAUSE: &str = "the tree gives item 1 of ys its own cause, absent, as for.try says, in a subject where neither engine gives it an entry, and this test compares it with the entries of the same name in the case's other subjects, which are unusable and null";
 
-const CASE_AGAINST_FOR_PASS: &str = "the case fails item 1 of ks, which is 3 and isn't an object, for the key k read on an empty list, where for.pass says an item that isn't an object passes when nothing is checked for it, and the tree follows the rule";
+const CASE_AGAINST_FOR_PASS: &str = "the case fails an item of the first list that isn't an object, a value read whole as a named by key or a list walked through its alias, when nothing is checked for it on an empty second list, where for.pass says an item that isn't an object passes when nothing is checked for it, and the tree follows the rule";
 
 const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 100] = [
     (
@@ -2549,19 +2547,19 @@ const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 100] = [
     ),
     (
         "for / an alias of an earlier line that walks a list fails a second line on an empty list when an item of it can't be read / fails, with an empty rows, when an item of it has no name",
-        EARLIER_ALIAS,
+        CASE_AGAINST_FOR_PASS,
     ),
     (
         "for / an alias of an earlier line that walks a list fails a second line on an empty list when an item of it can't be read / fails, with an empty rows, when an item of it is null",
-        EARLIER_ALIAS,
+        CASE_AGAINST_FOR_PASS,
     ),
     (
         "for / an alias of an earlier line that walks a list fails a second line on an empty list when an item of it can't be read / fails, with an empty rows, when it holds names of more than one kind",
-        EARLIER_ALIAS,
+        CASE_AGAINST_FOR_PASS,
     ),
     (
         "for / an alias that a pick on an empty list leaves without a value, read on a later line / names the alias as the policy writes it, with no $",
-        EARLIER_ALIAS,
+        NO_LIST,
     ),
     (
         "for / an item's own problem on a for line is said after a $params or $input root of its whose that can't be read / an item without v, with $input.os that is text",
