@@ -3278,3 +3278,16 @@ fn a_root_that_lists_items_is_said_once_with_its_own_count_before_the_items_of_t
         format!("{root}; item 2 of rows: n is missing; item 3 of rows: n is missing")
     );
 }
+
+#[test]
+fn a_root_walked_by_a_sentence_that_walks_a_list_under_the_item_is_said_once_with_no_item() {
+    assert_eq!(
+        for_tree(
+            "every ms as m",
+            &["every m.ys.v is in $params.os.name"],
+            json!({"ms": [{"ys": [{"v": "bob"}]}, {"ys": [{"v": "ann"}]}]}),
+            json!({"os": [{"name": "bob"}, {"k": 1}]}),
+        ),
+        "item 2 of $params.os: name is missing"
+    );
+}
