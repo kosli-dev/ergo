@@ -88,3 +88,13 @@ test_a_list_walked_from_the_input_after_is_in_ignoring_case_is_a_ref_used_with_t
 	ergo._used_ref_state(object.remove(ref, ["ignoring"]), r) == "null" with data.ergo_document as {"cs": [{"name": null}, {"name": "a"}, {"name": true}]}
 }
 
+test_is_in_ignoring_case_with_an_empty_list_from_a_field_still_fails_a_field_that_isnt_text_as_unusable if {
+	every cmp in ["in", "not_in"] {
+		field := {"op": "compare", "left": ["x"], "cmp": cmp, "right": ["ys"], "ignoring": "case"}
+		ergo._leaf_cause(field, {"x": 5, "ys": []}) == "unusable"
+		ergo._leaf_cause(field, {"x": null, "ys": []}) == "null"
+		ergo._leaf_cause(field, {"ys": []}) == "absent"
+	}
+	ergo._leaf_cause({"op": "compare", "left": ["x"], "cmp": "in", "right": ["ys"], "ignoring": "case"}, {"x": "a", "ys": []}) == "value"
+}
+
