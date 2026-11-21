@@ -7783,5 +7783,1564 @@
     }
    ]
   }
+ },
+ {
+  "name": "for r5/P1 [problems.where_said]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every ws as w, some ys whose n is at least w.z and whose n is at most u as y",
+       "assert": "y.n exists"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "ws": [
+      {
+       "z": "p; q"
+      }
+     ],
+     "ys": [
+      {
+       "n": 1
+      },
+      {
+       "n": 2
+      }
+     ]
+    }
+   ]
+  },
+  "want": "item 1 of ws: w.z is \"p; q\", which isn't a number; item 1 of ws: item 1 of ys: u is missing; item 1 of ws: item 2 of ys: u is missing"
+ },
+ {
+  "name": "for r5/P1b",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every ws as w, some ys whose n is at least w.z and whose n is at most u as y",
+       "assert": "y.n exists"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "ws": [
+      {
+       "z": "x; y, and z"
+      }
+     ],
+     "ys": [
+      {
+       "n": 1
+      },
+      {
+       "n": 2
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "name": "for r5/P2 [problems.all_said]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs as x",
+       "assert": [
+        "x.v is at least $params.a",
+        "x.v is at most $params.b",
+        "x.w is $params.c",
+        "x.u is in $params.d"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": 1,
+       "w": 1,
+       "u": 1
+      }
+     ]
+    }
+   ]
+  },
+  "want": "$params.a is missing; $params.b is missing; $params.c is missing; $params.d is missing"
+ },
+ {
+  "name": "for r5/P3",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs as x",
+       "assert": [
+        "x.v is 1",
+        "x.w is 1"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {},
+      {},
+      {},
+      {},
+      {}
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "name": "for r5/P4",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every cs as c, every c.rs as r",
+       "assert": "r.ok is true"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "cs": [
+      {
+       "rs": [
+        {},
+        {}
+       ]
+      },
+      {
+       "rs": [
+        {},
+        {}
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "name": "for r5/P5",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs as x",
+       "assert": "every x.ys.n is 1"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "ys": [
+        {
+         "n": 2
+        },
+        {}
+       ]
+      },
+      {
+       "ys": [
+        {
+         "n": 3
+        },
+        {}
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "name": "for r5/P6 [message.items]",
+  "params": {
+   "min": "s"
+  },
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every gs as g",
+       "assert": "count of g.es whose v is at least $params.min is 0"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "gs": [
+      {
+       "es": [
+        {},
+        {}
+       ]
+      },
+      {
+       "es": [
+        {},
+        {
+         "v": 2
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "want": "$params.min is \"s\", which isn't a number; item 1 of gs: item 1 of g.es: v is missing; item 1 of gs: item 2 of g.es: v is missing; item 2 of gs: item 1 of g.es: v is missing"
+ },
+ {
+  "name": "for r5/P7",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs as x",
+       "assert": [
+        "x.v is 1",
+        "z is 1"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": 2
+      },
+      {}
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "name": "for r5/P8",
+  "params": {
+   "min": "s"
+  },
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs whose v is at least $params.min as x",
+       "assert": "x.w is 1"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": 1
+      },
+      {}
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "name": "for r5/P9",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs as x",
+       "assert": "x.v is 1"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      1,
+      {},
+      null
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "name": "for r5/P11",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every ws as w, every w.ys as y",
+       "assert": "y.n is at least w.min"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "ws": [
+      {
+       "min": 1,
+       "ys": [
+        {
+         "n": 2
+        }
+       ]
+      },
+      {
+       "ys": [
+        {
+         "n": 1
+        }
+       ]
+      },
+      {
+       "ys": [
+        {
+         "n": 3
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "name": "for r5/P12",
+  "params": {
+   "min": "s"
+  },
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs as x",
+       "assert": "x.v is at least $params.min"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": null
+      },
+      {}
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "name": "for r5/P12b",
+  "params": {
+   "min": "s"
+  },
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs as x",
+       "assert": "x.v is at least $params.min"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": []
+    }
+   ]
+  }
+ },
+ {
+  "name": "for r5/P13",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs as x",
+       "assert": [
+        "x.v is 1",
+        "x.w is 1"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": "a, and b"
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "name": "for r5/P14",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs as x",
+       "assert": "x.v is 1"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": "p; q"
+      },
+      {
+       "v": "r; s"
+      },
+      {
+       "v": 3
+      },
+      {
+       "v": 4
+      },
+      {
+       "v": 5
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "name": "for r5/P15 [problems.where_said]",
+  "params": {
+   "min": "s; t"
+  },
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs as x",
+       "assert": "x.v is at least $params.min"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": "a; b"
+      },
+      {}
+     ]
+    }
+   ]
+  },
+  "want": "$params.min is \"s; t\", which isn't a number; item 1 of xs: x.v is \"a; b\", which isn't a number; item 2 of xs: x.v is missing"
+ },
+ {
+  "name": "for r5/P15c",
+  "params": {
+   "min": "s"
+  },
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs as x",
+       "assert": "x.v is at least $params.min"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": "a"
+      },
+      {}
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "name": "for r5/P16 [message.join]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs as x",
+       "assert": [
+        "every x.ys.n is 1",
+        "every x.ys.m is 1"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "ys": [
+        {
+         "n": 1,
+         "m": 2
+        },
+        {
+         "m": 1
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "want": "item 1 of xs: item 1 of x.ys: m is 2; item 1 of xs: item 2 of x.ys: n is missing"
+ },
+ {
+  "name": "for r5/P17",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every ws as w, every ys as y",
+       "assert": "y.n is w.n"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "ws": [
+      {
+       "n": 1
+      },
+      {
+       "n": 2
+      }
+     ],
+     "ys": null
+    }
+   ]
+  }
+ },
+ {
+  "name": "for r5/P18 [for.roots]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every gs as g",
+       "assert": "count of g.es.v that is m named by $params.k is 0"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "gs": [
+      {
+       "es": [
+        {
+         "v": {}
+        }
+       ]
+      },
+      {
+       "es": [
+        {
+         "v": {}
+        }
+       ]
+      },
+      {
+       "es": [
+        {
+         "v": {}
+        }
+       ]
+      },
+      {
+       "es": [
+        {
+         "v": {}
+        }
+       ]
+      },
+      {
+       "es": [
+        {
+         "v": {}
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "want": "$params.k is missing; item 1 of gs: item 1 of g.es: v: m is missing; item 2 of gs: item 1 of g.es: v: m is missing; item 3 of gs: item 1 of g.es: v: m is missing; and 2 more"
+ },
+ {
+  "name": "for r5/P19",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every ws as w, every ys whose n is at least w.z as x",
+       "assert": "x.n exists"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "ws": [
+      {},
+      {}
+     ],
+     "ys": [
+      {
+       "n": 1
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "name": "for r5/P20",
+  "params": {
+   "z": "s"
+  },
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every ws as w, every ys whose n is at least $params.z as x",
+       "assert": "x.n exists"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "ws": [
+      {}
+     ],
+     "ys": [
+      {
+       "n": 1
+      },
+      {}
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "name": "for r5/P21 [problems.item_order]",
+  "params": {
+   "a": null
+  },
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs as x",
+       "assert": [
+        "x.v is $params.a",
+        "x.v is $params.b"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": 1
+      }
+     ]
+    }
+   ]
+  },
+  "want": "$params.a is null; $params.b is missing"
+ },
+ {
+  "name": "for r5/P22",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "first of xs sorted by n as x",
+       "assert": "x.ok is true"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "n": 1,
+       "ok": false
+      },
+      {
+       "n": 1,
+       "ok": false
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "name": "for r5/P23 [message.items]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every gs as g",
+       "assert": "sum of g.rs.n is 3"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "gs": [
+      {
+       "rs": [
+        {
+         "n": "a"
+        },
+        {}
+       ]
+      },
+      {
+       "rs": [
+        {
+         "n": null
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "want": "item 1 of gs: item 1 of g.rs: n is \"a\", which isn't a number; item 1 of gs: item 2 of g.rs: n is missing; item 2 of gs: item 1 of g.rs: n is null"
+ },
+ {
+  "name": "for r5/P24",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "some xs as x, every x.ys as y",
+       "assert": "y.n is 1"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "ys": [
+        {
+         "n": 2
+        }
+       ]
+      },
+      {
+       "ys": [
+        {}
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "name": "for r5/P25 [for.roots]",
+  "params": {
+   "a": "s"
+  },
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs whose v is at least $params.min as x",
+       "assert": "x.w is at least $params.a"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": 1,
+       "w": 1
+      }
+     ]
+    }
+   ]
+  },
+  "want": "$params.min is missing; $params.a is \"s\", which isn't a number"
+ },
+ {
+  "name": "for r5/P25b [problems.item_order]",
+  "params": {
+   "a": "s"
+  },
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs as x",
+       "assert": [
+        "x.v is at least $params.b",
+        "x.w is at least $params.a"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": 1,
+       "w": 1
+      }
+     ]
+    }
+   ]
+  },
+  "want": "$params.b is missing; $params.a is \"s\", which isn't a number"
+ },
+ {
+  "name": "for r5/P27",
+  "params": {
+   "min": "s"
+  },
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs as x",
+       "assert": "x.v is at least $params.min"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {},
+      {},
+      {},
+      {},
+      {}
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "name": "for r5/P28",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs as x",
+       "assert": [
+        "x.v is at least $params.a",
+        "x.v is at most $params.b",
+        "x.w is $params.c",
+        "x.u is $params.d"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {},
+      {}
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "name": "for r5/P29",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every prs as pr, every pr.as as ap",
+       "assert": [
+        "ap.state is 1",
+        "ap.user is 1",
+        "pr.ok is true"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "prs": [
+      {
+       "ok": false,
+       "as": [
+        {
+         "state": 2,
+         "user": 1
+        },
+        {
+         "state": 1,
+         "user": 3
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "name": "for r5/P30",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every cs as c",
+       "assert": [
+        "every c.reviews.ok is true",
+        "c.a is 1"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "cs": [
+      {
+       "a": 2,
+       "reviews": [
+        {
+         "ok": true
+        },
+        {
+         "ok": false
+        }
+       ]
+      },
+      {
+       "a": 2,
+       "reviews": [
+        {
+         "ok": false
+        }
+       ]
+      },
+      {
+       "a": 2,
+       "reviews": [
+        {
+         "ok": false
+        }
+       ]
+      },
+      {
+       "a": 2,
+       "reviews": [
+        {
+         "ok": false
+        }
+       ]
+      },
+      {
+       "a": 2,
+       "reviews": [
+        {
+         "ok": false
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "name": "for r5/P31",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every prs as pr, every pr.as as ap",
+       "assert": [
+        "ap.state is 1",
+        "pr.ok is true"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "prs": [
+      {
+       "ok": false,
+       "as": [
+        {
+         "state": 2
+        },
+        {
+         "state": 3
+        }
+       ]
+      },
+      {
+       "ok": false,
+       "as": [
+        {
+         "state": 2
+        },
+        {
+         "state": 3
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "name": "for r5/P32",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs as x",
+       "assert": [
+        "x.v is 1",
+        "every zs.n is 1"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": 2
+      },
+      {}
+     ],
+     "zs": [
+      {
+       "n": 2
+      },
+      {},
+      {
+       "n": 3
+      },
+      {
+       "n": 4
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "name": "for r5/P33",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs as x",
+       "assert": [
+        "every zs.n is 1",
+        "x.v is 1"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": 2
+      },
+      {},
+      {
+       "v": 3
+      }
+     ],
+     "zs": [
+      {
+       "n": 2
+      },
+      {}
+     ]
+    }
+   ]
+  }
  }
 ]
