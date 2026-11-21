@@ -2575,3 +2575,44 @@ fn an_item_beside_a_root_takes_only_its_own_cause() {
         ]
     );
 }
+
+fn for_tree(for_line: &str, assertions: &[&str], subject: Value, params: Value) -> String {
+    super::RAN.with(|ran| ran.borrow_mut().clear());
+    for_items(for_line, assertions, subject, params);
+    let (_, roots, items) = super::RAN
+        .with(|ran| ran.take())
+        .pop()
+        .expect("the line ran");
+    let clauses: Vec<crate::ops::clause::Clause> = roots.into_iter().chain(items).collect();
+    crate::ops::clause::text(&crate::ops::clause::shown(&clauses))
+}
+
+#[test]
+fn the_list_before_a_key_that_cant_be_read_comes_after_the_key() {
+    assert_eq!(
+        for_tree(
+            "every o named by $params.k as x",
+            &["x is 1"],
+            json!({"o": "s"}),
+            json!({}),
+        ),
+        "$params.k is missing; o is \"s\", which isn't a list or an object"
+    );
+}
+
+#[test]
+fn a_sentence_that_reads_no_alias_comes_before_a_key_that_cant_be_read() {
+    let said = |o: Value| {
+        for_tree(
+            "every o named by $params.k as x",
+            &["x is 1", "z is 3"],
+            json!({"z": 2, "o": o}),
+            json!({}),
+        )
+    };
+    assert_eq!(said(json!({"a": [1]})), "z is 2; $params.k is missing");
+    assert_eq!(
+        said(json!("s")),
+        "z is 2; $params.k is missing; o is \"s\", which isn't a list or an object"
+    );
+}
