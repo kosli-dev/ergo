@@ -102,6 +102,24 @@ expect_in "(the body is read at the last push: push or re-run after editing it)"
 out=$(run "Fixes a thing." "$dir/reports-cargo-failed.md" "$dir/pairs-same.md")
 expect_in "tree. So the report counts could not be read because cargo failed (the body is read at the last push: push or re-run after editing it)." "$out"
 
+echo "body-facts.sh ignores a Changes the report line inside a code fence"
+out=$(run "$(printf 'Example:\n\n```\nChanges the report: yes.\n```\n')" "$dir/reports-changed.md" "$dir/pairs-same.md")
+expect_in "WARNING" "$out"
+out=$(run "$(printf 'Example:\n\n~~~\nChanges the report: yes.\n~~~\n')" "$dir/reports-changed.md" "$dir/pairs-same.md")
+expect_in "WARNING" "$out"
+out=$(run "$(printf '```\ncode\n```\n\nChanges the report: yes.\n')" "$dir/reports-changed.md" "$dir/pairs-same.md")
+expect_not_in "WARNING" "$out"
+
+echo "body-facts.sh ignores an unfilled Changes the report placeholder"
+out=$(run "$(printf 'Changes the report: <!-- say what changed -->\n')" "$dir/reports-changed.md" "$dir/pairs-same.md")
+expect_in "WARNING" "$out"
+out=$(run "$(printf 'Changes the report:   \n')" "$dir/reports-changed.md" "$dir/pairs-same.md")
+expect_in "WARNING" "$out"
+out=$(run "$(printf 'Changes the report: <!-- x --> yes.\n')" "$dir/reports-changed.md" "$dir/pairs-same.md")
+expect_not_in "WARNING" "$out"
+out=$(run "$(printf 'Changes the report: yes.\nChanges the report: <!-- x -->\n')" "$dir/reports-changed.md" "$dir/pairs-same.md")
+expect_not_in "WARNING" "$out"
+
 echo "body-facts.sh reads the body from a file"
 printf 'Changes the report: yes.\n' > "$dir/body.md"
 out=$(BODY_FACTS_BODY_FILE=$dir/body.md sh "$script" "$dir/reports-changed.md" "$dir/pairs-same.md")
