@@ -43,7 +43,7 @@ _case_names(topic) := {concat(" / ", [topic, group.description, c.description]) 
 
 test_every_known_difference_names_a_case if known_differences - union({_case_names(topic) | some topic, _ in data.spec.cases}) == set()
 
-_tested_topics := {"any_of", "compare", "compare_time", "contains", "deep_walks", "derived", "distinct", "equals", "for", "ignoring", "in", "list_items", "list_starts", "messages", "missing", "non_empty_string", "parts", "patterns", "present", "range", "requirements", "row_parts", "sentences", "subject_name", "subjects", "that", "walks"}
+_tested_topics := {"any_of", "compare", "compare_time", "contains", "deep_walks", "derived", "distinct", "equals", "for", "ignoring", "in", "list_items", "list_starts", "members", "messages", "missing", "non_empty_string", "parts", "patterns", "present", "range", "requirements", "row_parts", "sentences", "subject_name", "subjects", "that", "walks"}
 
 test_every_folder_of_cases_has_a_test_of_its_own if {t | some t, _ in data.spec.cases} == _tested_topics
 
@@ -303,6 +303,11 @@ test_the_range_cases_pass if {
 test_the_row_parts_cases_pass if {
 	_topic_failures("row_parts") == _known_in("row_parts")
 	_compiled_differences("row_parts") == set()
+}
+
+test_the_members_cases_pass if {
+	_topic_failures("members") == _known_in("members")
+	_compiled_differences("members") == set()
 }
 
 test_the_requirements_cases_pass if {
