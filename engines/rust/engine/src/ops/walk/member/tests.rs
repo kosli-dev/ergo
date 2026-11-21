@@ -1,15 +1,13 @@
 use super::super::*;
 use std::collections::BTreeMap;
 
-fn members(
-    subject: Value,
-    steps: &[&str],
-    options: Options,
-) -> (
+type Members = (
     Vec<(String, Value, String)>,
     Vec<(Cause, Value, String)>,
     String,
-) {
+);
+
+fn members(subject: Value, steps: &[&str], options: Options) -> Members {
     let input = json!({});
     let ctx = Ctx {
         label: None,
