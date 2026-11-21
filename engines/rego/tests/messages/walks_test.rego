@@ -129,3 +129,10 @@ test_a_named_failure_a_member_walk_wanted_as_an_object_says_it_isnt_one if {
 	ergo._m_named_fail({"path": "r.s", "cause": "unusable", "value": [1], "wants": "an object"}) == "r.s is [1], which isn't an object"
 	ergo._m_named_fail({"path": "r.s", "cause": "unusable", "value": [1]}) == "r.s is [1], which isn't a list or an object"
 }
+
+test_a_row_keeps_the_items_of_a_list_after_is_in_ignoring_case_in_list_order if {
+	ref := {"op": "in", "path": ["x"], "values": {"ref": ["$$params[]", "l"]}, "ignoring": "case"}
+	ergo._m_row_text(ref, {"x": "a"}, "unusable") == "item 2 of $params.l is null; item 3 of $params.l is 3, which isn't text" with data.ergo_params as {"l": ["a", null, 3]}
+	field := {"op": "compare", "left": ["x"], "cmp": "in", "right": ["ys"], "ignoring": "case"}
+	ergo._m_row_text(field, {"x": "a", "ys": [null, 3]}, "unusable") == "item 1 of ys is null; item 2 of ys is 3, which isn't text"
+}
