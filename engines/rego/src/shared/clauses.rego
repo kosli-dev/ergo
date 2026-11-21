@@ -90,13 +90,14 @@ _m_clause_more(n) := {"kind": "more", "count": n, "name": "", "cause": "value", 
 _m_clauses_shown(clauses) := array.concat(_m_clauses_ahead(once), items) if {
 	once := _once(clauses)
 	items := [c | some c in once; c.kind == "item"]
-	count(items) <= 3
+	count(_m_clause_units(items)) <= 3
 }
 
-_m_clauses_shown(clauses) := array.concat(array.concat(_m_clauses_ahead(once), array.slice(items, 0, 3)), [_m_clause_more(count(items) - 3)]) if {
+_m_clauses_shown(clauses) := array.concat(array.concat(_m_clauses_ahead(once), [u.clause | some u in units; u.key in kept]), [_m_clause_more(count(units) - 3)]) if {
 	once := _once(clauses)
-	items := [c | some c in once; c.kind == "item"]
-	count(items) > 3
+	units := _m_clause_units([c | some c in once; c.kind == "item"])
+	count(units) > 3
+	kept := [u.key | some u in array.slice(units, 0, 3)]
 }
 
 _m_clauses_ahead(once) := array.concat(
@@ -106,7 +107,7 @@ _m_clauses_ahead(once) := array.concat(
 
 _m_clause_ranks := {"not_an_object": 1, "ambiguous": 2, "unusable": 3, "absent": 4, "null": 5}
 
-_m_clauses_text(clauses) :=concat("; ", [t | some c in clauses; some t in _m_clause_lines(c)])
+_m_clauses_text(clauses) := concat("; ", [t | some c in clauses; some t in _m_clause_lines(c)])
 
 _m_clause_lines(c) := [c.text] if c.kind in {"root", "list"}
 
