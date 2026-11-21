@@ -503,11 +503,7 @@ pub(crate) fn ref_unfit(checks: &[&Check], reference: &Path, value: &Value, ctx:
         keyed
             || (check.refs().contains(reference)
                 && (check.flawed(ctx)
-                    || crate::ops::lists::text_unfit(
-                        check,
-                        &crate::name::name(reference),
-                        ctx,
-                    )))
+                    || nested_text_unfit(check, &crate::name::name(reference), ctx)))
     })
 }
 
@@ -537,12 +533,12 @@ pub(crate) fn input_unfit(checks: &[&Check], input: &crate::ops::Input, ctx: &Ct
         _ => {
             said_unfit(check, input, ctx)
                 || walked_root_unfit(check, input, ctx)
-                || nested_text_unfit(check, input, ctx)
+                || nested_text_unfit(check, &input.name, ctx)
         }
     })
 }
 
-fn nested_text_unfit(check: &Check, input: &crate::ops::Input, ctx: &Ctx) -> bool {
+fn nested_text_unfit(check: &Check, name: &str, ctx: &Ctx) -> bool {
     let mut outer = ctx.clone();
     outer
         .aliases
@@ -550,7 +546,7 @@ fn nested_text_unfit(check: &Check, input: &crate::ops::Input, ctx: &Ctx) -> boo
         .or_insert_with(|| ctx.subject.clone());
     crate::ops::for_line::nested_checks(check)
         .iter()
-        .any(|one| crate::ops::lists::text_unfit(one, &input.name, &outer))
+        .any(|one| crate::ops::lists::text_unfit(one, name, &outer))
 }
 
 fn said_unfit(check: &Check, input: &crate::ops::Input, ctx: &Ctx) -> bool {
