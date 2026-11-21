@@ -1589,7 +1589,7 @@ pub struct ForItem<'a> {
     pub picks: bool,
 }
 
-pub fn for_empty(items: &[ForItem], ctx: &Ctx, cause: Cause) -> String {
+pub fn for_empty(items: &[ForItem], ctx: &Ctx, cause: Cause) -> Vec<String> {
     let want = match cause {
         Cause::Absent => Some(Outcome::Absent),
         Cause::Null => Some(Outcome::Null),
@@ -1654,11 +1654,7 @@ pub fn for_empty(items: &[ForItem], ctx: &Ctx, cause: Cause) -> String {
                 .collect(),
         );
     }
-    if said.is_empty() {
-        FALLBACK.to_string()
-    } else {
-        joined(said)
-    }
+    said
 }
 
 pub fn reads_from_a_root(path: &Path) -> bool {

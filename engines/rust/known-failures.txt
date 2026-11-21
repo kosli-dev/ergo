@@ -105,6 +105,7 @@ for / a for item that isn't an object, named by a field / fails as unusable when
 for / a for item that isn't an object, with a path that reads inside it and a key that comes from a field / fails as not_an_object whatever the key field holds: a number
 for / a for line assertion whose followed by reads a piece from $params that is missing, null or not text / the check fails with the piece's cause, and the row and the check's $refs list the piece
 for / a for line runs the sentences that don't read the alias of an empty first list it tolerates, for each item of the second list / fails each approver that didn't approve when the whose of the first line leaves no commit
+for / a for line runs the sentences that don't read the alias of an empty list it tolerates on an item that isn't an object only when one of them reads the item / fails an approver that isn't an object with the sentence that reads it, and passes it when every sentence reads commit
 for / a for line runs the sentences that don't read the alias of an empty list it tolerates, for each item of the list before it / fails an approver whose subs can't be counted when there are no commits
 for / a for line runs the sentences that don't read the alias of an empty list it tolerates, for each item of the list before it / fails each approver that didn't approve when there are no commits, and skips the sentences that read commit
 for / a for line sorted by a key from $params that is missing says the key once and gives an item an entry only for its own problem / an item whose m is a list and an item without m
@@ -228,6 +229,7 @@ for / an item's own problem on a for line is said after a $params or $input root
 for / an item's own problem on a for line is said after a parent's root of its whose that can't be read / an item without v, with a parent list that is text
 for / an item's own problem on a for line is said after a parent's root of its whose that can't be read / an item without v, with an item of the parent list without the name
 for / an item's own problem on a for line is said after a root of its whose that can't be read, even when it fails no worse than the root / an item that is null, with an item of the part without the name
+for / an item's own problem on a for line is said after a root of its whose that can't be read, even when it fails no worse than the root / an item without v, with a null part
 for / an item's own problem on a for line is said after a root of its whose that can't be read, even when it fails no worse than the root / an item without v, with an item of the part without the name
 for / an item's own problem on a for line is said after a root of its whose that can't be read, even when it fails no worse than the root / an item without v, with names of more than one kind
 for / and N more counts each problem of a part of a subject that is a list once / four items that aren't objects are three shown and one more
@@ -255,6 +257,7 @@ for / params that are true leave a tie on a for line ambiguous when the check do
 for / some on a position of the params, with params as a number / fails as unusable and names the params and what they are
 for / the failed items of a list beside the first keep the values only on the sentences / a list that can't be walked is listed once with no sentences, and the item that failed a sentence has its values
 for / the latest commit picked on a for line / fails as ambiguous when another item ties with the one picked, and names every tied item
+for / two items over sibling lists, with two assertions / an approver who breaks both sentences lists both, in the order written
 in / a count of or a sum of that is on both sides of a comparison is named once when its list is missing or null / says the list is missing once
 in / a count of or a sum of that is on both sides of a comparison is named once when its list is missing or null / says the list is null once
 in / a field that is on both sides of a phrase is named once in the message / says the value once
@@ -413,7 +416,6 @@ messages / the roots of one sentence, keys and sides alike, are said worst cause
 messages / the roots of one sentence, with a key from $params that is null and nothing on the subject / says each missing root by name, then the null key
 messages / two roots after is in that aren't lists, in one relative clause / names both on an empty list too
 messages / two roots after is in that aren't lists, in one relative clause / names both, worst cause first and then by name, on a list with items
-messages / two roots in a whose that fail in different ways, beside a list that can be read, take the worst cause / a root that is null and one that is missing fail as absent
 messages / two roots in one relative clause that fail in different ways / names every root that failed, whatever its cause, worst cause first and then by name
 messages / two roots in one relative clause that fail in different ways / names them in front of what the items say when an item fails in a worse way
 parts / a child subject that reads its own field named like its parent's part, with no part of its own / prints no dot, because a bare name in the child doesn't read the parent's part
@@ -429,7 +431,6 @@ row_parts / a count of and a sum of on a for line name the items they can't read
 row_parts / a list walked by a sentence on a for line with two lists sits under the item of the second list, named with its alias / an inner item that is missing a field, an inner list that is null, and an inner item that isn't an object
 row_parts / an every or a some that asks whether a field exists gives a missing field the outcome absent, as every other check does / a some with no item that has the field, beside an item that isn't an object
 row_parts / an every or a some that asks whether a field exists gives a missing field the outcome absent, as every other check does / an item without the field gives its input the outcome absent, and one whose field is null the outcome null
-row_parts / two sentences on a for line that walk the same list under the item say its items in list order, and a check with several sentences keeps their order / two sentences that walk the same inner list say its items in list order on a for line, and in the order of the sentences outside one
 sentences / a count of a list of another kind is not between two numbers / fails as unusable when the field isn't a list
 sentences / a count of, a sum of and a plus read with named by a field / lists the field right after the list or the path it names, before the other side, on either side, and fails as the field says
 sentences / a field missing on the focus while its item has it / reads the focus, so the field is missing and the item's own field is never read
