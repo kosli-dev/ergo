@@ -2749,3 +2749,16 @@ fn a_sentence_that_reads_no_alias_is_a_clause_on_an_empty_list_the_line_tolerate
         "z is 2"
     );
 }
+
+#[test]
+fn a_root_that_a_sentence_reading_no_alias_gives_is_said_once_on_an_empty_list() {
+    assert_eq!(
+        for_tree(
+            "every ys, if any, as m",
+            &["count of zb is count of za"],
+            json!({"id": "p0", "zb": "s", "za": 3, "ys": []}),
+            json!({}),
+        ),
+        "za is 3, which isn't a list or an object; zb is \"s\", which isn't a list or an object"
+    );
+}
