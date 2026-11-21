@@ -197,3 +197,118 @@ for want in "used in more than one file" "dup1.md" "dup2.md"; do
     exit 1
   fi
 done
+
+fake_release() {
+  printf '_spec := "v8.8"\n' > release-ergo.rego
+}
+
+inline_group() {
+  cat <<DOC
+<!-- ergo-run: r role=file path=policy.yaml -->
+
+${fence}yaml
+a: 1
+${fence}
+
+<!-- ergo-run: r role=command $1 run=\`opa eval policy.yaml\` -->
+
+<!-- ergo-run: r role=output -->
+
+${fence}yaml
+a: 1
+${fence}
+DOC
+}
+
+release_group() {
+  cat <<DOC
+<!-- ergo-run: r role=file path=policy.yaml -->
+
+${fence}yaml
+a: 1
+${fence}
+
+<!-- ergo-run: r role=command use=release -->
+
+${fence}sh
+opa eval policy.yaml
+${fence}
+
+<!-- ergo-run: r role=output -->
+
+${fence}yaml
+a: 1
+${fence}
+DOC
+}
+
+echo "docs-run.sh runs the command given in a run attribute when the group has no command block"
+inline_group "" > inline.md
+sh "$script" inline.md > out.txt
+grep -q "^ok.*group r" out.txt || {
+  echo "docs-run.sh should say r is ok for a run attribute, and said: $(cat out.txt)" >&2
+  exit 1
+}
+
+echo "docs-run.sh fails on a run attribute in a group that also has a command block"
+{
+  inline_group ""
+  printf '\n<!-- ergo-run: r role=command -->\n\n%ssh\nopa eval policy.yaml\n%s\n' "$fence" "$fence"
+} > both.md
+if sh "$script" both.md > out.txt 2>&1; then
+  echo "docs-run.sh should fail on a run attribute beside a command block, and passed" >&2
+  exit 1
+fi
+
+echo "docs-run.sh fails on a run attribute that is not on a command marker"
+inline_group "" | sed 's|role=command|role=output|' > inline-role.md
+if sh "$script" inline-role.md > out.txt 2>&1; then
+  echo "docs-run.sh should fail on run outside a command marker, and passed" >&2
+  exit 1
+fi
+
+echo "docs-run.sh skips a use=release group when no release file is given, and does not say ok"
+release_group > release.md
+env -u DOCS_RUN_RELEASE_ERGO_REGO -u DOCS_RUN_REQUIRE_RELEASE sh "$script" release.md > out.txt 2>&1
+grep -q "^skip.*group r" out.txt || {
+  echo "docs-run.sh should say skip for r, and said: $(cat out.txt)" >&2
+  exit 1
+}
+if grep -q "^ok" out.txt; then
+  echo "docs-run.sh should not say ok for a skipped group" >&2
+  exit 1
+fi
+
+echo "docs-run.sh fails on a skipped group when DOCS_RUN_REQUIRE_RELEASE is 1"
+if env -u DOCS_RUN_RELEASE_ERGO_REGO DOCS_RUN_REQUIRE_RELEASE=1 sh "$script" release.md > out.txt 2>&1; then
+  echo "docs-run.sh should fail a skip when the release is required, and passed" >&2
+  exit 1
+fi
+
+echo "docs-run.sh runs a use=release group with the release file"
+fake_release
+DOCS_RUN_RELEASE_ERGO_REGO="$dir/release-ergo.rego" sh "$script" release.md > out.txt
+grep -q "^ok.*group r" out.txt || {
+  echo "docs-run.sh should say r is ok with the release file, and said: $(cat out.txt)" >&2
+  exit 1
+}
+
+echo "docs-run.sh fails a use=release group when the release file is missing"
+if DOCS_RUN_RELEASE_ERGO_REGO="$dir/nothing.rego" sh "$script" release.md > out.txt 2>&1; then
+  echo "docs-run.sh should fail on a missing release file, and passed" >&2
+  exit 1
+fi
+
+echo "docs-run.sh fails a use=release group whose output differs from the release's"
+sed 's|^a: 1$|a: 2|' release.md | awk '/role=output/ {f=1} f && /^a: 2$/ {print "a: 3"; next} {print}' > release-bad.md
+if DOCS_RUN_RELEASE_ERGO_REGO="$dir/release-ergo.rego" sh "$script" release-bad.md > out.txt 2>&1; then
+  echo "docs-run.sh should fail on a release mismatch, and passed" >&2
+  exit 1
+fi
+
+echo "docs-run.sh fails on a use value it doesn't know"
+release_group | sed 's|use=release|use=latest|' > use.md
+if sh "$script" use.md > out.txt 2>&1; then
+  echo "docs-run.sh should fail on an unknown use, and passed" >&2
+  exit 1
+fi
