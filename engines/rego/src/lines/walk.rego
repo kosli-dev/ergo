@@ -223,10 +223,14 @@ _read_off_item(p) if {
 
 _read_off_item(p) if p[0] == "$$input"
 
-_walk_keys(check, subj) := ks if {
+_walk_keys(check, subj) := _walk_member_keys(check, ks) if {
 	_ := _start_of(subj, check.path)
 	ks := _keys_in(subj, check.path)
 }
+
+_walk_member_keys(check, ks) := array.concat(ks, [_fm_mark]) if check.member == true
+
+else := ks
 
 _walk_start(check, subj) := {"c": _walk_root(check.path), "v": _walk_start_value(subj, check.path), "i": null, "iv": null, "r": [], "a": _walk_base(check.path)}
 
@@ -244,7 +248,9 @@ else := _pointer(w.trail[0].a, w.trail[0].v, array.slice(e.c, count(w.trail[0].c
 
 _walk_locations(w) := [_walk_at(w, e) | some e in w.items]
 
-_item_at(w, e) := _pointer(w.trail[0].a, w.trail[0].v, array.slice(e.i, count(w.trail[0].c), count(e.i)))
+_item_at(w, e) := _walk_at(w, e) if w.members == true
+
+else := _pointer(w.trail[0].a, w.trail[0].v, array.slice(e.i, count(w.trail[0].c), count(e.i)))
 
 _fail_locations(f) := f.ats if "ats" in object.keys(f)
 
@@ -258,7 +264,9 @@ _walk_root(path) := [path[0]] if _named(path)
 
 _walk_root(path) := [] if not _named(path)
 
-_walk(start, keys, if_any) := {"items": items, "fails": fails, "walked": walked, "trail": trail} if {
+_walk(start, keys, if_any) := _member_walk(start, keys, if_any) if {
+	_walk_members(keys)
+} else := {"items": items, "fails": fails, "walked": walked, "trail": trail} if {
 	r0 := _walk_level([start], keys, 0, if_any, start)
 	r1 := _walk_level(r0.entries, keys, 1, if_any, start)
 	r2 := _walk_level(r1.entries, keys, 2, if_any, start)

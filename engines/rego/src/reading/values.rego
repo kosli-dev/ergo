@@ -200,6 +200,11 @@ _escaped(k) := replace(replace(k, "~", "~0"), "/", "~1") if is_string(k)
 
 _escaped(k) := format_int(k, 10) if is_number(k)
 
+_escaped(k) := replace(replace(k.member, "~", "~0"), "/", "~1") if {
+	is_object(k)
+	is_string(k.member)
+}
+
 _probe(start, keys) := object.get(start, keys, _absent) if is_object(start)
 
 _probe(start, keys) := object.get({"v": start}, array.concat(["v"], keys), _absent) if not is_object(start)
@@ -354,4 +359,10 @@ _unusable_mark := {"ergo/unusable": set()}
 
 _walk_stop(w) := [] if w.walked != set()
 
-_walk_stop(w) := [{"path": e.c, "item": e.c, "cause": _walk_stop_state(e.v), "value": _walk_value(e.v, e, w), "at": _walk_at(w, e), "msg": _m_walk_kind(e.v)} | e := _walk_stopped_at(w.trail)] if w.walked == set()
+_walk_stop(w) := [{"path": e.c, "item": e.c, "cause": _walk_stop_state(e.v), "value": _walk_value(e.v, e, w), "at": _walk_at(w, e), "msg": _walk_stop_wants(w, e, _m_walk_kind(e.v))} | e := _walk_stopped_at(w.trail)] if w.walked == set()
+
+_walk_stop_wants(w, e, kind) := "an object" if {
+	_ = kind
+	w.members == true
+	e.c == w.trail[count(w.trail) - 1].c
+} else := kind
