@@ -9,13 +9,13 @@ mkdir -p "$root/.github" "$root/engines/rust/engine/src/ops/inner" "$root/engine
 cat > "$root/engines/rust/engine/src/a.rs" <<'RS'
 fn a(text: &str) {
     for piece in text.split("; ") {}
-    let rest = text.strip_prefix("item ");
+    let rest = text.strip_prefix("the subject ");
     let both = text.split("; ").count();
 }
 RS
 cat > "$root/engines/rust/engine/src/ops/inner/b.rs" <<'RS'
 fn b(text: &str) -> bool {
-    text.starts_with("item ")
+    text.split_once(" of ")
 }
 RS
 cat > "$root/engines/rust/engine/src/tests.rs" <<'RS'
@@ -67,8 +67,8 @@ commit() {
 echo "message-cuts.sh counts per pattern and per file, leaving out tests"
 out=$(run)
 expect_in "rust-split-semicolon engines/rust/engine/src/a.rs 2" "$out"
-expect_in "rust-item-prefix-starts engines/rust/engine/src/ops/inner/b.rs 1" "$out"
-expect_in "rust-item-prefix-strips engines/rust/engine/src/a.rs 1" "$out"
+expect_in "rust-split-of engines/rust/engine/src/ops/inner/b.rs 1" "$out"
+expect_in "rust-subject-prefix-strips engines/rust/engine/src/a.rs 1" "$out"
 expect_in "rego-split-semicolon engines/rego/src/messages/m.rego 1" "$out"
 expect_in "rego-split-and engines/rego/src/messages/m.rego 1" "$out"
 expect_in "rego-item-prefix engines/rego/src/messages/m.rego 1" "$out"
@@ -116,19 +116,19 @@ g checkout -q -b swap
 sed -i.bak '/split("; ")/d' "$root/engines/rust/engine/src/a.rs"
 /bin/rm -f "$root/engines/rust/engine/src/a.rs.bak"
 for n in 1 2 3 4; do
-  printf 'fn e%s(t: &str) { t.starts_with("item "); }\n' "$n" >> "$root/engines/rust/engine/src/a.rs"
+  printf 'fn e%s(t: &str) { t.split_once(" of "); }\n' "$n" >> "$root/engines/rust/engine/src/a.rs"
 done
 if out=$(run --against main); then
   echo "message-cuts.sh should fail when a pattern goes up" >&2
   exit 1
 fi
-expect_in "rust-item-prefix-starts went from 1 to 5" "$out"
+expect_in "rust-split-of went from 1 to 5" "$out"
 g checkout -q -f main
 g clean -fdq
 
 echo "message-cuts.sh --against passes when a cut is removed"
 g checkout -q -b remove
-sed -i.bak '/starts_with/d' "$root/engines/rust/engine/src/ops/inner/b.rs"
+sed -i.bak '/split_once/d' "$root/engines/rust/engine/src/ops/inner/b.rs"
 /bin/rm -f "$root/engines/rust/engine/src/ops/inner/b.rs.bak"
 out=$(run --against main)
 expect_in "total 6" "$out"
@@ -141,7 +141,7 @@ g checkout -q main
 printf 'fn m(t: &str) { t.find(" of "); }\n' >> "$root/engines/rust/engine/src/m.rs"
 commit "main adds a cut"
 g checkout -q behind
-sed -i.bak '/starts_with/d' "$root/engines/rust/engine/src/ops/inner/b.rs"
+sed -i.bak '/split_once/d' "$root/engines/rust/engine/src/ops/inner/b.rs"
 /bin/rm -f "$root/engines/rust/engine/src/ops/inner/b.rs.bak"
 out=$(run --against main)
 expect_in "total 6" "$out"
