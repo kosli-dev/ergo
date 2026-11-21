@@ -2390,15 +2390,13 @@ const CAPPED_ROOT: &str = "an item says the capped list of a name read outside t
 
 const WALKED_ROOT_UNDER_ITEM: &str = "a name read outside the item by a sentence that walks a list under the item, like pos.name in every m.ys.v is in pos.name, isn't a root clause, so the item says it, and no step of the R5 design makes it one";
 
-const NESTED_PAIR: &str = "a walk under the first item over the list the second item walks puts the second list's item under the walk's item, and no step of the R5 design keeps them apart";
-
 const WALK_ITEMS_JOINED: &str = "the row joins two items of a list walked under a walked item with , and and the tree gives each its own part, and no step of the R5 design says which one is right";
 
 const FREE_BEFORE_KEY: &str = "the tree says a sentence that reads no alias first and then the key of the line's whose, as for.pass says, where Rust's row leaves the key out and the case says it first, until R5-6 builds the row from the tree and moves the case";
 
 const ENTRY_CAUSE: &str = "the tree gives an item the cause the case gives its entry and Rust's entry doesn't, until R5-7 builds the entries from the clauses";
 
-const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 101] = [
+const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 99] = [
     (
         "for / a $params list that a for line reads fails it when the line's whose leaves nothing and an item of the list can't be read / fails, when the whose leaves nothing",
         SAID_OUTSIDE,
@@ -2644,14 +2642,6 @@ const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 101] = [
         WALK_ITEMS_JOINED,
     ),
     (
-        "messages / a for line over two lists, with a sentence on the second item before a walk under the first / the parts follow the items, not the sentences",
-        NESTED_PAIR,
-    ),
-    (
-        "messages / a for line over two lists, with a walk under the first item before a sentence on the second / the parts follow the items, not the sentences",
-        NESTED_PAIR,
-    ),
-    (
         "messages / a for line that picks nothing prints the list it read / a whose that leaves no item prints the list",
         NO_LIST,
     ),
@@ -2805,9 +2795,9 @@ const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 101] = [
     ),
 ];
 
-const ROWS_COMPARED: usize = 1424;
+const ROWS_COMPARED: usize = 1426;
 
-const ROWS_LISTED: usize = 158;
+const ROWS_LISTED: usize = 156;
 
 fn item_entries(failures: &Value, out: &mut Vec<(String, String)>) {
     for failure in failures.as_array().into_iter().flatten() {

@@ -3526,7 +3526,16 @@ impl For {
             .filter_map(|child| self.child_clause(child, Some(&mut riders)))
             .collect();
         riders.sort_by_key(|(idx, _)| *idx);
-        let mut riders: Vec<Clause> = riders.into_iter().map(|(_, clause)| clause).collect();
+        let (walked, mut riders): (Vec<Clause>, Vec<Clause>) = riders
+            .into_iter()
+            .map(|(_, clause)| clause)
+            .partition(|clause| clause.kind == super::clause::Kind::Item);
+        if !walked.is_empty() {
+            for clause in &walked {
+                merge_clause(&mut clauses, clause);
+            }
+            in_list_order(&mut clauses);
+        }
         match clauses.iter_mut().find(|clause| !clause.said.is_empty()) {
             Some(first) => {
                 for rider in riders {
