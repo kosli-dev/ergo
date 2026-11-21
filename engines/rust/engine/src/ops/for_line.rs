@@ -1197,6 +1197,7 @@ struct Child {
     failed: Option<Outcome>,
     sfails: Vec<Sfail>,
     copies: Vec<String>,
+    rooted: Vec<Clause>,
 }
 
 struct Outcome {
@@ -1390,6 +1391,7 @@ impl For {
                             failed: Some(failed),
                             sfails,
                             copies: Vec::new(),
+                            rooted: Vec::new(),
                         }],
                         unreadable: false,
                     };
@@ -1470,6 +1472,11 @@ impl For {
                     )
                 }
             };
+            let rooted = if outcome.is_none() && !last && live.at.value.is_object() {
+                self.item_roots(depth, &bound)
+            } else {
+                Vec::new()
+            };
             if outcome.is_none() {
                 passed += 1;
             }
@@ -1479,6 +1486,7 @@ impl For {
                 failed: outcome,
                 sfails,
                 copies: live.copies,
+                rooted,
             });
         }
         let _ = list_name;
@@ -2888,7 +2896,14 @@ impl For {
         } else {
             second.as_ref().map_or(level.cause, |(cause, _)| *cause)
         };
-        let items = if second.is_some() || cause == Cause::Satisfied || flawed {
+        let unread = |child: &Child| child.failed.is_none() && !child.rooted.is_empty();
+        let rooted = level.children.iter().any(unread)
+            && (!matches!(first.how, How::Some { .. })
+                || level
+                    .children
+                    .iter()
+                    .all(|child| child.failed.is_some() || unread(child)));
+        let items = if second.is_some() || flawed || cause == Cause::Satisfied && !rooted {
             Vec::new()
         } else {
             self.level_clauses(
@@ -3401,8 +3416,11 @@ impl For {
         child: &Child,
         mut riders: Option<&mut Vec<(usize, Clause)>>,
     ) -> Option<Clause> {
-        let outcome = child.failed.as_ref()?;
         let name = child.entry.shown();
+        let Some(outcome) = child.failed.as_ref() else {
+            let cause = Cause::worst(child.rooted.iter().map(|clause| clause.cause))?;
+            return Some(Clause::item(name, cause, String::new(), child.rooted.clone()));
+        };
         if bare_item(outcome, &child.entry) {
             let bare = child.entry.bare.as_deref().unwrap_or(name);
             let value = child.entry.raw.as_ref().unwrap_or(&child.entry.value);

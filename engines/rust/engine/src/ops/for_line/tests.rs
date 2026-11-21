@@ -2398,7 +2398,11 @@ const ENTRY_CAUSE: &str = "the tree gives an item the cause the case gives its e
 
 const SECOND_KEY: &str = "the tree says the sentence that reads only the first alias for the item, as for.pass says and the case does, but like the row it says the second list's key from $params inside each item, where problems.where_said says it once before any item, and no step of the R5 design makes that key a root clause";
 
-const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 103] = [
+const OTHER_SUBJECTS_CAUSE: &str = "the tree gives item 1 of ys its own cause, absent, as for.try says, in a subject where neither engine gives it an entry, and this test compares it with the entries of the same name in the case's other subjects, which are unusable and null";
+
+const CASE_AGAINST_FOR_PASS: &str = "the case fails item 1 of ks, which is 3 and isn't an object, for the key k read on an empty list, where for.pass says an item that isn't an object passes when nothing is checked for it, and the tree follows the rule";
+
+const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 100] = [
     (
         "for / a $params list that a for line reads fails it when the line's whose leaves nothing and an item of the list can't be read / fails, when the whose leaves nothing",
         SAID_OUTSIDE,
@@ -2440,10 +2444,6 @@ const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 103] = [
         TREE_IS_THE_CASE,
     ),
     (
-        "for / a for line that starts with some fails when the only items that pass have an alias the sentence can't read, even when nothing comes after them to check / fails when the only approver has no u for the sentence to read, even though there are no commits",
-        EARLIER_ALIAS,
-    ),
-    (
         "for / a for line whose second list fails for an item, with sentences that don't read the second alias / runs the sentences that don't read y for each item and says them before the list",
         TREE_IS_THE_CASE,
     ),
@@ -2453,15 +2453,11 @@ const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 103] = [
     ),
     (
         "for / a for line whose sentence reads a key from an alias of an earlier line / names a key of the wrong type once under its first item, on an empty list too",
-        EARLIER_ALIAS,
+        CASE_AGAINST_FOR_PASS,
     ),
     (
         "for / a for line's own whose lists a list it walks, as a check without a for line does / an item without the name is listed as null",
         WHOSE_ROOT,
-    ),
-    (
-        "for / a for line's sentence whose root reads the first item's alias, on the second item / fails when the second list is empty too",
-        EARLIER_ALIAS,
     ),
     (
         "for / a name read from outside the item and walked on a for line is said once, before what each item says on its own / an item without the name it reads is named after the root, without the root",
@@ -2680,16 +2676,12 @@ const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 103] = [
         WHOSE_ROOT,
     ),
     (
-        "messages / a root of a for line and a root that reads the alias in one message / names the root first, then the alias root of each first item",
-        EARLIER_ALIAS,
-    ),
-    (
         "messages / a root of a for line, said once / names the root once, with no item, whatever the list holds",
         WHOSE_ROOT,
     ),
     (
         "messages / a root that reads the alias of the first item of a for line, in the second item / fails before any item of the second list, naming each first item, on an empty list too",
-        EARLIER_ALIAS,
+        OTHER_SUBJECTS_CAUSE,
     ),
     (
         "messages / a whose that leaves no item of a part prints the part's list / the part's list is printed",
@@ -2813,9 +2805,9 @@ const ROWS_THE_CLAUSES_DONT_SAY_YET: [(&str, &str); 103] = [
     ),
 ];
 
-const ROWS_COMPARED: usize = 1425;
+const ROWS_COMPARED: usize = 1432;
 
-const ROWS_LISTED: usize = 157;
+const ROWS_LISTED: usize = 150;
 
 fn item_entries(failures: &Value, out: &mut Vec<(String, String)>) {
     for failure in failures.as_array().into_iter().flatten() {
