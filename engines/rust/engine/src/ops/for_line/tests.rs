@@ -2286,3 +2286,27 @@ fn a_sentence_says_what_it_says_as_a_check_of_its_own() {
         assert_eq!(crate::ops::clause::text(&clauses), own, "{assertion}");
     }
 }
+
+#[test]
+fn a_sentence_says_the_value_before_a_key_it_cant_read_after_leaving_out_the_key() {
+    let subject = json!({"xs": [{"m": 3}, {"m": {}}]});
+    let said = |item| {
+        let (cause, clauses) = item_clauses(
+            "every xs as x",
+            &["x.m named by $params.k is 1"],
+            subject.clone(),
+            json!({}),
+            item,
+            0,
+        );
+        (cause, crate::ops::clause::text(&clauses))
+    };
+    assert_eq!(
+        said(0),
+        (
+            crate::cause::Cause::Unusable,
+            "x.m is 3, which isn't an object".to_string()
+        )
+    );
+    assert_eq!(said(1), (crate::cause::Cause::Absent, String::new()));
+}
