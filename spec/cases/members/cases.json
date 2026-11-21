@@ -2434,6 +2434,277 @@
             ]
           }
         ]
+      },
+      {
+        "description": "reads a key that holds a colon, a semicolon, a quote or of as one member, and counts each toward and N more",
+        "rules": [
+          "walk.member",
+          "message.items",
+          "sentence.path.string"
+        ],
+        "input": {
+          "things": [
+            {
+              "statuses": {
+                "": "NO",
+                "a\" of b": "NO",
+                "a: b": "NO",
+                "a; b: c": "NO",
+                "x of y": "NO"
+              },
+              "id": "t1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "type": "thing",
+              "id": "t1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "statuses",
+                "value": [
+                  "NO",
+                  "NO",
+                  "NO",
+                  "NO",
+                  "NO"
+                ],
+                "locations": [
+                  "/things/0/statuses/",
+                  "/things/0/statuses/a\" of b",
+                  "/things/0/statuses/a: b",
+                  "/things/0/statuses/a; b: c",
+                  "/things/0/statuses/x of y"
+                ],
+                "outcome": "usable"
+              }
+            ],
+            "message": "member \"\" of statuses is \"NO\"; member \"a\\\" of b\" of statuses is \"NO\"; member \"a: b\" of statuses is \"NO\"; and 2 more",
+            "failures": [
+              {
+                "kind": "assertion",
+                "name": "every member of statuses is \"DONE\"",
+                "cause": "value",
+                "message": "",
+                "inputs": [],
+                "failures": [
+                  {
+                    "kind": "item",
+                    "name": "member \"\" of statuses",
+                    "cause": "value",
+                    "message": "member \"\" of statuses is \"NO\"",
+                    "inputs": [
+                      {
+                        "name": "statuses.\"\"",
+                        "value": "NO",
+                        "locations": [
+                          "/things/0/statuses/"
+                        ],
+                        "outcome": "usable"
+                      }
+                    ],
+                    "failures": [],
+                    "value": "NO",
+                    "locations": [
+                      "/things/0/statuses/"
+                    ]
+                  },
+                  {
+                    "kind": "item",
+                    "name": "member \"a\\\" of b\" of statuses",
+                    "cause": "value",
+                    "message": "member \"a\\\" of b\" of statuses is \"NO\"",
+                    "inputs": [
+                      {
+                        "name": "statuses.\"a\\\" of b\"",
+                        "value": "NO",
+                        "locations": [
+                          "/things/0/statuses/a\" of b"
+                        ],
+                        "outcome": "usable"
+                      }
+                    ],
+                    "failures": [],
+                    "value": "NO",
+                    "locations": [
+                      "/things/0/statuses/a\" of b"
+                    ]
+                  },
+                  {
+                    "kind": "item",
+                    "name": "member \"a: b\" of statuses",
+                    "cause": "value",
+                    "message": "member \"a: b\" of statuses is \"NO\"",
+                    "inputs": [
+                      {
+                        "name": "statuses.\"a: b\"",
+                        "value": "NO",
+                        "locations": [
+                          "/things/0/statuses/a: b"
+                        ],
+                        "outcome": "usable"
+                      }
+                    ],
+                    "failures": [],
+                    "value": "NO",
+                    "locations": [
+                      "/things/0/statuses/a: b"
+                    ]
+                  },
+                  {
+                    "kind": "item",
+                    "name": "member \"a; b: c\" of statuses",
+                    "cause": "value",
+                    "message": "member \"a; b: c\" of statuses is \"NO\"",
+                    "inputs": [
+                      {
+                        "name": "statuses.\"a; b: c\"",
+                        "value": "NO",
+                        "locations": [
+                          "/things/0/statuses/a; b: c"
+                        ],
+                        "outcome": "usable"
+                      }
+                    ],
+                    "failures": [],
+                    "value": "NO",
+                    "locations": [
+                      "/things/0/statuses/a; b: c"
+                    ]
+                  },
+                  {
+                    "kind": "item",
+                    "name": "member \"x of y\" of statuses",
+                    "cause": "value",
+                    "message": "member \"x of y\" of statuses is \"NO\"",
+                    "inputs": [
+                      {
+                        "name": "statuses.\"x of y\"",
+                        "value": "NO",
+                        "locations": [
+                          "/things/0/statuses/x of y"
+                        ],
+                        "outcome": "usable"
+                      }
+                    ],
+                    "failures": [],
+                    "value": "NO",
+                    "locations": [
+                      "/things/0/statuses/x of y"
+                    ]
+                  }
+                ],
+                "locations": [
+                  "$policy:/requirements/r/checks/c"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "every member of in a check whose other side can't be read",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "thing",
+          "checks": {
+            "c": "every member of xs is at least y"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "leaves the object out of the assertion's inputs, as a walked list is left out",
+        "rules": [
+          "walk.member",
+          "row.parts"
+        ],
+        "input": {
+          "things": [
+            {
+              "xs": {
+                "b": null,
+                "a": 5
+              },
+              "id": "t1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "type": "thing",
+              "id": "t1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "name": "xs",
+                "value": [
+                  5,
+                  null
+                ],
+                "locations": [
+                  "/things/0/xs/a",
+                  "/things/0/xs/b"
+                ],
+                "outcome": "usable"
+              },
+              {
+                "name": "y",
+                "value": null,
+                "locations": [
+                  "/things/0"
+                ],
+                "outcome": "absent"
+              }
+            ],
+            "message": "y is missing",
+            "failures": [
+              {
+                "kind": "assertion",
+                "name": "every member of xs is at least y",
+                "cause": "absent",
+                "message": "y is missing",
+                "inputs": [
+                  {
+                    "name": "y",
+                    "value": null,
+                    "locations": [
+                      "/things/0"
+                    ],
+                    "outcome": "absent"
+                  }
+                ],
+                "failures": [],
+                "locations": [
+                  "$policy:/requirements/r/checks/c"
+                ]
+              }
+            ]
+          }
+        ]
       }
     ]
   },
@@ -2766,6 +3037,152 @@
             ]
           }
         ]
+      },
+      {
+        "description": "names a member whose key holds a colon, a semicolon, a quote or of whole when the whose can't read it",
+        "rules": [
+          "tally.member",
+          "message.items",
+          "sentence.path.string"
+        ],
+        "input": {
+          "things": [
+            {
+              "evidence": {
+                "": {},
+                "a\" of b": {
+                  "kind": "scan"
+                },
+                "a: b": {},
+                "a; b: c": {
+                  "kind": "approval"
+                },
+                "x of y": {
+                  "kind": "scan"
+                }
+              },
+              "id": "t1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "type": "thing",
+              "id": "t1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "name": "count of member of evidence whose kind is \"approval\"",
+                "value": null,
+                "locations": [
+                  "/things/0/evidence/",
+                  "/things/0/evidence/a\" of b",
+                  "/things/0/evidence/a: b",
+                  "/things/0/evidence/a; b: c",
+                  "/things/0/evidence/x of y"
+                ]
+              },
+              {
+                "name": "evidence",
+                "value": [
+                  {},
+                  {
+                    "kind": "scan"
+                  },
+                  {},
+                  {
+                    "kind": "approval"
+                  },
+                  {
+                    "kind": "scan"
+                  }
+                ],
+                "locations": [
+                  "/things/0/evidence/",
+                  "/things/0/evidence/a\" of b",
+                  "/things/0/evidence/a: b",
+                  "/things/0/evidence/a; b: c",
+                  "/things/0/evidence/x of y"
+                ],
+                "outcome": "usable"
+              }
+            ],
+            "message": "member \"\" of evidence: kind is missing; member \"a: b\" of evidence: kind is missing",
+            "failures": [
+              {
+                "kind": "assertion",
+                "name": "count of member of evidence whose kind is \"approval\" is 1",
+                "cause": "absent",
+                "message": "",
+                "inputs": [
+                  {
+                    "name": "count of member of evidence whose kind is \"approval\"",
+                    "value": null,
+                    "locations": [
+                      "/things/0/evidence/",
+                      "/things/0/evidence/a\" of b",
+                      "/things/0/evidence/a: b",
+                      "/things/0/evidence/a; b: c",
+                      "/things/0/evidence/x of y"
+                    ]
+                  }
+                ],
+                "failures": [
+                  {
+                    "kind": "item",
+                    "name": "member \"\" of evidence",
+                    "cause": "absent",
+                    "message": "kind is missing",
+                    "inputs": [
+                      {
+                        "name": "evidence.\"\".kind",
+                        "value": null,
+                        "locations": [
+                          "/things/0/evidence/"
+                        ],
+                        "outcome": "absent"
+                      }
+                    ],
+                    "failures": [],
+                    "value": {},
+                    "locations": [
+                      "/things/0/evidence/"
+                    ]
+                  },
+                  {
+                    "kind": "item",
+                    "name": "member \"a: b\" of evidence",
+                    "cause": "absent",
+                    "message": "kind is missing",
+                    "inputs": [
+                      {
+                        "name": "evidence.\"a: b\".kind",
+                        "value": null,
+                        "locations": [
+                          "/things/0/evidence/a: b"
+                        ],
+                        "outcome": "absent"
+                      }
+                    ],
+                    "failures": [],
+                    "value": {},
+                    "locations": [
+                      "/things/0/evidence/a: b"
+                    ]
+                  }
+                ],
+                "locations": [
+                  "$policy:/requirements/r/checks/c"
+                ]
+              }
+            ]
+          }
+        ]
       }
     ]
   },
@@ -2879,6 +3296,108 @@
                     "value": "x",
                     "locations": [
                       "/things/0/costs/c"
+                    ]
+                  }
+                ],
+                "locations": [
+                  "$policy:/requirements/r/checks/c"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "names a member whose key holds a colon whole when it isn't a number",
+        "rules": [
+          "tally.member",
+          "sentence.path.string"
+        ],
+        "input": {
+          "things": [
+            {
+              "costs": {
+                "": 1,
+                "a: b": "x",
+                "a; b: c": 1
+              },
+              "id": "t1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "type": "thing",
+              "id": "t1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "name": "sum of member of costs",
+                "value": null,
+                "locations": [
+                  "/things/0/costs/",
+                  "/things/0/costs/a: b",
+                  "/things/0/costs/a; b: c"
+                ]
+              },
+              {
+                "name": "costs",
+                "value": [
+                  1,
+                  "x",
+                  1
+                ],
+                "locations": [
+                  "/things/0/costs/",
+                  "/things/0/costs/a: b",
+                  "/things/0/costs/a; b: c"
+                ],
+                "outcome": "usable"
+              }
+            ],
+            "message": "member \"a: b\" of costs is \"x\", which isn't a number",
+            "failures": [
+              {
+                "kind": "assertion",
+                "name": "sum of member of costs is at most 3",
+                "cause": "unusable",
+                "message": "",
+                "inputs": [
+                  {
+                    "name": "sum of member of costs",
+                    "value": null,
+                    "locations": [
+                      "/things/0/costs/",
+                      "/things/0/costs/a: b",
+                      "/things/0/costs/a; b: c"
+                    ]
+                  }
+                ],
+                "failures": [
+                  {
+                    "kind": "item",
+                    "name": "member \"a: b\" of costs",
+                    "cause": "unusable",
+                    "message": "member \"a: b\" of costs is \"x\", which isn't a number",
+                    "inputs": [
+                      {
+                        "name": "costs.\"a: b\"",
+                        "value": "x",
+                        "locations": [
+                          "/things/0/costs/a: b"
+                        ],
+                        "outcome": "unusable"
+                      }
+                    ],
+                    "failures": [],
+                    "value": "x",
+                    "locations": [
+                      "/things/0/costs/a: b"
                     ]
                   }
                 ],
@@ -3070,6 +3589,193 @@
             ]
           }
         ]
+      },
+      {
+        "description": "keeps a member whose key holds a semicolon, a colon, a quote or of whole, as an item of failures",
+        "rules": [
+          "walk.member",
+          "message.items",
+          "row.parts",
+          "sentence.path.string"
+        ],
+        "input": {
+          "things": [
+            {
+              "evidence": {
+                "a\" of b": {
+                  "kind": "approval",
+                  "status": "NO"
+                },
+                "a; b": {
+                  "kind": "approval",
+                  "status": "NO"
+                },
+                "a; b: c": {
+                  "kind": "approval",
+                  "status": "NO"
+                },
+                "x of y": {
+                  "kind": "approval",
+                  "status": "NO"
+                }
+              },
+              "id": "t1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "type": "thing",
+              "id": "t1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "evidence",
+                "value": [
+                  {
+                    "kind": "approval",
+                    "status": "NO"
+                  },
+                  {
+                    "kind": "approval",
+                    "status": "NO"
+                  },
+                  {
+                    "kind": "approval",
+                    "status": "NO"
+                  },
+                  {
+                    "kind": "approval",
+                    "status": "NO"
+                  }
+                ],
+                "locations": [
+                  "/things/0/evidence/a\" of b",
+                  "/things/0/evidence/a; b",
+                  "/things/0/evidence/a; b: c",
+                  "/things/0/evidence/x of y"
+                ],
+                "outcome": "usable"
+              }
+            ],
+            "message": "member \"a\\\" of b\" of evidence: e.status is \"NO\"; member \"a; b\" of evidence: e.status is \"NO\"; member \"a; b: c\" of evidence: e.status is \"NO\"; and 1 more",
+            "failures": [
+              {
+                "kind": "assertion",
+                "name": "e.status is \"COMPLETE\"",
+                "cause": "value",
+                "message": "",
+                "inputs": [],
+                "failures": [
+                  {
+                    "kind": "item",
+                    "name": "member \"a\\\" of b\" of evidence",
+                    "cause": "value",
+                    "message": "e.status is \"NO\"",
+                    "inputs": [
+                      {
+                        "name": "e.status",
+                        "value": "NO",
+                        "locations": [
+                          "/things/0/evidence/a\" of b/status"
+                        ],
+                        "outcome": "usable"
+                      }
+                    ],
+                    "failures": [],
+                    "value": {
+                      "kind": "approval",
+                      "status": "NO"
+                    },
+                    "locations": [
+                      "/things/0/evidence/a\" of b"
+                    ]
+                  },
+                  {
+                    "kind": "item",
+                    "name": "member \"a; b\" of evidence",
+                    "cause": "value",
+                    "message": "e.status is \"NO\"",
+                    "inputs": [
+                      {
+                        "name": "e.status",
+                        "value": "NO",
+                        "locations": [
+                          "/things/0/evidence/a; b/status"
+                        ],
+                        "outcome": "usable"
+                      }
+                    ],
+                    "failures": [],
+                    "value": {
+                      "kind": "approval",
+                      "status": "NO"
+                    },
+                    "locations": [
+                      "/things/0/evidence/a; b"
+                    ]
+                  },
+                  {
+                    "kind": "item",
+                    "name": "member \"a; b: c\" of evidence",
+                    "cause": "value",
+                    "message": "e.status is \"NO\"",
+                    "inputs": [
+                      {
+                        "name": "e.status",
+                        "value": "NO",
+                        "locations": [
+                          "/things/0/evidence/a; b: c/status"
+                        ],
+                        "outcome": "usable"
+                      }
+                    ],
+                    "failures": [],
+                    "value": {
+                      "kind": "approval",
+                      "status": "NO"
+                    },
+                    "locations": [
+                      "/things/0/evidence/a; b: c"
+                    ]
+                  },
+                  {
+                    "kind": "item",
+                    "name": "member \"x of y\" of evidence",
+                    "cause": "value",
+                    "message": "e.status is \"NO\"",
+                    "inputs": [
+                      {
+                        "name": "e.status",
+                        "value": "NO",
+                        "locations": [
+                          "/things/0/evidence/x of y/status"
+                        ],
+                        "outcome": "usable"
+                      }
+                    ],
+                    "failures": [],
+                    "value": {
+                      "kind": "approval",
+                      "status": "NO"
+                    },
+                    "locations": [
+                      "/things/0/evidence/x of y"
+                    ]
+                  }
+                ],
+                "locations": [
+                  "$policy:/requirements/r/checks/c/assert"
+                ]
+              }
+            ]
+          }
+        ]
       }
     ]
   },
@@ -3208,6 +3914,227 @@
                     },
                     "locations": [
                       "/things/0/records/0"
+                    ]
+                  }
+                ],
+                "locations": [
+                  "$policy:/requirements/r/checks/c/assert"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "keeps a member whose key holds a semicolon or a colon whole under the item of the first list",
+        "rules": [
+          "walk.member",
+          "message.items",
+          "row.parts",
+          "sentence.path.string"
+        ],
+        "input": {
+          "things": [
+            {
+              "records": [
+                {
+                  "evidence": {
+                    "a; b": {
+                      "status": "NO"
+                    }
+                  }
+                },
+                {
+                  "evidence": {
+                    "": {
+                      "status": "NO"
+                    },
+                    "a: b": {
+                      "status": "NO"
+                    }
+                  }
+                }
+              ],
+              "id": "t1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "type": "thing",
+              "id": "t1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "r.evidence",
+                "value": [
+                  {
+                    "status": "NO"
+                  },
+                  {
+                    "status": "NO"
+                  },
+                  {
+                    "status": "NO"
+                  }
+                ],
+                "locations": [
+                  "/things/0/records/0/evidence/a; b",
+                  "/things/0/records/1/evidence/",
+                  "/things/0/records/1/evidence/a: b"
+                ],
+                "outcome": "usable"
+              },
+              {
+                "name": "records[]",
+                "value": [
+                  {
+                    "evidence": {
+                      "a; b": {
+                        "status": "NO"
+                      }
+                    }
+                  },
+                  {
+                    "evidence": {
+                      "": {
+                        "status": "NO"
+                      },
+                      "a: b": {
+                        "status": "NO"
+                      }
+                    }
+                  }
+                ],
+                "locations": [
+                  "/things/0/records/0",
+                  "/things/0/records/1"
+                ],
+                "outcome": "usable"
+              }
+            ],
+            "message": "item 1 of records: member \"a; b\" of r.evidence: e.status is \"NO\"; item 2 of records: member \"\" of r.evidence: e.status is \"NO\"; item 2 of records: member \"a: b\" of r.evidence: e.status is \"NO\"",
+            "failures": [
+              {
+                "kind": "assertion",
+                "name": "e.status is \"COMPLETE\"",
+                "cause": "value",
+                "message": "",
+                "inputs": [],
+                "failures": [
+                  {
+                    "kind": "item",
+                    "name": "item 1 of records",
+                    "cause": "value",
+                    "message": "",
+                    "inputs": [],
+                    "failures": [
+                      {
+                        "kind": "item",
+                        "name": "member \"a; b\" of r.evidence",
+                        "cause": "value",
+                        "message": "e.status is \"NO\"",
+                        "inputs": [
+                          {
+                            "name": "e.status",
+                            "value": "NO",
+                            "locations": [
+                              "/things/0/records/0/evidence/a; b/status"
+                            ],
+                            "outcome": "usable"
+                          }
+                        ],
+                        "failures": [],
+                        "value": {
+                          "status": "NO"
+                        },
+                        "locations": [
+                          "/things/0/records/0/evidence/a; b"
+                        ]
+                      }
+                    ],
+                    "value": {
+                      "evidence": {
+                        "a; b": {
+                          "status": "NO"
+                        }
+                      }
+                    },
+                    "locations": [
+                      "/things/0/records/0"
+                    ]
+                  },
+                  {
+                    "kind": "item",
+                    "name": "item 2 of records",
+                    "cause": "value",
+                    "message": "",
+                    "inputs": [],
+                    "failures": [
+                      {
+                        "kind": "item",
+                        "name": "member \"\" of r.evidence",
+                        "cause": "value",
+                        "message": "e.status is \"NO\"",
+                        "inputs": [
+                          {
+                            "name": "e.status",
+                            "value": "NO",
+                            "locations": [
+                              "/things/0/records/1/evidence//status"
+                            ],
+                            "outcome": "usable"
+                          }
+                        ],
+                        "failures": [],
+                        "value": {
+                          "status": "NO"
+                        },
+                        "locations": [
+                          "/things/0/records/1/evidence/"
+                        ]
+                      },
+                      {
+                        "kind": "item",
+                        "name": "member \"a: b\" of r.evidence",
+                        "cause": "value",
+                        "message": "e.status is \"NO\"",
+                        "inputs": [
+                          {
+                            "name": "e.status",
+                            "value": "NO",
+                            "locations": [
+                              "/things/0/records/1/evidence/a: b/status"
+                            ],
+                            "outcome": "usable"
+                          }
+                        ],
+                        "failures": [],
+                        "value": {
+                          "status": "NO"
+                        },
+                        "locations": [
+                          "/things/0/records/1/evidence/a: b"
+                        ]
+                      }
+                    ],
+                    "value": {
+                      "evidence": {
+                        "": {
+                          "status": "NO"
+                        },
+                        "a: b": {
+                          "status": "NO"
+                        }
+                      }
+                    },
+                    "locations": [
+                      "/things/0/records/1"
                     ]
                   }
                 ],
