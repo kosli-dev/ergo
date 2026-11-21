@@ -7407,5 +7407,163 @@
    "min": "s"
   },
   "want": "$params.min is \"s\", which isn't a number; item 1 of es: v is missing; item 2 of es: v is missing; item 3 of es: v is missing; and 1 more"
+ },
+ {
+  "name": "walk rows/every item's own empty list beside a root after the phrase that is missing",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every pkgs.licenses is in $params.allowed"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "pkgs": [
+      {
+       "licenses": [
+        "MIT"
+       ]
+      },
+      {
+       "licenses": []
+      }
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "want": "$params.allowed is missing; item 2 of pkgs: licenses is []"
+ },
+ {
+  "name": "walk rows/some item's own empty list in the middle of the path beside a root that isn't a number",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "some xs.ys.v is at least $params.min"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "ys": [
+        {
+         "v": 1
+        }
+       ]
+      },
+      {
+       "ys": []
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "min": "s"
+  },
+  "want": "$params.min is \"s\", which isn't a number; item 2 of xs: ys is []"
+ },
+ {
+  "name": "walk rows/every item's own empty list beside a named by key that is null",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every rs.zz is m named by $input.k"
+     }
+    }
+   }
+  },
+  "input": {
+   "k": null,
+   "things": [
+    {
+     "id": "t",
+     "m": {
+      "a": "a"
+     },
+     "rs": [
+      {
+       "zz": [
+        1
+       ]
+      },
+      {
+       "zz": []
+      }
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "want": "$input.k is null; item 2 of rs: zz is []"
+ },
+ {
+  "name": "walk rows/every only empty lists of its own beside a root that is null says only the root",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every pkgs.licenses starts with $input.p"
+     }
+    }
+   }
+  },
+  "input": {
+   "p": null,
+   "things": [
+    {
+     "id": "t",
+     "pkgs": [
+      {
+       "licenses": []
+      },
+      {
+       "licenses": []
+      }
+     ]
+    }
+   ]
+  },
+  "params": {}
  }
 ]
