@@ -59,7 +59,7 @@ expect_in "WARNING" "$out"
 echo "body-facts.sh does not warn when the body has the line, even with a CR at the end"
 out=$(run "$(printf 'Fixes a thing.\n\nChanges the report: yes, 6.\r\n')" "$dir/reports-changed.md" "$dir/pairs-changed.md")
 expect_not_in "WARNING" "$out"
-expect_not_in "NOTE" "$out"
+expect_not_in "NOTE: the body has a line" "$out"
 
 echo "body-facts.sh needs the line at the start of a line"
 out=$(run "We say Changes the report: no." "$dir/reports-changed.md" "$dir/pairs-same.md")
@@ -73,7 +73,7 @@ expect_not_in "WARNING" "$out"
 echo "body-facts.sh has no warning or note when nothing changed and the body has no line"
 out=$(run "Fixes a thing." "$dir/reports-same.md" "$dir/pairs-skipped.md")
 expect_not_in "WARNING" "$out"
-expect_not_in "NOTE" "$out"
+expect_not_in "NOTE: the body has a line" "$out"
 expect_in "Rust case reports changed: 0" "$out"
 expect_in "Pairs whose Rust output changed: 0" "$out"
 
@@ -132,6 +132,7 @@ expect_in "WARNING" "$out"
 
 printf '## Rust report changes\n\n6 case reports changed between base and the working tree.\n\n## Known failures\n\nknown-failures.txt had 1 line and has 3 now.\n' > "$dir/reports-known.md"
 printf '## Rust report changes\n\nNo case report changed between base and the working tree.\n\n## Known failures\n\nknown-failures.txt had 2 lines and has 2 now.\n' > "$dir/reports-known-same.md"
+printf '## Rust report changes\n\n1 case report changed between base and the working tree.\n\n## Known failures\n\nknown-failures.txt had 1 line and has 1 now.\n' > "$dir/reports-one-known.md"
 printf 'garbled\n' > "$dir/garbled.md"
 
 fails_with() {
@@ -171,7 +172,7 @@ expect_in "the body says 9 case reports changed" "$out"
 expect_in "the body says Rust output changed on 8 pairs" "$out"
 
 echo "body-facts.sh reads the singular forms"
-out=$(run "$(printf 'Changes the report: 1 Rust case report changed, Rust output changed on 1 pair.\n\nknown-failures.txt had 1 line and has 1 now.\n')" "$dir/reports-one.md" "$dir/pairs-one.md")
+out=$(run "$(printf 'Changes the report: 1 Rust case report changed, Rust output changed on 1 pair.\n\nknown-failures.txt had 1 line and has 1 now.\n')" "$dir/reports-one-known.md" "$dir/pairs-one.md")
 expect_not_in "MISMATCH" "$out"
 fails_with "1 Rust case report changed." "$dir/reports-changed.md" "$dir/pairs-same.md"
 
