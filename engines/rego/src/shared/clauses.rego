@@ -93,7 +93,34 @@ _m_clause_lines(c) := [c.text] if c.kind in {"root", "list"}
 
 _m_clause_lines(c) := [concat("", ["and ", _literal_text(c.count), " more"])] if c.kind == "more"
 
-_m_clause_lines(c) := array.concat(
-	[c.text | c.text != ""],
-	[concat(": ", [c.name, concat(", and ", [s.text | some s in c.said])]) | c.said != []],
-) if c.kind == "item"
+_m_clause_lines(c) := [_m_clause_unit_text(u.clause) | some u in _m_clause_units([c])] if c.kind == "item"
+
+_m_clause_unit_text(c) := c.text if c.said == []
+
+_m_clause_unit_text(c) := concat(": ", [c.name, concat(", and ", [s.text | some s in c.said])]) if c.said != []
+
+_m_clause_units(items) := [x[1] | some x in sort([[u.key, u] | some t, c in items; some u in _m_clause_item_units(t, c)])]
+
+_m_clause_item_units(t, c) := {u |
+	nodes := {p: v | walk(c, [p, v]); _m_clause_item_node(v)}
+	some p, n in nodes
+	some u in _m_clause_node_units(array.concat([t], p), [nodes[q].name | some k in numbers.range(0, count(p)); k < count(p); k % 2 == 0; q := array.slice(p, 0, k)], n)
+}
+
+_m_clause_item_node(v) if {
+	is_object(v)
+	v.kind == "item"
+}
+
+_m_clause_node_units(key, lead, n) := array.concat(
+	[{"key": key, "clause": _m_clause("item", name, n.cause, concat(": ", array.concat(lead, [n.text])))} | n.text != ""],
+	[{"key": array.concat(key, ["said", i]), "clause": _m_item_clause(name, n.cause, run)} | some [i, run] in _m_clause_runs(n.said)],
+) if name := concat(": ", array.concat(lead, [n.name]))
+
+_m_clause_runs(said) := [[i, array.slice(said, i, _m_clause_run_end(said, i))] | some i, c in said; c.kind != "item"; _m_clause_run_start(said, i)]
+
+_m_clause_run_start(_, 0)
+
+_m_clause_run_start(said, i) if said[i - 1].kind == "item"
+
+_m_clause_run_end(said, i) := min({j | some j, c in said; j > i; c.kind == "item"} | {count(said)})
