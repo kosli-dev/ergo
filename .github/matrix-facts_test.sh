@@ -11,7 +11,9 @@ cat > "$dir/pairs.json" <<'JSON'
  {"name": "went_down", "policy": {}, "input": {}},
  {"name": "down_on_base", "policy": {}, "input": {}},
  {"name": "says_less", "policy": {}, "input": {}},
- {"name": "passes_now", "policy": {}, "input": {}}
+ {"name": "passes_now", "policy": {}, "input": {}},
+ {"name": "cut_elsewhere", "policy": {}, "input": {}},
+ {"name": "really_gone", "policy": {}, "input": {}}
 ]
 JSON
 
@@ -25,13 +27,29 @@ row() {
 report() {
   printf '{"results":[%s]}' "$(row "$@")"
 }
-six() {
-  printf '[%s,%s,%s,%s,%s,%s]' "$1" "$2" "$3" "$4" "$5" "$6"
+many() {
+  printf '['
+  sep=
+  for each in "$@"; do
+    printf '%s%s' "$sep" "$each"
+    sep=,
+  done
+  printf ']'
 }
+tree() {
+  printf '{"results":[{"requirement":"r","check":"c","subject":"t","passed":false,"cause":"unusable","message":"%s","failures":[{"kind":"assertion","message":"%s","name":"count","failures":[%s]}]}]}' "$1" "$2" "$3"
+}
+node() {
+  printf '{"kind":"item","name":"%s","message":"%s","failures":[]}' "$1" "$2"
+}
+cut_base=$(tree "item 1 of es: p is bad; item 2 of es: p is bad; and 1 more" "item 1 of es: p is bad; item 2 of es: p is bad; item 3 of es: p is bad" "")
+cut_head=$(tree "item 1 of es: p is bad; and 2 more" "" "$(node 'item 1 of es' 'p is bad'),$(node 'item 2 of es' 'p is bad'),$(node 'item 3 of es' 'p is bad')")
+gone_base=$(tree "item 1 of es: p is bad; item 2 of es: q is bad" "" "$(node 'item 1 of es' 'p is bad'),$(node 'item 2 of es' 'q is bad')")
+gone_head=$(tree "item 1 of es: p is bad" "" "$(node 'item 1 of es' 'p is bad')")
 
-six "$(report value)" "$(report absent)" "$(report absent)" "$(report absent)" "$(report value 'a is 1, and b is 2')" "$(report value)" > "$dir/rego.json"
-six "$(report value)" "$(report unusable)" "$(report value)" "$(report value)" "$(report value 'a is 1')" "$(report satisfied)" > "$dir/head.json"
-six "$(report value)" "$(report absent)" "$(report absent)" "$(report null)" "$(report value 'a is 1, and b is 2')" "$(report value)" > "$dir/base.json"
+many "$(report value)" "$(report absent)" "$(report absent)" "$(report absent)" "$(report value 'a is 1, and b is 2')" "$(report value)" "$cut_base" "$gone_base" > "$dir/rego.json"
+many "$(report value)" "$(report unusable)" "$(report value)" "$(report value)" "$(report value 'a is 1')" "$(report satisfied)" "$cut_head" "$gone_head" > "$dir/head.json"
+many "$(report value)" "$(report absent)" "$(report absent)" "$(report null)" "$(report value 'a is 1, and b is 2')" "$(report value)" "$cut_base" "$gone_base" > "$dir/base.json"
 
 run() {
   MATRIX_FACTS_PAIRS=$dir/pairs.json MATRIX_FACTS_REGO=$dir/rego.json \
@@ -58,10 +76,11 @@ expect "$dir/head.json" "$dir/base.json" "## Matrix matrix-a
 - down_on_base: r/c: base null, working tree value, Rego absent (already on base)
 - passes_now: r/c: base value, working tree satisfied, Rego value
 
-### Says less than base (usually a bug): 2
+### Says less than base (usually a bug): 3
 
 - says_less: r/c: missing \"b is 2\"; base says \"a is 1, and b is 2\", working tree says \"a is 1\"
 - passes_now: r/c: missing \"a problem\"; base says \"a problem\", working tree says \"none\"
+- really_gone: r/c: missing \"item 2 of es: q is bad\"; base says \"item 1 of es: p is bad; item 2 of es: q is bad\", working tree says \"item 1 of es: p is bad\"
 
 ### Cause went up (usually the rule problems.all_said; list for the Rego steps): 1
 
