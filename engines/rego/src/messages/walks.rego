@@ -519,7 +519,8 @@ _m_tally_keyed_base_items(subj, side) := array.concat(
 ) if {
 	b := _m_tally_keyed_base(subj, side)
 	w := _walk(_walk_start({"path": b.k.path}, subj), _walk_keys({"path": b.k.path}, subj), true)
-	_keyed_list_read(w)
+	w.fails == []
+	w.walked != set()
 	xs := [object.union(x, {"e": e}) | some e in w.items; x := _keyed_item(e, b.k)]
 	count(xs) == count(w.items)
 }
