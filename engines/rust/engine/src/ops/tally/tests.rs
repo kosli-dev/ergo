@@ -2231,6 +2231,23 @@ fn a_count_after_plus_says_each_items_own_value_beside_a_root_list_that_isnt_one
     );
 }
 
+#[test]
+fn a_count_names_no_kind_for_an_items_own_list_beside_an_empty_root_list() {
+    let clauses = tally_clauses_in(
+        "count of es whose v contains some of $input.x is 0",
+        json!({"things": [{"es": [{"v": [1, "a"]}]}], "x": []}),
+        json!({}),
+    );
+    assert_eq!(
+        kinds_causes_and_texts(&clauses),
+        [(
+            clause::Kind::Root,
+            Cause::Unusable,
+            "$input.x is [], which isn't a list with at least one value".to_string()
+        )]
+    );
+}
+
 fn kinds_and_names(clauses: &[Clause]) -> Vec<(clause::Kind, &str)> {
     clauses
         .iter()
