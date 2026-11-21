@@ -366,21 +366,21 @@ _m_for_said(check) := {t |
 }
 
 _m_for_unled(said, p) := [t] if {
-	startswith(p, "item ")
+	_walk_kind(p) == "item"
 	some t in said
 	endswith(p, concat("", [": ", t]))
 } else := [t, substring(p, 0, count(p) - count(tail))] if {
-	startswith(p, "item ")
+	_walk_kind(p) == "item"
 	some t in said
 	tail := concat("", [", and ", t])
 	endswith(p, tail)
 } else := [t, concat("", [substring(p, 0, i + 2), substring(p, (i + count(t)) + 8, -1)])] if {
-	startswith(p, "item ")
+	_walk_kind(p) == "item"
 	some t in said
 	i := indexof(p, concat("", [": ", t, ", and "]))
 	i > 0
 } else := [t, concat("", [substring(p, 0, i), substring(p, (i + count(t)) + 6, -1)])] if {
-	startswith(p, "item ")
+	_walk_kind(p) == "item"
 	some t in said
 	i := indexof(p, concat("", [", and ", t, ", and "]))
 	i > 0
@@ -400,7 +400,7 @@ _m_for_joined(ents) := concat("; ", array.concat(_once([e.t | some e in ents; _m
 	shown := array.slice(counted, 0, 3)
 }
 
-_m_for_counted(ents) := _once([_m_item_lead(e.t) | some e in ents; e.x == false; startswith(e.t, "item ")])
+_m_for_counted(ents) := _once([_m_item_lead(e.t) | some e in ents; e.x == false; _walk_kind(e.t) == "item"])
 
 _m_item_lead(t) := concat(": ", [_m_item_head(p) | some i, p in ps; i < n]) if {
 	ps := split(t, ": ")
@@ -435,7 +435,7 @@ _m_kept(e, shown, ents) if {
 _m_kept_text(t, shown) if not _m_cut_item(t, shown)
 
 _m_cut_item(t, shown) if {
-	startswith(t, "item ")
+	_walk_kind(t) == "item"
 	not _m_item_lead(t) in shown
 }
 
@@ -501,7 +501,7 @@ _m_second_tally_pieces(f, t) := [_m_releaded(lead, q) | some q in _m_top_split(t
 } else := [t]
 
 _m_releaded(lead, q) := concat("", [lead, ": ", q]) if {
-	startswith(q, "item ")
+	_walk_kind(q) == "item"
 	not startswith(q, concat("", [lead, ": "]))
 } else := q
 
@@ -551,7 +551,7 @@ _m_two_list(f) if {
 }
 
 _m_lead_of(t) := substring(t, 0, k) if {
-	startswith(t, "item ")
+	_walk_kind(t) == "item"
 	cuts := [i | some i in array.concat(_m_cuts(t, ": "), _m_cuts(t, " is ")); i > 0; _m_outside_quotes(substring(t, 0, i))]
 	count(cuts) > 0
 	k := min(cuts)
@@ -576,7 +576,7 @@ _m_list_leads(ls) := [x[3] | some x in sort([[_m_list_at(ls, l), _m_lead_n(l), i
 
 _m_list_at(ls, l) := min({i | some i, k in ls; _m_lead_list(k) == _m_lead_list(l)})
 
-_m_lead_list(l) := substring(l, indexof(l, " of ") + 4, -1) if startswith(l, "item ")
+_m_lead_list(l) := p[1] if p := _item_parts(l)
 
 else := l
 

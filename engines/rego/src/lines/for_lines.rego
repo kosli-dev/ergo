@@ -219,13 +219,17 @@ _for_deduped(m) := concat("; ", [c | some c in cs; not _for_led_more(c); not _fo
 } else := m
 
 _for_led_once(t, once) if {
-	startswith(t, "item ")
+	_walk_kind(t) == "item"
 	some o in once
-	startswith(o, "item ")
+	_walk_kind(o) == "item"
 	endswith(t, concat("", [": ", o]))
 }
 
-_for_led_more(t) if regex.match(`^item [^;]*: and [0-9]+ more$`, t)
+_for_led_more(t) if {
+	_walk_kind(t) == "item"
+	regex.match(`: and [0-9]+ more$`, t)
+	not contains(t, ";")
+}
 
 _m_root_skip(rs) := [x | some m in rs; some x in split(m, "; ")] if _walk_roots_on
 

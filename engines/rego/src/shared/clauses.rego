@@ -30,8 +30,7 @@ _m_more_clause(c) if {
 }
 
 _m_list_item_clause(c, lists) if {
-	startswith(c, "item ")
-	rest := substring(c, indexof(c, " of ") + 4, -1)
+	rest := _item_parts(c)[1]
 	some l in lists
 	_m_names_list(rest, l)
 }
