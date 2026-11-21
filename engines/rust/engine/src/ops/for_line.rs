@@ -1311,16 +1311,17 @@ impl For {
                     let lifted = self.item_roots(depth, &bound);
                     let texts: Vec<&str> = lifted.iter().map(|root| root.text.as_str()).collect();
                     let clauses: Vec<Clause> = self
-                        .nested_clauses(&nested, assertions.is_empty(), depth + 1, &bound)
+                        .first_alias_clauses(&nested, depth, &bound)
                         .into_iter()
+                        .chain(self.nested_clauses(
+                            &nested,
+                            assertions.is_empty(),
+                            depth + 1,
+                            &bound,
+                        ))
                         .filter_map(|clause| unrooted(clause, &texts))
                         .collect();
-                    let clauses: Vec<Clause> = lifted
-                        .iter()
-                        .cloned()
-                        .chain(self.first_alias_clauses(&nested, depth, &bound))
-                        .chain(clauses)
-                        .collect();
+                    let clauses: Vec<Clause> = lifted.iter().cloned().chain(clauses).collect();
                     let said = if leaf.is_empty() {
                         parts.join("; ").replace(FREE, "")
                     } else {
@@ -1345,11 +1346,7 @@ impl For {
                 }
             };
             let rooted = if outcome.is_none() && !last {
-                let whole = !live.at.value.is_object();
                 self.item_roots(depth, &bound)
-                    .into_iter()
-                    .filter(|root| !whole || root.cause != Cause::NotAnObject)
-                    .collect()
             } else {
                 Vec::new()
             };
@@ -2882,17 +2879,21 @@ impl For {
                 .collect();
             let mut said = super::message::root_clauses(&whose, &outer);
             said.extend(super::message::walked_root_clauses(&whose, &outer));
-            for sentence in self.sentences.iter().filter(|sentence| sentence.reads_last) {
+            for sentence in &self.sentences {
                 said.extend(sentence_roots_said(&sentence.check, &outer));
             }
             said
         };
+        let whole = ctx
+            .aliases
+            .get(&self.items[depth].alias)
+            .is_some_and(|at| !at.value.is_object());
         let mut up = ctx.clone();
         up.aliases.remove(&self.items[depth].alias);
         let before: Vec<String> = roots(&up).into_iter().map(|root| root.text).collect();
         let mut out: Vec<Clause> = Vec::new();
         for root in roots(ctx) {
-            if !before.contains(&root.text) {
+            if !before.contains(&root.text) && !(whole && root.cause == Cause::NotAnObject) {
                 push_new(&mut out, Clause::said(root.cause, root.text));
             }
         }
