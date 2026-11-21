@@ -587,6 +587,36 @@ fn every_is_a_prefix_not_a_key() {
 }
 
 #[test]
+fn every_member_of_reads_the_members_at_the_end_of_the_path() {
+    let line = from("every member of record.evidence whose kind is \"approval\"");
+    assert!(line.every);
+    assert!(line.member);
+    assert!(!line.distinct);
+    assert_eq!(line.path, with_steps(key("record"), vec![dot("evidence")]));
+    assert_eq!(line.whose.len(), 1);
+    assert!(from("every member of $input").member);
+}
+
+#[test]
+fn a_field_called_member_still_reads_as_a_field() {
+    let line = from("every member.x");
+    assert!(!line.member);
+    assert_eq!(line.path, with_steps(key("member"), vec![dot("x")]));
+    assert_eq!(from("member").path, key("member"));
+    assert!(!from("every member").member);
+    assert_eq!(from("every member of member").path, key("member"));
+}
+
+#[test]
+fn member_of_without_every_or_with_distinct_still_reads_so_a_rule_can_name_it() {
+    let line = from("member of x");
+    assert!(line.member);
+    assert!(!line.every);
+    let line = from("every distinct member of x");
+    assert!(line.member && line.distinct && line.every);
+}
+
+#[test]
 fn the_right_side_of_each_of_is_a_right_path() {
     assert!(parse_from("x named by each of \"a b\"").is_err());
     assert!(parse_from("x named by each of .\"a b\"").is_ok());
