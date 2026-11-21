@@ -683,7 +683,7 @@ _m_named_item(f) := concat("", [object.get(f, "bare", object.get(f, "said", f.it
 
 _m_named_item(f) := _m_isnt(object.get(f, "bare", object.get(f, "said", f.item)), object.get(f, "raw", f.value), "an object") if f.cause == "not_an_object"
 
-_m_named_item(f) := _m_isnt(object.get(f, "said", f.item), f.value, _m_walk_kind(f.value)) if f.cause == "unusable"
+_m_named_item(f) := _m_isnt(object.get(f, "said", f.item), f.value, object.get(f, "wants", _m_walk_kind(f.value))) if f.cause == "unusable"
 
 _m_tie(check, k, failed) := concat("", [_m_listed([f.item | some f in failed; f.cause == "ambiguous"]), " tie", _m_tie_on(check, k)])
 

@@ -978,7 +978,7 @@ _for_failed_base(check, f) := {
 	"bare": _m_rest_named(_m_for_item_name(check, f.item), f),
 }
 
-_for_failed_flags(f) := object.union(object.union(object.union(object.union({"msg": f.why | "why" in object.keys(f)}, {"raw": f.raw | "raw" in object.keys(f)}), {"hoisted": true | object.get(f, "hoisted", false) == true}), {"whose_of": f.whose_of | "whose_of" in object.keys(f)}), object.union(_fail_levels(f), {"ergo/sorted": f.sorted | "sorted" in object.keys(f)}))
+_for_failed_flags(f) := object.union(object.union(object.union(object.union({"msg": f.why | "why" in object.keys(f)}, {"raw": f.raw | "raw" in object.keys(f)}), {"hoisted": true | object.get(f, "hoisted", false) == true}), {"whose_of": f.whose_of | "whose_of" in object.keys(f)}), object.union(object.union(_fail_levels(f), {"ergo/sorted": f.sorted | "sorted" in object.keys(f)}), {"wants": f.msg | object.get(f, "msg", "") == "an object"}))
 
 _fail_levels(f) := {"ergo/levels": f.lv} if {
 	"lv" in object.keys(f)
