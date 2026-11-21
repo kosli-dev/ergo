@@ -52,6 +52,9 @@ python3 .github/rego-layers.py
 .github/pr-facts_test.sh
 .github/pairs-facts_test.sh
 .github/body-facts_test.sh
+.github/message-cuts_test.sh
+.github/rules_test.sh
+.github/gitattributes_test.sh
 .github/matrix-facts_test.sh
 .github/spec-placeholder.sh
 .github/spec-placeholder_test.sh
@@ -219,7 +222,7 @@ The report must stay byte-identical for the same policy and input, whatever orde
 - `$` marks Ergo's own names. Only `$input` and `$params` can also be read, and a label inside `inputs` or a message is plain words.
 - A line that coverage lists isn't dead code. Check every caller and try a real policy before deleting it. If it can be reached, add a test.
 - In Rego, `not f(x.y)` is undefined when `x.y` is missing. Put the test in a small rule and negate that.
-- Don't cut a message as text. Today messages are built from finished text and then split again on `; `, `, and ` and `item `, which is why a quoted `; ` or a name that looks like an item gives a wrong reading (#694 moves messages to parts). `.github/message-cuts.sh` counts those cuts in `engines/rust/engine/src` and `engines/rego/src`, per named pattern and per file, and fails when a count is higher than `.github/message-cuts.baseline`. The counts may only go down. When a change deletes cuts, run `.github/message-cuts.sh --update` and commit the lower baseline; the script says when it is lower. `.github/message-cuts_test.sh` tests it.
+- Don't cut a message as text. Today messages are built from finished text and then split again on `; `, `, and ` and `item `, which is why a quoted `; ` or a name that looks like an item gives a wrong reading (#694 moves messages to parts). `.github/message-cuts.sh` counts those cuts in `engines/rust/engine/src` and `engines/rego/src`, per named pattern and per file. CI runs `.github/message-cuts.sh --against origin/main` on pull requests, which counts the same cuts in the base branch's tree and fails when any pattern, or the total, is higher in your tree, and prints the lines you added. Your own net change decides, so two pull requests that each remove a cut never conflict. When a cut is truly needed, list its pattern name in `.github/message-cuts.allow` (empty by default) and say why in the pull request. `.github/message-cuts_test.sh` tests it.
 
 ## Spec rules
 

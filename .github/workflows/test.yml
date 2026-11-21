@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
+    types: [opened, synchronize, reopened, edited]
 
 permissions:
   contents: read
@@ -85,8 +86,13 @@ jobs:
         run: .github/body-facts_test.sh
       - name: Check the script that counts the places that cut a message as text
         run: .github/message-cuts_test.sh
-      - name: Check that engine code cuts no more messages as text than the baseline allows
-        run: .github/message-cuts.sh
+      - name: Check that engine code cuts no more messages as text than the base branch
+        if: github.event_name == 'pull_request'
+        run: .github/message-cuts.sh --against origin/${{ github.base_ref }}
+      - name: Check the script that finds spec rules
+        run: .github/rules_test.sh
+      - name: Check that the merge drivers in .gitattributes work
+        run: .github/gitattributes_test.sh
       - name: Check the script that runs the common checks
         run: .github/checks_test.sh
       - name: Check the release workflow's latest flag, release notes and tag checks

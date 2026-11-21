@@ -2,13 +2,15 @@
 set -eu
 here=$(cd "$(dirname "$0")" && pwd)
 root=${MESSAGE_CUTS_ROOT:-$(cd "$here/.." && pwd)}
-baseline=${MESSAGE_CUTS_BASELINE:-$here/message-cuts.baseline}
-update=no
+against=
 case ${1:-} in
   "") ;;
-  --update) update=yes ;;
+  --against)
+    [ -n "${2:-}" ] || { echo "usage: message-cuts.sh [--against REF]" >&2; exit 2; }
+    against=$2
+    ;;
   *)
-    echo "usage: message-cuts.sh [--update]" >&2
+    echo "usage: message-cuts.sh [--against REF]" >&2
     exit 2
     ;;
 esac
@@ -43,74 +45,89 @@ pat rego-subject-prefix rego E '(startswith|trim_prefix)\([^)]*"the subject '
 pat rego-indexof-of rego E 'indexof\([^)]*" of "'
 pat rego-indexof-and rego E 'indexof\(.*", and "'
 
-find engines/rust/engine/src -name '*.rs' ! -name tests.rs ! -path '*/tests/*' 2>/dev/null | LC_ALL=C sort > "$work/rust.files"
-find engines/rego/src -name '*.rego' 2>/dev/null | LC_ALL=C sort > "$work/rego.files"
+scan() {
+  (
+    cd "$1"
+    out=$2
+    find engines/rust/engine/src -name '*.rs' ! -name tests.rs ! -path '*/tests/*' 2>/dev/null | LC_ALL=C sort > "$out.rust.files"
+    find engines/rego/src -name '*.rego' 2>/dev/null | LC_ALL=C sort > "$out.rego.files"
+    tab=$(printf '\t')
+    : > "$out.counts"
+    : > "$out.lines"
+    while IFS=$tab read -r name lang mode pattern; do
+      flag=-F
+      [ "$mode" = E ] && flag=-E
+      while IFS= read -r file; do
+        [ -n "$file" ] || continue
+        n=$(grep -c $flag -e "$pattern" "$file" || true)
+        [ "$n" != 0 ] || continue
+        echo "$name $file $n" >> "$out.counts"
+        grep -n $flag -e "$pattern" "$file" | sed "s|^|$name $file:|" >> "$out.lines"
+      done < "$out.$lang.files"
+    done < "$work/patterns"
+    awk '{ t[$1] += $3; total += $3 } END { for (k in t) print k, t[k]; print "total", total }' "$out.counts" | LC_ALL=C sort > "$out.totals"
+    : > "$out.full"
+    for name in $(cut -f1 "$work/patterns"); do
+      n=$(awk -v k="$name" '$1 == k { print $2 }' "$out.totals")
+      echo "$name ${n:-0}" >> "$out.full"
+    done
+    echo "total $(awk '$1 == "total" { print $2 }' "$out.totals")" >> "$out.full"
+  )
+}
 
-tab=$(printf '\t')
-: > "$work/counts"
-: > "$work/lines"
-while IFS=$tab read -r name lang mode pattern; do
-  flag=-F
-  [ "$mode" = E ] && flag=-E
-  while IFS= read -r file; do
-    [ -n "$file" ] || continue
-    n=$(grep -c $flag -e "$pattern" "$file" || true)
-    [ "$n" != 0 ] || continue
-    echo "$name $file $n" >> "$work/counts"
-    grep -n $flag -e "$pattern" "$file" | sed "s|^|$name $file:|" >> "$work/lines"
-  done < "$work/$lang.files"
-done < "$work/patterns"
-
-awk '{ t[$1] += $3; total += $3 } END { for (k in t) print k, t[k]; print "total", total }' "$work/counts" | LC_ALL=C sort > "$work/totals"
-names=$(cut -f1 "$work/patterns")
-: > "$work/full"
-for name in $names; do
-  n=$(awk -v k="$name" '$1 == k { print $2 }' "$work/totals")
-  echo "$name ${n:-0}" >> "$work/full"
-done
-echo "total $(awk '$1 == "total" { print $2 }' "$work/totals")" >> "$work/full"
+scan "$root" "$work/head"
 
 echo "Places where engine code cuts a message as text, per pattern and file:"
-LC_ALL=C sort "$work/counts"
+LC_ALL=C sort "$work/head.counts"
 echo
 echo "Per pattern:"
-awk '$1 == "total" { print; next } { print $1, "total", $2 }' "$work/full"
+awk '$1 == "total" { print; next } { print $1, "total", $2 }' "$work/head.full"
 
-if [ "$update" = yes ]; then
-  cp -f "$work/full" "$baseline"
-  echo
-  echo "Wrote $baseline."
-  exit 0
-fi
+[ -n "$against" ] || exit 0
 
-if [ ! -f "$baseline" ]; then
-  echo "message-cuts.sh: no baseline at $baseline: run message-cuts.sh --update" >&2
+mkdir "$work/base"
+git -C "$root" archive "$against" engines/rust/engine/src engines/rego/src | tar -x -C "$work/base" || {
+  echo "message-cuts.sh: cannot read $against" >&2
   exit 1
-fi
+}
+scan "$work/base" "$work/base"
+
+allow=$root/.github/message-cuts.allow
+allowed() {
+  [ -f "$allow" ] && grep -qx -e "$1" "$allow"
+}
 
 failed=0
-lower=0
+extra=0
 while read -r name now; do
-  was=$(awk -v k="$name" '$1 == k { print $2 }' "$baseline")
+  was=$(awk -v k="$name" '$1 == k { print $2 }' "$work/base.full")
   was=${was:-0}
-  if [ "$now" -gt "$was" ]; then
-    failed=1
-    echo
-    echo "$name went from $was to $now"
-    if [ "$name" != total ]; then
-      grep "^$name " "$work/lines" | head -n 5 | sed 's/^[^ ]* /  /'
-    fi
-  elif [ "$now" -lt "$was" ]; then
-    lower=1
+  [ "$name" = total ] && continue
+  [ "$now" -gt "$was" ] || continue
+  if allowed "$name"; then
+    extra=$((extra + now - was))
+    continue
   fi
-done < "$work/full"
+  failed=1
+  echo
+  echo "$name went from $was to $now. Lines added:"
+  sed 's/^\([^ ]*\) \([^:]*\):\([0-9]*\):/\1\t\2\t\3\t/' "$work/base.lines" | awk -F'\t' -v k="$name" '$1 == k { seen[$2 "\t" $4]++ }
+    END { for (x in seen) print x "\t" seen[x] }' | LC_ALL=C sort > "$work/base.keys"
+  sed 's/^\([^ ]*\) \([^:]*\):\([0-9]*\):/\1\t\2\t\3\t/' "$work/head.lines" | awk -F'\t' -v k="$name" -v keys="$work/base.keys" '
+    BEGIN { while ((getline l < keys) > 0) { split(l, f, "\t"); left[f[1] "\t" f[2]] = f[3] } }
+    $1 == k { key = $2 "\t" $4; if (left[key] > 0) left[key]--; else print "  " $2 ":" $3 ": " $4 }'
+done < "$work/head.full"
+
+was=$(awk '$1 == "total" { print $2 }' "$work/base.full")
+now=$(awk '$1 == "total" { print $2 }' "$work/head.full")
+if [ $((now - extra)) -gt "$was" ]; then
+  failed=1
+  echo
+  echo "total went from $was to $now"
+fi
 
 if [ "$failed" = 1 ]; then
   echo >&2
-  echo "FAILED: message-cuts.sh found more places that cut a message as text than the baseline allows. Carry the parts instead, or, when a cut is truly needed, say why in the pull request." >&2
+  echo "FAILED: message-cuts.sh found more places that cut a message as text than $against has. Carry the parts instead, or, when a cut is truly needed, list its pattern in .github/message-cuts.allow and say why in the pull request." >&2
   exit 1
-fi
-if [ "$lower" = 1 ]; then
-  echo
-  echo "lower than baseline, run message-cuts.sh --update"
 fi

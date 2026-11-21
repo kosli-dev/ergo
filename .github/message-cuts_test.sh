@@ -94,7 +94,7 @@ fi
 expect_in "rust-split-semicolon went from 2 to 3" "$out"
 expect_in "engines/rust/engine/src/ops/inner/b.rs:4:" "$out"
 expect_in 'fn d(t: &str) { t.split("; "); }' "$out"
-expect_not_in "engines/rust/engine/src/a.rs" "$out"
+expect_not_in "engines/rust/engine/src/a.rs:" "$out"
 expect_in "total went from 7 to 8" "$out"
 
 echo "message-cuts.sh --against lists the added line, not the first lines by file"
