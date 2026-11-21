@@ -6,7 +6,7 @@ _fm_mark := {"ergo/member": true}
 
 default _fm_any := false
 
-_fm_any if count(object.get(data.ergo_subject_sentences, "member", [])) > 0
+_fm_any if some _ in data.ergo_subject_sentences.member
 
 default _member_from(_) := false
 

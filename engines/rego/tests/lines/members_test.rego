@@ -9,6 +9,13 @@ _fm_keys(w) := [s.key | some s in w.subjects]
 
 _fm_said(w) := [[f.path, f.cause] | some f in w.fails]
 
+test_a_policy_reads_members_when_one_subject_does_whether_the_names_are_a_set_or_a_compiled_list if {
+	ergo._fm_any with data.ergo_subject_sentences as {"member": {"e"}}
+	ergo._fm_any with data.ergo_subject_sentences as {"member": ["e"]}
+	not ergo._fm_any with data.ergo_subject_sentences as {"member": set()}
+	not ergo._fm_any with data.ergo_subject_sentences as {"every": {"e"}}
+}
+
 test_each_member_of_the_object_at_the_end_is_an_item_in_key_order_with_its_key if {
 	w := ergo._fm_walk({"records": [{"id": "r1", "evidence": {"sign-off": {"kind": "approval"}, "build-7": {"kind": "scan"}}}]}, ["records", "evidence"])
 	_fm_ats(w) == ["/records/0/evidence/build-7", "/records/0/evidence/sign-off"]
