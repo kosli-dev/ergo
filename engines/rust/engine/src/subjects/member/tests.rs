@@ -208,3 +208,70 @@ fn a_parent_that_is_a_list_with_no_path_after_it_is_not_an_object_and_is_named()
         Some(Read::Failed(Cause::NotAnObject))
     ));
 }
+
+type EntriesRead = (Vec<(String, Option<String>)>, Vec<(String, Cause)>);
+
+fn entries_of(subject: Value, input: &Value) -> EntriesRead {
+    let policy = Policy::read(&json!({
+        "ergo_spec": crate::SPEC,
+        "subjects": {"e": subject},
+        "requirements": {"r": {"subject": "e", "checks": {"c": "status exists"}}}
+    }));
+    let reading = Reading::of(&policy);
+    let env = Env {
+        reading: &reading,
+        requirement_name: "r",
+        requirement: &policy.requirements["r"],
+        subject: "e",
+        checks: BTreeMap::new(),
+        input,
+        params: None,
+        unreadable: Vec::new(),
+    };
+    match member_entries(&env, &path::ABSENT, reading.lowered("e").unwrap(), &[]) {
+        Read::Entries { entries, broken } => (
+            entries
+                .iter()
+                .map(|e| (e.at.location.render(), e.key.clone()))
+                .collect(),
+            broken
+                .iter()
+                .filter(|b| !b.msg.is_empty())
+                .map(|b| (b.msg.clone(), b.cause))
+                .collect(),
+        ),
+        Read::Failed(cause) => panic!("the read failed as {cause:?}"),
+    }
+}
+
+#[test]
+fn member_entries_give_each_member_with_its_key_as_the_id() {
+    let (entries, broken) = entries_of(
+        json!({"from": "every member of records.evidence"}),
+        &json!({"records": [{"evidence": {"b": {}, "a": {}}}]}),
+    );
+    assert_eq!(
+        entries,
+        [
+            ("/records/0/evidence/a".to_string(), Some("a".to_string())),
+            ("/records/0/evidence/b".to_string(), Some("b".to_string()))
+        ]
+    );
+    assert!(broken.is_empty());
+}
+
+#[test]
+fn member_entries_drop_the_key_when_the_subject_has_identified_by() {
+    let (entries, _) = entries_of(
+        json!({"from": "every member of records.evidence", "identified_by": "id"}),
+        &json!({"records": [{"evidence": {"a": {"id": "x"}}}]}),
+    );
+    assert_eq!(entries, [("/records/0/evidence/a".to_string(), None)]);
+}
+
+#[test]
+fn member_entries_say_where_a_read_with_no_list_stops_as_every_does() {
+    let (entries, broken) = entries_of(json!({"from": "every member of p.q"}), &json!({"p": null}));
+    assert!(entries.is_empty());
+    assert_eq!(broken, [("p is null".to_string(), Cause::Null)]);
+}
