@@ -506,6 +506,8 @@ _tally_root_said(r, rs) if {
 
 _tally_record_listed(src) if _m_positions(src.item.i) != []
 
+_tally_record_listed(src) if _m_positions(src.key.i) != []
+
 _tally_record_listed(src) if _m_positions(src.fail.path) != []
 
 _tally_rest_of(m, names, texts) := _tally_rest(m, names) if count(texts) == 0
@@ -1476,8 +1478,9 @@ _tally_word_cause(c, cause) := "unusable" if {
 	cause in {"absent", "null"}
 }
 
-_tally_record_entry([state, text, src], side, w, roots, at, subj) := _tally_leveled(_tally_item_entry(e, _tally_record_cause(state), text, side, w, roots, subj), e.i, w, at) if {
-	e := src.item
+_tally_record_entry([state, text, src], side, w, roots, at, subj) := _tally_leveled(_tally_item_entry(e, _m_src_cause(state), text, side, w, roots, subj), e.i, w, at) if {
+	some k in ["item", "key"]
+	e := src[k]
 	_m_positions(e.i) != []
 }
 
