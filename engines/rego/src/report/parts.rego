@@ -707,13 +707,19 @@ _row_failures(row, at, where, _) := [_tallied_entry(
 	some k, fa in row.failed_assertions
 ] if _all_of_run(where.check)
 
+_scoped_walk_outcome(c, req, subj) := o if {
+	_scoped(req)
+	s := _scope_of(req, subj)
+	o := _keyed_rooted(_for_said(_check_outcome(c, subj, "")), c, subj) with input as s
+} else := _keyed_rooted(_for_said(_check_outcome(c, subj, "")), c, subj)
+
 _tallied_entry(e, c, o, at, where, row) := object.union(e, {"inputs": x.inputs, "failures": x.failures, "message": x.message}) if {
 	_walks(c)
 	c.op != "for"
 	_ = o
-	raw := _check_outcome(c, row["ergo/subj"], "")
+	raw := _scoped_walk_outcome(c, row["ergo/req"], row["ergo/subj"])
 	raw.passed == false
-	wrow := object.union(_anchored(_keyed_rooted(_for_said(raw), c, row["ergo/subj"]), at), {"ergo/subj": row["ergo/subj"], "ergo/req": row["ergo/req"]})
+	wrow := object.union(_anchored(raw, at), {"ergo/subj": row["ergo/subj"], "ergo/req": row["ergo/req"]})
 	x := _walk_assertion_entry(wrow, at, object.union(where, {"check": object.union(c, {"expression": e.name}), "ats": {"": e.locations}}), _with_outcomes(wrow.inputs))
 } else := object.union(e, {"inputs": [i | some i in e.inputs; not i.name in names; not _item_input(i, lists); not _tally_own_read(i, c, names, items)], "failures": array.concat(ls, items), "message": _tally_rest_of(e.message, names, texts)}) if {
 	not _walks(c)
