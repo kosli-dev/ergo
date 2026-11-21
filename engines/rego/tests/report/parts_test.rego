@@ -88,3 +88,13 @@ test_a_member_read_by_its_key_is_its_list_and_its_key if {
 	ergo._whose_item_name({"item": `member "a b" of r.evidence`}) == `r.evidence."a b"`
 	ergo._whose_item_name({"item": "item 2 of xs"}) == "xs[1]"
 }
+
+test_the_object_a_count_of_member_of_reads_is_its_own_read_once_its_members_are_listed if {
+	members := ergo._s_written_check("sum of member of costs is at most 3")
+	ergo._tally_own_read({"name": "costs"}, members, set(), [{"kind": "item"}])
+	not ergo._tally_own_read({"name": "costs"}, members, set(), [])
+	not ergo._tally_own_read({"name": "costs[]"}, members, set(), [{"kind": "item"}])
+	items := ergo._s_written_check("sum of costs is at most 3")
+	ergo._tally_own_read({"name": "costs[]"}, items, set(), [{"kind": "item"}])
+	not ergo._tally_own_read({"name": "costs"}, items, set(), [{"kind": "item"}])
+}
