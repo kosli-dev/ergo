@@ -7829,7 +7829,7 @@
   "want": "item 1 of ws: w.z is \"p; q\", which isn't a number; item 1 of ws: item 1 of ys: u is missing; item 1 of ws: item 2 of ys: u is missing"
  },
  {
-  "name": "for r5/P1b",
+  "name": "for r5/P1b [problems.where_said]",
   "params": {},
   "policy": {
    "subjects": {
@@ -7869,7 +7869,8 @@
      ]
     }
    ]
-  }
+  },
+  "want": "item 1 of ws: w.z is \"x; y, and z\", which isn't a number; item 1 of ws: item 1 of ys: u is missing; item 1 of ws: item 2 of ys: u is missing"
  },
  {
   "name": "for r5/P2 [problems.all_said]",
@@ -8206,6 +8207,45 @@
     }
    ]
   }
+ },
+ {
+  "name": "for r5/P10 [sentence.resolve.root, for.roots, path.ref_step, problems.all_said, problems.same_path]",
+  "params": {
+   "k": 3
+  },
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs as x",
+       "assert": "x.v is m named by $params.k"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": {}
+      },
+      {}
+     ]
+    }
+   ]
+  },
+  "want": "$params.k is 3, which isn't text; m is missing; item 2 of xs: x.v is missing"
  },
  {
   "name": "for r5/P11",
@@ -8902,7 +8942,7 @@
   }
  },
  {
-  "name": "for r5/P25 [for.roots]",
+  "name": "for r5/P25 [for.roots] decided, not yet in rule text",
   "params": {
    "a": "s"
   },
