@@ -3218,3 +3218,18 @@ fn a_sentence_that_reads_no_alias_keeps_its_message_whole() {
         "count of rows is 1, and m is 3"
     );
 }
+
+#[test]
+fn a_walk_over_the_second_list_under_the_first_item_gives_its_items_beside_the_pairs() {
+    let said = |assertions: &[&str]| {
+        for_tree(
+            "every ws as w, every w.items as i",
+            assertions,
+            json!({"ws": [{"items": [{"k": 2, "m": 1}, {"k": 1}]}]}),
+            json!({}),
+        )
+    };
+    let want = "item 1 of ws: item 1 of w.items: i.k is 2; item 1 of ws: item 2 of w.items: m is missing";
+    assert_eq!(said(&["every w.items.m is 1", "i.k is 1"]), want);
+    assert_eq!(said(&["i.k is 1", "every w.items.m is 1"]), want);
+}
