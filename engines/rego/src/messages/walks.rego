@@ -717,7 +717,16 @@ _m_root_texts(subj, c, cause) := [_m_isnt("$input", data.ergo_document, "an obje
 	is_array(data.ergo_document)
 } else := _m_keyed_off(subj, c, cause) if count(_m_keyed_off(subj, c, cause)) > 0
 
-else := [concat("", [_input_name(_as_subject_part(p)), " is ", _m_state_word(cause)]) | some p in sort(_root_reads(c))]
+else := [m | some p in sort(_root_reads(c)); some m in _m_root_state_texts(subj, c, p, cause)]
+
+_m_root_state_texts(subj, c, p, cause) := [_m_text_items(_root_label(p), v)] if {
+	_text_list_root(c, p)
+	v := _root_value(subj, p)
+	_text_items_state(v) == cause
+} else := [] if {
+	_text_list_root(c, p)
+	_text_items_state(_root_value(subj, p))
+} else := [concat("", [_input_name(_as_subject_part(p)), " is ", _m_state_word(cause)])]
 
 _m_key_ref_failed(p) if {
 	some seg in p
