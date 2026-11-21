@@ -1760,3 +1760,15 @@ fn a_walk_whose_key_step_cant_be_read_says_the_key_then_each_root_after_the_phra
         );
     }
 }
+
+#[test]
+fn an_empty_list_root_after_the_phrase_is_said_once_and_not_inside_each_item() {
+    assert_eq!(
+        said_row(
+            "every rows.v is in $params.d.name",
+            json!({"rows": [{"v": "a"}, {"v": "b"}]}),
+            json!({"d": []}),
+        ),
+        (Cause::Value, "$params.d is []".to_string())
+    );
+}
