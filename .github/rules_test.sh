@@ -93,6 +93,24 @@ if out=$(run 2>&1); then
 fi
 case $out in *"check the spec rules first"*) ;; *) echo "usage should say so: $out" >&2; exit 1 ;; esac
 
+echo "rules.sh treats a hyphen like a space, so named-by finds what named by finds"
+out=$(run named-by)
+case $out in *"names.key"*) ;; *) echo "named-by should find names.key: $out" >&2; exit 1 ;; esac
+[ "$out" = "$(run named by)" ] || { echo "named-by and named by differ" >&2; exit 1; }
+
+echo "rules.sh prints no traceback when its output is cut short by head"
+mkdir -p "$dir/big/cases"
+{
+  echo "# Big"
+  i=0
+  while [ "$i" -lt 3000 ]; do
+    printf '**[big.rule%s]** The item has a long text so the output is large enough to fill a pipe. Second sentence.\n\n' "$i"
+    i=$((i + 1))
+  done
+} > "$dir/big/semantics.md"
+err=$( { RULES_SPEC_DIR=$dir/big sh "$script" item | head -n 1 > /dev/null; } 2>&1 )
+[ -z "$err" ] || { echo "unexpected stderr: $err" >&2; exit 1; }
+
 echo "rules.sh runs from another folder against the real spec and finds problems.all_said with a case"
 cd "$dir"
 out=$(sh "$script" all said)
