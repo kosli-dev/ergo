@@ -2770,3 +2770,27 @@ fn a_list_with_the_name_of_an_item_is_not_that_item() {
     let list = Clause::list("item 1 of xs", Cause::Absent, String::new());
     assert!(!own_item(&list, "item 1 of xs"));
 }
+
+fn counted_text(sentence: &str, items: Value) -> String {
+    clause::text(&clause::shown(&tally_clauses(sentence, items, json!({}))))
+}
+
+#[test]
+fn an_item_that_reaches_a_missing_or_null_on_the_way_to_its_end_is_said_to_miss_the_end() {
+    assert_eq!(
+        counted_text("sum of items.n is 3", json!([{}])),
+        "item 1 of items: n is missing"
+    );
+    assert_eq!(
+        counted_text("sum of items.m.n is 3", json!([{"m": null}])),
+        "item 1 of items: m.n is missing"
+    );
+    assert_eq!(
+        counted_text("count of items.m.n is 3", json!([{"m": null}])),
+        "item 1 of items: m.n is missing"
+    );
+    assert_eq!(
+        counted_text("count of items.m.n is 3", json!([{"m": 1}])),
+        "item 1 of items: m is 1, which isn't an object"
+    );
+}
