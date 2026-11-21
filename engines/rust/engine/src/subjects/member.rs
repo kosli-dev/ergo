@@ -181,6 +181,15 @@ pub(super) fn member_walk<'a>(
     }
 }
 
+fn parent_failure<'a>(value: &Value, first: Option<&Step>, _root: &str) -> Option<Read<'a>> {
+    match (value, first) {
+        (Value::Object(_), _) | (Value::Array(_), Some(_)) => None,
+        (Value::Null, Some(Step::Index(_))) => Some(Read::Failed(Cause::Absent)),
+        (_, Some(Step::Index(_))) => Some(Read::Failed(Cause::Unusable)),
+        _ => Some(Read::Failed(Cause::NotAnObject)),
+    }
+}
+
 pub(super) fn member_entries<'a>(
     env: &Env<'a>,
     empty: &'a Value,
@@ -197,11 +206,10 @@ pub(super) fn member_entries<'a>(
         if std::ptr::eq(parent.at.value, empty) {
             return Read::Failed(Cause::Absent);
         }
-        match (parent.at.value, path.steps.first()) {
-            (Value::Object(_), _) | (Value::Array(_), Some(_)) => {}
-            (Value::Null, Some(Step::Index(_))) => return Read::Failed(Cause::Absent),
-            (_, Some(Step::Index(_))) => return Read::Failed(Cause::Unusable),
-            _ => return Read::Failed(Cause::NotAnObject),
+        if let Some(failed) =
+            parent_failure(parent.at.value, path.steps.first(), &root_name(true, anc))
+        {
+            return failed;
         }
         parent.at.clone()
     } else {

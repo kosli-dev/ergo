@@ -187,3 +187,24 @@ fn a_list_in_the_middle_is_walked_as_every_walks_it() {
         ["/records/0/evidence/a", "/records/1/evidence/b"]
     );
 }
+
+#[test]
+fn a_parent_that_is_a_list_with_no_path_after_it_is_not_an_object_and_is_named() {
+    let list = json!([1]);
+    match parent_failure(&list, None, "record") {
+        Some(Read::Entries { entries, broken }) => {
+            assert!(entries.is_empty());
+            assert_eq!(broken.len(), 1);
+            assert_eq!(broken[0].msg, "record is [1], which isn't an object");
+            assert_eq!(broken[0].cause, Cause::NotAnObject);
+            assert!(!broken[0].listed);
+        }
+        _ => panic!("a list parent must say what it is"),
+    }
+    assert!(parent_failure(&list, Some(&Step::Key("x".into())), "record").is_none());
+    assert!(parent_failure(&json!({}), None, "record").is_none());
+    assert!(matches!(
+        parent_failure(&json!("t"), None, "record"),
+        Some(Read::Failed(Cause::NotAnObject))
+    ));
+}
