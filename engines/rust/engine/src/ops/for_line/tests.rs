@@ -2,6 +2,15 @@ use crate::SPEC;
 use serde_json::{Value, json};
 
 fn row(for_line: &str, assertions: Value, subject: Value) -> Value {
+    row_with(
+        for_line,
+        assertions,
+        subject,
+        json!({"k": "a", "list": ["x"], "kinds": "code", "need": {"b": 1}}),
+    )
+}
+
+fn row_with(for_line: &str, assertions: Value, subject: Value, params: Value) -> Value {
     let policy = json!({
         "ergo_spec": SPEC,
         "subjects": {"thing": {"from": "things", "identified_by": "id"}},
@@ -10,13 +19,7 @@ fn row(for_line: &str, assertions: Value, subject: Value) -> Value {
     let mut subject = subject;
     subject["id"] = json!(1);
     let input = json!({"things": [subject]});
-    let report = crate::report::keeping_stash(|| {
-        crate::report(
-            &input,
-            &policy,
-            &json!({"k": "a", "list": ["x"], "kinds": "code", "need": {"b": 1}}),
-        )
-    });
+    let report = crate::report::keeping_stash(|| crate::report(&input, &policy, &params));
     report["results"]
         .as_array()
         .unwrap()
@@ -3517,4 +3520,93 @@ fn a_whose_item_says_each_own_read_beside_a_key_that_isnt_text() {
         crate::ops::clause::text(&items),
         "item 1 of es: zz is missing, and m is missing; item 3 of es: zz is missing, and m is null"
     );
+}
+
+fn entries(failures: &Value) -> Vec<String> {
+    let mut out = Vec::new();
+    for entry in failures.as_array().into_iter().flatten() {
+        out.push(format!(
+            "{} {} {}: {}",
+            entry["kind"].as_str().unwrap_or_default(),
+            entry["name"].as_str().unwrap_or_default(),
+            entry["cause"].as_str().unwrap_or_default(),
+            entry["message"].as_str().unwrap_or_default()
+        ));
+        out.extend(
+            entries(&entry["failures"])
+                .into_iter()
+                .map(|e| format!("  {e}")),
+        );
+    }
+    out
+}
+
+#[test]
+fn a_whose_key_that_cant_be_read_is_an_input_of_the_row_and_no_list_entry() {
+    for (params, outcome, key) in [
+        (
+            json!({"k": 3}),
+            "unusable",
+            "$params.k is 3, which isn't text",
+        ),
+        (json!({"k": null}), "null", "$params.k is null"),
+        (json!({}), "absent", "$params.k is missing"),
+    ] {
+        let row = row_with(
+            "every xs whose v is m named by $params.k as x",
+            json!("x.v is 1"),
+            json!({"xs": [{"v": 1}, {"v": 1, "m": null}, {"v": 1, "m": {}}]}),
+            params,
+        );
+        assert_eq!(
+            row["message"],
+            format!("{key}; item 1 of xs: m is missing; item 2 of xs: m is null")
+        );
+        assert_eq!(
+            entries(&row["failures"]),
+            [
+                "item item 1 of xs absent: m is missing",
+                "item item 2 of xs null: m is null"
+            ],
+            "{key}"
+        );
+        let inputs: Vec<&Value> = row["inputs"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter(|input| input["name"] == "$params.k")
+            .collect();
+        assert_eq!(inputs.len(), 1, "{key}");
+        assert_eq!(inputs[0]["outcome"], outcome, "{key}");
+    }
+}
+
+#[test]
+fn a_second_lines_whose_names_a_key_that_isnt_text_once_and_each_item_its_own_read() {
+    for (for_line, subject) in [
+        (
+            "every ms as m, every m.es whose zz is m named by $params.k as e",
+            json!({"ms": [{"es": [{"n": 2}, {"n": 2, "zz": 1}]}]}),
+        ),
+        (
+            "every ms as m, every es whose zz is m named by $params.k as e",
+            json!({"ms": [{"a": 1}], "es": [{"n": 2}, {"n": 2, "zz": 1}]}),
+        ),
+    ] {
+        let list = if for_line.contains("m.es") {
+            "m.es"
+        } else {
+            "es"
+        };
+        for (params, key) in [
+            (json!({"k": 3}), "$params.k is 3, which isn't text"),
+            (json!({"k": null}), "$params.k is null"),
+        ] {
+            assert_eq!(
+                for_row_message(for_line, "e.n is 2", subject.clone(), params),
+                format!("{key}; item 1 of ms: item 1 of {list}: zz is missing"),
+                "{for_line}"
+            );
+        }
+    }
 }
