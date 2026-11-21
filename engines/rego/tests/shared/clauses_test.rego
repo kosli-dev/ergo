@@ -100,6 +100,15 @@ test_and_n_more_comes_after_the_roots_and_the_lists_in_a_count if {
 	])
 }
 
+test_the_cap_counts_leaf_items_not_outer_items if {
+	ergo._m_clauses_text(ergo._m_clauses_shown(_items_of("cs", 1, 2, _items_of("rs", 1, 2, [_missing("ok")])))) == concat("; ", [
+		"item 1 of cs: item 1 of rs: ok is missing",
+		"item 1 of cs: item 2 of rs: ok is missing",
+		"item 2 of cs: item 1 of rs: ok is missing",
+		"and 1 more",
+	])
+}
+
 test_a_clause_given_twice_is_shown_once if {
 	ergo._m_clauses_shown([
 		_missing("$params.k"),
