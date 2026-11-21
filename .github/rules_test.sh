@@ -100,14 +100,15 @@ case $out in *"names.key"*) ;; *) echo "named-by should find names.key: $out" >&
 
 echo "rules.sh prints no traceback when its output is cut short by head"
 mkdir -p "$dir/big/cases"
-{
-  echo "# Big"
-  i=0
-  while [ "$i" -lt 3000 ]; do
-    printf '**[big.rule%s]** The item has a long text so the output is large enough to fill a pipe. Second sentence.\n\n' "$i"
-    i=$((i + 1))
-  done
-} > "$dir/big/semantics.md"
+awk 'BEGIN {
+  print "# Big"
+  for (i = 0; i < 3000; i++) {
+    n = ""
+    k = i
+    do { n = n sprintf("%c", 97 + k % 26); k = int(k / 26) } while (k > 0)
+    printf "**[big.%s]** The item has a long text so the output is large enough to fill a pipe. Second sentence.\n\n", n
+  }
+}' > "$dir/big/semantics.md"
 err=$( { RULES_SPEC_DIR=$dir/big sh "$script" item | head -n 1 > /dev/null; } 2>&1 )
 [ -z "$err" ] || { echo "unexpected stderr: $err" >&2; exit 1; }
 

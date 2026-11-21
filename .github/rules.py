@@ -59,6 +59,14 @@ def has_word(word, haystack):
     return re.search(r"(?<![A-Za-z0-9_])" + re.escape(word) + r"(?![A-Za-z0-9_])", haystack, re.I) is not None
 
 
+def squash(text):
+    return re.sub(r"[-_ ]+", " ", text)
+
+
+def has_any_spelling(word, haystack):
+    return has_word(word, haystack) or has_word(squash(word), squash(haystack))
+
+
 def main(argv):
     any_mode = False
     if argv and argv[0] == "--any":
@@ -85,7 +93,7 @@ def main(argv):
     found = []
     for name, rule in rules.items():
         searchable = name.replace(".", " ").replace("_", " ") + " " + name + " " + rule["text"]
-        matched = sum(1 for w in argv if has_word(w, searchable))
+        matched = sum(1 for w in argv if has_any_spelling(w, searchable))
         if matched == len(argv) or (any_mode and matched > 0):
             found.append((-matched, name))
     if not found:
@@ -106,4 +114,10 @@ def main(argv):
     return 0
 
 
-sys.exit(main(sys.argv[1:]))
+try:
+    status = main(sys.argv[1:])
+    sys.stdout.flush()
+except BrokenPipeError:
+    os.dup2(os.open(os.devnull, os.O_WRONLY), sys.stdout.fileno())
+    status = 0
+sys.exit(status)
