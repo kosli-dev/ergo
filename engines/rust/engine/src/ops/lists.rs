@@ -195,7 +195,11 @@ fn broken_in(start: &Value, order: &[Seg]) -> Option<(Vec<Seg>, Value, &'static 
     None
 }
 
-fn item_fault(walked: &walk::Walked, item: &walk::WalkItem) -> Option<(Cause, Vec<Seg>, String)> {
+fn item_fault(
+    walked: &walk::Walked,
+    item: &walk::WalkItem,
+    text: bool,
+) -> Option<(Cause, Vec<Seg>, String)> {
     use super::message::{isnt, stated};
     match item.end {
         Some(Value::Null) => Some((
@@ -207,6 +211,11 @@ fn item_fault(walked: &walk::Walked, item: &walk::WalkItem) -> Option<(Cause, Ve
                 &Value::Null,
                 "",
             ),
+        )),
+        Some(value) if text && !value.is_string() => Some((
+            Cause::Unusable,
+            item.end_segs.clone(),
+            isnt(&walked.item_name(&item.end_segs), value, "text"),
         )),
         Some(_) => None,
         None => match item.miss {
@@ -254,10 +263,62 @@ pub(super) fn starts_at_a_list(path: &Path, ctx: &Ctx) -> bool {
 }
 
 pub fn walked(path: &Path, ctx: &Ctx) -> Option<Walked> {
-    walked_from(path, ctx, true)
+    walked_from(path, ctx, true, false)
 }
 
-fn walked_from(path: &Path, ctx: &Ctx, from_start: bool) -> Option<Walked> {
+fn text_right(check: &super::Check) -> Option<&Path> {
+    match check {
+        super::Check::In(In {
+            values: Right::Ref(path) | Right::Field(path),
+            ignoring: Some(_),
+            ..
+        }) => Some(path),
+        _ => None,
+    }
+}
+
+fn text_walk(check: &super::Check, path: &Path, ctx: &Ctx) -> Option<Walked> {
+    use super::message::{isnt, stated};
+    if text_right(check) != Some(path) {
+        return None;
+    }
+    if let Some(walk) = walked_from(path, ctx, true, true) {
+        return Some(walk);
+    }
+    let read = read_path(path, ctx);
+    let (Outcome::Found, Some(Value::Array(items)), Some(first)) =
+        (read.outcome, read.value.as_ref(), read.inputs.first())
+    else {
+        return None;
+    };
+    let faults: Vec<(Cause, String)> = items
+        .iter()
+        .enumerate()
+        .filter_map(|(at, item)| {
+            let name = format!("item {} of {}", at + 1, first.name);
+            match item {
+                Value::String(_) => None,
+                Value::Null => Some((Cause::Null, stated(&name, Cause::Null, item, ""))),
+                other => Some((Cause::Unusable, isnt(&name, other, "text"))),
+            }
+        })
+        .collect();
+    let cause = Cause::worst(faults.iter().map(|f| f.0))?;
+    Some(Walked {
+        name: first.name.clone(),
+        value: items.clone(),
+        locations: first.locations.clone(),
+        cause: Some(cause),
+        text: super::message::joined(faults.into_iter().map(|f| f.1).collect()),
+        part: first.part.clone(),
+    })
+}
+
+fn fault_walk(check: &super::Check, path: &Path, ctx: &Ctx) -> Option<Walked> {
+    text_walk(check, path, ctx).or_else(|| walked(path, ctx))
+}
+
+fn walked_from(path: &Path, ctx: &Ctx, from_start: bool, text: bool) -> Option<Walked> {
     let simple = path
         .steps
         .iter()
@@ -301,7 +362,7 @@ fn walked_from(path: &Path, ctx: &Ctx, from_start: bool) -> Option<Walked> {
         walked
             .items
             .iter()
-            .filter_map(|item| item_fault(&walked, item)),
+            .filter_map(|item| item_fault(&walked, item, text)),
     );
     faults.sort_by(|a, b| a.1.cmp(&b.1));
     let cause = Cause::worst(faults.iter().map(|f| f.0));
@@ -1096,7 +1157,7 @@ pub fn walked_in(check: &super::Check, path: &Path, ctx: &Ctx) -> Option<Walked>
     if one_rights(check).contains(&path) {
         return None;
     }
-    walked_from(path, ctx, right_paths(check).contains(&path))
+    walked_from(path, ctx, right_paths(check).contains(&path), false)
 }
 
 pub(super) fn walked_root_fault(
@@ -1125,9 +1186,8 @@ pub(super) fn field_walk_fault(check: &super::Check, ctx: &Ctx) -> Option<(Cause
 
 pub fn walk_fault(check: &super::Check, ctx: &Ctx) -> Option<(Cause, String)> {
     rights_of(check).into_iter().find_map(|right| match right {
-        Right::Ref(path) | Right::Field(path) => {
-            walked(path, ctx).and_then(|walk| walk.cause.map(|cause| (cause, walk.text)))
-        }
+        Right::Ref(path) | Right::Field(path) => fault_walk(check, path, ctx)
+            .and_then(|walk| walk.cause.map(|cause| (cause, walk.text))),
         _ => None,
     })
 }
