@@ -79,6 +79,8 @@ jobs:
         run: .github/mutants-facts_test.sh
       - name: Check the script that lists what a change did to the matrix pairs
         run: .github/matrix-facts_test.sh
+      - name: Check that ergo.rego reads every pair the for generator writes
+        run: .github/matrix/for_test.sh
       - name: Check the script that compares the pull request body with the report facts
         run: .github/body-facts_test.sh
       - name: Check the script that runs the common checks

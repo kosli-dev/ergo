@@ -30,6 +30,9 @@ for name in build-ergo build-ergo_test dump-diff_test pr-facts_test pairs-facts_
   printf '#!/bin/sh\n[ ! -e "%s/fail-%s" ]\n' "$dir" "$name" > "$repo/.github/$name.sh"
   chmod +x "$repo/.github/$name.sh"
 done
+mkdir -p "$repo/.github/matrix"
+printf '#!/bin/sh\n[ ! -e "%s/fail-for_test" ]\n' "$dir" > "$repo/.github/matrix/for_test.sh"
+chmod +x "$repo/.github/matrix/for_test.sh"
 cp "$script" "$repo/.github/checks.sh"
 git -C "$repo" init --quiet
 
