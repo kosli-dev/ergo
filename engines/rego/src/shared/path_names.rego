@@ -261,3 +261,12 @@ else := "item" if {
 	startswith(name, "member ")
 	regex.match(`^member (?:[A-Za-z_][A-Za-z0-9_-]*|"(?:[^"\\]|\\.)*") of `, name)
 } else := "list"
+
+_item_parts(name) := [ps[0], concat(" of ", array.slice(ps, 1, count(ps)))] if {
+	startswith(name, "item ")
+	ps := split(name, " of ")
+	count(ps) > 1
+} else := [m[1], m[2]] if {
+	_walk_kind(name) == "item"
+	m := regex.find_all_string_submatch_n(`^(member (?:[A-Za-z_][A-Za-z0-9_-]*|"(?:[^"\\]|\\.)*")) of (.*)$`, name, 1)[0]
+}

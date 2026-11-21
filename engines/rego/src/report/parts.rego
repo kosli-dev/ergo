@@ -350,7 +350,10 @@ _whose_read_name(p, f) := concat("", [_whose_item_name(f), ".", _path_name(array
 
 else := _whose_item_name(f)
 
-_whose_item_name(f) := concat("", [_list_base(f.item), "[", format_int(to_number(substring(f.item, 5, indexof(f.item, " of ") - 5)) - 1, 10), "]"])
+_whose_item_name(f) := concat("", [p[1], ".", substring(p[0], 7, -1)]) if {
+	p := _item_parts(f.item)
+	startswith(p[0], "member ")
+} else := concat("", [_list_base(f.item), "[", format_int(to_number(substring(f.item, 5, indexof(f.item, " of ") - 5)) - 1, 10), "]"])
 
 _whose_read(_, p, f, st) := {"name": _whose_read_name(p, f), "value": null, "locations": f.locations, "outcome": _worst_of({st} | {x | some seg in p; x := _ref_step_flaw(seg); x in _value_fault_causes})} if st in _no_value_states
 
@@ -919,11 +922,9 @@ _list_base(name) := substring(n, 0, indexof(n, "[")) if {
 	contains(n, "[")
 } else := _unitemed(name)
 
-_unitemed(name) := concat(" of ", array.slice(ps, 1, count(ps))) if {
-	startswith(name, "item ")
-	ps := split(name, " of ")
-	count(ps) > 1
-} else := name
+_unitemed(name) := p[1] if p := _item_parts(name)
+
+else := name
 
 _walk_entries(_, [], _) := []
 
@@ -941,8 +942,8 @@ _root_texts(row, texts) := [t | some k, t in texts; _root_text(row.failed_items[
 
 _root_text(name, t) if {
 	t != ""
-	startswith(name, "item ")
-	not startswith(t, "item ")
+	_walk_kind(name) == "item"
+	_walk_kind(t) == "list"
 }
 
 _walk_entries(row, texts, at) := _nested_items([_leveled(_walk_entry(row, texts, name, at), row, name, at) |
@@ -988,14 +989,13 @@ _item_levels_of(row, name) := ls[0] if {
 	count(ls) > 0
 } else := []
 
-_level_names(name, m) := array.concat(_outer_level_names(b, m), [concat("", ["item ", substring(name, 5, at - 5), " of ", _level_field(b.fields[m])])]) if {
-	startswith(name, "item ")
-	at := indexof(name, " of ")
-	b := _level_bits(substring(name, at + 4, -1), m)
+_level_names(name, m) := array.concat(_outer_level_names(b, m), [concat("", [p[0], " of ", _level_field(b.fields[m])])]) if {
+	p := _item_parts(name)
+	b := _level_bits(p[1], m)
 }
 
 _level_names(name, m) := array.concat(_outer_level_names(b, m), [b.fields[m]]) if {
-	not startswith(name, "item ")
+	_walk_kind(name) == "list"
 	b := _level_bits(name, m)
 }
 
