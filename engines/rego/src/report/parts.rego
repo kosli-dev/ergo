@@ -736,8 +736,8 @@ _tallied_entry(e, c, o, at, where, row) := object.union(e, {"inputs": x.inputs, 
 	count(names) + count(items) > 0
 } else := object.union(e, {"inputs": [i | some i in e.inputs; not _item_input(i, lists); not _tally_own_read(i, c, set(), [])]}) if {
 	not _walks(c)
+	count(_m_tally_parts(c)) > 0
 	lists := _tally_list_names(c)
-	count(lists) > 0
 }
 
 else := e
