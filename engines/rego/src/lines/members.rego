@@ -62,6 +62,6 @@ _fm_object(v) if {
 	not _walk_marked(v)
 }
 
-_fm_end_fail(e) := _fl_fail(e, _walk_state(e.v)) if _fl_gone(e.v)
+_fm_end_fail(e) := _fl_fail(object.union({"w": null}, e), _walk_state(e.v)) if _fl_gone(e.v)
 
-else := object.union(_fl_fail(e, "unusable"), {"why": {"path": e.c, "value": e.v, "kind": "an object"}})
+else := object.union(_fl_fail(object.union({"w": null}, e), "unusable"), {"why": {"path": e.c, "value": e.v, "kind": "an object"}})
