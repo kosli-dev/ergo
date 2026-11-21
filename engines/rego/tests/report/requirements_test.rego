@@ -137,6 +137,12 @@ test_two_clauses_about_one_item_of_a_min_subjects_row_join_as_any_two_problems_d
 	ergo._ms_join2(own, [], []).message == "evidence.a is an object; evidence.b is text"
 }
 
+test_two_clauses_about_one_item_of_a_plain_every_row_join_with_a_semicolon_as_in_the_row if {
+	own := [{"kind": "item", "name": "item 2 of p0", "cause": "unusable", "inputs": [], "failures": [], "message": "p1 is 3, which isn't an object"}, {"kind": "item", "name": "item 2 of p0", "cause": "unusable", "inputs": [], "failures": [], "message": "p1 is a number"}]
+	ergo._ms_join(own, [], []).message == "p1 is 3, which isn't an object; p1 is a number"
+	ergo._ms_join2(own, [], []).message == "p1 is 3, which isn't an object; p1 is a number"
+}
+
 test_a_note_about_a_value_not_in_a_list_item_reads_that_value_as_usable if {
 	ergo._ms_list_outcome({"note": true, "cause": "unusable"}) == "usable"
 	ergo._ms_list_outcome({"note": false, "cause": "absent"}) == ergo._key_list_outcome("absent")
