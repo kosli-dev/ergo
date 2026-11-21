@@ -70,6 +70,8 @@ Run them from the repo root. The last three lines use a virtual environment that
 
 `.github/pairs-facts_test.sh` tests `.github/pairs-facts.sh`, which runs the pairs in `.github/sweep-pairs.json` through both engines and prints how many the engines differ on, how many say their `want`, and which pairs the Rust output of a change moved, first and in capitals any that moved away from Rego or from their `want`; it only informs, and the `pairs-facts` job writes it in the summary of a pull request.
 
+`.github/mutants-facts_test.sh` tests `.github/mutants-facts.sh`, which runs `cargo-mutants` on the lines of Rust source a change touches, stops at a time limit (`MUTANTS_FACTS_TIMEOUT`, 900 seconds by default) and prints how many mutants were caught, missed, unviable or timed out, and the missed ones; it only informs, and the `mutants-facts` job writes it in the summary of a pull request.
+
 `.github/matrix-facts_test.sh` tests `.github/matrix-facts.sh`, which runs one of the generators in `.github/matrix` (`matrix-a` by default) on a base and on the working tree and prints the pairs that got worse than the base and the Rust causes that are lower than `ergo.rego`'s; it only informs, and the `matrix-facts` job writes it in the summary of a pull request. `.github/matrix/README.md` says what each generator makes and how to run one by hand.
 
 `opa fmt --list` should print nothing. If it prints file names, run `opa fmt -w` on them.
