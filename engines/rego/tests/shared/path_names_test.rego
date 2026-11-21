@@ -62,3 +62,15 @@ test_an_entry_named_like_an_item_or_a_member_is_an_item_and_anything_else_is_a_l
 	ergo._walk_kind("member.x of y") == "list"
 	ergo._walk_kind(`member "a of statuses`) == "list"
 }
+
+test_a_member_name_reads_its_key_up_to_the_closing_quote_and_then_the_list if {
+	ergo._item_parts(`member "a: b" of statuses is 1`) == [`member "a: b"`, "statuses is 1"]
+	ergo._item_parts(`member "a; b: c" of statuses`) == [`member "a; b: c"`, "statuses"]
+	ergo._item_parts(`member "a\" of b" of statuses`) == [`member "a\" of b"`, "statuses"]
+	ergo._item_parts(`member "x of y" of statuses`) == [`member "x of y"`, "statuses"]
+	ergo._item_parts(`member "" of statuses`) == [`member ""`, "statuses"]
+	ergo._item_parts("member sign-off of r.evidence: e.status is 1") == ["member sign-off", "r.evidence: e.status is 1"]
+	ergo._item_parts("item 2 of xs: v is 1") == ["item 2", "xs: v is 1"]
+	not ergo._item_parts(`member "a of statuses`)
+	not ergo._item_parts("member.x of y")
+}

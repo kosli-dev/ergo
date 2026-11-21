@@ -350,10 +350,9 @@ _whose_read_name(p, f) := concat("", [_whose_item_name(f), ".", _path_name(array
 
 else := _whose_item_name(f)
 
-_whose_item_name(f) := concat("", [p[1], ".", substring(p[0], 7, -1)]) if {
-	p := _item_parts(f.item)
-	startswith(p[0], "member ")
-} else := concat("", [_list_base(f.item), "[", format_int(to_number(substring(f.item, 5, indexof(f.item, " of ") - 5)) - 1, 10), "]"])
+_whose_item_name(f) := concat("", [p[1], ".", substring(p[0], 7, -1)]) if p := _member_parts(f.item)
+
+else := concat("", [_list_base(f.item), "[", format_int(to_number(substring(f.item, 5, indexof(f.item, " of ") - 5)) - 1, 10), "]"])
 
 _whose_read(_, p, f, st) := {"name": _whose_read_name(p, f), "value": null, "locations": f.locations, "outcome": _worst_of({st} | {x | some seg in p; x := _ref_step_flaw(seg); x in _value_fault_causes})} if st in _no_value_states
 
