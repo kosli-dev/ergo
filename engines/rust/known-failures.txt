@@ -194,7 +194,6 @@ for / a part that holds a list is walked in the whose of a for line and in a who
 for / a part that holds a list is walked in the whose of a for line and in a whose under it / an empty part leaves every item out
 for / a part that holds a list is walked on the right of is in on a for line / an item without the name fails as absent and names the item
 for / a root a for sentence can't use is said once, on the assertion, beside items that read fine / one item that reads fine and one whose v is null
-for / a root in a for line's relative clause doesn't hide an item's own problem / names the root once, then the item's own problem
 for / a root in one of two relative clauses, in either order / gives the same report in either order, the root first, then the item's own problem
 for / a second for item picking from a list read through the first alias, which ties for one first item and is missing for another / one first item fails as ambiguous and the other as absent, each with its own second list failure
 for / a second for item that picks with sorted by, under a first item that sorts by another key / names the second item's key when its items tie
@@ -218,7 +217,6 @@ for / a whose on the second for item with first of that reads $input after is in
 for / a whose on the second for item with last of that reads $input after is in says the root once, with no item of its list / fails as unusable with the root once when it is an object, and then the item that can't be read on its own
 for / a whose on the second for item with some that reads $input after is in says the root once, with no item of its list / fails as unusable with the root once when it is an object, and then the item that can't be read on its own
 for / a whose on the second for item with some that reads $input after is in says the root once, with no item of its list / fails as unusable with the root once when it is text
-for / a whose that reads a $params list that isn't a list / fails as unusable, whatever the items hold, and lists the items it couldn't decide
 for / an alias that a pick on an empty list leaves without a value, read on a later line / names the alias as the policy writes it, with no $
 for / an every on a for line that walks a $params list / the row lists the $params list it walked, as the every does on its own
 for / an every or some on a for line that walks a $params list that is missing, null or not a list / the check fails with the list's cause, and the row lists the $params list with no items
@@ -471,7 +469,6 @@ sentences / a named by key on the right of every, after a part, a parent, an ali
 sentences / a named by key on the right of every, after a part, a parent, an alias, $params or $input / fails as null once when the subject's key is null
 sentences / a named by key on the right of every, after a part, a parent, an alias, $params or $input / fails as unusable once when the subject's key isn't text
 sentences / a named by on the right of every that can't be read / names the key that is null, as the plain check does, when m is null too
-sentences / a root name of the wrong type on the left of a compare inside a relative clause / says its problem once, with no item named, as on the right, even on an empty list
 sentences / a root name on the right of some in a from line's condition, read up front / fails the candidate once, with no item named, even when its list is empty
 sentences / a second for item whose whose takes its key from the subject / names pr.k alone, and keeps the first item when the name depends on it
 sentences / a sum of whose that or whose reads a named by key against the focus / is written wrong naming the key, and a key from the subject or a count of is fine

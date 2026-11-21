@@ -589,25 +589,18 @@ pub fn alias_base(path: &Path, ctx: &Ctx) -> Option<(String, String, Cause)> {
 }
 
 /// What a `whose` check says about each `$params` or `$input` key it reads
-/// that is missing or `null`, with the cause: said once, before any item.
-pub fn missing_keys(check: &Check, ctx: &Ctx) -> Vec<(Cause, String)> {
+/// that is missing, `null` or not text, with the cause: said once, before
+/// any item.
+pub fn unreadable_keys(check: &Check, ctx: &Ctx) -> Vec<(Cause, String)> {
     let mut out: Vec<(Cause, String)> = Vec::new();
     for path in check.paths() {
         for step in &path.steps {
-            let Step::Ref(key) = step else {
-                continue;
-            };
-            if !matches!(key.start, path::Start::Params | path::Start::Input) {
-                continue;
-            }
-            match key_flaw(key, ctx) {
-                Some((outcome @ (Outcome::Absent | Outcome::Null), text, _)) => {
-                    if !out.iter().any(|(_, t)| *t == text) {
-                        out.push((outcome.cause().unwrap_or(Cause::Absent), text));
-                    }
-                }
-                Some(_) => return Vec::new(),
-                None => {}
+            if let Step::Ref(key) = step
+                && matches!(key.start, path::Start::Params | path::Start::Input)
+                && let Some((outcome, text, _)) = key_flaw(key, ctx)
+                && !out.iter().any(|(_, said)| *said == text)
+            {
+                out.push((outcome.cause().unwrap_or(Cause::Unusable), text));
             }
         }
     }

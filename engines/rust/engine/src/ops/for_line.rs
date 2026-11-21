@@ -411,6 +411,7 @@ struct RunItems {
 struct Dead {
     raw: Option<Value>,
     msg: Option<String>,
+    told: Option<Option<Clause>>,
     bare: Option<String>,
     shared: bool,
     order: Vec<Seg>,
@@ -429,6 +430,7 @@ impl Dead {
             raw: None,
             bare: None,
             msg: None,
+            told: None,
             shared: false,
             order: Vec::new(),
             path: name.clone(),
@@ -453,6 +455,7 @@ impl Dead {
         Dead {
             bare: None,
             msg: None,
+            told: None,
             shared: false,
             order: failure.order.clone(),
             name: failure.item.clone(),
@@ -471,6 +474,7 @@ impl Dead {
             raw: self.raw.clone(),
             bare: self.bare.clone(),
             msg: self.msg.clone(),
+            told: self.told.clone(),
             shared: self.shared,
             order: self.order.clone(),
             name: self.name.clone(),
@@ -638,187 +642,61 @@ impl For {
             at.subject = w.item.clone();
             at.label = None;
             let focus = walk::focus_ctx(w, &outer);
-            let read: Vec<(Verdict, bool)> = item
+            let verdicts: Vec<Verdict> = item
                 .whose
                 .iter()
-                .map(|check| walk::focus_verdict(check, w, &at, &focus))
+                .map(|check| walk::focus_verdict(check, w, &at, &focus).0)
                 .collect();
-            let lost = read.iter().any(|(_, lost)| *lost);
-            let verdicts: Vec<Verdict> = read.into_iter().map(|(verdict, _)| verdict).collect();
             let causes: Vec<Cause> = verdicts.iter().map(|v| v.cause).collect();
             let name = walked.name_of(&w.item_segs, w.unaliased);
             let undecided = Cause::worst(causes.iter().copied().filter(|c| c.is_failure()));
-            let first_alias = self.items[0].alias.as_str();
-            let rooted = item
-                .whose
-                .iter()
-                .zip(&verdicts)
-                .filter(|(_, verdict)| verdict.cause.is_failure())
-                .any(|(check, verdict)| root_fails(check, &outer, verdict.cause));
-            let own_text = item
-                .whose
-                .iter()
-                .zip(&verdicts)
-                .filter(|(_, verdict)| verdict.cause.is_failure())
-                .find_map(|(check, verdict)| {
-                    if lost || !rooted {
-                        return None;
-                    }
-                    let said = own_beside_root(check, &outer, &focus, verdict.cause)?;
-                    let name = walked.item_name_dotted(walk::focus_segs(w, check));
-                    let name = if depth > 0 { self.strip(&name) } else { name };
-                    Some(super::message::prefixed(&name, &said))
-                });
-            let fault = item
-                .whose
-                .iter()
-                .zip(&verdicts)
-                .find(|(_, verdict)| verdict.cause.is_failure())
-                .and_then(|(check, verdict)| {
-                    let text = (!lost)
-                        .then(|| {
-                            super::message::root_flaw(&[check], &outer)
-                                .filter(|(cause, _)| {
-                                    depth > 0
-                                        && *cause == verdict.cause
-                                        && !own_read_fails(check, &focus)
-                                })
-                                .and_then(|(_, text)| text.split("; ").next().map(str::to_string))
-                                .or_else(|| {
-                                    super::message::root_fault(check, &outer, verdict.cause)
-                                })
-                                .or_else(|| {
-                                    (verdict.cause == Cause::Unusable)
-                                        .then(|| {
-                                            check
-                                                .paths()
-                                                .into_iter()
-                                                .chain(walk::listed_refs(check))
-                                                .find_map(|path| {
-                                                    super::message::reads_from_a_root(path)
-                                                        .then(|| {
-                                                            super::message::root_kind_fault(
-                                                                check, path, &outer,
-                                                            )
-                                                        })
-                                                        .flatten()
-                                                })
-                                        })
-                                        .flatten()
-                                })
-                        })
-                        .flatten()?;
-                    Some(if depth > 0 && !reads_alias(check, first_alias) {
-                        format!("{FREE}{text}")
-                    } else {
-                        text
-                    })
-                });
-            let own = |check: &Check, verdict: &Verdict| {
-                let roots = super::message::root_flaw(&[check], &outer)
-                    .map(|(_, text)| text)
-                    .unwrap_or_default();
-                super::message::message(check, &focus, verdict)
-                    .split("; ")
-                    .flat_map(|part| part.split(", and "))
-                    .any(|part| !roots.split("; ").any(|root| root == part))
-            };
             let undecided_whose = || {
                 item.whose
                     .iter()
                     .zip(&verdicts)
                     .filter(|(_, verdict)| verdict.cause.is_failure())
             };
-            let why = undecided_whose()
-                .find_map(|(check, verdict)| {
-                    super::message::root_flaw(&[check], &outer)
-                        .filter(|(cause, _)| {
-                            !lost && *cause == verdict.cause && !own_read_fails(check, &focus)
-                        })
-                        .map(|(_, text)| text)
+            let told =
+                undecided_whose().find_map(|(check, _)| walk::item_own(check, w, &walked, &outer));
+            let first_alias = self.items[0].alias.as_str();
+            let root = undecided_whose().find_map(|(check, _)| {
+                let roots: Vec<Clause> =
+                    super::message::listed_root_clauses(&[check], &outer, true)
+                        .into_iter()
+                        .chain(super::message::walked_root_clauses(&[check], &outer))
+                        .collect();
+                let line = super::clause::lines(&roots).into_iter().next()?;
+                Some(if reads_alias(check, first_alias) {
+                    line
+                } else {
+                    format!("{FREE}{line}")
                 })
-                .or_else(|| {
-                    undecided_whose()
-                        .find(|(check, verdict)| !lost && own(check, verdict))
-                        .map(|(check, verdict)| {
-                            super::message::prefixed(
-                                &walked.item_name_dotted(walk::focus_segs(w, check)),
-                                &super::message::message(check, &focus, verdict),
-                            )
-                        })
-                })
-                .or_else(|| {
-                    undecided_whose().next().map(|(check, verdict)| {
-                        if !lost
-                            && let Some(fault) =
-                                super::message::root_fault(check, &outer, verdict.cause)
-                        {
-                            return fault;
-                        }
-                        if lost {
-                            let lost_check = walk::focus_check(w);
-                            let verdict = walk::lost_verdict(w, &at);
-                            super::message::prefixed(
-                                &walked.item_name_dotted(&w.item_segs),
-                                &super::message::message(&lost_check, &at, &verdict),
-                            )
-                        } else {
-                            super::message::prefixed(
-                                &walked.item_name_dotted(walk::focus_segs(w, check)),
-                                &super::message::message(check, &focus, verdict),
-                            )
-                        }
-                    })
-                });
+            });
+            let rootless =
+                root.is_none() && !undecided_whose().any(|(check, _)| check.flawed(&outer));
             let keyed_input = undecided_whose().find_map(|(check, _)| {
                 super::lists::input_key_fault(check, &outer)
                     .into_iter()
                     .next()
             });
-            let fault = keyed_input.clone().or(own_text.clone()).or(fault);
-            let why = keyed_input.or(own_text).or(why);
-            let key_base = item
-                .whose
-                .iter()
-                .zip(&verdicts)
-                .filter(|(_, verdict)| verdict.cause.is_failure())
-                .find_map(|(check, _)| {
-                    check
-                        .paths()
-                        .into_iter()
-                        .find_map(|path| super::key_base::of_path(path, false, &at))
-                });
-            let (why, fault, undecided) = match key_base {
-                None => (why, fault, undecided),
-                Some(kb) => {
-                    let missing = matches!(kb.key_cause, Cause::Absent | Cause::Null);
-                    let (text, cause) = match (&kb.base, missing) {
-                        (None, true) => continue,
-                        (Some((base, cause, _)), true) => (
-                            base.clone(),
-                            Cause::worst([kb.key_cause, *cause]).unwrap_or(*cause),
-                        ),
-                        (Some((base, cause, _)), false) => (
-                            format!("{}; {base}", kb.key),
-                            Cause::worst([kb.key_cause, *cause]).unwrap_or(*cause),
-                        ),
-                        (None, false) => (kb.key.clone(), kb.key_cause),
-                    };
-                    let named = walked.item_name_dotted(&w.item_segs);
-                    let named = if depth > 0 { self.strip(&named) } else { named };
-                    let said = Some(super::message::prefixed(&named, &text));
-                    (said.clone(), said, Some(cause))
-                }
+            let said = match (&keyed_input, &told) {
+                (Some(text), _) => Some(text.clone()),
+                (None, Some(clause)) => Some(super::clause::text(std::slice::from_ref(clause))),
+                (None, None) if rootless => undecided_whose().next().map(|(check, verdict)| {
+                    super::message::prefixed(
+                        &walked.item_name_dotted(walk::focus_segs(w, check)),
+                        &super::message::message(check, &focus, verdict),
+                    )
+                }),
+                (None, None) if depth > 0 => root.clone(),
+                (None, None) => Some(String::new()),
             };
+            let says = undecided.is_some() && (depth > 0 || !matches!(item.how, How::Pick { .. }));
             let dead_item = |cause: Cause| Dead {
                 raw: (w.end.is_none() && !w.item.value.is_object()).then(|| w.item.value.clone()),
-                msg: if undecided.is_some() && depth == 0 && !matches!(item.how, How::Pick { .. }) {
-                    why.clone()
-                } else if undecided.is_some() && depth > 0 {
-                    fault.clone().or_else(|| why.clone())
-                } else {
-                    None
-                },
+                msg: if says { said.clone() } else { None },
+                told: (says && keyed_input.is_none() && (told.is_some() || !rootless))
+                    .then(|| told.clone()),
                 order: w.item_segs.clone(),
                 said: if !w.rest.is_empty() && w.item.value.is_object() && cause != Cause::Unusable
                 {
@@ -829,7 +707,16 @@ impl For {
                 ..Dead::at(name.clone(), cause, w.shown(), Some(w.end_location.clone()))
             };
             if let Some(cause) = undecided {
-                dead.push(dead_item(cause));
+                let keyed = undecided_whose().any(|(check, _)| {
+                    check
+                        .paths()
+                        .into_iter()
+                        .any(|path| super::key_base::of_path(path, false, &at).is_some())
+                });
+                let own = told.as_ref().filter(|_| keyed).map(|clause| clause.cause);
+                dead.push(dead_item(
+                    Cause::worst(own.into_iter().chain([cause])).unwrap_or(cause),
+                ));
                 continue;
             }
             if causes.contains(&Cause::Value) {
@@ -1421,7 +1308,8 @@ impl For {
                                 .dead
                                 .iter()
                                 .filter(|d| !(second && d.shared) && d.cause != Cause::Ambiguous)
-                                .map(|d| self.dead_text(d)),
+                                .map(|d| self.dead_text(d))
+                                .filter(|text| !text.is_empty()),
                         );
                     }
                     let ties: Vec<&Dead> = nested
@@ -1992,12 +1880,12 @@ impl For {
                 .iter()
                 .flat_map(|s| nested_whose(&s.check, true))
                 .collect();
-            run.message = super::message::walked_roots_ahead(
-                run.message.take(),
-                &whose,
-                &outer_ctx(ctx),
-                &counted,
-            );
+            let outer = outer_ctx(ctx);
+            let message = run
+                .message
+                .take()
+                .or_else(|| super::message::walks_a_root(&whose, &outer).then(String::new));
+            run.message = super::message::walked_roots_ahead(message, &whose, &outer, &counted);
             self.key_base_after_key(&mut run, ctx);
             self.whose_keys_first(&mut run, ctx);
             self.free_first(&mut run, ctx);
@@ -2167,21 +2055,21 @@ impl For {
 
     fn whose_keys_first(&self, run: &mut Run, ctx: &Ctx) {
         let outer = outer_ctx(ctx);
-        let keys: Vec<(Cause, String)> = self
+        let mut keys: Vec<(Cause, String)> = Vec::new();
+        for key in self
             .items
             .iter()
             .flat_map(|item| item.whose.iter())
-            .flat_map(|check| super::key_base::missing_keys(check, &outer))
-            .collect();
-        if keys.is_empty()
-            || self
-                .items
-                .iter()
-                .flat_map(|item| item.whose.iter())
-                .any(|check| !super::key_base::unusable_keys(check, &outer).is_empty())
+            .flat_map(|check| super::key_base::unreadable_keys(check, &outer))
         {
+            if !keys.contains(&key) {
+                keys.push(key);
+            }
+        }
+        if keys.is_empty() {
             return;
         }
+        keys.sort();
         let said = run.message.clone().unwrap_or_default();
         let mut pieces: Vec<String> = keys.iter().map(|(_, text)| text.clone()).collect();
         pieces.extend(
@@ -3379,6 +3267,15 @@ impl For {
             });
             return Clause::item(dead.shown(), cause, text, Vec::new());
         }
+        if let Some(told) = &dead.told {
+            return match told {
+                Some(clause) => Clause {
+                    cause: dead.cause,
+                    ..clause.clone()
+                },
+                None => Clause::item(dead.shown(), dead.cause, String::new(), Vec::new()),
+            };
+        }
         let text = self.dead_text(dead).replace(FREE, "");
         Clause::item(dead.shown(), dead.cause, text, Vec::new())
     }
@@ -4035,52 +3932,6 @@ fn unskipped(text: &str, skip: &[String]) -> String {
         .filter(|part| !part.is_empty())
         .collect::<Vec<_>>()
         .join("; ")
-}
-
-fn root_fails(check: &Check, outer: &Ctx, cause: Cause) -> bool {
-    super::message::root_flaw(&[check], outer).is_some()
-        || super::message::root_fault(check, outer, cause).is_some()
-}
-
-fn own_beside_root(check: &Check, outer: &Ctx, focus: &Ctx, cause: Cause) -> Option<String> {
-    let flaw = super::message::root_flaw(&[check], outer);
-    let fault = super::message::root_fault(check, outer, cause);
-    let own = check.paths().into_iter().find_map(|path| {
-        if !matches!(path.start, Start::Subject | Start::Own) {
-            return None;
-        }
-        path::read(path, focus).outcome.cause()
-    })?;
-    let mut roots: Vec<String> = flaw
-        .map(|(_, text)| text)
-        .into_iter()
-        .chain(fault)
-        .collect();
-    roots.extend(super::message::root_fault(check, outer, own));
-    let roots: Vec<&str> = roots.iter().flat_map(|text| text.split("; ")).collect();
-    let verdict = Verdict {
-        cause: own,
-        inputs: Vec::new(),
-    };
-    let said = super::message::message(check, focus, &verdict);
-    let parts: Vec<&str> = said
-        .split("; ")
-        .flat_map(|part| part.split(", and "))
-        .filter(|part| !roots.contains(part) && super::message::cap_note(part).is_none())
-        .collect();
-    (!parts.is_empty()).then(|| parts.join(", and "))
-}
-
-fn own_read_fails(check: &Check, focus: &Ctx) -> bool {
-    let counts_a_root = matches!(check, Check::Tally(tally) if tally
-        .counted_paths()
-        .iter()
-        .any(|path| super::message::reads_from_a_root(path)));
-    !counts_a_root
-        || check.paths().into_iter().any(|path| {
-            matches!(path.start, Start::Subject | Start::Own)
-                && path::read(path, focus).outcome.cause().is_some()
-        })
 }
 
 fn unled(roots: &[String], text: &str) -> Vec<String> {
