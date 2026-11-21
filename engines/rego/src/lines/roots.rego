@@ -682,7 +682,7 @@ _root_stand_in(c) := object.union(c, {"cmp": "eq", f: c[g]}) if {
 	g != f
 	is_array(c[g])
 	not _walk_outside(c[g])
-} else := {"op": "compare", "cmp": "eq", "left": c.path, "right": c.path} if {
+} else := object.union({"op": "compare", "cmp": "eq", "left": c.path, "right": c.path}, object.filter(c, {"ignoring"})) if {
 	c.op == "in"
 	_is_ref(c.values)
 	is_array(c.path)
