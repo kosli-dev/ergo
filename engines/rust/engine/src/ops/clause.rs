@@ -70,7 +70,7 @@ pub fn shown(clauses: &[Clause]) -> Vec<Clause> {
     out.sort_by(|a, b| (a.group, a.cause, &a.name).cmp(&(b.group, b.cause, &b.name)));
     out.extend(of_kind(Kind::List).cloned());
     let items: Vec<&Clause> = of_kind(Kind::Item).collect();
-    let leaves: usize = items.iter().map(|item| pieces(item).len()).sum();
+    let leaves: usize = items.iter().map(|item| leaves(item)).sum();
     if leaves <= SHOWN_ITEMS {
         out.extend(items.into_iter().cloned());
         return out;
@@ -151,23 +151,39 @@ fn cut(item: &Clause, left: &mut usize) -> Option<Clause> {
         }
         *left = left.saturating_sub(1);
     }
-    let mut run_kept: Option<bool> = None;
-    for clause in &item.said {
-        if clause.kind == Kind::Item {
-            run_kept = None;
-            kept.said.extend(cut(clause, left));
-        } else {
-            let keep = *run_kept.get_or_insert_with(|| {
-                let keep = *left > 0;
-                *left = left.saturating_sub(1);
-                keep
-            });
-            if keep {
+    if has_items(item) {
+        for clause in &item.said {
+            if clause.kind == Kind::Item {
+                kept.said.extend(cut(clause, left));
+            } else {
                 kept.said.push(clause.clone());
             }
         }
+        if !has_items(&kept) {
+            kept.said.clear();
+        }
+    } else if !item.said.is_empty() {
+        if *left > 0 {
+            kept.said = item.said.clone();
+        }
+        *left = left.saturating_sub(1);
     }
     (!kept.text.is_empty() || !kept.said.is_empty()).then_some(kept)
+}
+
+fn has_items(item: &Clause) -> bool {
+    item.said.iter().any(|clause| clause.kind == Kind::Item)
+}
+
+fn leaves(item: &Clause) -> usize {
+    let own = !item.said.is_empty() && !has_items(item);
+    let under: usize = item
+        .said
+        .iter()
+        .filter(|clause| clause.kind == Kind::Item)
+        .map(leaves)
+        .sum();
+    usize::from(!item.text.is_empty()) + usize::from(own) + under
 }
 
 #[cfg(test)]
