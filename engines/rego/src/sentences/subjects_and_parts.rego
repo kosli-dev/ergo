@@ -458,7 +458,7 @@ _s_filter_name(i, n) := concat("", ["whose ", strings.replace_n({" ": "0"}, spri
 	sprintf_pad := concat("", [substring("                    ", 0, width - count(digits)), digits])
 }
 
-_s_every_unsupported(_, fl, _) := {_s_distinct_on_from | object.get(fl, "distinct", false) == true} | {_s_member_on_from | object.get(fl, "member", false) == true} if object.get(fl, "every", false) != true
+_s_every_unsupported(_, fl, _) := ({_s_distinct_on_from | object.get(fl, "distinct", false) == true} | {_s_member_on_from | object.get(fl, "member", false) == true}) | _s_member_with_distinct(fl) if object.get(fl, "every", false) != true
 
 _s_distinct_on_from := `on a from line, distinct goes after every, like "every distinct sbom.components"`
 
