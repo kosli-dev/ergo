@@ -7,6 +7,7 @@ fn read(kind: Kind, name: &str, cause: Cause, text: &str) -> Clause {
         cause,
         text: text.to_string(),
         said: Vec::new(),
+        group: 0,
     }
 }
 

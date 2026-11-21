@@ -15,6 +15,7 @@ pub struct Clause {
     pub cause: Cause,
     pub text: String,
     pub said: Vec<Clause>,
+    pub group: usize,
 }
 
 impl Clause {
@@ -25,6 +26,7 @@ impl Clause {
             cause,
             text,
             said: Vec::new(),
+            group: 0,
         }
     }
 
@@ -45,6 +47,11 @@ impl Clause {
             said,
             ..Clause::root(name, cause, text)
         }
+    }
+
+    #[cfg_attr(not(test), expect(dead_code))]
+    pub fn in_group(self, group: usize) -> Clause {
+        Clause { group, ..self }
     }
 }
 
@@ -79,6 +86,7 @@ pub fn shown(clauses: &[Clause]) -> Vec<Clause> {
         cause: Cause::Value,
         text: String::new(),
         said: Vec::new(),
+        group: 0,
     });
     out
 }
