@@ -1874,3 +1874,65 @@ fn the_item_entry_of_copies_lists_the_location_of_each_item_not_the_end_of_its_p
         ])
     );
 }
+
+#[test]
+fn a_list_after_is_in_ignoring_case_with_an_item_that_isnt_text_is_said_once_before_the_items_on_an_empty_list_too() {
+    for (sentence, subject, params, cause, message) in [
+        (
+            "every xs.v is in ys ignoring case",
+            json!({"xs": [{"v": "a"}, {"v": "b"}], "ys": ["A", 3]}),
+            json!({}),
+            Cause::Unusable,
+            "item 2 of ys is 3, which isn't text",
+        ),
+        (
+            "some xs.v is not in ys ignoring case",
+            json!({"xs": [{"v": "a"}, {"v": "b"}], "ys": [3]}),
+            json!({}),
+            Cause::Unusable,
+            "item 1 of ys is 3, which isn't text",
+        ),
+        (
+            "every xs.v, if any, is in ys ignoring case",
+            json!({"xs": [], "ys": [1, "a"]}),
+            json!({}),
+            Cause::Unusable,
+            "item 1 of ys is 1, which isn't text",
+        ),
+        (
+            "every xs.v, if any, is one of ys ignoring case",
+            json!({"xs": [], "ys": ["a", null]}),
+            json!({}),
+            Cause::Null,
+            "item 2 of ys is null",
+        ),
+        (
+            "every xs.v, if any, is in $params.l ignoring case",
+            json!({"xs": []}),
+            json!({"l": ["a", null]}),
+            Cause::Null,
+            "item 2 of $params.l is null",
+        ),
+        (
+            "every xs.v is in $params.l ignoring case",
+            json!({"xs": [{"v": "a"}, {"v": "b"}]}),
+            json!({"l": [null]}),
+            Cause::Null,
+            "item 1 of $params.l is null",
+        ),
+        (
+            "every xs.v, if any, is in $params.l ignoring case",
+            json!({"xs": []}),
+            json!({"l": ["a", 3]}),
+            Cause::Unusable,
+            "item 2 of $params.l is 3, which isn't text",
+        ),
+    ] {
+        let out = row_of(sentence, subject, params);
+        assert_eq!(
+            (out.verdict.cause, out.message.as_deref()),
+            (cause, Some(message)),
+            "{sentence}"
+        );
+    }
+}
