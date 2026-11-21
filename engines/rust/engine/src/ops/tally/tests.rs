@@ -2490,3 +2490,105 @@ fn an_elapsed_term_reads_a_hidden_alias_named_on_either_end() {
     assert!(reads_derived(derived_left(&to), &["g"]));
     assert!(!reads_derived(derived_left(&neither), &["g"]));
 }
+
+fn report_row(sentence: &str, input: Value) -> Value {
+    let policy = json!({
+        "ergo_spec": SPEC,
+        "subjects": {"thing": {"from": "things", "identified_by": "id"}},
+        "requirements": {"r": {"subject": "thing", "checks": {"c": sentence}}}
+    });
+    let report = crate::report(&input, &policy, &json!({}));
+    report["results"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|row| row["check"] == "c")
+        .unwrap()
+        .clone()
+}
+
+fn row_says(sentence: &str, input: Value) -> (String, String) {
+    let row = report_row(sentence, input);
+    (
+        row["cause"].as_str().unwrap().to_string(),
+        row["message"].as_str().unwrap().to_string(),
+    )
+}
+
+const IN_ROOT_LIST: &str = "count of xs whose v is in $input.rs.k is 2";
+
+#[test]
+fn a_walked_root_that_is_not_an_object_is_said_once_and_before_the_count() {
+    assert_eq!(
+        row_says(
+            IN_ROOT_LIST,
+            json!({"rs": [1], "things": [{"id": 1, "xs": []}]})
+        )
+        .1,
+        "item 1 of $input.rs is 1, which isn't an object; count of xs whose v is in $input.rs.k is 0"
+    );
+}
+
+#[test]
+fn a_walked_root_item_that_lacks_the_field_is_said_before_the_item_that_lacks_its_own() {
+    assert_eq!(
+        row_says(
+            IN_ROOT_LIST,
+            json!({"rs": [{"k": 1}, {}], "things": [{"id": 1, "xs": [{"v": 1}, {}]}]})
+        ),
+        (
+            "absent".to_string(),
+            "item 2 of $input.rs: k is missing; item 2 of xs: v is missing".to_string()
+        )
+    );
+}
+
+#[test]
+fn a_walked_root_that_is_unusable_and_an_item_that_is_null_fail_as_unusable() {
+    assert_eq!(
+        row_says(
+            IN_ROOT_LIST,
+            json!({"rs": [1], "things": [{"id": 1, "xs": [{"v": null}]}]})
+        ),
+        (
+            "unusable".to_string(),
+            "item 1 of $input.rs is 1, which isn't an object; item 1 of xs: v is null".to_string()
+        )
+    );
+}
+
+#[test]
+fn a_walked_root_in_a_second_whose_is_said_with_the_one_in_the_first_and_not_its_items() {
+    assert_eq!(
+        row_says(
+            "count of xs whose v is in $input.rs.k and whose w is in $input.q.k is 2",
+            json!({"rs": [1], "q": "x", "things": [{"id": 1}]})
+        )
+        .1,
+        "$input.q is \"x\", which isn't an object; xs is missing"
+    );
+}
+
+#[test]
+fn a_ref_that_is_null_decides_the_row_even_when_an_item_cannot_read_its_own_count() {
+    assert_eq!(
+        row_says(
+            "count of xs whose count of ys is $input.r is 1",
+            json!({"r": null, "things": [{"id": 1, "xs": [{"ys": "s"}]}]})
+        )
+        .0,
+        "null"
+    );
+}
+
+#[test]
+fn a_sum_says_the_items_that_are_not_numbers_and_not_the_walked_root_that_reads_fine() {
+    assert_eq!(
+        row_says(
+            "sum of xs.n that is in $input.rs.k is 3",
+            json!({"rs": [{"k": "s"}], "things": [{"id": 1, "xs": [{"n": "s"}]}]})
+        )
+        .1,
+        "item 1 of xs: n is \"s\", which isn't a number"
+    );
+}
