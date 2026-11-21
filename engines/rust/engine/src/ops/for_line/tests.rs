@@ -2310,3 +2310,16 @@ fn a_sentence_says_the_value_before_a_key_it_cant_read_after_leaving_out_the_key
     );
     assert_eq!(said(1), (crate::cause::Cause::Absent, String::new()));
 }
+
+#[test]
+fn each_root_of_one_sentence_keeps_its_own_cause() {
+    assert_eq!(
+        for_roots(
+            "every xs as x",
+            &["$params.a is at least $params.b"],
+            json!({"xs": [{}]}),
+            json!({"b": "s"}),
+        ),
+        "$params.b is \"s\", which isn't a number; $params.a is missing"
+    );
+}
