@@ -1314,9 +1314,30 @@ _said_outcomes(row) := row if row.passed == true
 else := _said_outcomes_of(_unled_dropped(row))
 
 _said_outcomes_of(row) := object.union(row, {
-	"inputs": _said_unusable(row.inputs, row.message),
-	"failures": [_said_entry(e) | some e in row.failures],
-})
+	"inputs": [_unfit_on_entry(i, unfit) | some i in _said_unusable(row.inputs, row.message)],
+	"failures": fs,
+}) if {
+	fs := [_said_entry(e) | some e in row.failures]
+	unfit := _entries_unfit(fs)
+}
+
+_entries_unfit(entries) := {[i.name, i.value, i.locations] |
+	some e in entries
+	some a in _entry_assertions(e)
+	some i in a.inputs
+	i.outcome == "unusable"
+}
+
+_entry_assertions(e) := [e] if e.kind == "assertion"
+
+else := [a | some a in e.failures; a.kind == "assertion"] if e.kind == "option"
+
+else := []
+
+_unfit_on_entry(i, unfit) := object.union(i, {"outcome": "unusable"}) if {
+	i.outcome == "usable"
+	[i.name, i.value, i.locations] in unfit
+} else := i
 
 _unled_dropped(row) := object.union(row, {
 	"message": concat("; ", [x | some x in ps; not endswith(x, ": ")]),
