@@ -41,3 +41,10 @@ test_a_for_line_drops_a_member_clause_that_only_repeats_a_text_or_says_how_many_
 	ergo._for_led_more("member a of xs: and 2 more")
 	not ergo._for_led_more("member a of xs: v is 1")
 }
+
+test_an_item_of_the_second_list_keeps_that_a_member_walk_wanted_an_object if {
+	check := {"items": [{"as": "r", "path": ["rs"]}, {"as": "y", "path": ["$r", "s"]}]}
+	f := {"path": ["$r", "s"], "item": ["$r", "s"], "cause": "unusable", "value": [1], "msg": "an object"}
+	ergo._for_unchecked_item(check, f).wants == "an object"
+	not ergo._for_unchecked_item(check, object.union(f, {"msg": "a list"})).wants
+}
