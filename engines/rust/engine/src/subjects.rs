@@ -2837,7 +2837,7 @@ fn walk_part(
             .iter()
             .filter(|i| {
                 let n = i.get("name").and_then(Value::as_str).unwrap_or("");
-                !parts::item_input(n, &lists)
+                !walked_list_input(n, &lists, walk, ctx)
                     && ((failures.is_empty() && !keyed) || !own.iter().any(|o| o == n))
             })
             .cloned()
@@ -2846,6 +2846,10 @@ fn walk_part(
         failures,
         message: clause::text(&said),
     }
+}
+
+fn walked_list_input(name: &str, lists: &[String], _walk: &ops::walk::Walk, _ctx: &Ctx) -> bool {
+    parts::item_input(name, lists)
 }
 
 fn line_of(said: &Clause) -> String {
