@@ -92,3 +92,8 @@ _m_clauses_text(clauses) := concat("; ", [t | some c in clauses; some t in _m_cl
 _m_clause_lines(c) := [c.text] if c.kind in {"root", "list"}
 
 _m_clause_lines(c) := [concat("", ["and ", _literal_text(c.count), " more"])] if c.kind == "more"
+
+_m_clause_lines(c) := array.concat(
+	[c.text | c.text != ""],
+	[concat(": ", [c.name, concat(", and ", [s.text | some s in c.said])]) | c.said != []],
+) if c.kind == "item"
