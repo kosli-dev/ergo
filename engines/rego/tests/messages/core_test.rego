@@ -55,3 +55,16 @@ test_a_row_says_what_else_it_cant_read_beside_a_key_it_cant_read if {
 	ergo._m_message(row, {}, "absent") == "$params.k is missing, and k is missing" with data.ergo_params as {}
 	ergo._m_unkeyed_said({}, check, "absent") == [] with data.ergo_params as {}
 }
+
+test_a_list_after_is_in_ignoring_case_names_each_item_that_isnt_text_in_list_order if {
+	field := {"op": "compare", "left": ["x"], "cmp": "in", "right": ["ys"], "ignoring": "case"}
+	ergo._message(field, {"x": "a", "ys": ["A", 3]}, "unusable") == "item 2 of ys is 3, which isn't text"
+	ergo._message(field, {"x": 3, "ys": ["a", null, {"a": 1}]}, "unusable") == `item 2 of ys is null; item 3 of ys is {"a": 1}, which isn't text`
+	ergo._message(object.union(field, {"cmp": "not_in"}), {"x": "a", "ys": [null]}, "null") == "item 1 of ys is null"
+	ergo._message(field, {"ys": [null]}, "null") == "x is missing, and item 1 of ys is null"
+	ref := {"op": "in", "path": ["x"], "values": {"ref": ["$$params[]", "l"]}, "ignoring": "case"}
+	ergo._message(ref, {"x": "a"}, "unusable") == "item 1 of $params.l is 1, which isn't text" with data.ergo_params as {"l": [1, "a"]}
+	ergo._message(ref, {"x": "a"}, "null") == "item 1 of $params.l is null" with data.ergo_params as {"l": [null]}
+	ergo._message(ref, {}, "null") == "x is missing, and item 1 of $params.l is null" with data.ergo_params as {"l": [null]}
+	ergo._message(ref, {"x": "a"}, "unusable") == `$params.l is "s", which isn't a list` with data.ergo_params as {"l": "s"}
+}
