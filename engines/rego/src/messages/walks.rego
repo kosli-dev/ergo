@@ -511,7 +511,7 @@ _m_tally(subj, side) := ts if {
 	ts := _m_tally_keyed_base_items(subj, side)
 } else := ts if {
 	ts := _m_tally_key_items(subj, side)
-} else := _m_tally_walked_side(subj, side)
+} else := array.concat(_m_tally_keyed_root(subj, side), _m_tally_walked_side(subj, side))
 
 _m_tally_keyed_base_items(subj, side) := array.concat(
 	[[concat("", ["root ", b.fault.cause]), b.fault.text]],
@@ -524,6 +524,10 @@ _m_tally_keyed_base_items(subj, side) := array.concat(
 	xs := [object.union(x, {"e": e}) | some e in w.items; x := _keyed_item(e, b.k)]
 	count(xs) == count(w.items)
 }
+
+_m_tally_keyed_root(subj, side) := [[concat("", ["root ", b.fault.cause]), b.fault.text]] if {
+	b := _m_tally_keyed_base(subj, side)
+} else := []
 
 _m_tally_keyed_base(subj, side) := {"k": {"path": side.count_of, "clause": c}, "fault": f} if {
 	c := _keyed_clause_of(object.get(side, "count_of", null), object.get(side, "whose", null))
