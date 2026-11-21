@@ -54,13 +54,14 @@ impl Walk {
 pub enum Seg {
     Index(u64),
     Key(String),
+    Member(String),
 }
 
 impl Seg {
     pub fn to_step(&self) -> Step {
         match self {
             Seg::Index(at) => Step::Index(*at),
-            Seg::Key(key) => Step::Key(key.clone()),
+            Seg::Key(key) | Seg::Member(key) => Step::Key(key.clone()),
         }
     }
 }
@@ -104,7 +105,7 @@ fn rank_of(start: &Start, segs: &[Seg]) -> Vec<Rank> {
     };
     rank.extend(segs.iter().map(|seg| match seg {
         Seg::Index(at) => Rank::Index(*at),
-        Seg::Key(key) => Rank::Text(key.clone()),
+        Seg::Key(key) | Seg::Member(key) => Rank::Text(key.clone()),
     }));
     rank
 }
@@ -197,7 +198,7 @@ impl Walked<'_> {
         let indexes: Vec<usize> = segs
             .iter()
             .enumerate()
-            .filter(|(_, seg)| matches!(seg, Seg::Index(_)))
+            .filter(|(_, seg)| matches!(seg, Seg::Index(_) | Seg::Member(_)))
             .map(|(at, _)| at)
             .collect();
         let Some(first) = indexes.first() else {
@@ -214,21 +215,22 @@ impl Walked<'_> {
                 steps: segs.iter().map(Seg::to_step).collect(),
             })
         };
-        let mut parts = vec![self.said_name(&segs[..=*first], own_dot)];
+        let mut parts = vec![match &segs[*first] {
+            Seg::Member(key) => member::named(key, &self.said_name(&segs[..*first], own_dot)),
+            _ => self.said_name(&segs[..=*first], own_dot),
+        }];
         for pair in indexes.windows(2) {
-            let Seg::Index(at) = &segs[pair[1]] else {
-                continue;
-            };
             let between = &segs[pair[0] + 1..pair[1]];
-            parts.push(format!(
-                "item {} of {}",
-                at + 1,
-                if between.is_empty() {
-                    "it".to_string()
-                } else {
-                    plain(between)
-                }
-            ));
+            let list = if between.is_empty() {
+                "it".to_string()
+            } else {
+                plain(between)
+            };
+            match &segs[pair[1]] {
+                Seg::Index(at) => parts.push(format!("item {} of {list}", at + 1)),
+                Seg::Member(key) => parts.push(member::named(key, &list)),
+                Seg::Key(_) => {}
+            }
         }
         let tail = &segs[indexes[indexes.len() - 1] + 1..];
         if !tail.is_empty() {
@@ -392,6 +394,8 @@ fn before_field(path: &Path, at: usize, ctx: &Ctx) -> Option<Outcome> {
 }
 
 pub fn walk<'a>(path: &Path, ctx: &Ctx<'a>, options: Options) -> Walked<'a> {
+    let (path, member) = member::split(path);
+    let path = &path;
     let leading = path::leading_steps(&path.start);
     let mut segs = Vec::new();
     for (at, step) in leading.iter().chain(path.steps.iter()).enumerate() {
@@ -456,7 +460,7 @@ pub fn walk<'a>(path: &Path, ctx: &Ctx<'a>, options: Options) -> Walked<'a> {
     for level in 0..=total {
         let seg = segs.get(level);
         let walks_here = entries.iter().any(|entry| {
-            entry.val.array().is_some() && seg.is_none_or(|seg| !matches!(seg, Seg::Index(_)))
+            entry.val.array().is_some() && seg.map_or(!member, |seg| !matches!(seg, Seg::Index(_)))
         });
         if walks_here {
             walked.insert(level);
@@ -513,7 +517,13 @@ pub fn walk<'a>(path: &Path, ctx: &Ctx<'a>, options: Options) -> Walked<'a> {
             }
         }
     }
-    if walked.is_empty() {
+    let stops_early = walked.is_empty() && member::stop_before_end(&trail).is_some();
+    if member && !stops_early {
+        let (next, found) = member::expand(entries, empty_ok);
+        entries = next;
+        raws.extend(found);
+    }
+    if walked.is_empty() && (!member || stops_early) {
         let stopped = trail
             .iter()
             .find(|(_, val, _)| !val.container())

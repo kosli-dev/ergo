@@ -2209,14 +2209,14 @@ fn located_below<'a>(base: &Located<'a>, segs: &[walk::Seg]) -> Located<'a> {
     for seg in segs {
         let value = match (seg, at.value) {
             (walk::Seg::Index(i), Value::Array(items)) => items.get(*i as usize),
-            (walk::Seg::Key(key), Value::Object(map)) => map.get(key),
+            (walk::Seg::Key(key) | walk::Seg::Member(key), Value::Object(map)) => map.get(key),
             _ => None,
         };
         at = Located {
             value: value.unwrap_or(&Value::Null),
             location: match seg {
                 walk::Seg::Index(i) => at.location.index(*i),
-                walk::Seg::Key(key) => at.location.key(key),
+                walk::Seg::Key(key) | walk::Seg::Member(key) => at.location.key(key),
             },
         };
     }

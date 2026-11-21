@@ -1109,7 +1109,7 @@ pub fn params_break(path: &Path, params: &Value, ctx: &Ctx) -> Option<String> {
             Step::Key(key) => Resolved::Key(key.clone()),
             Step::Index(index) => Resolved::Index(*index),
             Step::Ref(_) => path::resolve(step, ctx).ok()?,
-            Step::Field(_) => return None,
+            Step::Field(_) | Step::Members => return None,
         };
         let next = match (&key, at) {
             (Resolved::Key(key), Value::Object(map)) => map.get(key),

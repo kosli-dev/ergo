@@ -3257,7 +3257,7 @@ fn foreign_step(path: &Path, alias: &str) -> bool {
             !matches!(&reference.start, Start::Alias(name) if name == alias)
                 || foreign_step(reference, alias)
         }
-        Step::Key(_) | Step::Index(_) => false,
+        Step::Key(_) | Step::Index(_) | Step::Members => false,
     })
 }
 

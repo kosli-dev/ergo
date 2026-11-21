@@ -24,16 +24,13 @@ fn members(
     };
     let path = Path {
         start: Start::Subject,
-        steps: steps.iter().map(|s| Step::Key(s.to_string())).collect(),
+        steps: steps
+            .iter()
+            .map(|s| Step::Key(s.to_string()))
+            .chain([Step::Members])
+            .collect(),
     };
-    let walked = walk(
-        &path,
-        &ctx,
-        Options {
-            member: true,
-            ..options
-        },
-    );
+    let walked = walk(&path, &ctx, options);
     (
         walked
             .items
