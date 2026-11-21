@@ -2500,3 +2500,31 @@ fn two_sentences_walking_one_list_merge_by_item() {
         ["item 1 of xs[item 1 of x.ys[m is 2|m is 2], item 2 of x.ys[n is missing|n is missing]]"]
     );
 }
+
+fn causes(clauses: &[crate::ops::clause::Clause]) -> Vec<String> {
+    clauses
+        .iter()
+        .flat_map(|clause| {
+            std::iter::once(format!("{}: {}", clause.name, clause.cause.name()))
+                .chain(causes(&clause.said))
+        })
+        .collect()
+}
+
+#[test]
+fn an_item_beside_a_root_takes_only_its_own_cause() {
+    let items = for_items(
+        "every xs as x",
+        &["count of x.es whose v is at least $params.a is $params.b"],
+        json!({"xs": [{"es": [{"v": 1}, {}]}]}),
+        json!({"a": "s", "b": 0}),
+    );
+    assert_eq!(
+        causes(&items),
+        [
+            "item 1 of xs: absent",
+            "item 2 of x.es: absent",
+            "v is missing: absent"
+        ]
+    );
+}
