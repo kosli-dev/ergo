@@ -25,7 +25,7 @@ if [ -z "${MUTANTS_FACTS_CARGO:-}" ]; then
 fi
 
 cd "$root/engines/rust"
-"$cargo" mutants --workspace --in-diff "$work/diff" --output "$work/out" --timeout "$per" --minimum-test-timeout 20 -j 2 > "$work/log" 2>&1 &
+"$cargo" mutants --workspace --in-diff "$work/diff" --output "$work/out" --timeout "$per" --minimum-test-timeout 20 --in-place > "$work/log" 2>&1 &
 pid=$!
 waited=0
 stopped=
