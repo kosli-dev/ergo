@@ -3155,3 +3155,23 @@ fn a_path_whose_key_cant_be_read_isnt_said_again_after_the_key() {
         "item 1 of ks: k is null"
     );
 }
+
+#[test]
+fn a_key_that_sorts_the_line_is_said_once_before_the_items_own_problems() {
+    let said = |rows: Value| {
+        for_tree(
+            "first of rows sorted by m named by $params.km as r",
+            &["r.v is 1"],
+            json!({ "rows": rows }),
+            json!({}),
+        )
+    };
+    assert_eq!(
+        said(json!([{"m": {"q": 2}, "v": 2}, {"m": {"q": 1}, "v": 1}])),
+        "$params.km is missing"
+    );
+    assert_eq!(
+        said(json!([{"m": [5, 1]}, {"m": {"a": 1}}, {"v": 1}])),
+        "$params.km is missing; item 1 of rows: m is [5, 1], which isn't an object; item 3 of rows: m is missing"
+    );
+}
