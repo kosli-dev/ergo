@@ -4611,6 +4611,47 @@
   "want": "$params.k is 3, which isn't text; item 1 of es: zz is missing, and m is missing; item 2 of es: zz is missing, and m is missing"
  },
  {
+  "name": "D14/for",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every es whose zz is m named by $params.k as e",
+       "assert": "e.v exists"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": 1
+      },
+      {
+       "v": 2
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "k": 3
+  },
+  "want": "$params.k is 3, which isn't text; item 1 of es: zz is missing, and m is missing; item 2 of es: zz is missing, and m is missing"
+ },
+ {
   "name": "D14/two",
   "policy": {
    "subjects": {
@@ -9382,6 +9423,141 @@
     }
    ]
   }
+ },
+ {
+  "name": "message.items/count of a root/every",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every rows whose n is count of $params.os.name exists"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "rows": [
+      {
+       "n": 1
+      },
+      {},
+      {
+       "n": null
+      },
+      "s"
+     ]
+    }
+   ]
+  },
+  "params": {
+   "os": [
+    {
+     "name": "bob"
+    },
+    {}
+   ]
+  },
+  "want": "item 2 of $params.os: name is missing; item 2 of rows: n is missing; item 3 of rows: n is null; and 1 more"
+ },
+ {
+  "name": "message.items/count of a root/count",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of rows whose n is count of $params.os.name is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "rows": [
+      {
+       "n": 1
+      },
+      {},
+      {
+       "n": null
+      },
+      "s"
+     ]
+    }
+   ]
+  },
+  "params": {
+   "os": [
+    {
+     "name": "bob"
+    },
+    {}
+   ]
+  },
+  "want": "item 2 of $params.os: name is missing; item 2 of rows: n is missing; item 3 of rows: n is null; and 1 more"
+ },
+ {
+  "name": "message.items/count of a root/sum",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "sum of rows.n that is count of $params.os.name is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "rows": [
+      {
+       "n": 1
+      },
+      {},
+      {
+       "n": null
+      },
+      "s"
+     ]
+    }
+   ]
+  },
+  "params": {
+   "os": [
+    {
+     "name": "bob"
+    },
+    {}
+   ]
+  },
+  "want": "item 2 of $params.os: name is missing; item 2 of rows: n is missing; item 3 of rows: n is null; and 1 more"
  },
  {
   "name": "member r5/M1 [walk.member.not_an_object]",
