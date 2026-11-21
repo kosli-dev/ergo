@@ -30170,7 +30170,7 @@
                   "/arts/0/c/z"
                 ],
                 "name": "art.cov.z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "part": {
                   "id": null,
                   "name": "art.cov"
@@ -30302,7 +30302,7 @@
                   "/arts/0/c/z"
                 ],
                 "name": "art.cov.z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "part": {
                   "id": null,
                   "name": "art.cov"
