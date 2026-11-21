@@ -386,7 +386,15 @@ _walk_root_flaw(check, subj) := _worst_of(states) if {
 	count(states) > 0
 } else := ""
 
-_walk_root_conds(check) := array.concat(_walk_whose_conds(check), _for_sentence_conds(check))
+_walk_root_conds(check) := array.concat(array.concat(_walk_whose_conds(check), _for_sentence_conds(check)), _text_leaf_conds(check))
+
+_text_leaf_conds(check) := [c] if {
+	c := object.get(check, "check", null)
+	is_object(c)
+	c.ignoring
+	some p in _root_reads(c)
+	_text_list_root(c, p)
+} else := []
 
 _walk_whose_conds(check) := array.concat(array.concat(object.get(check, "whose", []), [c | check.op == "for"; some item in check.items; some c in object.get(item, "whose", [])]), _for_nested_conds(check))
 
@@ -509,7 +517,7 @@ _walk_root_msgs(check, subj) := _m_root_sorted(_once(array.concat(
 	sort([m | some c in _walk_count_conds(check); some m in array.concat(_m_root_texts_all(subj, c), _m_cond_walked_texts(c)); _m_ref_first(m)]),
 	array.concat(
 		[m |
-			some c in _walk_whose_conds(check)
+			some c in array.concat(_walk_whose_conds(check), _text_leaf_conds(check))
 			some m in array.concat(_m_cond_root_texts(subj, c), _m_cond_walked_texts(c))
 		],
 		[m |
@@ -652,12 +660,12 @@ _item_keyed(p) if {
 }
 
 _items_judged_alone(subj, side) if {
-	some c in object.get(side, "whose", [])
+	some c in array.concat(object.get(side, "whose", []), _text_leaf_conds(side))
 	_root_read_flaw(subj, c) != ""
 	_root_stand_in(c) != c
 }
 
-_whose_alone(subj, side) := object.union(side, {"whose": [_root_stand_in(c) | some c in side.whose]}) if _items_judged_alone(subj, side)
+_whose_alone(subj, side) := object.union(object.union(side, {"whose": [_root_stand_in(c) | some c in side.whose]}), {"check": _root_stand_in(c) | some c in _text_leaf_conds(side)}) if _items_judged_alone(subj, side)
 
 else := side
 
