@@ -447,7 +447,9 @@ _m_src_path(src) := src.key.i
 
 _m_src_cause(state) := substring(state, 5, -1) if startswith(state, "root ")
 
-else := _tally_record_cause(state)
+else := substring(state, 6, -1) if startswith(state, "focus ")
+
+else := state
 
 _m_item_text_clause(name, cause, text) := _m_item_clause(name, cause, [_m_clause("root", _m_clause_name(rest), cause, rest)]) if {
 	lead := concat("", [name, ": "])

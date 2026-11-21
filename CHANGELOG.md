@@ -56,6 +56,8 @@ This file is about `ergo.rego` only. The Rust engine's changes are in [engines/r
 
 - A subject can narrow a child subject, and be narrowed in turn, as spec 0.7 says ([sentence.subject.narrow](spec/syntax.md#subjects), [subjects.chain](spec/semantics.md#requirements)), where it was written wrong with `can't build on a subject read from another subject yet`. Its rows keep the child's id and `in`, it is counted per parent, and narrowing doesn't count as a level of a chain. Changes the report of such policies, which now get real rows.
 
+- A `count of` or a `sum of` whose `whose` or `that` reads a root it can't read fails with the worst cause of the root and of the items it says, as spec 0.7 says ([problems.all_said](spec/semantics.md#which-problems-a-message-says)). With no `r` in the params and `ms` holding `[{"v": "s"}, {}]`, `count of ms whose v is at least $params.r is 0` fails as `unusable`, not `absent`, with `$params.r is missing; item 1 of ms: v is "s", which isn't a number; item 2 of ms: v is missing`.
+
 ### Fixed
 
 - An item of a `$min_subjects` row that the walk breaks in and that `subjects.every.same` names too joins its two clauses with `; `, as the row's message does and as spec 0.7 says ([subjects.failed_items](spec/semantics.md#requirements), [message.join](spec/semantics.md#messages)), where it joined them with `, `. With `from: every p0.p1.p2` on `{"p0": [{"p1": [{"p2": [{"status": "ok"}]}]}, {"p1": 3}]}`, the entry `item 2 of p0` says `p1 is 3, which isn't an object; p1 is a number`, where it said `p1 is 3, which isn't an object, p1 is a number`. The row's message doesn't change. Changes the report of such policies.
