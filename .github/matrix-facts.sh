@@ -112,12 +112,64 @@ def rank(verdict):
     return CAUSES.index(verdict[1]) if verdict[1] in CAUSES else None
 
 
-def fragments(row):
+SPLIT = r"; |, and (?!\d+ more)"
+MORE = re.compile(r"(and )?\d+ more")
+PREFIX = re.compile(r"^(?:item \d+ of [^:;]+?: |[\w.$\[\]]+: )+")
+ITEM = re.compile(r"item \d+ of [^:;]+?: ")
+
+
+def parts(text):
+    return [part for part in re.split(SPLIT, text) if part and not MORE.fullmatch(part)]
+
+
+def problems(row):
+    found = set()
+
+    def collect(node, item):
+        if isinstance(node, dict):
+            if node.get("kind") == "item" and item is None:
+                item = node.get("name")
+            if isinstance(node.get("message"), str):
+                for part in parts(node["message"]):
+                    named = ITEM.match(part)
+                    found.add((named.group(0)[:-2] if named else item or "", PREFIX.sub("", part)))
+            for key, value in node.items():
+                if key != "message":
+                    collect(value, item)
+        elif isinstance(node, list):
+            for value in node:
+                collect(value, item)
+
+    collect(row.get("failures"), None)
+    if not row.get("failures"):
+        for part in parts(row.get("message") or ""):
+            found.add(("", PREFIX.sub("", part)))
+    return found
+
+
+def names(row):
+    found = set()
+
+    def collect(node):
+        if isinstance(node, dict):
+            if node.get("name"):
+                found.add(node["name"])
+            for value in node.values():
+                collect(value)
+        elif isinstance(node, list):
+            for value in node:
+                collect(value)
+
+    collect(row.get("failures"))
+    return found
+
+
+def cut(row):
     texts = []
 
     def collect(node):
         if isinstance(node, dict):
-            if isinstance(node.get("message"), str) and node["message"]:
+            if isinstance(node.get("message"), str):
                 texts.append(node["message"])
             for value in node.values():
                 collect(value)
@@ -126,7 +178,7 @@ def fragments(row):
                 collect(value)
 
     collect(row)
-    return texts
+    return any(re.search(r"(and )?\d+ more$", text) for text in texts)
 
 
 def said(row):
@@ -138,14 +190,17 @@ def said(row):
 def missing(base_row, head_row):
     if base_row is None or base_row.get("passed"):
         return []
-    have = " ".join(fragments(head_row)) if head_row is not None else ""
+    have = problems(head_row) if head_row is not None else set()
+    texts = {text for _, text in have}
+    truncated = head_row is not None and cut(head_row)
+    shown = names(head_row) if head_row is not None else set()
     lost = []
-    for text in fragments(base_row):
-        for part in re.split(r"; |, and (?!\d+ more)", text):
-            if re.fullmatch(r"(and )?\d+ more", part):
-                continue
-            if part not in have and part not in lost:
-                lost.append(part)
+    for item, text in sorted(problems(base_row)):
+        if (item, text) in have or ("", text) in have or (item == "" and text in texts):
+            continue
+        if truncated and item not in shown:
+            continue
+        lost.append(f"{item}: {text}" if item else text)
     return lost
 
 
