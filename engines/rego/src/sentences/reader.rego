@@ -405,10 +405,14 @@ _s_path_of(text, pat) := _s_lifted(_s_unlifted_path_of(text, pat))
 _s_qpath_of(text, pat) := _s_path_of(_s_unmember(_s_undistinct(text)), pat)
 
 _s_unmember(text) := m[1] if {
+	startswith(text, "member ")
 	m := regex.find_all_string_submatch_n(`^member +of +(\S.*)$`, text, 1)[0]
 } else := text
 
-_s_list_words_of(text) := object.union(_s_distinct_of(text), {"member": true | _s_unmember(_s_undistinct(text)) != _s_undistinct(text)})
+_s_list_words_of(text) := object.union(_s_distinct_of(text), {"member": true}) if {
+	contains(text, "member ")
+	_s_unmember(_s_undistinct(text)) != _s_undistinct(text)
+} else := _s_distinct_of(text)
 
 _s_undistinct(text) := m[1] if {
 	m := regex.find_all_string_submatch_n(`^distinct +(\S.*)$`, text, 1)[0]

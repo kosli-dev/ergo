@@ -79,11 +79,6 @@ _fm_end_fail(e) := _fl_fail(object.union({"w": null}, e), _walk_state(e.v)) if _
 
 else := object.union(_fl_fail(object.union({"w": null}, e), "unusable"), {"why": {"path": e.c, "value": e.v, "kind": "an object"}})
 
-_walk_members(keys) if {
-	count(keys) > 0
-	keys[count(keys) - 1] == _fm_mark
-}
-
 _member_walk(start, keys, if_any) := {"items": items, "fails": fails, "walked": walked, "trail": trail, "members": true} if {
 	r0 := _member_list_level([start], keys, 0, if_any, start)
 	r1 := _member_list_level(r0.entries, keys, 1, if_any, start)

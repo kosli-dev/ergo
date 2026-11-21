@@ -91,10 +91,11 @@ test_a_member_read_by_its_key_is_its_list_and_its_key if {
 
 test_the_object_a_count_of_member_of_reads_is_its_own_read_as_a_walked_list_is if {
 	members := ergo._s_written_check("sum of member of costs is at most 3")
-	ergo._tally_own_read({"name": "costs"}, members, set(), [{"kind": "item"}])
-	ergo._tally_own_read({"name": "costs"}, members, set(), [])
-	not ergo._tally_own_read({"name": "costs.x"}, members, set(), [])
-	not ergo._tally_own_read({"name": "costs[]"}, members, set(), [{"kind": "item"}])
+	ergo._tally_own_read({"name": "costs", "value": [1, 5]}, members, set(), [{"kind": "item"}])
+	ergo._tally_own_read({"name": "costs", "value": []}, members, set(), [])
+	not ergo._tally_own_read({"name": "costs", "value": 5}, members, set(), [])
+	not ergo._tally_own_read({"name": "costs.x", "value": [1]}, members, set(), [])
+	not ergo._tally_own_read({"name": "costs[]", "value": [1]}, members, set(), [{"kind": "item"}])
 	items := ergo._s_written_check("sum of costs is at most 3")
 	ergo._tally_own_read({"name": "costs[]"}, items, set(), [{"kind": "item"}])
 	not ergo._tally_own_read({"name": "costs"}, items, set(), [{"kind": "item"}])

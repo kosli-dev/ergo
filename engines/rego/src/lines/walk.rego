@@ -267,7 +267,7 @@ _walk_root(path) := [path[0]] if _named(path)
 _walk_root(path) := [] if not _named(path)
 
 _walk(start, keys, if_any) := _member_walk(start, keys, if_any) if {
-	_walk_members(keys)
+	keys[count(keys) - 1] == _fm_mark
 } else := {"items": items, "fails": fails, "walked": walked, "trail": trail} if {
 	r0 := _walk_level([start], keys, 0, if_any, start)
 	r1 := _walk_level(r0.entries, keys, 1, if_any, start)

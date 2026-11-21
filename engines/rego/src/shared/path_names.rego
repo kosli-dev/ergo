@@ -30,9 +30,8 @@ _visible_path_name(path, root) := concat("", ["item ", _literal_text(path[count(
 	count(path) == 1
 	_index_step(path[0])
 } else := concat("", ["member ", substring(_plain_step_name(1, path[count(path) - 1]), 1, -1), " of ", _rooted_steps_name(array.slice(path, 0, count(path) - 1), root)]) if {
-	is_array(path)
+	is_string(path[count(path) - 1].member)
 	count(path) > 1
-	_member_step(path[count(path) - 1])
 } else := _rooted_steps_name(path, root)
 
 _ref_name(path) := concat("", ["item ", _literal_text(path[count(path) - 1] + 1), " of ", _plain_steps_name(array.slice(path, 0, count(path) - 1))]) if {
@@ -97,7 +96,7 @@ _nameable_step(p) if _parent_step_form(p)
 
 _nameable_step(p) if _plain_step_form(p)
 
-_nameable_step(p) if _member_step(p)
+_nameable_step(p) if is_string(p.member)
 
 _nameable_step(p) if {
 	_is_literal(p)
@@ -184,8 +183,8 @@ _plain_step_name(i, step) := concat("", [".", _s_key_text(step.literal)]) if {
 _plain_step_name(_, step) := concat("", ["[", _literal_text(step), "]"]) if _index_step(step)
 
 _plain_step_name(i, step) := concat("", [".", _s_key_text(step.member)]) if {
+	is_string(step.member)
 	i > 0
-	_member_step(step)
 }
 
 _step_dot(i) := "." if i > 0

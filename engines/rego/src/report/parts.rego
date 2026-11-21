@@ -532,6 +532,8 @@ _tally_own_read(i, c, _, items) if {
 }
 
 _tally_own_read(i, c, _, _) if {
+	is_array(i.value)
+	not contains(i.name, "[]")
 	some side in _m_tally_parts(c)
 	side.member == true
 	p := side[_basic_form(side)]
