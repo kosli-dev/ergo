@@ -310,7 +310,11 @@ _tally(subj, side) := {"states": {"not_an_object"}, "list": _path_name(path), "v
 	r := object.union(object.union({"states": states, "list": _walk_name(side[f], w.walked), "values": [_walk_value(e.v, e, w) | some e in w.items], "locations": _walk_locations(w)}, _tally_value(f, _tally_distinct(side, kept, subj, "kept"), states)), _tally_stop_outcome(stop))
 }
 
-_tally_walk(subj, side) := _walk(_walk_start({"path": p}, subj), _walk_keys({"path": p}, subj), true) if p := side[_basic_form(side)]
+_tally_walk(subj, side) := _walk(_walk_start({"path": p}, subj), _walk_keys(_tally_walked(side, p), subj), true) if p := side[_basic_form(side)]
+
+_tally_walked(side, p) := {"path": p, "member": true} if side.member == true
+
+else := {"path": p}
 
 _tally_stop_outcome(stop) := {"ergo/outcome": stop[0].cause} if {
 	stop != []
