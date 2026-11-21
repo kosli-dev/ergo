@@ -1891,3 +1891,38 @@ fn the_item_entry_of_copies_lists_the_location_of_each_item_not_the_end_of_its_p
         ])
     );
 }
+
+#[test]
+fn a_one_line_walk_count_or_sum_says_a_counted_root_once_and_then_each_item_its_own_value() {
+    let policy = serde_json::json!({
+        "ergo_spec": crate::SPEC,
+        "subjects": {"t": {"from": "things", "identified_by": "id"}},
+        "requirements": {"r": {"subject": "t", "checks": {
+            "every": "every rows whose n is count of $params.os.name exists",
+            "count": "count of rows whose n is count of $params.os.name is 0",
+            "sum": "sum of rows.n that is count of $params.os.name is 0"
+        }}}
+    });
+    let input =
+        serde_json::json!({"things": [{"id": "a", "rows": [{"n": 1}, {}, {"n": null}, "s"]}]});
+    let params = serde_json::json!({"os": [{"name": "bob"}, {}]});
+    let report = crate::report(&input, &policy, &params);
+    for check in ["every", "count", "sum"] {
+        let row = report["results"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|row| row["check"] == check)
+            .unwrap();
+        assert_eq!(
+            (row["cause"].as_str(), row["message"].as_str()),
+            (
+                Some("not_an_object"),
+                Some(
+                    "item 2 of $params.os: name is missing; item 2 of rows: n is missing; item 3 of rows: n is null; and 1 more"
+                )
+            ),
+            "{check}"
+        );
+    }
+}

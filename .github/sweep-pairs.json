@@ -9423,5 +9423,140 @@
     }
    ]
   }
+ },
+ {
+  "name": "message.items/count of a root/every",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every rows whose n is count of $params.os.name exists"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "rows": [
+      {
+       "n": 1
+      },
+      {},
+      {
+       "n": null
+      },
+      "s"
+     ]
+    }
+   ]
+  },
+  "params": {
+   "os": [
+    {
+     "name": "bob"
+    },
+    {}
+   ]
+  },
+  "want": "item 2 of $params.os: name is missing; item 2 of rows: n is missing; item 3 of rows: n is null; and 1 more"
+ },
+ {
+  "name": "message.items/count of a root/count",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of rows whose n is count of $params.os.name is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "rows": [
+      {
+       "n": 1
+      },
+      {},
+      {
+       "n": null
+      },
+      "s"
+     ]
+    }
+   ]
+  },
+  "params": {
+   "os": [
+    {
+     "name": "bob"
+    },
+    {}
+   ]
+  },
+  "want": "item 2 of $params.os: name is missing; item 2 of rows: n is missing; item 3 of rows: n is null; and 1 more"
+ },
+ {
+  "name": "message.items/count of a root/sum",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "sum of rows.n that is count of $params.os.name is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "rows": [
+      {
+       "n": 1
+      },
+      {},
+      {
+       "n": null
+      },
+      "s"
+     ]
+    }
+   ]
+  },
+  "params": {
+   "os": [
+    {
+     "name": "bob"
+    },
+    {}
+   ]
+  },
+  "want": "item 2 of $params.os: name is missing; item 2 of rows: n is missing; item 3 of rows: n is null; and 1 more"
  }
 ]
