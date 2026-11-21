@@ -652,6 +652,8 @@ _key_step(step) if _field_step(step)
 
 _rooted_failed(r) := [] if r.cause in _not_failing_causes
 
+else := r.failed
+
 _rooted_kept(check, r) := [] if {
 	_text_leaf_conds(check) != []
 	_ = r
@@ -665,8 +667,6 @@ _empty_beside_text_leaf(check, r) if {
 		f.cause == "value"
 	}
 }
-
-else := r.failed
 
 _item_keyed(p) if {
 	some step in p
