@@ -379,3 +379,34 @@ fn walk_entries_read_each_records_clause_kind_and_not_its_text() {
         ]
     );
 }
+
+#[test]
+fn a_member_name_is_an_item_and_reads_back_as_the_path_of_its_key() {
+    assert!(is_item("member k of xs"));
+    assert!(is_item("member \"a of b\" of xs"));
+    assert!(!is_item("membership is 1"));
+    assert_eq!(position_name("member k of xs"), "xs.k");
+    assert_eq!(position_name("member \"a; b\" of r.e"), "r.e.\"a; b\"");
+    assert_eq!(position_name("member \"a of b\" of xs"), "xs.\"a of b\"");
+    assert_eq!(list_base("member k of xs"), "xs");
+    assert_eq!(list_base("member \"a of b\" of xs"), "xs");
+}
+
+#[test]
+fn a_member_record_becomes_an_item_entry_named_by_its_key() {
+    use crate::ops::clause::Kind;
+    let member = said_clause("member a of xs", Cause::Value, "member a of xs is 2");
+    assert_eq!(member.kind, Kind::Item);
+    let records = [record(
+        "member a of xs",
+        "member a of xs",
+        "value",
+        "member a of xs is 2",
+    )];
+    let walked = walk_entries(&records, &record_clauses(&records));
+    let Failure::Item { part, .. } = &walked.entries[0] else {
+        panic!("not an item entry");
+    };
+    assert_eq!(part.name, "member a of xs");
+    assert_eq!(part.inputs[0]["name"], json!("xs.a"));
+}
