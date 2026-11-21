@@ -32,6 +32,16 @@ _basic_form(side) := f if {
 	is_string(side.text)
 }
 
+_basic_form(side) := f if {
+	is_object(side)
+	side.member == true
+	some f in _tally_forms
+	object.keys(side) == {f, "whose", "text", "member"}
+	is_array(side[f])
+	is_array(side.whose)
+	is_string(side.text)
+}
+
 _basic_form(side) := "elapsed" if {
 	is_object(side)
 	object.keys(side) == {"unit", "elapsed_from", "elapsed_to", "text"}

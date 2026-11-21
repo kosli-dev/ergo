@@ -86,6 +86,13 @@ pub fn marked_name(path: &Path, marks: &BTreeSet<usize>) -> String {
 }
 
 fn render(path: &Path, marks: Option<&BTreeSet<usize>>) -> String {
+    if let Some((Step::Members, before)) = path.steps.split_last() {
+        let object = Path {
+            start: path.start.clone(),
+            steps: before.to_vec(),
+        };
+        return render(&object, marks);
+    }
     let mark = |out: &mut String, at: usize| {
         if marks.is_some_and(|marks| marks.contains(&at)) {
             if out.is_empty() {
@@ -131,6 +138,7 @@ fn render(path: &Path, marks: Option<&BTreeSet<usize>>) -> String {
                     out.push_str(&format!("[{index}]"));
                 }
             }
+            Step::Members => {}
             Step::Ref(reference) | Step::Field(reference) => {
                 let ref_name = name(reference);
                 let one_key = ((matches!(

@@ -139,3 +139,13 @@ _arg(x) := x if {
 	not _is_ref(x)
 	not _is_literal(x)
 }
+
+_member_step(p) if {
+	is_object(p)
+	object.keys(p) == {"member"}
+	is_string(p.member)
+}
+
+_item_step(p) if is_number(p)
+
+_item_step(p) if _member_step(p)

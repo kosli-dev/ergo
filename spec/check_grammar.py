@@ -13,6 +13,7 @@ NON_SYNTAX = [
         r" can't be an alias$",
         r" is given twice$",
         r"^if any can't go with some$",
+        r"^distinct can't go with every member of$",
         r"^unknown name ",
         r"^unknown alias ",
         r"^min above max$",

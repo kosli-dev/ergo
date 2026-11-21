@@ -379,3 +379,58 @@ fn walk_entries_read_each_records_clause_kind_and_not_its_text() {
         ]
     );
 }
+
+#[test]
+fn a_member_name_is_an_item_and_reads_back_as_the_path_of_its_key() {
+    assert!(is_item("member k of xs"));
+    assert!(is_item("member \"a of b\" of xs"));
+    assert!(!is_item("membership is 1"));
+    assert_eq!(position_name("member k of xs"), "xs.k");
+    assert_eq!(position_name("member \"a; b\" of r.e"), "r.e.\"a; b\"");
+    assert_eq!(position_name("member \"a of b\" of xs"), "xs.\"a of b\"");
+    assert_eq!(list_base("member k of xs"), "xs");
+    assert_eq!(list_base("member \"a of b\" of xs"), "xs");
+}
+
+#[test]
+fn a_member_record_becomes_an_item_entry_named_by_its_key() {
+    use crate::ops::clause::Kind;
+    let member = said_clause("member a of xs", Cause::Value, "member a of xs is 2");
+    assert_eq!(member.kind, Kind::Item);
+    let records = [record(
+        "member a of xs",
+        "member a of xs",
+        "value",
+        "member a of xs is 2",
+    )];
+    let walked = walk_entries(&records, &record_clauses(&records));
+    let Failure::Item { part, .. } = &walked.entries[0] else {
+        panic!("not an item entry");
+    };
+    assert_eq!(part.name, "member a of xs");
+    assert_eq!(part.inputs[0]["name"], json!("xs.a"));
+}
+
+#[test]
+fn a_member_entry_of_an_object_in_a_list_nests_under_its_item_named_by_its_key() {
+    let input = json!({"s": {"rs": [{"statuses": {"a": "DONE", "b": 1}}]}});
+    let entry = Failure::Item {
+        part: Part {
+            name: "member b of rs[0].statuses".to_string(),
+            cause: Cause::Unusable,
+            inputs: Vec::new(),
+            failures: Vec::new(),
+            message: "item 1 of rs: member b of statuses is 1, which isn't text".to_string(),
+        },
+        value: json!(1),
+        locations: vec!["/s/rs/0/statuses/b".to_string()],
+    };
+    let nested = nest(vec![entry], &input);
+    assert_eq!(nested[0].part().name, "item 1 of rs");
+    let inner = &nested[0].part().failures[0];
+    assert_eq!(inner.part().name, "member b of statuses");
+    assert_eq!(
+        inner.part().message,
+        "member b of statuses is 1, which isn't text"
+    );
+}

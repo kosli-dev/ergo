@@ -313,7 +313,10 @@ pub fn lower_for(
         let walk_path = match here.path(path) {
             Ok(found) => {
                 problems.extend(lower::walk_too_long(&found));
-                Some(found)
+                Some(lower::with_members(
+                    found,
+                    matches!(item, s::ForItem::Walk { member: true, .. }),
+                ))
             }
             Err(found) => {
                 problems.extend(found);
@@ -399,6 +402,7 @@ struct RunItems {
 
 #[derive(Clone)]
 struct Dead {
+    wants_object: bool,
     raw: Option<Value>,
     msg: Option<String>,
     bare: Option<String>,
@@ -416,6 +420,7 @@ struct Dead {
 impl Dead {
     fn at(name: String, cause: Cause, value: Value, location: Option<Location>) -> Dead {
         Dead {
+            wants_object: false,
             raw: None,
             bare: None,
             msg: None,
@@ -441,6 +446,7 @@ impl Dead {
 
     fn of_failure(failure: &Failure) -> Dead {
         Dead {
+            wants_object: failure.wants_object,
             bare: None,
             msg: None,
             shared: false,
@@ -458,6 +464,7 @@ impl Dead {
 
     fn copy(&self) -> Dead {
         Dead {
+            wants_object: self.wants_object,
             raw: self.raw.clone(),
             bare: self.bare.clone(),
             msg: self.msg.clone(),
@@ -2839,7 +2846,9 @@ impl For {
         if let Some(text) = &dead.msg {
             return text.clone();
         }
-        let kind = if matches!(dead.value, Value::Object(_)) {
+        let kind = if dead.wants_object {
+            "an object"
+        } else if matches!(dead.value, Value::Object(_)) {
             "a list"
         } else {
             "a list or an object"
@@ -3257,7 +3266,7 @@ fn foreign_step(path: &Path, alias: &str) -> bool {
             !matches!(&reference.start, Start::Alias(name) if name == alias)
                 || foreign_step(reference, alias)
         }
-        Step::Key(_) | Step::Index(_) => false,
+        Step::Key(_) | Step::Index(_) | Step::Members => false,
     })
 }
 
@@ -3365,7 +3374,7 @@ fn own_read_fails(check: &Check, focus: &Ctx) -> bool {
 }
 
 fn unled(roots: &[String], text: &str) -> Vec<String> {
-    if !text.starts_with("item ") {
+    if !crate::parts::is_item(text) {
         return vec![text.to_string()];
     }
     if let Some(root) = roots
@@ -3456,7 +3465,7 @@ fn outside_quotes(text: &str) -> bool {
 }
 
 fn lead_of(text: &str) -> String {
-    if !text.starts_with("item ") {
+    if !crate::parts::is_item(text) {
         return String::new();
     }
     let cuts = text

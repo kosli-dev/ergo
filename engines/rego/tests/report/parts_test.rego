@@ -63,3 +63,40 @@ test_an_item_two_conditions_of_a_count_cant_decide_is_one_entry_that_says_both i
 	parts := ergo._tally_item_parts(check, {"es": [{}]}, "absent", "/things/0", "item 1 of es: v is missing; item 1 of es: w is missing")
 	[[p.name, p.cause, p.message] | some p in parts] == [["item 1 of es", "absent", "v is missing; w is missing"]]
 }
+
+test_a_member_nests_under_the_items_of_the_lists_before_it_like_an_item if {
+	ergo._level_names("member b of rs[0].statuses", 1) == ["item 1 of rs", "member b of statuses"]
+	ergo._level_names(`member "a; b" of rs[1].statuses`, 1) == ["item 2 of rs", `member "a; b" of statuses`]
+	ergo._level_names("item 2 of rs[0].statuses", 1) == ["item 1 of rs", "item 2 of statuses"]
+}
+
+test_the_list_of_a_member_is_what_follows_its_key if {
+	ergo._list_base("member b of statuses") == "statuses"
+	ergo._list_base(`member "x of y" of r.evidence`) == "r.evidence"
+	ergo._list_base("item 2 of xs[0].ys") == "xs"
+	ergo._list_base("xs") == "xs"
+}
+
+test_a_text_beside_a_member_that_names_no_item_is_a_root_text if {
+	ergo._root_text("member b of xs", "$params.k is missing")
+	not ergo._root_text("member b of xs", "member b of xs is 1")
+	not ergo._root_text("member b of xs", "")
+}
+
+test_a_member_read_by_its_key_is_its_list_and_its_key if {
+	ergo._whose_item_name({"item": "member b of xs"}) == "xs.b"
+	ergo._whose_item_name({"item": `member "a b" of r.evidence`}) == `r.evidence."a b"`
+	ergo._whose_item_name({"item": "item 2 of xs"}) == "xs[1]"
+}
+
+test_the_object_a_count_of_member_of_reads_is_its_own_read_as_a_walked_list_is if {
+	members := ergo._s_written_check("sum of member of costs is at most 3")
+	ergo._tally_own_read({"name": "costs", "value": [1, 5]}, members, set(), [{"kind": "item"}])
+	ergo._tally_own_read({"name": "costs", "value": []}, members, set(), [])
+	not ergo._tally_own_read({"name": "costs", "value": 5}, members, set(), [])
+	not ergo._tally_own_read({"name": "costs.x", "value": [1]}, members, set(), [])
+	not ergo._tally_own_read({"name": "costs[]", "value": [1]}, members, set(), [{"kind": "item"}])
+	items := ergo._s_written_check("sum of costs is at most 3")
+	ergo._tally_own_read({"name": "costs[]"}, items, set(), [{"kind": "item"}])
+	not ergo._tally_own_read({"name": "costs"}, items, set(), [{"kind": "item"}])
+}

@@ -15,3 +15,13 @@ test_sum_of_and_plus_add_numbers_as_decimals if {
 	ergo._decimal_sum([0.123456789012345]) == 0.123456789012345
 	ergo._decimal_sum([0.1, 0.2, 100]) == 100.3
 }
+
+test_a_count_or_sum_of_member_of_walks_each_member_of_the_object_as_an_item if {
+	side := {"sum_of": ["costs"], "whose": [], "text": "sum of member of costs", "member": true}
+	t := ergo._tally({"costs": {"b": 5, "a": 1, "c": "x"}}, side)
+	t.values == [1, 5, "x"]
+	t.list == "costs"
+	t.states == {"unusable"}
+	approvals := {"count_of": ["evidence"], "whose": [{"op": "equals", "path": ["kind"], "value": "approval"}], "text": "count of member of evidence", "member": true}
+	ergo._tally({"evidence": {"x": {"kind": "scan"}, "y": {"kind": "approval"}}}, approvals).value == 1
+}

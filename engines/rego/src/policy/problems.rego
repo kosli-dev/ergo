@@ -504,8 +504,8 @@ _op_fields := object.union(_required_fields, {
 	"not_includes_all": {"path", "values"},
 	"all": {"path", "check", "each", "as"},
 	"any": {"path", "check", "each", "as"},
-	"every": {"path", "check", "whose", "if_any", "distinct"},
-	"some": {"path", "check", "whose", "if_any", "distinct"},
+	"every": {"path", "check", "whose", "if_any", "distinct", "member"},
+	"some": {"path", "check", "whose", "if_any", "distinct", "member"},
 })
 
 _range_bounds_problem(node) := {concat("", ["invalid ", f]) |

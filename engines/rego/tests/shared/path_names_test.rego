@@ -39,3 +39,26 @@ test_a_path_with_no_name_is_called_the_subject_and_never_it if {
 test_the_input_path_of_nothing_is_the_input if {
 	ergo._input_path_name([]) == "$input"
 }
+
+test_a_member_step_is_named_by_its_key_written_as_a_path_writes_it if {
+	ergo._input_name(["statuses", {"member": "sign-off"}]) == "member sign-off of statuses"
+	ergo._input_name(["statuses", {"member": "a; b"}]) == `member "a; b" of statuses`
+	ergo._input_name(["rs", 0, "statuses", {"member": "1"}]) == `member "1" of rs[0].statuses`
+	ergo._input_name(["evidence", {"member": "y"}, "kind"]) == "evidence.y.kind"
+	ergo._steps_name(["statuses", {"member": "sign-off"}]) == "statuses.sign-off"
+	ergo._steps_name(["statuses", {"member": ""}]) == `statuses.""`
+	ergo._steps_name(["rs", 0, "statuses", {"member": "b"}]) == "rs[0].statuses.b"
+}
+
+test_an_entry_named_like_an_item_or_a_member_is_an_item_and_anything_else_is_a_list if {
+	ergo._walk_kind("item 2 of xs") == "item"
+	ergo._walk_kind("member sign-off of statuses") == "item"
+	ergo._walk_kind(`member "a; b" of statuses`) == "item"
+	ergo._walk_kind(`member "" of statuses`) == "item"
+	ergo._walk_kind("member y of evidence: kind is missing") == "item"
+	ergo._walk_kind("xs") == "list"
+	ergo._walk_kind("member") == "list"
+	ergo._walk_kind("member is missing") == "list"
+	ergo._walk_kind("member.x of y") == "list"
+	ergo._walk_kind(`member "a of statuses`) == "list"
+}

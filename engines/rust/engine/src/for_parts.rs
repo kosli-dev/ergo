@@ -240,7 +240,7 @@ fn whose_reads(whose: &[Check], f: &Value, ctx: &Ctx) -> Vec<Value> {
     let Some(object) = f.get("value").filter(|v| v.is_object()) else {
         return Vec::new();
     };
-    let base = parts_base(&text(f, "item"));
+    let base = crate::parts::position_name(&text(f, "item"));
     let mut out = Vec::new();
     let place = strings(f, "locations").first().cloned().unwrap_or_default();
     let mut at = ctx.clone();
@@ -302,17 +302,6 @@ fn whose_reads(whose: &[Check], f: &Value, ctx: &Ctx) -> Vec<Value> {
     out
 }
 
-fn parts_base(item: &str) -> String {
-    let Some(rest) = item.strip_prefix("item ") else {
-        return item.to_string();
-    };
-    let Some((number, list)) = rest.split_once(" of ") else {
-        return item.to_string();
-    };
-    let at = number.parse::<u64>().unwrap_or(1).saturating_sub(1);
-    format!("{list}[{at}]")
-}
-
 fn whose_of<'a>(line: &'a For, f: &Value) -> &'a [Check] {
     let base = crate::parts::list_base(&text(f, "item"));
     let names: Vec<String> = line
@@ -337,7 +326,7 @@ fn dead_entry(line: &For, f: &Value, ctx: &Ctx) -> Option<Failure> {
             .filter_map(|x| {
                 let said = entry_text(&text(x, "ergo/text"), &said_name(x));
                 (!said.is_empty()).then(|| {
-                    if text(x, "item").starts_with("item ") {
+                    if crate::parts::is_item(&text(x, "item")) {
                         item(
                             text(x, "item"),
                             cause_of(x),
@@ -366,7 +355,7 @@ fn dead_entry(line: &For, f: &Value, ctx: &Ctx) -> Option<Failure> {
     }
     if let Some(sorted) = f.get("ergo/sorted") {
         let input = json!({
-            "name": format!("{}.{}", parts_base(&name), text(sorted, "key")),
+            "name": format!("{}.{}", crate::parts::position_name(&name), text(sorted, "key")),
             "value": f.get("value").cloned().unwrap_or(Value::Null),
             "locations": f.get("locations").cloned().unwrap_or(json!([])),
             "outcome": text(sorted, "outcome"),
@@ -383,7 +372,7 @@ fn dead_entry(line: &For, f: &Value, ctx: &Ctx) -> Option<Failure> {
             locations: vec![text(sorted, "at")],
         });
     }
-    if name.starts_with("item ") {
+    if crate::parts::is_item(&name) {
         Some(item(
             name.clone(),
             cause_of(f),
@@ -444,11 +433,12 @@ pub fn for_failures(
     for f in failed {
         let mut after_key = false;
         for piece in text(f, "ergo/text").split("; ") {
-            if after_key || piece.starts_with("item ") || !text(f, "item").starts_with("item ") {
+            if after_key || crate::parts::is_item(piece) || !crate::parts::is_item(&text(f, "item"))
+            {
                 ops::push_new(&mut item_made, piece.to_string());
             }
-            after_key =
-                piece.starts_with("item ") && key_texts.iter().any(|k| piece.ends_with(k.as_str()));
+            after_key = crate::parts::is_item(piece)
+                && key_texts.iter().any(|k| piece.ends_with(k.as_str()));
         }
     }
     let whose_roots = line.whose_roots(ctx);
@@ -520,17 +510,12 @@ pub fn for_failures(
             std::iter::once(k.key_text.as_str()).chain(k.base.iter().map(|(t, _, _)| t.as_str()))
         })
         .collect();
-    let first_reads: Option<(String, String)> = (line.items.len() == 2
+    let first_reads: Option<String> = (line.items.len() == 2
         && matches!(line.items[0].how, for_line::How::Some { .. }))
-    .then(|| {
-        (
-            "item ".to_string(),
-            format!(" of {}: {}.", list_names[0], line.items[0].alias),
-        )
-    });
+    .then(|| format!(" of {}: {}.", list_names[0], line.items[0].alias));
     for clause in message.split("; ") {
-        if let Some((lead, middle)) = &first_reads
-            && clause.starts_with(lead.as_str())
+        if let Some(middle) = &first_reads
+            && crate::parts::is_item(clause)
             && clause.contains(middle.as_str())
             && (clause.ends_with(" is missing")
                 || clause.ends_with(" is null")
@@ -549,7 +534,7 @@ pub fn for_failures(
             || key_said.contains(&clause)
             || failed.iter().any(|f| {
                 let named = text(f, "item");
-                named.starts_with("item ")
+                crate::parts::is_item(&named)
                     && clause
                         .strip_prefix(&format!("{named}: "))
                         .is_some_and(|rest| {
@@ -700,7 +685,7 @@ pub fn for_failures(
             let second = line.items.len() == 2
                 && !matches!(line.items[1].how, for_line::How::Pick { .. })
                 && cause_of(f) != Cause::NotAnObject
-                && text(f, "item").starts_with("item ")
+                && crate::parts::is_item(&text(f, "item"))
                 && crate::parts::list_base(&text(f, "item")) == list_names[1];
             if !second {
                 continue;

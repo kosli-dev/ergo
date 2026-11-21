@@ -180,14 +180,14 @@ fn broken_in(start: &Value, order: &[Seg]) -> Option<(Vec<Seg>, Value, &'static 
     let mut current = start;
     for (at, seg) in order.iter().enumerate() {
         let (holds, wants) = match seg {
-            Seg::Key(_) => (current.is_object(), "an object"),
+            Seg::Key(_) | Seg::Member(_) => (current.is_object(), "an object"),
             Seg::Index(_) => (current.is_array(), "a list"),
         };
         if !holds && !current.is_null() {
             return Some((order[..at].to_vec(), current.clone(), wants));
         }
         current = match (current, seg) {
-            (Value::Object(map), Seg::Key(key)) => map.get(key)?,
+            (Value::Object(map), Seg::Key(key) | Seg::Member(key)) => map.get(key)?,
             (Value::Array(items), Seg::Index(index)) => items.get(usize::try_from(*index).ok()?)?,
             _ => return None,
         };

@@ -106,7 +106,7 @@ impl Parser {
         if let Some((quantifier, j)) = self.quantifier(i)
             && let Some(k) = self.ws(j)
         {
-            for ((distinct, path), m) in self.distinct_path(k, Side::Left) {
+            for (((distinct, member), path), m) in self.member_path(k) {
                 for (whose, w) in self.whose_opt(m) {
                     for (if_any, n) in self.if_any_opt(w) {
                         let Some(p) = self.ws(n) else { continue };
@@ -114,7 +114,11 @@ impl Parser {
                             let assertion = Assertion::Quantified {
                                 quantifier,
                                 path: path.clone(),
-                                options: ListOptions { distinct, if_any },
+                                options: ListOptions {
+                                    distinct,
+                                    member,
+                                    if_any,
+                                },
                                 whose: chain_items(&whose),
                                 phrase,
                             };
@@ -217,7 +221,7 @@ impl Parser {
         if let Some((quantifier, j)) = self.quantifier(i)
             && let Some(k) = self.ws(j)
         {
-            for ((distinct, path), m) in self.distinct_path(k, Side::Left) {
+            for (((distinct, member), path), m) in self.member_path(k) {
                 for (whose, w) in self.whose_opt(m) {
                     for (if_any, n) in self.if_any_opt(w) {
                         if let Some((alias, end)) = self.alias_after(n) {
@@ -225,6 +229,7 @@ impl Parser {
                                 quantifier,
                                 path: path.clone(),
                                 distinct,
+                                member,
                                 whose: chain_items(&whose),
                                 if_any,
                                 alias,
@@ -266,7 +271,7 @@ impl Parser {
         heads.push((None, i));
         let mut out = Vec::new();
         for (quantifier, k) in heads {
-            for ((distinct, path), m) in self.distinct_path(k, Side::Left) {
+            for (((distinct, member), path), m) in self.member_path(k) {
                 for (whose, w) in self.whose_opt(m) {
                     for (sorted_by, s) in self.sorted_opt(w) {
                         for (if_any, n) in self.if_any_opt(s) {
@@ -279,6 +284,7 @@ impl Parser {
                                     quantifier,
                                     path: path.clone(),
                                     distinct,
+                                    member,
                                     whose: chain_items(&whose),
                                     if_any,
                                     alias,

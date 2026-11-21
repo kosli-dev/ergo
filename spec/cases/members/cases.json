@@ -1637,11 +1637,11 @@
     ]
   },
   {
-    "description": "every member of written in the wrong place",
-    "policy": {"ergo_spec": "{{spec}}", "subjects": {"s": {}, "a": {"from": "member of records.evidence"}, "b": {"from": "every distinct member of records.evidence"}, "c": {"from": "every member of records named by each of $params.l"}}, "requirements": {"a": {"subject": "a", "checks": {"c": "status exists"}}, "b": {"subject": "b", "checks": {"c": "status exists"}}, "c": {"subject": "c", "checks": {"c": "status exists"}}, "d": {"subject": "s", "checks": {"c": "every member of xs is 1"}}, "e": {"subject": "s", "checks": {"c": "count of member of xs is 1"}}, "f": {"subject": "s", "checks": {"c": {"for": "every member of xs as m", "assert": "m is 1"}}}}},
+    "description": "every member of written wrong",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"s": {}, "a": {"from": "member of records.evidence"}, "b": {"from": "every distinct member of records.evidence"}, "c": {"from": "every member of records named by each of $params.l"}}, "requirements": {"a": {"subject": "a", "checks": {"c": "status exists"}}, "b": {"subject": "b", "checks": {"c": "status exists"}}, "c": {"subject": "c", "checks": {"c": "status exists"}}, "d": {"subject": "s", "checks": {"c": "every distinct member of xs is 1"}}, "e": {"subject": "s", "checks": {"c": "count of distinct member of xs is 1"}}, "f": {"subject": "s", "checks": {"c": {"for": "every distinct member of xs as m", "assert": "m is 1"}}}}},
     "cases": [
       {
-        "description": "goes right after every on a from line, without distinct or named by each of, and nowhere else for now",
+        "description": "goes right after every on a from line, without distinct or named by each of, and after every, some, count of or sum of elsewhere, never with distinct",
         "rules": ["sentence.subject.member"],
         "input": {},
         "compliant": false,
@@ -1754,11 +1754,11 @@
                 "locations": [],
                 "name": "checks.c",
                 "value": [
-                  "every member of only goes on a from line for now"
+                  "distinct can't go with every member of"
                 ]
               }
             ],
-            "message": "checks.c: every member of only goes on a from line for now",
+            "message": "checks.c: distinct can't go with every member of",
             "passed": false,
             "requirement": "d",
             "subject": {
@@ -1784,11 +1784,11 @@
                 "locations": [],
                 "name": "checks.c",
                 "value": [
-                  "every member of only goes on a from line for now"
+                  "distinct can't go with every member of"
                 ]
               }
             ],
-            "message": "checks.c: every member of only goes on a from line for now",
+            "message": "checks.c: distinct can't go with every member of",
             "passed": false,
             "requirement": "e",
             "subject": {
@@ -1814,11 +1814,11 @@
                 "locations": [],
                 "name": "checks.c",
                 "value": [
-                  "for: every member of only goes on a from line for now"
+                  "for: distinct can't go with every member of"
                 ]
               }
             ],
-            "message": "checks.c: for: every member of only goes on a from line for now",
+            "message": "checks.c: for: distinct can't go with every member of",
             "passed": false,
             "requirement": "f",
             "subject": {
@@ -1871,6 +1871,1351 @@
               "id": null,
               "type": "g"
             }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "every member of in a check",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "thing",
+          "checks": {
+            "c": "every member of statuses is \"DONE\""
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "lists each member that fails, named by its key",
+        "rules": [
+          "walk.member",
+          "message.items"
+        ],
+        "input": {
+          "things": [
+            {
+              "statuses": {
+                "build": "DONE",
+                "sign-off": "FAILED"
+              },
+              "id": "t1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "type": "thing",
+              "id": "t1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "statuses",
+                "value": [
+                  "DONE",
+                  "FAILED"
+                ],
+                "locations": [
+                  "/things/0/statuses/build",
+                  "/things/0/statuses/sign-off"
+                ],
+                "outcome": "usable"
+              }
+            ],
+            "message": "member sign-off of statuses is \"FAILED\"",
+            "failures": [
+              {
+                "kind": "assertion",
+                "name": "every member of statuses is \"DONE\"",
+                "cause": "value",
+                "message": "",
+                "inputs": [],
+                "failures": [
+                  {
+                    "kind": "item",
+                    "name": "member sign-off of statuses",
+                    "cause": "value",
+                    "message": "member sign-off of statuses is \"FAILED\"",
+                    "inputs": [
+                      {
+                        "name": "statuses.sign-off",
+                        "value": "FAILED",
+                        "locations": [
+                          "/things/0/statuses/sign-off"
+                        ],
+                        "outcome": "usable"
+                      }
+                    ],
+                    "failures": [],
+                    "value": "FAILED",
+                    "locations": [
+                      "/things/0/statuses/sign-off"
+                    ]
+                  }
+                ],
+                "locations": [
+                  "$policy:/requirements/r/checks/c"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "passes when every member passes",
+        "rules": [
+          "walk.member"
+        ],
+        "input": {
+          "things": [
+            {
+              "statuses": {
+                "build": "DONE",
+                "scan": "DONE"
+              },
+              "id": "t1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "type": "thing",
+              "id": "t1"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "statuses",
+                "value": [
+                  "DONE",
+                  "DONE"
+                ],
+                "locations": [
+                  "/things/0/statuses/build",
+                  "/things/0/statuses/scan"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "reads members in key order, quotes a key the way a path writes it, and says how many more after three",
+        "rules": [
+          "walk.member",
+          "message.items",
+          "sentence.path.string"
+        ],
+        "input": {
+          "things": [
+            {
+              "statuses": {
+                "a; b": 1,
+                "": 2,
+                "1": 3,
+                "a.b": 4
+              },
+              "id": "t1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "type": "thing",
+              "id": "t1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "name": "statuses",
+                "value": [
+                  2,
+                  3,
+                  4,
+                  1
+                ],
+                "locations": [
+                  "/things/0/statuses/",
+                  "/things/0/statuses/1",
+                  "/things/0/statuses/a.b",
+                  "/things/0/statuses/a; b"
+                ],
+                "outcome": "usable"
+              }
+            ],
+            "message": "member \"\" of statuses is 2, which isn't text; member \"1\" of statuses is 3, which isn't text; member \"a.b\" of statuses is 4, which isn't text; and 1 more",
+            "failures": [
+              {
+                "kind": "assertion",
+                "name": "every member of statuses is \"DONE\"",
+                "cause": "unusable",
+                "message": "",
+                "inputs": [],
+                "failures": [
+                  {
+                    "kind": "item",
+                    "name": "member \"\" of statuses",
+                    "cause": "unusable",
+                    "message": "member \"\" of statuses is 2, which isn't text",
+                    "inputs": [
+                      {
+                        "name": "statuses.\"\"",
+                        "value": 2,
+                        "locations": [
+                          "/things/0/statuses/"
+                        ],
+                        "outcome": "unusable"
+                      }
+                    ],
+                    "failures": [],
+                    "value": 2,
+                    "locations": [
+                      "/things/0/statuses/"
+                    ]
+                  },
+                  {
+                    "kind": "item",
+                    "name": "member \"1\" of statuses",
+                    "cause": "unusable",
+                    "message": "member \"1\" of statuses is 3, which isn't text",
+                    "inputs": [
+                      {
+                        "name": "statuses.\"1\"",
+                        "value": 3,
+                        "locations": [
+                          "/things/0/statuses/1"
+                        ],
+                        "outcome": "unusable"
+                      }
+                    ],
+                    "failures": [],
+                    "value": 3,
+                    "locations": [
+                      "/things/0/statuses/1"
+                    ]
+                  },
+                  {
+                    "kind": "item",
+                    "name": "member \"a.b\" of statuses",
+                    "cause": "unusable",
+                    "message": "member \"a.b\" of statuses is 4, which isn't text",
+                    "inputs": [
+                      {
+                        "name": "statuses.\"a.b\"",
+                        "value": 4,
+                        "locations": [
+                          "/things/0/statuses/a.b"
+                        ],
+                        "outcome": "unusable"
+                      }
+                    ],
+                    "failures": [],
+                    "value": 4,
+                    "locations": [
+                      "/things/0/statuses/a.b"
+                    ]
+                  },
+                  {
+                    "kind": "item",
+                    "name": "member \"a; b\" of statuses",
+                    "cause": "unusable",
+                    "message": "member \"a; b\" of statuses is 1, which isn't text",
+                    "inputs": [
+                      {
+                        "name": "statuses.\"a; b\"",
+                        "value": 1,
+                        "locations": [
+                          "/things/0/statuses/a; b"
+                        ],
+                        "outcome": "unusable"
+                      }
+                    ],
+                    "failures": [],
+                    "value": 1,
+                    "locations": [
+                      "/things/0/statuses/a; b"
+                    ]
+                  }
+                ],
+                "locations": [
+                  "$policy:/requirements/r/checks/c"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable when the path ends at a value that isn't an object, a list included",
+        "rules": [
+          "walk.member.not_an_object"
+        ],
+        "input": {
+          "things": [
+            {
+              "statuses": [
+                "DONE"
+              ],
+              "id": "t1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "type": "thing",
+              "id": "t1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "name": "statuses",
+                "value": [],
+                "locations": [],
+                "outcome": "unusable"
+              }
+            ],
+            "message": "statuses is [\"DONE\"], which isn't an object",
+            "failures": [
+              {
+                "kind": "assertion",
+                "name": "every member of statuses is \"DONE\"",
+                "cause": "unusable",
+                "message": "",
+                "inputs": [],
+                "failures": [
+                  {
+                    "kind": "list",
+                    "name": "statuses",
+                    "cause": "unusable",
+                    "message": "statuses is [\"DONE\"], which isn't an object",
+                    "inputs": [
+                      {
+                        "name": "statuses",
+                        "value": [
+                          "DONE"
+                        ],
+                        "locations": [
+                          "/things/0/statuses"
+                        ],
+                        "outcome": "unusable"
+                      }
+                    ],
+                    "failures": []
+                  }
+                ],
+                "locations": [
+                  "$policy:/requirements/r/checks/c"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails as absent when the object is missing",
+        "rules": [
+          "walk.member.not_an_object"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "type": "thing",
+              "id": "t1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "name": "statuses",
+                "value": [],
+                "locations": [],
+                "outcome": "absent"
+              }
+            ],
+            "message": "statuses is missing",
+            "failures": [
+              {
+                "kind": "assertion",
+                "name": "every member of statuses is \"DONE\"",
+                "cause": "absent",
+                "message": "",
+                "inputs": [],
+                "failures": [
+                  {
+                    "kind": "list",
+                    "name": "statuses",
+                    "cause": "absent",
+                    "message": "statuses is missing",
+                    "inputs": [
+                      {
+                        "name": "statuses",
+                        "value": null,
+                        "locations": [
+                          "/things/0"
+                        ],
+                        "outcome": "absent"
+                      }
+                    ],
+                    "failures": []
+                  }
+                ],
+                "locations": [
+                  "$policy:/requirements/r/checks/c"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails as null when the object is null",
+        "rules": [
+          "walk.member.not_an_object"
+        ],
+        "input": {
+          "things": [
+            {
+              "statuses": null,
+              "id": "t1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "type": "thing",
+              "id": "t1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "null",
+            "inputs": [
+              {
+                "name": "statuses",
+                "value": [],
+                "locations": [],
+                "outcome": "null"
+              }
+            ],
+            "message": "statuses is null",
+            "failures": [
+              {
+                "kind": "assertion",
+                "name": "every member of statuses is \"DONE\"",
+                "cause": "null",
+                "message": "",
+                "inputs": [],
+                "failures": [
+                  {
+                    "kind": "list",
+                    "name": "statuses",
+                    "cause": "null",
+                    "message": "statuses is null",
+                    "inputs": [
+                      {
+                        "name": "statuses",
+                        "value": null,
+                        "locations": [
+                          "/things/0/statuses"
+                        ],
+                        "outcome": "null"
+                      }
+                    ],
+                    "failures": []
+                  }
+                ],
+                "locations": [
+                  "$policy:/requirements/r/checks/c"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails as value on an object with no members, as on an empty list",
+        "rules": [
+          "walk.member"
+        ],
+        "input": {
+          "things": [
+            {
+              "statuses": {},
+              "id": "t1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "type": "thing",
+              "id": "t1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "statuses",
+                "value": [],
+                "locations": [],
+                "outcome": "usable"
+              }
+            ],
+            "message": "statuses is {}",
+            "failures": [
+              {
+                "kind": "assertion",
+                "name": "every member of statuses is \"DONE\"",
+                "cause": "value",
+                "message": "",
+                "inputs": [],
+                "failures": [
+                  {
+                    "kind": "list",
+                    "name": "statuses",
+                    "cause": "value",
+                    "message": "statuses is {}",
+                    "inputs": [
+                      {
+                        "name": "statuses",
+                        "value": {},
+                        "locations": [
+                          "/things/0/statuses"
+                        ],
+                        "outcome": "usable"
+                      }
+                    ],
+                    "failures": []
+                  }
+                ],
+                "locations": [
+                  "$policy:/requirements/r/checks/c"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "every member of an object in each item of a list",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "thing",
+          "checks": {
+            "c": "every member of rs.statuses is \"DONE\""
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "names the member under the item it sits in",
+        "rules": [
+          "walk.member",
+          "message.items",
+          "row.parts"
+        ],
+        "input": {
+          "things": [
+            {
+              "rs": [
+                {
+                  "statuses": {
+                    "a": "DONE",
+                    "b": 1
+                  }
+                }
+              ],
+              "id": "t1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "type": "thing",
+              "id": "t1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "name": "rs[].statuses",
+                "value": [
+                  "DONE",
+                  1
+                ],
+                "locations": [
+                  "/things/0/rs/0/statuses/a",
+                  "/things/0/rs/0/statuses/b"
+                ],
+                "outcome": "usable"
+              }
+            ],
+            "message": "item 1 of rs: member b of statuses is 1, which isn't text",
+            "failures": [
+              {
+                "kind": "assertion",
+                "name": "every member of rs.statuses is \"DONE\"",
+                "cause": "unusable",
+                "message": "",
+                "inputs": [],
+                "failures": [
+                  {
+                    "kind": "item",
+                    "name": "item 1 of rs",
+                    "cause": "unusable",
+                    "message": "",
+                    "inputs": [],
+                    "failures": [
+                      {
+                        "kind": "item",
+                        "name": "member b of statuses",
+                        "cause": "unusable",
+                        "message": "member b of statuses is 1, which isn't text",
+                        "inputs": [
+                          {
+                            "name": "rs[0].statuses.b",
+                            "value": 1,
+                            "locations": [
+                              "/things/0/rs/0/statuses/b"
+                            ],
+                            "outcome": "unusable"
+                          }
+                        ],
+                        "failures": [],
+                        "value": 1,
+                        "locations": [
+                          "/things/0/rs/0/statuses/b"
+                        ]
+                      }
+                    ],
+                    "value": {
+                      "statuses": {
+                        "a": "DONE",
+                        "b": 1
+                      }
+                    },
+                    "locations": [
+                      "/things/0/rs/0"
+                    ]
+                  }
+                ],
+                "locations": [
+                  "$policy:/requirements/r/checks/c"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "count of member of",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "thing",
+          "checks": {
+            "c": "count of member of evidence whose kind is \"approval\" is 1"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "counts the members that pass the whose",
+        "rules": [
+          "tally.member"
+        ],
+        "input": {
+          "things": [
+            {
+              "evidence": {
+                "build-7": {
+                  "kind": "scan"
+                },
+                "sign-off": {
+                  "kind": "approval"
+                }
+              },
+              "id": "t1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "type": "thing",
+              "id": "t1"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "count of member of evidence whose kind is \"approval\"",
+                "value": 1,
+                "locations": [
+                  "/things/0/evidence/build-7",
+                  "/things/0/evidence/sign-off"
+                ]
+              },
+              {
+                "name": "evidence",
+                "value": [
+                  {
+                    "kind": "scan"
+                  },
+                  {
+                    "kind": "approval"
+                  }
+                ],
+                "locations": [
+                  "/things/0/evidence/build-7",
+                  "/things/0/evidence/sign-off"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "names each member the whose can't read",
+        "rules": [
+          "tally.member",
+          "message.items"
+        ],
+        "input": {
+          "things": [
+            {
+              "evidence": {
+                "x": {
+                  "kind": "scan"
+                },
+                "y": {},
+                "z": 3
+              },
+              "id": "t1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "type": "thing",
+              "id": "t1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "not_an_object",
+            "inputs": [
+              {
+                "name": "count of member of evidence whose kind is \"approval\"",
+                "value": null,
+                "locations": [
+                  "/things/0/evidence/x",
+                  "/things/0/evidence/y",
+                  "/things/0/evidence/z"
+                ]
+              },
+              {
+                "name": "evidence",
+                "value": [
+                  {
+                    "kind": "scan"
+                  },
+                  {},
+                  3
+                ],
+                "locations": [
+                  "/things/0/evidence/x",
+                  "/things/0/evidence/y",
+                  "/things/0/evidence/z"
+                ],
+                "outcome": "usable"
+              }
+            ],
+            "message": "member y of evidence: kind is missing; member z of evidence is 3, which isn't an object",
+            "failures": [
+              {
+                "kind": "assertion",
+                "name": "count of member of evidence whose kind is \"approval\" is 1",
+                "cause": "not_an_object",
+                "message": "",
+                "inputs": [
+                  {
+                    "name": "count of member of evidence whose kind is \"approval\"",
+                    "value": null,
+                    "locations": [
+                      "/things/0/evidence/x",
+                      "/things/0/evidence/y",
+                      "/things/0/evidence/z"
+                    ]
+                  }
+                ],
+                "failures": [
+                  {
+                    "kind": "item",
+                    "name": "member y of evidence",
+                    "cause": "absent",
+                    "message": "kind is missing",
+                    "inputs": [
+                      {
+                        "name": "evidence.y.kind",
+                        "value": null,
+                        "locations": [
+                          "/things/0/evidence/y"
+                        ],
+                        "outcome": "absent"
+                      }
+                    ],
+                    "failures": [],
+                    "value": {},
+                    "locations": [
+                      "/things/0/evidence/y"
+                    ]
+                  },
+                  {
+                    "kind": "item",
+                    "name": "member z of evidence",
+                    "cause": "not_an_object",
+                    "message": "member z of evidence is 3, which isn't an object",
+                    "inputs": [
+                      {
+                        "name": "evidence.z.kind",
+                        "value": null,
+                        "locations": [
+                          "/things/0/evidence/z"
+                        ],
+                        "outcome": "not_an_object"
+                      }
+                    ],
+                    "failures": [],
+                    "value": 3,
+                    "locations": [
+                      "/things/0/evidence/z"
+                    ]
+                  }
+                ],
+                "locations": [
+                  "$policy:/requirements/r/checks/c"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "sum of member of",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "thing",
+          "checks": {
+            "c": "sum of member of costs is at most 3"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "adds up the members and names one that isn't a number",
+        "rules": [
+          "tally.member"
+        ],
+        "input": {
+          "things": [
+            {
+              "costs": {
+                "a": 1,
+                "b": 5,
+                "c": "x"
+              },
+              "id": "t1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "type": "thing",
+              "id": "t1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "name": "sum of member of costs",
+                "value": null,
+                "locations": [
+                  "/things/0/costs/a",
+                  "/things/0/costs/b",
+                  "/things/0/costs/c"
+                ]
+              },
+              {
+                "name": "costs",
+                "value": [
+                  1,
+                  5,
+                  "x"
+                ],
+                "locations": [
+                  "/things/0/costs/a",
+                  "/things/0/costs/b",
+                  "/things/0/costs/c"
+                ],
+                "outcome": "usable"
+              }
+            ],
+            "message": "member c of costs is \"x\", which isn't a number",
+            "failures": [
+              {
+                "kind": "assertion",
+                "name": "sum of member of costs is at most 3",
+                "cause": "unusable",
+                "message": "",
+                "inputs": [
+                  {
+                    "name": "sum of member of costs",
+                    "value": null,
+                    "locations": [
+                      "/things/0/costs/a",
+                      "/things/0/costs/b",
+                      "/things/0/costs/c"
+                    ]
+                  }
+                ],
+                "failures": [
+                  {
+                    "kind": "item",
+                    "name": "member c of costs",
+                    "cause": "unusable",
+                    "message": "member c of costs is \"x\", which isn't a number",
+                    "inputs": [
+                      {
+                        "name": "costs.c",
+                        "value": "x",
+                        "locations": [
+                          "/things/0/costs/c"
+                        ],
+                        "outcome": "unusable"
+                      }
+                    ],
+                    "failures": [],
+                    "value": "x",
+                    "locations": [
+                      "/things/0/costs/c"
+                    ]
+                  }
+                ],
+                "locations": [
+                  "$policy:/requirements/r/checks/c"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "every member of on a for line",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "for": "every member of evidence whose kind is \"approval\" as e",
+              "assert": "e.status is \"COMPLETE\""
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "checks each member the whose keeps, named by its key",
+        "rules": [
+          "walk.member",
+          "message.items",
+          "row.parts"
+        ],
+        "input": {
+          "things": [
+            {
+              "evidence": {
+                "build-7": {
+                  "kind": "scan"
+                },
+                "sign-off": {
+                  "kind": "approval",
+                  "status": "PENDING"
+                }
+              },
+              "id": "t1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "type": "thing",
+              "id": "t1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "evidence",
+                "value": [
+                  {
+                    "kind": "scan"
+                  },
+                  {
+                    "kind": "approval",
+                    "status": "PENDING"
+                  }
+                ],
+                "locations": [
+                  "/things/0/evidence/build-7",
+                  "/things/0/evidence/sign-off"
+                ],
+                "outcome": "usable"
+              }
+            ],
+            "message": "member sign-off of evidence: e.status is \"PENDING\"",
+            "failures": [
+              {
+                "kind": "assertion",
+                "name": "e.status is \"COMPLETE\"",
+                "cause": "value",
+                "message": "",
+                "inputs": [],
+                "failures": [
+                  {
+                    "kind": "item",
+                    "name": "member sign-off of evidence",
+                    "cause": "value",
+                    "message": "e.status is \"PENDING\"",
+                    "inputs": [
+                      {
+                        "name": "e.status",
+                        "value": "PENDING",
+                        "locations": [
+                          "/things/0/evidence/sign-off/status"
+                        ],
+                        "outcome": "usable"
+                      }
+                    ],
+                    "failures": [],
+                    "value": {
+                      "kind": "approval",
+                      "status": "PENDING"
+                    },
+                    "locations": [
+                      "/things/0/evidence/sign-off"
+                    ]
+                  }
+                ],
+                "locations": [
+                  "$policy:/requirements/r/checks/c/assert"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable when the path ends at a value that isn't an object",
+        "rules": [
+          "walk.member.not_an_object"
+        ],
+        "input": {
+          "things": [
+            {
+              "evidence": [
+                {
+                  "kind": "approval"
+                }
+              ],
+              "id": "t1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "type": "thing",
+              "id": "t1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "name": "evidence",
+                "value": [],
+                "locations": [],
+                "outcome": "unusable"
+              }
+            ],
+            "message": "evidence is [{\"kind\": \"approval\"}], which isn't an object",
+            "failures": [
+              {
+                "kind": "list",
+                "name": "evidence",
+                "cause": "unusable",
+                "message": "evidence is [{\"kind\": \"approval\"}], which isn't an object",
+                "inputs": [
+                  {
+                    "name": "evidence",
+                    "value": [
+                      {
+                        "kind": "approval"
+                      }
+                    ],
+                    "locations": [
+                      "/things/0/evidence"
+                    ],
+                    "outcome": "unusable"
+                  }
+                ],
+                "failures": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "every member of as the second item of a for line",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "for": "every records as r, every member of r.evidence as e",
+              "assert": "e.status is \"COMPLETE\""
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "names the member under the item of the first list",
+        "rules": [
+          "walk.member",
+          "message.items",
+          "row.parts"
+        ],
+        "input": {
+          "things": [
+            {
+              "records": [
+                {
+                  "evidence": {
+                    "x": {
+                      "status": "NO"
+                    }
+                  }
+                }
+              ],
+              "id": "t1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "type": "thing",
+              "id": "t1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "r.evidence",
+                "value": [
+                  {
+                    "status": "NO"
+                  }
+                ],
+                "locations": [
+                  "/things/0/records/0/evidence/x"
+                ],
+                "outcome": "usable"
+              },
+              {
+                "name": "records[]",
+                "value": [
+                  {
+                    "evidence": {
+                      "x": {
+                        "status": "NO"
+                      }
+                    }
+                  }
+                ],
+                "locations": [
+                  "/things/0/records/0"
+                ],
+                "outcome": "usable"
+              }
+            ],
+            "message": "item 1 of records: member x of r.evidence: e.status is \"NO\"",
+            "failures": [
+              {
+                "kind": "assertion",
+                "name": "e.status is \"COMPLETE\"",
+                "cause": "value",
+                "message": "",
+                "inputs": [],
+                "failures": [
+                  {
+                    "kind": "item",
+                    "name": "item 1 of records",
+                    "cause": "value",
+                    "message": "",
+                    "inputs": [],
+                    "failures": [
+                      {
+                        "kind": "item",
+                        "name": "member x of r.evidence",
+                        "cause": "value",
+                        "message": "e.status is \"NO\"",
+                        "inputs": [
+                          {
+                            "name": "e.status",
+                            "value": "NO",
+                            "locations": [
+                              "/things/0/records/0/evidence/x/status"
+                            ],
+                            "outcome": "usable"
+                          }
+                        ],
+                        "failures": [],
+                        "value": {
+                          "status": "NO"
+                        },
+                        "locations": [
+                          "/things/0/records/0/evidence/x"
+                        ]
+                      }
+                    ],
+                    "value": {
+                      "evidence": {
+                        "x": {
+                          "status": "NO"
+                        }
+                      }
+                    },
+                    "locations": [
+                      "/things/0/records/0"
+                    ]
+                  }
+                ],
+                "locations": [
+                  "$policy:/requirements/r/checks/c/assert"
+                ]
+              }
+            ]
           }
         ]
       }

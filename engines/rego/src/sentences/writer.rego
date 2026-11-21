@@ -28,7 +28,7 @@ _s_assertion_text(a) := concat(" ", [_s_quantified_text(a), _s_phrase_text(a.phr
 
 _s_assertion_text(a) := concat(" ", [concat("", [_s_left_text(a), _s_where_text(a)]), _s_phrase_text(a.phrase)]) if _s_quantifier_of(a) == ""
 
-_s_quantified_text(a) := concat("", [_s_quantifier_of(a), " ", _s_distinct_text(a), _s_path_text(a[_s_quantifier_of(a)], "left"), _s_where_text(a), _s_if_any_text(a)])
+_s_quantified_text(a) := concat("", [_s_quantifier_of(a), " ", _s_distinct_text(a), _s_member_text(a), _s_path_text(a[_s_quantifier_of(a)], "left"), _s_where_text(a), _s_if_any_text(a)])
 
 _s_quantifier_of(a) := "every" if "every" in object.keys(a)
 
@@ -56,7 +56,7 @@ _s_itself(p) if object.get(p, "that", false) == true
 
 _s_cond_body(c) := concat(" ", [_s_left_text(c), _s_phrase_text(c.phrase)]) if _s_quantifier_of(c) == ""
 
-_s_cond_body(c) := concat(" ", [concat("", [_s_quantifier_of(c), " ", _s_distinct_text(c), _s_path_text(c[_s_quantifier_of(c)], "left"), _s_if_any_text(c)]), _s_phrase_text(c.phrase)]) if _s_quantifier_of(c) in _quantifier_words
+_s_cond_body(c) := concat(" ", [concat("", [_s_quantifier_of(c), " ", _s_distinct_text(c), _s_member_text(c), _s_path_text(c[_s_quantifier_of(c)], "left"), _s_if_any_text(c)]), _s_phrase_text(c.phrase)]) if _s_quantifier_of(c) in _quantifier_words
 
 _s_left_text(c) := _s_path_text(c.path, "left") if "path" in object.keys(c)
 
@@ -66,12 +66,12 @@ _s_terms_text(terms) := concat(" plus ", [_s_term_text(t) | some t in terms])
 
 _s_term_text(t) := _json_text(t) if is_number(t)
 
-_s_term_text(t) := concat("", ["count of ", _s_distinct_text(t), _s_path_text(t.count, "left")]) if {
+_s_term_text(t) := concat("", ["count of ", _s_distinct_text(t), _s_member_text(t), _s_path_text(t.count, "left")]) if {
 	is_object(t)
 	"count" in object.keys(t)
 }
 
-_s_term_text(t) := concat("", ["sum of ", _s_distinct_text(t), _s_path_text(t.sum, "left")]) if {
+_s_term_text(t) := concat("", ["sum of ", _s_distinct_text(t), _s_member_text(t), _s_path_text(t.sum, "left")]) if {
 	is_object(t)
 	"sum" in object.keys(t)
 }
