@@ -2794,3 +2794,60 @@ fn an_item_that_reaches_a_missing_or_null_on_the_way_to_its_end_is_said_to_miss_
         "item 1 of items: m is 1, which isn't an object"
     );
 }
+
+fn faults_of(sentence: &str, input: Value) -> Vec<(Cause, String)> {
+    let Check::Tally(tally) = lowered(sentence) else {
+        panic!("{sentence} is not a count or a sum");
+    };
+    let ctx = Ctx {
+        label: None,
+        item_by_item: false,
+        subject: Located {
+            value: &input["things"][0],
+            location: Location::input_root().key("things").index(0),
+        },
+        input: &input,
+        params: None,
+        aliases: BTreeMap::new(),
+    };
+    let path = tally.counted_paths()[0].clone();
+    counted_faults(&tally, &path, &ctx)
+}
+
+#[test]
+fn a_counted_list_that_cannot_be_read_is_a_fault_of_its_path() {
+    assert_eq!(
+        faults_of("count of xs whose v is 1 is 2", json!({"things": [{}]})),
+        [(Cause::Absent, "xs is missing".to_string())]
+    );
+    assert_eq!(
+        faults_of(
+            "count of xs whose v is 1 is 2",
+            json!({"things": [{"xs": null}]})
+        ),
+        [(Cause::Null, "xs is null".to_string())]
+    );
+    assert!(
+        faults_of(
+            "count of xs whose v is 1 is 2",
+            json!({"things": [{"xs": [{"v": 1}]}]})
+        )
+        .is_empty()
+    );
+}
+
+#[test]
+fn the_refs_a_whose_walks_are_the_refs_the_count_walks() {
+    let walking = |sentence: &str| -> Vec<String> {
+        lowered(sentence)
+            .walking_refs()
+            .iter()
+            .map(crate::name::name)
+            .collect()
+    };
+    assert_eq!(
+        walking("count of xs whose v is in $input.rs.k is 2"),
+        ["$input.rs.k"]
+    );
+    assert!(walking("count of xs whose v is 1 is 2").is_empty());
+}
