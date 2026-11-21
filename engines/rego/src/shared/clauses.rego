@@ -80,3 +80,91 @@ _clause_quotes_shut(s) if count(split(replace(replace(s, "\\\\", ""), "\\\"", ""
 _clause_last_cut(ends, n) := ends if ends[count(ends) - 1] == n
 
 else := array.concat(ends, [n])
+
+_m_clause(kind, name, cause, text) := {"kind": kind, "name": name, "cause": cause, "text": text, "said": []}
+
+_m_item_clause(name, cause, said) := {"kind": "item", "name": name, "cause": cause, "text": "", "said": said}
+
+_m_clause_more(n) := {"kind": "more", "count": n, "name": "", "cause": "value", "text": "", "said": []}
+
+_m_clauses_shown(clauses) := array.concat(_m_clauses_ahead(once), items) if {
+	once := _once(clauses)
+	items := [c | some c in once; c.kind == "item"]
+	count(_m_clause_counted_names(_m_clause_units(items))) <= 3
+}
+
+_m_clauses_shown(clauses) := array.concat(array.concat(_m_clauses_ahead(once), [u.clause | some u in pieces; _m_clause_kept(u, pieces, kept)]), [_m_clause_more(count(names) - 3)]) if {
+	once := _once(clauses)
+	pieces := _m_clause_units([c | some c in once; c.kind == "item"])
+	names := _m_clause_counted_names(pieces)
+	count(names) > 3
+	kept := {n | some n in array.slice(names, 0, 3)}
+}
+
+_m_clause_counted_names(pieces) := _once([u.clause.name | some u in pieces; u.counted])
+
+_m_clause_kept(u, _, kept) if {
+	u.counted
+	u.clause.name in kept
+}
+
+_m_clause_kept(u, pieces, kept) if {
+	not u.counted
+	under := array.slice(u.key, 0, count(u.key) - 1)
+	some p in pieces
+	p.counted
+	p.clause.name in kept
+	array.slice(p.key, 0, count(under)) == under
+}
+
+_m_clauses_ahead(once) := [c | some i, c in ahead; not c.text in {a.text | some a in array.slice(ahead, 0, i)}] if {
+	ahead := array.concat(
+		[x[3] | some x in sort([[object.get(_m_clause_ranks, c.cause, 6), c.name, c.text, c] | some c in once; c.kind == "root"])],
+		[c | some c in once; c.kind == "list"],
+	)
+}
+
+_m_clause_ranks := {"not_an_object": 1, "ambiguous": 2, "unusable": 3, "absent": 4, "null": 5}
+
+_m_clauses_text(clauses) := concat("; ", [t | some c in clauses; some t in _m_clause_lines(c)])
+
+_m_clause_lines(c) := [c.text] if c.kind in {"root", "list"}
+
+_m_clause_lines(c) := [concat("", ["and ", _literal_text(c.count), " more"])] if c.kind == "more"
+
+_m_clause_lines(c) := [_m_clause_unit_text(u.clause) | some u in _m_clause_units([c])] if c.kind == "item"
+
+_m_clause_unit_text(c) := c.text if c.said == []
+
+_m_clause_unit_text(c) := concat(": ", [c.name, concat(", and ", [s.text | some s in c.said])]) if c.said != []
+
+_m_clause_units(items) := [x[1] | some x in sort([[u.key, u] | some t, c in items; some u in _m_clause_item_units(t, c)])]
+
+_m_clause_item_units(t, c) := {u |
+	nodes := {p: v | walk(c, [p, v]); _m_clause_item_node(v)}
+	some p, n in nodes
+	some u in _m_clause_node_units(array.concat([t], p), [nodes[q].name | some k in numbers.range(0, count(p)); k < count(p); k % 2 == 0; q := array.slice(p, 0, k)], n)
+}
+
+_m_clause_item_node(v) if {
+	is_object(v)
+	v.kind == "item"
+}
+
+_m_clause_node_units(key, lead, n) := array.concat(
+	[{"key": key, "counted": true, "clause": _m_clause("item", name, n.cause, concat(": ", array.concat(lead, [n.text])))} | n.text != ""],
+	[{"key": array.concat(key, ["said", i]), "counted": _m_clause_leaf(n), "clause": _m_item_clause(name, n.cause, run)} | some [i, run] in _m_clause_runs(n.said)],
+) if name := concat(": ", array.concat(lead, [n.name]))
+
+_m_clause_leaf(n) := false if {
+	some c in n.said
+	c.kind == "item"
+} else := true
+
+_m_clause_runs(said) := [[i, array.slice(said, i, _m_clause_run_end(said, i))] | some i, c in said; c.kind != "item"; _m_clause_run_start(said, i)]
+
+_m_clause_run_start(_, 0)
+
+_m_clause_run_start(said, i) if said[i - 1].kind == "item"
+
+_m_clause_run_end(said, i) := min({j | some j, c in said; j > i; c.kind == "item"} | {count(said)})
