@@ -134,6 +134,7 @@ test_the_ids_message_keeps_each_text_once_in_the_order_it_first_comes_like_the_o
 test_two_clauses_about_one_item_of_a_min_subjects_row_join_as_any_two_problems_do if {
 	own := [{"kind": "item", "name": "item 1 of records", "cause": "unusable", "inputs": [], "failures": [], "message": "evidence.a is an object"}, {"kind": "item", "name": "item 1 of records", "cause": "unusable", "inputs": [], "failures": [], "message": "evidence.b is text"}]
 	ergo._ms_join(own, [], []).message == "evidence.a is an object; evidence.b is text"
+	ergo._ms_join2(own, [], []).message == "evidence.a is an object; evidence.b is text"
 }
 
 test_a_note_about_a_value_not_in_a_list_item_reads_that_value_as_usable if {
