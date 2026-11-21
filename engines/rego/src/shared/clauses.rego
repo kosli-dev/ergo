@@ -93,10 +93,10 @@ _m_clauses_shown(clauses) := array.concat(_m_clauses_ahead(once), items) if {
 	count([u | some u in _m_clause_units(items); u.counted]) <= 3
 }
 
-_m_clauses_shown(clauses) := array.concat(array.concat(_m_clauses_ahead(once), [u.clause | some u in units; _m_clause_kept(u, kept)]), [_m_clause_more(count(counted) - 3)]) if {
+_m_clauses_shown(clauses) := array.concat(array.concat(_m_clauses_ahead(once), [u.clause | some u in pieces; _m_clause_kept(u, kept)]), [_m_clause_more(count(counted) - 3)]) if {
 	once := _once(clauses)
-	units := _m_clause_units([c | some c in once; c.kind == "item"])
-	counted := [u.key | some u in units; u.counted]
+	pieces := _m_clause_units([c | some c in once; c.kind == "item"])
+	counted := [u.key | some u in pieces; u.counted]
 	count(counted) > 3
 	kept := array.slice(counted, 0, 3)
 }
