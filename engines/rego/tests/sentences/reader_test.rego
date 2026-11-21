@@ -211,3 +211,34 @@ test_ignoring_is_a_word_of_the_grammar if {
 	not ergo._s_word("status")
 	not "ignoring" in ergo._s_words
 }
+
+test_every_member_of_reads_the_members_at_the_end_of_a_from_line if {
+	ergo._from_line(`every member of record.evidence`) == {"every": true, "member": true, "path": {"steps": ["record", "evidence"]}}
+	ergo._from_line(`every  member  of x whose k is 1`) == {"every": true, "member": true, "path": {"steps": ["x"]}, "where": [{"path": {"steps": ["k"]}, "phrase": {"op": "is", "value": 1}}]}
+	ergo._s_from_line_text(ergo._from_line(`every  member  of record.evidence whose kind is "a"`)) == `every member of record.evidence whose kind is "a"`
+}
+
+test_a_field_called_member_still_reads_as_a_field if {
+	ergo._from_line(`every member.x`) == {"every": true, "path": {"steps": ["member", "x"]}}
+	ergo._from_line(`every member of member`) == {"every": true, "member": true, "path": {"steps": ["member"]}}
+	ergo._from_line(`member`) == {"path": {"steps": ["member"]}}
+}
+
+test_member_of_without_every_or_with_distinct_still_reads_so_a_rule_can_name_it if {
+	ergo._from_line(`member of x`) == {"member": true, "path": {"steps": ["x"]}}
+	ergo._from_line(`every distinct member of x`) == {"every": true, "distinct": true, "member": true, "path": {"steps": ["x"]}}
+	ergo._s_from_line_text(ergo._from_line(`every distinct member of x`)) == `every distinct member of x`
+}
+
+test_every_member_of_anywhere_but_the_start_of_a_from_line_says_it_only_goes_there if {
+	said := ["every member of only goes on a from line for now"]
+	ergo._sentence(`every member of xs is 1`).problems == said
+	ergo._sentence(`some member of xs.y exists`).problems == said
+	ergo._sentence(`count of member of xs is 1`).problems == said
+	ergo._sentence(`sum of member of xs is 1`).problems == said
+	ergo._sentence(`every distinct member of xs is 1`).problems == said
+	ergo._sentence(`x is count of member of xs`).problems == said
+	ergo._for_line(`every member of xs as m`).problems == said
+	ergo._from_line(`xs whose every member of t is 1`).problems == said
+	ergo._from_line(`every member of xs whose some member of t is 1`).problems == said
+}

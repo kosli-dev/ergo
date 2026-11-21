@@ -19,3 +19,16 @@ test_a_subject_that_narrows_a_child_descends_from_the_childs_parent if {
 	})
 	parts.descend == {"b": "art", "nb": "art", "nnb": "art", "c": "nnb"}
 }
+
+test_every_member_of_a_subjects_name_is_a_child_and_never_narrows_it if {
+	fl := {"every": true, "member": true, "path": {"steps": ["rec"]}}
+	subjects := {"rec": {"from": "records"}, "m": {"from": "every member of rec"}}
+	ergo._s_descends("m", fl, subjects)
+	not ergo._s_narrows("m", fl, subjects)
+	ergo._s_every_unsupported("m", fl, subjects) == set()
+}
+
+test_member_of_goes_after_every_and_never_with_distinct if {
+	ergo._s_every_unsupported("a", {"member": true, "path": {"steps": ["x"]}}, {}) == {`on a from line, member of goes after every, like "every member of record.evidence"`}
+	ergo._s_every_unsupported("b", {"every": true, "distinct": true, "member": true, "path": {"steps": ["x"]}}, {}) == {"distinct can't go with every member of"}
+}
