@@ -362,7 +362,11 @@ fn every_member_of_a_subjects_name_is_a_child_that_reads_the_members_of_each_par
     ));
     assert_eq!(
         r.lowered("m").unwrap().from_text,
-        "every member of rec whose kind is \"approval\""
+        "every member of rec"
+    );
+    assert_eq!(
+        r.lowered("t").unwrap().from_text,
+        "every member of records.evidence"
     );
 }
 
