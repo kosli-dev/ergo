@@ -44,12 +44,13 @@ test_a_list_after_is_in_ignoring_case_in_a_one_line_every_is_a_root_read_before_
 	ergo._walk_root_flaw(every_field, {"xs": [], "ys": ["a", null]}) == "null"
 	ergo._walk_root_flaw(every_field, {"xs": [], "ys": [1, "a"]}) == "unusable"
 	ergo._walk_root_flaw(every_field, {"xs": [], "ys": ["a"]}) == ""
-	ergo._walk_root_flaw(object.union(every_field, {"check": object.remove(field, ["ignoring"])}), {"xs": [], "ys": ["a", null]}) == ""
+	ergo._walk_root_flaw(object.union(object.remove(every_field, ["check"]), {"check": object.remove(field, ["ignoring"])}), {"xs": [], "ys": ["a", null]}) == ""
 	ergo._walk_root_msgs(every_field, {"xs": [], "ys": ["a", null]}) == ["item 2 of ys is null"]
 	ergo._walk_root_msgs(every_field, {"xs": [], "ys": [1, "a"]}) == ["item 1 of ys is 1, which isn't text"]
 	ergo._items_judged_alone({"xs": [], "ys": [3]}, every_field)
 	not ergo._items_judged_alone({"xs": [], "ys": ["a"]}, every_field)
-	ergo._whose_alone({"xs": [], "ys": [3]}, every_field).check == {"op": "compare", "cmp": "eq", "left": ["x"], "right": ["x"], "ignoring": "case"}
+	ergo._whose_alone({"xs": [], "ys": [3]}, every_field).check == {"op": "in", "path": ["x"], "values": [""], "ignoring": "case"}
+	ergo._whose_alone({"xs": [], "ys": [3]}, object.union(every_field, {"check": {"cmp": "not_in"}})).check == {"op": "in", "path": ["x"], "values": [""], "ignoring": "case"}
 	ref := {"op": "in", "path": ["x"], "values": {"ref": ["$$params[]", "l"]}, "ignoring": "case"}
 	every_ref := {"op": "every", "path": ["xs", "x"], "check": ref, "whose": [], "if_any": true}
 	ergo._walk_root_flaw(every_ref, {"xs": []}) == "null" with data.ergo_params as {"l": [null]}
