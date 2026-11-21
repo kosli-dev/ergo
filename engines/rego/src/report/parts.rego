@@ -1460,7 +1460,7 @@ else := null if kept == []
 
 else := [_worst_of({_tally_clause_cause(c, r[0]) | some c in kept}), concat("", [lead, concat("; ", kept)]), r[2]]
 
-_tally_clause_cause(c, state) := _tally_word_cause(c, _tally_record_cause(state))
+_tally_clause_cause(c, state) := _tally_word_cause(c, _m_src_cause(state))
 
 _tally_word_cause(c, _) := "absent" if endswith(c, " is missing")
 
@@ -1495,10 +1495,6 @@ _tally_record_entry([state, text, src], _, w, roots, at, _) := _tally_leveled(_e
 }
 
 _tally_key_read(src, w) := {"name": _input_name(array.concat(src.key.c, src.flaw.prefix)), "value": _key_list_value(src.flaw.value), "locations": [_item_read_at(w, src.key, array.concat(object.get(src.key, "r", []), src.flaw.prefix))], "outcome": _key_flaw_outcome(src.flaw, src.steps)}
-
-_tally_record_cause(state) := substring(state, 6, -1) if startswith(state, "focus ")
-
-else := state
 
 _tally_item_entry(e, cause, text, side, w, roots, subj) := object.union(
 	_entry("item", _m_item_name(e.i, roots), cause, _tally_item_reads(e, cause, side, w, text, subj), [], text),
