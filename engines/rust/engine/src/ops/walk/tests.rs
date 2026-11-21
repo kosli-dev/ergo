@@ -1592,3 +1592,37 @@ fn an_item_that_isnt_a_time_says_so_beside_a_time_root_that_cant_be_read() {
         }
     }
 }
+
+#[test]
+fn an_item_a_that_root_leaves_undecided_still_says_what_the_phrase_cant_use_in_its_own_value() {
+    assert_eq!(
+        judged(
+            "every items.v that is on or after $params.x is 1",
+            json!([{"v": "2024-01-01T00:00:00Z"}, {"v": 2}]),
+            json!({"x": null}),
+        ),
+        vec![
+            Some((
+                Cause::Unusable,
+                "item 1 of items: v is \"2024-01-01T00:00:00Z\", which isn't a number".to_string()
+            )),
+            Some((
+                Cause::Unusable,
+                "item 2 of items: v is 2, which isn't a time written like \"1970-01-01T00:00:00Z\""
+                    .to_string()
+            )),
+        ]
+    );
+}
+
+#[test]
+fn an_item_a_whose_that_doesnt_read_it_leaves_undecided_says_nothing_of_its_own() {
+    assert_eq!(
+        judged(
+            "every items.b whose $params.z is 1 exists",
+            json!([{"b": 1}, null, {"b": "s"}]),
+            json!({}),
+        ),
+        vec![None, None, None]
+    );
+}
