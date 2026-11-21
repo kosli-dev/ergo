@@ -2592,3 +2592,90 @@ fn a_sum_says_the_items_that_are_not_numbers_and_not_the_walked_root_that_reads_
         "item 1 of xs: n is \"s\", which isn't a number"
     );
 }
+
+fn all_items(sentence: &str, items: Value, params: Value, cause: Cause, said: Said) -> String {
+    let check = lowered(sentence);
+    let Check::Tally(tally) = &check else {
+        panic!("{sentence} is not a count or a sum");
+    };
+    let input = json!({"things": [{"items": items}]});
+    let ctx = Ctx {
+        label: None,
+        item_by_item: false,
+        subject: Located {
+            value: &input["things"][0],
+            location: Location::input_root().key("things").index(0),
+        },
+        input: &input,
+        params: Some(&params),
+        aliases: BTreeMap::new(),
+    };
+    super::super::message::said_text(&with_all_items(tally, &ctx, cause, said))
+}
+
+#[test]
+fn a_row_that_is_not_failing_gets_no_items_added_to_what_it_says() {
+    assert_eq!(
+        all_items(
+            "count of items whose v is 1 is $params.n",
+            json!([{}]),
+            json!({}),
+            Cause::Satisfied,
+            Vec::new(),
+        ),
+        ""
+    );
+    assert_eq!(
+        all_items(
+            "count of items whose v is 1 is $params.n",
+            json!([{}]),
+            json!({}),
+            Cause::Absent,
+            Vec::new(),
+        ),
+        "item 1 of items: v is missing"
+    );
+}
+
+#[test]
+fn params_that_are_a_list_are_said_first_when_the_count_reads_them_whole() {
+    assert_eq!(
+        all_items(
+            "count of $params is 1",
+            json!([]),
+            json!([1, 2]),
+            Cause::Unusable,
+            Vec::new(),
+        ),
+        "$params is [1, 2], which isn't an object; $params is [1, 2], which isn't an object"
+    );
+}
+
+#[test]
+fn params_that_are_a_list_are_not_said_again_when_the_row_already_says_them() {
+    let params = "$params is [1, 2], which isn't an object";
+    assert_eq!(
+        all_items(
+            "count of $params is 1",
+            json!([]),
+            json!([1, 2]),
+            Cause::Unusable,
+            vec![vec![Piece::Said(params.to_string())]],
+        ),
+        format!("{params}; {params}")
+    );
+}
+
+#[test]
+fn params_that_are_a_list_are_not_said_first_when_the_count_reads_a_key_of_them() {
+    assert_eq!(
+        all_items(
+            "count of $params.xs is 1",
+            json!([]),
+            json!([1, 2]),
+            Cause::Unusable,
+            Vec::new(),
+        ),
+        "$params is [1, 2], which isn't an object"
+    );
+}
