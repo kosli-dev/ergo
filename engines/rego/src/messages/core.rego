@@ -141,11 +141,9 @@ _m_plural(v) := "objects" if is_object(v)
 
 _m_is(name, v) := concat("", [name, " is ", _m_print_at(v, name, null)])
 
-_m_isnt(name, v, kind) := _m_text_items(name, v) if kind == _m_text_items_kind
+_m_isnt(name, v, kind) := _m_text_items(name, v) if kind == _text_items_kind
 
 else := concat("", [name, " is ", _m_print_at(v, name, null), ", which isn't ", kind])
-
-_m_text_items_kind := "text in every item"
 
 _m_text_items(name, v) := concat("; ", [_m_text_item(concat("", ["item ", format_int(i + 1, 10), " of ", name]), x) |
 	some i, x in v

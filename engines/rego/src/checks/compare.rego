@@ -344,6 +344,12 @@ _text_items_state(r) := "unusable" if {
 	v == null
 }
 
+_text_items_kind := "text in every item"
+
+_text_list_kind(r) := "a list" if not is_array(r)
+
+else := _text_items_kind if _text_items_state(r) == "unusable"
+
 _list_flawed(leaf, x) if count(_list_flaw(leaf, x)) > 0
 
 _list_right_usable(cmp, r) if {

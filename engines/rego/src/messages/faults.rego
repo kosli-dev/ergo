@@ -334,7 +334,7 @@ _m_ref_list_fault(check) := [[check.values, k]] if {
 	check.ignoring
 	_is_ref(check.values)
 	_ref_state(check.values.ref) == "value"
-	k := _m_text_list_kind(_ref_shown(check.values.ref))
+	k := _text_list_kind(_ref_shown(check.values.ref))
 } else := [[check[f], _m_right_kind(cmp, v)]] if {
 	not check.ignoring
 	some f in _list_argument_keys
@@ -423,7 +423,7 @@ _m_list_right(subj, check) := [[check.right, k]] if {
 	check.ignoring
 	_lstate(check, subj) == "value"
 	not _lfailed(check, subj)
-	k := _m_text_list_kind(_lvalue(check, subj))
+	k := _text_list_kind(_lvalue(check, subj))
 } else := [[check.right, _m_right_kind(check.cmp, r)]] if {
 	not check.ignoring
 	_lstate(check, subj) == "value"
@@ -586,7 +586,3 @@ _m_side_kind(subj, check, side) := _m_kind(o) if {
 }
 
 _m_fits_kind(v, k) if _m_kind(v) == k
-
-_m_text_list_kind(r) := "a list" if not is_array(r)
-
-else := _m_text_items_kind if _text_items_state(r) == "unusable"

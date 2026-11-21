@@ -110,7 +110,7 @@ _m_for_root_text(subj, c, p, st) := f.msg if {
 	f := _tally_root_fault(subj, c, p)
 } else := _m_isnt(_root_label(p), _root_value(subj, p), k) if k := _root_kind(subj, c, p)
 
-else := _m_text_items(_root_label(p), v) if {
+else := _m_isnt(_root_label(p), v, _text_items_kind) if {
 	_text_list_root(c, p)
 	v := _root_value(subj, p)
 	_text_items_state(v) == st
@@ -216,7 +216,7 @@ _root_state(subj, c, p, lists) := "not_an_object" if {
 	_has_field_step(p)
 } else := _root_list_state(subj, p, lists)
 
-_root_kind(subj, c, p) := _m_text_list_kind(_root_value(subj, p)) if {
+_root_kind(subj, c, p) := _text_list_kind(_root_value(subj, p)) if {
 	_text_list_root(c, p)
 } else := "text" if {
 	c.ignoring
