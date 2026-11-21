@@ -66,3 +66,20 @@ test_a_tally_of_member_of_walks_each_member_of_the_object_as_an_item if {
 	[e.v | some e in w.items] == [1, 5]
 	[e.i | some e in w.items] == [["costs", {"member": "a"}], ["costs", {"member": "b"}]]
 }
+
+_min_said(sentence, subj) := {"cause": r.cause, "message": ergo._m_walk_outcome(check, subj, r).message} if {
+	check := ergo._s_written_check(sentence)
+	r := ergo._walk_row(check, subj)
+}
+
+test_a_root_after_the_phrase_is_said_first_beside_items_that_fail_on_their_own_and_the_row_takes_the_worst_cause if {
+	five := {"xs": [{}, {}, {}, {}, {}]}
+	_min_said("every xs.v is at least $params.min", five) == {"cause": "unusable", "message": "$params.min is \"s\", which isn't a number; item 1 of xs: v is missing; item 2 of xs: v is missing; item 3 of xs: v is missing; and 2 more"} with input as {"ergo/names": {"ergo/subject": five}} with data.ergo_params as {"min": "s"}
+	two := {"xs": [{}, {}]}
+	_min_said("some xs.v is at least $params.min", two) == {"cause": "unusable", "message": "$params.min is \"s\", which isn't a number; item 1 of xs: v is missing; item 2 of xs: v is missing"} with input as {"ergo/names": {"ergo/subject": two}} with data.ergo_params as {"min": "s"}
+	mixed := {"xs": [{"v": null}, {"v": 1}]}
+	_min_said("every xs.v is at least $params.min", mixed) == {"cause": "unusable", "message": "$params.min is \"s\", which isn't a number; item 1 of xs: v is null"} with input as {"ergo/names": {"ergo/subject": mixed}} with data.ergo_params as {"min": "s"}
+	odd := {"xs": [1, {}]}
+	_min_said("every xs.v is at least $params.min", odd) == {"cause": "not_an_object", "message": "$params.min is \"s\", which isn't a number; item 1 of xs is 1, which isn't an object; item 2 of xs: v is missing"} with input as {"ergo/names": {"ergo/subject": odd}} with data.ergo_params as {"min": "s"}
+	_min_said("every xs.v is at least $params.min", {}) == {"cause": "unusable", "message": "$params.min is \"s\", which isn't a number; xs is missing"} with input as {"ergo/names": {"ergo/subject": {}}} with data.ergo_params as {"min": "s"}
+}
