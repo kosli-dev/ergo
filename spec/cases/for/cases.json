@@ -108597,5 +108597,124 @@
           ]
         }
       ]
-    }
+    },
+  {
+    "description": "the roots of the line's own whose come before the roots of its sentences, whatever their causes",
+    "params": {
+      "a": "s"
+    },
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "for": "every xs whose v is at least $params.min as x",
+              "assert": "x.w is at least $params.a"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "$params.min is missing and says first, though $params.a has the worse cause",
+        "rules": [
+          "for.roots",
+          "problems.item_order"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t",
+              "xs": [
+                {
+                  "v": 1,
+                  "w": 1
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c/assert"
+                ],
+                "message": "$params.a is \"s\", which isn't a number",
+                "name": "x.w is at least $params.a"
+              },
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/xs/0"
+                    ],
+                    "name": "xs[]",
+                    "outcome": "usable",
+                    "value": [
+                      {
+                        "v": 1,
+                        "w": 1
+                      }
+                    ]
+                  }
+                ],
+                "kind": "list",
+                "message": "$params.min is missing",
+                "name": "xs"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/a"
+                ],
+                "name": "$params.a",
+                "outcome": "unusable",
+                "value": "s"
+              },
+              {
+                "locations": [
+                  "/things/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "v": 1,
+                    "w": 1
+                  }
+                ]
+              }
+            ],
+            "message": "$params.min is missing; $params.a is \"s\", which isn't a number",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  }
 ]
