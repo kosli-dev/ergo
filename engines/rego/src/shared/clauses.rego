@@ -90,14 +90,27 @@ _m_clause_more(n) := {"kind": "more", "count": n, "name": "", "cause": "value", 
 _m_clauses_shown(clauses) := array.concat(_m_clauses_ahead(once), items) if {
 	once := _once(clauses)
 	items := [c | some c in once; c.kind == "item"]
-	count(_m_clause_units(items)) <= 3
+	count([u | some u in _m_clause_units(items); u.counted]) <= 3
 }
 
-_m_clauses_shown(clauses) := array.concat(array.concat(_m_clauses_ahead(once), [u.clause | some u in units; u.key in kept]), [_m_clause_more(count(units) - 3)]) if {
+_m_clauses_shown(clauses) := array.concat(array.concat(_m_clauses_ahead(once), [u.clause | some u in units; _m_clause_kept(u, kept)]), [_m_clause_more(count(counted) - 3)]) if {
 	once := _once(clauses)
 	units := _m_clause_units([c | some c in once; c.kind == "item"])
-	count(units) > 3
-	kept := [u.key | some u in array.slice(units, 0, 3)]
+	counted := [u.key | some u in units; u.counted]
+	count(counted) > 3
+	kept := array.slice(counted, 0, 3)
+}
+
+_m_clause_kept(u, kept) if {
+	u.counted
+	u.key in kept
+}
+
+_m_clause_kept(u, kept) if {
+	not u.counted
+	under := array.slice(u.key, 0, count(u.key) - 1)
+	some k in kept
+	array.slice(k, 0, count(under)) == under
 }
 
 _m_clauses_ahead(once) := array.concat(
@@ -133,9 +146,14 @@ _m_clause_item_node(v) if {
 }
 
 _m_clause_node_units(key, lead, n) := array.concat(
-	[{"key": key, "clause": _m_clause("item", name, n.cause, concat(": ", array.concat(lead, [n.text])))} | n.text != ""],
-	[{"key": array.concat(key, ["said", i]), "clause": _m_item_clause(name, n.cause, run)} | some [i, run] in _m_clause_runs(n.said)],
+	[{"key": key, "counted": true, "clause": _m_clause("item", name, n.cause, concat(": ", array.concat(lead, [n.text])))} | n.text != ""],
+	[{"key": array.concat(key, ["said", i]), "counted": _m_clause_leaf(n), "clause": _m_item_clause(name, n.cause, run)} | some [i, run] in _m_clause_runs(n.said)],
 ) if name := concat(": ", array.concat(lead, [n.name]))
+
+_m_clause_leaf(n) := false if {
+	some c in n.said
+	c.kind == "item"
+} else := true
 
 _m_clause_runs(said) := [[i, array.slice(said, i, _m_clause_run_end(said, i))] | some i, c in said; c.kind != "item"; _m_clause_run_start(said, i)]
 
