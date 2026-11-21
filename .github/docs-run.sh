@@ -6,6 +6,11 @@ ergo=${DOCS_RUN_ERGO_REGO:-$here/dist/ergo.rego}
 release=${DOCS_RUN_RELEASE_ERGO_REGO:-}
 require_release=${DOCS_RUN_REQUIRE_RELEASE:-0}
 export DOCS_RUN_OPA="$opa"
+release_note() {
+  if [ "$command_use" = release ] && [ -n "${DOCS_RUN_RELEASE_NOTE:-}" ]; then
+    echo "$DOCS_RUN_RELEASE_NOTE" >&2
+  fi
+}
 
 if [ "$#" -eq 0 ]; then
   cd "$here"
@@ -64,6 +69,9 @@ for file in "$@"; do
           line = substr(line, 1, RSTART - 1) substr(line, RSTART + RLENGTH)
         }
         sub(/[ \t]+$/, "", line)
+        if (index(line, "`") > 0) {
+          fail(NR, "run= cannot contain a backtick")
+        }
         count = split(line, parts, / +/)
         names = parts[1]
         role = "-"
@@ -247,6 +255,7 @@ ROWS
   else
     echo "group $name: the command at $command_at failed" >&2
     cat "$work/stderr.$gi" >&2
+    release_note
     status=1
     continue
   fi
@@ -257,6 +266,7 @@ ROWS
   else
     echo "group $name: the output at $output_at is not what the command at $command_at prints (- is the docs, + is the run):" >&2
     tail -n +3 "$work/diff.$gi" >&2
+    release_note
     status=1
   fi
 done < "$work/groups"
