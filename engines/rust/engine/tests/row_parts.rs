@@ -155,3 +155,83 @@ fn a_walk_in_an_any_of_option_lists_the_params_it_reads_on_its_assertion() {
     assert_eq!(assertion["failures"][0]["name"], "item 1 of ids");
     assert_eq!(assertion["failures"][0]["inputs"][0]["name"], "ids[0].v");
 }
+
+fn tree(entries: &Value) -> Vec<String> {
+    let mut out = Vec::new();
+    for entry in entries.as_array().into_iter().flatten() {
+        out.push(format!(
+            "{} {}: {}",
+            entry["kind"].as_str().unwrap(),
+            entry["name"].as_str().unwrap(),
+            entry["message"].as_str().unwrap()
+        ));
+        out.extend(
+            tree(&entry["failures"])
+                .into_iter()
+                .map(|e| format!("  {e}")),
+        );
+    }
+    out
+}
+
+fn rows_of(policy: Value, input: Value) -> Vec<Value> {
+    let mut policy = policy;
+    policy["ergo_spec"] = json!(SPEC);
+    ergo_policy_engine::report(&input, &policy, &Value::Null)["results"]
+        .as_array()
+        .unwrap()
+        .clone()
+}
+
+fn tree_of(rows: &[Value], check: &str) -> Vec<String> {
+    tree(&rows.iter().find(|row| row["check"] == check).unwrap()["failures"])
+}
+
+#[test]
+fn a_for_lines_whose_root_with_more_than_three_problems_keeps_the_entries_it_has_until_entries_come_from_clauses()
+ {
+    let pos = rows_of(
+        json!({
+            "subjects": {"c": {"from": "every cs", "has": {"pos": "os"}}},
+            "requirements": {"r": {"subject": "c", "checks": {
+                "whose": {"for": "every rows whose v is in pos.name as r", "assert": "r.v is \"bob\""}
+            }}}
+        }),
+        json!({"cs": [{"id": "c1", "os": [{"name": "bob", "k": 1}, {"v": 0}, {"v": 1}, {"v": 2}, {"v": 3}, {"v": 4}], "rows": [{"v": "bob"}, {}, {}]}]}),
+    );
+    assert_eq!(
+        tree_of(&pos, "whose"),
+        [
+            "assertion r.v is \"bob\": item 2 of pos: name is missing; item 3 of pos: name is missing; item 4 of pos: name is missing",
+            "item item 2 of rows: v is missing",
+            "item item 3 of rows: v is missing"
+        ]
+    );
+    let counted = rows_of(
+        json!({
+            "subjects": {"t": {"from": "every teams", "has": {"pl": "c"}}},
+            "requirements": {"r": {"subject": "t", "checks": {
+                "own": {"for": "every rows whose n is count of pl.k, if any, as r", "assert": "r.n is at least 0"},
+                "second": {"for": "every ms as m, every m.ws whose n is count of pl.k, if any, as w", "assert": "w.n is at least 0"}
+            }}}
+        }),
+        json!({"teams": [[
+            {"c": [1, 2], "rows": [{"n": 2}, {"n": 3}], "ms": [{"ws": [{"n": 2}, {"n": 3}]}]},
+            {"c": [1, 2], "rows": [{"n": 2}, {"n": 3}], "ms": [{"ws": [{"n": 2}, {"n": 3}]}]}
+        ]]}),
+    );
+    let three = "item 1 of t: item 1 of c is 1, which isn't an object; item 1 of t: item 2 of c is 2, which isn't an object; item 2 of t: item 1 of c is 1, which isn't an object";
+    assert_eq!(tree_of(&counted, "own"), [format!("list t.rows: {three}")]);
+    let capped = format!("{three}; and 1 more");
+    assert_eq!(
+        tree_of(&counted, "second"),
+        [
+            "item item 1 of t[0].ms: ".to_string(),
+            format!("  item item 1 of m.ws: {capped}"),
+            format!("  item item 2 of m.ws: {capped}"),
+            "item item 1 of t[1].ms: ".to_string(),
+            format!("  item item 1 of m.ws: {capped}"),
+            format!("  item item 2 of m.ws: {capped}"),
+        ]
+    );
+}
