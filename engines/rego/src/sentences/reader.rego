@@ -26,7 +26,7 @@ _s_pattern_set(tail) := {
 	"assertion": concat("", [`^(?:(every|some) +(`, qpath, `)|(`, left, `))(?: +(`, conds, `))?(, +if +any,)? +(`, phrase, `)$`]),
 	"for_items": concat("", [`(`, for_item, `)(?:, +|$)`]),
 	"for_item": concat("", [`^(?:(every|some) +)?(`, qpath, `)(?: +(`, conds, `))?(?: +sorted +by +(`, path, `)( +alphabetically)?)?(, +if +any,)? +as +(`, key, `)$`]),
-	"from": concat("", [`^((?:distinct +)?(?:member +of +)?`, path, `)(?: +named +by +each +of +(`, rpath, `))?(?: +(`, from_conds, `))?$`]),
+	"from": concat("", [`^(`, qpath, `)(?: +named +by +each +of +(`, rpath, `))?(?: +(`, from_conds, `))?$`]),
 	"from_conds": concat("", [`(`, from_cond, `)(?: +and +|$)`]),
 	"from_cond": concat("", [`^(?:whose +(?:(every|some) +(`, qpath, `)(, +if +any,)?|(`, left, `)) +|that +)(`, phrase, `)$`]),
 	"conds": concat("", [`(`, cond, `)(?: +and +|$)`]),
@@ -253,17 +253,26 @@ _s_from_of(text, pat) := object.union(_s_from_plain(m[1], pat), {"every": true})
 	m := regex.find_all_string_submatch_n(`^every +(\S.*)$`, text, 1)[0]
 } else := _s_from_plain(text, pat)
 
-_s_from_plain(text, pat) := object.union(object.union({"path": _s_path_of(_s_unmember(_s_undistinct(m[1])), pat)}, object.union(_s_distinct_of(m[1]), _s_member_of(_s_undistinct(m[1])))), object.union(_s_each_of(m[2], pat), _s_from_where_of(m[3], pat))) if {
-	m := regex.find_all_string_submatch_n(pat.from, text, 1)[0]
+_s_from_plain(text, pat) := object.union(_s_from_path_line(rest, pat), {"member": true}) if {
+	contains(text, "member ")
+	rest := _s_member_rest(text)
+} else := _s_from_path_line(text, pat)
+
+_s_member_rest(text) := concat("", ["distinct ", _s_after_member(trim_left(substring(text, 9, -1), " "))]) if startswith(text, "distinct ")
+
+else := _s_after_member(text)
+
+_s_after_member(text) := rest if {
+	startswith(text, "member ")
+	after := trim_left(substring(text, 7, -1), " ")
+	startswith(after, "of ")
+	rest := trim_left(substring(after, 3, -1), " ")
+	rest != ""
 }
 
-_s_unmember(text) := m[1] if {
-	m := regex.find_all_string_submatch_n(`^member +of +(\S.*)$`, text, 1)[0]
-} else := text
-
-_s_member_of(text) := {"member": true} if _s_unmember(text) != text
-
-else := {}
+_s_from_path_line(text, pat) := object.union(object.union({"path": _s_qpath_of(m[1], pat)}, _s_distinct_of(m[1])), object.union(_s_each_of(m[2], pat), _s_from_where_of(m[3], pat))) if {
+	m := regex.find_all_string_submatch_n(pat.from, text, 1)[0]
+}
 
 _s_member_text(a) := "member of " if object.get(a, "member", false) == true
 
