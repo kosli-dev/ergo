@@ -1218,19 +1218,6 @@ pub fn prefixed(item: &str, said: &str) -> String {
     }
 }
 
-pub fn with_roots(said: Vec<String>, roots: &str) -> Vec<String> {
-    let roots: Vec<String> = roots.split("; ").map(str::to_string).collect();
-    if said.iter().all(|part| roots.contains(part)) {
-        return roots;
-    }
-    let mut out: Vec<String> = roots
-        .into_iter()
-        .filter(|root| !said.iter().any(|part| part.contains(root.as_str())))
-        .collect();
-    out.extend(said);
-    out
-}
-
 pub fn joined(parts: Vec<String>) -> String {
     let mut once: Vec<String> = Vec::new();
     let mut hidden = 0;
@@ -1790,11 +1777,6 @@ pub fn root_flaw(checks: &[&Check], ctx: &Ctx) -> Option<(Cause, String)> {
     root_flaw_ordered(checks, ctx, &[], &[])
 }
 
-/// What [`root_flaw`] says, one text for each root.
-pub fn root_texts(checks: &[&Check], ctx: &Ctx) -> Option<(Cause, Vec<String>)> {
-    root_texts_with(checks, ctx, &[], &[], true)
-}
-
 pub fn root_flaw_ordered(
     checks: &[&Check],
     ctx: &Ctx,
@@ -1813,22 +1795,6 @@ fn root_flaw_with(
 ) -> Option<(Cause, String)> {
     root_texts_with(checks, ctx, refs_first, keys_left, walked_counts)
         .map(|(cause, texts)| (cause, texts.join("; ")))
-}
-
-pub fn key_cause(checks: &[&Check], ctx: &Ctx) -> Option<(Cause, String)> {
-    worst_texts(key_problems(checks, ctx, false))
-}
-
-pub fn worse_key_cause(
-    flaw: Option<(Cause, String)>,
-    checks: &[&Check],
-    ctx: &Ctx,
-) -> Option<(Cause, String)> {
-    match (flaw, key_cause(checks, ctx)) {
-        (Some(flaw), Some(key)) if key.0 >= flaw.0 => Some(flaw),
-        (flaw, None) => flaw,
-        (_, key) => key,
-    }
 }
 
 fn key_problems(checks: &[&Check], ctx: &Ctx, listed: bool) -> Vec<Clause> {
@@ -1870,17 +1836,6 @@ fn key_problems(checks: &[&Check], ctx: &Ctx, listed: bool) -> Vec<Clause> {
             }
         })
         .collect()
-}
-
-fn worst_texts(found: Vec<Clause>) -> Option<(Cause, String)> {
-    let worst = Cause::worst(found.iter().map(|clause| clause.cause))?;
-    let mut texts: Vec<String> = Vec::new();
-    for clause in found {
-        if clause.cause == worst && !texts.contains(&clause.text) {
-            texts.push(clause.text);
-        }
-    }
-    Some((worst, joined(texts)))
 }
 
 pub fn walked_roots_ahead(
