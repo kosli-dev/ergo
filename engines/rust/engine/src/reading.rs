@@ -44,6 +44,7 @@ pub enum Source {
         path: path::Path,
         every: bool,
         distinct: bool,
+        member: bool,
         each_of: Option<path::Path>,
         names: usize,
         every_text: String,
@@ -52,6 +53,7 @@ pub enum Source {
         path: path::Path,
         every: bool,
         distinct: bool,
+        member: bool,
         each_of: Option<path::Path>,
         names: usize,
         every_text: String,
@@ -268,7 +270,9 @@ fn names_a_subject<'a>(
 
 fn relation_of(line: &s::FromLine, own_name: &str, names: &BTreeSet<String>) -> Relation {
     match names_a_subject(line, own_name, names) {
-        Some(parent) if line.named_by_each_of.is_some() => Relation::Child(parent.to_string()),
+        Some(parent) if line.named_by_each_of.is_some() || line.member => {
+            Relation::Child(parent.to_string())
+        }
         Some(parent) => {
             if line.path.steps.is_empty() && line.path.position.is_none() {
                 Relation::Narrows(parent.to_string())
@@ -307,6 +311,7 @@ fn synthesized(name: &str) -> s::FromLine {
     s::FromLine {
         every: false,
         distinct: false,
+        member: false,
         path: s::Path {
             position: None,
             start: s::Start::Field {
@@ -572,6 +577,12 @@ impl Raws<'_, '_> {
         if line.distinct && !line.every {
             problems.push(DISTINCT_ON_FROM.to_string());
         }
+        if line.member && !line.every {
+            problems.push(MEMBER_ON_FROM.to_string());
+        }
+        if line.member && line.distinct {
+            problems.push("distinct can't go with every member of".to_string());
+        }
         if line.path.start == s::Start::Params {
             problems.push("a from reads the input, so it can't start at $params".to_string());
         }
@@ -719,6 +730,9 @@ impl Raws<'_, '_> {
 const DISTINCT_ON_FROM: &str =
     r#"on a from line, distinct goes after every, like "every distinct sbom.components""#;
 
+const MEMBER_ON_FROM: &str =
+    r#"on a from line, member of goes after every, like "every member of record.evidence""#;
+
 fn plain_text(steps: &[Step]) -> String {
     if steps.is_empty() {
         "$input".to_string()
@@ -770,6 +784,7 @@ fn source_of(
                 path,
                 every: line.every,
                 distinct: line.every && line.distinct,
+                member: line.every && line.member,
                 each_of,
                 names,
                 every_text: every_text(line),
@@ -811,6 +826,7 @@ fn source_of(
                 },
                 every: line.every,
                 distinct: line.every && line.distinct,
+                member: line.every && line.member,
                 each_of,
                 names,
                 every_text: every_text(line),
@@ -831,6 +847,7 @@ fn every_text(line: &s::FromLine) -> String {
         &s::FromLine {
             every: true,
             distinct: false,
+            member: false,
             path: line.path.clone(),
             named_by_each_of: None,
             whose: Vec::new(),
@@ -846,11 +863,13 @@ fn source_text(source: &Source) -> String {
             path,
             every,
             distinct,
+            member,
             ..
         } => {
-            let words = match (*every, *distinct) {
-                (true, true) => "every distinct ",
-                (true, false) => "every ",
+            let words = match (*every, *distinct, *member) {
+                (true, _, true) => "every member of ",
+                (true, true, false) => "every distinct ",
+                (true, false, false) => "every ",
                 _ => "",
             };
             let from_input = matches!(path.steps.first(), Some(Step::Index(_) | Step::Ref(_)));
@@ -868,11 +887,13 @@ fn source_text(source: &Source) -> String {
             path,
             every,
             distinct,
+            member,
             ..
         } => {
-            let words = match (*every, *distinct) {
-                (true, true) => "every distinct ",
-                (true, false) => "every ",
+            let words = match (*every, *distinct, *member) {
+                (true, _, true) => "every member of ",
+                (true, true, false) => "every distinct ",
+                (true, false, false) => "every ",
                 _ => "",
             };
             format!("{words}{}", name::name(path))

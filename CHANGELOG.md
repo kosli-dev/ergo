@@ -6,6 +6,8 @@ This file is about `ergo.rego` only. The Rust engine's changes are in [engines/r
 
 ### New
 
+- `from: every member of <path>` makes each member of the object the path ends at a subject, whatever its key, as spec 0.7 says ([subjects.every.member](spec/semantics.md#requirements)). With `record` read from `records`, `every member of record.evidence whose kind is "approval"` on `{"records": [{"id": "r1", "evidence": {"build-7": {"kind": "scan"}, "sign-off": {"kind": "approval"}}}]}` gives one subject, `sign-off`. The id is the key unless `identified_by` is written, and a value at the end that isn't an object fails `$min_subjects` as `unusable`. Elsewhere, like `every member of xs is 1`, it is written wrong with `every member of only goes on a from line for now`. Changes the report of a policy with `member of` right after `every`, `some`, `count of` or `sum of`, which said `doesn't parse`.
+
 - `is`, `equals`, `is equal to`, `is not`, `does not equal`, and `is one of` and `is not one of` with written values, can end with `ignoring case`, `ignoring surrounding spaces` or `ignoring case and surrounding spaces`, as spec 0.7 says ([text.ignoring](spec/semantics.md#text-ignoring-case-and-surrounding-spaces)). `status is one of "in progress", "done" ignoring case and surrounding spaces` passes on `"  IN Progress "`. `is in` and `is one of` with a path, like `type is in $params.states ignoring case`, are written wrong for now, with `"is in" can't take ignoring case yet`, until [#712](https://github.com/kosli-dev/ergo/issues/712) adds them. `ignoring` is a word of the grammar now, so a field with that name is written `.ignoring`. Changes the report of a policy that uses `ignoring` as a name: a bare `ignoring` is written wrong everywhere a name can stand, like a check `ignoring is an object` on a subject called `ignoring`, a child's `from: every ignoring.xs`, `sum of ignoring` or `sorted by ignoring`, and `.ignoring is "b"` names its input `.ignoring` where it said `ignoring`.
 
 ### Changed
@@ -55,6 +57,8 @@ This file is about `ergo.rego` only. The Rust engine's changes are in [engines/r
 - A subject can narrow a child subject, and be narrowed in turn, as spec 0.7 says ([sentence.subject.narrow](spec/syntax.md#subjects), [subjects.chain](spec/semantics.md#requirements)), where it was written wrong with `can't build on a subject read from another subject yet`. Its rows keep the child's id and `in`, it is counted per parent, and narrowing doesn't count as a level of a chain. Changes the report of such policies, which now get real rows.
 
 ### Fixed
+
+- An item of a `$min_subjects` row that the walk breaks in and that `subjects.every.same` names too joins its two clauses with `; `, as the row's message does and as spec 0.7 says ([subjects.failed_items](spec/semantics.md#requirements), [message.join](spec/semantics.md#messages)), where it joined them with `, `. With `from: every p0.p1.p2` on `{"p0": [{"p1": [{"p2": [{"status": "ok"}]}]}, {"p1": 3}]}`, the entry `item 2 of p0` says `p1 is 3, which isn't an object; p1 is a number`, where it said `p1 is 3, which isn't an object, p1 is a number`. The row's message doesn't change. Changes the report of such policies.
 
 - An `identified_by` that starts at `$input` or `$params`, like `$input.x`, is written wrong with `identified_by is a path, like "id" or "build.number"`, as spec 0.7 says ([subjects.id](spec/semantics.md#requirements)) and the Rust engine already did, where `ergo.rego` read it and named the input `ds[0]."$$input".x`.
 

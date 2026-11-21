@@ -104,6 +104,7 @@ pub(crate) fn chain_reads<T: Clone>(
 pub(crate) struct FromRead {
     every: bool,
     distinct: bool,
+    member: bool,
     path: Path,
     named_by_each_of: Option<Path>,
     whose: Chain<FromCondition>,
@@ -114,6 +115,7 @@ impl FromRead {
         FromLine {
             every: self.every,
             distinct: self.distinct,
+            member: self.member,
             path: self.path,
             named_by_each_of: self.named_by_each_of,
             whose: chain_items(&self.whose),
@@ -1168,9 +1170,33 @@ impl Parser {
         )
     }
 
+    fn member_path(&self, i: usize) -> Reads<((bool, bool), Path)> {
+        let mut starts = Vec::new();
+        if let Some(j) = self.lead(i, "distinct") {
+            starts.push((true, j));
+        }
+        starts.push((false, i));
+        let mut out = Vec::new();
+        for (distinct, j) in starts {
+            if let Some(k) = self.lead(j, "member of") {
+                out.extend(
+                    self.path(k, Side::Left)
+                        .into_iter()
+                        .map(|(p, end)| (((distinct, true), p), end)),
+                );
+            }
+            out.extend(
+                self.path(j, Side::Left)
+                    .into_iter()
+                    .map(|(p, end)| (((distinct, false), p), end)),
+            );
+        }
+        out
+    }
+
     pub(crate) fn read_from_core(&self, i: usize, every: bool) -> Reads<FromRead> {
         let mut out = Vec::new();
-        for ((distinct, path), j) in self.distinct_path(i, Side::Left) {
+        for (((distinct, member), path), j) in self.member_path(i) {
             let mut eaches: Reads<Option<Path>> = Vec::new();
             if let Some(k) = self.ws(j).and_then(|m| self.lead(m, "named by each of")) {
                 for (each, end) in self.path(k, Side::Right) {
@@ -1185,6 +1211,7 @@ impl Parser {
                             FromRead {
                                 every,
                                 distinct,
+                                member,
                                 path: path.clone(),
                                 named_by_each_of: each.clone(),
                                 whose,
@@ -1197,6 +1224,7 @@ impl Parser {
                     FromRead {
                         every,
                         distinct,
+                        member,
                         path: path.clone(),
                         named_by_each_of: each,
                         whose: None,

@@ -6,7 +6,7 @@ _s_check_text(parsed) := concat(" and ", [_s_assertion_text(a) | some a in parse
 
 _s_for_line_text(parsed) := concat(", ", [_s_for_item_text(a) | some a in parsed.items])
 
-_s_from_line_text(parsed) := concat("", [_s_every_text(parsed), _s_distinct_text(parsed), _s_path_text(parsed.path, "left"), _s_each_text(parsed), _s_where_text(parsed)])
+_s_from_line_text(parsed) := concat("", [_s_every_text(parsed), _s_distinct_text(parsed), _s_member_text(parsed), _s_path_text(parsed.path, "left"), _s_each_text(parsed), _s_where_text(parsed)])
 
 _s_every_text(parsed) := "every " if object.get(parsed, "every", false) == true
 

@@ -209,6 +209,7 @@ _s_from_read_of(name, fl, subjects, chains) := object.union(
 			"parent": parent,
 			"every": every_list,
 			"distinct": object.get(fl, "distinct", false) == true,
+			"member": object.get(fl, "member", false) == true,
 		},
 		_p_from_part(name, fl, subjects, chains.parts),
 	),
@@ -392,6 +393,16 @@ _s_descends(name, fl, subjects) if {
 	"position" in object.keys(fl.path)
 }
 
+_s_descends(name, fl, subjects) if {
+	object.get(fl, "member", false) == true
+	not "start" in object.keys(fl.path)
+	object.get(fl.path, "dot", false) != true
+	fl.path.steps == [fl.path.steps[0]]
+	is_string(fl.path.steps[0])
+	fl.path.steps[0] != name
+	fl.path.steps[0] in object.keys(subjects)
+}
+
 _s_narrows(name, fl, subjects) if {
 	not "start" in object.keys(fl.path)
 	not "position" in object.keys(fl.path)
@@ -401,6 +412,7 @@ _s_narrows(name, fl, subjects) if {
 	fl.path.steps[0] != name
 	fl.path.steps[0] in object.keys(subjects)
 	not "named_by_each_of" in object.keys(fl)
+	object.get(fl, "member", false) != true
 }
 
 _s_from_steps(path) := [_s_plain_from_step(st) | some st in array.slice(path, 1, count(path))] if {
@@ -446,11 +458,15 @@ _s_filter_name(i, n) := concat("", ["whose ", strings.replace_n({" ": "0"}, spri
 	sprintf_pad := concat("", [substring("                    ", 0, width - count(digits)), digits])
 }
 
-_s_every_unsupported(_, fl, _) := {_s_distinct_on_from | object.get(fl, "distinct", false) == true} if object.get(fl, "every", false) != true
+_s_every_unsupported(_, fl, _) := ({_s_distinct_on_from | object.get(fl, "distinct", false) == true} | {_s_member_on_from | object.get(fl, "member", false) == true}) | _s_member_with_distinct(fl) if object.get(fl, "every", false) != true
 
 _s_distinct_on_from := `on a from line, distinct goes after every, like "every distinct sbom.components"`
 
-_s_every_unsupported(name, fl, subjects) := (_s_every_over_subject(name, fl, subjects) | _s_every_with_each_of(fl)) | _s_every_too_long(fl) if object.get(fl, "every", false) == true
+_s_member_on_from := `on a from line, member of goes after every, like "every member of record.evidence"`
+
+_s_every_unsupported(name, fl, subjects) := ((_s_every_over_subject(name, fl, subjects) | _s_every_with_each_of(fl)) | _s_every_too_long(fl)) | _s_member_with_distinct(fl) if object.get(fl, "every", false) == true
+
+_s_member_with_distinct(fl) := {"distinct can't go with every member of" | object.get(fl, "member", false) == true; object.get(fl, "distinct", false) == true}
 
 _s_every_over_subject(name, fl, subjects) := {concat("", [t, " is a subject: write ", t, " whose … to narrow it, without every"]) |
 	_s_narrows(name, fl, subjects)
@@ -533,6 +549,7 @@ _s_subject_sentences(subjects, reads, parts) := {
 	"every_text": _s_every_texts(subjects, reads, parts.lines),
 	"every": {name | some name, r in reads; _s_from_used(subjects[name], r); object.get(r, "every", false) == true},
 	"distinct": {name | some name, r in reads; _s_from_used(subjects[name], r); object.get(r, "every", false) == true; object.get(r, "distinct", false) == true},
+	"member": {name | some name, r in reads; _s_from_used(subjects[name], r); object.get(r, "every", false) == true; object.get(r, "member", false) == true},
 	"narrowed": {name | some name, r in reads; _s_from_used(subjects[name], r); "of" in object.keys(r.fields)},
 	"filters": {[name, n] | some name, r in reads; _s_from_used(subjects[name], r); some n, _ in object.get(r.fields, "applies_to", {})},
 	"problems": {name: probs | some name, def in subjects; probs := _s_subject_problems(name, def, reads, parts.lines); probs != {}},
@@ -584,6 +601,7 @@ _s_subject_sentences(subjects, _, _) := {
 	"narrowing": {},
 	"every": set(),
 	"distinct": set(),
+	"member": set(),
 	"narrowed": set(),
 	"filters": set(),
 	"problems": {},

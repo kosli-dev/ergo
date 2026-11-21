@@ -407,6 +407,8 @@ _s_problems(text, pat) := [concat("", ["unclosed quote at column ", _json_text(c
 		not regex.match(pat.string, token)
 	]
 	count(invalid) > 0
+} else := [_s_member_misplaced] if {
+	_s_member_after_a_word(text, pat)
 } else := sort(problems) if {
 	problems := _s_sentence_problems(_s_parsed_anyway(text, pat), pat) | _s_text_names(text)
 	count(problems) > 0
@@ -425,6 +427,32 @@ _s_problems(text, pat) := [concat("", ["unclosed quote at column ", _json_text(c
 } else := ["doesn't parse"]
 
 _s_distinct_misplaced := "distinct goes after every, some, count of or sum of"
+
+_s_member_misplaced := "every member of only goes on a from line for now"
+
+_s_member_after_a_word(text, pat) if {
+	tokens := [m[0] | some m in regex.find_all_string_submatch_n(concat("", [`(?:`, pat.strings, `|[^ ])+`]), trim_space(text), -1)]
+	some i, word in tokens
+	word == "member"
+	tokens[i + 1] == "of"
+	_s_member_after(_s_before_member(tokens, i))
+}
+
+_s_before_member(tokens, i) := array.slice(tokens, max([0, i - 3]), i - 1) if {
+	i > 1
+	tokens[i - 1] == "distinct"
+} else := array.slice(tokens, max([0, i - 2]), i)
+
+_s_member_after(before) if {
+	count(before) > 0
+	before[count(before) - 1] in _quantifier_words
+}
+
+_s_member_after(before) if {
+	count(before) == 2
+	before[0] in _term_tally_keys
+	before[1] == "of"
+}
 
 _s_distinct_misplaced_in(text, pat) if {
 	tokens := [m[0] | some m in regex.find_all_string_submatch_n(concat("", [`(?:`, pat.strings, `|[^ ])+`]), trim_space(text), -1)]

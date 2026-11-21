@@ -29,8 +29,11 @@ for-item          = quantifier WS [distinct] path [WS whose] [if-any] WS "as" WS
 sorted-by         = "sorted" WS "by" WS first-key *step [WS "alphabetically"]
 alias             = bare-key
 
-; A subject's from: line. syntax.md writes distinct without every wrong.
-from-line         = ["every" WS] [distinct] path [WS "named" WS "by" WS "each" WS "of" WS right-path] [WS from-whose]
+; A subject's from: line. syntax.md writes distinct without every wrong,
+; and member of without every or with distinct.
+from-line         = ["every" WS] [distinct] [member-of] path [WS "named" WS "by" WS "each" WS "of" WS right-path] [WS from-whose]
+; member of reads each member of the object at the end of the path.
+member-of         = "member" WS "of" WS
 
 ; whose keeps the items that pass every condition. Each condition starts with
 ; its own word: whose, then a path and a phrase, or that, then a phrase about

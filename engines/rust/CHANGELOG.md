@@ -6,9 +6,13 @@ Each release names the version of the spec it follows. The spec's own changes ar
 
 ### New
 
+- `from: every member of <path>` makes each member of the object the path ends at a subject, whatever its key, as in `ergo.rego` 0.7.0 and spec 0.7 ([subjects.every.member](../../spec/semantics.md#requirements)). The id is the key unless `identified_by` is written, and a value at the end that isn't an object fails `$min_subjects` as `unusable`. Elsewhere it is written wrong with `every member of only goes on a from line for now`.
+
 - `is`, `equals`, `is equal to`, `is not`, `does not equal`, and `is one of` and `is not one of` with written values, can end with `ignoring case`, `ignoring surrounding spaces` or `ignoring case and surrounding spaces`, as in `ergo.rego` 0.7.0 and spec 0.7 ([text.ignoring](../../spec/semantics.md#text-ignoring-case-and-surrounding-spaces)). `status is one of "in progress", "done" ignoring case and surrounding spaces` passes on `"  IN Progress "`. A value that isn't text fails as `unusable`, on either side. `is in` and `is one of` with a path, like `type is in $params.states ignoring case`, are written wrong for now, with `"is in" can't take ignoring case yet`, until [#712](https://github.com/kosli-dev/ergo/issues/712) adds them.
 
 ### Changed
+
+- `ergo-policy-sentences` reads `member of` into a new public field of `FromLine`, `member`, so a struct literal of `FromLine` outside the crate no longer compiles until it sets the field.
 
 - `ergo-policy-sentences` reads the words into a new variant, `Phrase::Ignoring`, which holds the phrase they follow and an `Ignoring`. `Phrase` is an exhaustive public enum, so a `match` on it outside the crate no longer compiles until it handles the new variant.
 

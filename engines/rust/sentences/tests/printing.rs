@@ -172,6 +172,19 @@ fn a_later_key_never_gets_a_dot() {
 }
 
 #[test]
+fn every_member_of_prints_before_distinct_and_the_path() {
+    let read = from("every  member  of record.evidence whose kind is \"approval\"");
+    assert_eq!(
+        print_from(&read, &[], &[]),
+        "every member of record.evidence whose kind is \"approval\""
+    );
+    assert_eq!(
+        print_from(&from("every distinct member of x"), &[], &[]),
+        "every distinct member of x"
+    );
+}
+
+#[test]
 fn a_dot_written_before_an_alias_name_is_kept_on_the_right() {
     let read = from("x whose y equals .pr");
     assert_eq!(print_from(&read, &["pr"], &[]), "x whose y equals .pr");

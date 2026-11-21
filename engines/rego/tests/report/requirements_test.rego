@@ -130,3 +130,35 @@ test_the_ids_message_keeps_each_text_once_in_the_order_it_first_comes_like_the_o
 	ergo._id_joined(texts) == "repeated d ids is [\"a\"]; item 2 of ds: id is missing; b.id is missing; item 1 of ds: id is null; item 4 of ds is null; and 1 more"
 	ergo._id_joined(array.slice(texts, 0, 3)) == ergo._m_joined(array.slice(texts, 0, 3))
 }
+
+test_two_clauses_about_one_item_of_a_min_subjects_row_join_as_any_two_problems_do if {
+	own := [{"kind": "item", "name": "item 1 of records", "cause": "unusable", "inputs": [], "failures": [], "message": "evidence.a is an object"}, {"kind": "item", "name": "item 1 of records", "cause": "unusable", "inputs": [], "failures": [], "message": "evidence.b is text"}]
+	ergo._ms_join(own, [], []).message == "evidence.a is an object; evidence.b is text"
+	ergo._ms_join2(own, [], []).message == "evidence.a is an object; evidence.b is text"
+}
+
+test_two_clauses_about_one_item_of_a_plain_every_row_join_with_a_semicolon_as_in_the_row if {
+	own := [{"kind": "item", "name": "item 2 of p0", "cause": "unusable", "inputs": [], "failures": [], "message": "p1 is 3, which isn't an object"}, {"kind": "item", "name": "item 2 of p0", "cause": "unusable", "inputs": [], "failures": [], "message": "p1 is a number"}]
+	ergo._ms_join(own, [], []).message == "p1 is 3, which isn't an object; p1 is a number"
+	ergo._ms_join2(own, [], []).message == "p1 is 3, which isn't an object; p1 is a number"
+}
+
+test_the_from_text_of_every_member_of_says_member_of_as_written if {
+	ergo._every_word({"subject": "e"}) == "every member of " with data.ergo_subject_sentences as {"every": {"e"}, "member": {"e"}, "narrowing": {}} with data.ergo_resolved as {"e": {}}
+	ergo._every_word({"subject": "n"}) == "every member of " with data.ergo_subject_sentences as {"every": {"e"}, "member": {"e"}, "narrowing": {"n": ["e"]}} with data.ergo_resolved as {"e": {}, "n": {}}
+	ergo._every_word({"subject": "e"}) == "every " with data.ergo_subject_sentences as {"every": {"e"}, "member": set(), "narrowing": {}} with data.ergo_resolved as {"e": {}}
+}
+
+test_a_note_about_a_value_not_in_a_list_item_reads_that_value_as_usable if {
+	ergo._ms_list_outcome({"note": true, "cause": "unusable"}) == "usable"
+	ergo._ms_list_outcome({"note": false, "cause": "absent"}) == ergo._key_list_outcome("absent")
+}
+
+test_a_null_member_outside_a_list_has_no_id_and_is_named_by_its_path if {
+	req := {"subject": "m"}
+	place := ergo._id_fault_place({"subject": null, "at": "/evidence/a", "c": ["evidence", "a"]}, req, {"evidence": {"a": null}}) with data.ergo_resolved as {"m": {"def": {"from": ["evidence"], "identified_by": ["id"]}}} with data.ergo_subject_sentences as {"every": {"m"}, "member": {"m"}, "narrowing": {}, "chains": {}}
+	place.text == "evidence.a is null"
+	place.cause == "null"
+	place.listed == false
+	place.at == "/evidence/a"
+}

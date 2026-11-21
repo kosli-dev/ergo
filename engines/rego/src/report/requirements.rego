@@ -32,6 +32,8 @@ else := "."
 
 _every_word(req) := "every distinct " if _distinct_from(req)
 
+else := "every member of " if _member_from(req)
+
 else := "every " if _every_from(req)
 
 else := ""
@@ -451,7 +453,7 @@ _ms_entries(doc, req) := [_entry("list", _m_from_root(req), row_cause, [{"name":
 	not _fl_parent_unread(doc, req)
 	_from_well_formed(req)
 	not _from_unreadable(req)
-	w := _fl_broken(doc, _from_keys(req))
+	w := _fl_broken(doc, _fl_keys(req))
 } else := _ms_tree(req, doc, _ms_note_places(req, n), _from_keys(req)) if {
 	not _every_from(req)
 	n := _fl_plain_typed(doc, req)
@@ -505,7 +507,7 @@ _ms_place_name(req, p) := name if name := p.name
 
 else := _ms_read_name(req, p.c)
 
-_ms_flat(req, doc, p, keys) := {"levels": [], "entry": _entry("list", _m_from_item_name(req, p.c), p.cause, [{"name": _ms_list_name(req, p.c, keys), "value": _ms_list_value(doc, p, keys), "locations": [p.at], "outcome": _key_list_outcome(p.cause)}], [], p.text), "key": [0, [], 0]} if {
+_ms_flat(req, doc, p, keys) := {"levels": [], "entry": _entry("list", _m_from_item_name(req, p.c), p.cause, [{"name": _ms_list_name(req, p.c, keys), "value": _ms_list_value(doc, p, keys), "locations": [p.at], "outcome": _ms_list_outcome(p)}], [], p.text), "key": [0, [], 0]} if {
 	not p.plain
 	ws := [i | some i, _ in p.c; _ms_walked(p.c, keys, i)]
 	ws == []
@@ -537,6 +539,10 @@ _ms_item_read(req, p, keys) := {"name": _ms_read_name(req, array.concat(p.c, [k]
 	ks := [x | some x in keys; is_string(x)]
 	k := ks[count([x | some x in p.c; is_string(x)])]
 } else := {"name": _ms_place_name(req, p), "value": p.value, "locations": [p.at], "outcome": _ms_read_outcome(p)}
+
+_ms_list_outcome(p) := "usable" if p.note
+
+else := _key_list_outcome(p.cause)
 
 _ms_read_outcome(p) := "usable" if p.note
 
@@ -601,7 +607,7 @@ _ms_node(same) := _ms_join(own, kids, lv) if {
 _ms_join(own, kids, lv) := object.union(own[0], {
 	"cause": _worst_or_value({e.cause | some e in own} | {e.cause | some e in under}),
 	"inputs": _once([i | some e in own; some i in e.inputs]),
-	"message": concat(", ", _once([e.message | some e in own; e.message != ""])),
+	"message": concat("; ", _once([e.message | some e in own; e.message != ""])),
 	"failures": under,
 }) if {
 	count(own) > 0
@@ -619,7 +625,7 @@ _ms_node2(same) := _ms_join2(own, [f.levels[0] | some f in same; count(f.levels)
 _ms_join2(own, lv, deeper) := object.union(own[0], {
 	"cause": _worst_or_value({e.cause | some e in own} | {e.cause | some e in deeper}),
 	"inputs": _once([i | some e in own; some i in e.inputs]),
-	"message": concat(", ", _once([e.message | some e in own; e.message != ""])),
+	"message": concat("; ", _once([e.message | some e in own; e.message != ""])),
 	"failures": deeper,
 }) if {
 	count(own) > 0
@@ -750,6 +756,13 @@ _id_fault_place(entry, req, doc) := object.union(object.remove(place, ["item"]),
 	_id_listed(ec)
 	place := _id_place(entry, req, doc)
 	text := concat("", [_m_from_item_name(req, ec), " is null"])
+}
+
+_id_fault_place(entry, req, doc) := object.union(object.remove(place, ["item"]), {"c": ec, "at": entry.at, "cause": "null", "value": null, "text": concat("", [_ms_read_name(req, ec), " is null"]), "note": false, "plain": false}) if {
+	entry.subject == null
+	ec := _entry_c(entry, req)
+	not _id_listed(ec)
+	place := _id_place(entry, req, doc)
 }
 
 _id_said_on(req, ec, subject, item, id, doc) := _id_present(item, array.concat(_id_tail(ec), id)) if _id_listed(ec)
