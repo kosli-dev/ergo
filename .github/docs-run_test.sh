@@ -129,3 +129,71 @@ grep -q "no marked blocks" out.txt || {
   echo "docs-run.sh should say there are no marked blocks, and said: $(cat out.txt)" >&2
   exit 1
 }
+
+echo "docs-run.sh reads a file with CRLF line endings"
+group "" v9.9 | sed 's/$/\r/' > crlf.md
+sh "$script" crlf.md > out.txt
+case $(cat out.txt) in
+  *"ok"*"g"*) ;;
+  *)
+    echo "docs-run.sh should say g is ok for a CRLF file, and said: $(cat out.txt)" >&2
+    exit 1
+    ;;
+esac
+
+echo "docs-run.sh fails on a CRLF file whose output differs"
+group "" v1.0 | sed 's/$/\r/' > crlf-bad.md
+if sh "$script" crlf-bad.md > out.txt 2>&1; then
+  echo "docs-run.sh should fail on a CRLF file with a changed output, and passed" >&2
+  exit 1
+fi
+grep -q "group g" out.txt || {
+  echo "docs-run.sh should name group g, and said: $(cat out.txt)" >&2
+  exit 1
+}
+
+echo "docs-run.sh fails on a file with ergo-run text and no marker, naming each line"
+printf 'Text.\n<!--ergo-run: g role=output -->\nMore.\n<!-- ergo_run: g role=output -->\n' > typo.md
+if sh "$script" typo.md > out.txt 2>&1; then
+  echo "docs-run.sh should fail on text that is not a marker, and passed" >&2
+  exit 1
+fi
+for want in "typo.md:2" "typo.md:4"; do
+  if ! grep -qF -- "$want" out.txt; then
+    echo "docs-run.sh should name $want, and said: $(cat out.txt)" >&2
+    exit 1
+  fi
+done
+if grep -q "no marked blocks" out.txt; then
+  echo "docs-run.sh should not say there are no marked blocks for typo.md" >&2
+  exit 1
+fi
+
+echo "docs-run.sh fails on an attribute with no equals sign, naming the word"
+group "" v9.9 | sed 's|role=command|role=command bogus|' > bare.md
+if sh "$script" bare.md > out.txt 2>&1; then
+  echo "docs-run.sh should fail on an attribute with no =, and passed" >&2
+  exit 1
+fi
+grep -q "bogus" out.txt || {
+  echo "docs-run.sh should name bogus, and said: $(cat out.txt)" >&2
+  exit 1
+}
+if grep -q "^ok" out.txt; then
+  echo "docs-run.sh should not print ok for group g with a bad attribute" >&2
+  exit 1
+fi
+
+echo "docs-run.sh says a group name is used in more than one file"
+group "" v9.9 > dup1.md
+group "" v9.9 > dup2.md
+if sh "$script" dup1.md dup2.md > out.txt 2>&1; then
+  echo "docs-run.sh should fail on a group in two files, and passed" >&2
+  exit 1
+fi
+for want in "used in more than one file" "dup1.md" "dup2.md"; do
+  if ! grep -qF -- "$want" out.txt; then
+    echo "docs-run.sh should print $want, and said: $(cat out.txt)" >&2
+    exit 1
+  fi
+done
