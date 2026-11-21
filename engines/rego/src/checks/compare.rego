@@ -330,29 +330,6 @@ _list_flaw(leaf, _) := {st} if {
 	st := _text_ref_state(leaf.values.ref)
 }
 
-_text_ref_state(r) := _worst_of(states) if {
-	_ref_walks(r)
-	w := _ref_walk(r)
-	states := {w.state | w.failed} | {"unusable" | some v in w.value; v != null; not is_string(v)}
-	count(states) > 0
-} else := _list_text_state(_ref_read(r)) if {
-	not _ref_walks(r)
-	_ref_state(r) == "value"
-}
-
-_list_text_state(r) := "unusable" if not is_array(r)
-
-else := _text_items_state(r)
-
-_text_items_state(r) := "unusable" if {
-	some v in r
-	v != null
-	not is_string(v)
-} else := "null" if {
-	some v in r
-	v == null
-}
-
 _text_items_kind := "text in every item"
 
 _text_list_kind(r) := "a list" if not is_array(r)

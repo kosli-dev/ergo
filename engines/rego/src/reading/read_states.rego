@@ -515,7 +515,40 @@ _used_ref_state(check, r) := "not_an_object" if {
 	_input_key_ref(r)
 	r in _step_refs(check)
 	_plain_check(check)
+} else := "unusable" if {
+	_text_walked_ref(check, r)
+	_text_ref_state(r) == "unusable"
 } else := _ref_state(r)
+
+_text_walked_ref(check, r) if {
+	check.ignoring
+	check.op in _membership_ops
+	check.values == {"ref": r}
+	_ref_walks(r)
+}
+
+_text_ref_state(r) := _worst_of(states) if {
+	_ref_walks(r)
+	w := _ref_walk(r)
+	states := {w.state | w.failed} | {"unusable" | some v in w.value; v != null; not is_string(v)}
+	count(states) > 0
+} else := _list_text_state(_ref_read(r)) if {
+	not _ref_walks(r)
+	_ref_state(r) == "value"
+}
+
+_list_text_state(r) := "unusable" if not is_array(r)
+
+else := _text_items_state(r)
+
+_text_items_state(r) := "unusable" if {
+	some v in r
+	v != null
+	not is_string(v)
+} else := "null" if {
+	some v in r
+	v == null
+}
 
 _key_of_list_input_path(check, r) if {
 	is_array(data.ergo_document)
