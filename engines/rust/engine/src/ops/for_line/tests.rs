@@ -3631,3 +3631,57 @@ fn a_first_item_whose_second_items_fail_only_on_a_whose_key_has_no_entry() {
         ]
     );
 }
+
+#[test]
+fn a_second_lines_whose_key_that_is_the_first_alias_is_said_under_its_first_item() {
+    let m = r#"m is {"es": [{"n": 2, "zz": 1}], "q": 3}, which isn't text"#;
+    for (for_line, rest) in [
+        (
+            "every ms as m, every m.es whose zz is q named by m.q as e",
+            "q is missing",
+        ),
+        (
+            "every ms as m, every m.es whose zz is q named by m as e",
+            "q is missing",
+        ),
+    ] {
+        let row = row(
+            for_line,
+            json!("e.n is 2"),
+            json!({"ms": [{"q": 3, "es": [{"n": 2, "zz": 1}]}]}),
+        );
+        assert_eq!(row["cause"], "unusable", "{for_line}");
+        assert_eq!(
+            row["message"],
+            format!("item 1 of ms: {m}; item 1 of ms: item 1 of m.es: {rest}"),
+            "{for_line}"
+        );
+        assert_eq!(
+            entries(&row["failures"]),
+            [
+                format!("assertion e.n is 2 unusable: item 1 of ms: {m}"),
+                "item item 1 of ms absent: ".to_string(),
+                format!("  item item 1 of m.es absent: {rest}"),
+            ],
+            "{for_line}"
+        );
+    }
+}
+
+#[test]
+fn a_second_lines_whose_key_that_is_the_first_alias_fails_the_row_on_an_empty_list() {
+    for (for_line, message) in [
+        (
+            "every ms as m, every es whose zz is q named by m as e",
+            "es is []; item 1 of ms: m is 3, which isn't text",
+        ),
+        (
+            "every ms as m, every es whose zz is q named by m, if any, as e",
+            "item 1 of ms: m is 3, which isn't text",
+        ),
+    ] {
+        let row = row(for_line, json!("e.n is 2"), json!({"ms": [3], "es": []}));
+        assert_eq!(row["cause"], "unusable", "{for_line}");
+        assert_eq!(row["message"], message, "{for_line}");
+    }
+}
