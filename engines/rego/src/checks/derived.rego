@@ -354,6 +354,10 @@ _keyed_stand_in(c, f) := _typed_stand_in(c.cmp, c.left) if {
 	c.cmp in _text_cmps
 } else := object.union(c, {"cmp": "eq", f: c[_keyed_other_side(f)]})
 
+_typed_stand_in(op, path) := {"op": "not_matches_any", "path": path, "patterns": {"literal": []}} if op in _pattern_ops
+
+else := {"op": "excludes", "path": path, "values": {"literal": []}}
+
 _keyed_ordered(c) if c.cmp in {"gt", "gte", "lt", "lte"}
 
 _keyed_ordered(c) if "within" in object.keys(c)
