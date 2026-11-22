@@ -2982,3 +2982,36 @@ fn a_count_or_a_sum_still_says_a_missing_step_as_missing_beside_one_that_is_null
         );
     }
 }
+
+fn read_of(state: crate::path::Outcome, locations: &[&str]) -> Input {
+    Input {
+        name: "m".to_string(),
+        value: json!([]),
+        locations: locations.iter().map(|l| l.to_string()).collect(),
+        part: None,
+        state,
+        null_at: None,
+        worked: false,
+    }
+}
+
+#[test]
+fn two_reads_of_the_same_value_merge_into_one_input_with_the_worst_outcome() {
+    use crate::path::Outcome;
+    let usable = read_of(Outcome::Found, &[]);
+    let unusable = read_of(Outcome::Unusable, &[]);
+    let absent = read_of(Outcome::Absent, &[]);
+    let elsewhere = read_of(Outcome::Absent, &["/m"]);
+    for (entries, wanted) in [
+        (vec![usable.clone(), unusable.clone()], vec![unusable.clone()]),
+        (vec![unusable.clone(), usable.clone()], vec![unusable.clone()]),
+        (vec![absent, unusable.clone(), usable.clone()], vec![unusable.clone()]),
+        (vec![usable.clone(), usable.clone()], vec![usable]),
+        (
+            vec![unusable.clone(), elsewhere.clone()],
+            vec![unusable, elsewhere],
+        ),
+    ] {
+        assert_eq!(merged(entries.clone()), wanted, "{entries:?}");
+    }
+}

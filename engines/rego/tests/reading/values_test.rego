@@ -25,3 +25,15 @@ test_a_read_that_starts_at_a_name_nothing_holds_has_no_location_and_never_leaves
 	ergo._unread_at({}, {"path": ["$nope", "a"]}, {}) == {}
 	ergo._fail_locations({"path": ["$nope", "a"]}) == []
 }
+
+test_two_reads_of_the_same_value_merge_into_one_input_with_the_worst_outcome if {
+	usable := {"name": "m", "value": [], "locations": []}
+	unusable := {"name": "m", "value": [], "locations": [], "ergo/outcome": "unusable"}
+	absent := {"name": "m", "value": [], "locations": [], "ergo/outcome": "absent"}
+	ergo._merged_inputs([usable, unusable]) == [unusable]
+	ergo._merged_inputs([unusable, usable]) == [unusable]
+	ergo._merged_inputs([absent, unusable, usable]) == [unusable]
+	ergo._merged_inputs([usable, usable]) == [usable]
+	other := {"name": "m", "value": [], "locations": ["/m"], "ergo/outcome": "absent"}
+	ergo._merged_inputs([other, unusable]) == [unusable, other]
+}
