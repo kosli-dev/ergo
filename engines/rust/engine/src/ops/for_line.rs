@@ -1366,14 +1366,16 @@ impl For {
                             .iter()
                             .any(|clause| clause.cause == Cause::NotAnObject);
                     first_alias.retain(|clause| !bare || clause.cause != Cause::NotAnObject);
+                    let through =
+                        bare && reads_path(&self.items[depth + 1].path, &self.items[depth].alias);
+                    let nested_clauses = if through {
+                        Vec::new()
+                    } else {
+                        self.nested_clauses(&nested, assertions.is_empty(), depth + 1, &bound)
+                    };
                     let clauses: Vec<Clause> = first_alias
                         .into_iter()
-                        .chain(self.nested_clauses(
-                            &nested,
-                            assertions.is_empty(),
-                            depth + 1,
-                            &bound,
-                        ))
+                        .chain(nested_clauses)
                         .filter_map(|clause| unrooted(clause, &texts))
                         .collect();
                     let clauses: Vec<Clause> = lifted.iter().cloned().chain(clauses).collect();
