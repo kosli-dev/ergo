@@ -586,7 +586,7 @@ where
     let left = read_path(path, ctx);
     let inputs = left.inputs.into_iter().chain(read.inputs).collect();
     let cause = match (read.forced, read.outcome.cause(), &read.value) {
-        (Some(forced), _, _) if text => Cause::worst(
+        (Some(forced), _, _) if text && forced != Cause::Value => Cause::worst(
             [
                 Some(forced),
                 text_side_cause(&left.outcome, left.value.as_ref()),
