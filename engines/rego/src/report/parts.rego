@@ -165,7 +165,7 @@ _for_assertion_base(row, at, where, t, i, a) := _policy_entry(
 			[x | some [_, _, l] in lines; some x in _with_outcomes(object.get(l, "inputs", [])); not _alias_named(x.name, aliases); not _sentence_walked_read(x, where.check.checks[i])],
 			[_with_row_part(x, row.inputs) | some l in t.free; l.assertion == a; some x in _with_outcomes(_anchored_inputs(l.inputs, at))],
 		),
-		[x | lines == []; not a in {l.assertion | some l in t.free}; some x in _with_outcomes(row.inputs); _for_row_read(x.name, where.check.checks[i], row); not _alias_named(x.name, aliases)],
+		[x | lines == []; not a in {l.assertion | some l in t.free}; some x in _with_outcomes(row.inputs); _for_sentence_read(x.name, where.check.checks[i]); not _alias_named(x.name, aliases)],
 	)),
 	items,
 	t.said[i],
@@ -200,14 +200,7 @@ _for_sentence_read(name, c) if {
 	name == _ref_label(r)
 }
 
-_for_row_read(name, c, _) if _for_sentence_read(name, c)
-
-_for_row_read(name, c, row) if {
-	row.failed_items == []
-	_for_part_list_read(name, c)
-}
-
-_for_part_list_read(name, c) if {
+_for_sentence_read(name, c) if {
 	contains(name, "[]")
 	some p in _root_reads(c)
 	_subject_part(p)
