@@ -149,8 +149,9 @@ _for_cond_clause(c, e) := _m_item_clause(_m_item_name(e.i, set()), cause, [_m_cl
 	p != []
 	not _walk_outside(p)
 	name := _m_item_name(fe.i, set())
-} else := _m_item_clause(_m_item_name(e.i, set()), cause, said) if {
-	said := _once(_for_cond_own(c, _focus_of(e, c), object.get(_for_names, "ergo/subject", null)))
+} else := _m_item_clause(_m_item_name(fe.i, set()), cause, said) if {
+	fe := _focus_of(e, c)
+	said := _once(_for_cond_own(c, fe, object.get(_for_names, "ergo/subject", null)))
 	cause := _for_said_cause(said)
 	cause != "satisfied"
 }
