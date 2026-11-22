@@ -1392,3 +1392,62 @@ fn a_list_after_is_in_ignoring_case_names_each_item_that_isnt_text_in_list_order
         assert_eq!(list_fault(sentence, subject, params), want, "{sentence}");
     }
 }
+
+#[test]
+fn a_walked_list_after_is_in_ignoring_case_with_an_item_that_isnt_text_is_a_root_fault_whatever_the_field_holds()
+ {
+    let root_fault = |sentence: &str, cs: Value| {
+        let check = lowered_check(sentence);
+        let Check::In(In {
+            values: Right::Ref(list),
+            ..
+        }) = &check
+        else {
+            panic!("not in");
+        };
+        let input = json!({"things": [{}], "cs": cs});
+        let ctx = Ctx {
+            label: None,
+            item_by_item: false,
+            subject: Located {
+                value: &input["things"][0],
+                location: Location::input_root().key("things").index(0),
+            },
+            input: &input,
+            params: Some(&json!({})),
+            aliases: BTreeMap::new(),
+        };
+        walked_root_fault(&check, list, &ctx)
+    };
+    assert_eq!(
+        root_fault(
+            "v is in $input.cs.name ignoring case",
+            json!([{"name": 3}])
+        ),
+        Some((
+            Cause::Unusable,
+            "item 1 of $input.cs: name is 3, which isn't text".to_string()
+        ))
+    );
+    assert_eq!(
+        root_fault(
+            "v is not in $input.cs.name ignoring case",
+            json!([{"name": "a"}, {"name": true}])
+        ),
+        Some((
+            Cause::Unusable,
+            "item 2 of $input.cs: name is true, which isn't text".to_string()
+        ))
+    );
+    assert_eq!(
+        root_fault("v is in $input.cs.name", json!([{"name": 3}])),
+        None
+    );
+    assert_eq!(
+        root_fault(
+            "v is in $input.cs.name ignoring case",
+            json!([{"name": "a"}])
+        ),
+        None
+    );
+}
