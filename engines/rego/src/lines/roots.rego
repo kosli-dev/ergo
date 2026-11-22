@@ -704,7 +704,7 @@ _root_stand_in(c) := object.union(c, {"cmp": "eq", f: c[g]}) if {
 } else := {"op": "compare", "cmp": "eq", "left": c.path, "right": c.path} if {
 	some f in ["values", "patterns"]
 	_is_ref(object.get(c, f, null))
-	_list_phrase(c)
+	c.op in (_list_phrase_ops | _single_contain_ops)
 	is_array(c.path)
 	not _walk_outside(c.path)
 } else := c

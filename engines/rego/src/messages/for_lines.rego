@@ -78,7 +78,7 @@ _for_why(first, item, e, names, wh, failure) := object.union(failure, {"why": []
 	ts := [t |
 		some c in item.whose
 		cause := _for_focus_cause(c, e) with input as {"ergo/names": names}
-		not cause in _not_failing_causes
+		_for_cause_undecided(cause, c) with input as {"ergo/names": names}
 		not _for_own_read_fails(c, e)
 		said := _for_root_why(c, _m_undecided(cause), object.get(names, "ergo/subject", null)) with input as {"ergo/names": names}
 		some t in said
@@ -95,7 +95,7 @@ _for_why(first, item, e, names, wh, failure) := object.union(failure, {"why": []
 	ms := [[m, _for_is_free({"whose": [c]}, names)] |
 		some c in item.whose
 		cause := _for_focus_cause(c, e) with input as {"ergo/names": names}
-		not cause in _not_failing_causes
+		_for_cause_undecided(cause, c) with input as {"ergo/names": names}
 		off := [_m_aliased(t) | some t in _m_keyed_off(object.get(names, "ergo/subject", null), c, cause)] with input as {"ergo/names": names}
 		some m in off
 	]
@@ -108,7 +108,7 @@ _for_why(first, item, e, names, wh, failure) := object.union(failure, {"why": []
 		some c in item.whose
 		fe := _focus_of(e, c)
 		cause := _for_focus_cause(c, e) with input as {"ergo/names": names}
-		not cause in _not_failing_causes
+		_for_cause_undecided(cause, c) with input as {"ergo/names": names}
 		said := _m_whose_said_in(item, names, c, fe.iv, cause)
 		roots := _m_keyed_roots(object.get(names, "ergo/subject", null), c, cause)
 	] with input as {"ergo/names": names}
@@ -124,7 +124,7 @@ _for_own_why(true, item, e, names) if {
 	some c in item.whose
 	fe := _focus_of(e, c) with input as {"ergo/names": names}
 	cause := _for_focus_cause(c, e) with input as {"ergo/names": names}
-	not cause in _not_failing_causes
+	_for_cause_undecided(cause, c) with input as {"ergo/names": names}
 	roots := _m_keyed_roots(object.get(names, "ergo/subject", null), c, cause) with input as {"ergo/names": names}
 	_m_own_said(_m_whose_said_in(item, names, c, fe.iv, cause), roots) with input as {"ergo/names": names}
 }
@@ -136,7 +136,7 @@ _for_own_why_of(false, _, own) := {"own": own}
 _for_root_fails(item, e, names) if {
 	some c in item.whose
 	cause := _for_focus_cause(c, e) with input as {"ergo/names": names}
-	not cause in _not_failing_causes
+	_for_cause_undecided(cause, c) with input as {"ergo/names": names}
 	subj := object.get(names, "ergo/subject", null)
 	count(array.concat(_for_root_why(c, _m_undecided(cause), subj), _m_keyed_off(subj, c, cause))) > 0 with input as {"ergo/names": names}
 }
@@ -144,14 +144,14 @@ _for_root_fails(item, e, names) if {
 _for_root_fails(item, e, names) if {
 	some c in item.whose
 	cause := _for_focus_cause(c, e) with input as {"ergo/names": names}
-	not cause in _not_failing_causes
+	_for_cause_undecided(cause, c) with input as {"ergo/names": names}
 	not _root_read_flaw(object.get(names, "ergo/subject", null), c) in _tolerated_root_flaws with input as {"ergo/names": names}
 }
 
 _for_own_texts(item, e, names) := [t |
 	some c in item.whose
 	cause := _for_focus_cause(c, e) with input as {"ergo/names": names}
-	not cause in _not_failing_causes
+	_for_cause_undecided(cause, c) with input as {"ergo/names": names}
 	fe := _focus_of(e, c)
 	some x in _walk_sides_paths(c)
 	is_array(x[0])

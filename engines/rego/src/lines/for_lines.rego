@@ -172,7 +172,7 @@ _for_rooted_row(check, subj, r) := object.union(r, {"cause": "unusable", "other_
 	r.cause == "value"
 	_walk_key_texts(check, r) != []
 	_key_beats_roots(check, subj)
-} else := object.union(r, {"cause": _worst_of({flaw, r.cause}), "other_roots": ms}) if {
+} else := object.union(r, {"cause": _worst_or_value({flaw, r.cause}), "other_roots": ms}) if {
 	_for_list_failures(r)
 	flaw := _walk_root_flaw(check, subj)
 	flaw != ""
@@ -180,7 +180,7 @@ _for_rooted_row(check, subj, r) := object.union(r, {"cause": "unusable", "other_
 	ms != []
 } else := _m_row_texts(_worse_root(check, subj, _rooted_row(check, subj, r)))
 
-_worse_root(check, subj, rr) := object.union(rr, {"cause": _worst_of({rr.cause, flaw})}) if {
+_worse_root(check, subj, rr) := object.union(rr, {"cause": _worst_or_value({rr.cause, flaw})}) if {
 	"other_roots" in object.keys(rr)
 	flaw := _walk_root_flaw(check, subj)
 	flaw != ""
@@ -725,9 +725,13 @@ _under_location(l, at) if startswith(l, concat("", [at, "/"]))
 
 _for_whose(item, e, names) := {"undecided": _for_undecided(undecided, kept, e), "kept": kept} if {
 	causes := [_for_focus_cause(c, e) | some c in item.whose] with input as {"ergo/names": names}
-	undecided := [c | some c in causes; not c in _not_failing_causes]
+	undecided := [x | some i, x in causes; _for_cause_undecided(x, item.whose[i])] with input as {"ergo/names": names}
 	kept := count([c | some c in causes; c == "value"]) == 0
 }
+
+_for_cause_undecided(x, _) if not x in _not_failing_causes
+
+_for_cause_undecided("value", c) if "value" in _walked_root_states(c)
 
 _for_focus_cause(c, e) := "unusable" if {
 	_node_param_broken(c)
