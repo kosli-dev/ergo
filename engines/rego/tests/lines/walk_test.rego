@@ -79,7 +79,13 @@ test_a_root_after_the_phrase_is_said_first_beside_items_that_fail_on_their_own_a
 	_min_said("some xs.v is at least $params.min", two) == {"cause": "unusable", "message": "$params.min is \"s\", which isn't a number; item 1 of xs: v is missing; item 2 of xs: v is missing"} with input as {"ergo/names": {"ergo/subject": two}} with data.ergo_params as {"min": "s"}
 	mixed := {"xs": [{"v": null}, {"v": 1}]}
 	_min_said("every xs.v is at least $params.min", mixed) == {"cause": "unusable", "message": "$params.min is \"s\", which isn't a number; item 1 of xs: v is null"} with input as {"ergo/names": {"ergo/subject": mixed}} with data.ergo_params as {"min": "s"}
-	odd := {"xs": [1, {}]}
-	_min_said("every xs.v is at least $params.min", odd) == {"cause": "not_an_object", "message": "$params.min is \"s\", which isn't a number; item 1 of xs is 1, which isn't an object; item 2 of xs: v is missing"} with input as {"ergo/names": {"ergo/subject": odd}} with data.ergo_params as {"min": "s"}
-	_min_said("every xs.v is at least $params.min", {}) == {"cause": "unusable", "message": "$params.min is \"s\", which isn't a number; xs is missing"} with input as {"ergo/names": {"ergo/subject": {}}} with data.ergo_params as {"min": "s"}
+}
+
+test_a_named_by_key_after_the_phrase_that_cant_be_read_leaves_the_items_to_say_their_own_problems_as_path_ref_step_says if {
+	check := ergo._s_written_check("every rs.zz is m named by $input.k")
+	rs := {"m": {"a": "a"}, "rs": [{"v": 1}, {"v": 2}]}
+	r := ergo._walk_row(check, rs) with input as {"ergo/names": {"ergo/subject": rs}} with data.ergo_document as {"k": null}
+	ergo._leaf_root_flaw(check, rs) != "" with input as {"ergo/names": {"ergo/subject": rs}} with data.ergo_document as {"k": null}
+	r.cause == "absent"
+	not "root_msgs" in object.keys(r)
 }

@@ -29425,6 +29425,55 @@
     ]
   },
   {
+    "description": "a root after the phrase of a type the phrase can't use is said first, beside items that fail on their own, and the walk takes the worst cause",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"every": "every xs.v is at least $params.min", "some": "some xs.v is at least $params.min"}}}},
+    "params": {"min": "s"},
+    "cases": [
+      {
+        "description": "five items without v",
+        "rules": ["message.items", "problems.all_said", "row.parts"],
+        "input": {"things": [{"id": "t", "xs": [{}, {}, {}, {}, {}]}]},
+        "results": [
+          {"cause": "unusable", "check": "every", "failures": [{"cause": "unusable", "failures": [
+            {"cause": "absent", "failures": [], "inputs": [{"locations": ["/things/0/xs/0"], "name": "xs[0].v", "outcome": "absent", "value": null}], "kind": "item", "locations": ["/things/0/xs/0"], "message": "v is missing", "name": "item 1 of xs", "value": {}},
+            {"cause": "absent", "failures": [], "inputs": [{"locations": ["/things/0/xs/1"], "name": "xs[1].v", "outcome": "absent", "value": null}], "kind": "item", "locations": ["/things/0/xs/1"], "message": "v is missing", "name": "item 2 of xs", "value": {}},
+            {"cause": "absent", "failures": [], "inputs": [{"locations": ["/things/0/xs/2"], "name": "xs[2].v", "outcome": "absent", "value": null}], "kind": "item", "locations": ["/things/0/xs/2"], "message": "v is missing", "name": "item 3 of xs", "value": {}},
+            {"cause": "absent", "failures": [], "inputs": [{"locations": ["/things/0/xs/3"], "name": "xs[3].v", "outcome": "absent", "value": null}], "kind": "item", "locations": ["/things/0/xs/3"], "message": "v is missing", "name": "item 4 of xs", "value": {}},
+            {"cause": "absent", "failures": [], "inputs": [{"locations": ["/things/0/xs/4"], "name": "xs[4].v", "outcome": "absent", "value": null}], "kind": "item", "locations": ["/things/0/xs/4"], "message": "v is missing", "name": "item 5 of xs", "value": {}}
+          ], "inputs": [{"locations": ["$params:/min"], "name": "$params.min", "outcome": "unusable", "value": "s"}], "kind": "assertion", "locations": ["$policy:/requirements/s/checks/every"], "message": "$params.min is \"s\", which isn't a number", "name": "every xs.v is at least $params.min"}],
+            "inputs": [{"locations": ["/things/0/xs/0", "/things/0/xs/1", "/things/0/xs/2", "/things/0/xs/3", "/things/0/xs/4"], "name": "xs[].v", "outcome": "usable", "value": [null, null, null, null, null]}],
+            "message": "$params.min is \"s\", which isn't a number; item 1 of xs: v is missing; item 2 of xs: v is missing; item 3 of xs: v is missing; and 2 more", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "some", "failures": [{"cause": "unusable", "failures": [
+            {"cause": "absent", "failures": [], "inputs": [{"locations": ["/things/0/xs/0"], "name": "xs[0].v", "outcome": "absent", "value": null}], "kind": "item", "locations": ["/things/0/xs/0"], "message": "v is missing", "name": "item 1 of xs", "value": {}},
+            {"cause": "absent", "failures": [], "inputs": [{"locations": ["/things/0/xs/1"], "name": "xs[1].v", "outcome": "absent", "value": null}], "kind": "item", "locations": ["/things/0/xs/1"], "message": "v is missing", "name": "item 2 of xs", "value": {}},
+            {"cause": "absent", "failures": [], "inputs": [{"locations": ["/things/0/xs/2"], "name": "xs[2].v", "outcome": "absent", "value": null}], "kind": "item", "locations": ["/things/0/xs/2"], "message": "v is missing", "name": "item 3 of xs", "value": {}},
+            {"cause": "absent", "failures": [], "inputs": [{"locations": ["/things/0/xs/3"], "name": "xs[3].v", "outcome": "absent", "value": null}], "kind": "item", "locations": ["/things/0/xs/3"], "message": "v is missing", "name": "item 4 of xs", "value": {}},
+            {"cause": "absent", "failures": [], "inputs": [{"locations": ["/things/0/xs/4"], "name": "xs[4].v", "outcome": "absent", "value": null}], "kind": "item", "locations": ["/things/0/xs/4"], "message": "v is missing", "name": "item 5 of xs", "value": {}}
+          ], "inputs": [{"locations": ["$params:/min"], "name": "$params.min", "outcome": "unusable", "value": "s"}], "kind": "assertion", "locations": ["$policy:/requirements/s/checks/some"], "message": "$params.min is \"s\", which isn't a number", "name": "some xs.v is at least $params.min"}],
+            "inputs": [{"locations": ["/things/0/xs/0", "/things/0/xs/1", "/things/0/xs/2", "/things/0/xs/3", "/things/0/xs/4"], "name": "xs[].v", "outcome": "usable", "value": [null, null, null, null, null]}],
+            "message": "$params.min is \"s\", which isn't a number; item 1 of xs: v is missing; item 2 of xs: v is missing; item 3 of xs: v is missing; and 2 more", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "an item whose v is null and an item that reads only the root",
+        "rules": ["message.items", "problems.all_said", "problems.item_order"],
+        "input": {"things": [{"id": "t", "xs": [{"v": null}, {"v": 1}]}]},
+        "results": [
+          {"cause": "unusable", "check": "every", "failures": [{"cause": "unusable", "failures": [
+            {"cause": "null", "failures": [], "inputs": [{"locations": ["/things/0/xs/0/v"], "name": "xs[0].v", "outcome": "null", "value": null}], "kind": "item", "locations": ["/things/0/xs/0"], "message": "v is null", "name": "item 1 of xs", "value": {"v": null}}
+          ], "inputs": [{"locations": ["$params:/min"], "name": "$params.min", "outcome": "unusable", "value": "s"}], "kind": "assertion", "locations": ["$policy:/requirements/s/checks/every"], "message": "$params.min is \"s\", which isn't a number", "name": "every xs.v is at least $params.min"}],
+            "inputs": [{"locations": ["/things/0/xs/0/v", "/things/0/xs/1/v"], "name": "xs[].v", "outcome": "usable", "value": [null, 1]}],
+            "message": "$params.min is \"s\", which isn't a number; item 1 of xs: v is null", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "some", "failures": [{"cause": "unusable", "failures": [
+            {"cause": "null", "failures": [], "inputs": [{"locations": ["/things/0/xs/0/v"], "name": "xs[0].v", "outcome": "null", "value": null}], "kind": "item", "locations": ["/things/0/xs/0"], "message": "v is null", "name": "item 1 of xs", "value": {"v": null}}
+          ], "inputs": [{"locations": ["$params:/min"], "name": "$params.min", "outcome": "unusable", "value": "s"}], "kind": "assertion", "locations": ["$policy:/requirements/s/checks/some"], "message": "$params.min is \"s\", which isn't a number", "name": "some xs.v is at least $params.min"}],
+            "inputs": [{"locations": ["/things/0/xs/0/v", "/things/0/xs/1/v"], "name": "xs[].v", "outcome": "usable", "value": [null, 1]}],
+            "message": "$params.min is \"s\", which isn't a number; item 1 of xs: v is null", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
     "description": "a root after the phrase whose value holds a semicolon is said once on the assertion of a walk",
     "policy": {
       "ergo_spec": "{{spec}}",

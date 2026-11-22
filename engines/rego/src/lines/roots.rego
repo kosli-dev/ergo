@@ -577,7 +577,26 @@ _rooted_row(check, subj, r) := object.union(object.remove(a, ["other_roots"]), {
 	flaw != ""
 	ms := _walk_root_clauses(check, subj)
 	ms != []
+} else := object.union(r, {"cause": _worst_of({flaw, r.cause}), "root_msgs": _with_roots(ps, ms), "ergo/alone_items": [_unrooted_text(t, ms) | some t in _walk_item_texts(ps, r)]}) if {
+	check.op != "for"
+	not _walk_keyed(check)
+	r.cause in _value_fault_causes
+	r.fails != []
+	every f in r.fails {
+		_path_through_item(f.item)
+	}
+	_walk_root_flaw(check, subj) == ""
+	_step_refs(check.check) == set()
+	flaw := _leaf_root_flaw(check, subj)
+	flaw == "unusable"
+	ms := _leaf_root_clauses(check, flaw)
+	ms != []
+	ps := _walk_parts(check, subj, r, r)
 } else := _rooted_main(check, subj, r)
+
+_unrooted_text(t, ms) := "" if t in {m.text | some m in ms}
+
+else := t
 
 _rooted_main(check, subj, r) := object.union(r, {"cause": "unusable", "failed": [], "root_msgs": _walk_key_root_clauses(check, subj, r)}) if {
 	r.cause in _not_failing_causes
