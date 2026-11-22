@@ -2478,6 +2478,16 @@ const ROWS_THE_CLAUSES_DONT_SAY_YET: &[(&str, usize, &str)] = &[
         5,
         OTHER_SUBJECTS_CAUSE,
     ),
+    (
+        "for / a walk through a for line's alias leaves a root after the phrase to the assertion, and each item keeps its own cause and the items of its list / an item whose list holds five items without v",
+        1,
+        ENTRY_CAUSE,
+    ),
+    (
+        "for / a walk through a for line's alias leaves a root after the phrase to the assertion, and each item keeps its own cause and the items of its list / an item whose list holds five items without v",
+        2,
+        ENTRY_CAUSE,
+    ),
 ];
 
 fn item_entries(failures: &Value, out: &mut Vec<(String, String)>) {

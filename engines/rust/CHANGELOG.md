@@ -14,6 +14,8 @@ Each release names the version of the spec it follows. The spec's own changes ar
 
 ### Changed
 
+- `ergo --version` also prints the commit the binary was built from, like `ergo 0.5.0-dev (commit ab81076ed80cff04a4c2e395418ca5535c6c3dab)`, and `unknown` when the build isn't in a git checkout of this repo. It no longer prints only `ergo 0.5.0-dev`. A script that reads the version line must read the first word after `ergo`.
+
 - `ergo-policy-sentences` reads `member of` after `every`, `some`, `count of` and `sum of` and on `for` lines into new public fields, `ListOptions::member`, `Derived::member` and `ForItem::Walk`'s `member`, so a struct literal of them outside the crate no longer compiles until it sets the field.
 
 - A failed `$min_subjects` row has `failures`, `[]` when it has no entries, whatever its `from` line, as spec 0.7 says ([row.parts](../../spec/semantics.md#requirements)). A passed one has none. Changes the report of every failed `$min_subjects` row that had no `failures`.
@@ -60,6 +62,8 @@ Each release names the version of the spec it follows. The spec's own changes ar
 - The assertion of an `every` or a `some` no longer says again an item that its entry already says, when the item says more than one thing or its value holds `; ` ([row.parts](../../spec/semantics.md#what-a-row-shows)). With `xs` holding `[{"v": "a"}]` and `ys` holding `[{}, 3]`, `every xs.v is in ys.v` has an assertion whose message is `""` and an entry for item 1 of `xs` that says `item 1 of ys: v is missing; item 2 of ys is 3, which isn't an object`, where the assertion said that too. With `xs` holding `[{"v": "p; q"}]`, `every xs.v is 1` has an assertion whose message is `""`, where it said `item 1 of xs: v is "p; q", which isn't a number`. Changes the report of such checks.
 
 ### Fixed
+
+- A one-line `every` fails when its `whose` reads a path from outside the item through a key the item holds, like `$input.m named by key`, and the part before the key is missing, `null` or not an object, even when each item reads its own fields fine ([walk.every](../../spec/semantics.md#every-and-some), [problems.where_said](../../spec/semantics.md#which-problems-a-message-says)). With `xs` holding `[{"key": "a", "v": 1}]` and `$input.m` `null`, `every xs whose v is $input.m named by key exists` fails as `null` with `$input.m is null`, as `some` already did, where it passed. The same goes for `, if any,`, `is not`, `contains`, `matches`, `is in`, `that`, `plus`, the root on the left (`every xs whose $input.m named by key is v exists`), two conditions, `distinct`, a deeper focus like `every xs.o whose key is $input.m named by key exists`, a root of `$params.m` or `$input.d.m`, and a sentence under a `for` line whose root is an alias. Changes the report of such checks, which passed.
 
 - A `for` line keeps an item whose value holds `; ` as an `item` entry under its sentence, with its whole message, as `ergo.rego` does ([row.parts](../../spec/semantics.md#what-a-row-shows)). With `xs` holding `["a; b", 1, 1, 1]`, `for: every xs as s` with `s is 2` gives `item 1 of xs` the message `item 1 of xs is "a; b", which isn't a number` and leaves the assertion's message empty, where it cut the text at the `; `, gave the item `item 1 of xs is "a` and the assertion `b", which isn't a number`. Changes the report of a `for` line where a value its message shows holds `; `.
 
