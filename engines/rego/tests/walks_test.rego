@@ -425,7 +425,7 @@ test_a_walk_whose_param_cant_be_used_fails_as_unusable_even_with_if_any if {
 	}
 	r := ergo.report(doc, _sentence_policy(checks), {"l": "text"})
 	[[row.check, row.cause, row.failures] | some row in r.results; row.check in {"a", "b", "c"}] == [
-		["a", "unusable", [_assertion("every xs.v whose kind is not in $params.l, if any, is 1", "unusable", ["$policy:/requirements/s/checks/a"], [_seen("$params.l", "text", ["$params:/l"], "unusable")], "$params.l is \"text\", which isn't a list", [_item("item 1 of xs", "not_an_object", {"kind": "a", "v": 2}, ["/things/0/xs/0"], [_seen("xs[0].v.kind", null, ["/things/0/xs/0/v"], "not_an_object")], "v is 2, which isn't an object", [])])]],
+		["a", "unusable", [_assertion("every xs.v whose kind is not in $params.l, if any, is 1", "unusable", ["$policy:/requirements/s/checks/a"], [_seen("$params.l", "text", ["$params:/l"], "unusable")], "$params.l is \"text\", which isn't a list", [])]],
 		["b", "unusable", [_assertion("every xs is not in $params.l", "unusable", ["$policy:/requirements/s/checks/b"], [_seen("$params.l", "text", ["$params:/l"], "unusable")], "$params.l is \"text\", which isn't a list", [])]],
 		["c", "unusable", [_assertion("every xs.kind is in $params.l", "unusable", ["$policy:/requirements/s/checks/c#2"], [_seen("$params.l", "text", ["$params:/l"], "unusable")], "$params.l is \"text\", which isn't a list", [])]],
 	]
