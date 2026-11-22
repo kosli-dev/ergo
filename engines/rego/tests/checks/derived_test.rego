@@ -53,6 +53,19 @@ test_a_count_fails_as_value_on_an_empty_list_on_the_right_of_its_whose_whatever_
 	}
 }
 
+_count_messages(sentence, xs) := [r.message | some r in ergo.report({"things": [{"id": 1, "xs": xs}]}, _sentence_policy({"c": sentence}), {"cs": []}).results; r.check == "c"]
+
+test_a_count_says_an_empty_list_on_the_right_once_and_then_each_items_own_problem if {
+	every sentence in [
+		"count of xs whose v is in $params.cs.name is 0",
+		"count of xs.v that is in $params.cs.name is 0",
+	] {
+		_count_messages(sentence, []) == ["$params.cs is []"]
+		_count_messages(sentence, [{"v": "a"}, {"v": "b"}]) == ["$params.cs is []"]
+		_count_messages(sentence, [{}]) == ["$params.cs is []; item 1 of xs: v is missing"]
+	}
+}
+
 test_a_count_or_sum_of_member_of_walks_each_member_of_the_object_as_an_item if {
 	side := {"sum_of": ["costs"], "whose": [], "text": "sum of member of costs", "member": true}
 	t := ergo._tally({"costs": {"b": 5, "a": 1, "c": "x"}}, side)
