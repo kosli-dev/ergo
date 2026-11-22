@@ -2211,5 +2211,5 @@ test_an_item_that_fails_on_its_own_field_keeps_a_whose_key_that_isnt_text_in_eac
 	checks := {"every": "every es whose zz is m named by $params.k exists", "some": "some es whose zz is m named by $params.k exists", "for": {"for": "every es whose zz is m named by $params.k as e", "assert": "e.v exists"}}
 	said := "item 1 of es: $params.k is 3, which isn't text; item 2 of es: $params.k is 3, which isn't text"
 	_key_rows(checks, {"es": [{"v": 1}, {"v": 2}]}, {"k": 3}) == {c: ["unusable", said] | some c in ["every", "some", "for"]}
-	_key_rows({"every": checks.every}, {"es": [{"v": 2}, {"zz": 2, "m": null}]}, {"k": null}) == {"every": ["absent", "item 1 of es: zz is missing; $params.k is null"]}
+	_key_rows({"every": checks.every}, {"es": [{"v": 2}, {"zz": 2, "m": null}]}, {"k": null}) == {"every": ["absent", "$params.k is null; item 1 of es: zz is missing"]}
 }
