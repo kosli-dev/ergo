@@ -1073,25 +1073,33 @@ _for_numbered(c) if {
 
 _for_list_rank(lists, l) := [i | some i, x in lists; x == l][0]
 
-_for_row_clauses(check, subj, r) := array.concat(array.concat(p.free, p.items), p.lists) if p := _for_row_parts(check, subj, r)
+_for_row_clauses(check, subj, r) := array.concat(array.concat(array.concat(p.roots, p.free), p.items), p.lists) if p := _for_row_parts(check, subj, r)
 
-_for_row_parts(check, subj, r) := {"free": free, "items": items, "lists": array.concat(listed, line), "line": line} if {
-	free := _for_free_clauses(check, subj, r)
-	said := {t | some c in free; some t in _m_clause_lines(c)}
+_for_row_parts(check, subj, r) := {"roots": roots, "free": free, "items": items, "lists": array.concat(listed, line), "line": line} if {
+	roots := _for_root_clauses(check, subj)
+	rooted := {c.text | some c in roots}
+	free := [x | some c in _for_free_clauses(check, subj, r); x := _for_free_unrooted(c, rooted)]
+	said := {t | some c in array.concat(roots, free); some t in _m_clause_lines(c)}
 	name := _input_name(check.items[0].path)
 	walked := _for_items_walked(check)
-	items := [x | some k, f in r.failed; f.path != name; x := _for_unrooted(_for_item_clause_at(check, r.failed, k, walked), said)]
-	listed := [object.union(_for_item_clause_at(check, r.failed, k, walked), {"kind": "list"}) | some k, f in r.failed; f.path == name]
-	line := [_m_clause("list", t, r.cause, t) | some t in _for_list_texts(check, subj, r)]
+	after := (3 * count(check.checks)) + 2
+	items := [object.union(x, {"group": after}) | some k, f in r.failed; f.path != name; x := _for_unrooted(_for_item_clause_at(check, r.failed, k, walked), said)]
+	listed := [object.union(_for_item_clause_at(check, r.failed, k, walked), {"kind": "list", "group": after}) | some k, f in r.failed; f.path == name]
+	line := [object.union(_m_clause("list", t, r.cause, t), {"group": after}) | some t in _for_list_texts(check, subj, r)]
 }
 
-_for_free_clauses(check, subj, r) := [object.union(x, {"group": i - count(check.checks)}) |
+_for_free_clauses(check, subj, r) := [object.union(x, {"group": i}) |
 	some i, c in check.checks
 	not _for_reads_an_alias(check, c)
 	ls := array.concat([l | some f in r.failed; some l in object.get(f, "failed_assertions", []); l.assertion == check.assertions[i]], [l | some l in object.get(r, "free_lines", []); l.assertion == check.assertions[i]])
 	ls != []
 	some x in _for_sentence_clauses(check, c, subj, ls[0].cause)
 ]
+
+_for_free_unrooted(c, rooted) := c if {
+	c.kind != "item"
+	_ = rooted
+} else := _for_unrooted(c, rooted)
 
 _for_unrooted(c, said) := object.union(c, {"said": kept}) if {
 	kept := [x | some x in c.said; not _for_said_by_row(x, said)]
