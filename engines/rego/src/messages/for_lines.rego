@@ -156,7 +156,7 @@ _for_own_texts(item, e, names) := [t |
 	some x in _walk_sides_paths(c)
 	is_array(x[0])
 	not _walk_outside(x[0])
-	own := _side_state(fe.iv, x[0])
+	own := _for_own_state(c, fe.iv, x[0])
 	own in _failed_read_states
 	subj := object.get(names, "ergo/subject", null)
 	roots := {piece | some r in array.concat(array.concat(_for_root_why(c, _m_undecided(own), subj), _m_keyed_off(subj, c, own)), _m_cond_root_texts(subj, c)); some piece in split(r, "; ")} with input as {"ergo/names": names}
@@ -166,7 +166,9 @@ _for_own_texts(item, e, names) := [t |
 	t := _m_aliased(concat(", and ", parts))
 ]
 
-_m_whose_why(first, f) := _for_why(first, wo[0], wo[1], wo[2], wo[3], f) if {
+_for_own_state(_, iv, p) := _side_state(iv, p)
+
+_m_whose_why(first, f) :=_for_why(first, wo[0], wo[1], wo[2], wo[3], f) if {
 	wo := f.whose_of
 	_for_root_fails(wo[0], wo[1], wo[2])
 } else := _for_why(first, wo[0], wo[1], wo[2], wo[3], f) if {
