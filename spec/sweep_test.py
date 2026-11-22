@@ -134,6 +134,38 @@ class StaleBinaryTest(unittest.TestCase):
             tree, _ = self.make_tree(directory)
             self.assertNotIn("uncommitted", self.refused("ergo 0.5.0-dev (commit " + "a" * 40 + ")", tree))
 
+    def test_an_old_binary_without_a_commit_is_accepted_when_old_ones_are_allowed(self):
+        with tempfile.TemporaryDirectory() as directory:
+            tree, _ = self.make_tree(directory)
+            sweep.check_commit("ergo 0.5.0-dev", tree, allow_old=True)
+
+    def test_allowing_old_binaries_still_stops_on_another_commit_and_on_unknown(self):
+        with tempfile.TemporaryDirectory() as directory:
+            tree, _ = self.make_tree(directory)
+            with mock.patch.dict(os.environ, {}, clear=False):
+                os.environ.pop(sweep.ALLOW_STALE, None)
+                for version in ("ergo 0.5.0-dev (commit " + "a" * 40 + ")", "ergo 0.5.0-dev (commit unknown)"):
+                    with self.assertRaises(SystemExit):
+                        sweep.check_commit(version, tree, allow_old=True)
+
+    def test_running_the_rust_engine_goes_on_with_an_old_binary_when_old_ones_are_allowed(self):
+        with tempfile.TemporaryDirectory() as directory:
+            tree, _ = self.make_tree(directory)
+            seen = []
+
+            def fake(argv, shell, script):
+                seen.append(script)
+                if len(seen) > 1:
+                    raise RuntimeError("cells")
+                return mock.Mock(stdout="ergo 0.5.0-dev\n")
+
+            with mock.patch.object(sweep, "run_command", side_effect=fake), \
+                    mock.patch.dict(os.environ, {}, clear=False):
+                os.environ.pop(sweep.ALLOW_STALE, None)
+                with self.assertRaises(RuntimeError):
+                    sweep.run_rust("sh -s", ["0"], tree, allow_old=True)
+        self.assertEqual(len(seen), 2)
+
     def test_running_the_rust_engine_stops_before_any_cell_when_the_binary_is_stale(self):
         with tempfile.TemporaryDirectory() as directory:
             tree, _ = self.make_tree(directory)
