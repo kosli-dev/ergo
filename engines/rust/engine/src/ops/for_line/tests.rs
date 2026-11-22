@@ -1955,6 +1955,21 @@ fn on_line<T>(
 }
 
 #[test]
+fn the_root_texts_hold_each_item_of_a_root_that_walks_a_list() {
+    let texts = on_line(
+        "every rows as r",
+        &["r.v is in $params.pos.name"],
+        json!({"rows": [{"v": "bob"}, {}]}),
+        json!({"pos": [{"name": "bob"}, {"v": 0}, {"v": 1}, {"v": 2}, {"v": 3}]}),
+        |line, ctx| line.root_texts(ctx),
+    );
+    for n in 2..=5 {
+        let said = format!("item {n} of $params.pos: name is missing");
+        assert!(texts.contains(&said), "{said} in {texts:#?}");
+    }
+}
+
+#[test]
 fn each_sentence_that_reads_a_root_gives_it() {
     let roots = |idx| {
         for_assertion_roots(
