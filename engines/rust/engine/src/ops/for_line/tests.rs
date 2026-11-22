@@ -3802,6 +3802,24 @@ fn a_params_key_of_the_second_list_that_cant_be_read_is_said_once_after_the_sent
 }
 
 #[test]
+fn a_params_key_of_the_second_list_that_cant_be_read_is_said_once_before_each_items_list_that_fails_whatever_the_key()
+ {
+    assert_eq!(
+        for_row(
+            "every ws as w, every w.o named by $params.k as x",
+            &["x is 1"],
+            json!({"ws": [{"o": {"a": [1]}}, {"o": "s"}, {}]}),
+            json!({}),
+        ),
+        (
+            "unusable".to_string(),
+            "$params.k is missing; item 2 of ws: w.o is \"s\", which isn't a list or an object; item 3 of ws: w.o is missing"
+                .to_string()
+        )
+    );
+}
+
+#[test]
 fn a_list_the_line_cant_walk_isnt_counted_as_an_item() {
     let zz = |n: usize| {
         (1..=n)
