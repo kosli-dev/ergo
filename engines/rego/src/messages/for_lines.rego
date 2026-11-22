@@ -854,13 +854,41 @@ _for_item_bound(check, f) := _bound(_for_names, item.as, e.v, _walk_at(w, e)) if
 	_failed_name(e.i, _for_dotted(check)) == f.path
 }
 
-_for_item_sentences(check, f, names) := _once([x |
+_for_item_sentences(check, f, names) := _for_in_list_order(_once([x |
 	some i, c in check.checks
 	_for_reads_an_alias(check, c)
 	some l in f.failed_assertions
 	l.assertion == check.assertions[i]
 	some x in _for_sentence_clauses(check, c, object.get(names, "ergo/subject", null), l.cause) with input as {"ergo/names": names}
-])
+]))
+
+_for_in_list_order(said) := [_for_slot(said, sorted, i) | some i, _ in said] if {
+	items := [c | some c in said; c.kind == "item"]
+	lists := _once([_for_item_list(c) | some c in items])
+	sorted := [x[3] | some x in sort([[_for_list_rank(lists, _for_item_list(c)), _for_item_number(c), j, c] | some j, c in items])]
+}
+
+_for_slot(said, sorted, i) := said[i] if {
+	said[i].kind != "item"
+	_ = sorted
+}
+
+else := sorted[count([j | some j, c in said; j < i; c.kind == "item"])]
+
+_for_item_list(c) := array.slice(c.name, 0, count(c.name) - 1) if _for_numbered(c)
+
+else := c.name
+
+_for_item_number(c) := c.name[count(c.name) - 1] if _for_numbered(c)
+
+else := 0
+
+_for_numbered(c) if {
+	is_array(c.name)
+	is_number(c.name[count(c.name) - 1])
+}
+
+_for_list_rank(lists, l) := [i | some i, x in lists; x == l][0]
 
 _m_leaf_message(_, leaf, cause, _) := _m_root_alone(leaf, cause)
 
