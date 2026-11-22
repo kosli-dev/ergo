@@ -31,7 +31,6 @@ derived / a count whose whose reads a root outside the item through a key the it
 derived / a count whose whose reads a root outside the item through a key the item holds says each item's own problems after the root, and stops after three problems / the root is null and an item's tags and v are of the wrong kind
 derived / a count whose whose reads a root outside the item through a key the item holds says each item's own problems after the root, and stops after three problems / the root is null and the item's key and field print with a semicolon and a comma
 derived / a count whose whose reads a root outside the item through a key the item holds says the root once and first / a root further back is null and the items have no key
-derived / a count whose whose reads a root outside the item through a key the item holds says the root once and first / the root is missing and the first item is null
 derived / a count whose whose reads a root outside the item through a key the item holds says the root once and first / the root is null and the first item's key isn't text
 derived / a count whose whose reads a root with a named by key from the item, problems inside an item in the order the sentence reads them / names a null root and then a missing key inside the item
 derived / a count whose whose reads a root with a named by key from the item, problems inside an item in the order the sentence reads them / names a null root and then a null key inside the item

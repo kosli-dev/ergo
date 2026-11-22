@@ -117,7 +117,7 @@ _keyed_root_fault(subj, p) := fs[0] if {
 	count(fs) > 0
 }
 
-_keyed_prefix_fault(subj, p, j, k) := {"cause": st, "text": concat("", [_input_name(shown), " is ", _m_state_word(st)])} if {
+_keyed_prefix_fault(subj, p, j, k) := {"cause": st, "text": concat("", [_input_name(_keyed_named(p, j, k, st)), " is ", _m_state_word(st)])} if {
 	shown := _as_subject_part(array.slice(p, 0, j))
 	st := _any_read_state(subj, shown)
 	st in {"absent", "null"}
@@ -128,6 +128,11 @@ _keyed_prefix_fault(subj, p, j, k) := {"cause": st, "text": concat("", [_input_n
 	not is_object(v)
 	_keyed_prefix_stops(j, k, v)
 }
+
+_keyed_named(p, j, k, st) := _as_subject_part(array.slice(p, 0, k)) if {
+	st == "absent"
+	_builtin(p)
+} else := _as_subject_part(array.slice(p, 0, j))
 
 _keyed_prefix_stops(j, k, _) if j == k
 
