@@ -224,7 +224,12 @@ _whose_item_texts(line, subj, params) := [[ergo._m_aliased(t) | some t in ergo._
 ]
 
 test_a_whose_item_says_only_its_own_read_beside_a_root if {
-	_whose_item_texts("every xs whose v is at least $params.min as x", {"xs": [{"v": 1}, {}]}, {"min": "s"}) == [[], ["item 2 of xs: v is missing"]]
+	_whose_item_texts("every xs whose v is at least $params.min as x", {"xs": [{"v": 1}, {}]}, {"min": "s"}) == [["item 2 of xs: v is missing"]]
+}
+
+test_a_whose_item_says_the_first_condition_that_says_something if {
+	_whose_item_texts("every xs whose v is at least $params.min and whose w is 1 as x", {"xs": [{"v": 1}]}, {"min": "s"}) == [["item 1 of xs: w is missing"]]
+	_whose_item_texts("every xs whose v is at least $params.min and whose w is at least $params.min as x", {"xs": [{"v": 1}]}, {"min": "s"}) == [["item 1 of xs: w is missing"]]
 }
 
 test_a_whose_item_beside_a_root_says_a_value_of_the_wrong_kind_and_a_null if {
@@ -235,7 +240,6 @@ test_a_whose_item_says_each_own_read_beside_a_key_that_isnt_text if {
 	subj := {"es": [{"v": 1}, {"v": 2, "zz": 1, "m": {"a": 1}}, {"v": 3, "m": null}]}
 	_whose_item_texts("every es whose zz is m named by $params.k as e", subj, {"k": 3}) == [
 		["item 1 of es: zz is missing, and m is missing"],
-		[],
 		["item 3 of es: zz is missing, and m is null"],
 	]
 }
