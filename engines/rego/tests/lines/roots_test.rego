@@ -159,6 +159,14 @@ test_a_walked_list_after_is_in_ignoring_case_takes_the_worst_cause_of_its_values
 	ergo._walked_root_states(object.remove(ref, ["ignoring"])) == set() with data.ergo_document as {"cs": [{"name": 3}]} with input as {}
 }
 
+test_a_walked_root_is_judged_for_the_words_at_its_own_condition_so_each_row_walks_the_check_once if {
+	ref := {"op": "in", "path": ["v"], "values": {"ref": ["$$input[]", "cs", "name"]}, "ignoring": "case"}
+	p := ["$$input[]", "cs", "name"]
+	ergo._walked_root_states_at(ref, p) == {"unusable"} with data.ergo_document as {"cs": [{"name": 3}]} with input as {}
+	ergo._walked_root_states_at(object.remove(ref, ["ignoring"]), p) == set() with data.ergo_document as {"cs": [{"name": 3}]} with input as {}
+	ergo._walked_root_states_at(ref, p) == {"absent"} with data.ergo_document as {"cs": [{"name": null}, {}]} with input as {}
+}
+
 test_a_row_whose_items_fail_worse_than_its_roots_keeps_its_items if {
 	c := {"op": "in", "path": ["$$params", "k"], "values": {"ref": ["$$params[]", "l"]}, "ignoring": "case"}
 	check := {"op": "every", "path": ["xs"], "whose": [c], "check": {"op": "present", "path": ["x"]}, "if_any": true}

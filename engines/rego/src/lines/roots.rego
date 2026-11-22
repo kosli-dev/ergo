@@ -39,11 +39,10 @@ _walked_root_states(c) := {st |
 	walk(c, [_, x])
 	is_object(x)
 	some p in _m_walked_roots(x)
-	st := _walked_root_state(x, _rwalk_run(object.get(input, ["ergo/names", "ergo/subject"], null), _dotted_root_part(p)))
-} | {st |
-	walk(c, [_, x])
-	is_object(x)
-	some p in _m_walked_roots(x)
+	some st in _walked_root_states_at(x, p)
+}
+
+_walked_root_states_at(x, p) := {st | st := _walked_root_state(x, _rwalk_run(object.get(input, ["ergo/names", "ergo/subject"], null), _dotted_root_part(p)))} | {st |
 	_text_walked_ref(x, p)
 	st := _text_ref_state(p)
 	st in _failed_read_states
@@ -686,10 +685,10 @@ _rooted_main(check, subj, r) := object.union(r, {"cause": "unusable", "failed": 
 _rooted_cause_said(_, _, r, flaw) if r.cause in {"satisfied", "value", flaw}
 
 _rooted_cause_said(check, subj, r, flaw) if {
-	some c in array.concat(_walk_root_conds(check), [object.get(check, "check", {})])
-	c.ignoring
 	_worst_of({flaw, r.cause}) == flaw
 	r.fails != []
+	some c in array.concat(_walk_root_conds(check), [object.get(check, "check", {})])
+	c.ignoring
 	ms := _walk_root_msgs(check, subj)
 	every f in r.fails {
 		f.msg in ms
