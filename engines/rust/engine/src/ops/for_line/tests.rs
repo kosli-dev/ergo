@@ -2642,12 +2642,12 @@ const ROWS_THE_CLAUSES_DONT_SAY_YET: &[(&str, usize, &str)] = &[
         SAID_OUTSIDE,
     ),
     (
-        "for / a part that holds a list is walked in the whose of a for line and in a whose under it / an empty part leaves every item out",
+        "for / a part that holds a list is walked in the whose of a for line and in a whose under it / an empty part fails as value",
         1,
         NO_LIST,
     ),
     (
-        "for / a part that holds a list is walked in the whose of a for line and in a whose under it / an empty part leaves every item out",
+        "for / a part that holds a list is walked in the whose of a for line and in a whose under it / an empty part fails as value",
         4,
         NO_LIST,
     ),
