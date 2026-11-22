@@ -3572,6 +3572,25 @@ fn a_list_the_line_picks_nothing_from_is_said_after_a_sentence_that_reads_no_ali
 }
 
 #[test]
+fn a_sentence_that_reads_params_that_arent_an_object_says_only_the_params_beside_a_tie() {
+    assert_eq!(
+        for_row(
+            "first of xs sorted by v as x",
+            &[
+                "x.v is at least $params.min",
+                "count of es whose zz is m named by $params.k is 0",
+            ],
+            json!({"xs": [{"v": 1}, {"v": 1}], "es": [null, {"zz": 2, "m": 3}]}),
+            json!(3),
+        ),
+        (
+            "ambiguous".to_string(),
+            "$params is 3, which isn't an object; item 1 and item 2 of xs tie on v".to_string()
+        )
+    );
+}
+
+#[test]
 fn a_list_the_line_cant_walk_isnt_counted_as_an_item() {
     let zz = |n: usize| {
         (1..=n)
