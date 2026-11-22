@@ -104,6 +104,29 @@ _roots_said_today(line, sentences, subj, params) := {x[1] | some x in said} if {
 	said := ergo._walk_root_said(check, subj) with input as {"ergo/names": {"ergo/subject": subj}} with data.ergo_params as params
 }
 
+_on_tree(line, sentences, subj, params) if {
+	check := ergo._s_written_check({"for": line, "assert": sentences})
+	names := {"ergo/subject": subj, "$at": {"names": {}}}
+	r := ergo._for_freed(check, subj, ergo._for_row_raw(check, subj)) with input as {"ergo/names": names} with data.ergo_params as params
+	ergo._for_on_tree(check, subj, r) with input as {"ergo/names": names} with data.ergo_params as params
+}
+
+test_a_one_list_for_row_with_nothing_read_outside_it_that_fails_takes_its_message_from_the_tree if {
+	_on_tree("every xs as x", ["x.v is 1", "z is 1"], {"xs": [{"v": 2}], "z": 2}, {})
+	_on_tree("every xs as x", ["x.v is at least $params.min"], {"xs": [{"v": 0}]}, {"min": 1})
+	_on_tree("first of xs sorted by t as x", ["x.v is 1"], {"xs": [{"t": 1, "v": 2}]}, {})
+}
+
+test_a_for_row_keeps_its_message_off_the_tree_while_the_tree_cant_say_its_roots_keys_or_second_list if {
+	not _on_tree("every xs as x, every x.ys as y", ["y.v is 1"], {"xs": [{"ys": [{"v": 2}]}]}, {})
+	not _on_tree("every xs as x", ["x.v is at least $params.min"], {"xs": [{"v": 0}]}, {"min": "s"})
+	not _on_tree("every xs as x", ["x.v is at least $params.min"], {"xs": [{"v": 0}]}, {})
+	not _on_tree("every o named by $params.k as x", ["x is 1"], {"o": {"a": [2]}}, {"k": "a"})
+	not _on_tree("first of xs sorted by m named by $params.k as x", ["x.v is 1"], {"xs": [{"m": {"a": 1}, "v": 2}]}, {"k": "a"})
+	not _on_tree("every es whose zz is m named by $params.k as e", ["e.v is 1"], {"es": [{"zz": 1}]}, {"k": 3})
+	not _on_tree("every xs as x", ["x.v is 1"], {"xs": [{"v": 1}]}, {})
+}
+
 test_for_root_clauses_name_the_roots_the_row_names_today if {
 	rows := [
 		["every xs as x", ["x.v is at least $params.b", "x.w is at least $params.a"], {"xs": [{"v": 1, "w": 1}]}, {"a": "s"}],

@@ -485,6 +485,26 @@ test_the_list_a_line_picks_nothing_from_comes_after_a_sentence_that_reads_no_ali
 	_row_tree_text("first of xs sorted by v as x", ["x.v is 1", "z is 1"], {"xs": [], "z": 3}, {}) == "z is 3; xs is []"
 }
 
+_tree_said(line, sentences, subj, params, cause) := said if {
+	check := ergo._s_written_check({"for": line, "assert": sentences})
+	names := {"ergo/subject": subj, "$at": {"names": {}}}
+	r := ergo._for_freed(check, subj, ergo._for_row_raw(check, subj)) with input as {"ergo/names": names} with data.ergo_params as params
+	raw := {"passed": false, "cause": cause, "message": "", "ergo/for_raw": {"check": check, "subj": subj, "r": object.union(r, {"cause": cause}), "tree": true}}
+	said := ergo._for_said(raw) with input as {"ergo/names": names} with data.ergo_params as params
+}
+
+test_a_row_on_the_tree_says_the_trees_message if {
+	said := _tree_said("every xs as x", ["x.v is at least z", "z is 1"], {"xs": [{"v": 1}, {"v": 3}], "z": 5}, {}, "value")
+	ergo._m_aliased(said.message) == "z is 5; item 1 of xs: x.v is 1; item 2 of xs: x.v is 3"
+	said.cause == "value"
+	not "ergo/for_raw" in object.keys(said)
+}
+
+test_a_row_on_the_tree_takes_the_worst_cause_of_what_it_says if {
+	_tree_said("every xs as x", ["x.v is 1"], {"xs": [{}]}, {}, "value").cause == "absent"
+	_tree_said("every xs as x", ["x.v is 1"], {"xs": [{}]}, {}, "not_an_object").cause == "not_an_object"
+}
+
 test_items_of_an_inner_list_that_tie_are_said_under_their_item if {
 	_item_texts("every ws as w, first of w.ys sorted by t as y", ["y.v is 1"], {"ws": [{"ys": [{"t": 1, "v": 2}, {"t": 1, "v": 3}]}]}, {}) == [["item 1 of ws: item 1 and item 2 of w.ys tie on t"]]
 }
