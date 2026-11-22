@@ -1012,13 +1012,22 @@ _for_item_walked(check, f) := [e, w] if {
 
 _for_item_bound(check, f) := _bound(_for_names, check.items[0].as, e.v, _walk_at(w, e)) if [e, w] := _for_item_walked(check, f)
 
-_for_item_sentences(check, f, names) := _for_in_list_order(_once([x |
-	some i, c in check.checks
-	_for_reads_an_alias(check, c)
-	some l in f.failed_assertions
-	l.assertion == check.assertions[i]
-	some x in _for_sentence_clauses(check, c, object.get(names, "ergo/subject", null), l.cause) with input as {"ergo/names": names}
-]))
+_for_item_sentences(check, f, names) := _for_in_list_order([x | some i, x in said; not _for_said_earlier(x, array.slice(said, 0, i))]) if {
+	said := _once([x |
+		some i, c in check.checks
+		_for_reads_an_alias(check, c)
+		some l in f.failed_assertions
+		l.assertion == check.assertions[i]
+		some x in _for_sentence_clauses(check, c, object.get(names, "ergo/subject", null), l.cause) with input as {"ergo/names": names}
+	])
+}
+
+_for_said_earlier(x, earlier) if {
+	x.kind != "item"
+	some e in earlier
+	e.kind != "item"
+	e.text == x.text
+}
 
 _for_in_list_order(said) := [_for_slot(said, sorted, i) | some i, _ in said] if {
 	items := [c | some c in said; c.kind == "item"]
