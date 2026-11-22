@@ -434,6 +434,18 @@ test_items_of_the_second_list_the_line_cant_check_are_said_with_no_pair_beside_t
 	_item_texts("every ws as w, some ys whose n is at least w.z and whose n is at most u as y", ["y.n exists"], subj, {}) == [["item 1 of ws: item 1 of ys: u is missing", "item 1 of ws: item 2 of ys: u is missing"]]
 }
 
+test_a_second_list_item_that_isnt_an_object_is_named_by_the_item if {
+	_item_texts("every prs as pr, every pr.as as ap", ["ap.state is 1"], {"prs": [{"as": [3, {"state": 2}, null]}]}, {}) == [[
+		"item 1 of prs: item 1 of pr.as is 3, which isn't an object",
+		"item 1 of prs: item 2 of pr.as: ap.state is 2",
+		"item 1 of prs: item 3 of pr.as is null, which isn't an object",
+	]]
+}
+
+test_a_second_alias_read_whole_is_named_by_its_item if {
+	_item_texts("every ws as w, every member of w.ms as m", ["m is 1"], {"ws": [{"ms": {"a": 2, "b": 1}}]}, {}) == [["item 1 of ws: member a of w.ms is 2"]]
+}
+
 test_items_of_an_inner_list_that_tie_are_said_under_their_item if {
 	_item_texts("every ws as w, first of w.ys sorted by t as y", ["y.v is 1"], {"ws": [{"ys": [{"t": 1, "v": 2}, {"t": 1, "v": 3}]}]}, {}) == [["item 1 of ws: item 1 and item 2 of w.ys tie on t"]]
 }
