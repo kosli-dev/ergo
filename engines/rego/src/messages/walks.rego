@@ -686,7 +686,7 @@ _m_undecided_text(subj, c, e, cause, roots) := _m_isnt(_m_item_name(e.i, roots),
 	cause == "not_an_object"
 	off := _m_input_one_refs(c)
 	off != []
-} else := _m_leaf_in(e.i, _m_cond_message(c, e.iv, cause), roots)
+} else := _m_leaf_in(e.i, _m_cond_message(subj, c, e.iv, cause), roots)
 
 _m_own_clauses(c, item, cause) := _once([_m_state_clause(s) |
 	some s in _m_sources(item, c)
@@ -841,7 +841,7 @@ _m_shown_at(shown, _, "absent") := shown
 
 _m_shown_at(shown, i, "null") := array.slice(shown, 0, i)
 
-_m_cond_message(c, item, cause) := concat("; ", array.concat(_m_null_before_key(item, c), [concat(", and ", cs)])) if {
+_m_cond_message(subj, c, item, cause) := concat("; ", array.concat(_m_unsaid_null_before_key(subj, item, c), [concat(", and ", cs)])) if {
 	cause in _no_value_states
 	cs := _m_key_states(item, c, cause)
 	cs != []
@@ -1035,6 +1035,19 @@ _m_null_before_key(item, c) := _once([concat("", [_input_name(prefix), " is null
 	prefix := array.slice(p, 0, i)
 	_m_resolved_prefix(item, prefix) == null
 ])
+
+_m_unsaid_null_before_key(subj, item, c) := [t | some t in ns; not t in _m_keyed_root_said(subj, c)] if {
+	ns := _m_null_before_key(item, c)
+	ns != []
+} else := []
+
+_m_keyed_root_said(subj, c) := {f.text |
+	not _unreadable_input
+	object.get(c, "op", null) == "compare"
+	some p in [object.get(c, "left", null), object.get(c, "right", null)]
+	_keyed_root_path(p)
+	f := _keyed_root_fault(subj, p)
+}
 
 _m_rooted_path(p) if _part_start(p)
 
