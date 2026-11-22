@@ -927,13 +927,13 @@ else := _m_clause("item", f.said, f.cause, _m_named_item(f)) if {
 
 else := _m_item_clause(f.said, _for_said_cause(said), said) if {
 	f.failed_assertions != []
-	not _m_two_list(f)
+	count(check.items) == 1
 	said := _for_item_sentences(check, f, _for_item_bound(check, f))
 	said != []
 }
 
 else := _m_item_clause(f.said, _for_said_cause(said), said) if {
-	_m_two_list(f)
+	count(check.items) == 2
 	said := _for_pairs_said(check, f, _for_item_bound(check, f))
 	said != []
 }
