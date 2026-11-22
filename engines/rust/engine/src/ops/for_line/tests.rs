@@ -4044,3 +4044,19 @@ fn a_key_that_isnt_text_is_said_once_and_each_item_says_only_its_own_problem() {
         );
     }
 }
+
+#[test]
+fn a_root_of_a_sentence_that_reads_the_alias_comes_before_the_list_the_line_cant_walk() {
+    assert_eq!(
+        for_row(
+            "every o named by $params.k as x",
+            &["every x.ys.n is 1", "x.v is at least z"],
+            json!({"z": "s"}),
+            json!({}),
+        ),
+        (
+            "unusable".to_string(),
+            "$params.k is missing; z is \"s\", which isn't a number; o is missing".to_string()
+        )
+    );
+}
