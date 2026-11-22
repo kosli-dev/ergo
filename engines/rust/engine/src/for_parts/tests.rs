@@ -32,3 +32,99 @@ fn a_member_whose_key_holds_a_semicolon_makes_its_whole_clause_and_leaves_no_roo
     assert_eq!(made, ["member \"a; b\" of statuses is 1"]);
     assert!(row_roots("member \"a; b\" of statuses is 1", &made).is_empty());
 }
+
+fn entries(for_line: &str, assertions: Value, subject: Value, params: Value) -> Vec<String> {
+    let policy = json!({
+        "ergo_spec": crate::SPEC,
+        "subjects": {"thing": {"from": "things", "identified_by": "id"}},
+        "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": for_line, "assert": assertions}}}}
+    });
+    let mut subject = subject;
+    subject["id"] = json!(1);
+    let report = crate::report(&json!({"things": [subject]}), &policy, &params);
+    let row = report["results"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|row| row["check"] == "c")
+        .unwrap()
+        .clone();
+    let mut out = Vec::new();
+    tree(&row["failures"], 0, &mut out);
+    out
+}
+
+fn tree(failures: &Value, depth: usize, out: &mut Vec<String>) {
+    for entry in failures.as_array().into_iter().flatten() {
+        let inputs: Vec<String> = entry["inputs"]
+            .as_array()
+            .into_iter()
+            .flatten()
+            .map(|input| format!("{} {}", input["name"], input["outcome"]))
+            .collect();
+        out.push(format!(
+            "{}{} {} [{}] {:?} ({})",
+            "  ".repeat(depth),
+            entry["kind"].as_str().unwrap_or_default(),
+            entry["name"].as_str().unwrap_or_default(),
+            entry["cause"].as_str().unwrap_or_default(),
+            entry["message"].as_str().unwrap_or_default(),
+            inputs.join(", ")
+        ));
+        tree(&entry["failures"], depth + 1, out);
+    }
+}
+
+#[test]
+fn an_items_own_read_keeps_its_own_cause_beside_a_root() {
+    let said = entries(
+        "every ws as w",
+        json!("every w.xs.v is at least $params.min"),
+        json!({"ws": [{"xs": [{}, {}]}]}),
+        json!({"min": "s"}),
+    );
+    assert_eq!(said[1], "  item item 1 of ws [absent] \"\" ()");
+    assert_eq!(
+        said[2],
+        "    item item 1 of w.xs [absent] \"v is missing\" (\"w.xs[0].v\" \"absent\")"
+    );
+}
+
+#[test]
+fn an_item_entry_is_its_clause() {
+    assert_eq!(
+        entries(
+            "every xs as x",
+            json!("every x.ys.n is 1"),
+            json!({"xs": [{"ys": [{"n": 1}, {}]}, {}]}),
+            json!({}),
+        ),
+        [
+            "assertion every x.ys.n is 1 [absent] \"\" ()",
+            "  item item 1 of xs [absent] \"\" ()",
+            "    item item 2 of x.ys [absent] \"n is missing\" (\"x.ys[1].n\" \"absent\")",
+            "  item item 2 of xs [absent] \"\" ()",
+            "    list x.ys [absent] \"x.ys is missing\" (\"x.ys\" \"absent\")",
+        ]
+    );
+}
+
+#[test]
+fn a_value_that_holds_a_semicolon_stays_whole_in_its_entry() {
+    let said = entries(
+        "every xs as x",
+        json!("x.v is 1"),
+        json!({"xs": [{"v": "p; q"}, {"v": "r; s"}, {"v": 3}, {"v": 4}, {"v": 5}]}),
+        json!({}),
+    );
+    assert_eq!(said.len(), 6, "{said:#?}");
+    assert_eq!(said[0], "assertion x.v is 1 [unusable] \"\" ()");
+    assert_eq!(
+        said[1],
+        "  item item 1 of xs [unusable] \"x.v is \\\"p; q\\\", which isn't a number\" (\"x.v\" \"unusable\")"
+    );
+    assert_eq!(
+        said[2],
+        "  item item 2 of xs [unusable] \"x.v is \\\"r; s\\\", which isn't a number\" (\"x.v\" \"unusable\")"
+    );
+}
