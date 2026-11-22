@@ -1926,3 +1926,126 @@ fn a_one_line_walk_count_or_sum_says_a_counted_root_once_and_then_each_item_its_
         );
     }
 }
+
+#[test]
+fn an_every_whose_item_is_undecided_and_says_nothing_of_its_own_does_not_pass_even_with_if_any() {
+    let subject = json!({"xs": [{"v": 1}]});
+    let input = json!({});
+    let context = ctx(&subject, &input, None);
+    let walked = walk(&at(Start::Subject, &["xs"]), &context, Options::default());
+    let undecided = Judged {
+        kept: true,
+        passed: false,
+        decided: false,
+        reached: false,
+        alone: None,
+        failure: None,
+    };
+    for if_any in [false, true] {
+        let check = every(&["xs"], vec![], present(false), if_any);
+        assert_eq!(
+            cause_of(&check, &walked, std::slice::from_ref(&undecided), &[]),
+            Cause::Value,
+            "if any: {if_any}"
+        );
+    }
+}
+
+fn keyed_root_row(sentence: &str, input: Value, params: Value) -> (Cause, String) {
+    let Check::Walk(walk_check) = lowered(sentence) else {
+        panic!("{sentence} is not every or some");
+    };
+    let subject = json!({"xs": [{"key": "a", "v": "x", "tags": ["x"]}]});
+    let mut context = ctx(&subject, &input, Some(&params));
+    context.label = Some("thing".to_string());
+    let out = run(&walk_check, &context);
+    (out.verdict.cause, out.message.unwrap_or_default())
+}
+
+#[test]
+fn an_every_or_some_fails_on_a_root_before_a_key_from_the_item_it_cant_read_even_when_each_item_reads_fine()
+ {
+    let roots = [
+        (
+            "$params.m",
+            json!({}),
+            json!({}),
+            Cause::Absent,
+            "$params.m is missing",
+        ),
+        (
+            "$params.m",
+            json!({}),
+            json!({"m": null}),
+            Cause::Null,
+            "$params.m is null",
+        ),
+        (
+            "$params.m",
+            json!({}),
+            json!({"m": 3}),
+            Cause::Unusable,
+            "$params.m is 3, which isn't an object",
+        ),
+        (
+            "$params.m",
+            json!({}),
+            json!({"m": []}),
+            Cause::Unusable,
+            "$params.m is [], which isn't an object",
+        ),
+        (
+            "$input.m",
+            json!({}),
+            json!({}),
+            Cause::Absent,
+            "$input.m is missing",
+        ),
+        (
+            "$input.m",
+            json!({"m": null}),
+            json!({}),
+            Cause::Null,
+            "$input.m is null",
+        ),
+        (
+            "$input.m",
+            json!({"m": 3}),
+            json!({}),
+            Cause::Unusable,
+            "$input.m is 3, which isn't an object",
+        ),
+        (
+            "$input.d.m",
+            json!({"d": null}),
+            json!({}),
+            Cause::Null,
+            "$input.d is null",
+        ),
+        (
+            "$input.d.m",
+            json!({"d": 3}),
+            json!({}),
+            Cause::Unusable,
+            "$input.d is 3, which isn't an object",
+        ),
+    ];
+    let forms = [
+        "every xs whose {} named by key exists",
+        "every xs whose {} named by key, if any, exists",
+        "some xs whose {} named by key exists",
+    ];
+    let phrases = ["v is", "v is not", "tags contains", "v matches", "v is in"];
+    for (root, input, params, cause, said) in roots {
+        for form in forms {
+            for phrase in phrases {
+                let sentence = form.replace("{}", &format!("{phrase} {root}"));
+                assert_eq!(
+                    keyed_root_row(&sentence, input.clone(), params.clone()),
+                    (cause, said.to_string()),
+                    "{sentence} with input {input} and params {params}"
+                );
+            }
+        }
+    }
+}
