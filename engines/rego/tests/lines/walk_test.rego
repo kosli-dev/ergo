@@ -102,6 +102,14 @@ test_a_named_by_key_after_the_phrase_that_cant_be_read_leaves_the_items_to_say_t
 	not "root_msgs" in object.keys(r)
 }
 
+test_a_walk_lists_its_failed_items_in_list_order_even_when_a_later_item_failed_on_a_read_outside_it if {
+	fails := [
+		{"path": ["$$input", "m"], "item": ["xs", 2], "cause": "absent", "value": null, "at": "~~/m"},
+		{"path": ["xs", 0, "tags"], "item": ["xs", 0], "cause": "not_an_object", "value": null, "at": "~~/xs/0"},
+	]
+	[f.item | some f in ergo._walk_failed("not_an_object", fails, ["xs"])] == ["item 1 of xs", "item 3 of xs"]
+}
+
 test_a_walk_through_a_for_alias_leaves_a_root_after_the_phrase_to_the_for_line_so_each_item_keeps_its_own_cause_as_for_roots_says if {
 	check := ergo._s_written_check({"for": "every ws as w", "assert": "every w.xs.v is at least $params.min"}).checks[0]
 	w := {"xs": [{}, {}]}
