@@ -555,3 +555,11 @@ test_a_for_line_whose_says_an_empty_list_on_the_right_then_the_list_or_each_item
 	_for_said_beside_empty("every xs whose v is in $params.cs.name, if any, as m", []) == [["value", "$params.cs is []"]]
 	_for_said_beside_empty("every xs whose v is in $params.cs.name, if any, as m", [{"v": "a"}, {}]) == [["value", "$params.cs is []; item 2 of xs: v is missing"]]
 }
+
+test_a_for_lines_whose_leaves_an_empty_part_out_of_the_rows_inputs_as_a_null_part if {
+	policy := _item_policy({"has": {"pl": "c"}}, {"every": {"for": "every xs whose v is in pl.z as m", "assert": "m.v is 1"}})
+	every part in [[], null] {
+		rows := [r | some r in ergo.report({"prs": [{"id": "p0", "c": part, "xs": [{"v": 1}]}]}, policy, {}).results; r.check == "every"]
+		[i.name | some i in rows[0].inputs] == ["xs[]"]
+	}
+}
