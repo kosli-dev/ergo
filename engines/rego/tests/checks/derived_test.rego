@@ -92,6 +92,22 @@ test_an_empty_list_after_contains_all_of_or_none_of_is_said_once_and_fails_the_r
 	}
 }
 
+_said_beside_list(sentence, thing) := [[r.cause, r.message] | some r in ergo.report({"things": [object.union({"id": 1, "k": 0}, thing)]}, _sentence_policy({"c": sentence}), {"cs": []}).results; r.check == "c"]
+
+test_a_count_or_a_sum_says_an_empty_list_on_the_right_before_its_own_list_that_cant_be_read if {
+	every sentence in [
+		"count of xs whose v is in $params.cs.name is 0",
+		"count of xs whose v is not one of $params.cs.name is 0",
+		"count of xs whose v matches $params.cs.name is 0",
+		"count of xs.v that is in $params.cs.name is 0",
+		"sum of xs.n that is in $params.cs.name is 0",
+		"k plus count of xs whose v is in $params.cs.name is 0",
+	] {
+		_said_beside_list(sentence, {}) == [["absent", "$params.cs is []; xs is missing"]]
+		_said_beside_list(sentence, {"xs": null}) == [["null", "$params.cs is []; xs is null"]]
+	}
+}
+
 test_a_count_or_sum_of_member_of_walks_each_member_of_the_object_as_an_item if {
 	side := {"sum_of": ["costs"], "whose": [], "text": "sum of member of costs", "member": true}
 	t := ergo._tally({"costs": {"b": 5, "a": 1, "c": "x"}}, side)
