@@ -2520,12 +2520,11 @@ fn the_clauses_of_every_for_row_say_what_the_row_and_its_entries_say_today() {
         for result in report["results"].as_array().into_iter().flatten() {
             item_entries(&result["failures"], &mut entries);
         }
-        for (at, (cause, message, roots, items)) in
+        for (at, (cause, message, clauses)) in
             super::RAN.with(|ran| ran.take()).into_iter().enumerate()
         {
             let row = at + 1;
             let message = message.unwrap_or_default();
-            let clauses: Vec<crate::ops::clause::Clause> = roots.into_iter().chain(items).collect();
             let shown = crate::ops::clause::shown(&clauses);
             let said = crate::ops::clause::text(&shown);
             let mut causes: Vec<(String, String)> = Vec::new();
@@ -2951,11 +2950,10 @@ fn an_item_beside_a_root_takes_only_its_own_cause() {
 fn for_tree(for_line: &str, assertions: &[&str], subject: Value, params: Value) -> String {
     super::RAN.with(|ran| ran.borrow_mut().clear());
     for_items(for_line, assertions, subject, params);
-    let (_, _, roots, items) = super::RAN
+    let (_, _, clauses) = super::RAN
         .with(|ran| ran.take())
         .pop()
         .expect("the line ran");
-    let clauses: Vec<crate::ops::clause::Clause> = roots.into_iter().chain(items).collect();
     crate::ops::clause::text(&crate::ops::clause::shown(&clauses))
 }
 
@@ -3969,4 +3967,22 @@ fn sentences_that_read_no_alias_are_said_first_in_the_order_they_are_written_wit
             "{for_line} {assertions:?}"
         );
     }
+}
+
+#[test]
+fn a_root_of_a_sentence_that_reads_the_first_alias_stays_before_the_second_list_when_the_first_is_empty()
+ {
+    assert_eq!(
+        for_row(
+            "every xs, if any, as x, every es as e",
+            &["x.v is at least $params.min", "z is 1", "e.n is 1"],
+            json!({"xs": [], "es": [{"n": 2}], "z": 2}),
+            json!({"min": "s"}),
+        ),
+        (
+            "unusable".to_string(),
+            "z is 2; $params.min is \"s\", which isn't a number; item 1 of es: e.n is 2"
+                .to_string()
+        )
+    );
 }

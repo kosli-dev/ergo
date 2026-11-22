@@ -58,23 +58,32 @@ impl Clause {
 const SHOWN_ITEMS: usize = 3;
 
 pub fn shown(clauses: &[Clause]) -> Vec<Clause> {
-    let once = said_once(clauses);
-    let (mut out, mut rest): (Vec<Clause>, Vec<Clause>) = once
-        .into_iter()
-        .partition(|clause| clause.kind == Kind::Root);
-    out.sort_by(|a, b| (a.group, a.cause, &a.name).cmp(&(b.group, b.cause, &b.name)));
-    rest.sort_by_key(|clause| (clause.group, clause.kind == Kind::Item));
-    let leaves: usize = rest
+    let mut once = said_once(clauses);
+    let rank = |clause: &Clause| match clause.kind {
+        Kind::Root => 0,
+        Kind::List => 1,
+        Kind::Item | Kind::More(_) => 2,
+    };
+    once.sort_by(|a, b| {
+        (a.group, rank(a)).cmp(&(b.group, rank(b))).then_with(|| {
+            if a.kind == Kind::Root && b.kind == Kind::Root {
+                (a.cause, &a.name).cmp(&(b.cause, &b.name))
+            } else {
+                std::cmp::Ordering::Equal
+            }
+        })
+    });
+    let leaves: usize = once
         .iter()
         .filter(|clause| clause.kind == Kind::Item)
         .map(leaves)
         .sum();
     if leaves <= SHOWN_ITEMS {
-        out.extend(rest);
-        return out;
+        return once;
     }
+    let mut out: Vec<Clause> = Vec::new();
     let mut left = SHOWN_ITEMS;
-    for clause in rest {
+    for clause in once {
         if clause.kind == Kind::Item {
             out.extend(cut(&clause, &mut left));
         } else {

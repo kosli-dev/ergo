@@ -90,7 +90,7 @@ pub struct Run {
 }
 
 #[cfg(test)]
-type Ran = (Cause, Option<String>, Vec<Clause>, Vec<Clause>);
+type Ran = (Cause, Option<String>, Vec<Clause>);
 
 #[cfg(test)]
 thread_local! {
@@ -1891,11 +1891,7 @@ impl For {
 
     pub fn run(&self, ctx: &Ctx) -> Run {
         let mut run = self.run_items(ctx);
-        let clauses: Vec<Clause> = self
-            .root_clauses(ctx)
-            .into_iter()
-            .chain(run.items.iter().cloned())
-            .collect();
+        let clauses = row_clauses(self.root_clauses(ctx), &run.items, self.sentences.len());
         let shown = super::clause::shown(&clauses);
         let walked = run.verdict.cause;
         run.verdict.cause =
@@ -1915,12 +1911,8 @@ impl For {
         }
         #[cfg(test)]
         RAN.with(|ran| {
-            ran.borrow_mut().push((
-                run.verdict.cause,
-                run.message.clone(),
-                self.root_clauses(ctx),
-                run.items.clone(),
-            ));
+            ran.borrow_mut()
+                .push((run.verdict.cause, run.message.clone(), clauses.clone()));
         });
         run
     }
@@ -2206,6 +2198,15 @@ impl For {
             if let Some(rest) = self.after_first() {
                 let mut reduced = rest.run_items(ctx);
                 reduced.verdict.inputs = run.verdict.inputs;
+                let kept: Vec<usize> = (0..self.sentences.len())
+                    .filter(|at| !reads_alias(&self.sentences[*at].check, &self.items[0].alias))
+                    .collect();
+                for clause in &mut reduced.items {
+                    clause.group = kept
+                        .get(clause.group)
+                        .copied()
+                        .unwrap_or_else(|| clause.group - kept.len() + self.sentences.len());
+                }
                 return reduced;
             }
             if run.verdict.cause == Cause::Satisfied {
@@ -3194,6 +3195,22 @@ impl For {
                 .iter()
                 .any(|check| reads_alias(check, &first.alias))
     }
+}
+
+fn row_clauses(roots: Vec<Clause>, items: &[Clause], free: usize) -> Vec<Clause> {
+    let after = roots.iter().map(|root| root.group + 1).max().unwrap_or(0);
+    let walked = |clause: &Clause| match clause.group {
+        group if group < free => group,
+        group => after + group,
+    };
+    roots
+        .into_iter()
+        .chain(
+            items
+                .iter()
+                .map(|clause| clause.clone().in_group(walked(clause))),
+        )
+        .collect()
 }
 
 fn tree_causes(clauses: &[Clause]) -> Vec<Cause> {
