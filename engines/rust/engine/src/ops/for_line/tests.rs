@@ -4244,3 +4244,34 @@ fn an_items_own_problem_is_said_beside_a_second_list_whose_items_arent_objects_w
         );
     }
 }
+
+#[test]
+fn a_problem_two_sentences_that_read_no_alias_give_is_said_with_the_first() {
+    for (assertions, message) in [
+        (
+            [
+                "every es.zz is 1",
+                "count of es whose zz is m named by $params.k is 0",
+            ],
+            "es is null; $params.k is 3, which isn't text",
+        ),
+        (
+            [
+                "count of es whose zz is m named by $params.k is 0",
+                "every es.zz is 1",
+            ],
+            "$params.k is 3, which isn't text; es is null",
+        ),
+    ] {
+        assert_eq!(
+            for_row(
+                "every ks as k",
+                &assertions,
+                json!({"ks": ["a"], "es": null}),
+                json!({"k": 3}),
+            ),
+            ("unusable".to_string(), message.to_string()),
+            "{assertions:?}"
+        );
+    }
+}
