@@ -4782,5 +4782,390 @@
         ]
       }
     ]
+  },
+  {
+    "description": "count of member of beside count of in another option, reading the same object",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "thing", "checks": {"c": {"any_of": {"o1": "count of member of m is 1", "o2": "count of m is 1"}}}}}},
+    "cases": [
+      {
+        "description": "lists the object once, with the worst outcome of the two reads",
+        "rules": [
+          "row.inputs_once",
+          "location.merged",
+          "tally.member",
+          "row.parts"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "m": {}
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [
+                  {
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "count of member of m",
+                        "value": 0
+                      }
+                    ],
+                    "kind": "assertion",
+                    "locations": [
+                      "$policy:/requirements/r/checks/c/any_of/o1"
+                    ],
+                    "message": "count of member of m is 0",
+                    "name": "count of member of m is 1"
+                  }
+                ],
+                "inputs": [],
+                "kind": "option",
+                "locations": [
+                  "$policy:/requirements/r/checks/c/any_of/o1"
+                ],
+                "message": "",
+                "name": "o1"
+              },
+              {
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [
+                      {
+                        "cause": "unusable",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/m"
+                            ],
+                            "name": "m",
+                            "outcome": "unusable",
+                            "value": {}
+                          }
+                        ],
+                        "kind": "list",
+                        "message": "m is {}, which isn't a list",
+                        "name": "m"
+                      }
+                    ],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "count of m",
+                        "value": null
+                      }
+                    ],
+                    "kind": "assertion",
+                    "locations": [
+                      "$policy:/requirements/r/checks/c/any_of/o2"
+                    ],
+                    "message": "",
+                    "name": "count of m is 1"
+                  }
+                ],
+                "inputs": [],
+                "kind": "option",
+                "locations": [
+                  "$policy:/requirements/r/checks/c/any_of/o2"
+                ],
+                "message": "",
+                "name": "o2"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count of m",
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "count of member of m",
+                "value": 0
+              },
+              {
+                "locations": [],
+                "name": "m",
+                "outcome": "unusable",
+                "value": []
+              }
+            ],
+            "message": "o1: count of member of m is 0; o2: m is {}, which isn't a list",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "count of member of added to count of, reading the same object",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "thing", "checks": {"c": "count of member of m plus count of m is 1"}}}},
+    "cases": [
+      {
+        "description": "lists the object once, with the worst outcome of the two reads",
+        "rules": [
+          "row.inputs_once",
+          "location.merged",
+          "tally.member",
+          "row.parts"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "m": {}
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/m"
+                        ],
+                        "name": "m",
+                        "outcome": "unusable",
+                        "value": {}
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "m is {}, which isn't a list",
+                    "name": "m"
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "count of member of m plus count of m",
+                    "value": null
+                  },
+                  {
+                    "locations": [],
+                    "name": "count of member of m",
+                    "value": 0
+                  },
+                  {
+                    "locations": [],
+                    "name": "count of m",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/c"
+                ],
+                "message": "",
+                "name": "count of member of m plus count of m is 1"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count of member of m plus count of m",
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "count of member of m",
+                "value": 0
+              },
+              {
+                "locations": [],
+                "name": "m",
+                "outcome": "unusable",
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "count of m",
+                "value": null
+              }
+            ],
+            "message": "m is {}, which isn't a list",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "count of member of in a from line's whose",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things whose count of member of m is 1 and whose sum of m.v is 1", "identified_by": "id"}}, "requirements": {"r": {"subject": "thing", "checks": {"c": "id exists"}}}},
+    "cases": [
+      {
+        "description": "says the input for a value that isn't an object is unusable, as a check of its own does",
+        "rules": [
+          "walk.member.not_an_object",
+          "tally.member",
+          "row.parts"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "m": [
+                "a"
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "not_an_object",
+            "check": "$applies",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/m"
+                        ],
+                        "name": "m",
+                        "outcome": "unusable",
+                        "value": [
+                          "a"
+                        ]
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "m is [\"a\"], which isn't an object",
+                    "name": "m"
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "count of member of m",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/subjects/thing/from#1"
+                ],
+                "message": "",
+                "name": "count of member of m is 1"
+              },
+              {
+                "cause": "not_an_object",
+                "failures": [
+                  {
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/m/0"
+                        ],
+                        "name": "m[0].v",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/m/0"
+                    ],
+                    "message": "item 1 of m is \"a\", which isn't an object",
+                    "name": "item 1 of m",
+                    "value": "a"
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/m/0"
+                    ],
+                    "name": "sum of m.v",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/subjects/thing/from#2"
+                ],
+                "message": "",
+                "name": "sum of m.v is 1"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count of member of m",
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "m",
+                "outcome": "unusable",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/things/0/m/0"
+                ],
+                "name": "m[].v",
+                "outcome": "usable",
+                "value": [
+                  null
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/m/0"
+                ],
+                "name": "sum of m.v",
+                "value": null
+              }
+            ],
+            "message": "m is [\"a\"], which isn't an object; item 1 of m is \"a\", which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]

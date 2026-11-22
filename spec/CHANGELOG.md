@@ -14,7 +14,7 @@ Each version says whether reports changed, so that anyone who only stores report
 
 ### Changed
 
-- The input for the list a `count of`, a `sum of`, a walk or a `for` line's second list reads says how reading it ended when it gives no item ([walk.member.not_an_object](semantics.md#every-and-some), [row.parts](semantics.md#what-a-row-shows)): `unusable` when the path reads a value it can't walk, also when the path has a position or a `named by` key, and the worst of what the ends hold when the path walks a list and no end can be walked, whatever the order of the items. Reports change only in that input's `outcome`, which said `usable`, like `y[0].v` for `count of y[0].v is 1` with `{"y": [{"v": 1}]}`.
+- The input for the list a `count of`, a `sum of`, a walk or a `for` line's second list reads says how reading it ended when it gives no item ([walk.member.not_an_object](semantics.md#every-and-some), [row.parts](semantics.md#what-a-row-shows)): `unusable` when the path reads a value it can't walk, also when the path has a position or a `named by` key, and, in an `every member of` sentence, the worst of what the ends hold when the path walks a list and no end is an object, whatever the order of the items. Reports change only in that input's `outcome`, which said `usable`, like `y[0].v` for `count of y[0].v is 1` with `{"y": [{"v": 1}]}`.
 
 - A `for` line's alias read whole, not through a field, like `k` in `named by k`, doesn't need its item to be an object, and fails like any other root when its value can't be read. An item of the first list that is a list is walked by a field read like any list, and a member that can't be read fails the item even when nothing is checked for it. Reports don't change: both engines already do this.
 
