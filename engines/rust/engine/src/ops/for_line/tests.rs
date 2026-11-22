@@ -3650,6 +3650,22 @@ fn an_item_that_isnt_an_object_is_named_without_a_colon_beside_a_second_list_tha
 }
 
 #[test]
+fn an_item_that_isnt_an_object_isnt_named_for_a_later_lines_whose_that_reads_it_through_a_field() {
+    assert_eq!(
+        for_row(
+            "some xs as x, every es whose zz is x.v, if any, as e",
+            &["e.n exists"],
+            json!({"xs": [{"v": null}, [1]], "es": null}),
+            json!({}),
+        ),
+        (
+            "null".to_string(),
+            "es is null; item 1 of xs: x.v is null".to_string()
+        )
+    );
+}
+
+#[test]
 fn a_list_the_line_cant_walk_isnt_counted_as_an_item() {
     let zz = |n: usize| {
         (1..=n)
