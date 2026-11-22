@@ -1959,9 +1959,9 @@ test_a_path_that_walks_on_the_left_stays_unusable_even_when_the_right_is_the_sam
 	_walk_right_rows("deps.name is in deps.name", {"things": [{"id": "t1", "deps": [{"name": "a"}]}]}, {}) == [[false, "unusable", "deps is [{\"name\": \"a\"}], which isn't an object"]]
 }
 
-test_a_whose_that_reads_a_ref_that_walks_an_empty_list_leaves_the_item_out_as_a_value if {
+test_a_whose_that_reads_a_ref_that_walks_an_empty_list_says_the_list_then_each_item if {
 	rows := _walk_right_rows("every deps.name whose x is in $input.sbom.components.name is \"a\"", {"sbom": {"components": []}, "things": [{"id": "t1", "deps": [{"name": "a", "x": "a"}]}]}, {})
-	rows == [[false, "value", "deps is [{\"name\": \"a\", \"x\": \"a\"}]"]]
+	rows == [[false, "not_an_object", "$input.sbom.components is []; item 1 of deps: name is \"a\", which isn't an object"]]
 }
 
 test_a_whose_that_reads_a_ref_that_walks_an_empty_list_decides_before_its_left_side_is_looked_at if {
