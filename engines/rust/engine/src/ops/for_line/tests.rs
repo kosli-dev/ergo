@@ -4125,3 +4125,39 @@ fn sentences_that_read_no_alias_and_walk_one_list_each_keep_their_own_parts() {
         );
     }
 }
+
+#[test]
+fn a_root_that_a_sentence_reading_no_alias_reads_is_said_with_that_sentence() {
+    for (for_line, assertions, subject, params, message) in [
+        (
+            "every xs as x",
+            vec!["x.v is at least zb", "zb is at least 1", "w is 1"],
+            json!({"zb": "s", "xs": [{"v": 1}]}),
+            json!({}),
+            "zb is \"s\", which isn't a number; w is missing",
+        ),
+        (
+            "every o named by $params.k as x",
+            vec!["$params.k is \"a\"", "w is 1", "x is 1"],
+            json!({"o": {"a": [1]}}),
+            json!({"k": 3}),
+            "$params.k is 3, which isn't text; w is missing",
+        ),
+        (
+            "every xs whose v is in $params.l as x",
+            vec![
+                "x.v is at least $params.min",
+                "count of es whose zz is at least $params.min is 1",
+            ],
+            json!({"xs": [{"v": 1}], "es": []}),
+            json!({"min": "s", "l": null}),
+            "$params.min is \"s\", which isn't a number; $params.l is null",
+        ),
+    ] {
+        assert_eq!(
+            for_row(for_line, &assertions, subject, params),
+            ("unusable".to_string(), message.to_string()),
+            "{for_line} {assertions:?}"
+        );
+    }
+}
