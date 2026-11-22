@@ -111,6 +111,7 @@ _m_walk_said(clauses, items) := {
 	"message": concat("; ", ts),
 	"ergo/own": [t | some t in ts; not t in {c.text | some c in items}],
 	"ergo/texts": items,
+	"ergo/heads": [],
 } if {
 	count(clauses) <= 3
 	every c in clauses {
@@ -122,6 +123,7 @@ _m_walk_said(clauses, items) := {
 	"message": _m_clauses_text(_m_clauses_cut(ordered)),
 	"ergo/own": [t | some t in _m_clause_texts(ordered); not t in {c.text | some c in items}],
 	"ergo/texts": items,
+	"ergo/heads": [c | some c in ordered; c.kind != "item"],
 } if {
 	ordered := _m_clauses_order(clauses)
 }
