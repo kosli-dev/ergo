@@ -1391,21 +1391,8 @@ _parted_applies_in(raw, at, evals, req, conds, subj) := p if {
 	raw.passed == false
 	unfit := {u | some n, _ in evals; some u in conds[n].unfit}
 	count(unfit) > 0
-	p := _parted_applies(_applies_deduped(raw), at, evals, req, conds, subj) with data.ergo_unfit as unfit
-} else := _parted_applies(_applies_deduped(raw), at, evals, req, conds, subj) if {
-	_m_marked_cause(raw.cause)
+	p := _parted_applies(raw, at, evals, req, conds, subj) with data.ergo_unfit as unfit
 } else := _parted_applies(raw, at, evals, req, conds, subj)
-
-_applies_deduped(raw) := object.union(raw, {"inputs": [i | some i in raw.inputs; not _unusable_twin(i, raw.inputs)]})
-
-_unusable_twin(i, ins) if {
-	not i["ergo/outcome"]
-	some j in ins
-	j["ergo/outcome"] == "unusable"
-	j.name == i.name
-	j.value == i.value
-	j.locations == i.locations
-}
 
 _tally_item_parts(c, subj, cause, at, m) := _nested_items(_tally_one_per_item(array.concat(xs, _tally_keyed_extra(c, subj, at, m, xs)))) if {
 	xs := _tally_item_records(c, subj, cause, at, m)

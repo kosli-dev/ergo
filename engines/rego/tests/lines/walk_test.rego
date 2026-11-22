@@ -11,6 +11,18 @@ test_a_walk_that_starts_at_a_name_with_no_location_still_walks_its_items if {
 
 _member_walk(subj, path, if_any) := ergo._walk(ergo._walk_start({"path": path}, subj), ergo._walk_keys({"path": path, "member": true}, subj), if_any)
 
+_member_list_outcome(subj) := object.get(ergo._walk_inputs({"path": ["xs", "ys"], "member": true}, _member_walk(subj, ["xs", "ys"], false))[0], "ergo/outcome", "usable")
+
+test_a_member_walk_whose_every_end_stops_reads_the_list_as_its_worst_stop_in_any_order if {
+	_member_list_outcome({"xs": [{"ys": 3}]}) == "unusable"
+	_member_list_outcome({"xs": [{"ys": null}, {"ys": 3}]}) == "unusable"
+	_member_list_outcome({"xs": [{"ys": 3}, {"ys": null}]}) == "unusable"
+	_member_list_outcome({"xs": [{"ys": null}, {}]}) == "absent"
+	_member_list_outcome({"xs": [{}, {"ys": null}]}) == "absent"
+	_member_list_outcome({"xs": [{"ys": {"a": 1}}, {"ys": 3}]}) == "usable"
+	_member_list_outcome({"xs": [{"ys": {}}, {"ys": null}]}) == "usable"
+}
+
 test_a_walk_that_ends_with_member_of_reads_each_member_of_the_object_in_key_order if {
 	w := _member_walk({"statuses": {"sign-off": "FAILED", "build": "DONE"}}, ["statuses"], false)
 	[e.c | some e in w.items] == [["statuses", {"member": "build"}], ["statuses", {"member": "sign-off"}]]
