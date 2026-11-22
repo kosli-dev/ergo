@@ -115,6 +115,7 @@ test_a_one_list_for_row_with_nothing_read_outside_it_that_fails_takes_its_messag
 	_on_tree("every xs as x", ["x.v is 1", "z is 1"], {"xs": [{"v": 2}], "z": 2}, {})
 	_on_tree("every xs as x", ["x.v is at least $params.min"], {"xs": [{"v": 0}]}, {"min": 1})
 	_on_tree("first of xs sorted by t as x", ["x.v is 1"], {"xs": [{"t": 1, "v": 2}]}, {})
+	_on_tree("every xs[0].ys as y", ["y.v is 1"], {"xs": [{"ys": [{"v": 2}]}]}, {})
 }
 
 test_a_for_row_keeps_its_message_off_the_tree_while_the_tree_cant_say_its_roots_keys_or_second_list if {
@@ -126,6 +127,15 @@ test_a_for_row_keeps_its_message_off_the_tree_while_the_tree_cant_say_its_roots_
 	not _on_tree("every es whose zz is m named by $params.k as e", ["e.v is 1"], {"es": [{"zz": 1}]}, {"k": 3})
 	not _on_tree("every xs as x", ["every x.ys.n is 1", "every x.ys.m is 1"], {"xs": [{"ys": [{"n": 2, "m": 2}]}]}, {})
 	not _on_tree("every xs as x", ["every x.ys exists", "sum of x.ys.n is 3"], {"xs": [{"ys": [{"n": 1}, null]}]}, {})
+}
+
+test_a_for_row_on_the_tree_leaves_its_message_to_the_tree if {
+	check := ergo._s_written_check({"for": "every xs as x", "assert": "x.v is 1"})
+	subj := {"xs": [{"v": 2}]}
+	row := ergo._for_row(check, subj) with input as {"ergo/names": {"ergo/subject": subj, "$at": {"names": {}}}}
+	row.message == ""
+	row["ergo/for_raw"].tree == true
+	not "once" in object.keys(row["ergo/for_raw"])
 }
 
 test_a_for_row_whose_line_reads_its_item_whole_keeps_its_message_off_the_tree if {

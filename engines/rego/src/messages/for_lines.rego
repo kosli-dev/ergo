@@ -1079,33 +1079,20 @@ _for_free_clauses(check, subj, r) := [object.union(x, {"group": i - count(check.
 
 _for_unrooted(c, said) := object.union(c, {"said": kept}) if {
 	kept := [x | some x in c.said; not _for_said_by_row(x, said)]
-	_for_still_says(c, kept, said)
+	not _for_says_nothing(c.text, kept, said)
 }
+
+_for_says_nothing(text, [], said) if text in ({""} | said)
 
 _for_said_by_row(x, said) if {
 	x.said == []
 	x.text in said
 }
 
-_for_said_by_row(x, _) if {
-	x.kind == "item"
-	x.said == []
-	x.text == ""
-}
-
-_for_still_says(_, kept, _) if kept != []
-
-_for_still_says(c, _, said) if {
-	c.text != ""
-	not c.text in said
-}
-
 _for_list_texts(check, subj, r) := [] if {
 	r.failed != []
 	_ = [check, subj]
 } else := _for_empty_texts(check, subj, r.unfreed) if "unfreed" in object.keys(r)
-
-else := [] if "free_lines" in object.keys(r)
 
 else := _for_empty_texts(check, subj, r)
 

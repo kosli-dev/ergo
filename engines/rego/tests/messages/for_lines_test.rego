@@ -492,6 +492,28 @@ test_a_value_a_sentence_that_reads_no_alias_said_is_not_said_again_under_each_it
 	_row_tree_text("every xs as x", ["x.v is at least z", "z is 1"], {"xs": [{"v": 1}, {"v": 3}], "z": 5}, {}) == "z is 5; item 1 of xs: x.v is 1; item 2 of xs: x.v is 3"
 }
 
+test_the_first_list_said_as_a_whole_is_not_counted_among_the_items if {
+	_row_tree_text("every ks, if any, as k", ["every es.zz is 1"], {"ks": null, "es": [{"zz": 2}, {"zz": 3}, {"zz": 4}]}, {}) == "item 1 of es: zz is 2; item 2 of es: zz is 3; item 3 of es: zz is 4; ks is null"
+}
+
+test_an_item_that_says_only_what_a_sentence_that_reads_no_alias_said_is_left_out if {
+	_row_tree_text("every ks as k", ["count of es is 1", "every es.m named by k is 1"], {"ks": ["v"], "es": null}, {}) == "es is null"
+}
+
+test_an_item_keeps_only_what_the_row_hasnt_said_already if {
+	said := {"z is 5"}
+	not ergo._for_unrooted(ergo._m_clause("item", "item 1 of xs", "value", "z is 5"), said)
+	not ergo._for_unrooted(ergo._m_item_clause("item 1 of xs", "value", [ergo._m_clause("root", "z", "value", "z is 5")]), said)
+	ergo._for_unrooted(ergo._m_item_clause("item 1 of xs", "value", [ergo._m_clause("root", "z", "value", "z is 5"), ergo._m_clause("root", "v", "value", "v is 1")]), said).said == [ergo._m_clause("root", "v", "value", "v is 1")]
+	ergo._for_unrooted(ergo._m_clause("item", "item 1 of xs", "value", "item 1 of xs is 1"), said).text == "item 1 of xs is 1"
+}
+
+test_a_for_line_on_a_subject_that_isnt_an_object_says_so_as_its_list_text if {
+	check := ergo._s_written_check({"for": "every xs as x", "assert": "x.v is 1"})
+	ergo._for_empty_texts(check, 3, {"cause": "not_an_object", "failed": []}) == ["the subject is 3, which isn't an object"]
+	ergo._for_list_texts(check, 3, {"cause": "not_an_object", "failed": []}) == ["the subject is 3, which isn't an object"]
+}
+
 test_the_list_a_line_picks_nothing_from_comes_after_a_sentence_that_reads_no_alias if {
 	_row_tree_text("every xs whose v is 1 as x", ["x.v is 1", "z is 1"], {"xs": [{"v": 3}], "z": 3}, {}) == `z is 3; xs is [{"v": 3}]`
 	_row_tree_text("first of xs sorted by v as x", ["x.v is 1", "z is 1"], {"xs": [], "z": 3}, {}) == "z is 3; xs is []"
