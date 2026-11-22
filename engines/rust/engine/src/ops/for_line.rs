@@ -3046,21 +3046,12 @@ impl For {
     fn whole_alias_texts(&self, depth: usize, ctx: &Ctx) -> Vec<String> {
         let alias = &self.items[depth].alias;
         let outer = outer_ctx(ctx);
-        let mut texts: Vec<String> = Vec::new();
-        for sentence in self
-            .sentences
+        self.sentences
             .iter()
             .filter(|sentence| reads_alias_whole(&sentence.check, alias))
-        {
-            texts.extend(
-                sentence_roots_said(&sentence.check, &outer)
-                    .into_iter()
-                    .map(|clause| clause.text),
-            );
-            let (_, clauses) = self.said_clauses(sentence, &run_full(&sentence.check, ctx), ctx);
-            texts.extend(clauses.into_iter().map(|clause| clause.text));
-        }
-        texts
+            .flat_map(|sentence| sentence_roots_said(&sentence.check, &outer))
+            .map(|clause| clause.text)
+            .collect()
     }
 
     fn later_key(&self, depth: usize, ctx: &Ctx) -> Option<(path::Outcome, String, Input)> {
