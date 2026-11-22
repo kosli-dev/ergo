@@ -1310,7 +1310,7 @@ impl For {
                         inner: Vec::new(),
                         clauses: Vec::new(),
                         lifted: 0,
-                        whole: Vec::new(),
+                        whole: self.whole_roots(depth, &bound),
                         bare: false,
                     }),
                     Vec::new(),
@@ -1393,27 +1393,13 @@ impl For {
                     } else {
                         self.nested_clauses(&nested, assertions.is_empty(), depth + 1, &bound)
                     };
-                    let mut clauses: Vec<Clause> = lifted.clone();
-                    clauses.extend(
-                        first_alias
-                            .into_iter()
-                            .filter_map(|clause| unrooted(clause, &texts)),
-                    );
-                    let whole = if live.at.value.is_object() {
-                        Vec::new()
-                    } else {
-                        let read_whole = self.whole_alias_texts(depth, &bound);
-                        clauses
-                            .iter()
-                            .filter(|clause| read_whole.contains(&clause.text))
-                            .cloned()
-                            .collect()
-                    };
-                    clauses.extend(
-                        nested_clauses
-                            .into_iter()
-                            .filter_map(|clause| unrooted(clause, &texts)),
-                    );
+                    let clauses: Vec<Clause> = first_alias
+                        .into_iter()
+                        .chain(nested_clauses)
+                        .filter_map(|clause| unrooted(clause, &texts))
+                        .collect();
+                    let clauses: Vec<Clause> = lifted.iter().cloned().chain(clauses).collect();
+                    let whole = self.whole_roots(depth, &bound);
                     let said = if leaf.is_empty() {
                         parts.join("; ").replace(FREE, "")
                     } else {
@@ -3043,14 +3029,22 @@ impl For {
         out
     }
 
-    fn whole_alias_texts(&self, depth: usize, ctx: &Ctx) -> Vec<String> {
+    fn whole_roots(&self, depth: usize, ctx: &Ctx) -> Vec<Clause> {
         let alias = &self.items[depth].alias;
+        if ctx.aliases.get(alias).is_none_or(|at| at.value.is_object()) {
+            return Vec::new();
+        }
         let outer = outer_ctx(ctx);
-        self.sentences
+        let texts: Vec<String> = self
+            .sentences
             .iter()
             .filter(|sentence| reads_alias_whole(&sentence.check, alias))
             .flat_map(|sentence| sentence_roots_said(&sentence.check, &outer))
             .map(|clause| clause.text)
+            .collect();
+        self.item_roots(depth, ctx)
+            .into_iter()
+            .filter(|root| texts.contains(&root.text))
             .collect()
     }
 
