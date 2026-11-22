@@ -3625,6 +3625,31 @@ fn a_sentence_that_reads_params_that_arent_an_object_says_only_the_params_beside
 }
 
 #[test]
+fn an_item_that_isnt_an_object_is_named_without_a_colon_beside_a_second_list_that_fails() {
+    for for_line in [
+        "some xs as x, every es, if any, as e",
+        "every xs as x, every es, if any, as e",
+        "every xs as x, every es as e",
+        "some xs as x, every es whose zz is x.v, if any, as e",
+    ] {
+        assert_eq!(
+            for_row(
+                for_line,
+                &["x.v exists"],
+                json!({"xs": [{}, [1]], "es": null}),
+                json!({}),
+            ),
+            (
+                "not_an_object".to_string(),
+                "es is null; item 1 of xs: x.v is missing; item 2 of xs is [1], which isn't an object"
+                    .to_string()
+            ),
+            "{for_line}"
+        );
+    }
+}
+
+#[test]
 fn a_list_the_line_cant_walk_isnt_counted_as_an_item() {
     let zz = |n: usize| {
         (1..=n)
