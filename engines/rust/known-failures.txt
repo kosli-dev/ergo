@@ -60,10 +60,6 @@ distinct / a grandchild of a subject read with every distinct / its rows list th
 distinct / a value that holds a key called locations / only the locations of the row are listed for every copy, never the value
 distinct / distinct with a list read through an alias or a part / the list is outside the item, so it reads even when copies differ in their own ok
 distinct / distinct with a list that is the subject / the subject's name reads the subject, outside the item, so it reads
-distinct / distinct with a phrase that also reads a bare name / it reads the subject's lo, so it reads whatever the dropped copy's lo is: higher
-distinct / distinct with a phrase that also reads a bare name / it reads the subject's lo, so it reads whatever the dropped copy's lo is: missing
-distinct / distinct with a phrase that also reads a bare name / it reads the subject's lo, so it reads whatever the dropped copy's lo is: null
-distinct / distinct with a phrase that also reads a bare name / it reads the subject's lo, so it reads whatever the dropped copy's lo is: text
 distinct / every distinct with conditions / copies a condition can't decide fail one $applies row with every copy's location
 distinct / locations read through the subject and read from the input / a read through the subject lists every copy, and a path from the input lists only the location it names
 for / a $params list that a for line reads fails it when the line's whose leaves nothing and an item of the list can't be read / fails, when the whose leaves nothing
@@ -335,13 +331,7 @@ list_starts / every, some, count of and sum of walk a subject that is a list / a
 list_starts / every, some, count of and sum of walk a subject that is a list / only the list the path starts at is walked, so a list inside it is an item that isn't an object
 members / every member of on a for line whose whose reads a named by key from $params that isn't text, beside a member that fails on its own field / says the key in each member, the member that has its field too, in key order
 messages / a clause that an earlier sentence of the row already gave / is left out of the row's message and of the option's, and each sentence keeps its whole message
-messages / a count of a field in a position of a field that holds objects / fails as unusable and names the item once
-messages / a count of a key in a position of the input that holds objects / fails as unusable and names the item once
-messages / a count of a list in a list in a list names the inner lists by it / both inner lists are named it, as no step sits between the positions
 messages / a count of a list in a list item of a for alias / the key read from the field names the value
-messages / a count of a list in a list names each item of the inner list by it / an inner list in the inner list
-messages / a count of a list in a list names each item of the inner list by it / an item of the inner list that isn't an object
-messages / a count of a list in a list, read by a position and a key from a field, names the list that isn't an object / the inner item is named it, as a list of the subject is
 messages / a count of a list in a list, read by a position and a key from a field, names the list that isn't an object / the same with the key field missing
 messages / a count of a path with a key from a field names the value once whatever the field holds / the key field is missing
 messages / a count of a path with a key from a field names the value once whatever the field holds / the key field is null
@@ -367,8 +357,6 @@ messages / a param after the phrase, a root in a whose and the list beside them 
 messages / a parent's part read in a that on a for line / names a part of the wrong type once, before what each item says
 messages / a parent's part read in a that on a plain check, next to a list that can't be read / names a part of the wrong type before a list that is text
 messages / a parent's part read in a whose inside an any_of option, next to a list that can't be read / names the part that has the wrong type, then the list that is text
-messages / a parent's part read in a whose inside an any_of option, next to a list that can't be read / names the part that is missing, then the list that is null
-messages / a parent's part read in a whose inside an any_of option, next to a list that can't be read / names the part that is null, then the list that is missing
 messages / a parent's part read in a whose on a plain check, next to a list that can't be read / names a part of the wrong type before a list that is text
 messages / a parent's part read in a whose, on a for line and in a count of / names a part of the wrong type once with no item
 messages / a parent's part read in a whose, on an empty list / fails when the part is of the wrong type
