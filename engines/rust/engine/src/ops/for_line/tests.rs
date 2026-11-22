@@ -3780,6 +3780,23 @@ fn a_count_whose_walked_part_cant_be_read_is_null_in_the_rows_inputs_on_an_empty
 }
 
 #[test]
+fn a_params_key_of_the_second_list_that_cant_be_read_is_said_once_after_the_sentence_that_doesnt_read_it()
+ {
+    assert_eq!(
+        for_row(
+            "every ws as w, every w.o named by $params.k as x",
+            &["x is 1", "w.n is 1"],
+            json!({"ws": [{"o": {"a": [1]}, "n": 2}, {"o": {"a": [1]}, "n": 1}]}),
+            json!({"k": 3}),
+        ),
+        (
+            "unusable".to_string(),
+            "item 1 of ws: w.n is 2; $params.k is 3, which isn't text".to_string()
+        )
+    );
+}
+
+#[test]
 fn a_list_the_line_cant_walk_isnt_counted_as_an_item() {
     let zz = |n: usize| {
         (1..=n)
