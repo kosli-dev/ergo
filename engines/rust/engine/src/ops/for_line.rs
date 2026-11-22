@@ -3275,16 +3275,13 @@ fn listed_roots(clauses: Vec<Clause>) -> Vec<Clause> {
 fn unrooted(clause: Clause, roots: &[&str]) -> Option<Clause> {
     let rooted = roots.contains(&clause.text.as_str())
         || clause.text.split("; ").all(|piece| roots.contains(&piece));
-    if rooted && clause.said.is_empty() {
-        return None;
-    }
     let said: Vec<Clause> = clause
         .said
         .into_iter()
         .filter_map(|inner| unrooted(inner, roots))
         .collect();
-    let empty =
-        clause.kind == super::clause::Kind::Item && clause.text.is_empty() && said.is_empty();
+    let bare = clause.kind == super::clause::Kind::Item && clause.text.is_empty();
+    let empty = said.is_empty() && (rooted || bare);
     (!empty).then_some(Clause { said, ..clause })
 }
 
