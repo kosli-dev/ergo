@@ -280,6 +280,7 @@ test_a_whose_item_beside_a_list_root_says_only_its_own_read if {
 test_a_whose_item_whose_focus_is_missing_says_the_path_to_it if {
 	_whose_item_texts("every xs.t whose n is 1 as x", {"xs": [{"t": {"n": 1}}, {}]}, {}) == [["item 2 of xs: t is missing"]]
 	_whose_item_texts("every xs.t.u whose n is 1 as x", {"xs": [{"t": {"u": {"n": 1}}}, {"t": {}}, {}]}, {}) == [["item 2 of xs: t.u is missing"], ["item 3 of xs: t.u is missing"]]
+	_whose_item_texts("every xs.t.u whose n is 1 as x", {"xs": [{"t": 3}, {"t": null}]}, {}) == [["item 1 of xs: t is 3, which isn't an object"], ["item 2 of xs: t is null"]]
 }
 
 test_a_whose_item_whose_focus_isnt_an_object_says_so_by_its_path if {
