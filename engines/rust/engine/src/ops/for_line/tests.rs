@@ -4275,3 +4275,28 @@ fn a_problem_two_sentences_that_read_no_alias_give_is_said_with_the_first() {
         );
     }
 }
+
+#[test]
+fn an_item_a_second_lines_whose_cant_decide_is_said_beside_what_else_fails() {
+    for (assertion, message) in [
+        (
+            "x.v is at least zb",
+            "zb is [1], which isn't a number; item 1 of xs is [1], which isn't an object; item 2 of xs: item 1 of x.ys: n is \"s\", which isn't a number",
+        ),
+        (
+            "y.n is 1",
+            "item 1 of xs is [1], which isn't an object; item 2 of xs: item 1 of x.ys: n is \"s\", which isn't a number; item 2 of xs: item 2 of x.ys: y.n is 3",
+        ),
+    ] {
+        assert_eq!(
+            for_row(
+                "every xs as x, every x.ys whose n is at least x.v as y",
+                &[assertion],
+                json!({"xs": [[1], {"v": 1, "ys": [{"n": "s"}, {"n": 3}]}], "zb": [1]}),
+                json!({}),
+            ),
+            ("not_an_object".to_string(), message.to_string()),
+            "{assertion}"
+        );
+    }
+}
