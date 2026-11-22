@@ -4342,3 +4342,23 @@ fn a_root_a_sentence_that_reads_no_alias_reads_is_said_with_it_though_another_se
         );
     }
 }
+
+#[test]
+fn a_walked_list_is_a_root_named_by_its_path_so_its_own_sentence_says_it_first() {
+    assert_eq!(
+        for_row(
+            "every xs as x",
+            &[
+                "x.v is 1",
+                "every es.m named by $params.k is 1",
+                "count of es whose zz is at least z is 0"
+            ],
+            json!({"xs": [{"v": 1}], "es": "s", "z": 3}),
+            json!({"k": 3}),
+        ),
+        (
+            "unusable".to_string(),
+            "$params.k is 3, which isn't text; es is \"s\", which isn't an object; es is \"s\", which isn't a list or an object".to_string()
+        )
+    );
+}
