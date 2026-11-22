@@ -198,3 +198,11 @@ test_a_root_beside_a_list_after_is_in_ignoring_case_says_its_own_state_and_not_t
 	ergo._m_root_texts({"ys": ["a", null]}, c, "absent") == ["$params.k is missing"] with data.ergo_params as {}
 	ergo._m_root_texts({"ys": ["a", null]}, c, "null") == ["$params.k is null", "item 2 of ys is null"] with data.ergo_params as {"k": null}
 }
+
+test_a_list_after_is_in_ignoring_case_that_holds_null_is_said_with_the_roots_that_are_null_and_no_item_is_named_for_it if {
+	c := {"op": "compare", "cmp": "in", "left": ["$$params", "k"], "right": [`${"alias":"","n":-1,"of":null,"old":true}`, "ys"], "ignoring": "case"}
+	ergo._m_keyed_off({"ys": ["a", null]}, c, "null") == ["item 2 of ys is null"] with data.ergo_params as {}
+	ergo._m_keyed_off({"ys": ["a", null]}, c, "null") == ["$params.k is null", "item 2 of ys is null"] with data.ergo_params as {"k": null}
+	ergo._m_keyed_off({"ys": ["a", null]}, c, "absent") == ["$params.k is missing"] with data.ergo_params as {}
+	ergo._m_keyed_off({"ys": ["a", 3]}, c, "null") == [] with data.ergo_params as {}
+}
