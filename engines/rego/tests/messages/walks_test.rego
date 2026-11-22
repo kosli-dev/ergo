@@ -106,6 +106,13 @@ test_an_item_doesnt_say_again_the_root_a_key_from_it_is_read_in if {
 	}
 }
 
+test_an_item_doesnt_say_again_a_missing_root_a_key_from_it_is_read_in if {
+	side := _keyed_count_side("count of xs whose tags contains $input.m named by key and whose v is $params.zz is 1")
+	said := [x[1] | some x in ergo._m_tally({"xs": [{"key": "a", "tags": ["x"], "v": "x"}]}, side)] with data.ergo_document as {}
+		with data.ergo_params as {}
+	said == ["$input.m is missing", "$params.zz is missing"]
+}
+
 test_an_item_still_says_its_own_key_beside_the_root_a_key_from_it_is_read_in if {
 	side := _keyed_count_side("count of xs whose v is not $input.m named by key is 0")
 	said := [x[1] | some x in ergo._m_tally({"xs": [{"v": 1}]}, side)] with data.ergo_document as {"m": 3}
