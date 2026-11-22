@@ -319,6 +319,16 @@ _key_conds(check, r) := array.concat(object.get(check, "whose", []), [x | x := o
 	not "empty" in object.keys(r)
 } else := []
 
+_text_leaf_flawed(check, subj) := [c | some c in _text_leaf_conds(check); _text_leaf_broken(subj, c)]
+
+_text_leaf_broken(subj, c) if {
+	some p in _root_reads(c)
+	_text_list_root(c, p)
+	v := _root_value(subj, p)
+	is_array(v)
+	_text_items_state(v)
+}
+
 _text_list_root(c, p) if {
 	c.ignoring
 	c.op in _membership_ops
@@ -382,11 +392,11 @@ _ref_key_seg(seg) := _ref_read(seg.ref) if _is_ref(seg)
 else := seg
 
 _walk_root_flaw(check, subj) := _worst_of(states) if {
-	states := {fl | some c in _walk_root_conds(check); fl := _root_read_flaw(subj, c); fl != ""}
+	states := {fl | some c in array.concat(_walk_root_conds(check), _text_leaf_flawed(check, subj)); fl := _root_read_flaw(subj, c); fl != ""}
 	count(states) > 0
 } else := ""
 
-_walk_root_conds(check) := array.concat(array.concat(_walk_whose_conds(check), _for_sentence_conds(check)), _text_leaf_conds(check))
+_walk_root_conds(check) := array.concat(_walk_whose_conds(check), _for_sentence_conds(check))
 
 _text_leaf_conds(check) := [c] if {
 	c := object.get(check, "check", null)
@@ -517,7 +527,7 @@ _walk_root_msgs(check, subj) := _m_root_sorted(_once(array.concat(
 	sort([m | some c in _walk_count_conds(check); some m in array.concat(_m_root_texts_all(subj, c), _m_cond_walked_texts(c)); _m_ref_first(m)]),
 	array.concat(
 		[m |
-			some c in array.concat(_walk_whose_conds(check), _text_leaf_conds(check))
+			some c in array.concat(_walk_whose_conds(check), _text_leaf_flawed(check, subj))
 			some m in array.concat(_m_cond_root_texts(subj, c), _m_cond_walked_texts(c))
 		],
 		[m |
@@ -592,7 +602,7 @@ _rooted_row(check, subj, r) := object.union(object.remove(a, ["other_roots"]), {
 } else := object.union(object.remove(_rooted_main(check, subj, r), ["other_roots"]), {"cause": _worst_of({flaw, r.cause}), "root_msgs": _with_roots(_walk_parts(check, subj, r, r), ms)}) if {
 	check.op != "for"
 	_walk_list_fails(r)
-	not _empty_beside_text_leaf(check, r)
+	not _empty_beside_text_leaf(check, subj, r)
 	not _walk_keyed(check)
 	flaw := _walk_root_flaw(check, subj)
 	flaw != ""
@@ -604,7 +614,7 @@ _rooted_main(check, subj, r) := object.union(r, {"cause": "unusable", "failed": 
 	r.cause in _not_failing_causes
 	_walk_key_texts(check, r) != []
 	_key_beats_roots(check, subj)
-} else := object.union(r, object.union({"cause": flaw, "failed": _rooted_kept(check, r)}, {"root_msgs": ms | ms := _walk_root_msgs(check, subj); ms != []})) if {
+} else := object.union(r, object.union({"cause": flaw, "failed": _rooted_kept(check, subj, r)}, {"root_msgs": ms | ms := _walk_root_msgs(check, subj); ms != []})) if {
 	flaw := _walk_root_flaw(check, subj)
 	flaw != ""
 	r.cause in {"satisfied", "value", flaw}
@@ -654,15 +664,15 @@ _rooted_failed(r) := [] if r.cause in _not_failing_causes
 
 else := r.failed
 
-_rooted_kept(check, r) := [] if {
-	_text_leaf_conds(check) != []
+_rooted_kept(check, subj, r) := [] if {
+	_text_leaf_flawed(check, subj) != []
 	_ = r
 }
 
 else := _rooted_failed(r)
 
-_empty_beside_text_leaf(check, r) if {
-	_text_leaf_conds(check) != []
+_empty_beside_text_leaf(check, subj, r) if {
+	_text_leaf_flawed(check, subj) != []
 	every f in r.fails {
 		f.cause == "value"
 	}
@@ -680,14 +690,11 @@ _items_judged_alone(subj, side) if {
 	_root_stand_in(c) != c
 }
 
-_items_judged_alone(subj, side) if {
-	some c in _text_leaf_conds(side)
-	_root_read_flaw(subj, c) != ""
-}
+_items_judged_alone(subj, side) if _text_leaf_flawed(side, subj) != []
 
 _whose_alone(subj, side) := object.union(side, {"whose": [_root_stand_in(c) | some c in side.whose]}) if {
 	_items_judged_alone(subj, side)
-	_text_leaf_conds(side) == []
+	_text_leaf_flawed(side, subj) == []
 } else := object.union(object.remove(side, ["check"]), {"whose": [_root_stand_in(c) | some c in side.whose], "check": _text_stand_in(side.check)}) if _items_judged_alone(subj, side)
 
 else := side
