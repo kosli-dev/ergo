@@ -1413,12 +1413,15 @@ _tally_item_parts(c, subj, cause, at, m) := _nested_items(_tally_one_per_item(_t
 
 _tally_merged(xs, [], _, _) := xs
 
-_tally_merged(xs, extra, c, subj) := array.concat(array.concat(array.slice(xs, 0, first), keyed), [x | some x in array.slice(xs, first, count(xs)); _tally_rank(x, order) < 0]) if {
+_tally_merged(xs, extra, c, subj) := array.concat(array.concat(array.slice(xs, 0, first), keyed), array.slice(xs, end, count(xs))) if {
 	extra != []
 	order := _tally_item_order(c, subj)
-	first := array.concat([i | some i, x in xs; _tally_rank(x, order) >= 0], [count(xs)])[0]
-	es := array.concat(xs, extra)
-	keyed := [es[p[1]] | some p in sort({[r, i] | some i, e in es; r := _tally_rank(e, order); r >= 0})]
+	rs := [_tally_rank(x, order) | some x in xs]
+	first := array.concat([i | some i, r in rs; r >= 0], [count(xs)])[0]
+	end := min({count(xs)} | {j | some j, r in rs; j > first; r <= rs[j - 1]})
+	es := array.concat(array.slice(xs, first, end), extra)
+	ers := array.concat(array.slice(rs, first, end), [_tally_rank(e, order) | some e in extra])
+	keyed := [es[p[1]] | some p in sort({[ers[i], i] | some i, _ in es})]
 }
 
 _tally_rank(e, order) := rs[0] if {
