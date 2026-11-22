@@ -167,8 +167,6 @@ _keyed_operand_fits("includes", v) if {
 
 _keyed_operand_fits("matches_any", v) if is_string(v)
 
-_keyed_operand_fits("eq", v) if v != null
-
 _keyed_operand_mixed("includes", v) if {
 	is_array(v)
 	count({type_name(x) | some x in v}) > 1
