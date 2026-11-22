@@ -673,7 +673,13 @@ _m_tally_items_at(subj, side) := [[_m_positions(e.i), [1, k], array.concat(x, [{
 	keyed := _m_keyed_root_texts(subj, side)
 }
 
-_m_keyed_root_texts(subj, side) := {f.text | some f in b.faults} if {
+_m_keyed_root_texts(subj, side) := {f.text | some f in b.faults} | {concat("", [_path_name(p), " is ", _m_state_word(f.cause)]) |
+	some c in side.whose
+	some p in [object.get(c, "left", null), object.get(c, "right", null)]
+	_keyed_root_path(p)
+	f := _keyed_root_fault(subj, p)
+	f.cause in _no_value_states
+} if {
 	b := _m_tally_keyed_base(subj, side)
 } else := set()
 
