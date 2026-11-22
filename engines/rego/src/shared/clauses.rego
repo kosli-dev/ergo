@@ -109,7 +109,7 @@ _m_clauses_order(clauses) := array.concat(array.concat(_m_clauses_ahead(once), [
 
 _m_walk_said(clauses, items) := {
 	"message": concat("; ", ts),
-	"ergo/own": [t | some t in ts; not t in items],
+	"ergo/own": [t | some t in ts; not t in {c.text | some c in items}],
 	"ergo/texts": items,
 } if {
 	count(clauses) <= 3
@@ -120,7 +120,7 @@ _m_walk_said(clauses, items) := {
 	ts := _once([c.text | some c in clauses])
 } else := {
 	"message": _m_clauses_text(_m_clauses_cut(ordered)),
-	"ergo/own": [t | some t in _m_clause_texts(ordered); not t in items],
+	"ergo/own": [t | some t in _m_clause_texts(ordered); not t in {c.text | some c in items}],
 	"ergo/texts": items,
 } if {
 	ordered := _m_clauses_order(clauses)

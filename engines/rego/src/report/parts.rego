@@ -277,7 +277,7 @@ _alias_unmarked(o) := object.union(o, object.filter(
 		"message": _m_aliased(o.message),
 		"inputs": [object.union(x, {"name": _m_aliased(x.name)}) | some x in o.inputs],
 		"failed_items": [object.union(f, object.filter({"item": _m_aliased(f.item), "path": _m_aliased(f.path), "ergo/read": _m_aliased(object.get(f, "ergo/read", ""))}, object.keys(f))) | some f in object.get(o, "failed_items", [])],
-		"ergo/texts": [_m_aliased(t) | some t in object.get(o, "ergo/texts", [])],
+		"ergo/texts": [object.union(c, {"text": _m_aliased(c.text)}) | some c in object.get(o, "ergo/texts", [])],
 		"ergo/own": [_m_aliased(t) | some t in object.get(o, "ergo/own", [])],
 	},
 	object.keys(o),
@@ -793,13 +793,13 @@ _walk_assertion_entry(row, at, where, ins) := _policy_entry(
 	row.cause,
 	_once(array.concat(array.concat(array.concat([ins[j] | some j, i in row.inputs; not _item_input(i, lists); not _walked_path_read(i, wname)], _key_flaw_entries(where.check.path)), _walk_cond_ref_entries(_walk_cond_refs(where.check), row.inputs)), _walk_param_entries(where.check, row.inputs))),
 	array.concat([_keyed_walk_entry(x, where.check, row) | some x in entries], flaws),
-	_tally_rest(concat("; ", [m | some m in _once(array.concat(object.get(row, "ergo/own", [row.message]), _root_texts(row, texts))); not m in {e.message | some e in kls}]), {e.name | some e in flaws}),
+	_tally_rest(concat("; ", [m | some m in _once(array.concat(object.get(row, "ergo/own", [row.message]), _walk_root_texts(row, clauses))); not m in {e.message | some e in kls}]), {e.name | some e in flaws}),
 	[_assertion_at(where, null, 0)],
 ) if {
-	texts := object.get(row, "ergo/texts", [])
+	clauses := object.get(row, "ergo/texts", [])
 	lists := {_list_base(f.item) | some f in row.failed_items}
 	kls := _key_list_parts(row, at)
-	entries := array.concat(_walk_entries(row, _item_owned(row, texts), at), kls)
+	entries := array.concat(_walk_entries(row, _walk_owned_texts(row, clauses), at), kls)
 	wname := _m_aliased(_walked_name(where.check.path))
 	flaws := _walk_flaw_lists(row, at, where.check, entries)
 }
@@ -956,22 +956,18 @@ else := name
 
 _walk_entries(_, [], _) := []
 
-_item_owned(row, texts) := texts if {
-	every k, t in texts {
-		not _root_text(row.failed_items[k].item, t)
-	}
-} else := [_owned_text(row.failed_items[k].item, t) | some k, t in texts]
+_walk_owned_texts(row, clauses) := [_walk_owned_text(row, k, c) | some k, c in clauses]
 
-_owned_text(name, t) := "" if _root_text(name, t)
+_walk_owned_text(row, k, c) := "" if _walk_root_clause(row, k, c)
 
-else := t
+else := c.text
 
-_root_texts(row, texts) := [t | some k, t in texts; _root_text(row.failed_items[k].item, t)]
+_walk_root_texts(row, clauses) := [c.text | some k, c in clauses; _walk_root_clause(row, k, c)]
 
-_root_text(name, t) if {
-	t != ""
-	_walk_kind(name) == "item"
-	_walk_kind(t) == "list"
+_walk_root_clause(row, k, c) if {
+	c.text != ""
+	c.kind != "item"
+	_walk_kind(row.failed_items[k].item) == "item"
 }
 
 _walk_entries(row, texts, at) := _nested_items([_leveled(_walk_entry(row, texts, name, at), row, name, at) |
