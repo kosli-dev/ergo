@@ -812,7 +812,7 @@ _m_walked_root_fault(c, shown, x, cause) := _m_text_walk_text(shown) if {
 	_text_walked_ref(c, shown)
 	_text_ref_state(shown) == cause
 } else := _rwalk_text(x, shown) if {
-	not _text_walked_ref(c, shown)
+	not _text_walk_flawed(c, shown)
 	w := _rwalk(x, shown)
 	w.failed
 	w.state == cause
@@ -821,6 +821,11 @@ _m_walked_root_fault(c, shown, x, cause) := _m_text_walk_text(shown) if {
 	w := _rwalk(x, shown)
 	not w.failed
 	k := _m_leaf_needs(c, w.value)
+}
+
+_text_walk_flawed(c, shown) if {
+	_text_walked_ref(c, shown)
+	_text_ref_state(shown)
 }
 
 _m_off_right(subj, c) := [_m_isnt(_root_label(p), _root_value(subj, p), k) |
