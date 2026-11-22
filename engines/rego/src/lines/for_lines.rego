@@ -1026,6 +1026,7 @@ else := {"name": t[0], "value": t[1], "locations": t[2], "ergo/outcome": t[3]}
 _for_whose_pairs(check, subj) := {[x[1].name, x[1].value, x[1].locations] |
 	some item in check.items
 	some x in _listed_reads(subj, object.get(item, "whose", []))
+	x[1].value != []
 } | {_for_tuple(i) |
 	some item in check.items
 	some i in _input_ref_inputs(object.get(item, "whose", []))
