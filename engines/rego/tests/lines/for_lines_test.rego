@@ -48,3 +48,19 @@ test_an_item_of_the_second_list_keeps_that_a_member_walk_wanted_an_object if {
 	ergo._for_unchecked_item(check, f).wants == "an object"
 	not ergo._for_unchecked_item(check, object.union(f, {"msg": "a list"})).wants
 }
+
+_second_list_outcome(line, subj) := object.get([i | some i in ergo._for_inputs(check, subj, {}, check.items[0], ergo._for_walk(check.items[0], subj, {})); i.name == "x.ys"][0], "ergo/outcome", "usable") if {
+	check := ergo._s_written_check({"for": line, "assert": "y is 1"})
+}
+
+test_a_second_list_that_no_item_of_the_first_reads_says_its_worst_stop_in_any_order if {
+	member := "every xs as x, every member of x.ys as y"
+	plain := "every xs as x, every x.ys as y"
+	_second_list_outcome(member, {"xs": [{"ys": [1]}]}) == "unusable"
+	_second_list_outcome(member, {"xs": [{"ys": 3}, {"ys": null}]}) == "unusable"
+	_second_list_outcome(member, {"xs": [{"ys": null}, {"ys": 3}]}) == "unusable"
+	_second_list_outcome(member, {"xs": [{"ys": null}, {}]}) == "absent"
+	_second_list_outcome(plain, {"xs": [{"ys": null}]}) == "null"
+	_second_list_outcome(plain, {"xs": [{"ys": {"a": 1}}, {"ys": 3}]}) == "unusable"
+	_second_list_outcome(member, {"xs": [{"ys": {"a": 1}}, {"ys": 3}]}) == "usable"
+}
