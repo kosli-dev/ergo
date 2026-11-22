@@ -18,6 +18,8 @@ _tolerated_root_flaws := {"", "not_an_object"}
 
 _not_failing_causes := {"satisfied", "value"}
 
+_stand_in_value := {"compare": 0, "compare_time": "1970-01-01T00:00:00Z"}
+
 _tally_decided_causes := {"satisfied", "value", "missing"}
 
 _holding_statuses := {"met", "not_applicable"}

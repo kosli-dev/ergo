@@ -726,10 +726,6 @@ _root_stand_in(c) := _typed_stand_in(c.cmp, c.left) if {
 	not _walk_outside(c.path)
 } else := c
 
-_typed_stand_in(op, path) := {"op": "not_matches_any", "path": path, "patterns": {"literal": []}} if op in _pattern_ops
-
-else := {"op": "excludes", "path": path, "values": {"literal": []}}
-
 _stand_in_side(cmp, _) if cmp in {"eq", "ne", "in", "includes"}
 
 _stand_in_side(cmp, "right") if cmp in _list_cmps
@@ -738,8 +734,6 @@ _stand_in_keyed(p) if {
 	some step in p
 	_key_step(step)
 }
-
-_stand_in_value := {"compare": 0, "compare_time": "1970-01-01T00:00:00Z"}
 
 _alone_read(check, subj) := object.union(a, {
 	"cause": _worst_of({f.cause | some f in failed}),

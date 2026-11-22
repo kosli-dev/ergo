@@ -25,3 +25,18 @@ test_keyed_list_takes_only_a_one_step_list if {
 	ergo._keyed_clause(["xs"], whose) == whose[0]
 	not ergo._keyed_clause(["xs", "v"], whose)
 }
+
+test_keyed_root_fault_names_a_step_before_the_last_that_isnt_an_object if {
+	p := ["$$input", "m", "a", {"named_by_field": "key"}]
+	ergo._keyed_root_fault({}, p) == {"cause": "unusable", "text": "$input.m is 3, which isn't an object"} with data.ergo_document as {"m": 3}
+	ergo._keyed_root_fault({}, p) == {"cause": "unusable", "text": "$input.m.a is 3, which isn't an object"} with data.ergo_document as {"m": {"a": 3}}
+	ergo._keyed_root_fault({}, p) == {"cause": "absent", "text": "$input.m.a is missing"} with data.ergo_document as {"m": {}}
+	not ergo._keyed_root_fault({}, p) with data.ergo_document as {"m": {"a": {}}}
+}
+
+test_keyed_root_fault_names_a_missing_root_from_input_or_params_by_its_whole_path_and_a_null_step_alone if {
+	ergo._keyed_root_fault({}, ["$$input", "m", "a", {"named_by_field": "key"}]) == {"cause": "absent", "text": "$input.m.a is missing"} with data.ergo_document as {}
+	ergo._keyed_root_fault({}, ["$$input", "d", "m", {"named_by_field": "key"}]) == {"cause": "absent", "text": "$input.d.m is missing"} with data.ergo_document as {}
+	ergo._keyed_root_fault({}, ["$$params", "d", "m", {"named_by_field": "key"}]) == {"cause": "absent", "text": "$params.d.m is missing"} with data.ergo_params as {}
+	ergo._keyed_root_fault({}, ["$$input", "d", "m", {"named_by_field": "key"}]) == {"cause": "null", "text": "$input.d is null"} with data.ergo_document as {"d": null}
+}

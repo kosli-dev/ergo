@@ -609,7 +609,10 @@ _m_for_fail(f) := array.concat([_m_under(object.get(f, "said", f.item), q) | som
 	f.failed_assertions != []
 }
 
-_m_for_groups(f) := _m_groups(_once([q | some ps in lines; some p in ps; q := _m_unskipped(p, object.get(f, "skip", [])); q != ""]), _m_two_list(f)) if lines := [_m_tally_pieces(l, _m_line_msg(l, f)) | some l in f.failed_assertions]
+_m_for_groups(f) := array.concat(_m_groups([q | some q in qs; not _m_more_clause(q)], _m_two_list(f)), [[q] | some q in qs; _m_more_clause(q)]) if {
+	lines := [_m_tally_pieces(l, _m_line_msg(l, f)) | some l in f.failed_assertions]
+	qs := _once([q | some ps in lines; some p in ps; q := _m_unskipped(p, object.get(f, "skip", [])); q != ""])
+}
 
 _m_tally_pieces(l, ps) := [q | some p in ps; some q in _m_top_split(p, "; ")] if {
 	not "items" in object.keys(l)

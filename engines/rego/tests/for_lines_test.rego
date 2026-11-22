@@ -571,3 +571,16 @@ test_a_sentence_under_a_for_line_over_an_empty_list_lists_no_input_on_its_assert
 		[[e.kind, [i.name | some i in e.inputs]] | some e in rows[0].failures] == [["assertion", []], ["list", ["xs"]]]
 	}
 }
+
+test_a_for_line_fails_on_a_root_its_count_reads_through_a_key_from_the_item_even_when_the_inner_list_is_empty if {
+	every sentence in [
+		"count of w.xs whose v is $input.m named by key is 0",
+		"count of w.xs whose tags contains $input.m named by key is 0",
+		"count of w.xs that is $input.m named by key is 0",
+	] {
+		every pair in [[{}, "absent"], [{"m": null}, "null"], [{"m": 3}, "unusable"]] {
+			doc := object.union(pair[0], {"things": [{"id": "t", "ws": [{"xs": []}]}]})
+			[r.cause | some r in ergo.report(doc, _sentence_policy({"c": {"for": "every ws as w", "assert": sentence}}), {}).results; r.check == "c"] == [pair[1]]
+		}
+	}
+}

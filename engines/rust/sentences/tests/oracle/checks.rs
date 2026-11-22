@@ -5451,6 +5451,42 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
+        "count of xs whose $input.m named by key is v is 0",
+        "count of xs whose $input.m named by key equals v is 0",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose v is at least $input.m named by key is 0",
+        "count of xs whose v is at least $input.m named by key is 0",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose v is not $input.d.m named by key is 0",
+        "count of xs whose v does not equal $input.d.m named by key is 0",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose v is not $input.m named by key is 0",
+        "count of xs whose v does not equal $input.m named by key is 0",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose v is not $input.m.a named by key is 0",
+        "count of xs whose v does not equal $input.m.a named by key is 0",
+        &[],
+        &[],
+    ),
+    (
+        "count of ys.v whose v is not $input.m named by key is 0",
+        "count of ys.v whose v does not equal $input.m named by key is 0",
+        &[],
+        &[],
+    ),
+    (
         "count of ys plus count of xs whose v equals $input.m named by key is 1",
         "count of ys plus count of xs whose v equals $input.m named by key is 1",
         &[],

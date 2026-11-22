@@ -18,6 +18,7 @@ _keyed_said(o, k, fault, subj) := object.union(object.union(o, {"cause": _worst_
 	said := [x.text | some x in items; x.text != ""]
 	failed := [_keyed_failed(f, items) | some f in object.get(o, "failed_items", [])]
 } else := object.union(o, {"cause": _worst_of({fault.cause, o.cause}), "message": _m_joined([fault.text, o.message]), "ergo/own": array.concat([fault.text], object.get(o, "ergo/own", [o.message]))}) if {
+	object.get(k, "count", false) == false
 	is_string(object.get(o, "message", null))
 	w := _walk(_walk_start({"path": k.path}, subj), _walk_keys({"path": k.path}, subj), true)
 	not _keyed_list_read(w)
@@ -55,7 +56,7 @@ _keyed_list(check) := k if {
 	k := _keyed_side(object.get(check, "left", null), object.get(check, "right", null))
 }
 
-_keyed_side(side, other) := {"path": side.count_of, "clause": c} if {
+_keyed_side(side, other) := {"path": side.count_of, "clause": c, "count": true} if {
 	is_object(side)
 	is_array(object.get(side, "whose", null))
 	object.keys(side) == {"count_of", "text", "whose"}
@@ -116,16 +117,28 @@ _keyed_root_fault(subj, p) := fs[0] if {
 	count(fs) > 0
 }
 
-_keyed_prefix_fault(subj, p, j, k) := {"cause": st, "text": concat("", [_input_name(shown), " is ", _m_state_word(st)])} if {
+_keyed_prefix_fault(subj, p, j, k) := {"cause": st, "text": concat("", [_input_name(_keyed_named(p, j, k, st)), " is ", _m_state_word(st)])} if {
 	shown := _as_subject_part(array.slice(p, 0, j))
 	st := _any_read_state(subj, shown)
 	st in {"absent", "null"}
 } else := {"cause": "unusable", "text": _m_isnt(_input_name(shown), v, "an object")} if {
-	j == k
 	shown := _as_subject_part(array.slice(p, 0, j))
 	_any_read_state(subj, shown) == "value"
 	v := _value_at(subj, shown)
 	not is_object(v)
+	_keyed_prefix_stops(j, k, v)
+}
+
+_keyed_named(p, j, k, st) := _as_subject_part(array.slice(p, 0, k)) if {
+	st == "absent"
+	_builtin(p)
+} else := _as_subject_part(array.slice(p, 0, j))
+
+_keyed_prefix_stops(j, k, _) if j == k
+
+_keyed_prefix_stops(j, k, v) if {
+	j < k
+	not is_array(v)
 }
 
 _keyed_item(e, k) := {"text": _m_isnt(_m_item_name(e.i, _dotted_roots([k.path])), e.iv, "an object"), "causes": {"not_an_object"}} if not is_object(e.iv)
@@ -153,8 +166,6 @@ _keyed_operand_fits("includes", v) if {
 }
 
 _keyed_operand_fits("matches_any", v) if is_string(v)
-
-_keyed_operand_fits("eq", v) if v != null
 
 _keyed_operand_mixed("includes", v) if {
 	is_array(v)
