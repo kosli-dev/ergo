@@ -24768,5 +24768,3710 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a part that holds an empty list or null on the right of any phrase in a whose or a that is said once, then what each item says on its own",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"t": {"from": "ts", "identified_by": "id", "has": {"pl": "p"}}}, "requirements": {"r": {"subject": "t", "checks": {"not_one_of": "count of xs whose v is not one of pl.name is 0", "matches": "count of xs whose v matches pl.name is 0", "not_match": "every xs whose v does not match pl.name exists", "contains_all": "count of xs whose tags contains all of pl.name is 0", "contains_none": "some xs whose tags contains none of pl.name exists", "contains_some": "count of xs whose tags contains some of pl.name is 0", "not_contain_all": "every xs whose tags does not contain all of pl.name, if any, exists", "that": "count of xs.v that is not one of pl.name is 0", "plus": "k plus count of xs whose v is not one of pl.name is 0"}}}},
+    "cases": [
+      {
+        "description": "an empty part, then an item with no field",
+        "rules": ["walk.right.fail", "tally.whose", "problems.all_said"],
+        "input": {"ts": [{"id": "t", "k": 0, "p": [], "xs": [{}]}]},
+        "results": [
+          {
+            "cause": "absent",
+            "check": "contains_all",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/xs/0"
+                        ],
+                        "name": "xs[0].tags",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "message": "tags is missing",
+                    "name": "item 1 of xs",
+                    "value": {}
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "name": "count of xs whose tags contains all of pl.name",
+                    "value": null
+                  },
+                  {
+                    "locations": [],
+                    "name": "pl[].name",
+                    "outcome": "usable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/contains_all"
+                ],
+                "message": "pl is []",
+                "name": "count of xs whose tags contains all of pl.name is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "count of xs whose tags contains all of pl.name",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {}
+                ]
+              },
+              {
+                "locations": [],
+                "name": "pl[].name",
+                "outcome": "usable",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": []
+              }
+            ],
+            "message": "pl is []; item 1 of xs: tags is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "contains_none",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/xs/0"
+                        ],
+                        "name": "xs[0].tags",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "message": "tags is missing",
+                    "name": "item 1 of xs",
+                    "value": {}
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "pl[].name",
+                    "outcome": "usable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/contains_none"
+                ],
+                "message": "pl is []",
+                "name": "some xs whose tags contains none of pl.name exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "pl[].name",
+                "outcome": "usable",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": []
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {}
+                ]
+              }
+            ],
+            "message": "pl is []; item 1 of xs: tags is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "contains_some",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/xs/0"
+                        ],
+                        "name": "xs[0].tags",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "message": "tags is missing",
+                    "name": "item 1 of xs",
+                    "value": {}
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "name": "count of xs whose tags contains some of pl.name",
+                    "value": null
+                  },
+                  {
+                    "locations": [],
+                    "name": "pl[].name",
+                    "outcome": "usable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/contains_some"
+                ],
+                "message": "pl is []",
+                "name": "count of xs whose tags contains some of pl.name is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "count of xs whose tags contains some of pl.name",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {}
+                ]
+              },
+              {
+                "locations": [],
+                "name": "pl[].name",
+                "outcome": "usable",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": []
+              }
+            ],
+            "message": "pl is []; item 1 of xs: tags is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "matches",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/xs/0"
+                        ],
+                        "name": "xs[0].v",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "message": "v is missing",
+                    "name": "item 1 of xs",
+                    "value": {}
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "name": "count of xs whose v matches pl.name",
+                    "value": null
+                  },
+                  {
+                    "locations": [],
+                    "name": "pl[].name",
+                    "outcome": "usable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/matches"
+                ],
+                "message": "pl is []",
+                "name": "count of xs whose v matches pl.name is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "count of xs whose v matches pl.name",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {}
+                ]
+              },
+              {
+                "locations": [],
+                "name": "pl[].name",
+                "outcome": "usable",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": []
+              }
+            ],
+            "message": "pl is []; item 1 of xs: v is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "not_contain_all",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/xs/0"
+                        ],
+                        "name": "xs[0].tags",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "message": "tags is missing",
+                    "name": "item 1 of xs",
+                    "value": {}
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "pl[].name",
+                    "outcome": "usable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/not_contain_all"
+                ],
+                "message": "pl is []",
+                "name": "every xs whose tags does not contain all of pl.name, if any, exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "pl[].name",
+                "outcome": "usable",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": []
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {}
+                ]
+              }
+            ],
+            "message": "pl is []; item 1 of xs: tags is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "not_match",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/xs/0"
+                        ],
+                        "name": "xs[0].v",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "message": "v is missing",
+                    "name": "item 1 of xs",
+                    "value": {}
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "pl[].name",
+                    "outcome": "usable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/not_match"
+                ],
+                "message": "pl is []",
+                "name": "every xs whose v does not match pl.name exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "pl[].name",
+                "outcome": "usable",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": []
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {}
+                ]
+              }
+            ],
+            "message": "pl is []; item 1 of xs: v is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "not_one_of",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/xs/0"
+                        ],
+                        "name": "xs[0].v",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "message": "v is missing",
+                    "name": "item 1 of xs",
+                    "value": {}
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "name": "count of xs whose v is not in pl.name",
+                    "value": null
+                  },
+                  {
+                    "locations": [],
+                    "name": "pl[].name",
+                    "outcome": "usable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/not_one_of"
+                ],
+                "message": "pl is []",
+                "name": "count of xs whose v is not in pl.name is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "count of xs whose v is not in pl.name",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {}
+                ]
+              },
+              {
+                "locations": [],
+                "name": "pl[].name",
+                "outcome": "usable",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": []
+              }
+            ],
+            "message": "pl is []; item 1 of xs: v is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "plus",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/xs/0"
+                        ],
+                        "name": "xs[0].v",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "message": "v is missing",
+                    "name": "item 1 of xs",
+                    "value": {}
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/k",
+                      "/ts/0/xs/0"
+                    ],
+                    "name": "k plus count of xs whose v is not in pl.name",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "/ts/0/k"
+                    ],
+                    "name": "k",
+                    "outcome": "usable",
+                    "value": 0
+                  },
+                  {
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "name": "count of xs whose v is not in pl.name",
+                    "value": null
+                  },
+                  {
+                    "locations": [],
+                    "name": "pl[].name",
+                    "outcome": "usable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/plus"
+                ],
+                "message": "pl is []",
+                "name": "k plus count of xs whose v is not in pl.name is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/ts/0/k",
+                  "/ts/0/xs/0"
+                ],
+                "name": "k plus count of xs whose v is not in pl.name",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": null
+              },
+              {
+                "locations": [
+                  "/ts/0/k"
+                ],
+                "name": "k",
+                "outcome": "usable",
+                "value": 0
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "count of xs whose v is not in pl.name",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {}
+                ]
+              },
+              {
+                "locations": [],
+                "name": "pl[].name",
+                "outcome": "usable",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": []
+              }
+            ],
+            "message": "pl is []; item 1 of xs: v is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "that",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/xs/0"
+                        ],
+                        "name": "xs[0].v",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "message": "v is missing",
+                    "name": "item 1 of xs",
+                    "value": {}
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "name": "count of xs.v that is not in pl.name",
+                    "value": null
+                  },
+                  {
+                    "locations": [],
+                    "name": "pl[].name",
+                    "outcome": "usable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/that"
+                ],
+                "message": "pl is []",
+                "name": "count of xs.v that is not in pl.name is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "count of xs.v that is not in pl.name",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[].v",
+                "outcome": "usable",
+                "value": [
+                  null
+                ]
+              },
+              {
+                "locations": [],
+                "name": "pl[].name",
+                "outcome": "usable",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": []
+              }
+            ],
+            "message": "pl is []; item 1 of xs: v is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          }
+        ]
+      },
+      {
+        "description": "an empty part, then an item that is null",
+        "rules": ["walk.right.fail", "tally.whose", "problems.all_said"],
+        "input": {"ts": [{"id": "t", "k": 0, "p": [], "xs": [null]}]},
+        "results": [
+          {
+            "cause": "not_an_object",
+            "check": "contains_all",
+            "failures": [
+              {
+                "cause": "not_an_object",
+                "failures": [
+                  {
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/xs/0"
+                        ],
+                        "name": "xs[0].tags",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "message": "item 1 of xs is null, which isn't an object",
+                    "name": "item 1 of xs",
+                    "value": null
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "name": "count of xs whose tags contains all of pl.name",
+                    "value": null
+                  },
+                  {
+                    "locations": [],
+                    "name": "pl[].name",
+                    "outcome": "usable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/contains_all"
+                ],
+                "message": "pl is []",
+                "name": "count of xs whose tags contains all of pl.name is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "count of xs whose tags contains all of pl.name",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  null
+                ]
+              },
+              {
+                "locations": [],
+                "name": "pl[].name",
+                "outcome": "usable",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": []
+              }
+            ],
+            "message": "pl is []; item 1 of xs is null, which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "not_an_object",
+            "check": "contains_none",
+            "failures": [
+              {
+                "cause": "not_an_object",
+                "failures": [
+                  {
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/xs/0"
+                        ],
+                        "name": "xs[0].tags",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "message": "item 1 of xs is null, which isn't an object",
+                    "name": "item 1 of xs",
+                    "value": null
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "pl[].name",
+                    "outcome": "usable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/contains_none"
+                ],
+                "message": "pl is []",
+                "name": "some xs whose tags contains none of pl.name exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "pl[].name",
+                "outcome": "usable",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": []
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  null
+                ]
+              }
+            ],
+            "message": "pl is []; item 1 of xs is null, which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "not_an_object",
+            "check": "contains_some",
+            "failures": [
+              {
+                "cause": "not_an_object",
+                "failures": [
+                  {
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/xs/0"
+                        ],
+                        "name": "xs[0].tags",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "message": "item 1 of xs is null, which isn't an object",
+                    "name": "item 1 of xs",
+                    "value": null
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "name": "count of xs whose tags contains some of pl.name",
+                    "value": null
+                  },
+                  {
+                    "locations": [],
+                    "name": "pl[].name",
+                    "outcome": "usable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/contains_some"
+                ],
+                "message": "pl is []",
+                "name": "count of xs whose tags contains some of pl.name is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "count of xs whose tags contains some of pl.name",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  null
+                ]
+              },
+              {
+                "locations": [],
+                "name": "pl[].name",
+                "outcome": "usable",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": []
+              }
+            ],
+            "message": "pl is []; item 1 of xs is null, which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "not_an_object",
+            "check": "matches",
+            "failures": [
+              {
+                "cause": "not_an_object",
+                "failures": [
+                  {
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/xs/0"
+                        ],
+                        "name": "xs[0].v",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "message": "item 1 of xs is null, which isn't an object",
+                    "name": "item 1 of xs",
+                    "value": null
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "name": "count of xs whose v matches pl.name",
+                    "value": null
+                  },
+                  {
+                    "locations": [],
+                    "name": "pl[].name",
+                    "outcome": "usable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/matches"
+                ],
+                "message": "pl is []",
+                "name": "count of xs whose v matches pl.name is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "count of xs whose v matches pl.name",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  null
+                ]
+              },
+              {
+                "locations": [],
+                "name": "pl[].name",
+                "outcome": "usable",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": []
+              }
+            ],
+            "message": "pl is []; item 1 of xs is null, which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "not_an_object",
+            "check": "not_contain_all",
+            "failures": [
+              {
+                "cause": "not_an_object",
+                "failures": [
+                  {
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/xs/0"
+                        ],
+                        "name": "xs[0].tags",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "message": "item 1 of xs is null, which isn't an object",
+                    "name": "item 1 of xs",
+                    "value": null
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "pl[].name",
+                    "outcome": "usable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/not_contain_all"
+                ],
+                "message": "pl is []",
+                "name": "every xs whose tags does not contain all of pl.name, if any, exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "pl[].name",
+                "outcome": "usable",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": []
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  null
+                ]
+              }
+            ],
+            "message": "pl is []; item 1 of xs is null, which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "not_an_object",
+            "check": "not_match",
+            "failures": [
+              {
+                "cause": "not_an_object",
+                "failures": [
+                  {
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/xs/0"
+                        ],
+                        "name": "xs[0].v",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "message": "item 1 of xs is null, which isn't an object",
+                    "name": "item 1 of xs",
+                    "value": null
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "pl[].name",
+                    "outcome": "usable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/not_match"
+                ],
+                "message": "pl is []",
+                "name": "every xs whose v does not match pl.name exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "pl[].name",
+                "outcome": "usable",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": []
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  null
+                ]
+              }
+            ],
+            "message": "pl is []; item 1 of xs is null, which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "not_an_object",
+            "check": "not_one_of",
+            "failures": [
+              {
+                "cause": "not_an_object",
+                "failures": [
+                  {
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/xs/0"
+                        ],
+                        "name": "xs[0].v",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "message": "item 1 of xs is null, which isn't an object",
+                    "name": "item 1 of xs",
+                    "value": null
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "name": "count of xs whose v is not in pl.name",
+                    "value": null
+                  },
+                  {
+                    "locations": [],
+                    "name": "pl[].name",
+                    "outcome": "usable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/not_one_of"
+                ],
+                "message": "pl is []",
+                "name": "count of xs whose v is not in pl.name is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "count of xs whose v is not in pl.name",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  null
+                ]
+              },
+              {
+                "locations": [],
+                "name": "pl[].name",
+                "outcome": "usable",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": []
+              }
+            ],
+            "message": "pl is []; item 1 of xs is null, which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "not_an_object",
+            "check": "plus",
+            "failures": [
+              {
+                "cause": "not_an_object",
+                "failures": [
+                  {
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/xs/0"
+                        ],
+                        "name": "xs[0].v",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "message": "item 1 of xs is null, which isn't an object",
+                    "name": "item 1 of xs",
+                    "value": null
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/k",
+                      "/ts/0/xs/0"
+                    ],
+                    "name": "k plus count of xs whose v is not in pl.name",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "/ts/0/k"
+                    ],
+                    "name": "k",
+                    "outcome": "usable",
+                    "value": 0
+                  },
+                  {
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "name": "count of xs whose v is not in pl.name",
+                    "value": null
+                  },
+                  {
+                    "locations": [],
+                    "name": "pl[].name",
+                    "outcome": "usable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/plus"
+                ],
+                "message": "pl is []",
+                "name": "k plus count of xs whose v is not in pl.name is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/ts/0/k",
+                  "/ts/0/xs/0"
+                ],
+                "name": "k plus count of xs whose v is not in pl.name",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": null
+              },
+              {
+                "locations": [
+                  "/ts/0/k"
+                ],
+                "name": "k",
+                "outcome": "usable",
+                "value": 0
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "count of xs whose v is not in pl.name",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  null
+                ]
+              },
+              {
+                "locations": [],
+                "name": "pl[].name",
+                "outcome": "usable",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": []
+              }
+            ],
+            "message": "pl is []; item 1 of xs is null, which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "not_an_object",
+            "check": "that",
+            "failures": [
+              {
+                "cause": "not_an_object",
+                "failures": [
+                  {
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/xs/0"
+                        ],
+                        "name": "xs[0].v",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "message": "item 1 of xs is null, which isn't an object",
+                    "name": "item 1 of xs",
+                    "value": null
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "name": "count of xs.v that is not in pl.name",
+                    "value": null
+                  },
+                  {
+                    "locations": [],
+                    "name": "pl[].name",
+                    "outcome": "usable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/that"
+                ],
+                "message": "pl is []",
+                "name": "count of xs.v that is not in pl.name is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "count of xs.v that is not in pl.name",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[].v",
+                "outcome": "usable",
+                "value": [
+                  null
+                ]
+              },
+              {
+                "locations": [],
+                "name": "pl[].name",
+                "outcome": "usable",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": []
+              }
+            ],
+            "message": "pl is []; item 1 of xs is null, which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          }
+        ]
+      },
+      {
+        "description": "an empty part, then an item whose field is null",
+        "rules": ["walk.right.fail", "tally.whose", "problems.all_said"],
+        "input": {"ts": [{"id": "t", "k": 0, "p": [], "xs": [{"v": null, "tags": null}]}]},
+        "results": [
+          {
+            "cause": "null",
+            "check": "contains_all",
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/xs/0/tags"
+                        ],
+                        "name": "xs[0].tags",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "message": "tags is null",
+                    "name": "item 1 of xs",
+                    "value": {
+                      "tags": null,
+                      "v": null
+                    }
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "name": "count of xs whose tags contains all of pl.name",
+                    "value": null
+                  },
+                  {
+                    "locations": [],
+                    "name": "pl[].name",
+                    "outcome": "usable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/contains_all"
+                ],
+                "message": "pl is []",
+                "name": "count of xs whose tags contains all of pl.name is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "count of xs whose tags contains all of pl.name",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "tags": null,
+                    "v": null
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "pl[].name",
+                "outcome": "usable",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": []
+              }
+            ],
+            "message": "pl is []; item 1 of xs: tags is null",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "contains_none",
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/xs/0/tags"
+                        ],
+                        "name": "xs[0].tags",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "message": "tags is null",
+                    "name": "item 1 of xs",
+                    "value": {
+                      "tags": null,
+                      "v": null
+                    }
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "pl[].name",
+                    "outcome": "usable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/contains_none"
+                ],
+                "message": "pl is []",
+                "name": "some xs whose tags contains none of pl.name exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "pl[].name",
+                "outcome": "usable",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": []
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "tags": null,
+                    "v": null
+                  }
+                ]
+              }
+            ],
+            "message": "pl is []; item 1 of xs: tags is null",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "contains_some",
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/xs/0/tags"
+                        ],
+                        "name": "xs[0].tags",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "message": "tags is null",
+                    "name": "item 1 of xs",
+                    "value": {
+                      "tags": null,
+                      "v": null
+                    }
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "name": "count of xs whose tags contains some of pl.name",
+                    "value": null
+                  },
+                  {
+                    "locations": [],
+                    "name": "pl[].name",
+                    "outcome": "usable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/contains_some"
+                ],
+                "message": "pl is []",
+                "name": "count of xs whose tags contains some of pl.name is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "count of xs whose tags contains some of pl.name",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "tags": null,
+                    "v": null
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "pl[].name",
+                "outcome": "usable",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": []
+              }
+            ],
+            "message": "pl is []; item 1 of xs: tags is null",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "matches",
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/xs/0/v"
+                        ],
+                        "name": "xs[0].v",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "message": "v is null",
+                    "name": "item 1 of xs",
+                    "value": {
+                      "tags": null,
+                      "v": null
+                    }
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "name": "count of xs whose v matches pl.name",
+                    "value": null
+                  },
+                  {
+                    "locations": [],
+                    "name": "pl[].name",
+                    "outcome": "usable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/matches"
+                ],
+                "message": "pl is []",
+                "name": "count of xs whose v matches pl.name is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "count of xs whose v matches pl.name",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "tags": null,
+                    "v": null
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "pl[].name",
+                "outcome": "usable",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": []
+              }
+            ],
+            "message": "pl is []; item 1 of xs: v is null",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "not_contain_all",
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/xs/0/tags"
+                        ],
+                        "name": "xs[0].tags",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "message": "tags is null",
+                    "name": "item 1 of xs",
+                    "value": {
+                      "tags": null,
+                      "v": null
+                    }
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "pl[].name",
+                    "outcome": "usable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/not_contain_all"
+                ],
+                "message": "pl is []",
+                "name": "every xs whose tags does not contain all of pl.name, if any, exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "pl[].name",
+                "outcome": "usable",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": []
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "tags": null,
+                    "v": null
+                  }
+                ]
+              }
+            ],
+            "message": "pl is []; item 1 of xs: tags is null",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "not_match",
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/xs/0/v"
+                        ],
+                        "name": "xs[0].v",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "message": "v is null",
+                    "name": "item 1 of xs",
+                    "value": {
+                      "tags": null,
+                      "v": null
+                    }
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "pl[].name",
+                    "outcome": "usable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/not_match"
+                ],
+                "message": "pl is []",
+                "name": "every xs whose v does not match pl.name exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "pl[].name",
+                "outcome": "usable",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": []
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "tags": null,
+                    "v": null
+                  }
+                ]
+              }
+            ],
+            "message": "pl is []; item 1 of xs: v is null",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "not_one_of",
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/xs/0/v"
+                        ],
+                        "name": "xs[0].v",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "message": "v is null",
+                    "name": "item 1 of xs",
+                    "value": {
+                      "tags": null,
+                      "v": null
+                    }
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "name": "count of xs whose v is not in pl.name",
+                    "value": null
+                  },
+                  {
+                    "locations": [],
+                    "name": "pl[].name",
+                    "outcome": "usable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/not_one_of"
+                ],
+                "message": "pl is []",
+                "name": "count of xs whose v is not in pl.name is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "count of xs whose v is not in pl.name",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "tags": null,
+                    "v": null
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "pl[].name",
+                "outcome": "usable",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": []
+              }
+            ],
+            "message": "pl is []; item 1 of xs: v is null",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "plus",
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/xs/0/v"
+                        ],
+                        "name": "xs[0].v",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "message": "v is null",
+                    "name": "item 1 of xs",
+                    "value": {
+                      "tags": null,
+                      "v": null
+                    }
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/k",
+                      "/ts/0/xs/0"
+                    ],
+                    "name": "k plus count of xs whose v is not in pl.name",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "/ts/0/k"
+                    ],
+                    "name": "k",
+                    "outcome": "usable",
+                    "value": 0
+                  },
+                  {
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "name": "count of xs whose v is not in pl.name",
+                    "value": null
+                  },
+                  {
+                    "locations": [],
+                    "name": "pl[].name",
+                    "outcome": "usable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/plus"
+                ],
+                "message": "pl is []",
+                "name": "k plus count of xs whose v is not in pl.name is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/ts/0/k",
+                  "/ts/0/xs/0"
+                ],
+                "name": "k plus count of xs whose v is not in pl.name",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": null
+              },
+              {
+                "locations": [
+                  "/ts/0/k"
+                ],
+                "name": "k",
+                "outcome": "usable",
+                "value": 0
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "count of xs whose v is not in pl.name",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "tags": null,
+                    "v": null
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "pl[].name",
+                "outcome": "usable",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": []
+              }
+            ],
+            "message": "pl is []; item 1 of xs: v is null",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "that",
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/xs/0/v"
+                        ],
+                        "name": "xs[0].v",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "message": "v is null",
+                    "name": "item 1 of xs",
+                    "value": {
+                      "tags": null,
+                      "v": null
+                    }
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/xs/0/v"
+                    ],
+                    "name": "count of xs.v that is not in pl.name",
+                    "value": null
+                  },
+                  {
+                    "locations": [],
+                    "name": "pl[].name",
+                    "outcome": "usable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/that"
+                ],
+                "message": "pl is []",
+                "name": "count of xs.v that is not in pl.name is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/ts/0/xs/0/v"
+                ],
+                "name": "count of xs.v that is not in pl.name",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0/v"
+                ],
+                "name": "xs[].v",
+                "outcome": "usable",
+                "value": [
+                  null
+                ]
+              },
+              {
+                "locations": [],
+                "name": "pl[].name",
+                "outcome": "usable",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": []
+              }
+            ],
+            "message": "pl is []; item 1 of xs: v is null",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          }
+        ]
+      },
+      {
+        "description": "a null part, then an item with no field",
+        "rules": ["walk.right.fail", "tally.whose", "problems.all_said"],
+        "input": {"ts": [{"id": "t", "k": 0, "p": null, "xs": [{}]}]},
+        "results": [
+          {
+            "cause": "absent",
+            "check": "contains_all",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/xs/0"
+                        ],
+                        "name": "xs[0].tags",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "message": "tags is missing",
+                    "name": "item 1 of xs",
+                    "value": {}
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "name": "count of xs whose tags contains all of pl.name",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "/ts/0/p"
+                    ],
+                    "name": "pl.name",
+                    "outcome": "null",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/contains_all"
+                ],
+                "message": "pl is null",
+                "name": "count of xs whose tags contains all of pl.name is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "count of xs whose tags contains all of pl.name",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {}
+                ]
+              },
+              {
+                "locations": [
+                  "/ts/0/p"
+                ],
+                "name": "pl.name",
+                "outcome": "null",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": null
+              }
+            ],
+            "message": "pl is null; item 1 of xs: tags is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "contains_none",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/xs/0"
+                        ],
+                        "name": "xs[0].tags",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "message": "tags is missing",
+                    "name": "item 1 of xs",
+                    "value": {}
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/p"
+                    ],
+                    "name": "pl.name",
+                    "outcome": "null",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/contains_none"
+                ],
+                "message": "pl is null",
+                "name": "some xs whose tags contains none of pl.name exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/ts/0/p"
+                ],
+                "name": "pl.name",
+                "outcome": "null",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": null
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {}
+                ]
+              }
+            ],
+            "message": "pl is null; item 1 of xs: tags is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "contains_some",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/xs/0"
+                        ],
+                        "name": "xs[0].tags",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "message": "tags is missing",
+                    "name": "item 1 of xs",
+                    "value": {}
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "name": "count of xs whose tags contains some of pl.name",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "/ts/0/p"
+                    ],
+                    "name": "pl.name",
+                    "outcome": "null",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/contains_some"
+                ],
+                "message": "pl is null",
+                "name": "count of xs whose tags contains some of pl.name is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "count of xs whose tags contains some of pl.name",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {}
+                ]
+              },
+              {
+                "locations": [
+                  "/ts/0/p"
+                ],
+                "name": "pl.name",
+                "outcome": "null",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": null
+              }
+            ],
+            "message": "pl is null; item 1 of xs: tags is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "matches",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/xs/0"
+                        ],
+                        "name": "xs[0].v",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "message": "v is missing",
+                    "name": "item 1 of xs",
+                    "value": {}
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "name": "count of xs whose v matches pl.name",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "/ts/0/p"
+                    ],
+                    "name": "pl.name",
+                    "outcome": "null",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/matches"
+                ],
+                "message": "pl is null",
+                "name": "count of xs whose v matches pl.name is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "count of xs whose v matches pl.name",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {}
+                ]
+              },
+              {
+                "locations": [
+                  "/ts/0/p"
+                ],
+                "name": "pl.name",
+                "outcome": "null",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": null
+              }
+            ],
+            "message": "pl is null; item 1 of xs: v is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "not_contain_all",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/xs/0"
+                        ],
+                        "name": "xs[0].tags",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "message": "tags is missing",
+                    "name": "item 1 of xs",
+                    "value": {}
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/p"
+                    ],
+                    "name": "pl.name",
+                    "outcome": "null",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/not_contain_all"
+                ],
+                "message": "pl is null",
+                "name": "every xs whose tags does not contain all of pl.name, if any, exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/ts/0/p"
+                ],
+                "name": "pl.name",
+                "outcome": "null",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": null
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {}
+                ]
+              }
+            ],
+            "message": "pl is null; item 1 of xs: tags is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "not_match",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/xs/0"
+                        ],
+                        "name": "xs[0].v",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "message": "v is missing",
+                    "name": "item 1 of xs",
+                    "value": {}
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/p"
+                    ],
+                    "name": "pl.name",
+                    "outcome": "null",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/not_match"
+                ],
+                "message": "pl is null",
+                "name": "every xs whose v does not match pl.name exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/ts/0/p"
+                ],
+                "name": "pl.name",
+                "outcome": "null",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": null
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {}
+                ]
+              }
+            ],
+            "message": "pl is null; item 1 of xs: v is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "not_one_of",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/xs/0"
+                        ],
+                        "name": "xs[0].v",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "message": "v is missing",
+                    "name": "item 1 of xs",
+                    "value": {}
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "name": "count of xs whose v is not in pl.name",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "/ts/0/p"
+                    ],
+                    "name": "pl.name",
+                    "outcome": "null",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/not_one_of"
+                ],
+                "message": "pl is null",
+                "name": "count of xs whose v is not in pl.name is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "count of xs whose v is not in pl.name",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {}
+                ]
+              },
+              {
+                "locations": [
+                  "/ts/0/p"
+                ],
+                "name": "pl.name",
+                "outcome": "null",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": null
+              }
+            ],
+            "message": "pl is null; item 1 of xs: v is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "plus",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/xs/0"
+                        ],
+                        "name": "xs[0].v",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "message": "v is missing",
+                    "name": "item 1 of xs",
+                    "value": {}
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/k",
+                      "/ts/0/xs/0",
+                      "/ts/0/p"
+                    ],
+                    "name": "k plus count of xs whose v is not in pl.name",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "/ts/0/k"
+                    ],
+                    "name": "k",
+                    "outcome": "usable",
+                    "value": 0
+                  },
+                  {
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "name": "count of xs whose v is not in pl.name",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "/ts/0/p"
+                    ],
+                    "name": "pl.name",
+                    "outcome": "null",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/plus"
+                ],
+                "message": "pl is null",
+                "name": "k plus count of xs whose v is not in pl.name is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/ts/0/k",
+                  "/ts/0/xs/0",
+                  "/ts/0/p"
+                ],
+                "name": "k plus count of xs whose v is not in pl.name",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": null
+              },
+              {
+                "locations": [
+                  "/ts/0/k"
+                ],
+                "name": "k",
+                "outcome": "usable",
+                "value": 0
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "count of xs whose v is not in pl.name",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {}
+                ]
+              },
+              {
+                "locations": [
+                  "/ts/0/p"
+                ],
+                "name": "pl.name",
+                "outcome": "null",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": null
+              }
+            ],
+            "message": "pl is null; item 1 of xs: v is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "that",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/xs/0"
+                        ],
+                        "name": "xs[0].v",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "message": "v is missing",
+                    "name": "item 1 of xs",
+                    "value": {}
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "name": "count of xs.v that is not in pl.name",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "/ts/0/p"
+                    ],
+                    "name": "pl.name",
+                    "outcome": "null",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/that"
+                ],
+                "message": "pl is null",
+                "name": "count of xs.v that is not in pl.name is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "count of xs.v that is not in pl.name",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[].v",
+                "outcome": "usable",
+                "value": [
+                  null
+                ]
+              },
+              {
+                "locations": [
+                  "/ts/0/p"
+                ],
+                "name": "pl.name",
+                "outcome": "null",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": null
+              }
+            ],
+            "message": "pl is null; item 1 of xs: v is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a part that holds an empty list on the right of a phrase in a count under a for line is said once, then what each item says on its own",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"t": {"from": "ts", "identified_by": "id", "has": {"pl": "p"}}}, "requirements": {"r": {"subject": "t", "checks": {"for_count": {"for": "every xs as m", "assert": "count of m.ys whose v is not one of pl.name is 0"}}}}},
+    "cases": [
+      {
+        "description": "an item of the inner list with no field",
+        "rules": ["walk.right.fail", "tally.whose", "problems.all_said", "for.roots"],
+        "input": {"ts": [{"id": "t", "k": 0, "p": [], "xs": [{"ys": [{}]}]}]},
+        "results": [
+          {
+            "cause": "absent",
+            "check": "for_count",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [
+                      {
+                        "cause": "absent",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/ts/0/xs/0/ys/0"
+                            ],
+                            "name": "m.ys[0].v",
+                            "outcome": "absent",
+                            "value": null
+                          }
+                        ],
+                        "kind": "item",
+                        "locations": [
+                          "/ts/0/xs/0/ys/0"
+                        ],
+                        "message": "v is missing",
+                        "name": "item 1 of m.ys",
+                        "value": {}
+                      }
+                    ],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/xs/0/ys/0"
+                        ],
+                        "name": "count of m.ys whose v is not in pl.name",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "message": "",
+                    "name": "item 1 of xs",
+                    "value": {
+                      "ys": [
+                        {}
+                      ]
+                    }
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "pl[].name",
+                    "outcome": "usable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/for_count/assert"
+                ],
+                "message": "pl is []",
+                "name": "count of m.ys whose v is not in pl.name is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "pl[].name",
+                "outcome": "usable",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": []
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "ys": [
+                      {}
+                    ]
+                  }
+                ]
+              }
+            ],
+            "message": "pl is []; item 1 of xs: item 1 of m.ys: v is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          }
+        ]
+      },
+      {
+        "description": "an item of the inner list whose field is null",
+        "rules": ["walk.right.fail", "tally.whose", "problems.all_said", "for.roots"],
+        "input": {"ts": [{"id": "t", "k": 0, "p": [], "xs": [{"ys": [{"v": null}]}]}]},
+        "results": [
+          {
+            "cause": "null",
+            "check": "for_count",
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [
+                      {
+                        "cause": "null",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/ts/0/xs/0/ys/0/v"
+                            ],
+                            "name": "m.ys[0].v",
+                            "outcome": "null",
+                            "value": null
+                          }
+                        ],
+                        "kind": "item",
+                        "locations": [
+                          "/ts/0/xs/0/ys/0"
+                        ],
+                        "message": "v is null",
+                        "name": "item 1 of m.ys",
+                        "value": {
+                          "v": null
+                        }
+                      }
+                    ],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/xs/0/ys/0"
+                        ],
+                        "name": "count of m.ys whose v is not in pl.name",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "message": "",
+                    "name": "item 1 of xs",
+                    "value": {
+                      "ys": [
+                        {
+                          "v": null
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "pl[].name",
+                    "outcome": "usable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/for_count/assert"
+                ],
+                "message": "pl is []",
+                "name": "count of m.ys whose v is not in pl.name is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "pl[].name",
+                "outcome": "usable",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": []
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "ys": [
+                      {
+                        "v": null
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "message": "pl is []; item 1 of xs: item 1 of m.ys: v is null",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]
