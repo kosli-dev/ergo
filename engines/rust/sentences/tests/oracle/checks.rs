@@ -5457,6 +5457,48 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
+        "every xs whose v is $input.m named by key exists",
+        "every xs whose v equals $input.m named by key exists",
+        &[],
+        &[],
+    ),
+    (
+        "every xs whose v is $input.m named by key, if any, exists",
+        "every xs whose v equals $input.m named by key, if any, exists",
+        &[],
+        &[],
+    ),
+    (
+        "some xs whose v is $input.m named by key exists",
+        "some xs whose v equals $input.m named by key exists",
+        &[],
+        &[],
+    ),
+    (
+        "every xs whose v is not $input.m named by key exists",
+        "every xs whose v does not equal $input.m named by key exists",
+        &[],
+        &[],
+    ),
+    (
+        "every xs whose v is $input.d.m named by key exists",
+        "every xs whose v equals $input.d.m named by key exists",
+        &[],
+        &[],
+    ),
+    (
+        "every xs whose v is $params.m named by key, if any, exists",
+        "every xs whose v equals $params.m named by key, if any, exists",
+        &[],
+        &[],
+    ),
+    (
+        "some xs whose v is $params.m named by key exists",
+        "some xs whose v equals $params.m named by key exists",
+        &[],
+        &[],
+    ),
+    (
         "every xs whose tags contains art.m named by key, if any, exists",
         "every xs whose tags contains art.m named by key, if any, exists",
         &[],
