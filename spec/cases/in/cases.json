@@ -8944,7 +8944,7 @@
         ]
       },
       {
-        "description": "leaves every item out as value when the list is empty",
+        "description": "fails as value and says the empty list once when the list is empty",
         "rules": ["walk.right", "compare.list", "sentence.phrase.one_of", "walk.right.fail"],
         "input": {"sbom": {"components": []}, "repos": [{"id": "r1", "deps": [{"name": "click", "n": 2}]}]},
         "results": [
@@ -8961,7 +8961,7 @@
                       "/repos/0/deps/0"
                     ],
                     "name": "count of deps whose name is in $input.sbom.components.name",
-                    "value": 0
+                    "value": null
                   },
                   {
                     "locations": [],
@@ -8974,7 +8974,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/a"
                 ],
-                "message": "count of deps whose name is in $input.sbom.components.name is 0",
+                "message": "$input.sbom.components is []",
                 "name": "count of deps whose name is in $input.sbom.components.name is 1"
               }
             ],
@@ -8984,7 +8984,7 @@
                   "/repos/0/deps/0"
                 ],
                 "name": "count of deps whose name is in $input.sbom.components.name",
-                "value": 0
+                "value": null
               },
               {
                 "locations": [
@@ -9006,7 +9006,7 @@
                 "value": []
               }
             ],
-            "message": "count of deps whose name is in $input.sbom.components.name is 0",
+            "message": "$input.sbom.components is []",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -19123,6 +19123,2627 @@
             "subject": {
               "id": "a",
               "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "an empty list on the right of a phrase in a whose or a that fails the row as value, said once, whatever the items",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"t": {"from": "ts", "identified_by": "id", "has": {"pl": "p"}}}, "requirements": {"r": {"subject": "t", "checks": {"contains_all": "count of xs whose tags contains all of $input.cs.name is 0", "count": "count of xs whose v is in $input.cs.name is 0", "every": "every xs whose v is in $input.cs.name exists", "for_line": {"for": "every ws as w", "assert": "count of xs whose v is in $input.cs.name is 0"}, "for_whose": {"for": "every xs whose v is in $input.cs.name, if any, as x", "assert": "x.v exists"}, "if_any": "every xs whose v is not one of $input.cs.name, if any, exists", "matches": "count of xs whose v matches $input.cs.name is 0", "member": "count of member of m whose v is in $input.cs.name is 0", "not_one_of": "count of xs whose v is not one of $params.cs.name is 0", "part": "count of xs whose v is in pl.name is 0", "some": "some xs whose v is in $params.cs.name exists", "sum": "sum of xs.n that is in $input.cs.name is 0", "that": "count of xs.v that is in $input.cs.name is 0"}}}},
+    "params": {"cs": []},
+    "cases": [
+      {
+        "description": "fails as value with the empty list said once, when the list has no item",
+        "rules": ["walk.right.fail", "walk.right.inputs", "tally.whose", "tally.walk", "problems.where_said", "problems.all_said"],
+        "input": {"cs": [], "ts": [{"id": "t", "xs": [], "ws": [{}], "m": {}, "p": []}]},
+        "results": [
+          {
+            "cause": "value",
+            "check": "contains_all",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "count of xs whose tags contains all of $input.cs.name",
+                    "value": null
+                  },
+                  {
+                    "locations": [],
+                    "name": "$input.cs[].name",
+                    "outcome": "usable",
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/contains_all"
+                ],
+                "message": "$input.cs is []",
+                "name": "count of xs whose tags contains all of $input.cs.name is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count of xs whose tags contains all of $input.cs.name",
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "$input.cs[].name",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "$input.cs is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "count",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "count of xs whose v is in $input.cs.name",
+                    "value": null
+                  },
+                  {
+                    "locations": [],
+                    "name": "$input.cs[].name",
+                    "outcome": "usable",
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/count"
+                ],
+                "message": "$input.cs is []",
+                "name": "count of xs whose v is in $input.cs.name is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count of xs whose v is in $input.cs.name",
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "$input.cs[].name",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "$input.cs is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "every",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [
+                  {
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/xs"
+                        ],
+                        "name": "xs",
+                        "outcome": "usable",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "xs is []",
+                    "name": "xs"
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "$input.cs[].name",
+                    "outcome": "usable",
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/every"
+                ],
+                "message": "$input.cs is []",
+                "name": "every xs whose v is in $input.cs.name exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "$input.cs[].name",
+                "outcome": "usable",
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "$input.cs is []; xs is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "for_line",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "count of xs whose v is in $input.cs.name",
+                    "value": null
+                  },
+                  {
+                    "locations": [],
+                    "name": "$input.cs[].name",
+                    "outcome": "usable",
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/for_line/assert"
+                ],
+                "message": "$input.cs is []",
+                "name": "count of xs whose v is in $input.cs.name is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "$input.cs[].name",
+                "outcome": "usable",
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "count of xs whose v is in $input.cs.name",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/ts/0/ws/0"
+                ],
+                "name": "ws[]",
+                "outcome": "usable",
+                "value": [
+                  {}
+                ]
+              },
+              {
+                "locations": [],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "$input.cs is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "for_whose",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "xs[]",
+                    "outcome": "usable",
+                    "value": []
+                  }
+                ],
+                "kind": "list",
+                "message": "$input.cs is []",
+                "name": "xs"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "$input.cs[].name",
+                "outcome": "usable",
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "$input.cs is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "if_any",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "$input.cs[].name",
+                    "outcome": "usable",
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/if_any"
+                ],
+                "message": "$input.cs is []",
+                "name": "every xs whose v is not in $input.cs.name, if any, exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "$input.cs[].name",
+                "outcome": "usable",
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "$input.cs is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "matches",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "count of xs whose v matches $input.cs.name",
+                    "value": null
+                  },
+                  {
+                    "locations": [],
+                    "name": "$input.cs[].name",
+                    "outcome": "usable",
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/matches"
+                ],
+                "message": "$input.cs is []",
+                "name": "count of xs whose v matches $input.cs.name is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count of xs whose v matches $input.cs.name",
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "$input.cs[].name",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "$input.cs is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "member",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "count of member of m whose v is in $input.cs.name",
+                    "value": null
+                  },
+                  {
+                    "locations": [],
+                    "name": "$input.cs[].name",
+                    "outcome": "usable",
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/member"
+                ],
+                "message": "$input.cs is []",
+                "name": "count of member of m whose v is in $input.cs.name is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count of member of m whose v is in $input.cs.name",
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "m",
+                "outcome": "usable",
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "$input.cs[].name",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "$input.cs is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "not_one_of",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "count of xs whose v is not in $params.cs.name",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/not_one_of"
+                ],
+                "message": "$params.cs is []",
+                "name": "count of xs whose v is not in $params.cs.name is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count of xs whose v is not in $params.cs.name",
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "$params.cs is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "part",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "count of xs whose v is in pl.name",
+                    "value": null
+                  },
+                  {
+                    "locations": [],
+                    "name": "pl[].name",
+                    "outcome": "usable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/part"
+                ],
+                "message": "pl is []",
+                "name": "count of xs whose v is in pl.name is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count of xs whose v is in pl.name",
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "pl[].name",
+                "outcome": "usable",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": []
+              }
+            ],
+            "message": "pl is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "some",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [
+                  {
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/xs"
+                        ],
+                        "name": "xs",
+                        "outcome": "usable",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "xs is []",
+                    "name": "xs"
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "$params.cs[].name",
+                    "outcome": "usable",
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/some"
+                ],
+                "message": "$params.cs is []",
+                "name": "some xs whose v is in $params.cs.name exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "$params.cs is []; xs is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "sum",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "sum of xs.n that is in $input.cs.name",
+                    "value": null
+                  },
+                  {
+                    "locations": [],
+                    "name": "$input.cs[].name",
+                    "outcome": "usable",
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/sum"
+                ],
+                "message": "$input.cs is []",
+                "name": "sum of xs.n that is in $input.cs.name is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "sum of xs.n that is in $input.cs.name",
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "xs[].n",
+                "outcome": "usable",
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "$input.cs[].name",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "$input.cs is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "that",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "count of xs.v that is in $input.cs.name",
+                    "value": null
+                  },
+                  {
+                    "locations": [],
+                    "name": "$input.cs[].name",
+                    "outcome": "usable",
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/that"
+                ],
+                "message": "$input.cs is []",
+                "name": "count of xs.v that is in $input.cs.name is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count of xs.v that is in $input.cs.name",
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "xs[].v",
+                "outcome": "usable",
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "$input.cs[].name",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "$input.cs is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as value with the empty list said once, when an item has no field",
+        "rules": ["walk.right.fail", "walk.right.inputs", "tally.whose", "tally.walk", "problems.where_said", "problems.all_said"],
+        "input": {"cs": [], "ts": [{"id": "t", "xs": [{}], "ws": [{}], "m": {"k": {}}, "p": []}]},
+        "results": [
+          {
+            "cause": "absent",
+            "check": "contains_all",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/xs/0"
+                        ],
+                        "name": "xs[0].tags",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "message": "tags is missing",
+                    "name": "item 1 of xs",
+                    "value": {}
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "name": "count of xs whose tags contains all of $input.cs.name",
+                    "value": null
+                  },
+                  {
+                    "locations": [],
+                    "name": "$input.cs[].name",
+                    "outcome": "usable",
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/contains_all"
+                ],
+                "message": "$input.cs is []",
+                "name": "count of xs whose tags contains all of $input.cs.name is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "count of xs whose tags contains all of $input.cs.name",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {}
+                ]
+              },
+              {
+                "locations": [],
+                "name": "$input.cs[].name",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "$input.cs is []; item 1 of xs: tags is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "count",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/xs/0"
+                        ],
+                        "name": "xs[0].v",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "message": "v is missing",
+                    "name": "item 1 of xs",
+                    "value": {}
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "name": "count of xs whose v is in $input.cs.name",
+                    "value": null
+                  },
+                  {
+                    "locations": [],
+                    "name": "$input.cs[].name",
+                    "outcome": "usable",
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/count"
+                ],
+                "message": "$input.cs is []",
+                "name": "count of xs whose v is in $input.cs.name is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "count of xs whose v is in $input.cs.name",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {}
+                ]
+              },
+              {
+                "locations": [],
+                "name": "$input.cs[].name",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "$input.cs is []; item 1 of xs: v is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "every",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/xs/0"
+                        ],
+                        "name": "xs[0].v",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "message": "v is missing",
+                    "name": "item 1 of xs",
+                    "value": {}
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "$input.cs[].name",
+                    "outcome": "usable",
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/every"
+                ],
+                "message": "$input.cs is []",
+                "name": "every xs whose v is in $input.cs.name exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "$input.cs[].name",
+                "outcome": "usable",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {}
+                ]
+              }
+            ],
+            "message": "$input.cs is []; item 1 of xs: v is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "for_line",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/xs/0"
+                        ],
+                        "name": "xs[0].v",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "message": "v is missing",
+                    "name": "item 1 of xs",
+                    "value": {}
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "name": "count of xs whose v is in $input.cs.name",
+                    "value": null
+                  },
+                  {
+                    "locations": [],
+                    "name": "$input.cs[].name",
+                    "outcome": "usable",
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/for_line/assert"
+                ],
+                "message": "$input.cs is []",
+                "name": "count of xs whose v is in $input.cs.name is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "$input.cs[].name",
+                "outcome": "usable",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "count of xs whose v is in $input.cs.name",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/ts/0/ws/0"
+                ],
+                "name": "ws[]",
+                "outcome": "usable",
+                "value": [
+                  {}
+                ]
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {}
+                ]
+              }
+            ],
+            "message": "$input.cs is []; item 1 of xs: v is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "for_whose",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "name": "xs[]",
+                    "outcome": "usable",
+                    "value": [
+                      {}
+                    ]
+                  }
+                ],
+                "kind": "list",
+                "message": "$input.cs is []",
+                "name": "xs"
+              },
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "name": "xs[0].v",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "item",
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "message": "v is missing",
+                "name": "item 1 of xs",
+                "value": {}
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "$input.cs[].name",
+                "outcome": "usable",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {}
+                ]
+              }
+            ],
+            "message": "$input.cs is []; item 1 of xs: v is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "if_any",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/xs/0"
+                        ],
+                        "name": "xs[0].v",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "message": "v is missing",
+                    "name": "item 1 of xs",
+                    "value": {}
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "$input.cs[].name",
+                    "outcome": "usable",
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/if_any"
+                ],
+                "message": "$input.cs is []",
+                "name": "every xs whose v is not in $input.cs.name, if any, exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "$input.cs[].name",
+                "outcome": "usable",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {}
+                ]
+              }
+            ],
+            "message": "$input.cs is []; item 1 of xs: v is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "matches",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/xs/0"
+                        ],
+                        "name": "xs[0].v",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "message": "v is missing",
+                    "name": "item 1 of xs",
+                    "value": {}
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "name": "count of xs whose v matches $input.cs.name",
+                    "value": null
+                  },
+                  {
+                    "locations": [],
+                    "name": "$input.cs[].name",
+                    "outcome": "usable",
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/matches"
+                ],
+                "message": "$input.cs is []",
+                "name": "count of xs whose v matches $input.cs.name is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "count of xs whose v matches $input.cs.name",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {}
+                ]
+              },
+              {
+                "locations": [],
+                "name": "$input.cs[].name",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "$input.cs is []; item 1 of xs: v is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "member",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/m/k"
+                        ],
+                        "name": "m.k.v",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/m/k"
+                    ],
+                    "message": "v is missing",
+                    "name": "member k of m",
+                    "value": {}
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/m/k"
+                    ],
+                    "name": "count of member of m whose v is in $input.cs.name",
+                    "value": null
+                  },
+                  {
+                    "locations": [],
+                    "name": "$input.cs[].name",
+                    "outcome": "usable",
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/member"
+                ],
+                "message": "$input.cs is []",
+                "name": "count of member of m whose v is in $input.cs.name is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/ts/0/m/k"
+                ],
+                "name": "count of member of m whose v is in $input.cs.name",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/ts/0/m/k"
+                ],
+                "name": "m",
+                "outcome": "usable",
+                "value": [
+                  {}
+                ]
+              },
+              {
+                "locations": [],
+                "name": "$input.cs[].name",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "$input.cs is []; member k of m: v is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "not_one_of",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/xs/0"
+                        ],
+                        "name": "xs[0].v",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "message": "v is missing",
+                    "name": "item 1 of xs",
+                    "value": {}
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "name": "count of xs whose v is not in $params.cs.name",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/not_one_of"
+                ],
+                "message": "$params.cs is []",
+                "name": "count of xs whose v is not in $params.cs.name is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "count of xs whose v is not in $params.cs.name",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {}
+                ]
+              }
+            ],
+            "message": "$params.cs is []; item 1 of xs: v is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "part",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/xs/0"
+                        ],
+                        "name": "xs[0].v",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "message": "v is missing",
+                    "name": "item 1 of xs",
+                    "value": {}
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "name": "count of xs whose v is in pl.name",
+                    "value": null
+                  },
+                  {
+                    "locations": [],
+                    "name": "pl[].name",
+                    "outcome": "usable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/part"
+                ],
+                "message": "pl is []",
+                "name": "count of xs whose v is in pl.name is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "count of xs whose v is in pl.name",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {}
+                ]
+              },
+              {
+                "locations": [],
+                "name": "pl[].name",
+                "outcome": "usable",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": []
+              }
+            ],
+            "message": "pl is []; item 1 of xs: v is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "some",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/xs/0"
+                        ],
+                        "name": "xs[0].v",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "message": "v is missing",
+                    "name": "item 1 of xs",
+                    "value": {}
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "$params.cs[].name",
+                    "outcome": "usable",
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/some"
+                ],
+                "message": "$params.cs is []",
+                "name": "some xs whose v is in $params.cs.name exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {}
+                ]
+              }
+            ],
+            "message": "$params.cs is []; item 1 of xs: v is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "sum",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/xs/0"
+                        ],
+                        "name": "xs[0].n",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "message": "n is missing",
+                    "name": "item 1 of xs",
+                    "value": {}
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "name": "sum of xs.n that is in $input.cs.name",
+                    "value": null
+                  },
+                  {
+                    "locations": [],
+                    "name": "$input.cs[].name",
+                    "outcome": "usable",
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/sum"
+                ],
+                "message": "$input.cs is []",
+                "name": "sum of xs.n that is in $input.cs.name is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "sum of xs.n that is in $input.cs.name",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[].n",
+                "outcome": "usable",
+                "value": [
+                  null
+                ]
+              },
+              {
+                "locations": [],
+                "name": "$input.cs[].name",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "$input.cs is []; item 1 of xs: n is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "that",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/xs/0"
+                        ],
+                        "name": "xs[0].v",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "message": "v is missing",
+                    "name": "item 1 of xs",
+                    "value": {}
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "name": "count of xs.v that is in $input.cs.name",
+                    "value": null
+                  },
+                  {
+                    "locations": [],
+                    "name": "$input.cs[].name",
+                    "outcome": "usable",
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/that"
+                ],
+                "message": "$input.cs is []",
+                "name": "count of xs.v that is in $input.cs.name is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "count of xs.v that is in $input.cs.name",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[].v",
+                "outcome": "usable",
+                "value": [
+                  null
+                ]
+              },
+              {
+                "locations": [],
+                "name": "$input.cs[].name",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "$input.cs is []; item 1 of xs: v is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as value with the empty list said once, when an item has the field",
+        "rules": ["walk.right.fail", "walk.right.inputs", "tally.whose", "tally.walk", "problems.where_said", "problems.all_said"],
+        "input": {"cs": [], "ts": [{"id": "t", "xs": [{"v": "a", "tags": ["a"], "n": 1}], "ws": [{}], "m": {"k": {"v": "a", "tags": ["a"], "n": 1}}, "p": []}]},
+        "results": [
+          {
+            "cause": "value",
+            "check": "contains_all",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "name": "count of xs whose tags contains all of $input.cs.name",
+                    "value": null
+                  },
+                  {
+                    "locations": [],
+                    "name": "$input.cs[].name",
+                    "outcome": "usable",
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/contains_all"
+                ],
+                "message": "$input.cs is []",
+                "name": "count of xs whose tags contains all of $input.cs.name is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "count of xs whose tags contains all of $input.cs.name",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "n": 1,
+                    "tags": [
+                      "a"
+                    ],
+                    "v": "a"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "$input.cs[].name",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "$input.cs is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "count",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "name": "count of xs whose v is in $input.cs.name",
+                    "value": null
+                  },
+                  {
+                    "locations": [],
+                    "name": "$input.cs[].name",
+                    "outcome": "usable",
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/count"
+                ],
+                "message": "$input.cs is []",
+                "name": "count of xs whose v is in $input.cs.name is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "count of xs whose v is in $input.cs.name",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "n": 1,
+                    "tags": [
+                      "a"
+                    ],
+                    "v": "a"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "$input.cs[].name",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "$input.cs is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "every",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "$input.cs[].name",
+                    "outcome": "usable",
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/every"
+                ],
+                "message": "$input.cs is []",
+                "name": "every xs whose v is in $input.cs.name exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "$input.cs[].name",
+                "outcome": "usable",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "n": 1,
+                    "tags": [
+                      "a"
+                    ],
+                    "v": "a"
+                  }
+                ]
+              }
+            ],
+            "message": "$input.cs is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "for_line",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "name": "count of xs whose v is in $input.cs.name",
+                    "value": null
+                  },
+                  {
+                    "locations": [],
+                    "name": "$input.cs[].name",
+                    "outcome": "usable",
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/for_line/assert"
+                ],
+                "message": "$input.cs is []",
+                "name": "count of xs whose v is in $input.cs.name is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "$input.cs[].name",
+                "outcome": "usable",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "count of xs whose v is in $input.cs.name",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/ts/0/ws/0"
+                ],
+                "name": "ws[]",
+                "outcome": "usable",
+                "value": [
+                  {}
+                ]
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "n": 1,
+                    "tags": [
+                      "a"
+                    ],
+                    "v": "a"
+                  }
+                ]
+              }
+            ],
+            "message": "$input.cs is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "for_whose",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "name": "xs[]",
+                    "outcome": "usable",
+                    "value": [
+                      {
+                        "n": 1,
+                        "tags": [
+                          "a"
+                        ],
+                        "v": "a"
+                      }
+                    ]
+                  }
+                ],
+                "kind": "list",
+                "message": "$input.cs is []",
+                "name": "xs"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "$input.cs[].name",
+                "outcome": "usable",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "n": 1,
+                    "tags": [
+                      "a"
+                    ],
+                    "v": "a"
+                  }
+                ]
+              }
+            ],
+            "message": "$input.cs is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "if_any",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "$input.cs[].name",
+                    "outcome": "usable",
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/if_any"
+                ],
+                "message": "$input.cs is []",
+                "name": "every xs whose v is not in $input.cs.name, if any, exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "$input.cs[].name",
+                "outcome": "usable",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "n": 1,
+                    "tags": [
+                      "a"
+                    ],
+                    "v": "a"
+                  }
+                ]
+              }
+            ],
+            "message": "$input.cs is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "matches",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "name": "count of xs whose v matches $input.cs.name",
+                    "value": null
+                  },
+                  {
+                    "locations": [],
+                    "name": "$input.cs[].name",
+                    "outcome": "usable",
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/matches"
+                ],
+                "message": "$input.cs is []",
+                "name": "count of xs whose v matches $input.cs.name is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "count of xs whose v matches $input.cs.name",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "n": 1,
+                    "tags": [
+                      "a"
+                    ],
+                    "v": "a"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "$input.cs[].name",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "$input.cs is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "member",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/m/k"
+                    ],
+                    "name": "count of member of m whose v is in $input.cs.name",
+                    "value": null
+                  },
+                  {
+                    "locations": [],
+                    "name": "$input.cs[].name",
+                    "outcome": "usable",
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/member"
+                ],
+                "message": "$input.cs is []",
+                "name": "count of member of m whose v is in $input.cs.name is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/ts/0/m/k"
+                ],
+                "name": "count of member of m whose v is in $input.cs.name",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/ts/0/m/k"
+                ],
+                "name": "m",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "n": 1,
+                    "tags": [
+                      "a"
+                    ],
+                    "v": "a"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "$input.cs[].name",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "$input.cs is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "not_one_of",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "name": "count of xs whose v is not in $params.cs.name",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/not_one_of"
+                ],
+                "message": "$params.cs is []",
+                "name": "count of xs whose v is not in $params.cs.name is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "count of xs whose v is not in $params.cs.name",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "n": 1,
+                    "tags": [
+                      "a"
+                    ],
+                    "v": "a"
+                  }
+                ]
+              }
+            ],
+            "message": "$params.cs is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "part",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "name": "count of xs whose v is in pl.name",
+                    "value": null
+                  },
+                  {
+                    "locations": [],
+                    "name": "pl[].name",
+                    "outcome": "usable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/part"
+                ],
+                "message": "pl is []",
+                "name": "count of xs whose v is in pl.name is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "count of xs whose v is in pl.name",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "n": 1,
+                    "tags": [
+                      "a"
+                    ],
+                    "v": "a"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "pl[].name",
+                "outcome": "usable",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": []
+              }
+            ],
+            "message": "pl is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "some",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "$params.cs[].name",
+                    "outcome": "usable",
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/some"
+                ],
+                "message": "$params.cs is []",
+                "name": "some xs whose v is in $params.cs.name exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/ts/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "n": 1,
+                    "tags": [
+                      "a"
+                    ],
+                    "v": "a"
+                  }
+                ]
+              }
+            ],
+            "message": "$params.cs is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "sum",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/xs/0/n"
+                    ],
+                    "name": "sum of xs.n that is in $input.cs.name",
+                    "value": null
+                  },
+                  {
+                    "locations": [],
+                    "name": "$input.cs[].name",
+                    "outcome": "usable",
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/sum"
+                ],
+                "message": "$input.cs is []",
+                "name": "sum of xs.n that is in $input.cs.name is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/ts/0/xs/0/n"
+                ],
+                "name": "sum of xs.n that is in $input.cs.name",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0/n"
+                ],
+                "name": "xs[].n",
+                "outcome": "usable",
+                "value": [
+                  1
+                ]
+              },
+              {
+                "locations": [],
+                "name": "$input.cs[].name",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "$input.cs is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "that",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/xs/0/v"
+                    ],
+                    "name": "count of xs.v that is in $input.cs.name",
+                    "value": null
+                  },
+                  {
+                    "locations": [],
+                    "name": "$input.cs[].name",
+                    "outcome": "usable",
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/that"
+                ],
+                "message": "$input.cs is []",
+                "name": "count of xs.v that is in $input.cs.name is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/ts/0/xs/0/v"
+                ],
+                "name": "count of xs.v that is in $input.cs.name",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/ts/0/xs/0/v"
+                ],
+                "name": "xs[].v",
+                "outcome": "usable",
+                "value": [
+                  "a"
+                ]
+              },
+              {
+                "locations": [],
+                "name": "$input.cs[].name",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "$input.cs is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "t"
             }
           }
         ]

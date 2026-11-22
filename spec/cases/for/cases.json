@@ -62545,7 +62545,8 @@
         "rules": [
           "for.roots",
           "walk.right",
-          "tally.whose"
+          "tally.whose",
+          "walk.right.fail"
         ],
         "input": {
           "prs": [
@@ -62567,19 +62568,51 @@
         },
         "results": [
           {
-            "cause": "satisfied",
+            "cause": "value",
             "check": "c",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/prs/0/xs/0"
+                    ],
+                    "name": "count of xs whose v is in pl.z",
+                    "value": null
+                  },
+                  {
+                    "locations": [],
+                    "name": "pl[].z",
+                    "outcome": "usable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/c/assert"
+                ],
+                "message": "pl is []",
+                "name": "count of xs whose v is in pl.z is 0"
+              }
+            ],
             "inputs": [
               {
                 "locations": [
                   "/prs/0/xs/0"
                 ],
                 "name": "count of xs whose v is in pl.z",
-                "value": 0
+                "value": null
               },
               {
                 "locations": [],
                 "name": "pl[].z",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "pl"
@@ -62591,6 +62624,7 @@
                   "/prs/0/xs/0"
                 ],
                 "name": "xs[]",
+                "outcome": "usable",
                 "value": [
                   {
                     "v": 1,
@@ -62603,7 +62637,8 @@
                 ]
               }
             ],
-            "passed": true,
+            "message": "pl is []",
+            "passed": false,
             "requirement": "r",
             "subject": {
               "id": "p0",
@@ -62617,7 +62652,8 @@
         "rules": [
           "for.roots",
           "walk.right",
-          "tally.whose"
+          "tally.whose",
+          "walk.right.fail"
         ],
         "input": {
           "prs": [
@@ -62633,6 +62669,33 @@
             "cause": "value",
             "check": "c",
             "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "count of xs whose v is in pl.z",
+                    "value": null
+                  },
+                  {
+                    "locations": [],
+                    "name": "pl[].z",
+                    "outcome": "usable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/c/assert"
+                ],
+                "message": "pl is []",
+                "name": "count of xs whose v is in pl.z is 0"
+              },
               {
                 "cause": "value",
                 "failures": [],
@@ -62655,8 +62718,7 @@
               {
                 "locations": [],
                 "name": "count of xs whose v is in pl.z",
-                "outcome": "usable",
-                "value": 0
+                "value": null
               },
               {
                 "locations": [],
@@ -62675,7 +62737,7 @@
                 "value": []
               }
             ],
-            "message": "xs is []",
+            "message": "pl is []; xs is []",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -63673,7 +63735,8 @@
         "rules": [
           "for.roots",
           "walk.right",
-          "tally.whose"
+          "tally.whose",
+          "walk.right.fail"
         ],
         "input": {
           "prs": [
@@ -63695,12 +63758,37 @@
         },
         "results": [
           {
-            "cause": "satisfied",
+            "cause": "value",
             "check": "c",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "pl[].z",
+                    "outcome": "usable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/c/assert"
+                ],
+                "message": "pl is []",
+                "name": "count of m.ys whose v is in pl.z is 0"
+              }
+            ],
             "inputs": [
               {
                 "locations": [],
                 "name": "pl[].z",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "pl"
@@ -63712,6 +63800,7 @@
                   "/prs/0/xs/0"
                 ],
                 "name": "xs[]",
+                "outcome": "usable",
                 "value": [
                   {
                     "v": 1,
@@ -63724,7 +63813,8 @@
                 ]
               }
             ],
-            "passed": true,
+            "message": "pl is []",
+            "passed": false,
             "requirement": "r",
             "subject": {
               "id": "p0",
@@ -63738,7 +63828,8 @@
         "rules": [
           "for.roots",
           "walk.right",
-          "tally.whose"
+          "tally.whose",
+          "walk.right.fail"
         ],
         "input": {
           "prs": [
@@ -63754,6 +63845,17 @@
             "cause": "value",
             "check": "c",
             "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/c/assert"
+                ],
+                "message": "pl is []",
+                "name": "count of m.ys whose v is in pl.z is 0"
+              },
               {
                 "cause": "value",
                 "failures": [],
@@ -63790,7 +63892,7 @@
                 "value": []
               }
             ],
-            "message": "xs is []",
+            "message": "pl is []; xs is []",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -75115,7 +75217,7 @@
         ]
       },
       {
-        "description": "an empty part leaves every item out",
+        "description": "an empty part fails as value",
         "rules": ["walk.right", "walk.right.fail", "walk.right.inputs", "for.roots", "for.inputs", "for.walk"],
         "input": {"prs": [{"id": "p0", "xs": [{"v": 1}], "c": []}]},
         "results": [
@@ -75141,21 +75243,11 @@
                   }
                 ],
                 "kind": "list",
-                "message": "xs is [{\"v\": 1}]",
+                "message": "pl is []",
                 "name": "xs"
               }
             ],
             "inputs": [
-              {
-                "locations": [],
-                "name": "pl[].z",
-                "outcome": "usable",
-                "part": {
-                  "id": null,
-                  "name": "pl"
-                },
-                "value": []
-              },
               {
                 "locations": [
                   "/prs/0/xs/0"
@@ -75169,7 +75261,7 @@
                 ]
               }
             ],
-            "message": "xs is [{\"v\": 1}]",
+            "message": "pl is []",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -75178,23 +75270,38 @@
             }
           },
           {
-            "cause": "satisfied",
+            "cause": "value",
             "check": "every_if_any",
-            "inputs": [
+            "failures": [
               {
-                "locations": [],
-                "name": "pl[].z",
-                "part": {
-                  "id": null,
-                  "name": "pl"
-                },
-                "value": []
-              },
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/prs/0/xs/0"
+                    ],
+                    "name": "xs[]",
+                    "outcome": "usable",
+                    "value": [
+                      {
+                        "v": 1
+                      }
+                    ]
+                  }
+                ],
+                "kind": "list",
+                "message": "pl is []",
+                "name": "xs"
+              }
+            ],
+            "inputs": [
               {
                 "locations": [
                   "/prs/0/xs/0"
                 ],
                 "name": "xs[]",
+                "outcome": "usable",
                 "value": [
                   {
                     "v": 1
@@ -75202,7 +75309,8 @@
                 ]
               }
             ],
-            "passed": true,
+            "message": "pl is []",
+            "passed": false,
             "requirement": "r",
             "subject": {
               "id": "p0",
@@ -75231,21 +75339,11 @@
                   }
                 ],
                 "kind": "list",
-                "message": "xs is [{\"v\": 1}]",
+                "message": "pl is []",
                 "name": "xs"
               }
             ],
             "inputs": [
-              {
-                "locations": [],
-                "name": "pl[].z",
-                "outcome": "usable",
-                "part": {
-                  "id": null,
-                  "name": "pl"
-                },
-                "value": []
-              },
               {
                 "locations": [
                   "/prs/0/xs/0"
@@ -75259,7 +75357,7 @@
                 ]
               }
             ],
-            "message": "xs is [{\"v\": 1}]",
+            "message": "pl is []",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -75276,19 +75374,21 @@
                 "failures": [],
                 "inputs": [
                   {
-                    "locations": [
-                      "/prs/0/c"
-                    ],
-                    "name": "pl.z",
-                    "outcome": "unusable",
-                    "value": null
+                    "locations": [],
+                    "name": "pl[].z",
+                    "outcome": "usable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/some_exists/assert"
                 ],
-                "message": "pl is [], which isn't an object",
+                "message": "pl is []",
                 "name": "some xs whose v is in pl.z exists"
               }
             ],
@@ -75316,7 +75416,7 @@
                 ]
               }
             ],
-            "message": "xs is [{\"v\": 1}]",
+            "message": "pl is []",
             "passed": false,
             "requirement": "r",
             "subject": {

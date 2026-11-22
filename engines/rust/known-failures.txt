@@ -189,7 +189,7 @@ for / a part that holds a list is walked by a whose in `count of xs whose v is i
 for / a part that holds a list is walked in the whose of a for line and in a whose under it / a missing part fails as absent
 for / a part that holds a list is walked in the whose of a for line and in a whose under it / a null part fails as null
 for / a part that holds a list is walked in the whose of a for line and in a whose under it / a part that is text fails as unusable
-for / a part that holds a list is walked in the whose of a for line and in a whose under it / an empty part leaves every item out
+for / a part that holds a list is walked in the whose of a for line and in a whose under it / an empty part fails as value
 for / a part that holds a list is walked on the right of is in on a for line / an item without the name fails as absent and names the item
 for / a root a for sentence can't use is said once, on the assertion, beside items that read fine / one item that reads fine and one whose v is null
 for / a root in one of two relative clauses, in either order / gives the same report in either order, the root first, then the item's own problem

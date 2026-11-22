@@ -1397,7 +1397,7 @@
                           "/things/0/rows/0/v"
                         ],
                         "name": "count of rows.v that is in d.name",
-                        "value": 0
+                        "value": null
                       },
                       {
                         "locations": [],
@@ -1410,7 +1410,7 @@
                     "locations": [
                       "/things/0/deps/0"
                     ],
-                    "message": "count of rows.v that is in d.name is 0",
+                    "message": "d is []",
                     "name": "item 1 of deps",
                     "value": []
                   }
@@ -1446,7 +1446,7 @@
                 ]
               }
             ],
-            "message": "item 1 of deps: count of rows.v that is in d.name is 0",
+            "message": "item 1 of deps: d is []",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -1470,7 +1470,7 @@
                           "/things/0/rows/0"
                         ],
                         "name": "count of rows whose v is in d.name",
-                        "value": 0
+                        "value": null
                       },
                       {
                         "locations": [],
@@ -1483,7 +1483,7 @@
                     "locations": [
                       "/things/0/deps/0"
                     ],
-                    "message": "count of rows whose v is in d.name is 0",
+                    "message": "d is []",
                     "name": "item 1 of deps",
                     "value": []
                   }
@@ -1521,7 +1521,7 @@
                 ]
               }
             ],
-            "message": "item 1 of deps: count of rows whose v is in d.name is 0",
+            "message": "item 1 of deps: d is []",
             "passed": false,
             "requirement": "r",
             "subject": {
