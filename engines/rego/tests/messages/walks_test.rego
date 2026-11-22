@@ -191,3 +191,10 @@ test_a_row_keeps_the_items_of_a_list_walked_from_the_input_after_is_in_ignoring_
 	ref := {"op": "in", "path": ["x"], "values": {"ref": ["$$input[]", "cs", "name"]}, "ignoring": "case"}
 	ergo._m_row_text(ref, {"x": "a"}, "unusable") == "item 1 of $input.cs: name is null; item 3 of $input.cs: name is true, which isn't text" with data.ergo_document as {"cs": [{"name": null}, {"name": "a"}, {"name": true}]}
 }
+
+test_a_root_beside_a_list_after_is_in_ignoring_case_says_its_own_state_and_not_the_lists if {
+	c := {"op": "compare", "cmp": "in", "left": ["$$params", "k"], "right": [`${"alias":"","n":-1,"of":null,"old":true}`, "ys"], "ignoring": "case"}
+	ergo._m_root_texts({"ys": ["a", null]}, c, "null") == ["item 2 of ys is null"] with data.ergo_params as {}
+	ergo._m_root_texts({"ys": ["a", null]}, c, "absent") == ["$params.k is missing"] with data.ergo_params as {}
+	ergo._m_root_texts({"ys": ["a", null]}, c, "null") == ["$params.k is null", "item 2 of ys is null"] with data.ergo_params as {"k": null}
+}
