@@ -82,3 +82,14 @@ test_a_root_list_after_is_in_ignoring_case_fails_with_the_worst_cause_of_its_ite
 	ergo._m_for_root_text({"v": "a"}, ref, p, "unusable") == "item 2 of $params.l is 3, which isn't text" with data.ergo_params as {"l": ["a", 3]}
 	ergo._m_for_root_text({"v": "a"}, ref, p, "null") == "item 2 of $params.l is null" with data.ergo_params as {"l": ["a", null]}
 }
+
+test_a_row_whose_items_fail_only_on_a_root_beside_a_list_after_is_in_ignoring_case_says_the_roots_and_no_item if {
+	c := {"op": "in", "path": ["$$params", "k"], "values": {"ref": ["$$params[]", "l"]}, "ignoring": "case"}
+	check := {"op": "every", "path": ["xs"], "whose": [c], "check": {"op": "present", "path": ["x"]}, "if_any": true}
+	r := ergo._walk_row(check, {"xs": [{"v": "a"}]}) with data.ergo_params as {"l": ["a", null]} with input as {}
+	r.cause == "absent"
+	r.root_msgs == ["$params.k is missing", "item 2 of $params.l is null"]
+	not "other_roots" in object.keys(r)
+	ok := ergo._walk_row(check, {"xs": [{"v": "a"}]}) with data.ergo_params as {"l": ["a"]} with input as {}
+	ok.root_msgs == ["$params.k is missing"]
+}
