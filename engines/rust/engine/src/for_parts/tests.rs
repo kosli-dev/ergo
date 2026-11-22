@@ -30,7 +30,17 @@ fn a_member_whose_key_holds_a_semicolon_makes_its_whole_clause_and_leaves_no_roo
     })];
     let made = item_made(&failed, &[]);
     assert_eq!(made, ["member \"a; b\" of statuses is 1"]);
-    assert!(row_roots("member \"a; b\" of statuses is 1", &made).is_empty());
+    let record = json!({
+        "ergo/clauses": clause::to_value(&[Clause::said(
+            Cause::Value,
+            "member \"a; b\" of statuses is 1".to_string(),
+        )]),
+    });
+    assert_eq!(
+        clause::lines(&own_said(&record, &[])),
+        ["member \"a; b\" of statuses is 1"]
+    );
+    assert!(own_said(&record, &made).is_empty());
 }
 
 fn entries(for_line: &str, assertions: Value, subject: Value, params: Value) -> Vec<String> {

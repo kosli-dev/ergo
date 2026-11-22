@@ -98,27 +98,6 @@ fn clauses(text: &str) -> Vec<&str> {
     ops::message::split_outside_quotes(text, "; ")
 }
 
-fn without_roots(message: &str, roots: &[String], moved: &mut Vec<String>) -> String {
-    clauses(message)
-        .into_iter()
-        .map(|part| {
-            part.split(", and ")
-                .filter(|piece| {
-                    if roots.iter().any(|r| r == piece) {
-                        ops::push_new(moved, (*piece).to_string());
-                        false
-                    } else {
-                        true
-                    }
-                })
-                .collect::<Vec<_>>()
-                .join(", and ")
-        })
-        .filter(|part| !part.is_empty())
-        .collect::<Vec<_>>()
-        .join("; ")
-}
-
 fn walked_under(
     line: &For,
     sentence: &Check,
@@ -172,52 +151,6 @@ fn walked_under(
         inputs,
         part.failures,
         String::new(),
-        f,
-    ))
-}
-
-fn line_item(
-    f: &Value,
-    l: &Value,
-    aliases: &[&str],
-    roots: &[String],
-    moved: &mut Vec<String>,
-) -> Option<Failure> {
-    let inner: Vec<Failure> = list(l, "items")
-        .iter()
-        .filter_map(|y| {
-            let message =
-                without_roots(&for_line::rendered(&said_name(y), &texts(y)), roots, moved);
-            (!message.is_empty()).then(|| {
-                item(
-                    text(y, "item"),
-                    cause_of(y),
-                    list(y, "inputs"),
-                    Vec::new(),
-                    message,
-                    y,
-                )
-            })
-        })
-        .collect();
-    let message = if l.get("items").is_some() {
-        String::new()
-    } else {
-        without_roots(&for_line::rendered(&said_name(f), &texts(l)), roots, moved)
-    };
-    if message.is_empty() && inner.is_empty() {
-        return None;
-    }
-    let inputs = list(l, "inputs")
-        .into_iter()
-        .filter(|x| alias_named(&text(x, "name"), aliases))
-        .collect();
-    Some(item(
-        text(f, "item"),
-        cause_of(l),
-        inputs,
-        inner,
-        message,
         f,
     ))
 }
@@ -565,14 +498,6 @@ fn item_made(failed: &[Value], key_texts: &[String]) -> Vec<String> {
     made
 }
 
-fn row_roots(message: &str, item_made: &[String]) -> Vec<String> {
-    clauses(message)
-        .into_iter()
-        .filter(|m| !m.is_empty() && !item_made.iter().any(|t| t == m))
-        .map(str::to_string)
-        .collect()
-}
-
 /// The entries of a failed `for` row's `failures`.
 pub fn for_failures(
     line: &For,
@@ -740,7 +665,6 @@ pub fn for_failures(
             ops::push_new(&mut owned[0], clause.to_string());
         }
     }
-    let roots = row_roots(message, &item_made);
     let root_texts = line.root_texts(ctx);
     let empty_first = line.items.first().is_some_and(|first| {
         matches!(&ops::read_path(&first.path, ctx).inputs.first(), Some(input) if input.value == json!([]))
@@ -758,7 +682,6 @@ pub fn for_failures(
         let mut causes: Vec<Cause> = Vec::new();
         let mut inputs: Vec<Value> = Vec::new();
         let mut items: Vec<Failure> = Vec::new();
-        let mut moved: Vec<String> = Vec::new();
         for f in failed.iter().filter(|f| !bare(f)) {
             for l in list(f, "failed_assertions") {
                 if text(&l, "assertion") != sentence.text {
@@ -771,7 +694,6 @@ pub fn for_failures(
                     }
                 }
                 if frees[i].is_none() {
-                    let _ = line_item(f, &l, &aliases, &roots, &mut moved);
                     let walked = walked_under(line, &sentence.check, f, &l, &aliases, ctx);
                     if let Some(entry) = item_entry(f, &l, &aliases, &root_texts, walked) {
                         items.push(entry);
@@ -816,8 +738,7 @@ pub fn for_failures(
                     own.push(said);
                 }
                 for piece in clauses(message) {
-                    let mine =
-                        owned[i].iter().any(|o| o == piece) || moved.iter().any(|m| m == piece);
+                    let mine = owned[i].iter().any(|o| o == piece);
                     let elsewhere = !odd_params && root_texts.iter().any(|t| t == piece)
                         || !roots.is_empty() && said_by_items.iter().any(|t| t == piece);
                     if mine && !elsewhere {
