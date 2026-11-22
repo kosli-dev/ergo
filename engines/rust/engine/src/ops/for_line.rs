@@ -3203,11 +3203,14 @@ fn row_clauses(roots: Vec<Clause>, items: &[Clause], free: usize) -> Vec<Clause>
         group if group < free => group,
         group => after + group,
     };
-    roots
+    let (read, broke): (Vec<Clause>, Vec<Clause>) = roots
         .into_iter()
+        .partition(|root| root.kind == super::clause::Kind::Root);
+    read.into_iter()
         .chain(
-            items
+            broke
                 .iter()
+                .chain(items)
                 .map(|clause| clause.clone().in_group(walked(clause))),
         )
         .collect()
