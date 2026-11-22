@@ -1121,11 +1121,11 @@ _for_said_by_row(x, said) if {
 _for_list_texts(check, subj, r) := [] if {
 	r.failed != []
 	_ = [check, subj]
-} else := _for_empty_texts(check, subj, r.unfreed) if "unfreed" in object.keys(r)
+} else := [] if "root_msgs" in object.keys(r)
+
+else := _for_empty_texts(check, subj, r.unfreed) if "unfreed" in object.keys(r)
 
 else := [] if "free_lines" in object.keys(r)
-
-else := [] if "root_msgs" in object.keys(r)
 
 else := _for_empty_texts(check, subj, r)
 
