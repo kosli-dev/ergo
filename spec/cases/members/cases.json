@@ -2830,6 +2830,127 @@
             ]
           }
         ]
+      },
+      {
+        "description": "says the worst of what the ends hold on the list's input when no end is an object, whatever the order of the items",
+        "rules": [
+          "walk.member.not_an_object",
+          "row.parts"
+        ],
+        "input": {
+          "things": [
+            {
+              "rs": [
+                {
+                  "statuses": null
+                },
+                {
+                  "statuses": 3
+                }
+              ],
+              "id": "t1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [
+                      {
+                        "cause": "null",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/rs/0/statuses"
+                            ],
+                            "name": "rs[0].statuses",
+                            "outcome": "null",
+                            "value": null
+                          }
+                        ],
+                        "kind": "list",
+                        "message": "statuses is null",
+                        "name": "statuses"
+                      }
+                    ],
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/rs/0"
+                    ],
+                    "message": "",
+                    "name": "item 1 of rs",
+                    "value": {
+                      "statuses": null
+                    }
+                  },
+                  {
+                    "cause": "unusable",
+                    "failures": [
+                      {
+                        "cause": "unusable",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/rs/1/statuses"
+                            ],
+                            "name": "rs[1].statuses",
+                            "outcome": "unusable",
+                            "value": 3
+                          }
+                        ],
+                        "kind": "list",
+                        "message": "statuses is 3, which isn't an object",
+                        "name": "statuses"
+                      }
+                    ],
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/rs/1"
+                    ],
+                    "message": "",
+                    "name": "item 2 of rs",
+                    "value": {
+                      "statuses": 3
+                    }
+                  }
+                ],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/c"
+                ],
+                "message": "",
+                "name": "every member of rs.statuses is \"DONE\""
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "rs[].statuses",
+                "outcome": "unusable",
+                "value": []
+              }
+            ],
+            "message": "item 1 of rs: statuses is null; item 2 of rs: statuses is 3, which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ]
       }
     ]
   },
@@ -3406,6 +3527,89 @@
                 ]
               }
             ]
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable when costs isn't an object, and says its input is unusable",
+        "rules": [
+          "tally.member",
+          "walk.member.not_an_object",
+          "row.parts"
+        ],
+        "input": {
+          "things": [
+            {
+              "costs": [
+                1
+              ],
+              "id": "t1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/costs"
+                        ],
+                        "name": "costs",
+                        "outcome": "unusable",
+                        "value": [
+                          1
+                        ]
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "costs is [1], which isn't an object",
+                    "name": "costs"
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "sum of member of costs",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/c"
+                ],
+                "message": "",
+                "name": "sum of member of costs is at most 3"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "sum of member of costs",
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "costs",
+                "outcome": "unusable",
+                "value": []
+              }
+            ],
+            "message": "costs is [1], which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
           }
         ]
       }
@@ -4300,6 +4504,100 @@
                 ]
               }
             ]
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable when an item's r.evidence isn't an object, and says the second list's input is unusable",
+        "rules": [
+          "walk.member.not_an_object",
+          "row.parts"
+        ],
+        "input": {
+          "things": [
+            {
+              "records": [
+                {
+                  "evidence": [
+                    1
+                  ]
+                }
+              ],
+              "id": "t1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/records/0/evidence"
+                        ],
+                        "name": "r.evidence",
+                        "outcome": "unusable",
+                        "value": [
+                          1
+                        ]
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "r.evidence is [1], which isn't an object",
+                    "name": "r.evidence"
+                  }
+                ],
+                "inputs": [],
+                "kind": "item",
+                "locations": [
+                  "/things/0/records/0"
+                ],
+                "message": "",
+                "name": "item 1 of records",
+                "value": {
+                  "evidence": [
+                    1
+                  ]
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "r.evidence",
+                "outcome": "unusable",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/things/0/records/0"
+                ],
+                "name": "records[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "evidence": [
+                      1
+                    ]
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of records: r.evidence is [1], which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
           }
         ]
       }
