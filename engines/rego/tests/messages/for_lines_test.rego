@@ -135,3 +135,16 @@ test_a_from_filter_walk_with_a_root_beside_items_that_fail_on_their_own_keeps_th
 	said["ergo/texts"] == [item]
 	said["ergo/own"] == ["$params.min is \"s\", which isn't a number"]
 }
+
+test_a_for_lines_whose_item_reads_its_own_field_as_the_phrase_needs_beside_a_root if {
+	ref := {"ref": ["$$params[]", "cs", "name"]}
+	listed := {"op": "excludes", "path": ["tags"], "values": ref}
+	[ergo._for_own_read(listed, item, ["tags"])[0] | some item in [{"tags": "a"}, {"tags": {}}, {}, {"tags": null}]] == ["unusable", "unusable", "absent", "null"]
+	every tags in [["a"], [1, "a"]] {
+		not ergo._for_own_read(listed, {"tags": tags}, ["tags"])[0] in {"absent", "null", "unusable", "not_an_object"}
+	}
+	patterned := {"op": "matches_any", "path": ["v"], "patterns": ref}
+	ergo._for_own_read(patterned, {"v": 3}, ["v"])[0] == "unusable"
+	not ergo._for_own_read(patterned, {"v": "s"}, ["v"])[0] in {"absent", "null", "unusable", "not_an_object"}
+	ergo._for_own_read({"op": "in", "path": ["v"], "values": ref}, {"v": {}}, ["v"])[0] == ergo._side_state({"v": {}}, ["v"])
+}
