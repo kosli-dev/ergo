@@ -571,6 +571,20 @@ fn clauses_come_back_whole_from_a_record() {
 }
 
 #[test]
+fn an_item_said_after_what_it_holds_reads_back_the_same() {
+    let clauses = vec![
+        Clause::item(
+            "item 1 of xs",
+            Cause::Absent,
+            "item 1 of xs: k is missing".to_string(),
+            vec![missing("v")],
+        )
+        .said_first(),
+    ];
+    assert_eq!(of_value(&to_value(&clauses)), Some(clauses));
+}
+
+#[test]
 fn clauses_that_cant_be_read_back_give_nothing() {
     let whole = to_value(&[missing("v").in_group(1)]);
     let mut wrong_cause = whole.clone();
