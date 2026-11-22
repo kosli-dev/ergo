@@ -663,14 +663,19 @@ else := x
 
 _m_tally_items(subj, side) := [x[2] | some x in _m_tally_items_at(subj, side)]
 
-_m_tally_items_at(subj, side) := [[_m_positions(e.i), [1, k], array.concat(x, [{"item": e}])] | some e in w.items; some k, x in array.concat(_m_whose_undecided(subj, alone, e, flaws, roots), [y | _tally_judge(side, e, flaws, w, long).read; some y in _m_tally_item(f, e, roots)])] if {
+_m_tally_items_at(subj, side) := [[_m_positions(e.i), [1, k], array.concat(x, [{"item": e}])] | some e in w.items; some k, x in array.concat(_m_whose_undecided(subj, alone, e, flaws, roots), [y | _tally_judge(side, e, flaws, w, long).read; some y in _m_tally_item(f, e, roots)]); not x[1] in {concat("", [_m_item_name(e.i, roots), ": ", t]) | some t in keyed}] if {
 	f := _basic_form(side)
 	w := _tally_walk(subj, side)
 	alone := _whose_alone(subj, side)
 	flaws := [_cond_flaw(c) | some c in alone.whose]
 	roots := _dotted_roots([side[f]])
 	long := _long_text(json.marshal([e.iv | some e in w.items]))
+	keyed := _m_keyed_root_texts(subj, side)
 }
+
+_m_keyed_root_texts(subj, side) := {f.text | some f in b.faults} if {
+	b := _m_tally_keyed_base(subj, side)
+} else := set()
 
 _m_whose_undecided(subj, side, e, flaws, roots) := _once([[_m_focus_state(e, c, cause), _m_focus_text(subj, c, e, cause, roots)] |
 	some i, c in side.whose
