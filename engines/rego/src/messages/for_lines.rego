@@ -796,14 +796,21 @@ _m_line(c, subj, cause) := _m_sentence(c, subj, cause)
 
 _for_sentence_clauses(_, _, _, "satisfied") := []
 
+_for_sentence_clauses(_, c, _, cause) := [] if {
+	cause != "satisfied"
+	_m_params_unread(c)
+}
+
 _for_sentence_clauses(check, c, subj, cause) := [x | some x in _m_walk_clauses(c, subj, cause, _walk_row(c, subj)); not _for_said_by_root(x, roots)] if {
 	cause != "satisfied"
+	not _m_params_unread(c)
 	_walks(c)
 	roots := _for_sentence_roots(check, c, subj)
 }
 
 _for_sentence_clauses(check, c, subj, cause) := _once([x | some g in said; some x in _for_group_clauses(g, roots, cause, whole)]) if {
 	cause != "satisfied"
+	not _m_params_unread(c)
 	not _walks(c)
 	said := _message_said(c, subj, cause)
 	roots := _for_sentence_roots(check, c, subj)
