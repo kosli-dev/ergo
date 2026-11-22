@@ -111,3 +111,11 @@ test_is_in_ignoring_case_fails_as_unusable_on_a_list_from_a_path_that_isnt_a_lis
 		ergo._leaf_cause(field, {"type": "a", "ys": "a"}) == "unusable"
 	}
 }
+
+test_a_list_walked_from_the_input_after_is_in_ignoring_case_that_cant_be_read_takes_the_worst_cause_beside_the_field if {
+	ref := {"op": "in", "path": ["x"], "values": {"ref": ["$$input[]", "cs", "name"]}, "ignoring": "case"}
+	ergo._worst_read({}, ref) == "absent" with data.ergo_document as {"cs": [{"name": "a"}, {"name": null}]}
+	ergo._worst_read({"x": 3}, ref) == "unusable" with data.ergo_document as {"cs": [{"name": "a"}, {"name": null}]}
+	ergo._worst_read({"x": "a"}, ref) == "null" with data.ergo_document as {"cs": [{"name": "a"}, {"name": null}]}
+	ergo._worst_read({}, object.remove(ref, ["ignoring"])) == "null" with data.ergo_document as {"cs": [{"name": "a"}, {"name": null}]}
+}

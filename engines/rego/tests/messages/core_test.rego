@@ -88,3 +88,11 @@ test_a_list_after_is_in_ignoring_case_that_cant_be_used_is_said_beside_a_field_t
 	ergo._message(ref, {}, "unusable") == "$params.k is 3, which isn't text, and item 2 of $params.l is null" with data.ergo_params as {"k": 3, "l": ["a", null]}
 	ergo._message(ref, {}, "unusable") == "$params.k is missing, and item 1 of $params.l is 3, which isn't text" with data.ergo_params as {"l": [3]}
 }
+
+test_a_list_walked_from_the_input_after_is_in_ignoring_case_is_said_beside_a_field_that_cant_be_read_whatever_its_cause if {
+	ref := {"op": "in", "path": ["x"], "values": {"ref": ["$$input[]", "cs", "name"]}, "ignoring": "case", "ergo/row": true}
+	ergo._message(ref, {}, "absent") == "x is missing, and item 2 of $input.cs: name is null" with data.ergo_document as {"cs": [{"name": "a"}, {"name": null}]}
+	ergo._message(ref, {"x": 3}, "unusable") == "x is 3, which isn't text, and item 2 of $input.cs: name is null" with data.ergo_document as {"cs": [{"name": "a"}, {"name": null}]}
+	params := object.union(ref, {"path": ["$$params", "k"]})
+	ergo._message(params, {}, "absent") == "$params.k is null, and item 2 of $input.cs: name is missing" with data.ergo_document as {"cs": [{"name": "a"}, {}]} with data.ergo_params as {"k": null}
+}
