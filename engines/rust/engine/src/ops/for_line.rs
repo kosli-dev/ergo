@@ -2934,9 +2934,11 @@ impl For {
                 continue;
             }
             let (_, clauses) = self.said_clauses(sentence, &run_full(&sentence.check, ctx), ctx);
+            let mut own: Vec<Clause> = Vec::new();
             for clause in clauses {
-                merge_clause(&mut out, &clause.in_group(at));
+                merge_clause(&mut own, &clause.in_group(at));
             }
+            out.extend(own);
         }
         out
     }
