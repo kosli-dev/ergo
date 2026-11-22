@@ -10725,6 +10725,30 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
+        "every xs whose $params.k is in thing.ys ignoring case, if any, exists",
+        "every xs whose $params.k is in thing.ys ignoring case, if any, exists",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose v is in $input.cs.name ignoring case is 0",
+        "count of xs whose v is in $input.cs.name ignoring case is 0",
+        &[],
+        &[],
+    ),
+    (
+        "every xs whose v is in $input.cs.name ignoring case, if any, exists",
+        "every xs whose v is in $input.cs.name ignoring case, if any, exists",
+        &[],
+        &[],
+    ),
+    (
+        "every xs.v, if any, is in $input.cs.name ignoring case",
+        "every xs.v, if any, is in $input.cs.name ignoring case",
+        &[],
+        &[],
+    ),
+    (
         "every xs.v is in ys ignoring case",
         "every xs.v is in ys ignoring case",
         &[],
