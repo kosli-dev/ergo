@@ -19,6 +19,16 @@ test_a_left_side_is_a_root_as_much_as_a_right_side if {
 	not ergo._side_root({"left": ["v"], "right": 1}, ["$$params", "q"])
 }
 
+test_a_root_before_is_in_ignoring_case_that_isnt_text_is_a_root_no_item_can_pass if {
+	p := ["$$params", "k"]
+	listed := {"op": "in", "path": p, "values": {"ref": ["$$params[]", "l"]}, "ignoring": "case"}
+	ergo._root_state({}, listed, p, set()) == "unusable" with data.ergo_params as {"k": 3, "l": ["a"]}
+	ergo._m_for_root_text({}, listed, p, "unusable") == "$params.k is 3, which isn't text" with data.ergo_params as {"k": 3, "l": ["a"]}
+	ergo._root_state({}, object.union(listed, {"op": "not_in"}), p, set()) == "unusable" with data.ergo_params as {"k": 3, "l": ["a"]}
+	ergo._root_state({}, listed, p, set()) == "value" with data.ergo_params as {"k": "a", "l": ["a"]}
+	ergo._root_state({}, object.remove(listed, ["ignoring"]), p, set()) == "value" with data.ergo_params as {"k": 3, "l": ["a"]}
+}
+
 test_a_root_a_whose_cant_read_stands_in_for_a_value_so_each_item_is_still_read if {
 	same := {"op": "compare", "cmp": "eq", "left": ["v"], "right": ["$$params", "p"]}
 	ergo._root_stand_in(same) == {"op": "compare", "cmp": "eq", "left": ["v"], "right": ["v"]}
