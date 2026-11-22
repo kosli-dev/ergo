@@ -99,7 +99,7 @@ test_for_root_clauses_name_the_roots_the_row_names_today if {
 		["every xs as x", ["x.v is at least $params.min"], {"xs": [{"v": "a; b"}]}, {"min": "s; t"}],
 		["every xs as x", ["x.v is in $params.l", "count of x.ys whose n is at least $params.m is 0"], {"xs": [{"v": 1, "ys": [{"n": 1}]}]}, {"l": 3}],
 		["every xs as x, every x.ys as y", ["y.n is at least $params.m", "x.v is $params.a"], {"xs": [{"v": 1, "ys": [{"n": 1}]}]}, {"a": null}],
-		["every xs whose v is at least $params.min as x", ["every x.ys whose n is $params.k has m that is 1", "x.w is at least $params.min"], {"xs": [{"v": 1, "w": 1, "ys": [{"n": 1, "m": 1}]}]}, {"min": [1]}],
+		["every xs whose v is at least $params.min as x", ["every x.ys whose n is at least $params.k exists", "x.w is at least $params.min"], {"xs": [{"v": 1, "w": 1, "ys": [{"n": 1, "m": 1}]}]}, {"min": [1]}],
 	]
 	every row in rows {
 		texts := {c.text | some c in _root_clauses_of(row[0], row[1], row[2], row[3])}

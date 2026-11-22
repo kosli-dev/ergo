@@ -186,7 +186,16 @@ _worse_root(check, subj, rr) := object.union(rr, {"cause": _worst_of({rr.cause, 
 	flaw != ""
 } else := rr
 
-_for_second_roots(check, subj) := [{"i": e.i, "fl": fl, "ms": ms, "raw": [_m_aliased(m) | some m in said]} |
+_for_root_clauses(check, subj) := [c | some i, c in cs; not c.text in {d.text | some d in array.slice(cs, 0, i)}] if {
+	cs := array.concat(
+		[_m_root_in(_m_clause_name(x[1]), x[0], x[1], 1) | some x in _walk_root_said(object.union(check, {"checks": [], "assertions": []}), subj)],
+		[_m_root_in(_m_clause_name(x[1]), x[0], x[1], i + 2) | some i, _ in check.checks; some x in _walk_root_said(_for_one_sentence(check, i), subj)],
+	)
+}
+
+_for_one_sentence(check, i) := object.union(check, {"items": [object.remove(it, ["whose"]) | some it in check.items], "checks": [check.checks[i]], "assertions": [check.assertions[i]]})
+
+_for_second_roots(check, subj) :=[{"i": e.i, "fl": fl, "ms": ms, "raw": [_m_aliased(m) | some m in said]} |
 	count(check.items) == 2
 	item := check.items[0]
 	w := _for_walk(item, subj, _for_names)
