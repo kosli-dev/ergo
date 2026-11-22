@@ -78,11 +78,11 @@ def read(path):
         return json.load(handle)
 
 
-def run_with_path(directory, ids, tree):
+def run_with_path(directory, ids, tree, allow_old=False):
     saved = os.environ["PATH"]
     os.environ["PATH"] = directory + os.pathsep + saved
     try:
-        return sweep.run_rust("sh -s", ids, tree)[1]
+        return sweep.run_rust("sh -s", ids, tree, allow_old)[1]
     finally:
         os.environ["PATH"] = saved
 
@@ -224,7 +224,7 @@ else:
     for pair in pairs:
         pair["policy"] = dict(pair["policy"], ergo_spec=base_spec)
     sweep.write_cells(pairs)
-    before = run_with_path(os.environ["MATRIX_FACTS_BASE_BIN"], ids, os.environ["MATRIX_FACTS_BASE_TREE"])
+    before = run_with_path(os.environ["MATRIX_FACTS_BASE_BIN"], ids, os.environ["MATRIX_FACTS_BASE_TREE"], True)
 
 base = os.environ["MATRIX_FACTS_BASE_NAME"]
 down = []

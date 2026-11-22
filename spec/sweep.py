@@ -207,11 +207,13 @@ def git_output(tree, *arguments):
     return out.stdout.strip()
 
 
-def check_commit(version, tree):
+def check_commit(version, tree, allow_old=False):
     if os.environ.get(ALLOW_STALE):
         return
     found = re.search(r"\(commit ([^)\s]+)\)", version)
     built = found.group(1) if found else None
+    if built is None and allow_old:
+        return
     head = git_output(tree, "rev-parse", "HEAD")
     if built == head:
         return
@@ -230,9 +232,9 @@ def check_commit(version, tree):
     )
 
 
-def run_rust(command, ids, tree=ROOT):
+def run_rust(command, ids, tree=ROOT, allow_old=False):
     version = run_command(command, True, "ergo --version").stdout.strip()
-    check_commit(version, tree)
+    check_commit(version, tree, allow_old)
     script = "\n".join([
         "cd dist/sweep/c",
         "for d in *; do",
