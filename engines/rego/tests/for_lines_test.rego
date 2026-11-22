@@ -576,3 +576,11 @@ test_a_sentence_under_a_for_line_lists_an_empty_part_it_reads_on_its_assertion_e
 		[[e.kind, [i.name | some i in e.inputs]] | some e in rows[0].failures] == [["assertion", [sentence[1]]]]
 	}
 }
+
+test_a_sentence_under_a_for_line_over_an_empty_list_lists_no_input_on_its_assertion_entry_for_an_empty_part_as_for_a_null_one if {
+	policy := _item_policy({"has": {"pl": "c"}}, {"c": {"for": "every xs as m", "assert": "count of m.ys whose v is in pl.z is 0"}})
+	every part in [[], null] {
+		rows := [r | some r in ergo.report({"prs": [{"id": "p0", "c": part, "xs": []}]}, policy, {}).results; r.check == "c"]
+		[[e.kind, [i.name | some i in e.inputs]] | some e in rows[0].failures] == [["assertion", []], ["list", ["xs"]]]
+	}
+}
