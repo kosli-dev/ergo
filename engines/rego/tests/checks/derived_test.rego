@@ -40,6 +40,33 @@ test_a_count_fails_on_the_root_a_key_from_the_item_is_read_in_even_when_the_list
 	ergo._tally({"xs": []}, _count_keyed_by_item("$input.m")).states == {"absent"} with data.ergo_document as {}
 }
 
+_count_keyed(sentence) := ergo._m_tally_parts(ergo._s_written_check(sentence))[0]
+
+_phrases_keyed_by_item := [
+	"count of xs whose v is not $input.m named by key is 0",
+	"count of xs that is $input.m named by key is 0",
+	"count of xs whose v is $input.m named by key and whose w equals 1 is 0",
+	"count of xs whose tags contains $input.m named by key is 0",
+	"count of xs whose v matches $input.m named by key is 0",
+	"count of xs whose $input.m named by key is v is 0",
+]
+
+test_a_count_on_an_empty_list_fails_on_the_root_a_key_from_the_item_is_read_in_whatever_the_phrase if {
+	every s in _phrases_keyed_by_item {
+		every pair in [[{}, "absent"], [{"m": null}, "null"], [{"m": 3}, "unusable"]] {
+			t := ergo._tally({"xs": []}, _count_keyed(s)) with data.ergo_document as pair[0]
+			t.states == {pair[1]}
+			not "value" in object.keys(t)
+		}
+	}
+}
+
+test_a_count_on_an_empty_list_fails_on_a_root_further_back_than_the_key_that_isnt_an_object if {
+	t := ergo._tally({"xs": []}, _count_keyed("count of xs whose v is $input.m.a named by key is 0")) with data.ergo_document as {"m": 3}
+	t.states == {"unusable"}
+	not "value" in object.keys(t)
+}
+
 test_a_count_or_sum_of_member_of_walks_each_member_of_the_object_as_an_item if {
 	side := {"sum_of": ["costs"], "whose": [], "text": "sum of member of costs", "member": true}
 	t := ergo._tally({"costs": {"b": 5, "a": 1, "c": "x"}}, side)

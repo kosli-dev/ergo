@@ -69,6 +69,35 @@ test_a_count_shows_every_item_it_cant_read_whatever_its_cause_but_not_a_root_or_
 	not ergo._m_record_shown(["absent", "item 1 of $params.l: v is missing", {"item": {"i": ["$$params", "l", 0]}}], "unusable")
 }
 
+_keyed_count_side(sentence) := ergo._m_tally_parts(ergo._s_written_check(sentence))[0]
+
+test_a_count_on_an_empty_list_says_only_the_root_a_key_from_the_item_is_read_in_whatever_the_phrase if {
+	every s in [
+		"count of xs whose v is $input.m named by key is 0",
+		"count of xs whose v is not $input.m named by key is 0",
+		"count of xs that is $input.m named by key is 0",
+		"count of xs whose v is $input.m named by key and whose w equals 1 is 0",
+		"count of xs whose tags contains $input.m named by key is 0",
+		"count of xs whose v matches $input.m named by key is 0",
+		"count of xs whose $input.m named by key is v is 0",
+	] {
+		said := [x[1] | some x in ergo._m_tally({"xs": []}, _keyed_count_side(s))] with data.ergo_document as {"m": null}
+		said == ["$input.m is null"]
+	}
+}
+
+test_a_count_on_an_empty_list_says_a_root_further_back_than_the_key_that_isnt_an_object if {
+	side := _keyed_count_side("count of xs whose v is $input.m.a named by key is 0")
+	said := [x[1] | some x in ergo._m_tally({"xs": []}, side)] with data.ergo_document as {"m": 3}
+	said == ["$input.m is 3, which isn't an object"]
+}
+
+test_a_count_on_an_empty_list_doesnt_add_its_root_again_after_the_root_it_already_says if {
+	check := ergo._s_written_check("count of xs whose tags contains $input.m named by key is 1")
+	o := {"passed": false, "cause": "null", "message": "$input.m is null"}
+	ergo._keyed_rooted(o, check, {"xs": []}) == o with data.ergo_document as {"m": null}
+}
+
 test_an_item_names_the_conditions_it_cant_decide_in_the_order_the_sentence_reads_them if {
 	side := _count_of_es([
 		{"op": "compare", "cmp": "eq", "left": ["w"], "right": {"literal": 1}},
