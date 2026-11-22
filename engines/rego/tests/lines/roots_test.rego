@@ -165,3 +165,12 @@ test_a_row_whose_items_fail_worse_than_its_roots_keeps_its_items if {
 	ergo._rooted_cause_said(check, {"xs": [{"v": "a"}]}, {"cause": "null", "fails": [{"msg": "$params.k is missing"}]}, "absent") with data.ergo_params as {"l": ["a"]} with input as {}
 	not ergo._rooted_cause_said(check, {"xs": [{"v": "a"}]}, {"cause": "unusable", "fails": [{"msg": "$params.k is missing"}]}, "absent") with data.ergo_params as {"l": ["a"]} with input as {}
 }
+
+test_a_row_without_the_words_whose_items_fail_on_a_null_item_of_the_list_keeps_its_item_entries_as_before if {
+	c := {"op": "in", "path": ["$$params", "k"], "values": {"ref": ["$$input[]", "cs", "name"]}}
+	check := {"op": "every", "path": ["xs"], "whose": [c], "check": {"op": "present", "path": ["x"]}, "if_any": true}
+	r := {"cause": "null", "fails": [{"msg": "item 1 of $input.cs: name is null"}]}
+	not ergo._rooted_cause_said(check, {"xs": [{}]}, r, "absent") with data.ergo_document as {"cs": [{"name": null}]} with data.ergo_params as {} with input as {}
+	words := object.union(check, {"whose": [object.union(c, {"ignoring": "case"})]})
+	ergo._rooted_cause_said(words, {"xs": [{}]}, r, "absent") with data.ergo_document as {"cs": [{"name": null}]} with data.ergo_params as {} with input as {}
+}
