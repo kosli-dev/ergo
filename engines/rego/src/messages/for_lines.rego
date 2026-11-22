@@ -116,6 +116,80 @@ _for_why(first, item, e, names, wh, failure) := object.union(failure, {"why": []
 	count(ms) > 0
 } else := failure
 
+_for_whose_item_clause(item, e, names, wh) := clause if {
+	wh.undecided != []
+	clause := _for_whose_own(item, e) with input as {"ergo/names": names}
+}
+
+_for_whose_own(_, e) := _m_clause("item", name, "not_an_object", _m_isnt(name, e.iv, "an object")) if {
+	not is_object(e.iv)
+	name := _m_item_name(e.i, set())
+}
+
+_for_whose_own(item, e) := clauses[0] if {
+	is_object(e.iv)
+	clauses := [_m_item_clause(_m_item_name(e.i, set()), cause, said) |
+		some c in item.whose
+		not _for_focus_cause(c, e) in _not_failing_causes
+		said := _once(_for_cond_own(c, _focus_of(e, c), object.get(_for_names, "ergo/subject", null)))
+		cause := _for_said_cause(said)
+		cause != "satisfied"
+	]
+}
+
+_for_said_cause(said) := _worst_or_value({x.cause | some x in said}) if said != []
+
+else := "satisfied"
+
+_for_cond_own(c, fe, subj) := array.concat(bases, _for_own_said(c, fe, subj)) if {
+	bases := [_m_clause("root", x[1], x[0], x[1]) | some x in _m_cond_base_said(fe.iv, c)]
+	_for_base_first(c, subj)
+} else := array.concat(_for_own_said(c, fe, subj), [_m_clause("root", x[1], x[0], x[1]) | some x in _m_cond_base_said(fe.iv, c)])
+
+_for_base_first(c, subj) if {
+	ps := _condition_paths(c)
+	some i, p in ps
+	_ref_step_flawed(p)
+	every q in array.slice(ps, 0, i) {
+		_for_blocked(c, q, subj)
+	}
+}
+
+_for_own_said(c, fe, subj) := [_m_clause("root", m, cause, m) |
+	s := _for_own_check(c, subj)
+	cause := _focus_cause(s, fe)
+	not cause in _not_failing_causes
+	m := _message(s, fe.iv, cause)
+]
+
+_for_own_check(c, subj) := c if {
+	not _for_blocks(c, subj)
+} else := object.union(c, {"left": c[f], "right": c[f]}) if {
+	c.op == "compare"
+	some f in _compare_side_list
+	not _for_side_blocked(c, c[f], subj)
+	some g in _compare_side_list
+	g != f
+	_for_side_blocked(c, c[g], subj)
+}
+
+_for_blocks(c, subj) if {
+	some p in _condition_paths(c)
+	_for_blocked(c, p, subj)
+}
+
+_for_side_blocked(c, side, subj) if {
+	some p in _side_paths(side)
+	_for_blocked(c, p, subj)
+}
+
+_for_blocked(_, p, _) if _ref_step_flawed(p)
+
+_for_blocked(c, p, subj) if {
+	_walk_outside(p)
+	_root_read_flaw(subj, c) != ""
+}
+
 _for_own_first(true, pairs) := array.concat([m | some [m, true] in pairs], [m | some [m, false] in pairs])
 
 _for_own_first(false, pairs) := [m | some [m, _] in pairs]
@@ -728,6 +802,49 @@ _m_walk_leaf(e, leaf, cause, roots) := t if {
 else := ""
 
 _m_line(c, subj, cause) := _m_sentence(c, subj, cause)
+
+_for_sentence_clauses(_, _, _, "satisfied") := []
+
+_for_sentence_clauses(_, c, _, cause) := [] if {
+	cause != "satisfied"
+	_m_params_unread(c)
+}
+
+_for_sentence_clauses(check, c, subj, cause) := [x | some x in _m_walk_clauses(c, subj, cause, _walk_row(c, subj)); not _for_said_by_root(x, roots)] if {
+	cause != "satisfied"
+	not _m_params_unread(c)
+	_walks(c)
+	roots := _for_sentence_roots(check, c, subj)
+}
+
+_for_sentence_clauses(check, c, subj, cause) := _once([x | some g in said; some x in _for_group_clauses(g, roots, cause, whole)]) if {
+	cause != "satisfied"
+	not _m_params_unread(c)
+	not _walks(c)
+	said := _message_said(c, subj, cause)
+	roots := _for_sentence_roots(check, c, subj)
+	whole := _for_says_whole(check, c)
+}
+
+_for_says_whole(check, c) := false if _for_reads_an_alias(check, c)
+
+else := true
+
+_for_group_clauses(g, roots, cause, false) := [x | some p in g; some x in _for_piece_clauses(p, roots, cause)]
+
+_for_group_clauses(g, roots, cause, true) := array.concat(
+	[x | some p in g; not is_string(p); some x in _for_piece_clauses(p, roots, cause)],
+	[_m_clause("root", t, cause, t) | ts := [p | some p in g; is_string(p); not p in roots]; ts != []; t := concat(", and ", ts)],
+)
+
+_for_piece_clauses(p, roots, cause) := [_m_clause("root", p, cause, p) | not p in roots] if is_string(p)
+
+else := [x | some x in p; not _for_said_by_root(x, roots)]
+
+_for_said_by_root(x, roots) if {
+	x.kind != "item"
+	x.text in roots
+}
 
 _m_leaf_message(_, leaf, cause, _) := _m_root_alone(leaf, cause)
 
