@@ -366,6 +366,20 @@ test_the_items_clause_says_what_the_row_says_today if {
 	}
 }
 
+test_an_items_clause_leaves_its_roots_to_the_row if {
+	_item_texts("every xs as x", ["x.v is at least $params.min"], {"xs": [{"v": "a"}, {}, {"v": 1}]}, {"min": "s"}) == [[`item 1 of xs: x.v is "a", which isn't a number`], ["item 2 of xs: x.v is missing"]]
+	_item_texts("every xs as x", ["x.v is at least $params.min"], {"xs": [{"v": 1}, {}]}, "s") == []
+}
+
+test_an_item_clause_is_given_only_for_an_item_in_the_failed_list if {
+	check := ergo._s_written_check({"for": "every xs as x", "assert": ["x.v is 1"]})
+	names := {"ergo/subject": {"xs": [{}]}, "$at": {"names": {}}}
+	r := ergo._for_row_raw(check, {"xs": [{}]}) with input as {"ergo/names": names}
+	not ergo._for_item_clause(check, r.failed, 1) with input as {"ergo/names": names}
+	not ergo._for_item_clause(check, r.failed, "0") with input as {"ergo/names": names}
+	not ergo._for_item_clause(check, null, 0) with input as {"ergo/names": names}
+}
+
 test_a_sentence_that_reads_no_alias_is_not_said_under_an_item if {
 	_item_texts("every xs as x", ["x.v is 1", "z is 1"], {"xs": [{"v": 2}, {}]}, {}) == [["item 1 of xs: x.v is 2"], ["item 2 of xs: x.v is missing"]]
 }
