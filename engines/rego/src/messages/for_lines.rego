@@ -156,17 +156,26 @@ _for_own_texts(item, e, names) := [t |
 	some x in _walk_sides_paths(c)
 	is_array(x[0])
 	not _walk_outside(x[0])
-	own := _for_own_state(c, fe.iv, x[0])
+	read := _for_own_read(c, fe.iv, x[0])
+	own := read[0]
 	own in _failed_read_states
 	subj := object.get(names, "ergo/subject", null)
 	roots := {piece | some r in array.concat(array.concat(_for_root_why(c, _m_undecided(own), subj), _m_keyed_off(subj, c, own)), _m_cond_root_texts(subj, c)); some piece in split(r, "; ")} with input as {"ergo/names": names}
-	said := _m_whose_said_in(item, names, c, fe.iv, own) with input as {"ergo/names": names}
+	said := _m_whose_said_in(item, names, read[1], fe.iv, own) with input as {"ergo/names": names}
 	parts := [y | some z in split(said, "; "); some y in split(z, ", and "); not y in roots; not regex.match(`^and [0-9]+ more$`, y)]
 	parts != []
 	t := _m_aliased(concat(", and ", parts))
 ]
 
-_for_own_state(_, iv, p) := _side_state(iv, p)
+_for_own_state(c, iv, p) := _for_own_read(c, iv, p)[0]
+
+_for_own_read(c, iv, p) := [s, st] if {
+	st := _root_stand_in(c)
+	st.op in (_contain_ops | _pattern_ops)
+	st.path == p
+	s := _row_cause(st, iv, "")
+	s in _failed_read_states
+} else := [_side_state(iv, p), c]
 
 _m_whose_why(first, f) :=_for_why(first, wo[0], wo[1], wo[2], wo[3], f) if {
 	wo := f.whose_of
