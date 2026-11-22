@@ -162,7 +162,7 @@ _m_text_list_said(subj, check, cause) := [_m_text_items(s.name, s.value)] if {
 	_m_text_state_said(check, _text_items_state(s.value), cause)
 } else := []
 
-_m_text_state_said(_, st, st)
+_m_text_state_said(_, st, cause) if st == cause
 
 _m_text_state_said(check, st, cause) if {
 	object.get(check, "ergo/row", false) == true
