@@ -2063,12 +2063,14 @@ impl For {
         for sentence in &self.sentences {
             clauses.extend(sentence_roots_listed(&sentence.check, &outer));
         }
-        let mut out: Vec<String> = Vec::new();
-        for clause in &clauses {
-            for said in std::iter::once(clause).chain(clause.said.iter()) {
-                push_new(&mut out, super::clause::text(std::slice::from_ref(said)));
+        fn said_lines(clauses: &[Clause], out: &mut Vec<String>) {
+            for clause in clauses {
+                push_new(out, super::clause::text(std::slice::from_ref(clause)));
+                said_lines(&clause.said, out);
             }
         }
+        let mut out: Vec<String> = Vec::new();
+        said_lines(&clauses, &mut out);
         out
     }
 

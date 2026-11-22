@@ -257,3 +257,17 @@ fn a_walk_through_the_alias_holds_the_root_beside_items_that_keep_their_own_caus
         ]
     );
 }
+
+#[test]
+fn an_assertion_says_a_root_that_walks_a_list_once_with_its_items_capped() {
+    let said = entries(
+        "every rows as r",
+        json!("r.v is in $params.pos.name"),
+        json!({"rows": [{"v": "bob"}, {}]}),
+        json!({"pos": [{"name": "bob"}, {"v": 0}, {"v": 1}, {"v": 2}, {"v": 3}]}),
+    );
+    assert!(
+        said[0].starts_with("assertion r.v is in $params.pos.name [absent] \"item 2 of $params.pos: name is missing; item 3 of $params.pos: name is missing; item 4 of $params.pos: name is missing; and 1 more\" "),
+        "{said:#?}"
+    );
+}
