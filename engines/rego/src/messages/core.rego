@@ -159,8 +159,27 @@ _m_text_list_said(subj, check, cause) := [_m_text_items(s.name, s.value)] if {
 	s := _m_shown(subj, _m_text_list_side(check))
 	s.state == "value"
 	is_array(s.value)
-	_text_items_state(s.value) == cause
+	_m_text_state_said(check, _text_items_state(s.value), cause)
 } else := []
+
+_m_text_state_said(_, st, st)
+
+_m_text_state_said(check, st, cause) if {
+	object.get(check, "ergo/row", false) == true
+	st != cause
+	st in _no_value_states
+}
+
+_m_text_side_said(subj, check) := [_m_state_clause(s)] if {
+	check.ignoring
+	_list_flawed(check, subj)
+	s := _m_shown(subj, _m_text_side(check))
+	s.state in _no_value_states
+} else := []
+
+_m_text_side(check) := check.left if check.op == "compare"
+
+else := check.path
 
 _m_text_list_side(check) := check.right if {
 	_list_cmp(check)
@@ -405,9 +424,9 @@ _m_message(check, subj, cause) := m if {
 	m := concat(", and ", clauses)
 } else := _m_fallback(check) if cause in _no_value_states
 
-_m_unusable_before_faults(subj, check, kf) := array.concat(array.concat(kf, _m_blocked_early(subj, check)), _m_params_faults_early(subj, check))
+_m_unusable_before_faults(subj, check, kf) := array.concat(array.concat(array.concat(kf, _m_blocked_early(subj, check)), _m_params_faults_early(subj, check)), _m_text_side_said(subj, check))
 
-_m_unusable_after_faults(subj, check) := array.concat(array.concat(array.concat(_m_blocked_late(subj, check), _m_walk_ref_faults(subj, check)), _m_tallies(subj, check, "unusable")), _m_params_beside_input(check))
+_m_unusable_after_faults(subj, check) := array.concat(array.concat(array.concat(array.concat(_m_blocked_late(subj, check), _m_walk_ref_faults(subj, check)), _m_tallies(subj, check, "unusable")), _m_params_beside_input(check)), _m_text_list_said(subj, check, "null"))
 
 _m_params_beside_input(check) := array.concat([_m_isnt("$input", data.ergo_document, "an object")], sort({c | walk(check, [_, v]); some c in _m_params_break(v)})) if {
 	_reads_input_key(check)

@@ -315,7 +315,7 @@ _list_flaw(leaf, x) := {"unusable"} if {
 	not _list_right_usable(leaf.cmp, _lvalue(leaf, x))
 }
 
-_list_flaw(leaf, x) := {st} if {
+_list_flaw(leaf, x) := {st} | _text_side_states(leaf.left, x) if {
 	_list_cmp(leaf)
 	leaf.ignoring
 	_lstate(leaf, x) == "value"
@@ -323,11 +323,16 @@ _list_flaw(leaf, x) := {st} if {
 	st := _list_text_state(_lvalue(leaf, x))
 }
 
-_list_flaw(leaf, _) := {st} if {
+_list_flaw(leaf, x) := {st} | _text_side_states(leaf.path, x) if {
 	leaf.op in _membership_ops
 	leaf.ignoring
 	_is_ref(leaf.values)
 	st := _text_ref_state(leaf.values.ref)
+}
+
+_text_side_states(p, x) := {st | st := _read_state(x, p); st != "value"} | {"unusable" |
+	v := _found(x, p)
+	not is_string(v)
 }
 
 _text_items_kind := "text in every item"

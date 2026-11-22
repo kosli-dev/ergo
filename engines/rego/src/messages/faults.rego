@@ -471,8 +471,8 @@ _m_right_kind(cmp, r) := "a list of one kind of value" if {
 
 _m_list_left(subj, check) := [[check.left, "text"]] if {
 	check.ignoring
-	not is_string(_found(subj, check.left))
-	not _list_flawed(check, subj)
+	v := _found(subj, check.left)
+	not is_string(v)
 } else := [] if {
 	check.ignoring
 } else := [[check.left, "text"]] if {
