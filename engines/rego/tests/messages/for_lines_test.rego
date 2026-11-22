@@ -320,6 +320,32 @@ test_items_that_tie_give_their_tie_once if {
 	c.cause == "ambiguous"
 }
 
+_item_texts_today(line, sentences, subj, params) := [[e.t | some e in ents; e.i == k] | some k, _ in r.failed] if {
+	check := ergo._s_written_check({"for": line, "assert": sentences})
+	names := {"ergo/subject": subj, "$at": {"names": {}}}
+	r := ergo._for_row_raw(check, subj) with input as {"ergo/names": names} with data.ergo_params as params
+	ents := ergo._for_ents(check, r) with input as {"ergo/names": names} with data.ergo_params as params
+}
+
+test_the_items_clause_says_what_the_row_says_today if {
+	shapes := [
+		["every xs as x", ["x.v is 1", "x.w is 1"], {"xs": [{}, {}, {}, {}, {}]}],
+		["every xs as x", ["every x.ys.n is 1"], {"xs": [{"ys": [{"n": 2}, {}]}, {"ys": [{"n": 3}, {}]}]}],
+		["every xs as x", ["x.v is 1"], {"xs": [1, {}, null]}],
+		["every xs as x", ["x.v is 1", "x.w is 1"], {"xs": [{"v": "a, and b"}]}],
+		["every xs as x", ["every x.ys.n is 1", "every x.ys.m is 1"], {"xs": [{"ys": [{"n": 1, "m": 2}, {"m": 1}]}]}],
+		["every prs as pr, every pr.as as ap", ["ap.state is 1", "ap.user is 1", "pr.ok is true"], {"prs": [{"ok": false, "as": [{"state": 2, "user": 1}, {"state": 1, "user": 3}]}]}],
+		["every cs as c", ["every c.reviews.ok is true", "c.a is 1"], {"cs": [{"a": 2, "reviews": [{"ok": true}, {"ok": false}]}, {"a": 2, "reviews": [{"ok": false}]}, {"a": 2, "reviews": [{"ok": false}]}, {"a": 2, "reviews": [{"ok": false}]}, {"a": 2, "reviews": [{"ok": false}]}]}],
+	]
+	every s in shapes {
+		_item_texts(s[0], s[1], s[2], {}) == _item_texts_today(s[0], s[1], s[2], {})
+	}
+}
+
+test_a_sentence_that_reads_no_alias_is_not_said_under_an_item if {
+	_item_texts("every xs as x", ["x.v is 1", "z is 1"], {"xs": [{"v": 2}, {}]}, {}) == [["item 1 of xs: x.v is 2"], ["item 2 of xs: x.v is missing"]]
+}
+
 test_a_sentence_that_doesnt_read_the_second_alias_rides_with_the_first_pair if {
 	subj := {"prs": [{"ok": false, "as": [{"state": 2, "user": 1}, {"state": 1, "user": 3}]}]}
 	_item_texts("every prs as pr, every pr.as as ap", ["ap.state is 1", "ap.user is 1", "pr.ok is true"], subj, {}) == [["item 1 of prs: item 1 of pr.as: ap.state is 2, and pr.ok is false", "item 1 of prs: item 2 of pr.as: ap.user is 3"]]
