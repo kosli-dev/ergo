@@ -59,7 +59,7 @@ test_a_row_says_what_else_it_cant_read_beside_a_key_it_cant_read if {
 test_a_list_after_is_in_ignoring_case_names_each_item_that_isnt_text_in_list_order if {
 	field := {"op": "compare", "left": ["x"], "cmp": "in", "right": ["ys"], "ignoring": "case"}
 	ergo._message(field, {"x": "a", "ys": ["A", 3]}, "unusable") == "item 2 of ys is 3, which isn't text"
-	ergo._message(field, {"x": 3, "ys": ["a", null, {"a": 1}]}, "unusable") == `item 2 of ys is null; item 3 of ys is {"a": 1}, which isn't text`
+	ergo._message(field, {"x": 3, "ys": ["a", null, {"a": 1}]}, "unusable") == `x is 3, which isn't text, and item 2 of ys is null; item 3 of ys is {"a": 1}, which isn't text`
 	ergo._message(object.union(field, {"cmp": "not_in"}), {"x": "a", "ys": [null]}, "null") == "item 1 of ys is null"
 	ergo._message(object.union(field, {"ergo/row": true}), {"ys": [null]}, "null") == "x is missing, and item 1 of ys is null"
 	ref := {"op": "in", "path": ["x"], "values": {"ref": ["$$params[]", "l"]}, "ignoring": "case"}
@@ -75,4 +75,16 @@ test_a_list_walked_from_the_input_after_is_in_ignoring_case_names_each_item_it_c
 	ergo._message(ref, {"x": "a"}, "unusable") == "item 2 of $input.cs: name is 3, which isn't text" with data.ergo_document as {"cs": [{"name": "a"}, {"name": 3}]}
 	ergo._message(ref, {"x": "a"}, "unusable") == "item 1 of $input.cs: name is missing; item 2 of $input.cs: name is 3, which isn't text" with data.ergo_document as {"cs": [{}, {"name": 3}]}
 	ergo._message(ref, {"x": "a"}, "unusable") == "item 1 of $input.cs is 3, which isn't an object; item 2 of $input.cs: name is 5, which isn't text" with data.ergo_document as {"cs": [3, {"name": 5}]}
+}
+
+test_a_list_after_is_in_ignoring_case_that_cant_be_used_is_said_beside_a_field_that_cant_be_read_whatever_its_cause if {
+	field := {"op": "compare", "left": ["x"], "cmp": "in", "right": ["ys"], "ignoring": "case", "ergo/row": true}
+	ergo._message(field, {"ys": ["a", null]}, "absent") == "x is missing, and item 2 of ys is null"
+	ergo._message(field, {"ys": [3]}, "unusable") == "x is missing, and item 1 of ys is 3, which isn't text"
+	ergo._message(field, {"x": null, "ys": [3]}, "unusable") == "x is null, and item 1 of ys is 3, which isn't text"
+	ergo._message(field, {"x": 3, "ys": ["a", null]}, "unusable") == "x is 3, which isn't text, and item 2 of ys is null"
+	ref := {"op": "in", "path": ["$$params", "k"], "values": {"ref": ["$$params[]", "l"]}, "ignoring": "case", "ergo/row": true}
+	ergo._message(ref, {}, "absent") == "$params.k is missing, and item 2 of $params.l is null" with data.ergo_params as {"l": ["a", null]}
+	ergo._message(ref, {}, "unusable") == "$params.k is 3, which isn't text, and item 2 of $params.l is null" with data.ergo_params as {"k": 3, "l": ["a", null]}
+	ergo._message(ref, {}, "unusable") == "$params.k is missing, and item 1 of $params.l is 3, which isn't text" with data.ergo_params as {"l": [3]}
 }

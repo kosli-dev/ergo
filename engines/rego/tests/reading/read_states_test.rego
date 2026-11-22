@@ -34,28 +34,33 @@ test_a_null_on_the_path_stops_the_read_at_the_step_after_the_first_key if {
 	ergo._null_stop_at({"c": null}, ["c", "z"]) == 1
 }
 
-test_is_in_ignoring_case_fails_on_a_list_item_that_isnt_text_whatever_the_field_holds if {
+test_is_in_ignoring_case_fails_on_a_list_item_that_isnt_text_whatever_the_field_holds_and_the_field_says_its_own_cause_beside_it if {
 	cases := [
-		[["A", 3], "unusable"],
-		[[1, "a"], "unusable"],
-		[[null], "null"],
-		[["a", null], "null"],
-		[["a", null, 3], "unusable"],
-		[["a", ["a"]], "unusable"],
-		[["a", {"a": 1}], "unusable"],
-		[[true], "unusable"],
+		[["A", 3], ["unusable", "unusable", "unusable", "unusable"]],
+		[[1, "a"], ["unusable", "unusable", "unusable", "unusable"]],
+		[[null], ["null", "unusable", "null", "absent"]],
+		[["a", null], ["null", "unusable", "null", "absent"]],
+		[["a", null, 3], ["unusable", "unusable", "unusable", "unusable"]],
+		[["a", ["a"]], ["unusable", "unusable", "unusable", "unusable"]],
+		[["a", {"a": 1}], ["unusable", "unusable", "unusable", "unusable"]],
+		[[true], ["unusable", "unusable", "unusable", "unusable"]],
 	]
 	every c in cases {
 		every cmp in ["in", "not_in"] {
 			field := {"op": "compare", "left": ["x"], "cmp": cmp, "right": ["ys"], "ignoring": "case"}
-			every subj in [{"x": "a", "ys": c[0]}, {"x": 3, "ys": c[0]}, {"x": null, "ys": c[0]}, {"ys": c[0]}] {
-				ergo._leaf_cause(field, subj) == c[1]
+			every i, subj in [{"x": "a", "ys": c[0]}, {"x": 3, "ys": c[0]}, {"x": null, "ys": c[0]}, {"ys": c[0]}] {
+				ergo._leaf_cause(field, subj) == c[1][i]
 			}
 			ref := {"op": cmp, "path": ["x"], "values": {"ref": ["$$params[]", "l"]}, "ignoring": "case"}
-			every subj in [{"x": "a"}, {"x": 3}, {"x": null}, {}] {
-				ergo._leaf_cause(ref, subj) == c[1] with data.ergo_params as {"l": c[0]}
+			every i, subj in [{"x": "a"}, {"x": 3}, {"x": null}, {}] {
+				ergo._leaf_cause(ref, subj) == c[1][i] with data.ergo_params as {"l": c[0]}
 			}
 		}
+	}
+	walked := {"op": "in", "path": ["x"], "values": {"ref": ["$$input[]", "cs", "name"]}, "ignoring": "case"}
+	every i, subj in [{"x": "a"}, {"x": 3}, {"x": null}, {}] {
+		ergo._leaf_cause(walked, subj) == cases[3][1][i] with data.ergo_document as {"cs": [{"name": "a"}, {"name": null}]}
+		ergo._leaf_cause(walked, subj) == "unusable" with data.ergo_document as {"cs": [{"name": "a"}, {"name": 3}]}
 	}
 }
 
