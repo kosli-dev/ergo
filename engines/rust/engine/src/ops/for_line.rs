@@ -212,6 +212,24 @@ pub fn reads_alias(check: &Check, alias: &str) -> bool {
     })
 }
 
+fn reads_alias_whole(check: &Check, alias: &str) -> bool {
+    let whole = |path: &Path| {
+        matches!(&path.start, Start::Alias(name) if name == alias) && path.steps.is_empty()
+    };
+    nested_checks(check).into_iter().any(|inner| {
+        all_paths(inner)
+            .into_iter()
+            .chain(inner.paths())
+            .any(|path| {
+                whole(path)
+                    || path.steps.iter().any(|step| match step {
+                        Step::Ref(reference) => whole(reference),
+                        _ => false,
+                    })
+            })
+    })
+}
+
 fn reads_path(path: &Path, alias: &str) -> bool {
     matches!(&path.start, Start::Alias(name) if name == alias)
         || path.steps.iter().any(|step| match step {
@@ -1105,6 +1123,7 @@ struct Outcome {
     inner: Vec<Dead>,
     clauses: Vec<Clause>,
     lifted: usize,
+    whole: Vec<Clause>,
     bare: bool,
 }
 
@@ -1291,6 +1310,7 @@ impl For {
                         inner: Vec::new(),
                         clauses: Vec::new(),
                         lifted: 0,
+                        whole: Vec::new(),
                         bare: false,
                     }),
                     Vec::new(),
@@ -1373,12 +1393,27 @@ impl For {
                     } else {
                         self.nested_clauses(&nested, assertions.is_empty(), depth + 1, &bound)
                     };
-                    let clauses: Vec<Clause> = first_alias
-                        .into_iter()
-                        .chain(nested_clauses)
-                        .filter_map(|clause| unrooted(clause, &texts))
-                        .collect();
-                    let clauses: Vec<Clause> = lifted.iter().cloned().chain(clauses).collect();
+                    let mut clauses: Vec<Clause> = lifted.clone();
+                    clauses.extend(
+                        first_alias
+                            .into_iter()
+                            .filter_map(|clause| unrooted(clause, &texts)),
+                    );
+                    let whole = if live.at.value.is_object() {
+                        Vec::new()
+                    } else {
+                        let read_whole = self.whole_alias_texts(depth, &bound);
+                        clauses
+                            .iter()
+                            .filter(|clause| read_whole.contains(&clause.text))
+                            .cloned()
+                            .collect()
+                    };
+                    clauses.extend(
+                        nested_clauses
+                            .into_iter()
+                            .filter_map(|clause| unrooted(clause, &texts)),
+                    );
                     let said = if leaf.is_empty() {
                         parts.join("; ").replace(FREE, "")
                     } else {
@@ -1397,6 +1432,7 @@ impl For {
                             inner: nested.dead,
                             clauses,
                             lifted: lifted.len(),
+                            whole,
                             bare,
                         }),
                         Vec::new(),
@@ -1621,6 +1657,7 @@ impl For {
             inner: Vec::new(),
             clauses: Vec::new(),
             lifted: 0,
+            whole: Vec::new(),
             bare: false,
         };
         if groups.len() > 1 {
@@ -2867,7 +2904,7 @@ impl For {
             let said = if outcome.bare {
                 outcome.clauses.clone()
             } else {
-                Vec::new()
+                outcome.whole.clone()
             };
             return Some(Clause::item(name, Cause::NotAnObject, text, said));
         }
@@ -3004,6 +3041,26 @@ impl For {
             }
         }
         out
+    }
+
+    fn whole_alias_texts(&self, depth: usize, ctx: &Ctx) -> Vec<String> {
+        let alias = &self.items[depth].alias;
+        let outer = outer_ctx(ctx);
+        let mut texts: Vec<String> = Vec::new();
+        for sentence in self
+            .sentences
+            .iter()
+            .filter(|sentence| reads_alias_whole(&sentence.check, alias))
+        {
+            texts.extend(
+                sentence_roots_said(&sentence.check, &outer)
+                    .into_iter()
+                    .map(|clause| clause.text),
+            );
+            let (_, clauses) = self.said_clauses(sentence, &run_full(&sentence.check, ctx), ctx);
+            texts.extend(clauses.into_iter().map(|clause| clause.text));
+        }
+        texts
     }
 
     fn later_key(&self, depth: usize, ctx: &Ctx) -> Option<(path::Outcome, String, Input)> {
