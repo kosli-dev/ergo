@@ -4060,3 +4060,36 @@ fn a_root_of_a_sentence_that_reads_the_alias_comes_before_the_list_the_line_cant
         )
     );
 }
+
+#[test]
+fn an_item_that_isnt_an_object_isnt_said_again_as_a_walk_of_its_alias_by_the_second_list() {
+    let xs = json!([[1], {"m": {"a": 1}, "ys": [{}]}]);
+    for (for_line, assertion, message) in [
+        (
+            "every xs as x, every x.ys as y",
+            "x.m named by z is 1",
+            "item 1 of xs is [1], which isn't an object",
+        ),
+        (
+            "every xs as x, every x.ys as y",
+            "x.v exists",
+            "item 1 of xs is [1], which isn't an object; item 2 of xs: x.v is missing",
+        ),
+        (
+            "every xs as x, every x.m named by $params.k as y",
+            "x.v is at least $params.min",
+            "item 1 of xs is [1], which isn't an object; item 2 of xs: x.v is missing; item 2 of xs: x.m.a is 1, which isn't a list or an object",
+        ),
+    ] {
+        assert_eq!(
+            for_row(
+                for_line,
+                &[assertion],
+                json!({"xs": xs, "z": "a"}),
+                json!({"k": "a", "min": 0}),
+            ),
+            ("not_an_object".to_string(), message.to_string()),
+            "{for_line} {assertion}"
+        );
+    }
+}
