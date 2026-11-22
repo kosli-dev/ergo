@@ -37,6 +37,14 @@ test_a_part_root_after_any_list_phrase_stands_in_for_a_value_so_each_item_is_sti
 	}
 }
 
+test_a_root_on_the_left_of_a_list_phrase_has_no_stand_in_so_the_item_is_still_read_as_a_list if {
+	part := [`${"alias":"pl","n":1,"of":null,"old":true}`, "p", "name"]
+	every cmp in ["not_in", "matches_any", "not_matches_any", "includes_all", "excludes_all", "includes_some", "not_includes_all"] {
+		c := {"op": "compare", "cmp": cmp, "left": part, "right": ["f"]}
+		ergo._root_stand_in(c) == c
+	}
+}
+
 test_a_root_a_whose_cant_read_has_no_stand_in_after_a_key_or_a_phrase_b9_leaves_out if {
 	keyed := {"op": "compare", "cmp": "eq", "left": ["v"], "right": ["$$params", "m", {"ref": ["$$params", "k"]}]}
 	ergo._root_stand_in(keyed) == keyed
