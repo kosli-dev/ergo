@@ -997,6 +997,16 @@ pub(super) fn focus_check(item: &WalkItem) -> Check {
     })
 }
 
+/// Whether `check` reads a list from outside the item, after a phrase that
+/// takes a list, that is empty, like `$input.cs.name` with `cs` holding `[]`.
+pub(super) fn empty_root(check: &Check, outer: &Ctx) -> bool {
+    super::lists::right_paths(check).into_iter().any(|path| {
+        message::reads_from_a_root(path)
+            && super::lists::walked_root_fault(check, path, outer)
+                .is_some_and(|(cause, _)| cause == Cause::Value)
+    })
+}
+
 pub(super) fn focus_verdict(
     check: &Check,
     item: &WalkItem,
@@ -1427,7 +1437,12 @@ fn before_key<'a>(path: &Path, at: &Ctx<'a>) -> Option<(Path, path::Read<'a>, Ca
 fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
     let mut at = ctx.clone();
     let leaf_roots = message::root_clauses(&[&*walk.check], ctx);
-    let leaf_walked = message::walked_root_clauses_with(&[&*walk.check], ctx, true);
+    let leaf_walked = message::walked_root_clauses(&[&*walk.check], ctx);
+    let emptied: Vec<&Check> = walk
+        .whose
+        .iter()
+        .filter(|check| empty_root(check, ctx))
+        .collect();
     walked
         .items
         .iter()
@@ -1443,7 +1458,11 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
                     (check, verdict, lost)
                 })
                 .collect();
-            let failing = || verdicts.iter().filter(|(_, v, _)| v.cause.is_failure());
+            let failing = || {
+                verdicts.iter().filter(|(check, v, _)| {
+                    v.cause.is_failure() || emptied.iter().any(|empty| std::ptr::eq(*empty, *check))
+                })
+            };
             let undecided = failing().next().is_some();
             let own = failing()
                 .filter(|(check, _, _)| !check.flawed(ctx))

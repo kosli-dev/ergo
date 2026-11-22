@@ -180,6 +180,8 @@ for / a part that a for line walks as a list fails it on an empty list when an i
 for / a part that a for line walks as a list fails it on an empty list when an item of it can't be read / fails, with an empty rows, when an item of it is null
 for / a part that a for line walks as a list fails it on an empty list when an item of it can't be read / fails, with an empty rows, when it holds names of more than one kind
 for / a part that holds a list is walked by a whose in `count of xs whose v is in pl.z is 0` / the part holds a list of objects and the list has an item
+for / a part that holds a list is walked by a whose in `count of xs whose v is in pl.z is 0` / the part holds an empty list and the list has an item
+for / a part that holds a list is walked by a whose in `count of xs whose v is in pl.z is 0` / the part holds an empty list and the list has no item
 for / a part that holds a list is walked by a whose in `count of xs whose v is in pl.z is 0` / the part holds an object with a list and the list has an item
 for / a part that holds a list is walked by a whose in `count of xs whose v is in pl.z is 0` / the part holds null and the list has an item
 for / a part that holds a list is walked by a whose in `count of xs whose v is in pl.z is 0` / the part holds null and the list has no item

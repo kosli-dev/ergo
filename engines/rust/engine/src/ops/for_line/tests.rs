@@ -1830,16 +1830,8 @@ fn params_that_are_not_an_object_still_fail_a_check_without_a_tie_as_unusable() 
 fn a_part_that_holds_a_list_is_walked_by_a_count_of_whose_under_a_for_line() {
     let xs = json!([{"v": 1, "ys": [{"v": 1}]}]);
     for (part, assertion, cause) in [
-        (
-            json!([]),
-            "count of xs whose v is in pl.z is 0",
-            "satisfied",
-        ),
-        (
-            json!([]),
-            "count of m.ys whose v is in pl.z is 0",
-            "satisfied",
-        ),
+        (json!([]), "count of xs whose v is in pl.z is 0", "value"),
+        (json!([]), "count of m.ys whose v is in pl.z is 0", "value"),
         (
             json!([{"z": 1}]),
             "count of xs whose v is in pl.z is 0",
@@ -2640,16 +2632,6 @@ const ROWS_THE_CLAUSES_DONT_SAY_YET: &[(&str, usize, &str)] = &[
         "for / a part that a for line walks as a list fails it on an empty list when an item of it can't be read / fails, with an empty rows, when it holds names of more than one kind",
         3,
         SAID_OUTSIDE,
-    ),
-    (
-        "for / a part that holds a list is walked in the whose of a for line and in a whose under it / an empty part fails as value",
-        1,
-        NO_LIST,
-    ),
-    (
-        "for / a part that holds a list is walked in the whose of a for line and in a whose under it / an empty part fails as value",
-        4,
-        NO_LIST,
     ),
     (
         "for / a second for item picking after the first alias lists nothing when it picks nothing / a first item that fails its check is listed and one that matches nothing is not",

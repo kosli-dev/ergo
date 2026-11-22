@@ -652,7 +652,12 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
     );
     let mut numbers: Vec<Value> = Vec::new();
     let mut at = outer.clone();
-    let mut any_undecided = false;
+    let emptied: Vec<&Check> = whose
+        .iter()
+        .copied()
+        .filter(|check| walk::empty_root(check, &outer))
+        .collect();
+    let mut any_undecided = !emptied.is_empty();
     for item in &walked.items {
         at.subject = item.item.clone();
         at.label = None;
@@ -664,7 +669,7 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
             .collect();
         let mut undecided = false;
         for (check, cause) in &verdicts {
-            if cause.is_failure() {
+            if cause.is_failure() || emptied.iter().any(|empty| std::ptr::eq(*empty, *check)) {
                 undecided = true;
                 match walk::item_own(check, item, &walked, &outer) {
                     Some(said) => causes.push(said.cause),
@@ -1720,7 +1725,12 @@ pub fn counted_said(counted: &Counted, ctx: &Ctx) -> (Vec<Clause>, Vec<Value>) {
             })
             .collect();
         let mut at = outer.clone();
-        let mut any_undecided = false;
+        let emptied: Vec<&Check> = whose
+            .iter()
+            .copied()
+            .filter(|check| walk::empty_root(check, &outer))
+            .collect();
+        let mut any_undecided = !emptied.is_empty();
         for item in &walked.items {
             at.subject = item.item.clone();
             at.label = None;
@@ -1729,7 +1739,9 @@ pub fn counted_said(counted: &Counted, ctx: &Ctx) -> (Vec<Clause>, Vec<Value>) {
             let mut undecided = false;
             for check in &counted.whose {
                 let (verdict, lost) = walk::focus_verdict(check, item, &at, &focus);
-                if !verdict.cause.is_failure() {
+                if !verdict.cause.is_failure()
+                    && !emptied.iter().any(|empty| std::ptr::eq(*empty, check))
+                {
                     continue;
                 }
                 undecided = true;
