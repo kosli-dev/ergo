@@ -3986,3 +3986,61 @@ fn a_root_of_a_sentence_that_reads_the_first_alias_stays_before_the_second_list_
         )
     );
 }
+
+#[test]
+fn root_clauses_say_a_key_that_isnt_text_once_and_not_again_with_the_path_it_reads() {
+    assert_eq!(
+        for_roots(
+            "every xs as x",
+            &["m named by $params.k is 1"],
+            json!({"xs": [{"m": {"a": 1}}], "m": null}),
+            json!({"k": 3}),
+        ),
+        "$params.k is 3, which isn't text"
+    );
+}
+
+#[test]
+fn a_key_that_isnt_text_is_said_once_and_each_item_says_only_its_own_problem() {
+    let xs = json!([{"m": {"a": 1}, "ys": [{}]}, {"m": null, "ys": [{}]}, {"ys": [{}]}]);
+    let said =
+        "$params.k is 3, which isn't text; item 2 of xs: x.m is null; item 3 of xs: x.m is missing";
+    for (for_line, assertion, subject, message) in [
+        (
+            "every xs as x, every es as e",
+            "x.m named by $params.k is 1",
+            json!({"xs": xs, "es": [{"zz": 1}]}),
+            said,
+        ),
+        (
+            "some xs as x, every es as e",
+            "x.m named by $params.k is 1",
+            json!({"xs": xs, "es": [{"zz": 1}]}),
+            said,
+        ),
+        (
+            "every xs as x, every x.ys as y",
+            "x.m named by $params.k is 1",
+            json!({"xs": xs}),
+            said,
+        ),
+        (
+            "every xs as x, every es as e",
+            "x.m named by z is 1",
+            json!({"xs": [{"m": {"a": 1}}, {"m": null}], "es": [{"zz": 1}], "z": 1}),
+            "z is 1, which isn't text; item 2 of xs: x.m is null",
+        ),
+        (
+            "every xs as x",
+            "m named by $params.k is 1",
+            json!({"xs": [{"m": {"a": 1}}], "m": null}),
+            "$params.k is 3, which isn't text; m is null",
+        ),
+    ] {
+        assert_eq!(
+            for_row(for_line, &[assertion], subject, json!({"k": 3})),
+            ("unusable".to_string(), message.to_string()),
+            "{for_line} {assertion}"
+        );
+    }
+}
