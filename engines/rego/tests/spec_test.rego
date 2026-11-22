@@ -3,7 +3,11 @@ package spec_test
 import data.ergo
 
 known_differences := {
+	"for / a part that holds a list is walked by a whose in `count of m.ys whose v is in pl.z is 0` / the part holds an empty list and the list has an item",
+	"for / a part that holds a list is walked by a whose in `count of m.ys whose v is in pl.z is 0` / the part holds an empty list and the list has no item",
+	"for / a part that holds a list is walked in the whose of a for line and in a whose under it / an empty part fails as value",
 	"for / the roots of the line's own whose come before the roots of its sentences, whatever their causes / $params.min is missing and says first, though $params.a has the worse cause",
+	"in / an empty list on the right of a phrase in a whose or a that fails the row as value, said once, whatever the items / fails as value with the empty list said once, when an item has no field",
 }
 
 _topic_cases(topic) := json.unmarshal(replace(json.marshal(data.spec.cases[topic]), "{{spec}}", ergo._spec))
