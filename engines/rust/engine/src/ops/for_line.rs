@@ -1997,7 +1997,7 @@ impl For {
             .iter()
             .enumerate()
             .filter(|(_, sentence)| self.reads_no_alias(sentence))
-            .map(|(at, sentence)| (at, read_names(&sentence.check)))
+            .map(|(at, sentence)| (at, root_names(&sentence.check)))
             .collect();
         for clause in &mut once {
             let root = clause.name.as_str();
@@ -3999,19 +3999,7 @@ fn sentence_root_clauses(forms: &[(Check, bool)], ctx: &Ctx) -> Vec<Clause> {
                 }
             }
             let (check, _) = form;
-            let mut named: Vec<String> = check
-                .paths()
-                .into_iter()
-                .chain(walk::listed_refs(check))
-                .flat_map(|root| {
-                    std::iter::once(crate::name::name(root)).chain(root.steps.iter().filter_map(
-                        |step| match step {
-                            Step::Ref(key) | Step::Field(key) => Some(crate::name::name(key)),
-                            _ => None,
-                        },
-                    ))
-                })
-                .collect();
+            let mut named: Vec<String> = root_names(check);
             named.sort_by_key(|name| std::cmp::Reverse(name.len()));
             faults
                 .into_iter()
@@ -4159,7 +4147,7 @@ fn is_text(read: &path::Read<'_>) -> bool {
     read.outcome == crate::path::Outcome::Found && read.value.is_some_and(Value::is_string)
 }
 
-fn read_names(check: &Check) -> Vec<String> {
+fn root_names(check: &Check) -> Vec<String> {
     let mut paths: Vec<&Path> = check.paths();
     paths.extend(walk::listed_refs(check));
     let mut names: Vec<String> = Vec::new();
@@ -4172,12 +4160,8 @@ fn read_names(check: &Check) -> Vec<String> {
         }
     }
     names.extend(check.refs().iter().map(crate::name::name));
-    if let Check::Walk(walk) = check {
-        names.push(crate::name::name(&walk.path));
-        names.extend(read_names(&walk.check));
-    }
     for nested in nested_whose(check, false) {
-        names.extend(read_names(nested));
+        names.extend(root_names(nested));
     }
     names
 }
