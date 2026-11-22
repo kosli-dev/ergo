@@ -9561,7 +9561,31 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/cs/0/rows/1/v"
+                        ],
+                        "name": "rows[1].v",
+                        "outcome": "unusable",
+                        "value": 5
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/cs/0/rows/1"
+                    ],
+                    "message": "v is 5, which isn't text",
+                    "name": "item 2 of rows",
+                    "value": {
+                      "v": 5
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -9592,7 +9616,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/count"
                 ],
-                "message": "item 2 of rows: v is 5, which isn't text",
+                "message": "",
                 "name": "count of rows whose v matches pos.p is 1"
               }
             ],
@@ -9893,7 +9917,31 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/cs/0/kids/0/rows/1/v"
+                        ],
+                        "name": "rows[1].v",
+                        "outcome": "unusable",
+                        "value": 5
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/cs/0/kids/0/rows/1"
+                    ],
+                    "message": "v is 5, which isn't text",
+                    "name": "item 2 of rows",
+                    "value": {
+                      "v": 5
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -9920,7 +9968,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/count"
                 ],
-                "message": "item 2 of rows: v is 5, which isn't text",
+                "message": "",
                 "name": "count of rows whose v matches c.os.p is 1"
               }
             ],
@@ -10213,7 +10261,31 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/cs/0/kids/0/rows/1/v"
+                        ],
+                        "name": "rows[1].v",
+                        "outcome": "unusable",
+                        "value": 5
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/cs/0/kids/0/rows/1"
+                    ],
+                    "message": "v is 5, which isn't text",
+                    "name": "item 2 of rows",
+                    "value": {
+                      "v": 5
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -10244,7 +10316,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/part_count"
                 ],
-                "message": "item 2 of rows: v is 5, which isn't text",
+                "message": "",
                 "name": "count of rows whose v matches c.pos.p is 1"
               }
             ],
