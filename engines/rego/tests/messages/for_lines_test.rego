@@ -320,6 +320,31 @@ test_items_that_tie_give_their_tie_once if {
 	c.cause == "ambiguous"
 }
 
+test_a_sentence_that_doesnt_read_the_second_alias_rides_with_the_first_pair if {
+	subj := {"prs": [{"ok": false, "as": [{"state": 2, "user": 1}, {"state": 1, "user": 3}]}]}
+	_item_texts("every prs as pr, every pr.as as ap", ["ap.state is 1", "ap.user is 1", "pr.ok is true"], subj, {}) == [["item 1 of prs: item 1 of pr.as: ap.state is 2, and pr.ok is false", "item 1 of prs: item 2 of pr.as: ap.user is 3"]]
+}
+
+test_a_rider_written_first_is_said_first_in_its_pair if {
+	subj := {"prs": [{"ok": false, "as": [{"state": 2}, {"state": 3}]}]}
+	_item_texts("every prs as pr, every pr.as as ap", ["pr.ok is true", "ap.state is 1"], subj, {}) == [["item 1 of prs: item 1 of pr.as: pr.ok is false, and ap.state is 2", "item 1 of prs: item 2 of pr.as: ap.state is 3"]]
+}
+
+test_a_rider_with_no_pair_is_said_under_the_first_item if {
+	_item_texts("every prs as pr, every pr.as as ap", ["ap.state is 1", "pr.ok is true"], {"prs": [{"ok": false, "as": [{"state": 1}]}]}, {}) == [["item 1 of prs: pr.ok is false"]]
+}
+
+test_a_pair_says_a_walk_apart_from_its_other_sentences if {
+	subj := {"xs": [{"ys": [{"m": 2, "zs": [{"n": 2}]}]}]}
+	_item_texts("every xs as x, every x.ys as y", ["every y.zs.n is 1", "y.m is 1"], subj, {}) == [["item 1 of xs: item 1 of x.ys: item 1 of y.zs: n is 2", "item 1 of xs: item 1 of x.ys: y.m is 2"]]
+}
+
+test_items_of_the_second_list_the_line_cant_check_come_in_list_order if {
+	line := "every xs as x, every x.ys whose n is 1 as y"
+	_item_texts(line, ["y.m is 1", "x.k is 1"], {"xs": [{"k": 2, "ys": [{}, {"n": 1, "m": 2}]}]}, {}) == [["item 1 of xs: item 1 of x.ys: n is missing", "item 1 of xs: item 2 of x.ys: y.m is 2, and x.k is 2"]]
+	_item_texts(line, ["y.m is 1"], {"xs": [{"ys": [{"n": 1, "m": 2}, {}]}]}, {}) == [["item 1 of xs: item 1 of x.ys: y.m is 2", "item 1 of xs: item 2 of x.ys: n is missing"]]
+}
+
 test_items_of_an_inner_list_that_tie_are_said_under_their_item if {
 	_item_texts("every ws as w, first of w.ys sorted by t as y", ["y.v is 1"], {"ws": [{"ys": [{"t": 1, "v": 2}, {"t": 1, "v": 3}]}]}, {}) == [["item 1 of ws: item 1 and item 2 of w.ys tie on t"]]
 }
