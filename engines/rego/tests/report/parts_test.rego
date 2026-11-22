@@ -275,6 +275,14 @@ test_a_count_keeps_a_nested_list_on_the_other_side_after_its_own_items_though_it
 	[e.name | some e in es] == ["item 2 of xs", "item 4 of xs", "item 1 of gs", "item 2 of gs"]
 }
 
+test_a_count_that_reads_the_same_list_on_both_sides_says_its_own_items_before_those_of_the_other_side if {
+	c := _keyed_count_against({"sum_of": ["xs", "n"], "text": "sum of xs.n", "whose": []})
+	subj := _keyed_count_subject
+	m := "item 2 of xs is null, which isn't an object; item 4 of xs: key is null, and item 2 of xs is null, which isn't an object"
+	es := ergo._tally_item_parts(c, subj, "not_an_object", {}, m) with input as {"ergo/names": {"ergo/subject": subj}}
+	[e.name | some e in es] == ["item 2 of xs", "item 4 of xs", "item 2 of xs"]
+}
+
 test_a_count_ranks_only_the_items_of_its_keyed_list_so_the_list_and_an_inner_item_of_another_list_keep_their_place if {
 	ergo._tally_rank({"name": "xs"}, ["item 1 of xs", "item 2 of xs"]) == -1
 	ergo._tally_rank({"name": "item 2 of xs", "ergo/levels": [{"name": "item 1 of gs"}]}, ["item 1 of xs", "item 2 of xs"]) == -1
