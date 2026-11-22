@@ -3703,6 +3703,24 @@ fn a_pairs_part_says_its_sentences_in_the_order_they_are_written() {
 }
 
 #[test]
+fn a_pairs_part_that_holds_a_sentence_that_doesnt_read_the_second_item_gives_no_list_entry() {
+    let row = row(
+        "every xs as x, every es as e",
+        json!(["x.v is 1", "e.n is 1"]),
+        json!({"xs": [{"v": 2}], "es": [{"n": 1}, {"n": 2}]}),
+    );
+    assert_eq!(
+        row["message"],
+        "item 1 of xs: item 2 of es: x.v is 2, and e.n is 2"
+    );
+    let said = entries(&row["failures"]);
+    assert!(
+        !said.iter().any(|entry| entry.starts_with("list ")),
+        "{said:#?}"
+    );
+}
+
+#[test]
 fn a_list_the_line_cant_walk_isnt_counted_as_an_item() {
     let zz = |n: usize| {
         (1..=n)
