@@ -359,17 +359,10 @@ impl Tally {
 
 pub fn run(check: &Tally, ctx: &Ctx) -> Verdict {
     let numbers = numbers_verdict(check, ctx);
-    let roots = root_causes(check, ctx);
-    let mut inputs = numbers.inputs;
-    if equals_a_root(check)
-        && roots.iter().any(|root| root.is_failure())
-        && let Some(count) = inputs.first_mut().filter(|count| count.worked)
-    {
-        count.value = Value::Null;
-    }
     Verdict {
-        cause: Cause::worst(std::iter::once(numbers.cause).chain(roots)).unwrap_or(numbers.cause),
-        inputs,
+        cause: Cause::worst(std::iter::once(numbers.cause).chain(root_causes(check, ctx)))
+            .unwrap_or(numbers.cause),
+        inputs: numbers.inputs,
     }
 }
 
@@ -669,11 +662,7 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
         };
     }
     let mut causes: Vec<Cause> = walked.failures.iter().map(|f| f.cause).collect();
-    causes.extend(
-        super::message::side_root_clauses(&whose, &outer)
-            .iter()
-            .map(|root| root.cause),
-    );
+    causes.extend(roots.iter().map(|root| root.cause));
     let mut numbers: Vec<Value> = Vec::new();
     let mut at = outer.clone();
     let mut any_undecided = false;
@@ -1366,41 +1355,14 @@ pub fn with_all_items(check: &Tally, ctx: &Ctx, cause: Cause, mut said: Said) ->
 
 /// What a `count of` or `sum of` row says: the check's own pieces, with the
 /// roots its whose reads first when a walked root can't be read, or else
-/// with every item it can't read, and then what its numbers say when they
-/// read fine but a root can't be read.
+/// with every item it can't read.
 pub fn row_said(check: &Tally, ctx: &Ctx, cause: Cause, said: Said) -> Said {
     let rooted = with_walked_roots(check, ctx, said.clone());
-    let mut out = if super::message::said_text(&rooted) == super::message::said_text(&said) {
+    if super::message::said_text(&rooted) == super::message::said_text(&said) {
         with_all_items(check, ctx, cause, said)
     } else {
         rooted
-    };
-    if let Some(own) = numbers_said(check, ctx, cause)
-        && super::message::said_text(&own) != super::message::said_text(&out)
-    {
-        out.extend(own);
     }
-    out
-}
-
-fn equals_a_root(check: &Tally) -> bool {
-    let whose: Vec<&Check> = check.counted_whose().collect();
-    matches!(whose.as_slice(), [Check::Compare(c)]
-        if c.cmp == Cmp::Eq
-            && matches!(&c.right, compare::Side::Path(p)
-                if matches!(p.start, path::Start::Input | path::Start::Params)))
-}
-
-fn numbers_said(check: &Tally, ctx: &Ctx, cause: Cause) -> Option<Said> {
-    if equals_a_root(check) {
-        return None;
-    }
-    let rooted = root_causes(check, ctx).iter().any(|root| root.is_failure());
-    let numbers = numbers_verdict(check, ctx);
-    (rooted && cause.is_failure() && numbers.cause == Cause::Value).then(|| {
-        let check = Check::Tally(check.clone());
-        super::message::said(&check, ctx, &numbers)
-    })
 }
 
 fn with_walked_roots(check: &Tally, ctx: &Ctx, said: Said) -> Said {
