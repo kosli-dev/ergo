@@ -89,3 +89,14 @@ test_a_named_by_key_after_the_phrase_that_cant_be_read_leaves_the_items_to_say_t
 	r.cause == "absent"
 	not "root_msgs" in object.keys(r)
 }
+
+test_a_walk_through_a_for_alias_leaves_a_root_after_the_phrase_to_the_for_line_so_each_item_keeps_its_own_cause_as_for_roots_says if {
+	check := ergo._s_written_check({"for": "every ws as w", "assert": "every w.xs.v is at least $params.min"}).checks[0]
+	w := {"xs": [{}, {}]}
+	subj := {"ws": [w]}
+	names := {"ergo/subject": subj, "w": w, "$at": {"names": {"w": "/ws/0"}}}
+	ergo._leaf_root_flaw(check, subj) == "unusable" with input as {"ergo/names": names} with data.ergo_params as {"min": "s"}
+	r := ergo._walk_row(check, subj) with input as {"ergo/names": names} with data.ergo_params as {"min": "s"}
+	r.cause == "absent"
+	not "root_msgs" in object.keys(r)
+}
