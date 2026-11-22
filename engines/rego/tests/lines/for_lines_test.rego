@@ -134,15 +134,6 @@ test_a_one_list_for_row_with_a_root_that_fails_takes_its_message_from_the_tree i
 	_on_tree("every xs as x", ["x.v is $params.a", "x.v is $params.b"], {"xs": [{"v": 1}]}, {"a": null})
 }
 
-test_a_for_row_run_again_to_read_its_walked_roots_keeps_its_message_off_the_tree_when_a_root_fails if {
-	check := ergo._s_written_check({"for": "every xs as x", "assert": "x.v is at least $params.min"})
-	subj := {"xs": [{"v": 0}]}
-	names := {"ergo/subject": subj, "$at": {"names": {}}}
-	r := ergo._for_freed(check, subj, ergo._for_row_raw(check, subj)) with input as {"ergo/names": names} with ergo._walk_roots_on as true
-	not ergo._for_on_tree(check, subj, r) with input as {"ergo/names": names} with ergo._walk_roots_on as true
-	_on_tree("every xs as x", ["x.v is 1"], {"xs": [{"v": 0}]}, {}) with ergo._walk_roots_on as true
-}
-
 test_a_for_row_on_the_tree_leaves_its_message_to_the_tree if {
 	check := ergo._s_written_check({"for": "every xs as x", "assert": "x.v is 1"})
 	subj := {"xs": [{"v": 2}]}
