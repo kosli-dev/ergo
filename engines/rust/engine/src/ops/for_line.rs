@@ -1611,6 +1611,7 @@ impl For {
                     "cause": f.cause.name(),
                     "inputs": f.inputs,
                     "ergo/texts": f.said,
+                    "ergo/clauses": super::clause::to_value(&f.clauses),
                 })
             })
             .collect();
@@ -1694,6 +1695,7 @@ impl For {
                             "cause": f.cause.name(),
                             "inputs": f.inputs,
                             "ergo/texts": f.said,
+                            "ergo/clauses": super::clause::to_value(&f.clauses),
                             "ergo/said": child.entry.shown(),
                             "value": child.entry.value,
                             "locations": locations,
@@ -1711,6 +1713,7 @@ impl For {
                     "cause": cause.name(),
                     "inputs": found[0].1.inputs,
                     "ergo/texts": found[0].1.said,
+                    "ergo/clauses": super::clause::to_value(&found[0].1.clauses),
                 }));
             }
         }

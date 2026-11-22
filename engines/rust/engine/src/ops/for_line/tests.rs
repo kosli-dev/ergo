@@ -1914,9 +1914,7 @@ fn for_assertion_roots(
     idx: usize,
 ) -> String {
     on_line(for_line, assertions, subject, params, |line, ctx| {
-        crate::ops::clause::text(&crate::ops::clause::shown(
-            &line.assertion_roots(idx, ctx),
-        ))
+        crate::ops::clause::text(&crate::ops::clause::shown(&line.assertion_roots(idx, ctx)))
     })
 }
 
@@ -1976,7 +1974,11 @@ fn a_sentence_gives_only_the_roots_it_reads() {
     let roots = |idx| {
         for_assertion_roots(
             "every xs as x",
-            &["x.v is at least $params.a", "x.w is at least $params.b", "x.u is 1"],
+            &[
+                "x.v is at least $params.a",
+                "x.w is at least $params.b",
+                "x.u is 1",
+            ],
             json!({"xs": [{}]}),
             json!({"a": "s"}),
             idx,
@@ -2663,7 +2665,10 @@ fn a_record_carries_each_sentences_clauses_whole() {
         json!({}),
     );
     let assertions = &run.failed_items[0]["failed_assertions"];
-    assert_eq!(record_clauses(&assertions[0]), ["x.v is \"p; q\""]);
+    assert_eq!(
+        record_clauses(&assertions[0]),
+        ["x.v is \"p; q\", which isn't a number"]
+    );
     assert_eq!(record_clauses(&assertions[1]), ["x.w is missing"]);
 }
 
@@ -2678,7 +2683,7 @@ fn a_record_of_a_second_list_carries_each_sentences_clauses() {
     let assertions = &run.failed_items[0]["failed_assertions"];
     assert_eq!(
         record_clauses(&assertions[0]["items"][0]),
-        ["y.v is \"p; q\""]
+        ["y.v is \"p; q\", which isn't a number"]
     );
     assert_eq!(record_clauses(&assertions[1]), ["w.n is 2"]);
 }
