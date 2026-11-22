@@ -576,6 +576,14 @@ pub fn for_failures(
                 .collect::<Vec<_>>()
         })
         .collect();
+    let root_texts = line.root_texts(ctx);
+    let free_texts: Vec<String> = line
+        .sentences
+        .iter()
+        .zip(&frees)
+        .filter(|(_, free)| free.is_some())
+        .map(|(sentence, _)| sentence.text.clone())
+        .collect();
     let off_subject = row_cause == Cause::NotAnObject && !ctx.subject.value.is_object();
     let owns: Vec<Vec<String>> = (0..line.sentences.len())
         .map(|i| {
@@ -625,11 +633,18 @@ pub fn for_failures(
                     && clause
                         .strip_prefix(&format!("{named}: "))
                         .is_some_and(|rest| {
-                            list(f, "failed_assertions").iter().any(|l| {
-                                texts(l)
-                                    .iter()
-                                    .any(|t| clauses(t).into_iter().any(|p| p == rest))
-                            })
+                            let sentences = list(f, "failed_assertions");
+                            let joined: Vec<String> = sentences
+                                .iter()
+                                .filter(|l| !free_texts.contains(&text(l, "assertion")))
+                                .flat_map(|l| clause::lines(&own_said(l, &root_texts)))
+                                .collect();
+                            joined.join(", and ") == rest
+                                || sentences.iter().any(|l| {
+                                    texts(l)
+                                        .iter()
+                                        .any(|t| clauses(t).into_iter().any(|p| p == rest))
+                                })
                         })
             })
             || failed.iter().any(|f| {
@@ -665,7 +680,6 @@ pub fn for_failures(
             ops::push_new(&mut owned[0], clause.to_string());
         }
     }
-    let root_texts = line.root_texts(ctx);
     let empty_first = line.items.first().is_some_and(|first| {
         matches!(&ops::read_path(&first.path, ctx).inputs.first(), Some(input) if input.value == json!([]))
     });

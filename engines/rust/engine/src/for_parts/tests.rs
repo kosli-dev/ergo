@@ -277,7 +277,11 @@ fn no_list_entry_holds_the_items_message() {
     assert_eq!(
         entries(
             "every xs as x",
-            json!(["x.v is at least $params.min", "z is 1", "x.w is at least $params.min"]),
+            json!([
+                "x.v is at least $params.min",
+                "z is 1",
+                "x.w is at least $params.min"
+            ]),
             json!({"xs": [{"v": 1}, {}], "z": 2}),
             json!({"min": "s"}),
         ),
