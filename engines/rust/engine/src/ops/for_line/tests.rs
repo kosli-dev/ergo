@@ -3749,6 +3749,37 @@ fn a_list_a_sentence_walks_joins_the_items_own_part_where_the_lines_second_list_
 }
 
 #[test]
+fn a_count_whose_walked_part_cant_be_read_is_null_in_the_rows_inputs_on_an_empty_list() {
+    let policy = json!({
+        "ergo_spec": SPEC,
+        "subjects": {
+            "c": {"from": "cs", "identified_by": "id", "has": {"pos": "os"}},
+            "k": {"from": "every c.kids", "identified_by": "id"}
+        },
+        "requirements": {"r": {"subject": "k", "checks": {"count": {
+            "for": "every rows, if any, as r",
+            "assert": "count of rows whose v is in c.os.name is 0"
+        }}}}
+    });
+    let input = json!({"cs": [{"id": "c1", "os": [{"name": "bob"}, {}], "kids": [{"id": "k1", "rows": []}]}]});
+    let report = crate::report(&input, &policy, &json!({}));
+    let row = report["results"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|row| row["check"] == "count")
+        .unwrap();
+    assert_eq!(row["cause"], "absent");
+    let count = row["inputs"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|input| input["name"] == "count of rows whose v is in c.os.name")
+        .unwrap();
+    assert_eq!(count["value"], Value::Null, "{count}");
+}
+
+#[test]
 fn a_list_the_line_cant_walk_isnt_counted_as_an_item() {
     let zz = |n: usize| {
         (1..=n)
