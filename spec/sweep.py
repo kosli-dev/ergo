@@ -4,6 +4,7 @@ import itertools
 import json
 import os
 import random
+import re
 import shlex
 import shutil
 import subprocess
@@ -11,6 +12,7 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 WORK = os.path.join(ROOT, "dist", "sweep")
+ALLOW_STALE = "ERGO_ALLOW_STALE_BINARY"
 ABSENT = "<missing>"
 
 KEYS = [ABSENT, None, "a", 3, True, [], {}]
@@ -195,10 +197,46 @@ def run_rego(opa, ids):
     return [r if isinstance(r, dict) else {"error": f"report is {json.dumps(r)}"} for r in reports]
 
 
-def run_rust(command, ids):
+def git_output(tree, *arguments):
+    try:
+        out = subprocess.run(["git", "-C", tree, *arguments], capture_output=True, text=True)
+    except OSError as error:
+        sys.exit(f"cannot run git in {tree}: {error}")
+    if out.returncode != 0:
+        sys.exit(f"`git {' '.join(arguments)}` failed in {tree}: {tail(out.stderr)}")
+    return out.stdout.strip()
+
+
+def check_commit(version, tree, allow_old=False):
+    if os.environ.get(ALLOW_STALE):
+        return
+    found = re.search(r"\(commit ([^)\s]+)\)", version)
+    built = found.group(1) if found else None
+    if built is None and allow_old:
+        return
+    head = git_output(tree, "rev-parse", "HEAD")
+    if built == head:
+        return
+    if built is None:
+        said = "does not say which commit it was built from"
+    elif built == "unknown":
+        said = "was built outside git, so its commit is unknown"
+    else:
+        said = f"was built from commit {built}"
+    dirty = ""
+    if git_output(tree, "status", "--porcelain"):
+        dirty = " The tree has uncommitted changes, and only the commit is compared."
+    sys.exit(
+        f"the ergo binary {said}, but the tree at {tree} is at commit {head}.{dirty} "
+        f"Rebuild the binary from that tree, or set {ALLOW_STALE}=1 to run it anyway."
+    )
+
+
+def run_rust(command, ids, tree=ROOT, allow_old=False):
+    version = run_command(command, True, "ergo --version").stdout.strip()
+    check_commit(version, tree, allow_old)
     script = "\n".join([
         "cd dist/sweep/c",
-        "ergo --version > ../version.txt || exit 1",
         "for d in *; do",
         "  ergo report --compact --policy $d/policy.json --input $d/input.json --params $d/params.json > $d/report.json 2> $d/error.txt || {",
         "    code=$?",
@@ -208,8 +246,6 @@ def run_rust(command, ids):
         "done",
     ])
     run_command(command, True, script)
-    with open(os.path.join(WORK, "version.txt")) as handle:
-        version = handle.read().strip()
     reports = []
     for cell_id in ids:
         folder = os.path.join(WORK, "c", cell_id)
