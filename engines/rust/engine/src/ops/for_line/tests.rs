@@ -4180,3 +4180,29 @@ fn a_problem_a_sentence_that_reads_no_alias_gave_isnt_said_again_under_an_item()
         );
     }
 }
+
+#[test]
+fn an_item_that_isnt_an_object_is_said_when_the_sort_key_cant_be_read() {
+    for (params, key) in [
+        (json!({}), "$params.k is missing"),
+        (json!({"k": 3}), "$params.k is 3, which isn't text"),
+    ] {
+        for assertion in ["x.v exists", "count of es whose zz is m named by x.k is 0"] {
+            assert_eq!(
+                for_row(
+                    "first of xs sorted by m named by $params.k as x",
+                    &[assertion],
+                    json!({"xs": [{"v": 1}, "str"], "es": [{"zz": 1}]}),
+                    params.clone(),
+                ),
+                (
+                    "not_an_object".to_string(),
+                    format!(
+                        "{key}; item 1 of xs: m is missing; item 2 of xs is \"str\", which isn't an object"
+                    )
+                ),
+                "{params} {assertion}"
+            );
+        }
+    }
+}
