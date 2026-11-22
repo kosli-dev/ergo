@@ -683,7 +683,15 @@ _whose_alone(subj, side) := object.union(side, {"whose": [_root_stand_in(c) | so
 
 else := side
 
-_root_stand_in(c) := object.union(c, {"cmp": "eq", f: c[g]}) if {
+_root_stand_in(c) := _typed_stand_in(c.cmp, c.left) if {
+	c.op == "compare"
+	c.cmp in (_all_cmps | _pattern_ops)
+	is_array(c.right)
+	_walk_outside(c.right)
+	not _stand_in_keyed(c.right)
+	is_array(c.left)
+	not _walk_outside(c.left)
+} else := object.union(c, {"cmp": "eq", f: c[g]}) if {
 	c.op == "compare"
 	some f in _compare_side_list
 	_stand_in_side(c.cmp, f)
@@ -704,6 +712,12 @@ _root_stand_in(c) := object.union(c, {"cmp": "eq", f: c[g]}) if {
 	g != f
 	is_array(c[g])
 	not _walk_outside(c[g])
+} else := _typed_stand_in(c.op, c.path) if {
+	some f in ["values", "patterns"]
+	_is_ref(object.get(c, f, null))
+	c.op in (_contain_ops | _pattern_ops)
+	is_array(c.path)
+	not _walk_outside(c.path)
 } else := {"op": "compare", "cmp": "eq", "left": c.path, "right": c.path} if {
 	some f in ["values", "patterns"]
 	_is_ref(object.get(c, f, null))
@@ -711,6 +725,10 @@ _root_stand_in(c) := object.union(c, {"cmp": "eq", f: c[g]}) if {
 	is_array(c.path)
 	not _walk_outside(c.path)
 } else := c
+
+_typed_stand_in(op, path) := {"op": "not_matches_any", "path": path, "patterns": {"literal": []}} if op in _pattern_ops
+
+else := {"op": "excludes", "path": path, "values": {"literal": []}}
 
 _stand_in_side(cmp, _) if cmp in {"eq", "ne", "in", "includes"}
 

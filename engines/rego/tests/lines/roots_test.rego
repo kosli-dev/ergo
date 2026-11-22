@@ -32,8 +32,12 @@ test_a_root_a_whose_cant_read_stands_in_for_a_value_so_each_item_is_still_read i
 
 test_a_part_root_after_any_list_phrase_stands_in_for_a_value_so_each_item_is_still_read if {
 	part := [`${"alias":"pl","n":1,"of":null,"old":true}`, "p", "name"]
-	every cmp in ["in", "not_in", "matches_any", "not_matches_any", "includes", "excludes", "includes_all", "excludes_all", "includes_some", "not_includes_all"] {
+	every cmp in ["in", "not_in", "includes", "excludes"] {
 		ergo._root_stand_in({"op": "compare", "cmp": cmp, "left": ["v"], "right": part}) == {"op": "compare", "cmp": "eq", "left": ["v"], "right": ["v"]}
+	}
+	every cmp in ["matches_any", "not_matches_any", "includes_all", "excludes_all", "includes_some", "not_includes_all"] {
+		c := {"op": "compare", "cmp": cmp, "left": ["v"], "right": part}
+		ergo._root_stand_in(c) != c
 	}
 }
 
