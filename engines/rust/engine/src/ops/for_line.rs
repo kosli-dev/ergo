@@ -1974,6 +1974,9 @@ impl For {
         if ran.verdict.passed() {
             return (cause, Vec::new());
         }
+        if super::message::params_that_arent_an_object(&sentence.check, ctx).is_some() {
+            return (Cause::Unusable, Vec::new());
+        }
         let walks = matches!(sentence.check, Check::Walk(_));
         let said = match &ran.parts {
             Some(parts) if walks && !parts.is_empty() => vec![vec![Piece::Counted(parts.clone())]],
