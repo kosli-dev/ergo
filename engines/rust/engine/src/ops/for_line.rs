@@ -1118,6 +1118,7 @@ struct Level {
 struct Collect {
     lists: Vec<(usize, Input)>,
     seen: Vec<bool>,
+    keyed: bool,
 }
 
 fn is_empty_list(list: &Input) -> bool {
@@ -1213,8 +1214,12 @@ impl For {
                         _ => Vec::new(),
                     }
                 };
+                let root_key = read.outcome == crate::path::Outcome::Found
+                    && !self.later_keys(depth, ctx).is_empty();
+                collect.keyed |= root_key;
                 vec![Dead {
                     msg: (!keyed.is_empty()).then(|| keyed.join(", and ")),
+                    told: root_key.then_some(None),
                     shared: !reads_path(&item.path, &self.items[0].alias),
                     list: true,
                     ..Dead::at(shown, cause, Value::Null, read.location)
@@ -2070,7 +2075,14 @@ impl For {
             .first_key(ctx)
             .map(|found| found.key)
             .into_iter()
-            .chain(self.whose_keys(ctx).into_iter().map(|(_, _, input)| input));
+            .chain(self.whose_keys(ctx).into_iter().map(|(_, _, input)| input))
+            .chain(
+                (1..self.items.len())
+                    .filter_map(|depth| self.later_key(depth, ctx))
+                    .map(|(_, _, input)| input)
+                    .filter(|input| run.items.iter().any(|clause| clause.name == input.name)),
+            )
+            .collect::<Vec<Input>>();
         for input in keys {
             if !run
                 .verdict
@@ -2243,8 +2255,10 @@ impl For {
         let mut collect = Collect {
             lists: Vec::new(),
             seen: vec![false; self.items.len()],
+            keyed: false,
         };
         let level = self.level(0, ctx, &mut collect);
+        let keyed = collect.keyed;
         let mut inputs: Vec<Input> = collect.lists.into_iter().map(|(_, list)| list).collect();
         for (depth, (item, seen)) in self.items.iter().zip(&collect.seen).enumerate() {
             if *seen {
@@ -2347,6 +2361,11 @@ impl For {
                     .filter(|text| !roots.contains(text))
                     .map(|text| Clause::list(&text.clone(), cause, text).in_group(self.sentences.len())),
             );
+        }
+        if keyed && cause != Cause::Satisfied {
+            for key in (1..self.items.len()).flat_map(|depth| self.later_keys(depth, ctx)) {
+                merge_clause(&mut items, &key);
+            }
         }
         Run {
             verdict: Verdict { cause, inputs },
@@ -2928,6 +2947,31 @@ impl For {
             }
         }
         out
+    }
+
+    fn later_key(&self, depth: usize, ctx: &Ctx) -> Option<(path::Outcome, String, Input)> {
+        let Some(Step::Ref(key)) = self.items[depth]
+            .path
+            .steps
+            .iter()
+            .find(|step| !matches!(step, Step::Key(_) | Step::Index(_)))
+        else {
+            return None;
+        };
+        if !matches!(key.start, Start::Params | Start::Input) {
+            return None;
+        }
+        super::key_base::key_flaw(key, &outer_ctx(ctx))
+    }
+
+    fn later_keys(&self, depth: usize, ctx: &Ctx) -> Vec<Clause> {
+        self.later_key(depth, ctx)
+            .map(|(outcome, text, input)| {
+                let cause = outcome.cause().unwrap_or(Cause::Unusable);
+                Clause::list(&input.name, cause, text).in_group(self.sentences.len() + 1)
+            })
+            .into_iter()
+            .collect()
     }
 
     fn item_roots(&self, depth: usize, ctx: &Ctx) -> Vec<Clause> {
