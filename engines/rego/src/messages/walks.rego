@@ -783,13 +783,14 @@ _m_walked_roots(c) := [p |
 	_walking_root(c, p)
 ]
 
-_m_walked_root_fault(c, shown, x, cause) := _rwalk_text(x, shown) if {
+_m_walked_root_fault(c, shown, x, cause) := _m_text_walk_text(shown) if {
+	_text_walked_ref(c, shown)
+	_text_ref_state(shown) == cause
+} else := _rwalk_text(x, shown) if {
+	not _text_walked_ref(c, shown)
 	w := _rwalk(x, shown)
 	w.failed
 	w.state == cause
-} else := _m_text_walk_text(shown) if {
-	_text_walked_ref(c, shown)
-	_text_ref_state(shown) == cause
 } else := _m_isnt(w.name, w.value, k) if {
 	cause == "unusable"
 	w := _rwalk(x, shown)

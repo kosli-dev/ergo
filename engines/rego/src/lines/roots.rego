@@ -39,6 +39,13 @@ _walked_root_states(c) := {st |
 	some p in _m_walked_roots(x)
 	st := _walked_root_state(x, _rwalk_run(object.get(input, ["ergo/names", "ergo/subject"], null), _dotted_root_part(p)))
 	st in _failed_read_states
+} | {st |
+	walk(c, [_, x])
+	is_object(x)
+	some p in _m_walked_roots(x)
+	_text_walked_ref(x, p)
+	st := _text_ref_state(p)
+	st in _failed_read_states
 }
 
 _dotted_root_part(p) := rest if {
