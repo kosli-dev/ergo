@@ -514,6 +514,10 @@ test_a_for_line_on_a_subject_that_isnt_an_object_says_so_as_its_list_text if {
 	ergo._for_list_texts(check, 3, {"cause": "not_an_object", "failed": []}) == ["the subject is 3, which isn't an object"]
 }
 
+test_an_empty_list_a_line_tolerates_is_not_said_beside_a_sentence_that_reads_no_alias if {
+	_row_tree_text("every xs, if any, as m", ["z is 1"], {"xs": [], "z": 3}, {}) == "z is 3"
+}
+
 test_the_list_a_line_picks_nothing_from_comes_after_a_sentence_that_reads_no_alias if {
 	_row_tree_text("every xs whose v is 1 as x", ["x.v is 1", "z is 1"], {"xs": [{"v": 3}], "z": 3}, {}) == `z is 3; xs is [{"v": 3}]`
 	_row_tree_text("first of xs sorted by v as x", ["x.v is 1", "z is 1"], {"xs": [], "z": 3}, {}) == "z is 3; xs is []"
