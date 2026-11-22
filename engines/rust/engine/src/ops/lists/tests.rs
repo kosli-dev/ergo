@@ -1157,40 +1157,41 @@ fn in_ignoring_case_fails_on_a_field_that_isnt_text() {
 }
 
 #[test]
-fn in_ignoring_case_fails_on_a_list_from_the_input_with_an_item_that_isnt_text_whatever_the_field_holds()
+fn in_ignoring_case_fails_on_a_list_from_the_input_with_an_item_that_isnt_text_whatever_the_field_holds_and_the_worst_cause_wins()
  {
+    use Cause::{Absent, Null, Unusable};
     let field = Right::Field(key_path(Start::Subject, &["ys"]));
     let params = Right::Ref(key_path(Start::Params, &["l"]));
+    let held = [Some(json!("a")), Some(json!(3)), Some(json!(null)), None];
     for not in [false, true] {
-        for (list, cause) in [
-            (json!(["A", 3]), Cause::Unusable),
-            (json!([1, "a"]), Cause::Unusable),
-            (json!([null]), Cause::Null),
-            (json!(["a", null]), Cause::Null),
-            (json!(["a", null, 3]), Cause::Unusable),
-            (json!(["a", ["a"]]), Cause::Unusable),
-            (json!(["a", {"a": 1}]), Cause::Unusable),
-            (json!([true]), Cause::Unusable),
+        for (list, causes) in [
+            (json!(["A", 3]), [Unusable; 4]),
+            (json!([1, "a"]), [Unusable; 4]),
+            (json!([null]), [Null, Unusable, Null, Absent]),
+            (json!(["a", null]), [Null, Unusable, Null, Absent]),
+            (json!(["a", null, 3]), [Unusable; 4]),
+            (json!(["a", ["a"]]), [Unusable; 4]),
+            (json!(["a", {"a": 1}]), [Unusable; 4]),
+            (json!([true]), [Unusable; 4]),
         ] {
-            for x in [json!("a"), json!(3), json!(null)] {
-                let subject = json!({"x": x, "ys": list});
+            for (x, cause) in held.iter().zip(causes) {
+                let mut subject = json!({ "ys": list });
+                let mut alone = json!({});
+                if let Some(x) = x {
+                    subject["x"] = x.clone();
+                    alone["x"] = x.clone();
+                }
                 assert_eq!(
                     in_ignoring(subject, None, field.clone(), not).cause,
                     cause,
-                    "{list} {x} {not}"
+                    "{list} {x:?} {not}"
                 );
-                let subject = json!({ "x": x });
                 assert_eq!(
-                    in_ignoring(subject, Some(json!({ "l": list })), params.clone(), not).cause,
+                    in_ignoring(alone, Some(json!({ "l": list })), params.clone(), not).cause,
                     cause,
-                    "{list} {x} {not}"
+                    "{list} {x:?} {not}"
                 );
             }
-            assert_eq!(
-                in_ignoring(json!({"ys": list}), None, field.clone(), not).cause,
-                cause,
-                "{list} missing x {not}"
-            );
         }
     }
 }
