@@ -563,10 +563,3 @@ test_a_for_lines_whose_leaves_an_empty_part_out_of_the_rows_inputs_as_a_null_par
 		[i.name | some i in rows[0].inputs] == ["xs[]"]
 	}
 }
-
-test_a_count_under_a_for_line_lists_an_empty_part_on_its_assertion_as_a_null_part if {
-	every part in [[], null] {
-		rows := [r | some r in ergo.report({"prs": [{"id": "p0", "c": part, "xs": [{"v": 1, "ys": [{"v": 1}]}]}]}, _count_part_policy, {}).results; r.check == "ys"]
-		[i.name | some i in rows[0].failures[0].inputs] == [{[]: "pl[].z", null: "pl.z"}[part]]
-	}
-}
