@@ -2887,12 +2887,12 @@ impl For {
             let bare = child.entry.bare.as_deref().unwrap_or(name);
             let value = child.entry.raw.as_ref().unwrap_or(&child.entry.value);
             let text = super::message::isnt(bare, value, "an object");
-            let said = if outcome.bare {
-                outcome.clauses.clone()
-            } else {
-                outcome.whole.clone()
-            };
-            return Some(Clause::item(name, Cause::NotAnObject, text, said));
+            if outcome.bare {
+                let said = outcome.clauses.clone();
+                return Some(Clause::item(name, Cause::NotAnObject, text, said));
+            }
+            let said = outcome.whole.clone();
+            return Some(Clause::item(name, Cause::NotAnObject, text, said).said_first());
         }
         let mut said: Vec<Clause> = outcome.clauses.clone();
         let mut text = String::new();

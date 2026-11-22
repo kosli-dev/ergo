@@ -4681,3 +4681,20 @@ fn an_alias_read_whole_is_said_before_an_item_that_only_a_sentence_finds_isnt_an
         );
     }
 }
+
+#[test]
+fn an_alias_key_read_whole_counts_before_its_item_when_a_row_says_and_n_more() {
+    assert_eq!(
+        for_row(
+            "every xs as x, every es whose zz is x.v as e",
+            &["m named by x is 1"],
+            json!({"xs": [3, 3], "es": [{"zz": 1}], "m": {"a": 1}}),
+            json!({}),
+        ),
+        (
+            "not_an_object".to_string(),
+            "item 1 of xs: x is 3, which isn't text; item 1 of xs is 3, which isn't an object; item 2 of xs: x is 3, which isn't text; and 1 more"
+                .to_string()
+        )
+    );
+}

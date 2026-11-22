@@ -17,6 +17,7 @@ pub struct Clause {
     pub text: String,
     pub said: Vec<Clause>,
     pub group: usize,
+    pub said_first: bool,
 }
 
 impl Clause {
@@ -28,6 +29,7 @@ impl Clause {
             text,
             said: Vec::new(),
             group: 0,
+            said_first: false,
         }
     }
 
@@ -52,6 +54,13 @@ impl Clause {
 
     pub fn in_group(self, group: usize) -> Clause {
         Clause { group, ..self }
+    }
+
+    pub fn said_first(self) -> Clause {
+        Clause {
+            said_first: true,
+            ..self
+        }
     }
 }
 
@@ -97,6 +106,7 @@ pub fn shown(clauses: &[Clause]) -> Vec<Clause> {
         text: String::new(),
         said: Vec::new(),
         group: 0,
+        said_first: false,
     });
     out
 }
@@ -151,7 +161,7 @@ pub fn lines(clauses: &[Clause]) -> Vec<String> {
 
 fn pieces(item: &Clause) -> Vec<String> {
     let mut out: Vec<String> = Vec::new();
-    if !item.text.is_empty() {
+    if !item.text.is_empty() && !item.said_first {
         out.push(item.text.clone());
     }
     let mut own: Vec<&str> = Vec::new();
@@ -174,6 +184,9 @@ fn pieces(item: &Clause) -> Vec<String> {
         }
     }
     flush(&mut own, &mut out);
+    if !item.text.is_empty() && item.said_first {
+        out.push(item.text.clone());
+    }
     out
 }
 
@@ -182,11 +195,8 @@ fn cut(item: &Clause, left: &mut usize) -> Option<Clause> {
         said: Vec::new(),
         ..item.clone()
     };
-    if !item.text.is_empty() {
-        if *left == 0 {
-            kept.text.clear();
-        }
-        *left = left.saturating_sub(1);
+    if !item.said_first {
+        cut_text(item, &mut kept, left);
     }
     if has_items(item) {
         for clause in &item.said {
@@ -205,7 +215,19 @@ fn cut(item: &Clause, left: &mut usize) -> Option<Clause> {
         }
         *left = left.saturating_sub(1);
     }
+    if item.said_first {
+        cut_text(item, &mut kept, left);
+    }
     (!kept.text.is_empty() || !kept.said.is_empty()).then_some(kept)
+}
+
+fn cut_text(item: &Clause, kept: &mut Clause, left: &mut usize) {
+    if !item.text.is_empty() {
+        if *left == 0 {
+            kept.text.clear();
+        }
+        *left = left.saturating_sub(1);
+    }
 }
 
 fn has_items(item: &Clause) -> bool {
@@ -271,6 +293,7 @@ pub fn of_value(value: &Value) -> Option<Vec<Clause>> {
                 text: text(clause, "text")?,
                 said: of_value(clause.get("said")?)?,
                 group: number(clause, "group")?,
+                said_first: false,
             })
         })
         .collect()

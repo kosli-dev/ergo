@@ -11552,7 +11552,7 @@
     }
    ]
   },
-  "want": "item 1 of xs is 3, which isn't an object; item 1 of xs: x is 3, which isn't text"
+  "want": "item 1 of xs: x is 3, which isn't text; item 1 of xs is 3, which isn't an object"
  },
  {
   "name": "for r5-6/alias key read whole after a field of it beside an item a second line's whose can't read [path.ref_step]",
@@ -11594,7 +11594,7 @@
     }
    ]
   },
-  "want": "item 1 of xs is 3, which isn't an object; item 1 of xs: x is 3, which isn't text"
+  "want": "item 1 of xs: x is 3, which isn't text; item 1 of xs is 3, which isn't an object"
  },
  {
   "name": "for r5-6/alias key read whole beside count of a field of it, second line's whose can't read [for.roots]",
@@ -11639,7 +11639,7 @@
     }
    ]
   },
-  "want": "item 1 of xs is 3, which isn't an object; item 1 of xs: x is 3, which isn't text"
+  "want": "item 1 of xs: x is 3, which isn't text; item 1 of xs is 3, which isn't an object"
  },
  {
   "name": "for r5-6/alias key read whole beside an item a second line's path can't walk [for.roots]",
@@ -11679,7 +11679,7 @@
     }
    ]
   },
-  "want": "item 1 of xs is 3, which isn't an object; item 1 of xs: x is 3, which isn't text"
+  "want": "item 1 of xs: x is 3, which isn't text; item 1 of xs is 3, which isn't an object"
  },
  {
   "name": "for r5-6/alias key read whole beside a field of it on one list, said by no engine [for.roots]",
