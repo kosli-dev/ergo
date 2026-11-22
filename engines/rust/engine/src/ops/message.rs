@@ -918,25 +918,30 @@ pub fn pieces(check: &Check, ctx: &Ctx, verdict: &Verdict) -> Vec<Piece> {
                     .filter(|(cause, _)| *cause == Cause::Value)
                     .map(|(_, text)| text),
             );
-            let mut found: Vec<Piece> = said_all(said).collect();
+            let mut counted: Vec<Piece> = Vec::new();
+            let mut emptied = false;
             if let Check::Tally(tally_check) = check {
                 for side in tally::tally_sides(tally_check) {
                     if let TallySide::Derived(derived) = side {
-                        found.extend(
-                            tally::derived_clauses(derived, ctx)
+                        for clauses in tally::derived_clauses(derived, ctx) {
+                            let kept: Vec<Clause> = clauses
                                 .into_iter()
-                                .map(|clauses| {
-                                    clauses
-                                        .into_iter()
-                                        .filter(|clause| clause.cause == Cause::Value)
-                                        .collect::<Vec<Clause>>()
-                                })
-                                .filter(|clauses| !clauses.is_empty())
-                                .map(Piece::Counted),
-                        );
+                                .filter(|clause| clause.cause == Cause::Value)
+                                .collect();
+                            emptied |= kept.iter().any(|c| c.kind == clause::Kind::Root);
+                            if !kept.is_empty() {
+                                counted.push(Piece::Counted(kept));
+                            }
+                        }
                     }
                 }
             }
+            let mut found: Vec<Piece> = if emptied {
+                Vec::new()
+            } else {
+                said_all(said).collect()
+            };
+            found.extend(counted);
             found
         }
         Cause::Absent | Cause::Null => {
