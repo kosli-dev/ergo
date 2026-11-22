@@ -585,12 +585,18 @@ _rooted_row(check, subj, r) := object.union(object.remove(a, ["other_roots"]), {
 	}
 	_walk_root_flaw(check, subj) == ""
 	_step_refs(check.check) == set()
+	not _walks_for_alias(check)
 	flaw := _leaf_root_flaw(check, subj)
 	flaw == "unusable"
 	ms := _leaf_root_clauses(check, flaw)
 	ms != []
 	ps := _walk_parts(check, subj, r, r)
 } else := _rooted_main(check, subj, r)
+
+_walks_for_alias(check) if {
+	is_string(check.path[0])
+	_for_alias_step(check.path[0])
+}
 
 _unrooted_text(t, ms) := "" if t in {m.text | some m in ms}
 
