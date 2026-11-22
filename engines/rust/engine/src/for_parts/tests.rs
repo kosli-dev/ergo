@@ -271,3 +271,27 @@ fn an_assertion_says_a_root_that_walks_a_list_once_with_its_items_capped() {
         "{said:#?}"
     );
 }
+
+#[test]
+fn no_list_entry_holds_the_items_message() {
+    assert_eq!(
+        entries(
+            "every xs as x",
+            json!(["x.v is at least $params.min", "z is 1", "x.w is at least $params.min"]),
+            json!({"xs": [{"v": 1}, {}], "z": 2}),
+            json!({"min": "s"}),
+        ),
+        [
+            format!(
+                "assertion x.v is at least $params.min [unusable] \"$params.min is \\\"s\\\", which isn't a number\" {MIN_S}"
+            ),
+            "  item item 2 of xs [absent] \"x.v is missing\" (\"x.v\" \"absent\")".to_string(),
+            "assertion z is 1 [value] \"z is 2\" (\"z\" \"usable\")".to_string(),
+            format!(
+                "assertion x.w is at least $params.min [unusable] \"$params.min is \\\"s\\\", which isn't a number\" {MIN_S}"
+            ),
+            "  item item 1 of xs [absent] \"x.w is missing\" (\"x.w\" \"absent\")".to_string(),
+            "  item item 2 of xs [absent] \"x.w is missing\" (\"x.w\" \"absent\")".to_string(),
+        ]
+    );
+}
