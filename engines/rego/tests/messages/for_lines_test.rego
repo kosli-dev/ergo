@@ -366,6 +366,10 @@ test_an_item_the_line_cant_reach_says_what_it_found_there if {
 	_item_texts("every xs.ys as y", ["y.v is 1"], {"xs": [{"ys": [{"v": 2}]}, {}, {"ys": null}]}, {}) == [["item 1 of xs: item 1 of ys: y.v is 2"], ["item 2 of xs: ys is missing"], ["item 3 of xs: ys is null"]]
 }
 
+test_a_problem_an_earlier_sentence_said_of_an_item_is_not_said_again if {
+	_item_texts("every xs as x", ["x.e exists", "x.e is after x.a"], {"xs": [{}]}, {}) == [["item 1 of xs: x.e is missing, and x.a is missing"]]
+}
+
 test_an_item_the_line_reads_through_says_what_it_found_there_with_no_whose if {
 	_item_texts("every pull_requests.title as t", [`t is "Fix"`], {"pull_requests": [{"title": "Fix"}, {}]}, {}) == [["item 2 of pull_requests: title is missing"]]
 }
