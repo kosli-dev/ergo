@@ -214,7 +214,7 @@ test_a_from_filter_walk_with_a_root_beside_items_that_fail_on_their_own_keeps_th
 }
 
 _whose_item_texts(line, subj, params) := [[ergo._m_aliased(t) | some t in ergo._m_clause_texts([c])] |
-	check := ergo._s_written_check({"for": line, "assert": ["1 is 1"]})
+	check := ergo._s_written_check({"for": line, "assert": ["z exists"]})
 	item := check.items[0]
 	names := {"ergo/subject": subj, "$at": {"names": {}}}
 	w := ergo._for_walk(item, subj, names) with input as {"ergo/names": names} with data.ergo_params as params

@@ -856,7 +856,9 @@ _m_cond_message(c, item, cause) := concat("; ", array.concat(_m_null_before_key(
 	cs != []
 } else := _m_fallback(c)
 
-_m_cond_base_texts(item, c) := _once([_m_key_list_text(_input_name(f.prefix), f) |
+_m_cond_base_texts(item, c) := [x[1] | some x in _m_cond_base_said(item, c)]
+
+_m_cond_base_said(item, c) := _once([[f.cause, _m_key_list_text(_input_name(f.prefix), f)] |
 	some [p, mode] in _key_base_reads(c)
 	not p[0] in _params_starts
 	not p[0] == "$$input"
