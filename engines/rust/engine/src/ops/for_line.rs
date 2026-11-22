@@ -2851,7 +2851,20 @@ impl For {
                 child.rooted.clone(),
             ));
         };
+        let taken: Vec<usize> = riders
+            .as_deref()
+            .map(|riders| riders.iter().map(|(idx, _)| *idx).collect())
+            .unwrap_or_default();
         if bare_item(outcome, &child.entry) || outcome.bare {
+            if let Some(riders) = riders.as_deref_mut() {
+                for fail in child.sfails.iter().filter(|fail| {
+                    !fail.reads_last && !self.is_free(fail) && !taken.contains(&fail.idx)
+                }) {
+                    for clause in &fail.clauses {
+                        push_new(riders, (fail.idx, clause.clone().in_group(fail.idx)));
+                    }
+                }
+            }
             let bare = child.entry.bare.as_deref().unwrap_or(name);
             let value = child.entry.raw.as_ref().unwrap_or(&child.entry.value);
             let text = super::message::isnt(bare, value, "an object");
@@ -2868,10 +2881,6 @@ impl For {
         let all_own = child.sfails.iter().all(|fail| fail.own);
         let mut marked: Option<&Clause> = None;
         let mut marked_causes: Vec<Cause> = Vec::new();
-        let taken: Vec<usize> = riders
-            .as_deref()
-            .map(|riders| riders.iter().map(|(idx, _)| *idx).collect())
-            .unwrap_or_default();
         for fail in &child.sfails {
             if !fail.reads_last && self.is_free(fail) {
                 continue;
