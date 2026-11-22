@@ -4574,10 +4574,7 @@ fn an_alias_read_whole_keeps_its_problem_beside_an_item_a_later_lines_whose_cant
     ] {
         for (assertions, said) in [
             (&["m named by x is 1"][..], "x is 3, which isn't text"),
-            (
-                &["x.m named by x.k is 1"][..],
-                "x is 3, which isn't text, and x is 3, which isn't an object",
-            ),
+            (&["x.m named by x.k is 1"][..], "x is 3, which isn't text"),
             (
                 &["m named by x is 1", "count of x.ys is 1"][..],
                 "x is 3, which isn't text",
