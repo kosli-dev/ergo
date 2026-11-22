@@ -222,9 +222,18 @@ test_the_object_a_count_of_member_of_reads_is_its_own_read_as_a_walked_list_is i
 }
 
 test_a_count_lists_its_items_in_list_order_when_one_comes_from_a_key_the_item_holds_for_a_part if {
-	written := ergo._s_written_check("count of xs whose tags contains $input.m named by key is 1")
 	part := ergo._p_marker("cov", 1, null, false)
-	c := json.patch(written, [{"op": "replace", "path": "/left/whose/0/right", "value": [part, "c", "m", {"named_by_field": "key"}]}])
+	c := {
+		"op": "compare",
+		"cmp": "eq",
+		"expression": "count of xs whose tags contains cov.m named by key is 1",
+		"left": {
+			"count_of": ["xs"],
+			"text": "count of xs whose tags contains cov.m named by key",
+			"whose": [{"op": "compare", "cmp": "includes", "left": ["tags"], "right": [part, "c", "m", {"named_by_field": "key"}]}],
+		},
+		"right": {"literal": 1},
+	}
 	subj := {"c": {"m": {"a": "x"}}, "xs": [{"key": "a", "tags": ["x"]}, {"tags": ["x"]}, {"key": null, "tags": ["x"]}, null]}
 	m := "item 2 of xs: key is missing; item 3 of xs: key is null; item 4 of xs is null, which isn't an object"
 	es := ergo._tally_item_parts(c, subj, "not_an_object", {}, m) with input as {"ergo/names": {"ergo/subject": subj}}
