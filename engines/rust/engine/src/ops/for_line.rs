@@ -4087,17 +4087,17 @@ fn sentence_root_faults(forms: &[(Check, bool)], ctx: &Ctx) -> Vec<(Cause, Strin
 
 fn unread_key<'p>(root: &'p Path, keys: &[&Path], ctx: &Ctx) -> Option<&'p Path> {
     root.steps.iter().find_map(|step| match step {
-        Step::Ref(key)
-            if keys.contains(&&**key)
-                && matches!(
-                    path::read(key, ctx).outcome,
-                    crate::path::Outcome::Absent | crate::path::Outcome::Null
-                ) =>
+        Step::Ref(key) | Step::Field(key)
+            if keys.contains(&&**key) && !is_text(&path::read(key, ctx)) =>
         {
             Some(&**key)
         }
         _ => None,
     })
+}
+
+fn is_text(read: &path::Read<'_>) -> bool {
+    read.outcome == crate::path::Outcome::Found && read.value.is_some_and(Value::is_string)
 }
 
 fn nested_whose(check: &Check, counts_only: bool) -> Vec<&Check> {
