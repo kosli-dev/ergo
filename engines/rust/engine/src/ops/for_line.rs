@@ -1876,6 +1876,7 @@ impl For {
                 &outer,
                 &[],
             ));
+            found.extend(empty_roots(&[check], &outer));
             for text in found {
                 for piece in text.split("; ") {
                     push_new(&mut texts, piece.to_string());
@@ -2330,6 +2331,12 @@ impl For {
             .flat_map(|item| item.whose.iter())
             .collect();
         let outer_flaw = super::message::root_flaw_ordered(&whose, &outer, &counted, &nested);
+        let emptied = empty_roots(&whose, &outer);
+        let read_empty = outer_flaw.is_none() && !emptied.is_empty();
+        let outer_flaw = match outer_flaw {
+            None if read_empty => Some((Cause::Value, emptied.join("; "))),
+            flaw => flaw,
+        };
         let outer_flaw = if !run.verdict.cause.is_failure() {
             super::message::worse_key_cause(outer_flaw, &item_whose, &outer)
         } else {
@@ -2341,7 +2348,7 @@ impl For {
             .flat_map(|s| root_forms(&s.check))
             .collect();
         let sentence_flaw = sentence_root_flaw(&forms, &outer);
-        let read_first = self.reads_a_flawed_root(&outer);
+        let read_first = self.reads_a_flawed_root(&outer) || read_empty;
         if read_first || outer_flaw.is_none() || list_failures(run.verdict.cause, &run.failed_items)
         {
             let flawed = read_first
@@ -4443,6 +4450,16 @@ fn bound_alias(root: &Path, ctx: &Ctx) -> bool {
         Start::Alias(name) => ctx.aliases.contains_key(name),
         _ => true,
     }
+}
+
+fn empty_roots(checks: &[&Check], ctx: &Ctx) -> Vec<String> {
+    let mut texts: Vec<String> = Vec::new();
+    for clause in super::message::walked_root_clauses(checks, ctx) {
+        if clause.cause == Cause::Value {
+            push_new(&mut texts, clause.text);
+        }
+    }
+    texts
 }
 
 fn sentence_roots_said(check: &Check, ctx: &Ctx) -> Vec<Clause> {
