@@ -299,3 +299,20 @@ fn no_list_entry_holds_the_items_message() {
         ]
     );
 }
+
+#[test]
+fn a_root_of_the_lines_own_whose_sits_on_the_lists_entry_capped_and_on_no_assertion() {
+    assert_eq!(
+        entries(
+            "every rows whose v is in $params.pos.name as r",
+            json!("r.v is \"bob\""),
+            json!({"rows": [{"v": "bob"}, {}, {}]}),
+            json!({"pos": [{"name": "bob"}, {"v": 0}, {"v": 1}, {"v": 2}, {"v": 3}, {"v": 4}]}),
+        ),
+        [
+            "list rows [absent] \"item 2 of $params.pos: name is missing; item 3 of $params.pos: name is missing; item 4 of $params.pos: name is missing; and 2 more\" (\"rows[]\" \"usable\")",
+            "item item 2 of rows [absent] \"v is missing\" (\"rows[1].v\" \"absent\")",
+            "item item 3 of rows [absent] \"v is missing\" (\"rows[2].v\" \"absent\")",
+        ]
+    );
+}
