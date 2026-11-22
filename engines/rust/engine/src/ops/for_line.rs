@@ -2835,10 +2835,10 @@ impl For {
                     None => match riders.as_deref_mut() {
                         Some(riders) if !fail.reads_last => {
                             if !taken.contains(&fail.idx) {
-                                push_new(riders, (fail.idx, clause.clone()));
+                                push_new(riders, (fail.idx, clause.clone().in_group(fail.idx)));
                             }
                         }
-                        _ => merge_clause(&mut said, clause),
+                        _ => merge_clause(&mut said, &clause.clone().in_group(fail.idx)),
                     },
                 }
             }
@@ -2976,6 +2976,7 @@ impl For {
                 for rider in riders {
                     merge_clause(&mut first.said, &rider);
                 }
+                in_sentence_order(&mut first.said);
             }
             None => {
                 riders.append(&mut clauses);
@@ -3246,6 +3247,23 @@ fn in_list_order(said: &mut [Clause]) {
     let mut sorted = keyed.into_iter().map(|(_, _, clause)| clause);
     for slot in said.iter_mut() {
         if slot.kind == super::clause::Kind::Item
+            && let Some(clause) = sorted.next()
+        {
+            *slot = clause;
+        }
+    }
+}
+
+fn in_sentence_order(said: &mut [Clause]) {
+    let mut own: Vec<Clause> = said
+        .iter()
+        .filter(|clause| clause.kind != super::clause::Kind::Item)
+        .cloned()
+        .collect();
+    own.sort_by_key(|clause| clause.group);
+    let mut sorted = own.into_iter();
+    for slot in said.iter_mut() {
+        if slot.kind != super::clause::Kind::Item
             && let Some(clause) = sorted.next()
         {
             *slot = clause;
