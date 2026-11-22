@@ -47,6 +47,10 @@ test_a_list_after_is_in_ignoring_case_in_a_one_line_every_is_a_root_read_before_
 	ergo._walk_root_flaw(every_field, {"xs": [], "ys": ["a", null]}) == "null"
 	ergo._walk_root_flaw(every_field, {"xs": [], "ys": [1, "a"]}) == "unusable"
 	ergo._walk_root_flaw(every_field, {"xs": [], "ys": ["a"]}) == ""
+	ergo._walk_root_flaw(every_field, {"xs": [], "ys": 3}) == ""
+	ergo._walk_root_flaw(every_field, {"xs": []}) == ""
+	not ergo._items_judged_alone({"xs": [{"x": 2}], "ys": 3}, every_field)
+	not ergo._items_judged_alone({"xs": [{"x": 2}]}, every_field)
 	ergo._walk_root_flaw(object.union(object.remove(every_field, ["check"]), {"check": object.remove(field, ["ignoring"])}), {"xs": [], "ys": ["a", null]}) == ""
 	ergo._walk_root_msgs(every_field, {"xs": [], "ys": ["a", null]}) == ["item 2 of ys is null"]
 	ergo._walk_root_msgs(every_field, {"xs": [], "ys": [1, "a"]}) == ["item 1 of ys is 1, which isn't text"]
