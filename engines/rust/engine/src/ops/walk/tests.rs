@@ -1966,8 +1966,20 @@ fn keyed_root_row(sentence: &str, input: Value, params: Value) -> (Cause, String
 fn an_every_or_some_fails_on_a_root_before_a_key_from_the_item_it_cant_read_even_when_each_item_reads_fine()
  {
     let roots = [
-        ("$params.m", json!({}), json!({}), Cause::Absent, "$params.m is missing"),
-        ("$params.m", json!({}), json!({"m": null}), Cause::Null, "$params.m is null"),
+        (
+            "$params.m",
+            json!({}),
+            json!({}),
+            Cause::Absent,
+            "$params.m is missing",
+        ),
+        (
+            "$params.m",
+            json!({}),
+            json!({"m": null}),
+            Cause::Null,
+            "$params.m is null",
+        ),
         (
             "$params.m",
             json!({}),
@@ -1982,8 +1994,20 @@ fn an_every_or_some_fails_on_a_root_before_a_key_from_the_item_it_cant_read_even
             Cause::Unusable,
             "$params.m is [], which isn't an object",
         ),
-        ("$input.m", json!({}), json!({}), Cause::Absent, "$input.m is missing"),
-        ("$input.m", json!({"m": null}), json!({}), Cause::Null, "$input.m is null"),
+        (
+            "$input.m",
+            json!({}),
+            json!({}),
+            Cause::Absent,
+            "$input.m is missing",
+        ),
+        (
+            "$input.m",
+            json!({"m": null}),
+            json!({}),
+            Cause::Null,
+            "$input.m is null",
+        ),
         (
             "$input.m",
             json!({"m": 3}),
@@ -1991,7 +2015,13 @@ fn an_every_or_some_fails_on_a_root_before_a_key_from_the_item_it_cant_read_even
             Cause::Unusable,
             "$input.m is 3, which isn't an object",
         ),
-        ("$input.d.m", json!({"d": null}), json!({}), Cause::Null, "$input.d is null"),
+        (
+            "$input.d.m",
+            json!({"d": null}),
+            json!({}),
+            Cause::Null,
+            "$input.d is null",
+        ),
         (
             "$input.d.m",
             json!({"d": 3}),
