@@ -1479,9 +1479,9 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
                         && leaf.cause.is_failure()
                         && failing().all(|(check, _, _)| reads_focus(check)));
             let alone = reached.then_some(leaf.cause).filter(|cause| {
-                super::lists::text_stand_in(&leaf_check, &at).is_some()
-                    || leaf_roots.iter().any(|root| root.cause == *cause)
-                        && !leaf_walked.iter().any(|root| root.cause == *cause)
+                (super::lists::text_stand_in(&leaf_check, &at).is_some()
+                    || leaf_roots.iter().any(|root| root.cause == *cause))
+                    && !leaf_walked.iter().any(|root| root.cause == *cause)
             });
             let failure = if let Some((_, true, said)) = own {
                 Some((
