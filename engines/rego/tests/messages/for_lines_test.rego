@@ -127,6 +127,89 @@ test_message_for_item_reads_each_member_when_it_asks_whether_an_item_cant_take_t
 	not ergo._for_list_unclean({"path": ["ev"]}, {"ev": {"b": {"m": {}}}}, _unclean_key_whose) with data.ergo_params as {"k": 3}
 }
 
+_sentence_clauses(line, sentences, subj, k, i, params) := cs if {
+	check := ergo._s_written_check({"for": line, "assert": sentences})
+	item := check.items[0]
+	names := ergo._bound({"ergo/subject": subj, "$at": {"names": {}}}, item.as, subj[item.path[0]][k], "~~/list/k")
+	c := check.checks[i]
+	cause := ergo._for_cause(c, subj) with input as {"ergo/names": names} with data.ergo_params as params
+	cs := ergo._for_sentence_clauses(check, c, subj, cause) with input as {"ergo/names": names} with data.ergo_params as params
+}
+
+_sentence_texts(line, sentences, subj, k, i, params) := [ergo._m_aliased(t) | some t in ergo._m_clause_texts(_sentence_clauses(line, sentences, subj, k, i, params))]
+
+test_a_sentence_says_its_own_read_without_the_root if {
+	subj := {"xs": [{"v": "a"}, {}]}
+	text := "\u0002x.v is \"a\", which isn't a number"
+	_sentence_clauses("every xs as x", ["x.v is at least $params.min"], subj, 0, 0, {"min": "s"}) == [ergo._m_clause("root", text, "unusable", text)]
+	_sentence_clauses("every xs as x", ["x.v is at least $params.min"], subj, 1, 0, {"min": "s"}) == [ergo._m_clause("root", "\u0002x.v is missing", "absent", "\u0002x.v is missing")]
+}
+
+test_a_sentence_that_reads_params_that_arent_an_object_gives_no_clauses if {
+	_sentence_clauses("every xs as x", ["x.v is at least $params.min"], {"xs": [{"v": 1}]}, 0, 0, "s") == []
+	_sentence_clauses("every xs as x", ["x.v is at least $params.min"], {"xs": [{}]}, 0, 0, "s") == []
+	_sentence_clauses("every gs as g", ["count of g.es whose v is at least $params.min is 0"], {"gs": [{"es": [{}, {"v": "a"}]}]}, 0, 0, "s") == []
+}
+
+test_a_sentence_keeps_a_value_that_holds_a_semicolon_whole if {
+	_sentence_texts("every xs as x", ["x.v is at least $params.min"], {"xs": [{"v": "a; b"}]}, 0, 0, {"min": "s; t"}) == [`x.v is "a; b", which isn't a number`]
+}
+
+test_a_sentence_says_a_null_read_of_its_item if {
+	_sentence_texts("every xs as x", ["x.v is 1"], {"xs": [{"v": null}]}, 0, 0, {}) == ["x.v is null"]
+}
+
+test_a_sentence_whose_only_problems_are_roots_says_nothing_for_the_item if {
+	sentences := ["x.v is at least $params.a", "x.v is at most $params.b", "x.w is $params.c", "x.u is in $params.d"]
+	every i, _ in sentences {
+		_sentence_clauses("every xs as x", sentences, {"xs": [{"v": 1, "w": 1, "u": 1}]}, 0, i, {}) == []
+	}
+}
+
+test_a_sentence_that_passes_says_nothing if {
+	_sentence_clauses("every xs as x", ["x.v is 1"], {"xs": [{"v": 1}]}, 0, 0, {}) == []
+}
+
+test_a_sentence_that_reads_the_alias_says_each_piece_as_its_own_clause if {
+	_sentence_texts("every xs as x", ["x.v is x.w"], {"xs": [{"v": 3, "w": 4}]}, 0, 0, {}) == ["x.v is 3", "x.w is 4"]
+}
+
+test_a_sentence_that_reads_no_alias_says_its_pieces_as_one_clause if {
+	_sentence_texts("every xs as x", ["z is w"], {"z": 3, "w": 4, "xs": [{}]}, 0, 0, {}) == ["z is 3, and w is 4"]
+}
+
+test_a_walk_sentence_gives_its_items_as_clauses if {
+	cs := _sentence_clauses("every xs as x", ["every x.ys.n is 1"], {"xs": [{"ys": [{"n": 2}, {}]}]}, 0, 0, {})
+	[c.kind | some c in cs] == ["item", "item"]
+	[ergo._m_aliased(c.text) | some c in cs] == ["item 1 of x.ys: n is 2", "item 2 of x.ys: n is missing"]
+}
+
+test_a_walk_sentence_leaves_out_its_root if {
+	_sentence_texts("every xs as x", ["every x.ys.n is at least $params.m"], {"xs": [{"ys": [{"n": 1}, {}]}]}, 0, 0, {"m": "s"}) == ["item 2 of x.ys: n is missing"]
+}
+
+test_a_count_under_the_line_gives_its_items_as_clauses if {
+	cs := _sentence_clauses("every gs as g", ["count of g.es whose v is at least $params.min is 0"], {"gs": [{"es": [{}, {}]}]}, 0, 0, {"min": "s"})
+	[c.kind | some c in cs] == ["item", "item"]
+	[ergo._m_aliased(t) | some t in ergo._m_clause_texts(cs)] == ["item 1 of g.es: v is missing", "item 2 of g.es: v is missing"]
+}
+
+test_a_sum_under_the_line_gives_its_items_as_clauses if {
+	subj := {"gs": [{"rs": [{"n": "a"}, {}]}, {"rs": [{"n": null}]}]}
+	_sentence_texts("every gs as g", ["sum of g.rs.n is 3"], subj, 0, 0, {}) == [`item 1 of g.rs: n is "a", which isn't a number`, "item 2 of g.rs: n is missing"]
+	_sentence_texts("every gs as g", ["sum of g.rs.n is 3"], subj, 1, 0, {}) == ["item 1 of g.rs: n is null"]
+}
+
+test_a_key_from_params_is_left_out_of_the_items_of_a_count_under_the_line if {
+	_sentence_texts("every gs as g", ["count of g.es.v that is m named by $params.k is 0"], {"gs": [{"es": [{"v": {}}]}]}, 0, 0, {}) == ["item 1 of g.es: v: m is missing"]
+}
+
+test_a_sentence_says_the_value_before_a_key_it_cant_read_after_leaving_out_the_key if {
+	subj := {"xs": [{"m": 3}, {"m": {}}]}
+	_sentence_texts("every xs as x", ["x.m named by $params.k is 1"], subj, 0, 0, {}) == ["x.m is 3, which isn't an object"]
+	_sentence_texts("every xs as x", ["x.m named by $params.k is 1"], subj, 1, 0, {}) == []
+}
+
 test_a_from_filter_walk_with_a_root_beside_items_that_fail_on_their_own_keeps_the_items_for_their_entries if {
 	root := ergo._m_clause("root", "$params.min", "unusable", "$params.min is \"s\", which isn't a number")
 	item := ergo._m_clause("item", ["xs", 0], "absent", "item 1 of xs: v is missing")
@@ -134,4 +217,51 @@ test_a_from_filter_walk_with_a_root_beside_items_that_fail_on_their_own_keeps_th
 	said := ergo._m_filter_walk({}, {}, false, "unusable", w)
 	said["ergo/texts"] == [item]
 	said["ergo/own"] == ["$params.min is \"s\", which isn't a number"]
+}
+
+_whose_item_texts(line, subj, params) := [[ergo._m_aliased(t) | some t in ergo._m_clause_texts([c])] |
+	check := ergo._s_written_check({"for": line, "assert": ["z exists"]})
+	item := check.items[0]
+	names := {"ergo/subject": subj, "$at": {"names": {}}}
+	w := ergo._for_walk(item, subj, names) with input as {"ergo/names": names} with data.ergo_params as params
+	some e in w.items
+	wh := ergo._for_whose(item, e, names) with data.ergo_params as params
+	c := ergo._for_whose_item_clause(item, e, names, wh) with data.ergo_params as params
+]
+
+test_a_whose_item_says_only_its_own_read_beside_a_root if {
+	_whose_item_texts("every xs whose v is at least $params.min as x", {"xs": [{"v": 1}, {}]}, {"min": "s"}) == [["item 2 of xs: v is missing"]]
+}
+
+test_a_whose_item_says_the_first_condition_that_says_something if {
+	_whose_item_texts("every xs whose v is at least $params.min and whose w is 1 as x", {"xs": [{"v": 1}]}, {"min": "s"}) == [["item 1 of xs: w is missing"]]
+	_whose_item_texts("every xs whose v is at least $params.min and whose w is at least $params.min as x", {"xs": [{"v": 1}]}, {"min": "s"}) == [["item 1 of xs: w is missing"]]
+}
+
+test_a_whose_item_beside_a_root_says_a_value_of_the_wrong_kind_and_a_null if {
+	_whose_item_texts("every xs whose v is at least $params.min as x", {"xs": [{"v": "a"}, {"v": null}]}, {"min": "s"}) == [[`item 1 of xs: v is "a", which isn't a number`], ["item 2 of xs: v is null"]]
+}
+
+test_a_whose_item_says_each_own_read_beside_a_key_that_isnt_text if {
+	subj := {"es": [{"v": 1}, {"v": 2, "zz": 1, "m": {"a": 1}}, {"v": 3, "m": null}]}
+	_whose_item_texts("every es whose zz is m named by $params.k as e", subj, {"k": 3}) == [
+		["item 1 of es: zz is missing, and m is missing"],
+		["item 3 of es: zz is missing, and m is null"],
+	]
+}
+
+test_a_whose_item_says_the_base_of_a_key_first_when_the_key_is_read_first if {
+	_whose_item_texts("every es whose m named by $params.k is zz as e", {"es": [{}]}, {"k": 3}) == [["item 1 of es: m is missing, and zz is missing"]]
+}
+
+test_a_whose_item_says_what_its_check_says_when_it_reads_no_root if {
+	_whose_item_texts("every xs whose v is w as x", {"xs": [{"w": 1}]}, {}) == [["item 1 of xs: v is missing"]]
+}
+
+test_a_whose_item_that_isnt_an_object_says_so_beside_a_root if {
+	_whose_item_texts("every xs whose v is at least $params.min as x", {"xs": [3]}, {"min": "s"}) == [["item 1 of xs is 3, which isn't an object"]]
+}
+
+test_an_item_the_whose_decides_has_no_whose_item_clause if {
+	_whose_item_texts("every xs whose v is 1 as x", {"xs": [{"v": 1}, {"v": 2}]}, {}) == []
 }
