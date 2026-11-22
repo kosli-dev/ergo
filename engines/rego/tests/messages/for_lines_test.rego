@@ -366,6 +366,18 @@ test_an_item_the_line_cant_reach_says_what_it_found_there if {
 	_item_texts("every xs.ys as y", ["y.v is 1"], {"xs": [{"ys": [{"v": 2}]}, {}, {"ys": null}]}, {}) == [["item 1 of xs: item 1 of ys: y.v is 2"], ["item 2 of xs: ys is missing"], ["item 3 of xs: ys is null"]]
 }
 
+test_an_item_the_whose_cant_decide_is_named_by_the_path_its_whose_reads if {
+	_item_texts("every xs.meta whose k is 1 as m", ["m exists"], {"xs": [{"meta": {"k": 1}}, {"meta": {"n": 1}, "k": 1}]}, {}) == [["item 2 of xs: meta: k is missing"]]
+}
+
+test_a_problem_an_earlier_sentence_said_of_an_item_is_not_said_again if {
+	_item_texts("every xs as x", ["x.e exists", "x.e is after x.a"], {"xs": [{}]}, {}) == [["item 1 of xs: x.e is missing, and x.a is missing"]]
+}
+
+test_an_item_the_line_reads_through_says_what_it_found_there_with_no_whose if {
+	_item_texts("every pull_requests.title as t", [`t is "Fix"`], {"pull_requests": [{"title": "Fix"}, {}]}, {}) == [["item 2 of pull_requests: title is missing"]]
+}
+
 test_an_item_the_whose_cant_decide_says_its_whose_clause if {
 	_item_texts("every xs whose v is 1 as x", ["x.w is 1"], {"xs": [{"w": 2}, {"v": 1, "w": 2}]}, {}) == [["item 1 of xs: v is missing"], ["item 2 of xs: x.w is 2"]]
 }
@@ -461,6 +473,102 @@ test_a_second_list_item_that_isnt_an_object_is_named_by_the_item if {
 
 test_a_second_alias_read_whole_is_named_by_its_item if {
 	_item_texts("every ws as w, every member of w.ms as m", ["m is 1"], {"ws": [{"ms": {"a": 2, "b": 1}}]}, {}) == [["item 1 of ws: member a of w.ms is 2"]]
+}
+
+_row_tree(line, sentences, subj, params) := tree if {
+	check := ergo._s_written_check({"for": line, "assert": sentences})
+	names := {"ergo/subject": subj, "$at": {"names": {}}}
+	r := ergo._for_freed(check, subj, ergo._for_row_raw(check, subj)) with input as {"ergo/names": names} with data.ergo_params as params
+	tree := ergo._for_row_clauses(check, subj, r) with input as {"ergo/names": names} with data.ergo_params as params
+}
+
+_row_tree_text(line, sentences, subj, params) := ergo._m_aliased(ergo._m_clauses_text(ergo._m_clauses_shown(_row_tree(line, sentences, subj, params))))
+
+test_sentences_that_read_no_alias_are_said_in_the_order_written_whatever_clause_they_give if {
+	_row_tree_text("every ks as k", ["every es.zz is 1", "z is 1"], {"ks": ["a"], "es": [{"zz": 2}], "z": 2}, {}) == "item 1 of es: zz is 2; z is 2"
+}
+
+test_a_value_a_sentence_that_reads_no_alias_said_is_not_said_again_under_each_item if {
+	_row_tree_text("every xs as x", ["x.v is at least z", "z is 1"], {"xs": [{"v": 1}, {"v": 3}], "z": 5}, {}) == "z is 5; item 1 of xs: x.v is 1; item 2 of xs: x.v is 3"
+}
+
+test_the_first_list_said_as_a_whole_is_not_counted_among_the_items if {
+	_row_tree_text("every ks, if any, as k", ["every es.zz is 1"], {"ks": null, "es": [{"zz": 2}, {"zz": 3}, {"zz": 4}]}, {}) == "item 1 of es: zz is 2; item 2 of es: zz is 3; item 3 of es: zz is 4; ks is null"
+}
+
+test_an_item_that_says_only_what_a_sentence_that_reads_no_alias_said_is_left_out if {
+	_row_tree_text("every ks as k", ["count of es is 1", "every es.m named by k is 1"], {"ks": ["v"], "es": null}, {}) == "es is null"
+}
+
+test_a_count_over_a_list_the_item_cant_give_joins_the_items_other_sentences if {
+	_row_tree_text("every xs as x", ["count of x.ys is 1", "x.w exists"], {"xs": [{"ys": null}]}, {}) == "item 1 of xs: x.ys is null, and x.w is missing"
+	_row_tree_text("every xs as x", ["x.w exists", "count of x.ys is 1"], {"xs": [{"ys": null}]}, {}) == "item 1 of xs: x.w is missing, and x.ys is null"
+	_row_tree_text("every xs as x", ["count of x.ys is 1", "x.w exists"], {"xs": [{}]}, {}) == "item 1 of xs: x.ys is missing, and x.w is missing"
+	_row_tree_text("every xs as x", ["count of x.ys is 1", "x.w exists"], {"xs": [{"ys": "s"}]}, {}) == `item 1 of xs: x.ys is "s", which isn't a list or an object, and x.w is missing`
+	_row_tree_text("every xs as x", ["count of x.ys whose n is 1 is 1", "x.w exists"], {"xs": [{"ys": null}]}, {}) == "item 1 of xs: x.ys is null, and x.w is missing"
+	_row_tree_text("every xs as x", ["sum of x.ys.n is 1", "x.w is 1"], {"xs": [{"ys": null, "w": 2}]}, {}) == "item 1 of xs: x.ys is null, and x.w is 2"
+}
+
+test_a_part_that_walks_no_list_stays_with_its_item_when_the_cap_cuts_an_inner_list if {
+	check := ergo._s_written_check({"for": "every xs as x", "assert": ["every x.ys.n is 1", "count of x.zs is 1", "x.v is 1"]})
+	subj := {"xs": [{"v": 2, "zs": [], "ys": [{"n": 2}, {"n": 3}, {"n": 4}, {"n": 5}]}]}
+	row := ergo._for_row(check, subj) with input as {"ergo/names": {"ergo/subject": subj, "$at": {"names": {}}}}
+	not row["ergo/for_raw"].tree
+	ergo._m_aliased(row.message) == "item 1 of xs: item 1 of x.ys: n is 2; item 1 of xs: item 2 of x.ys: n is 3; item 1 of xs: item 3 of x.ys: n is 4; item 1 of xs: count of x.zs is 0, and x.v is 2; and 1 more"
+}
+
+test_an_item_keeps_only_what_the_row_hasnt_said_already if {
+	said := {"z is 5"}
+	not ergo._for_unrooted(ergo._m_clause("item", "item 1 of xs", "value", "z is 5"), said)
+	not ergo._for_unrooted(ergo._m_item_clause("item 1 of xs", "value", [ergo._m_clause("root", "z", "value", "z is 5")]), said)
+	ergo._for_unrooted(ergo._m_item_clause("item 1 of xs", "value", [ergo._m_clause("root", "z", "value", "z is 5"), ergo._m_clause("root", "v", "value", "v is 1")]), said).said == [ergo._m_clause("root", "v", "value", "v is 1")]
+	ergo._for_unrooted(ergo._m_clause("item", "item 1 of xs", "value", "item 1 of xs is 1"), said).text == "item 1 of xs is 1"
+}
+
+test_a_for_line_on_a_subject_that_isnt_an_object_says_so_as_its_list_text if {
+	check := ergo._s_written_check({"for": "every xs as x", "assert": "x.v is 1"})
+	ergo._for_empty_texts(check, 3, {"cause": "not_an_object", "failed": []}) == ["the subject is 3, which isn't an object"]
+	ergo._for_list_texts(check, 3, {"cause": "not_an_object", "failed": []}) == ["the subject is 3, which isn't an object"]
+}
+
+test_an_empty_list_a_line_tolerates_is_not_said_beside_a_sentence_that_reads_no_alias if {
+	_row_tree_text("every xs, if any, as m", ["z is 1"], {"xs": [], "z": 3}, {}) == "z is 3"
+}
+
+test_the_list_a_line_picks_nothing_from_comes_after_a_sentence_that_reads_no_alias if {
+	_row_tree_text("every xs whose v is 1 as x", ["x.v is 1", "z is 1"], {"xs": [{"v": 3}], "z": 3}, {}) == `z is 3; xs is [{"v": 3}]`
+	_row_tree_text("first of xs sorted by v as x", ["x.v is 1", "z is 1"], {"xs": [], "z": 3}, {}) == "z is 3; xs is []"
+}
+
+_tree_said(line, sentences, subj, params, cause) := said if {
+	check := ergo._s_written_check({"for": line, "assert": sentences})
+	names := {"ergo/subject": subj, "$at": {"names": {}}}
+	r := ergo._for_freed(check, subj, ergo._for_row_raw(check, subj)) with input as {"ergo/names": names} with data.ergo_params as params
+	raw := {"passed": false, "cause": cause, "message": "", "ergo/for_raw": {"check": check, "subj": subj, "r": object.union(r, {"cause": cause}), "tree": true}}
+	said := ergo._for_said(raw) with input as {"ergo/names": names} with data.ergo_params as params
+}
+
+test_a_row_on_the_tree_says_the_trees_message if {
+	said := _tree_said("every xs as x", ["x.v is at least z", "z is 1"], {"xs": [{"v": 1}, {"v": 3}], "z": 5}, {}, "value")
+	ergo._m_aliased(said.message) == "z is 5; item 1 of xs: x.v is 1; item 2 of xs: x.v is 3"
+	said.cause == "value"
+	not "ergo/for_raw" in object.keys(said)
+}
+
+test_a_row_whose_sentence_reads_a_list_outside_its_item_keeps_the_text_the_tree_cant_say_yet if {
+	check := ergo._s_written_check({"for": "every rows as r", "assert": ["r.v is in $input.os.name"]})
+	subj := {"rows": [{"v": "bob"}, {"v": "ann"}]}
+	doc := {"os": [{"name": "ann"}, {}]}
+	names := {"ergo/subject": subj, "$at": {"names": {}}}
+	r := ergo._for_freed(check, subj, ergo._for_row_raw(check, subj)) with input as {"ergo/names": names} with data.ergo_document as doc
+	raw := {"passed": false, "cause": r.cause, "message": "", "ergo/for_raw": {"check": check, "subj": subj, "r": r, "tree": true}}
+	said := ergo._for_said(raw) with input as {"ergo/names": names} with data.ergo_document as doc
+	said.message == "item 2 of $input.os: name is missing"
+}
+
+test_a_row_on_the_tree_takes_the_worst_cause_of_what_it_says if {
+	_tree_said("every xs as x", ["x.v is 1"], {"xs": [{}]}, {}, "value").cause == "absent"
+	_tree_said("every xs as x", ["x.v is 1"], {"xs": [{}]}, {}, "not_an_object").cause == "not_an_object"
 }
 
 test_items_of_an_inner_list_that_tie_are_said_under_their_item if {

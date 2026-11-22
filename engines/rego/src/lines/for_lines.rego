@@ -35,10 +35,53 @@ _for_row_of(check, subj, r) := r if {
 	not r.cause in {"satisfied", "ambiguous"}
 	_m_params_unread(check)
 	m := _m_fallback(check)
+} else := object.union(object.remove(r, _row_extra_keys), {"failed": [_m_strip(f) | some f in r.failed], "message": "", "ergo/for_raw": {"check": check, "subj": subj, "r": r, "tree": true}}) if {
+	r.cause != "satisfied"
+	_for_on_tree(check, subj, r)
 } else := object.union(object.remove(r, _row_extra_keys), {"failed": [_m_strip(f) | some f in r.failed], "message": said.message, "ergo/for_raw": {"check": check, "subj": subj, "r": r, "once": said.once, "line": object.get(said, "line", [])}}) if {
 	r.cause != "satisfied"
 	said := _for_row_text(check, subj, r)
 }
+
+_for_on_tree(check, subj, r) if {
+	count(check.items) == 1
+	object.get(r, "natural", null) != "satisfied"
+	not "root_msgs" in object.keys(r)
+	not "other_roots" in object.keys(r)
+	not _walk_flawed(check)
+	_walk_root_flaw(check, subj) == ""
+	not _for_key_not_text(check)
+	not _for_key_is_alias(check)
+	count([c | some c in check.checks; _for_reads_an_alias(check, c); _for_reads_a_list(c)]) < 2
+	every c in object.get(check.items[0], "whose", []) {
+		every p in _condition_paths(c) {
+			p != []
+		}
+	}
+	every step in array.concat(check.items[0].path, object.get(object.get(check.items[0], "pick", {}), "by", [])) {
+		_for_plain_step(step)
+	}
+}
+
+_for_key_is_alias(check) if {
+	walk(check.checks, [_, y])
+	is_object(y)
+	some item in check.items
+	object.get(y, "named_by", null) == item.as
+}
+
+_for_reads_a_list(c) if _walks(c)
+
+_for_reads_a_list(c) if {
+	walk(c, [_, y])
+	is_object(y)
+	some f in _tally_forms
+	is_array(object.get(y, f, null))
+}
+
+_for_plain_step(step) if is_string(step)
+
+_for_plain_step(step) if is_number(step)
 
 _for_row_raw(check, subj) := object.union(r, {"cause": _for_shape_cause(r), "natural": r.cause}) if {
 	_params_shape_only_unreadable(check)

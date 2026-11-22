@@ -60,6 +60,25 @@ test_a_clause_without_a_group_sorts_as_group_zero if {
 	])) == "$params.b is null; $params.a is 3, which isn't an object"
 }
 
+test_a_clause_of_an_earlier_group_comes_first_whatever_its_kind if {
+	item := object.union(_clause_item("item 1 of es", "value", [_clause_root("zz", "value", "zz is 2")]), {"group": 0})
+	list := object.union(ergo._m_clause("list", "xs", "value", "xs is []"), {"group": 2})
+	ergo._m_clauses_text(ergo._m_clauses_shown([list, ergo._m_root_in("z", "value", "z is 2", 1), item])) == "item 1 of es: zz is 2; z is 2; xs is []"
+}
+
+test_items_of_an_earlier_group_keep_their_place_when_the_cap_cuts_them if {
+	items := [object.union(c, {"group": 0}) | some c in _clause_items_of("es", 1, 5, [_clause_missing("zz")])]
+	list := object.union(ergo._m_clause("list", "ks", "null", "ks is null"), {"group": 2})
+	ergo._m_clauses_text(ergo._m_clauses_shown(array.concat([list, ergo._m_root_in("z", "value", "z is 2", 1)], items))) == concat("; ", [
+		"item 1 of es: zz is missing",
+		"item 2 of es: zz is missing",
+		"item 3 of es: zz is missing",
+		"z is 2",
+		"ks is null",
+		"and 2 more",
+	])
+}
+
 _clause_root(name, cause, text) := ergo._m_clause("root", name, cause, text)
 
 _clause_missing(name) := _clause_root(name, "absent", concat("", [name, " is missing"]))
