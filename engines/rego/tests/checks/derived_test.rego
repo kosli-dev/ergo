@@ -40,6 +40,19 @@ test_a_count_fails_on_the_root_a_key_from_the_item_is_read_in_even_when_the_list
 	ergo._tally({"xs": []}, _count_keyed_by_item("$input.m")).states == {"absent"} with data.ergo_document as {}
 }
 
+test_a_count_fails_as_value_on_an_empty_list_on_the_right_of_its_whose_whatever_the_items if {
+	every sentence in [
+		"count of xs whose v is in $params.cs.name is 0",
+		"count of xs whose v is not one of $params.cs.name is 0",
+		"count of xs.v that is in $params.cs.name is 0",
+	] {
+		every xs in [[], [{"v": "a"}]] {
+			[row[1] | some row in _tally_rows(sentence, [{"id": 1, "xs": xs}], {"cs": []})] == ["value"]
+		}
+		[row[1] | some row in _tally_rows(sentence, [{"id": 1, "xs": [{}]}], {"cs": []})] == ["absent"]
+	}
+}
+
 test_a_count_or_sum_of_member_of_walks_each_member_of_the_object_as_an_item if {
 	side := {"sum_of": ["costs"], "whose": [], "text": "sum of member of costs", "member": true}
 	t := ergo._tally({"costs": {"b": 5, "a": 1, "c": "x"}}, side)
