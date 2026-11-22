@@ -128,6 +128,12 @@ test_a_for_row_keeps_its_message_off_the_tree_while_the_tree_cant_say_its_roots_
 	not _on_tree("every xs as x", ["every x.ys exists", "sum of x.ys.n is 3"], {"xs": [{"ys": [{"n": 1}, null]}]}, {})
 }
 
+test_a_for_row_whose_line_reads_its_item_whole_keeps_its_message_off_the_tree if {
+	not _on_tree(`every ws that starts with "b" as w`, ["w is not empty"], {"ws": ["b", 3]}, {})
+	not _on_tree("every xs that is at least c as x", ["x.n is 1"], {"c": 0, "xs": [1, {"c": 0, "n": 1}]}, {})
+	_on_tree("every xs whose n is at least c as x", ["x.n is 1"], {"c": 0, "xs": [1, {"c": 0, "n": 2}]}, {})
+}
+
 test_a_for_row_whose_item_walks_one_list_takes_its_message_from_the_tree if {
 	_on_tree("every xs as x", ["every x.ys.n is 1", "x.v is 1"], {"xs": [{"v": 2, "ys": [{"n": 2}]}]}, {})
 	_on_tree("every xs as x", ["count of x.ys is 1", "every es.n is 1"], {"xs": [{"ys": []}], "es": [{"n": 2}]}, {})
