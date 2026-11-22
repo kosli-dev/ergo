@@ -106,8 +106,6 @@ for / a for line whose second list has a named by key from $params that is missi
 for / a for line whose second list has a named by key from $params that isn't text / says the key once on the row, after the sentence that doesn't read x
 for / a for line whose sentence counts two subject fields that can't be counted / names each field once on an empty list
 for / a for line whose sentence counts two subject fields that can't be counted / names each field once, and not again after them, with items
-for / a for line whose sentence reads $params alone, when the params are an object / a bare $params that is an object, on an empty list
-for / a for line whose sentence reads $params alone, when the params are null / a bare $params on an empty list when the params are null
 for / a for line whose sentence reads $params alone, when the params are null / a bare $params when the params are null and the list is missing
 for / a for line whose sentence reads a key of the params on the right, with params as a number / fails as unusable and names the params and what they are
 for / a for line whose sentence reads a subject field as is, count of, sum of or a named by key, with items / names a field of the wrong type once, with no item in front, and lists every item that failed
@@ -139,8 +137,6 @@ for / a for line with if any whose sentence reads a subject field as is, count o
 for / a for line with if any whose sentence reads a subject field as is, count of, sum of or a named by key / fails on an empty list when the field is null, and names it once
 for / a for line with if any whose sentence reads a subject field as is, count of, sum of or a named by key / fails on an empty list when the field is text where a number or a list is read, and passes where the field is a key
 for / a for line with if any whose sentence reads a subject field on the left of a compare / fails on an empty list when the field is an object, and names it once
-for / a for line with if any whose sentence reads a subject field on the left of a compare / fails on an empty list when the field is missing, and names it once
-for / a for line with if any whose sentence reads a subject field on the left of a compare / fails on an empty list when the field is null, and names it once
 for / a for line with if any whose sentence reads a subject field on the left of a compare / fails on an empty list when the field is text, and names it once
 for / a for line with if any whose sentence reads a subject field on the left of a compare / names a field that is text once, with one item
 for / a for line with one item runs the sentences that don't read its alias on an empty list it tolerates / fails as null when a field a sentence reads is null and there are no commits
@@ -184,7 +180,6 @@ for / a part that holds a list is walked in the whose of a for line and in a who
 for / a part that holds a list is walked in the whose of a for line and in a whose under it / a part that is text fails as unusable
 for / a part that holds a list is walked in the whose of a for line and in a whose under it / an empty part fails as value
 for / a part that holds a list is walked on the right of is in on a for line / an item without the name fails as absent and names the item
-for / a root a for sentence can't use is said once, on the assertion, beside items that read fine / one item that reads fine and one whose v is null
 for / a root in one of two relative clauses, in either order / gives the same report in either order, the root first, then the item's own problem
 for / a second for item picking from a list read through the first alias, which ties for one first item and is missing for another / one first item fails as ambiguous and the other as absent, each with its own second list failure
 for / a second for item that picks with sorted by, under a first item that sorts by another key / names the second item's key when its items tie
@@ -198,7 +193,6 @@ for / a walk on a for line whose path is named with a character that sorts befor
 for / a walk on a for line whose whose reads $input after the item's alias / lists the alias first, then what the whose reads
 for / a walk on a for line whose whose reads $input on its left / lists the alias first, then what the whose reads
 for / a walk over the second item of a for line whose whose reads $input / lists the alias first in the inputs of each second item
-for / a walk through a for line's alias leaves a root after the phrase to the assertion, and each item keeps its own cause and the items of its list / an item whose list holds five items without v
 for / a whose on the second for item that reads $params text after is in says the root once, with no item of its list / fails as unusable with the root once
 for / a whose on the second for item that reads $params text after is in says the root once, with no item of its list / fails as unusable with the root once and then the item that can't be read on its own
 for / a whose on the second for item that reads a $params object after is in says the root once, with no item of its list / fails as unusable with the root once
@@ -353,7 +347,6 @@ messages / a parent's part read in a whose on a plain check, next to a list that
 messages / a parent's part read in a whose, on an empty list / fails when the part is of the wrong type
 messages / a part that is a list, read in a whose beside a list that can't be read, is said first and then the list, and the row takes the part's cause when it is the worst / a list that is empty
 messages / a position and a key after a null / names the null step, then a key that is missing, null or not text, and none when it is text
-messages / a problem is said where its path starts / a param is said once with no item, and a field of an earlier line's alias is said under each item it is about
 messages / a root and the list it is read beside that both can't be read are both said, roots first, with the worst cause / a root of the wrong type and a list that is missing fail as unusable
 messages / a root and the list it is read beside that both can't be read are both said, roots first, with the worst cause / a root that is missing and a list that is null fail as absent
 messages / a root and the list it is read beside that both can't be read are both said, roots first, with the worst cause / a root that is null and a list that is text fail as unusable

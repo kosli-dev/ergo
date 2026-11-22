@@ -222,6 +222,34 @@ fn line_item(
     ))
 }
 
+fn root_reads(check: &Check, roots: &[Clause], ctx: &Ctx) -> Vec<Value> {
+    let mut out: Vec<Value> = Vec::new();
+    let unread = |root: &&Clause| {
+        root.kind == Kind::Root
+            && matches!(
+                root.cause,
+                Cause::Absent | Cause::Null | Cause::Unusable | Cause::NotAnObject
+            )
+    };
+    for root in roots.iter().filter(unread) {
+        let Some(path) = for_line::all_paths(check).into_iter().find(|path| {
+            matches!(
+                path.start,
+                Start::Params | Start::Input | Start::Subject | Start::Own
+            ) && crate::name::name(path) == root.name
+        }) else {
+            continue;
+        };
+        if let Some(input) = ops::read_path(path, ctx).inputs.first() {
+            ops::push_new(
+                &mut out,
+                crate::parts::with_outcome(input, root.cause == Cause::Unusable),
+            );
+        }
+    }
+    out
+}
+
 fn said_clauses(record: &Value) -> Vec<Clause> {
     record
         .get("ergo/clauses")
@@ -286,7 +314,7 @@ fn item_entry(
         for kid in &walked.part().failures {
             said_by(kid, &[], &mut lines);
         }
-        !message.is_empty() && said.iter().all(|piece| covered(piece, &lines))
+        !message.is_empty() && said.iter().all(|piece| covered(piece, &lines, ""))
     });
     if let Some(walked) = walked {
         let part = walked.part().clone();
@@ -313,13 +341,14 @@ fn item_entry(
     })
 }
 
-fn covered(piece: &Clause, lines: &[String]) -> bool {
+fn covered(piece: &Clause, lines: &[String], lead: &str) -> bool {
     match piece.kind {
         Kind::More(_) => true,
         Kind::Item if !piece.said.is_empty() => {
-            piece.said.iter().all(|inner| covered(inner, lines))
+            let lead = format!("{lead}{}: ", piece.name);
+            piece.said.iter().all(|inner| covered(inner, lines, &lead))
         }
-        _ => lines.contains(&piece.text),
+        _ => lines.contains(&format!("{lead}{}", piece.text)),
     }
 }
 
@@ -336,7 +365,6 @@ fn said_by(entry: &Failure, lead: &[String], out: &mut Vec<String>) {
         }
         names.push(part.message.clone());
         out.push(names.join(": "));
-        out.push(part.message.clone());
     }
     for kid in &part.failures {
         said_by(kid, &here, out);
@@ -714,6 +742,9 @@ pub fn for_failures(
     }
     let roots = row_roots(message, &item_made);
     let root_texts = line.root_texts(ctx);
+    let empty_first = line.items.first().is_some_and(|first| {
+        matches!(&ops::read_path(&first.path, ctx).inputs.first(), Some(input) if input.value == json!([]))
+    });
     let mut out: Vec<Failure> = Vec::new();
     for (i, sentence) in line.sentences.iter().enumerate() {
         let first = line
@@ -758,19 +789,51 @@ pub fn for_failures(
                 }
                 said.clone()
             }
+            None if off_subject => String::new(),
             None => {
-                let mut own: Vec<String> = Vec::new();
-                for clause in clauses(message) {
-                    if owned[i].iter().any(|o| o == clause) || moved.iter().any(|m| m == clause) {
-                        ops::push_new(&mut own, clause.to_string());
+                let odd_params = ctx.params.is_some_and(|p| !p.is_object() && !p.is_null());
+                let roots = if odd_params {
+                    Vec::new()
+                } else {
+                    line.assertion_roots(i, ctx)
+                };
+                if !causes.is_empty() || empty_first {
+                    causes.extend(roots.iter().map(|root| root.cause));
+                    for input in root_reads(&sentence.check, &roots, ctx) {
+                        let walked = |x: &Value| text(x, "name").replace("[]", "");
+                        if !inputs.iter().any(|x| walked(x) == walked(&input)) {
+                            inputs.push(input);
+                        }
                     }
                 }
-                for m in moved {
-                    ops::push_new(&mut own, m);
+                let mut said_by_items: Vec<String> = Vec::new();
+                for entry in &items {
+                    said_by(entry, &[], &mut said_by_items);
+                }
+                let mut own: Vec<String> = Vec::new();
+                let said = clause::text(&clause::shown(&roots));
+                if !said.is_empty() {
+                    own.push(said);
+                }
+                for piece in clauses(message) {
+                    let mine =
+                        owned[i].iter().any(|o| o == piece) || moved.iter().any(|m| m == piece);
+                    let elsewhere = !odd_params && root_texts.iter().any(|t| t == piece)
+                        || !roots.is_empty() && said_by_items.iter().any(|t| t == piece);
+                    if mine && !elsewhere {
+                        ops::push_new(&mut own, piece.to_string());
+                    }
                 }
                 own.join("; ")
             }
         };
+        let mut named: Vec<String> = Vec::new();
+        inputs.retain(|x| {
+            let name = text(x, "name");
+            let first = !named.contains(&name);
+            named.push(name);
+            first
+        });
         if said.is_empty() && items.is_empty() {
             continue;
         }
