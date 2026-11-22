@@ -2213,13 +2213,7 @@ impl For {
                 return reduced;
             }
             if run.verdict.cause == Cause::Satisfied {
-                let lines = root_lines(&self.root_clauses(ctx));
-                let roots: Vec<&str> = lines.iter().map(String::as_str).collect();
-                run.items = self
-                    .free_clauses(ctx)
-                    .into_iter()
-                    .filter_map(|clause| unrooted(clause, &roots))
-                    .collect();
+                run.items = self.free_clauses(ctx);
             }
         }
         run
@@ -2346,13 +2340,8 @@ impl For {
             if second.is_some() || flawed || cause == Cause::Satisfied && !rooted {
                 (Vec::new(), Vec::new())
             } else {
-                let roots = root_lines(&self.root_clauses(ctx));
-                let texts: Vec<&str> = roots.iter().map(String::as_str).collect();
                 (
-                    self.free_clauses(ctx)
-                        .into_iter()
-                        .filter_map(|clause| unrooted(clause, &texts))
-                        .collect(),
+                    self.free_clauses(ctx),
                     self.level_clauses(&level, &self.root_clauses(ctx), ctx),
                 )
             };
@@ -2944,6 +2933,10 @@ impl For {
     }
 
     fn free_clauses(&self, ctx: &Ctx) -> Vec<Clause> {
+        let roots = self.root_clauses(ctx);
+        let whole = super::clause::lines(&roots);
+        let lines = root_lines(&roots);
+        let texts: Vec<&str> = lines.iter().map(String::as_str).collect();
         let mut out: Vec<Clause> = Vec::new();
         for (at, sentence) in self.sentences.iter().enumerate() {
             if !self.reads_no_alias(sentence) {
@@ -2956,7 +2949,20 @@ impl For {
             }
             out.extend(own);
         }
-        out
+        out.into_iter()
+            .filter_map(|clause| {
+                let said_by_a_root =
+                    clause.kind != super::clause::Kind::Item && whole.contains(&clause.text);
+                if said_by_a_root {
+                    Some(Clause {
+                        said: Vec::new(),
+                        ..clause
+                    })
+                } else {
+                    unrooted(clause, &texts)
+                }
+            })
+            .collect()
     }
 
     fn reads_no_alias(&self, sentence: &Sentence) -> bool {
