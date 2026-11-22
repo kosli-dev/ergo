@@ -326,6 +326,11 @@ def order_tags(row, m, ub):
     return tags
 
 
+class ShortParser(argparse.ArgumentParser):
+    def error(self, message):
+        sys.exit(f"property-check.py: {message}; see --help")
+
+
 def fail(message):
     sys.exit(f"property-check.py: {message}")
 
@@ -549,8 +554,8 @@ def add_binaries(parser):
 
 
 def main():
-    parser = argparse.ArgumentParser(usage=USAGE, add_help=True)
-    sub = parser.add_subparsers(dest="command", required=True)
+    parser = ShortParser(usage=USAGE)
+    sub = parser.add_subparsers(dest="command", required=True, parser_class=ShortParser)
     p = sub.add_parser("run")
     add_binaries(p)
     p.add_argument("--rego", help="the built ergo.rego (default: dist/ergo.rego)")
