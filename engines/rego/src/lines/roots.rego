@@ -358,6 +358,11 @@ _side_root(c, p) if c.right == {"ref": p}
 
 _side_root(c, p) if c.left == p
 
+_side_root(c, p) if {
+	c.op in _membership_ops
+	c.path == p
+}
+
 _root_value(subj, p) := _ref_read(p) if {
 	_builtin(p)
 	_ref_state(p) == "value"
