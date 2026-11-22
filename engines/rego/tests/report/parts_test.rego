@@ -230,3 +230,8 @@ test_a_count_lists_its_items_in_list_order_when_one_comes_from_a_key_the_item_ho
 	es := ergo._tally_item_parts(c, subj, "not_an_object", {}, m) with input as {"ergo/names": {"ergo/subject": subj}}
 	[e.name | some e in es] == ["item 2 of xs", "item 3 of xs", "item 4 of xs"]
 }
+
+test_a_count_puts_an_entry_that_is_not_an_item_of_its_list_before_the_items_as_the_list_comes_first if {
+	ergo._tally_rank({"name": "xs"}, ["item 1 of xs", "item 2 of xs"]) == -1
+	ergo._tally_rank({"name": "item 2 of xs"}, ["item 1 of xs", "item 2 of xs"]) == 1
+}

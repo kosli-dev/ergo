@@ -1407,9 +1407,31 @@ _unusable_twin(i, ins) if {
 	j.locations == i.locations
 }
 
-_tally_item_parts(c, subj, cause, at, m) := _nested_items(_tally_one_per_item(array.concat(xs, _tally_keyed_extra(c, subj, at, m, xs)))) if {
+_tally_item_parts(c, subj, cause, at, m) := _nested_items(_tally_one_per_item(_tally_merged(xs, _tally_keyed_extra(c, subj, at, m, xs), c, subj))) if {
 	xs := _tally_item_records(c, subj, cause, at, m)
 }
+
+_tally_merged(xs, [], _, _) := xs
+
+_tally_merged(xs, extra, c, subj) := [es[p[1]] | some p in sort({[_tally_rank(e, order), i] | some i, e in es})] if {
+	extra != []
+	es := array.concat(xs, extra)
+	order := _tally_item_order(c, subj)
+}
+
+_tally_rank(e, order) := rs[0] if {
+	rs := [i | some i, n in order; n == e.name]
+	rs != []
+} else := -1
+
+_tally_item_order(c, subj) := [_m_item_name(e.i, roots) |
+	mc := object.union(_m_with_sides(_m_walked(c, subj)), {"ergo/row": true})
+	some side in _m_tally_parts(mc)
+	_tally_outside_keyed(side, subj)
+	w := _tally_walk(subj, side)
+	roots := _dotted_roots([side[_basic_form(side)]])
+	some e in w.items
+]
 
 _tally_one_per_item(es) := [_tally_joined_item(e, [y | some y in es; _tally_same_item(y, e)]) |
 	some k, e in es
