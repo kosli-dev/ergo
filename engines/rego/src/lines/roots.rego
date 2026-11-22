@@ -560,7 +560,7 @@ _leaf_root_msgs(check, flaw) := [m] if {
 	is_string(m)
 }
 
-_rooted_row(check, subj, r) := object.union(object.remove(a, ["other_roots"]), {"cause": _worst_or_value({flaw, a.cause}), "inputs": r.inputs, "failed": a.failed, "root_msgs": _with_roots(ps, ms), "ergo/alone_items": [p.text | some p in ps; not p.text in {m.text | some m in ms}]}) if {
+_rooted_row(check, subj, r) := object.union(object.remove(a, ["other_roots"]), {"cause": _worst_or_value({flaw, a.cause}), "inputs": r.inputs, "failed": a.failed, "root_msgs": _with_roots(ps, ms), "ergo/alone_items": [p | some p in ps; not p.text in {m.text | some m in ms}]}) if {
 	check.op != "for"
 	not _walk_keyed(check)
 	_items_judged_alone(subj, check)
@@ -602,9 +602,9 @@ _walks_for_alias(check) if {
 	_for_alias_step(check.path[0])
 }
 
-_unrooted_text(t, ms) := "" if t in {m.text | some m in ms}
+_unrooted_text(c, ms) := object.union(c, {"text": ""}) if c.text in {m.text | some m in ms}
 
-else := t
+else := c
 
 _rooted_main(check, subj, r) := object.union(r, {"cause": "unusable", "failed": [], "root_msgs": _walk_key_root_clauses(check, subj, r)}) if {
 	r.cause in _not_failing_causes
