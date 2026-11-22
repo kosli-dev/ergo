@@ -329,6 +329,16 @@ test_a_walk_and_a_plain_sentence_keep_the_order_written if {
 	_item_texts("every xs as x", ["x.v is 1", "every x.ys.n is 1"], subj, {}) == [["item 1 of xs: x.v is 2", "item 1 of xs: item 1 of x.ys: n is 2"]]
 }
 
+test_a_member_walk_and_a_plain_sentence_keep_the_order_written if {
+	subj := {"xs": [{"v": 2, "ms": {"a": 2, "b": 1}}]}
+	_item_texts("every xs as x", ["every member of x.ms is 1", "x.v is 1"], subj, {}) == [["item 1 of xs: member a of x.ms is 2", "item 1 of xs: x.v is 2"]]
+}
+
+test_an_item_whose_sort_key_is_of_another_kind_says_why if {
+	subj := {"xs": [{"t": 1, "v": 2}, {"t": "a", "v": 3}]}
+	_item_texts("first of xs sorted by t as x", ["x.v is 1"], subj, {}) == [[`item 2 of xs: t is "a", which isn't a number, a time or a date`]]
+}
+
 test_an_item_that_isnt_an_object_says_so_as_its_own_text if {
 	cs := _item_clauses("every xs as x", ["x.v is 1"], {"xs": [1, {}, null]}, {})
 	[[c.cause, ergo._m_aliased(c.text)] | some c in cs] == [["not_an_object", "item 1 of xs is 1, which isn't an object"], ["absent", ""], ["not_an_object", "item 3 of xs is null, which isn't an object"]]
