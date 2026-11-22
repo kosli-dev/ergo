@@ -2404,6 +2404,16 @@ const ROW_LEAVES_OUT_AN_ITEM: &str = "the row and the tree leave out the item of
 
 const ROWS_THE_CLAUSES_DONT_SAY_YET: &[(&str, usize, &str)] = &[
     (
+        "in / an empty list on the right of a whose is said before the list it filters, after contains all of and none of, beside a plus and on a for line, as a null list is / fails with the empty list said once, then each item that can't be read under its item",
+        1,
+        ROOT_CAUSE_OVER_ITEM,
+    ),
+    (
+        "in / an empty list on the right of a whose is said before the list it filters, after contains all of and none of, beside a plus and on a for line, as a null list is / fails with the empty list said once, then each item that can't be read under its item",
+        2,
+        ROOT_CAUSE_OVER_ITEM,
+    ),
+    (
         "for / an item's own problem on a for line is said after a root of its whose that can't be read, even when it fails no worse than the root / an item without v, with a null part",
         1,
         ROOT_CAUSE_OVER_ITEM,
