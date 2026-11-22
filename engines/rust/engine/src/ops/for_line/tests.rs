@@ -2648,6 +2648,41 @@ fn the_clauses_of_every_for_row_say_what_the_row_and_its_entries_say_today() {
     assert!(compared > 0);
 }
 
+fn record_clauses(record: &Value) -> Vec<String> {
+    crate::ops::clause::lines(
+        &crate::ops::clause::of_value(&record["ergo/clauses"]).unwrap_or_default(),
+    )
+}
+
+#[test]
+fn a_record_carries_each_sentences_clauses_whole() {
+    let run = for_run(
+        "every xs as x",
+        &["x.v is 1", "x.w is 1"],
+        json!({"xs": [{"v": "p; q"}]}),
+        json!({}),
+    );
+    let assertions = &run.failed_items[0]["failed_assertions"];
+    assert_eq!(record_clauses(&assertions[0]), ["x.v is \"p; q\""]);
+    assert_eq!(record_clauses(&assertions[1]), ["x.w is missing"]);
+}
+
+#[test]
+fn a_record_of_a_second_list_carries_each_sentences_clauses() {
+    let run = for_run(
+        "every ws as w, every w.ys as y",
+        &["y.v is 1", "w.n is 1"],
+        json!({"ws": [{"n": 2, "ys": [{"v": "p; q"}]}]}),
+        json!({}),
+    );
+    let assertions = &run.failed_items[0]["failed_assertions"];
+    assert_eq!(
+        record_clauses(&assertions[0]["items"][0]),
+        ["y.v is \"p; q\""]
+    );
+    assert_eq!(record_clauses(&assertions[1]), ["w.n is 2"]);
+}
+
 fn for_items(
     for_line: &str,
     assertions: &[&str],
