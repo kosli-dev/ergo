@@ -13,11 +13,13 @@ _plain_root_flaw(subj, c) := _worst_of(states) if {
 } else := ""
 
 _plain_root_states(subj, c) := {st |
-	lists := {y[_basic_form(y)] | walk(c, [_, y]); _basic_form(y) in _tally_forms}
+	lists := _root_tally_lists(c)
 	some p in _root_reads(c)
 	st := _root_state(subj, c, p, lists)
 	st in _failed_read_states
 }
+
+_root_tally_lists(c) := {y[_basic_form(y)] | walk(c, [_, y]); _basic_form(y) in _tally_forms}
 
 _root_states(subj, c) := _named_root_states(subj, c) | _walked_root_states(c) if _walk_roots_on
 
@@ -617,7 +619,7 @@ _rooted_main(check, subj, r) := object.union(r, {"cause": "unusable", "failed": 
 } else := object.union(r, object.union({"cause": flaw, "failed": _rooted_kept(check, subj, r)}, {"root_msgs": ms | ms := _walk_root_msgs(check, subj); ms != []})) if {
 	flaw := _walk_root_flaw(check, subj)
 	flaw != ""
-	r.cause in {"satisfied", "value", flaw}
+	_rooted_cause_said(check, subj, r, flaw)
 } else := object.union(r, object.union({"cause": flaw, "failed": []}, {"root_msgs": ms | ms := _leaf_root_msgs(check, flaw); ms != []})) if {
 	r.cause in _not_failing_causes
 	flaw := _leaf_root_flaw(check, subj)
@@ -627,6 +629,16 @@ _rooted_main(check, subj, r) := object.union(r, {"cause": "unusable", "failed": 
 	ms := _walk_root_msgs(check, subj)
 	ms != []
 } else := r
+
+_rooted_cause_said(_, _, r, flaw) if r.cause in {"satisfied", "value", flaw}
+
+_rooted_cause_said(check, subj, r, _) if {
+	r.fails != []
+	ms := _walk_root_msgs(check, subj)
+	every f in r.fails {
+		f.msg in ms
+	}
+}
 
 _parts_ahead(parts, r) := _with_roots(parts, r.other_roots) if "other_roots" in object.keys(r)
 

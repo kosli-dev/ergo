@@ -201,10 +201,10 @@ test_a_root_beside_a_list_after_is_in_ignoring_case_says_its_own_state_and_not_t
 
 test_a_walked_root_after_is_in_ignoring_case_names_each_item_that_isnt_text if {
 	c := {"op": "in", "path": ["v"], "values": {"ref": ["$$input[]", "cs", "name"]}, "ignoring": "case"}
-	ergo._m_walked_root_text(c, "unusable") == "item 1 of $input.cs: name is 3, which isn't text" with data.ergo_document as {"cs": [{"name": 3}]}
-	ergo._m_walked_root_text(c, "unusable") == "item 1 of $input.cs: name is 3, which isn't text; item 2 of $input.cs: name is null" with data.ergo_document as {"cs": [{"name": 3}, {"name": null}]}
-	not ergo._m_walked_root_text(c, "unusable") with data.ergo_document as {"cs": [{"name": "a"}]}
-	not ergo._m_walked_root_text(object.remove(c, ["ignoring"]), "unusable") with data.ergo_document as {"cs": [{"name": 3}]}
+	ergo._m_walked_root_text(c, "unusable") == "item 1 of $input.cs: name is 3, which isn't text" with data.ergo_document as {"cs": [{"name": 3}]} with input as {}
+	ergo._m_walked_root_text(c, "unusable") == "item 1 of $input.cs: name is 3, which isn't text; item 2 of $input.cs: name is null" with data.ergo_document as {"cs": [{"name": 3}, {"name": null}]} with input as {}
+	not ergo._m_walked_root_text(c, "unusable") with data.ergo_document as {"cs": [{"name": "a"}]} with input as {}
+	not ergo._m_walked_root_text(object.remove(c, ["ignoring"]), "unusable") with data.ergo_document as {"cs": [{"name": 3}]} with input as {}
 }
 
 test_a_list_after_is_in_ignoring_case_that_holds_null_is_said_with_the_roots_that_are_null_and_no_item_is_named_for_it if {

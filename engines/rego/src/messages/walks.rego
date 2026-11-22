@@ -717,16 +717,7 @@ _m_root_texts(subj, c, cause) := [_m_isnt("$input", data.ergo_document, "an obje
 	is_array(data.ergo_document)
 } else := _m_keyed_off(subj, c, cause) if count(_m_keyed_off(subj, c, cause)) > 0
 
-else := [m | some p in sort(_root_reads(c)); some m in _m_root_state_texts(subj, c, p, cause)]
-
-_m_root_state_texts(subj, c, p, cause) := [_m_text_items(_root_label(p), v)] if {
-	_text_list_root(c, p)
-	v := _root_value(subj, p)
-	_text_items_state(v) == cause
-} else := [] if {
-	_text_list_root(c, p)
-	_text_items_state(_root_value(subj, p))
-} else := [concat("", [_input_name(_as_subject_part(p)), " is ", _m_state_word(cause)])]
+else := [concat("", [_input_name(_as_subject_part(p)), " is ", _m_state_word(cause)]) | some p in sort(_root_reads(c)); _root_state(subj, c, p, _root_tally_lists(c)) == cause]
 
 _m_key_ref_failed(p) if {
 	some seg in p
@@ -796,6 +787,9 @@ _m_walked_root_fault(c, shown, x, cause) := _rwalk_text(x, shown) if {
 	w := _rwalk(x, shown)
 	w.failed
 	w.state == cause
+} else := _m_text_walk_text(shown) if {
+	_text_walked_ref(c, shown)
+	_text_ref_state(shown) == cause
 } else := _m_isnt(w.name, w.value, k) if {
 	cause == "unusable"
 	w := _rwalk(x, shown)
@@ -808,13 +802,20 @@ _m_off_right(subj, c) := [_m_isnt(_root_label(p), _root_value(subj, p), k) |
 	k := _root_kind(subj, c, p)
 ]
 
-_m_off_item(subj, c, cause) := _once([concat("", [_input_name(shown_at), " is ", _m_state_word(cause)]) |
+_m_off_item(subj, c, cause) := _once([m |
 	some p in sort({x | walk(c, [_, x]); _m_off_path(x)})
 	not _m_key_ref_failed(p)
+	some m in _m_off_item_texts(subj, c, p, cause)
+]) if cause in _no_value_states
+
+_m_off_item_texts(subj, c, p, cause) := [_m_text_items(_root_label(p), v)] if {
+	_text_list_root(c, p)
+	v := _root_value(subj, p)
+	_text_items_state(v) == cause
+} else := [concat("", [_input_name(_m_shown_at(shown, i, cause)), " is ", _m_state_word(cause)])] if {
 	shown := _as_subject_part(p)
 	i := min({j | some j in numbers.range(1, count(shown)); _read_state(subj, array.slice(shown, 0, j)) == cause})
-	shown_at := _m_shown_at(shown, i, cause)
-]) if cause in _no_value_states
+} else := []
 
 _m_off_item(_, c, "not_an_object") := [_m_isnt("$input", data.ergo_document, "an object")] if {
 	some r in _step_refs(c)
