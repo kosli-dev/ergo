@@ -668,8 +668,15 @@ _item_keyed(p) if {
 
 _items_judged_alone(subj, side) if {
 	some c in object.get(side, "whose", [])
-	_root_read_flaw(subj, c) != ""
+	flaw := _root_read_flaw(subj, c)
+	flaw != ""
 	_root_stand_in(c) != c
+	not _root_said_alone(c, flaw)
+}
+
+_root_said_alone(c, flaw) if {
+	flaw in _root_read_flaws
+	not c.op in {"in", "compare", "compare_time"}
 }
 
 _whose_alone(subj, side) := object.union(side, {"whose": [_root_stand_in(c) | some c in side.whose]}) if _items_judged_alone(subj, side)
