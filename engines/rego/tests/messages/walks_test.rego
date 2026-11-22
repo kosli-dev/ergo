@@ -242,6 +242,22 @@ test_an_item_of_a_list_reached_through_a_list_says_what_it_cant_read_on_its_own_
 	}
 }
 
+test_a_count_says_the_root_a_key_from_the_item_is_read_in_once_before_the_items_with_a_phrase_that_orders_times if {
+	side := _keyed_count_side("count of xs whose v is after $input.m named by key is 0")
+	every pair in _roots_that_cant_be_read {
+		said := [x[1] | some x in ergo._m_tally({"xs": [{"key": "a"}, {"key": "b", "v": "2020-01-01T00:00:00Z"}]}, side)] with data.ergo_document as pair[0]
+		said == [pair[1], "item 1 of xs: v is missing"]
+	}
+}
+
+test_an_item_whose_focus_is_missing_says_only_that_after_the_root_a_key_from_it_is_read_in if {
+	side := _keyed_count_side("count of xs.v that is $input.m named by key is 0")
+	every pair in _roots_that_cant_be_read {
+		said := [x[1] | some x in ergo._m_tally({"xs": [{}]}, side)] with data.ergo_document as pair[0]
+		said == [pair[1], "item 1 of xs: v is missing"]
+	}
+}
+
 test_a_count_on_an_empty_list_doesnt_add_its_root_again_after_the_root_it_already_says if {
 	check := ergo._s_written_check("count of xs whose tags contains $input.m named by key is 1")
 	o := {"passed": false, "cause": "null", "message": "$input.m is null"}
