@@ -167,8 +167,6 @@ _for_own_texts(item, e, names) := [t |
 	t := _m_aliased(concat(", and ", parts))
 ]
 
-_for_own_state(c, iv, p) := _for_own_read(c, iv, p)[0]
-
 _for_own_read(c, iv, p) := [s, st] if {
 	st := _root_stand_in(c)
 	st.op in (_contain_ops | _pattern_ops)
