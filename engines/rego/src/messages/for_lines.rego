@@ -253,9 +253,6 @@ _m_for_empty(check, subj, cause) := cs if {
 	faults := _once([c | some item in check.items; some c in array.concat(_m_key_faults(subj, _m_for_item(item)), _m_whose_ref_faults(item))])
 	faults != []
 	cs := _once(array.concat(faults, [c | some item in check.items; _m_picked_none(subj, item); some c in _m_list_found(subj, item.path)]))
-} else := [_m_fallback(check)] if {
-	cause == "unusable"
-	_m_params_unread(check)
 } else := cs if {
 	cs := _once([c | some item in check.items; _m_narrows(subj, item); some c in _m_list_found(subj, item.path)])
 	cs != []
@@ -357,7 +354,9 @@ _m_tally_unit(lists, m) := _m_joined(xs) if {
 	xs[0] == m
 } else := m
 
-_m_for_said(check) := {t |
+_m_for_said(check) := {x[1] | some x in _m_for_said_pairs(check)}
+
+_m_for_said_pairs(check) := {[cause, t] |
 	walk(check, [_, c])
 	is_object(c)
 	_list_phrase(c)
@@ -1001,12 +1000,11 @@ _m_filter(check, subj, row) := object.union(object.union(row, {"message": _m_joi
 
 _m_filter_walk(_, _, true, _, _) := {}
 
-_m_filter_walk(_, _, false, _, w) := {"message": _m_joined(w.root_msgs), "ergo/own": w.root_msgs, "ergo/texts": []} if "root_msgs" in object.keys(w)
+_m_filter_walk(_, _, false, _, w) := _m_walk_said(w.root_msgs, object.get(w, "ergo/alone_items", [])) if "root_msgs" in object.keys(w)
 
-_m_filter_walk(check, subj, false, cause, w) := {"message": _m_joined(parts), "ergo/own": [p | some p in parts; not p in items], "ergo/texts": items} if {
+_m_filter_walk(check, subj, false, cause, w) := _m_walk_said(parts, _walk_item_texts(parts, w)) if {
 	not "root_msgs" in object.keys(w)
 	parts := _walk_parts(check, subj, {"cause": cause}, w)
-	items := _walk_item_texts(parts, w)
 }
 
 _m_applies(_, _, true) := {}

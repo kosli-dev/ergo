@@ -126,3 +126,12 @@ test_message_for_item_reads_each_member_when_it_asks_whether_an_item_cant_take_t
 	not ergo._for_list_unclean({"path": ["ev"], "member": true}, {"ev": [{"m": {}}]}, _unclean_key_whose) with data.ergo_params as {"k": 3}
 	not ergo._for_list_unclean({"path": ["ev"]}, {"ev": {"b": {"m": {}}}}, _unclean_key_whose) with data.ergo_params as {"k": 3}
 }
+
+test_a_from_filter_walk_with_a_root_beside_items_that_fail_on_their_own_keeps_the_items_for_their_entries if {
+	root := ergo._m_clause("root", "$params.min", "unusable", "$params.min is \"s\", which isn't a number")
+	item := ergo._m_clause("item", ["xs", 0], "absent", "item 1 of xs: v is missing")
+	w := {"root_msgs": [root, item], "ergo/alone_items": ["item 1 of xs: v is missing"]}
+	said := ergo._m_filter_walk({}, {}, false, "unusable", w)
+	said["ergo/texts"] == ["item 1 of xs: v is missing"]
+	said["ergo/own"] == ["$params.min is \"s\", which isn't a number"]
+}

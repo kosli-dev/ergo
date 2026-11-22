@@ -48,7 +48,7 @@ _for_row_raw(check, subj) := object.union(r, {"cause": _for_shape_cause(r), "nat
 	_walk_flawed(check)
 	_walk_root_flaw(check, subj) != ""
 	r := _for_rooted(check, subj, _for_outer(check, subj, _for_names))
-} else := object.union(r, {"root_msgs": ms | ms := array.concat(_flawed_root_msgs(check, subj, _for_message(check, subj, r)), [m | some x in _for_second_roots(check, subj); some m in x.ms]); ms != []}) if {
+} else := object.union(r, {"root_msgs": ms | ms := array.concat(_flawed_root_msgs(check, subj), [m | some x in _for_second_roots(check, subj); some m in x.ms]); ms != []}) if {
 	_walk_flawed(check)
 	r := object.union(_for_outer(check, subj, _for_names), {"cause": "unusable", "failed": []})
 } else := {"cause": "not_an_object", "inputs": [], "failed": []} if {
@@ -101,21 +101,22 @@ _params_shape_only_unreadable(check) if {
 	not _m_reads_params(check)
 }
 
-_flawed_root_msgs(check, subj, said) := _with_roots(split(said, "; "), roots) if {
-	walked := _m_for_said(check)
-	roots := _once(array.concat(_walk_root_msgs(check, subj), sort(walked)))
-	some m in roots
-	not m in walked
-} else := roots if {
+_flawed_root_msgs(check, subj) := roots if {
 	roots := _once(array.concat(_walk_root_msgs(check, subj), sort(_m_for_said(check))))
 	roots != []
 } else := []
 
 _with_roots(said, roots) := roots if {
+	texts := {_clause_text(m) | some m in roots}
 	every part in said {
-		part in roots
+		_clause_text(part) in texts
 	}
-} else := array.concat([m | some m in roots; not _m_said_in(m, said)], said)
+} else := array.concat([m | some m in roots; not _m_said_in(_clause_text(m), [_clause_text(p) | some p in said])], [_root_or_part(p, roots) | some p in said])
+
+_root_or_part(p, roots) := ms[0] if {
+	ms := [m | some m in roots; _clause_text(m) == _clause_text(p)]
+	ms != []
+} else := p
 
 _for_alias_list(item, v) if {
 	is_array(v)
@@ -177,7 +178,7 @@ _for_rooted_row(check, subj, r) := object.union(r, {"cause": "unusable", "other_
 	flaw != ""
 	ms := _walk_root_msgs(check, subj)
 	ms != []
-} else := _worse_root(check, subj, _rooted_row(check, subj, r))
+} else := _m_row_texts(_worse_root(check, subj, _rooted_row(check, subj, r)))
 
 _worse_root(check, subj, rr) := object.union(rr, {"cause": _worst_of({rr.cause, flaw})}) if {
 	"other_roots" in object.keys(rr)
