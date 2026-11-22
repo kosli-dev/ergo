@@ -354,7 +354,7 @@ _keyed_other_side("right") := "left"
 
 _keyed_focus_value(e) := e.iv if e.r == []
 
-else := e.v
+else := e.v if not e.v in {_absent, _unusable_mark}
 
 _keyed_key_state(item, p) := _key_state(object.get(item, _fk(p[count(p) - 1]), _absent)) if {
 	is_object(item)

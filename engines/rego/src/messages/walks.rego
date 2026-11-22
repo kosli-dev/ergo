@@ -540,7 +540,7 @@ _m_tally_keyed_base(subj, side) := object.union({"faults": fs, "paths": _m_keyed
 	_whose_reads_keyed_root(whose)
 	fs := _once([x[2] | some x in sort([[i, f.text, f] |
 		some c in whose
-		object.get(c, "op", null) == "compare"
+		object.get(c, "op", null) in {"compare", "compare_time"}
 		some p in [object.get(c, "left", null), object.get(c, "right", null)]
 		_keyed_root_path(p)
 		f := _keyed_root_fault(subj, p)
@@ -552,7 +552,7 @@ _m_tally_keyed_base(subj, side) := object.union({"faults": fs, "paths": _m_keyed
 
 _m_keyed_fault_paths(subj, whose) := {p |
 	some c in whose
-	object.get(c, "op", null) == "compare"
+	object.get(c, "op", null) in {"compare", "compare_time"}
 	some p in [object.get(c, "left", null), object.get(c, "right", null)]
 	_keyed_root_path(p)
 	_keyed_root_fault(subj, p)
