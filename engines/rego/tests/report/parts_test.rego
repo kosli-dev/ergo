@@ -240,6 +240,41 @@ test_a_count_lists_its_items_in_list_order_when_one_comes_from_a_key_the_item_ho
 	[e.name | some e in es] == ["item 2 of xs", "item 3 of xs", "item 4 of xs"]
 }
 
+_keyed_count_against(right) := {
+	"op": "compare",
+	"cmp": "eq",
+	"expression": "a count of xs against another list",
+	"left": {
+		"count_of": ["xs"],
+		"text": "count of xs whose tags contains cov.m named by key",
+		"whose": [{"op": "compare", "cmp": "includes", "left": ["tags"], "right": [ergo._p_marker("cov", 1, null, false), "c", "m", {"named_by_field": "key"}]}],
+	},
+	"right": right,
+}
+
+_keyed_count_subject := {
+	"c": {"m": {"a": "x", "b": "y"}},
+	"xs": [{"key": "a", "tags": ["x"], "n": 1}, null, {"key": "a", "tags": ["x"], "n": 1}, {"key": null, "tags": ["x"], "n": 1}],
+	"ys": [{"n": 1}, null, {"n": null}],
+	"gs": [{"xs": [{"n": 1}, {"n": null}]}, null],
+}
+
+test_a_count_keeps_the_items_of_the_list_on_the_other_side_after_its_own_items_when_one_comes_from_a_key_the_item_holds if {
+	c := _keyed_count_against({"sum_of": ["ys", "n"], "text": "sum of ys.n", "whose": []})
+	subj := _keyed_count_subject
+	m := "item 2 of xs is null, which isn't an object; item 4 of xs: key is null, and item 2 of ys is null, which isn't an object; item 3 of ys: n is null"
+	es := ergo._tally_item_parts(c, subj, "not_an_object", {}, m) with input as {"ergo/names": {"ergo/subject": subj}}
+	[e.name | some e in es] == ["item 2 of xs", "item 4 of xs", "item 2 of ys", "item 3 of ys"]
+}
+
+test_a_count_keeps_a_nested_list_on_the_other_side_after_its_own_items_though_its_inner_items_share_the_name_xs if {
+	c := _keyed_count_against({"sum_of": ["gs", "xs", "n"], "text": "sum of gs.xs.n", "whose": []})
+	subj := _keyed_count_subject
+	m := "item 2 of xs is null, which isn't an object; item 4 of xs: key is null, and item 1 of gs: item 2 of xs: n is null; item 2 of gs: xs is missing"
+	es := ergo._tally_item_parts(c, subj, "not_an_object", {}, m) with input as {"ergo/names": {"ergo/subject": subj}}
+	[e.name | some e in es] == ["item 2 of xs", "item 4 of xs", "item 1 of gs", "item 2 of gs"]
+}
+
 test_a_count_puts_an_entry_that_is_not_an_item_of_its_list_before_the_items_as_the_list_comes_first if {
 	ergo._tally_rank({"name": "xs"}, ["item 1 of xs", "item 2 of xs"]) == -1
 	ergo._tally_rank({"name": "item 2 of xs"}, ["item 1 of xs", "item 2 of xs"]) == 1
