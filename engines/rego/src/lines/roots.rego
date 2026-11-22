@@ -668,8 +668,6 @@ _stand_in_keyed(p) if {
 	_key_step(step)
 }
 
-_stand_in_value := {"compare": 0, "compare_time": "1970-01-01T00:00:00Z"}
-
 _alone_read(check, subj) := object.union(a, {
 	"cause": _worst_of({f.cause | some f in failed}),
 	"failed": failed,

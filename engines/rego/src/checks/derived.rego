@@ -306,7 +306,7 @@ _tally(subj, side) := {"states": {"not_an_object"}, "list": _path_name(path), "v
 	judged_states := {c | some j in judged; some c in j.states}
 	flaw_states := {fl | some fl in flaws; fl != ""}
 	root_flaw_states := {fl | some c in side.whose; fl := _root_read_flaw(subj, c); fl != ""}
-	states := (((((walk_states | judged_states) | _tally_number_states(f, _tally_distinct(side, read, subj, "read"))) | flaw_states) | root_flaw_states) | _tally_alone_states(subj, side, w)) | _tally_keyed_root_states(subj, side)
+	states := (((((walk_states | judged_states) | _tally_number_states(f, _tally_distinct(side, read, subj, "read"))) | flaw_states) | root_flaw_states) | _tally_alone_states(subj, side, w)) | _tally_keyed_root_states(subj, side, w.items)
 	r := object.union(object.union({"states": states, "list": _walk_name(side[f], w.walked), "values": [_walk_value(e.v, e, w) | some e in w.items], "locations": _walk_locations(w)}, _tally_value(f, _tally_distinct(side, kept, subj, "kept"), states)), _tally_stop_outcome(stop))
 }
 
@@ -321,9 +321,45 @@ _tally_alone_states(subj, side, w) := {s |
 
 else := set()
 
-_tally_keyed_root_states(subj, side) := {f.cause | some f in b.faults} if {
+_tally_keyed_root_states(subj, side, items) := {f.cause | some f in b.faults} | {s | some e in items; some c in side.whose; s := _keyed_own_cause(c, e, b.paths)} if {
 	b := _m_tally_keyed_base(subj, side)
 } else := set()
+
+_keyed_own_cause(c, e, paths) := _worst_of(states) if {
+	o := _keyed_own(c, e, paths)
+	states := {s | some s in [o.operand, o.key]; not s in _tally_decided_causes}
+	states != set()
+}
+
+_keyed_own(c, e, paths) := {"side": f, "stand": s, "operand": _tally_focus_cause(s, e, ""), "key": _keyed_key_state(_keyed_focus_value(e), c[f])} if {
+	c.cmp in {"eq", "ne", "in", "gt", "gte", "lt", "lte", "includes", "matches_any"}
+	sides := [x | some x in _compare_side_list; c[x] in paths]
+	sides != []
+	f := sides[0]
+	s := _keyed_stand_in(c, f)
+}
+
+_keyed_stand_in(c, f) := object.union(c, {f: {"literal": _keyed_stand_value[c.cmp]}}) if {
+	f == "right"
+	c.cmp in object.keys(_keyed_stand_value)
+} else := object.union(c, {f: {"literal": _stand_in_value[c.op]}}) if {
+	c.cmp in {"gt", "gte", "lt", "lte"}
+} else := object.union(c, {"cmp": "eq", f: c[_keyed_other_side(f)]})
+
+_keyed_stand_value := {"includes": null, "matches_any": "x"}
+
+_keyed_other_side("left") := "right"
+
+_keyed_other_side("right") := "left"
+
+_keyed_focus_value(e) := e.iv if e.r == []
+
+else := e.v
+
+_keyed_key_state(item, p) := _key_state(object.get(item, _fk(p[count(p) - 1]), _absent)) if {
+	is_object(item)
+	not is_string(object.get(item, _fk(p[count(p) - 1]), null))
+} else := "satisfied"
 
 _tally_walked(side, p) := {"path": p, "member": true} if side.member == true
 
