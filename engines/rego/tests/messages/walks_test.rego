@@ -201,6 +201,68 @@ test_an_item_without_its_key_says_its_own_value_and_its_key_after_the_root_a_key
 	}
 }
 
+_items_said_beside_the_keyed_root(sentence, xs, field) if {
+	side := _keyed_count_side(sentence)
+	every root in _roots_that_cant_be_read {
+		said := [x[1] | some x in ergo._m_tally({"xs": xs}, side)] with data.ergo_document as root[0]
+		said == [
+			root[1],
+			concat("", ["item 1 of xs: ", field, " is missing"]),
+			concat("", ["item 2 of xs: ", field, " is ", json.marshal(xs[1][field]), ", which isn't ", _kind_wanted[field]]),
+			concat("", ["item 3 of xs: ", field, " is null"]),
+		]
+	}
+}
+
+_kind_wanted := {"s": "text", "tags": "a list", "v": "a number"}
+
+test_a_count_says_the_root_a_key_from_the_item_is_read_in_once_and_then_what_each_item_cant_read_whatever_the_phrase if {
+	every s in [
+		"count of xs whose s starts with $input.m named by key is 0",
+		"count of xs whose s ends with $input.m named by key is 0",
+		"count of xs whose s does not start with $input.m named by key is 0",
+		"count of xs whose s does not end with $input.m named by key is 0",
+		"count of xs whose s is alphabetically before $input.m named by key is 0",
+		"count of xs whose s is alphabetically on or after $input.m named by key is 0",
+		"count of xs whose s matches $input.m named by key is 0",
+		"count of xs whose s does not match $input.m named by key is 0",
+		"count of xs whose $input.m named by key starts with s is 0",
+	] {
+		_items_said_beside_the_keyed_root(s, [{"key": "a"}, {"key": "b", "s": 3}, {"key": "c", "s": null}], "s")
+	}
+	every s in [
+		"count of xs whose tags contains $input.m named by key is 0",
+		"count of xs whose tags does not contain $input.m named by key is 0",
+		"count of xs whose tags contains all of $input.m named by key is 0",
+		"count of xs whose tags does not contain all of $input.m named by key is 0",
+		"count of xs whose tags contains some of $input.m named by key is 0",
+		"count of xs whose tags contains none of $input.m named by key is 0",
+		"count of xs whose $input.m named by key contains all of tags is 0",
+	] {
+		_items_said_beside_the_keyed_root(s, [{"key": "a"}, {"key": "b", "tags": "x"}, {"key": "c", "tags": null}], "tags")
+	}
+	every s in [
+		"count of xs whose v is $input.m named by key within 1 is 0",
+		"count of xs whose v is more than $input.m named by key is 0",
+	] {
+		_items_said_beside_the_keyed_root(s, [{"key": "a"}, {"key": "b", "v": "x"}, {"key": "c", "v": null}], "v")
+	}
+}
+
+test_a_count_says_the_root_a_key_from_the_item_is_read_in_once_and_then_the_items_without_their_own_value_with_a_phrase_that_takes_any_kind if {
+	every s in [
+		"count of xs whose v is not one of $input.m named by key is 0",
+		"count of xs whose v is one of $input.m named by key is 0",
+		"count of xs whose $input.m named by key contains v is 0",
+	] {
+		side := _keyed_count_side(s)
+		every root in _roots_that_cant_be_read {
+			said := [x[1] | some x in ergo._m_tally({"xs": [{"key": "a"}, {"key": "b", "v": "x"}, {"key": "c", "v": null}]}, side)] with data.ergo_document as root[0]
+			said == [root[1], "item 1 of xs: v is missing", "item 3 of xs: v is null"]
+		}
+	}
+}
+
 test_an_item_says_each_condition_that_reads_the_root_a_key_from_it_is_read_in if {
 	side := _keyed_count_side("count of xs whose v is not $input.m named by key and whose w is $input.m named by key is 0")
 	every root in _roots_that_cant_be_read {
