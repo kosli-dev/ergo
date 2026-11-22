@@ -145,6 +145,12 @@ test_a_sentence_says_its_own_read_without_the_root if {
 	_sentence_clauses("every xs as x", ["x.v is at least $params.min"], subj, 1, 0, {"min": "s"}) == [ergo._m_clause("root", "\u0002x.v is missing", "absent", "\u0002x.v is missing")]
 }
 
+test_a_sentence_that_reads_params_that_arent_an_object_gives_no_clauses if {
+	_sentence_clauses("every xs as x", ["x.v is at least $params.min"], {"xs": [{"v": 1}]}, 0, 0, "s") == []
+	_sentence_clauses("every xs as x", ["x.v is at least $params.min"], {"xs": [{}]}, 0, 0, "s") == []
+	_sentence_clauses("every gs as g", ["count of g.es whose v is at least $params.min is 0"], {"gs": [{"es": [{}, {"v": "a"}]}]}, 0, 0, "s") == []
+}
+
 test_a_sentence_keeps_a_value_that_holds_a_semicolon_whole if {
 	_sentence_texts("every xs as x", ["x.v is at least $params.min"], {"xs": [{"v": "a; b"}]}, 0, 0, {"min": "s; t"}) == [`x.v is "a; b", which isn't a number`]
 }
