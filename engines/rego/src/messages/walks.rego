@@ -551,7 +551,7 @@ _m_tally_keyed_base(subj, side) := object.union({"faults": fs}, _m_tally_keyed_c
 
 _m_tally_keyed_clause(side, fs) := {"k": {"path": side.count_of, "clause": c}, "fault": fs[0]} if {
 	c := _keyed_clause_of(object.get(side, "count_of", null), object.get(side, "whose", null))
-	c.cmp in {"eq", "includes", "matches_any"}
+	c.cmp == "eq"
 } else := {}
 
 _m_tally_fail_state(side, x) := concat("", ["root ", x.cause]) if {

@@ -81,7 +81,8 @@ test_a_count_on_an_empty_list_says_only_the_root_a_key_from_the_item_is_read_in_
 		"count of xs whose v matches $input.m named by key is 0",
 		"count of xs whose $input.m named by key is v is 0",
 	] {
-		said := [x[1] | some x in ergo._m_tally({"xs": []}, _keyed_count_side(s))] with data.ergo_document as {"m": null}
+		side := _keyed_count_side(s)
+		said := [x[1] | some x in ergo._m_tally({"xs": []}, side)] with data.ergo_document as {"m": null}
 		said == ["$input.m is null"]
 	}
 }
