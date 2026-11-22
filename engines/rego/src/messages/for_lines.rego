@@ -907,7 +907,7 @@ _for_item_own(check, f, walked) := _for_whose_item_clause(check.items[0], e, _fo
 	e := walked.items[f.path]
 	wh := _for_whose(check.items[0], e, _for_names)
 	wh.undecided != []
-	check.items[0].whose != []
+	object.get(check.items[0], "whose", []) != []
 }
 
 _for_item_own(check, f, walked) := c if {
@@ -916,7 +916,7 @@ _for_item_own(check, f, walked) := c if {
 }
 
 _for_whose_undecided(check, f, walked) if {
-	check.items[0].whose != []
+	object.get(check.items[0], "whose", []) != []
 	_for_whose(check.items[0], walked.items[f.path], _for_names).undecided != []
 }
 
