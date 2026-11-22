@@ -96,7 +96,10 @@ _clause_text(x) := x.text if is_object(x)
 
 else := x
 
-_m_row_texts(rr) := object.union(rr, {k: [_clause_text(c) | some c in rr[k]] | some k in ["root_msgs", "other_roots"]; is_array(object.get(rr, k, null))})
+_m_row_texts(rr) := object.union(rr, {k: [_clause_text(c) | some c in rr[k]] | some k in ["root_msgs", "other_roots"]; is_array(object.get(rr, k, null))}) if {
+	some k in ["root_msgs", "other_roots"]
+	k in object.keys(rr)
+} else := rr
 
 _m_clause_texts(clauses) := [t | some c in clauses; some t in _m_clause_lines(c)]
 
@@ -105,6 +108,17 @@ _m_clauses_shown(clauses) := _m_clauses_cut(_m_clauses_order(clauses))
 _m_clauses_order(clauses) := array.concat(array.concat(_m_clauses_ahead(once), [c | some c in once; c.kind == "item"]), [c | some c in once; c.kind == "more"]) if once := _once(clauses)
 
 _m_walk_said(clauses, items) := {
+	"message": concat("; ", ts),
+	"ergo/own": [t | some t in ts; not t in items],
+	"ergo/texts": items,
+} if {
+	count(clauses) <= 3
+	every c in clauses {
+		c.kind == "item"
+		c.said == []
+	}
+	ts := _once([c.text | some c in clauses])
+} else := {
 	"message": _m_clauses_text(_m_clauses_cut(ordered)),
 	"ergo/own": [t | some t in _m_clause_texts(ordered); not t in items],
 	"ergo/texts": items,

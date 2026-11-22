@@ -173,16 +173,13 @@ _walk_parts(check, subj, raw, r) := _m_said_clauses(_once([x |
 	ls != []
 } else := _walk_parts_of(check, subj, raw, r)
 
-_m_part_clause(name, cause, text, lists) := _m_clause("item", name, cause, text) if {
-	_walk_kind(name) == "item"
-	startswith(text, name)
-}
+_m_part_clause(name, cause, text, check) := _m_clause("item", name, cause, text) if _walk_kind(text) == "item"
 
-else := _m_clause("list", _m_clause_name(text), cause, text) if _m_clause_name(text) in lists
+else := _m_clause("list", _m_clause_name(text), cause, text) if _m_clause_name(text) in _walk_list_names(check)
 
 else := _m_clause("root", _m_clause_name(text), cause, text)
 
-_m_fail_clause(f, roots, lists) := _m_part_clause(_m_item_name(f.item, roots), f.cause, _m_fail(f, roots), lists)
+_m_fail_clause(f, roots, check) := _m_part_clause(f.item, f.cause, _m_fail(f, roots), check)
 
 _m_key_texts(path) := [x[1] | some x in _m_key_said(path)]
 
@@ -204,10 +201,9 @@ _walk_parts_of(check, _, _, r) := ms if {
 	r.cause != "satisfied"
 	fails := object.get(r, "fails", [])
 	roots := _dotted_roots([check.path])
-	lists := _walk_list_names(check)
-	ms := [_m_fail_clause(f, roots, lists) | some p in sort({f.path | some f in fails}); some f in fails; f.path == p]
+	ms := [_m_fail_clause(f, roots, check) | some p in sort({f.path | some f in fails}); some f in fails; f.path == p]
 	ms != []
-} else := [_m_part_clause(object.get(f, "item", f.path), f.cause, _m_named_fail(f), _walk_list_names(check)) | some f in r.failed] if r.failed != []
+} else := [_m_part_clause(object.get(f, "item", f.path), f.cause, _m_named_fail(f), check) | some f in r.failed] if r.failed != []
 
 _walk_parts_of(check, subj, raw, r) := [_m_clause("root", _m_clause_name(t), "not_an_object", t)] if {
 	r.failed == []

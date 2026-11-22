@@ -576,9 +576,9 @@ _rooted_row(check, subj, r) := object.union(object.remove(a, ["other_roots"]), {
 	ms := _walk_root_clauses(check, subj)
 	ms != []
 } else := object.union(r, {"cause": _worst_of({flaw, r.cause}), "root_msgs": _with_roots(ps, ms), "ergo/alone_items": [_unrooted_text(t, ms) | some t in _walk_item_texts(ps, r)]}) if {
+	r.cause in _value_fault_causes
 	check.op != "for"
 	not _walk_keyed(check)
-	r.cause in _value_fault_causes
 	r.fails != []
 	every f in r.fails {
 		_path_through_item(f.item)
