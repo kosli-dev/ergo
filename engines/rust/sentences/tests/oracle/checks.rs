@@ -10774,6 +10774,36 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    (
+        "count of m.ys whose v is in $input.cs.name is 0",
+        "count of m.ys whose v is in $input.cs.name is 0",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose tags contains all of $params.cs.name is 0",
+        "count of xs whose tags contains all of $params.cs.name is 0",
+        &[],
+        &[],
+    ),
+    (
+        "every xs whose tags contains none of $input.cs.name exists",
+        "every xs whose tags contains none of $input.cs.name exists",
+        &[],
+        &[],
+    ),
+    (
+        "k plus count of xs whose v is in $input.cs.name is 0",
+        "k plus count of xs whose v is in $input.cs.name is 0",
+        &[],
+        &[],
+    ),
+    (
+        "m.v exists",
+        "m.v exists",
+        &[],
+        &[],
+    ),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -15518,6 +15548,18 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "every xs whose v is at least $params.min as x",
         "every xs whose v is at least $params.min as x",
+        &[],
+        &[],
+    ),
+    (
+        "every xs whose v is in $input.cs.name as m",
+        "every xs whose v is in $input.cs.name as m",
+        &[],
+        &[],
+    ),
+    (
+        "some xs whose v is in $input.cs.name as m",
+        "some xs whose v is in $input.cs.name as m",
         &[],
         &[],
     ),
