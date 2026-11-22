@@ -425,7 +425,7 @@ test_a_walk_whose_param_cant_be_used_fails_as_unusable_even_with_if_any if {
 	}
 	r := ergo.report(doc, _sentence_policy(checks), {"l": "text"})
 	[[row.check, row.cause, row.failures] | some row in r.results; row.check in {"a", "b", "c"}] == [
-		["a", "unusable", [_assertion("every xs.v whose kind is not in $params.l, if any, is 1", "unusable", ["$policy:/requirements/s/checks/a"], [_seen("$params.l", "text", ["$params:/l"], "unusable")], "$params.l is \"text\", which isn't a list", [])]],
+		["a", "unusable", [_assertion("every xs.v whose kind is not in $params.l, if any, is 1", "unusable", ["$policy:/requirements/s/checks/a"], [_seen("$params.l", "text", ["$params:/l"], "unusable")], "$params.l is \"text\", which isn't a list", [_item("item 1 of xs", "not_an_object", {"kind": "a", "v": 2}, ["/things/0/xs/0"], [_seen("xs[0].v.kind", null, ["/things/0/xs/0/v"], "not_an_object")], "v is 2, which isn't an object", [])])]],
 		["b", "unusable", [_assertion("every xs is not in $params.l", "unusable", ["$policy:/requirements/s/checks/b"], [_seen("$params.l", "text", ["$params:/l"], "unusable")], "$params.l is \"text\", which isn't a list", [])]],
 		["c", "unusable", [_assertion("every xs.kind is in $params.l", "unusable", ["$policy:/requirements/s/checks/c#2"], [_seen("$params.l", "text", ["$params:/l"], "unusable")], "$params.l is \"text\", which isn't a list", [])]],
 	]
@@ -1964,9 +1964,9 @@ test_a_whose_that_reads_a_ref_that_walks_an_empty_list_says_the_list_then_each_i
 	rows == [[false, "not_an_object", "$input.sbom.components is []; item 1 of deps: name is \"a\", which isn't an object"]]
 }
 
-test_a_whose_that_reads_a_ref_that_walks_an_empty_list_decides_before_its_left_side_is_looked_at if {
+test_a_whose_that_reads_a_ref_that_walks_an_empty_list_after_contains_some_of_says_the_item_it_cant_read if {
 	rows := _walk_right_rows("every deps.name whose tags contains some of $input.sbom.components.name is \"a\"", {"sbom": {"components": []}, "things": [{"id": "t1", "deps": [{"name": "a", "tags": "text"}]}]}, {})
-	[row[1] | some row in rows] == ["value"]
+	rows == [[false, "not_an_object", "$input.sbom.components is []; item 1 of deps: name is \"a\", which isn't an object"]]
 }
 
 test_a_path_that_starts_at_a_part_walks_and_names_the_part if {

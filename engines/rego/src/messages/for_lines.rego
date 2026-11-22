@@ -789,6 +789,11 @@ _list_phrase(leaf) if {
 	leaf.op in _single_contain_ops
 }
 
+_list_phrase(leaf) if {
+	leaf.op in _single_contain_ops
+	_is_ref(object.get(leaf, "values", null))
+}
+
 _m_right_needs(leaf, v) := "a number" if {
 	leaf.op == "compare"
 	leaf.cmp in {"gt", "gte", "lt", "lte"}

@@ -506,7 +506,7 @@ test_host_data_cannot_turn_on_reading_walked_roots if {
 	doc := {"cs": [{"id": "c1", "rows": [{"tags": ["bob"]}]}]}
 	params := {"os": [{"name": "bob"}, {}]}
 	plain := ergo.report(doc, policy, params)
-	[[r.cause, r.message] | some r in plain.results; r.check == "c"] == [["absent", "item 1 of rows: item 2 of $params.os: name is missing"]]
+	[[r.cause, r.message] | some r in plain.results; r.check == "c"] == [["absent", "item 2 of $params.os: name is missing"]]
 	hosted := ergo.report(doc, policy, params) with data.ergo_walk_roots as true
 	hosted == plain
 }
