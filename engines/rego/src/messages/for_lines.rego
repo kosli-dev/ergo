@@ -128,13 +128,31 @@ _for_whose_own(_, e) := _m_clause("item", name, "not_an_object", _m_isnt(name, e
 
 _for_whose_own(item, e) := clauses[0] if {
 	is_object(e.iv)
-	clauses := [_m_item_clause(_m_item_name(e.i, set()), cause, said) |
+	clauses := [x |
 		some c in item.whose
 		not _for_focus_cause(c, e) in _not_failing_causes
-		said := _once(_for_cond_own(c, _focus_of(e, c), object.get(_for_names, "ergo/subject", null)))
-		cause := _for_said_cause(said)
-		cause != "satisfied"
+		x := _for_cond_clause(c, e)
 	]
+}
+
+_for_cond_clause(c, e) := _m_item_clause(_m_item_name(e.i, set()), cause, [_m_clause("root", m, cause, m)]) if {
+	_focus_lost(e, c)
+	p := {"op": "present", "path": e.r}
+	cause := _row_cause(p, e.iv, "")
+	m := _message(p, e.iv, cause)
+} else := _m_clause("item", name, "not_an_object", _m_isnt(name, fe.iv, "an object")) if {
+	e.r != []
+	fe := _focus_of(e, c)
+	fe.r == []
+	not is_object(fe.iv)
+	some p in _condition_paths(c)
+	p != []
+	not _walk_outside(p)
+	name := _m_item_name(fe.i, set())
+} else := _m_item_clause(_m_item_name(e.i, set()), cause, said) if {
+	said := _once(_for_cond_own(c, _focus_of(e, c), object.get(_for_names, "ergo/subject", null)))
+	cause := _for_said_cause(said)
+	cause != "satisfied"
 }
 
 _for_said_cause(said) := _worst_or_value({x.cause | some x in said}) if said != []
