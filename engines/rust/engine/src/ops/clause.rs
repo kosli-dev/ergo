@@ -59,8 +59,9 @@ const SHOWN_ITEMS: usize = 3;
 
 pub fn shown(clauses: &[Clause]) -> Vec<Clause> {
     let once = said_once(clauses);
-    let (mut out, mut rest): (Vec<Clause>, Vec<Clause>) =
-        once.into_iter().partition(|clause| clause.kind == Kind::Root);
+    let (mut out, mut rest): (Vec<Clause>, Vec<Clause>) = once
+        .into_iter()
+        .partition(|clause| clause.kind == Kind::Root);
     out.sort_by(|a, b| (a.group, a.cause, &a.name).cmp(&(b.group, b.cause, &b.name)));
     rest.sort_by_key(|clause| (clause.group, clause.kind == Kind::Item));
     let leaves: usize = rest

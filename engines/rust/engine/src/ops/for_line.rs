@@ -1905,8 +1905,9 @@ impl For {
             && walked == Cause::Satisfied
             && !super::walked_roots_on()
         {
-            run.verdict.inputs =
-                super::reading_walked_roots(|| self.run_items(ctx)).verdict.inputs;
+            run.verdict.inputs = super::reading_walked_roots(|| self.run_items(ctx))
+                .verdict
+                .inputs;
         }
         if run.verdict.cause != Cause::Satisfied {
             self.key_inputs(&mut run, ctx);
@@ -2379,7 +2380,9 @@ impl For {
                 super::message::for_empty(&listed, &outer, cause)
                     .into_iter()
                     .filter(|text| !roots.contains(text))
-                    .map(|text| Clause::list(&text.clone(), cause, text).in_group(self.sentences.len())),
+                    .map(|text| {
+                        Clause::list(&text.clone(), cause, text).in_group(self.sentences.len())
+                    }),
             );
         }
         if keyed && cause != Cause::Satisfied {

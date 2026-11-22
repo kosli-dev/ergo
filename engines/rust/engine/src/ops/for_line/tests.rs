@@ -3592,9 +3592,24 @@ fn a_list_that_a_sentence_and_the_line_both_cant_walk_is_said_once() {
 fn a_list_the_line_picks_nothing_from_is_said_after_a_sentence_that_reads_no_alias() {
     let kept = json!({"xs": [{"v": 3}], "z": 3});
     for (for_line, subject, cause, list) in [
-        ("every xs whose v is 1 as x", &kept, "value", "xs is [{\"v\": 3}]"),
-        ("some xs whose v is 1 as x", &kept, "value", "xs is [{\"v\": 3}]"),
-        ("first of xs whose v is 1 as x", &kept, "absent", "xs is [{\"v\": 3}]"),
+        (
+            "every xs whose v is 1 as x",
+            &kept,
+            "value",
+            "xs is [{\"v\": 3}]",
+        ),
+        (
+            "some xs whose v is 1 as x",
+            &kept,
+            "value",
+            "xs is [{\"v\": 3}]",
+        ),
+        (
+            "first of xs whose v is 1 as x",
+            &kept,
+            "absent",
+            "xs is [{\"v\": 3}]",
+        ),
         (
             "first of xs sorted by v as x",
             &json!({"xs": [], "z": 3}),
@@ -3836,25 +3851,37 @@ fn a_list_the_line_cant_walk_isnt_counted_as_an_item() {
             "every xs as x, every es as e",
             "x.v is 1",
             json!({"xs": [{"v": 2}, {"v": 3}, {"v": 4}], "es": null}),
-            ("null", "es is null; item 1 of xs: x.v is 2; item 2 of xs: x.v is 3; item 3 of xs: x.v is 4"),
+            (
+                "null",
+                "es is null; item 1 of xs: x.v is 2; item 2 of xs: x.v is 3; item 3 of xs: x.v is 4",
+            ),
         ),
         (
             "every ks, if any, as k",
             "every es.zz is 1",
             json!({"ks": null, "es": zz(3)}),
-            ("null", "item 1 of es: zz is 2; item 2 of es: zz is 3; item 3 of es: zz is 4; ks is null"),
+            (
+                "null",
+                "item 1 of es: zz is 2; item 2 of es: zz is 3; item 3 of es: zz is 4; ks is null",
+            ),
         ),
         (
             "every ks, if any, as k",
             "every es.zz is 1",
             json!({"ks": null, "es": zz(4)}),
-            ("null", "item 1 of es: zz is 2; item 2 of es: zz is 3; item 3 of es: zz is 4; ks is null; and 1 more"),
+            (
+                "null",
+                "item 1 of es: zz is 2; item 2 of es: zz is 3; item 3 of es: zz is 4; ks is null; and 1 more",
+            ),
         ),
         (
             "every ks as k",
             "every es.zz is 1",
             json!({"ks": [], "es": zz(3)}),
-            ("value", "item 1 of es: zz is 2; item 2 of es: zz is 3; item 3 of es: zz is 4; ks is []"),
+            (
+                "value",
+                "item 1 of es: zz is 2; item 2 of es: zz is 3; item 3 of es: zz is 4; ks is []",
+            ),
         ),
     ] {
         assert_eq!(
