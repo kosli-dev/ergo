@@ -212,3 +212,46 @@ test_a_from_filter_walk_with_a_root_beside_items_that_fail_on_their_own_keeps_th
 	said["ergo/texts"] == [item]
 	said["ergo/own"] == ["$params.min is \"s\", which isn't a number"]
 }
+
+_whose_item_texts(line, subj, params) := [[ergo._m_aliased(t) | some t in ergo._m_clause_texts([c])] |
+	check := ergo._s_written_check({"for": line, "assert": ["1 is 1"]})
+	item := check.items[0]
+	names := {"ergo/subject": subj, "$at": {"names": {}}}
+	w := ergo._for_walk(item, subj, names) with input as {"ergo/names": names} with data.ergo_params as params
+	some e in w.items
+	wh := ergo._for_whose(item, e, names) with data.ergo_params as params
+	c := ergo._for_whose_item_clause(item, e, names, wh) with data.ergo_params as params
+]
+
+test_a_whose_item_says_only_its_own_read_beside_a_root if {
+	_whose_item_texts("every xs whose v is at least $params.min as x", {"xs": [{"v": 1}, {}]}, {"min": "s"}) == [[], ["item 2 of xs: v is missing"]]
+}
+
+test_a_whose_item_beside_a_root_says_a_value_of_the_wrong_kind_and_a_null if {
+	_whose_item_texts("every xs whose v is at least $params.min as x", {"xs": [{"v": "a"}, {"v": null}]}, {"min": "s"}) == [[`item 1 of xs: v is "a", which isn't a number`], ["item 2 of xs: v is null"]]
+}
+
+test_a_whose_item_says_each_own_read_beside_a_key_that_isnt_text if {
+	subj := {"es": [{"v": 1}, {"v": 2, "zz": 1, "m": {"a": 1}}, {"v": 3, "m": null}]}
+	_whose_item_texts("every es whose zz is m named by $params.k as e", subj, {"k": 3}) == [
+		["item 1 of es: zz is missing, and m is missing"],
+		[],
+		["item 3 of es: zz is missing, and m is null"],
+	]
+}
+
+test_a_whose_item_says_the_base_of_a_key_first_when_the_key_is_read_first if {
+	_whose_item_texts("every es whose m named by $params.k is zz as e", {"es": [{}]}, {"k": 3}) == [["item 1 of es: m is missing, and zz is missing"]]
+}
+
+test_a_whose_item_says_what_its_check_says_when_it_reads_no_root if {
+	_whose_item_texts("every xs whose v is w as x", {"xs": [{"w": 1}]}, {}) == [["item 1 of xs: v is missing"]]
+}
+
+test_a_whose_item_that_isnt_an_object_says_so_beside_a_root if {
+	_whose_item_texts("every xs whose v is at least $params.min as x", {"xs": [3]}, {"min": "s"}) == [["item 1 of xs is 3, which isn't an object"]]
+}
+
+test_an_item_the_whose_decides_has_no_whose_item_clause if {
+	_whose_item_texts("every xs whose v is 1 as x", {"xs": [{"v": 1}, {"v": 2}]}, {}) == []
+}
