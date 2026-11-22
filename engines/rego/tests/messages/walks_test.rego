@@ -141,6 +141,84 @@ test_an_item_of_a_list_reached_through_a_list_doesnt_say_again_the_root_a_key_fr
 	}
 }
 
+_roots_that_cant_be_read := [
+	[{}, "$input.m is missing"],
+	[{"m": null}, "$input.m is null"],
+	[{"m": 3}, "$input.m is 3, which isn't an object"],
+]
+
+test_a_count_says_the_root_a_key_from_the_item_is_read_in_once_and_then_each_item_whose_own_value_it_cant_read if {
+	every s in [
+		"count of xs whose v is not $input.m named by key is 0",
+		"count of xs whose v is $input.m named by key is 0",
+		"count of xs whose v is at least $input.m named by key is 0",
+		"count of xs whose v is in $input.m named by key is 0",
+		"count of xs whose $input.m named by key is v is 0",
+	] {
+		side := _keyed_count_side(s)
+		every pair in _roots_that_cant_be_read {
+			said := [x[1] | some x in ergo._m_tally({"xs": [{"key": "a"}, {"key": "b", "v": null}]}, side)] with data.ergo_document as pair[0]
+			said == [pair[1], "item 1 of xs: v is missing", "item 2 of xs: v is null"]
+		}
+	}
+}
+
+test_an_item_without_its_key_says_its_own_value_and_its_key_after_the_root_a_key_from_it_is_read_in if {
+	every pair in [
+		["count of xs whose v is not $input.m named by key is 0", "item 1 of xs: v is missing, and key is missing"],
+		["count of xs whose v is at least $input.m named by key is 0", "item 1 of xs: v is missing, and key is missing"],
+		["count of xs whose v is in $input.m named by key is 0", "item 1 of xs: v is missing, and key is missing"],
+		["count of xs whose $input.m named by key is v is 0", "item 1 of xs: key is missing, and v is missing"],
+	] {
+		side := _keyed_count_side(pair[0])
+		every root in _roots_that_cant_be_read {
+			said := [x[1] | some x in ergo._m_tally({"xs": [{"tags": ["x"]}]}, side)] with data.ergo_document as root[0]
+			said == [root[1], pair[1]]
+		}
+	}
+}
+
+test_an_item_says_each_condition_that_reads_the_root_a_key_from_it_is_read_in if {
+	side := _keyed_count_side("count of xs whose v is not $input.m named by key and whose w is $input.m named by key is 0")
+	every root in _roots_that_cant_be_read {
+		said := [x[1] | some x in ergo._m_tally({"xs": [{"tags": ["x"]}, {"key": "a"}]}, side)] with data.ergo_document as root[0]
+		said == [
+			root[1],
+			"item 1 of xs: v is missing, and key is missing",
+			"item 1 of xs: w is missing, and key is missing",
+			"item 2 of xs: v is missing",
+			"item 2 of xs: w is missing",
+		]
+	}
+}
+
+test_a_count_says_a_root_further_back_once_and_then_each_item_it_cant_read_on_its_own if {
+	side := _keyed_count_side("count of xs whose v is not $input.d.m named by key is 0")
+	subj := {"xs": [null, {"key": "a", "tags": ["x"]}, {"tags": ["x"]}]}
+	every pair in [
+		[{"d": 3}, "$input.d is 3, which isn't an object"],
+		[{"d": "s"}, "$input.d is \"s\", which isn't an object"],
+		[{"d": null}, "$input.d is null"],
+	] {
+		said := [x[1] | some x in ergo._m_tally(subj, side)] with data.ergo_document as pair[0]
+		said == [
+			pair[1],
+			"item 1 of xs is null, which isn't an object",
+			"item 2 of xs: v is missing",
+			"item 3 of xs: v is missing, and key is missing",
+		]
+	}
+}
+
+test_an_item_of_a_list_reached_through_a_list_says_what_it_cant_read_on_its_own_after_the_root if {
+	side := _keyed_count_side("count of xs.v whose v is not $input.m named by key is 0")
+	subj := {"xs": [{"v": {"key": "a"}}, {"v": {"key": "b", "v": null}}]}
+	every pair in _roots_that_cant_be_read {
+		said := [x[1] | some x in ergo._m_tally(subj, side)] with data.ergo_document as pair[0]
+		said == [pair[1], "item 1 of xs: v: v is missing", "item 2 of xs: v: v is null"]
+	}
+}
+
 test_a_count_on_an_empty_list_doesnt_add_its_root_again_after_the_root_it_already_says if {
 	check := ergo._s_written_check("count of xs whose tags contains $input.m named by key is 1")
 	o := {"passed": false, "cause": "null", "message": "$input.m is null"}
