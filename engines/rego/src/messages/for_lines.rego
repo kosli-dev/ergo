@@ -902,14 +902,16 @@ _for_item_own(check, f) := _for_whose_item_clause(check.items[0], e, _for_names,
 	[e, _] := _for_item_walked(check, f)
 	wh := _for_whose(check.items[0], e, _for_names)
 	wh.undecided != []
+	check.items[0].whose != []
 }
 
 _for_item_own(check, f) := c if {
-	not _for_item_undecided(check, f)
+	not _for_whose_undecided(check, f)
 	c := _for_item_kept(check, f)
 }
 
-_for_item_undecided(check, f) if {
+_for_whose_undecided(check, f) if {
+	check.items[0].whose != []
 	[e, _] := _for_item_walked(check, f)
 	_for_whose(check.items[0], e, _for_names).undecided != []
 }

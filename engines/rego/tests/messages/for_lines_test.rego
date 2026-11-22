@@ -367,7 +367,7 @@ test_an_item_the_line_cant_reach_says_what_it_found_there if {
 }
 
 test_an_item_the_line_reads_through_says_what_it_found_there_with_no_whose if {
-	_item_texts("every pull_requests.title as t", ["t is 1"], {"pull_requests": [{"title": "Fix"}, {}]}, {}) == [["item 2 of pull_requests: title is missing"]]
+	_item_texts("every pull_requests.title as t", [`t is "Fix"`], {"pull_requests": [{"title": "Fix"}, {}]}, {}) == [["item 2 of pull_requests: title is missing"]]
 }
 
 test_an_item_the_whose_cant_decide_says_its_whose_clause if {
