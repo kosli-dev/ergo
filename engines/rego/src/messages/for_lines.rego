@@ -1120,6 +1120,8 @@ _for_list_texts(check, subj, r) := [] if {
 
 else := [] if "free_lines" in object.keys(r)
 
+else := [] if "root_msgs" in object.keys(r)
+
 else := _for_empty_texts(check, subj, r)
 
 _for_empty_texts(check, subj, r) := [_m_not_object(check, subj)] if r.cause == "not_an_object"
