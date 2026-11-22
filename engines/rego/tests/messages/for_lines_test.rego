@@ -262,6 +262,21 @@ test_a_whose_item_that_isnt_an_object_says_so_beside_a_root if {
 	_whose_item_texts("every xs whose v is at least $params.min as x", {"xs": [3]}, {"min": "s"}) == [["item 1 of xs is 3, which isn't an object"]]
 }
 
+test_a_whose_item_beside_a_time_root_says_its_own_read_against_a_stand_in_time if {
+	subj := {"xs": [{}, {"v": null}, {"v": 1}, {"v": "2020-01-01T00:00:00Z"}]}
+	_whose_item_texts("every xs whose v is after $params.t as x", subj, {"t": "s"}) == [["item 1 of xs: v is missing"], ["item 2 of xs: v is null"], [`item 3 of xs: v is 1, which isn't a time written like "1970-01-01T00:00:00Z"`]]
+}
+
+test_a_whose_item_beside_a_list_root_says_only_its_own_read if {
+	subj := {"xs": [{"v": 1}, {}, {"v": null}, {"v": ["a"]}]}
+	own := [["item 1 of xs: v is 1, which isn't a list"], ["item 2 of xs: v is missing"], ["item 3 of xs: v is null"]]
+	_whose_item_texts("every xs whose v contains $params.t as x", subj, {}) == own
+	_whose_item_texts("every xs whose v contains $params.t as x", subj, {"t": null}) == own
+	_whose_item_texts("every xs whose v contains all of $params.t as x", subj, {"t": 3}) == own
+	_whose_item_texts("every xs whose v is in $params.l as x", {"xs": [{"v": 1}, {}, {"v": null}]}, {"l": "s"}) == [["item 2 of xs: v is missing"], ["item 3 of xs: v is null"]]
+	_whose_item_texts("every xs whose v matches $params.p as x", {"xs": [{"v": 1}, {}, {"v": null}, {"v": "a"}]}, {"p": 3}) == [["item 1 of xs: v is 1, which isn't text"], ["item 2 of xs: v is missing"], ["item 3 of xs: v is null"]]
+}
+
 test_an_item_the_whose_decides_has_no_whose_item_clause if {
 	_whose_item_texts("every xs whose v is 1 as x", {"xs": [{"v": 1}, {"v": 2}]}, {}) == []
 }
