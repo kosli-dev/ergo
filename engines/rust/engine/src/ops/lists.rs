@@ -587,9 +587,12 @@ where
     let inputs = left.inputs.into_iter().chain(read.inputs).collect();
     let cause = match (read.forced, read.outcome.cause(), &read.value) {
         (Some(forced), _, _) if text => Cause::worst(
-            [Some(forced), text_side_cause(&left.outcome, left.value.as_ref())]
-                .into_iter()
-                .flatten(),
+            [
+                Some(forced),
+                text_side_cause(&left.outcome, left.value.as_ref()),
+            ]
+            .into_iter()
+            .flatten(),
         )
         .unwrap_or(forced),
         (Some(cause), _, _) | (None, Some(cause), _) => cause,
@@ -687,8 +690,12 @@ fn in_text(
     found: Option<&Value>,
 ) -> Cause {
     if let Some(cause) = text_items_cause(values) {
-        return Cause::worst([Some(cause), text_side_cause(outcome, found)].into_iter().flatten())
-            .unwrap_or(cause);
+        return Cause::worst(
+            [Some(cause), text_side_cause(outcome, found)]
+                .into_iter()
+                .flatten(),
+        )
+        .unwrap_or(cause);
     }
     let text = match left_cause(outcome, found) {
         Ok(Value::String(text)) => text,
