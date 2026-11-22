@@ -4425,3 +4425,140 @@ fn a_walked_list_is_a_root_named_by_its_path_so_its_own_sentence_says_it_first()
         )
     );
 }
+
+#[test]
+fn a_value_a_sentence_that_reads_no_alias_already_said_isnt_said_again_under_each_item() {
+    for (assertions, said) in [
+        (["z is 1", "x.v is at least z"], "z is 5"),
+        (["x.v is at least z", "z is 1"], "z is 5"),
+        (
+            ["$params.q is 1", "x.v is at least $params.q"],
+            "$params.q is 5",
+        ),
+        (
+            ["count of es is 1", "x.v is at least count of es"],
+            "count of es is 4",
+        ),
+        (
+            ["sum of es is 1", "x.v is at least sum of es"],
+            "sum of es is 10",
+        ),
+    ] {
+        assert_eq!(
+            for_tree(
+                "every xs as x",
+                &assertions,
+                json!({"xs": [{"v": 1}, {"v": 3}], "es": [1, 2, 3, 4], "z": 5}),
+                json!({"q": 5}),
+            ),
+            format!("{said}; item 1 of xs: x.v is 1; item 2 of xs: x.v is 3"),
+            "{assertions:?}"
+        );
+    }
+}
+
+#[test]
+fn a_list_a_sentence_that_reads_no_alias_already_said_isnt_said_again_under_each_item() {
+    for assertions in [
+        ["every es.zz is 1", "sum of es.m named by k is 1"],
+        ["every es.zz is 1", "count of es.m named by k is 1"],
+        ["sum of es.m named by k is 1", "every es.zz is 1"],
+    ] {
+        assert_eq!(
+            for_tree(
+                "every ks as k",
+                &assertions,
+                json!({"es": null, "ks": ["a", "v"]}),
+                json!({}),
+            ),
+            "es is null",
+            "{assertions:?}"
+        );
+    }
+}
+
+#[test]
+fn an_item_merged_with_one_of_the_same_name_keeps_each_text_once() {
+    use crate::cause::Cause;
+    use crate::ops::clause::Clause;
+    let null =
+        |text: &str| Clause::item("item 2 of x.ys", Cause::Null, text.to_string(), Vec::new());
+    let mut said = vec![null("item 2 of x.ys is null")];
+    for text in [
+        "item 2 of x.ys is null, which isn't an object",
+        "item 2 of x.ys is null",
+        "item 2 of x.ys is null, which isn't an object",
+    ] {
+        super::merge_clause(&mut said, &null(text));
+    }
+    assert_eq!(
+        crate::ops::clause::lines(&said),
+        [
+            "item 2 of x.ys is null",
+            "item 2 of x.ys is null, which isn't an object"
+        ]
+    );
+}
+
+#[test]
+fn two_sentences_that_say_different_problems_of_one_item_of_a_list_under_the_item_say_both() {
+    assert_eq!(
+        for_tree(
+            "every xs as x",
+            &["every x.ys exists", "sum of x.ys.n is 3"],
+            json!({"xs": [{"v": 2, "ys": [{"n": 1}, null]}]}),
+            json!({}),
+        ),
+        "item 1 of xs: item 2 of x.ys is null, and item 2 of x.ys is null, which isn't an object"
+    );
+    assert_eq!(
+        for_tree(
+            "every xs as x",
+            &["sum of x.ys.n is 3", "every x.ys exists"],
+            json!({"xs": [{"v": 2, "ys": [{"n": 1}, null]}]}),
+            json!({}),
+        ),
+        "item 1 of xs: item 2 of x.ys is null, which isn't an object, and item 2 of x.ys is null"
+    );
+}
+
+#[test]
+fn sentences_that_say_two_problems_of_one_item_of_a_list_under_the_item_say_each_once() {
+    for (assertions, said) in [
+        (
+            vec![
+                "every x.ys exists",
+                "sum of x.ys.n is 3",
+                "every x.ys.n is 1",
+            ],
+            "item 1 of xs: item 2 of x.ys is null, and item 2 of x.ys is null, which isn't an object",
+        ),
+        (
+            vec![
+                "sum of x.ys.n is 3",
+                "every x.ys exists",
+                "sum of x.ys.n is 4",
+            ],
+            "item 1 of xs: item 2 of x.ys is null, which isn't an object, and item 2 of x.ys is null",
+        ),
+        (
+            vec!["every x.ys exists", "every x.ys.n is 1"],
+            "item 1 of xs: item 2 of x.ys is null, and item 2 of x.ys is null, which isn't an object",
+        ),
+        (
+            vec!["every x.ys exists", "sum of x.ys.n is 3", "x.v is 1"],
+            "item 1 of xs: item 2 of x.ys is null, and item 2 of x.ys is null, which isn't an object; item 1 of xs: x.v is 2",
+        ),
+    ] {
+        assert_eq!(
+            for_tree(
+                "every xs as x",
+                &assertions,
+                json!({"xs": [{"v": 2, "ys": [{"n": 1}, null]}]}),
+                json!({}),
+            ),
+            said,
+            "{assertions:?}"
+        );
+    }
+}
