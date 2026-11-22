@@ -4206,3 +4206,41 @@ fn an_item_that_isnt_an_object_is_said_when_the_sort_key_cant_be_read() {
         }
     }
 }
+
+#[test]
+fn an_items_own_problem_is_said_beside_a_second_list_whose_items_arent_objects_when_a_key_isnt_text()
+ {
+    let xs = json!([{"v": "s", "k": "a"}, {"v": 1, "m": [5]}]);
+    let by_z = "z is 3, which isn't text; item 1 of xs: x.m named by z is missing; item 1 of xs: item 1 of es is 3, which isn't an object; item 2 of xs: item 1 of es is 3, which isn't an object";
+    for (for_line, assertion, params, message) in [
+        (
+            "every xs as x, every es as e",
+            "x.m named by z is 1",
+            json!({}),
+            by_z,
+        ),
+        (
+            "some xs as x, every es, if any, as e",
+            "x.m named by z is 1",
+            json!({}),
+            by_z,
+        ),
+        (
+            "every xs as x, every es as e",
+            "x.m named by $params.k is 1",
+            json!({"k": 3}),
+            "$params.k is 3, which isn't text; item 1 of xs: x.m is missing; item 1 of xs: item 1 of es is 3, which isn't an object; item 2 of xs: x.m is [5], which isn't an object; item 2 of xs: item 1 of es is 3, which isn't an object",
+        ),
+    ] {
+        assert_eq!(
+            for_row(
+                for_line,
+                &[assertion, "e.zz is x.v"],
+                json!({"xs": xs, "es": [3], "z": 3}),
+                params,
+            ),
+            ("not_an_object".to_string(), message.to_string()),
+            "{for_line} {assertion}"
+        );
+    }
+}
