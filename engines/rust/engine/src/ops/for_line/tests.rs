@@ -4094,3 +4094,34 @@ fn an_item_that_isnt_an_object_isnt_said_again_as_a_walk_of_its_alias_by_the_sec
         );
     }
 }
+
+#[test]
+fn sentences_that_read_no_alias_and_walk_one_list_each_keep_their_own_parts() {
+    let es = json!([{"m": null}, {"zz": "s", "m": null}]);
+    for (assertions, cause, message) in [
+        (
+            [
+                "count of es whose zz is at least $params.min is 1",
+                "count of es whose zz is m named by $params.k is 0",
+            ],
+            "unusable",
+            "$params.min is missing; item 1 of es: zz is missing; item 2 of es: zz is \"s\", which isn't a number; $params.k is missing; item 1 of es: zz is missing, and m is null; and 1 more",
+        ),
+        (
+            ["every es.zz is 1", "every es.m is 1"],
+            "unusable",
+            "item 1 of es: zz is missing; item 2 of es: zz is \"s\", which isn't a number; item 1 of es: m is null; and 1 more",
+        ),
+    ] {
+        assert_eq!(
+            for_row(
+                "every ks as k",
+                &assertions,
+                json!({"ks": ["a"], "es": es}),
+                json!({}),
+            ),
+            (cause.to_string(), message.to_string()),
+            "{assertions:?}"
+        );
+    }
+}
