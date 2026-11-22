@@ -11302,5 +11302,87 @@
    ]
   },
   "want": "$params is 3, which isn't an object"
+ },
+ {
+  "name": "plain r5-6/a null list two sentences read said once [problems.all_said]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "assert": [
+        "every es.zz is 1",
+        "count of es whose zz is m named by $params.k is 0"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": null
+    }
+   ]
+  },
+  "want": "es is null; $params.k is missing"
+ },
+ {
+  "name": "for r5-6/a root said with the sentence that can't read it, not an earlier one that reads it fine [for.pass]",
+  "params": {
+   "l": [
+    1,
+    2
+   ]
+  },
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs as x",
+       "assert": [
+        "z is in $params.l",
+        "w is 1",
+        "x.m named by z is 1"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "z": 1,
+     "xs": [
+      {
+       "m": {
+        "a": 1
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "want": "w is missing; z is 1, which isn't text"
  }
 ]
