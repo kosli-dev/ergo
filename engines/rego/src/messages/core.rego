@@ -365,6 +365,10 @@ _m_message(check, subj, "value") := m if {
 	clauses := _once([c | some side in _m_sides(check); some c in _m_value_clauses(subj, side)])
 	count(clauses) > 0
 	m := concat(", and ", clauses)
+} else := m if {
+	clauses := _m_tallies(subj, check, "value")
+	count(clauses) > 0
+	m := concat(", and ", clauses)
 } else := _m_fallback(check)
 
 _m_message(check, subj, cause) := m if {

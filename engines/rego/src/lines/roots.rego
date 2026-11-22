@@ -506,7 +506,7 @@ _m_cond_walked_said(c) := [[cause, t] |
 	walk(c, [_, x])
 	is_object(x)
 	_list_phrase(x)
-	some cause in _value_fault_cause_list
+	some cause in array.concat(_value_fault_cause_list, ["value"])
 	t := _m_walked_root_text(x, cause)
 ]
 
