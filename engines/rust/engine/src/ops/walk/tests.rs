@@ -2023,10 +2023,20 @@ fn a_root_compared_with_a_list_after_is_in_ignoring_case_is_said_once_and_names_
             Cause::Unusable,
             "item 2 of $params.l is 3, which isn't text; $params.k is missing",
         ),
+        (
+            json!({"k": 3, "l": ["a"]}),
+            Cause::Unusable,
+            "$params.k is 3, which isn't text",
+        ),
+        (
+            json!({"k": 3, "l": ["a", null]}),
+            Cause::Unusable,
+            "$params.k is 3, which isn't text; item 2 of $params.l is null",
+        ),
     ] {
         let out = row_of(
             "every xs whose $params.k is in $params.l ignoring case, if any, exists",
-            json!({"xs": [{"v": "a"}]}),
+            json!({"xs": [{"v": "a"}, {}]}),
             params.clone(),
         );
         assert_eq!(
