@@ -8,7 +8,6 @@ known_differences := {
 	"derived / an every or some whose whose reads a root from $input through a key the item holds fails on the root, said once, when each item reads fine / the root is missing",
 	"derived / an every or some whose whose reads a root from $input through a key the item holds fails on the root, said once, when each item reads fine / the root is null",
 	"derived / an every or some whose whose reads a root from $params through a key the item holds fails on the root, said once, when each item reads fine / the root is null",
-	"for / a part that holds a list is walked by a whose in `count of m.ys whose v is in pl.z is 0` / the part holds an empty list and the list has an item",
 	"for / a part that holds a list is walked in the whose of a for line and in a whose under it / an empty part fails as value",
 	"for / the roots of the line's own whose come before the roots of its sentences, whatever their causes / $params.min is missing and says first, though $params.a has the worse cause",
 }
