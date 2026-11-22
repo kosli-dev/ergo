@@ -93,3 +93,11 @@ test_a_row_whose_items_fail_only_on_a_root_beside_a_list_after_is_in_ignoring_ca
 	ok := ergo._walk_row(check, {"xs": [{"v": "a"}]}) with data.ergo_params as {"l": ["a"]} with input as {}
 	ok.root_msgs == ["$params.k is missing"]
 }
+
+test_a_walked_list_after_is_in_ignoring_case_takes_the_worst_cause_of_its_values_as_a_walked_root if {
+	ref := {"op": "in", "path": ["v"], "values": {"ref": ["$$input[]", "cs", "name"]}, "ignoring": "case"}
+	ergo._walked_root_states(ref) == {"unusable"} with data.ergo_document as {"cs": [{"name": 3}]} with input as {}
+	ergo._walked_root_states(ref) == {"unusable", "null"} with data.ergo_document as {"cs": [{"name": null}, {"name": true}]} with input as {}
+	ergo._walked_root_states(ref) == set() with data.ergo_document as {"cs": [{"name": "a"}]} with input as {}
+	ergo._walked_root_states(object.remove(ref, ["ignoring"])) == set() with data.ergo_document as {"cs": [{"name": 3}]} with input as {}
+}
