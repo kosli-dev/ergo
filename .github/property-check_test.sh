@@ -23,7 +23,7 @@ for requirement in policy["requirements"].values():
     for name in requirement["checks"]:
         for subject in data["things"]:
             results.append({"requirement": "r", "check": name, "subject": {"id": subject["id"]},
-                            "passed": os.environ.get("FAKE_PASSED") == "1", "cause": "satisfied", "message": ""})
+                            "passed": os.environ.get("FAKE_PASSED") == "1", "cause": "satisfied", "message": os.environ.get("FAKE_MESSAGE", "")})
 print(json.dumps({"results": results}))
 PY
 printf '#!/bin/sh\nexec python3 %s "$@"\n' "$dir/fake.py" > "$dir/ergo"
@@ -80,3 +80,37 @@ esac
 echo "property-check.py shows the rows of a flag"
 FAKE_PASSED=1 run --probes 30 > /dev/null
 python3 "$tool" show --out "$dir/out" PASS_WHERE_REGO_FAILS | grep -q "^## "
+
+echo "property-check.py makes another policy for another seed"
+FAKE_PASSED=0 run --probes 30 --seed 2 --out "$dir/out2" > "$dir/seed2.txt"
+grep -q "^seed 2: " "$dir/seed2.txt"
+if cmp -s "$dir/out/pol.json" "$dir/out2/pol.json"; then
+  echo "seeds 1 and 2 made the same policy" >&2
+  exit 1
+fi
+
+echo "property-check.py flags a problem said twice"
+FAKE_PASSED=0 FAKE_MESSAGE="x; x" run --probes 30 --out "$dir/out3" > "$dir/twice.txt"
+grep -q "SAID_TWICE" "$dir/twice.txt" || { echo "no flag: $(cat "$dir/twice.txt")" >&2; exit 1; }
+
+echo "property-check.py lists the rows that gained a flag between two runs"
+FAKE_PASSED=0 run --probes 30 --out "$dir/before" > /dev/null
+FAKE_PASSED=1 run --probes 30 --out "$dir/after" > /dev/null
+python3 "$tool" new "$dir/before" "$dir/after" | grep -q "^== PASS_WHERE_REGO_FAILS: [1-9]"
+python3 "$tool" new "$dir/before" "$dir/before" | grep -q "no row gained a flag"
+
+echo "property-check.py counts the probes it covered"
+python3 "$tool" cover "$dir/before" | grep -q "probes$"
+
+echo "property-check.py compares the two builds row by row"
+FAKE_COMMIT=$head python3 "$tool" order "$dir/before" --main-bin "$dir/ergo" --branch-bin "$dir/ergo" --main-tree "$root" --branch-tree "$root" | grep -q "rows$"
+
+echo "property-check.py answers a missing command or tag in one short line"
+for args in "" "show"; do
+  out=$(python3 "$tool" $args 2>&1 || true)
+  [ "$(printf '%s\n' "$out" | wc -l)" -eq 1 ] || { echo "expected one line for '$args', got: $out" >&2; exit 1; }
+  case $out in
+    *"see --help"*) ;;
+    *) echo "expected 'see --help' for '$args', got: $out" >&2; exit 1 ;;
+  esac
+done
