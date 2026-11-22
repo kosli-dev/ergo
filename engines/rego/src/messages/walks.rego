@@ -529,16 +529,30 @@ _m_tally_keyed_base_items(subj, side) := array.concat(
 	count(xs) == count(w.items)
 }
 
-_m_tally_keyed_root(subj, side) := [[concat("", ["root ", b.fault.cause]), b.fault.text]] if {
+_m_tally_keyed_root(subj, side) := [[concat("", ["root ", f.cause]), f.text] | some f in b.faults] if {
 	b := _m_tally_keyed_base(subj, side)
 } else := []
 
-_m_tally_keyed_base(subj, side) := {"k": {"path": side.count_of, "clause": c}, "fault": f} if {
-	c := _keyed_clause_of(object.get(side, "count_of", null), object.get(side, "whose", null))
-	c.cmp == "eq"
+_m_tally_keyed_base(subj, side) := object.union({"faults": fs}, _m_tally_keyed_clause(side, fs)) if {
 	not _unreadable_input
-	f := _keyed_root_fault(subj, c.right)
+	whose := object.get(side, "whose", null)
+	is_array(whose)
+	fs := _once([x[2] | some x in sort([[i, f.text, f] |
+		some c in whose
+		object.get(c, "op", null) == "compare"
+		some p in [object.get(c, "left", null), object.get(c, "right", null)]
+		_keyed_root_path(p)
+		f := _keyed_root_fault(subj, p)
+		some i, st in _cause_precedence
+		st == f.cause
+	])])
+	fs != []
 }
+
+_m_tally_keyed_clause(side, fs) := {"k": {"path": side.count_of, "clause": c}, "fault": fs[0]} if {
+	c := _keyed_clause_of(object.get(side, "count_of", null), object.get(side, "whose", null))
+	c.cmp in {"eq", "includes", "matches_any"}
+} else := {}
 
 _m_tally_fail_state(side, x) := concat("", ["root ", x.cause]) if {
 	count(_key_item_flaws(side)) > 0
