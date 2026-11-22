@@ -128,3 +128,122 @@ fn a_value_that_holds_a_semicolon_stays_whole_in_its_entry() {
         "  item item 2 of xs [unusable] \"x.v is \\\"r; s\\\", which isn't a number\" (\"x.v\" \"unusable\")"
     );
 }
+
+fn two_roots(subject: Value) -> Vec<String> {
+    entries(
+        "every xs as x",
+        json!(["x.v is at least $params.min", "x.w is at least $params.min"]),
+        subject,
+        json!({"min": "s"}),
+    )
+}
+
+const MIN_S: &str = "(\"$params.min\" \"unusable\")";
+
+#[test]
+fn every_assertion_entry_holds_the_root_it_reads() {
+    assert_eq!(
+        two_roots(json!({"xs": [{"v": 1}, {}]})),
+        [
+            format!(
+                "assertion x.v is at least $params.min [unusable] \"$params.min is \\\"s\\\", which isn't a number\" {MIN_S}"
+            ),
+            "  item item 2 of xs [absent] \"x.v is missing\" (\"x.v\" \"absent\")".to_string(),
+            format!(
+                "assertion x.w is at least $params.min [unusable] \"$params.min is \\\"s\\\", which isn't a number\" {MIN_S}"
+            ),
+            "  item item 1 of xs [absent] \"x.w is missing\" (\"x.w\" \"absent\")".to_string(),
+            "  item item 2 of xs [absent] \"x.w is missing\" (\"x.w\" \"absent\")".to_string(),
+        ]
+    );
+}
+
+#[test]
+fn an_item_whose_only_problem_is_a_root_has_no_entry() {
+    assert_eq!(
+        two_roots(json!({"xs": [{"v": 1, "w": 2}]})),
+        [
+            format!(
+                "assertion x.v is at least $params.min [unusable] \"$params.min is \\\"s\\\", which isn't a number\" {MIN_S}"
+            ),
+            format!(
+                "assertion x.w is at least $params.min [unusable] \"$params.min is \\\"s\\\", which isn't a number\" {MIN_S}"
+            ),
+        ]
+    );
+}
+
+#[test]
+fn an_assertion_entry_says_only_its_roots() {
+    assert_eq!(
+        entries(
+            "every xs as x",
+            json!("x.v is at least $params.min"),
+            json!({"xs": [{"v": "a"}, {}]}),
+            json!({"min": "s"}),
+        ),
+        [
+            format!(
+                "assertion x.v is at least $params.min [unusable] \"$params.min is \\\"s\\\", which isn't a number\" {MIN_S}"
+            ),
+            "  item item 1 of xs [unusable] \"x.v is \\\"a\\\", which isn't a number\" (\"x.v\" \"unusable\")".to_string(),
+            "  item item 2 of xs [absent] \"x.v is missing\" (\"x.v\" \"absent\")".to_string(),
+        ]
+    );
+}
+
+#[test]
+fn an_assertion_doesnt_say_its_items_again_beside_a_missing_root() {
+    assert_eq!(
+        entries(
+            "every ws as w",
+            json!("w.z is at least $params.min"),
+            json!({"ws": [{}]}),
+            json!({}),
+        ),
+        [
+            "assertion w.z is at least $params.min [absent] \"$params.min is missing\" (\"$params.min\" \"absent\")",
+            "  item item 1 of ws [absent] \"w.z is missing\" (\"w.z\" \"absent\")",
+        ]
+    );
+}
+
+#[test]
+fn an_assertion_over_an_empty_list_lists_the_root_it_cant_read() {
+    for (params, outcome) in [
+        (json!({"min": "s"}), "unusable"),
+        (json!({"min": null}), "null"),
+        (json!({}), "absent"),
+    ] {
+        let said = entries(
+            "every ws as w",
+            json!("w.z is at least $params.min"),
+            json!({"ws": []}),
+            params,
+        );
+        assert!(
+            said[0].ends_with(&format!("(\"$params.min\" \"{outcome}\")")),
+            "{said:#?}"
+        );
+    }
+}
+
+#[test]
+fn a_walk_through_the_alias_holds_the_root_beside_items_that_keep_their_own_cause() {
+    assert_eq!(
+        entries(
+            "every ws as w",
+            json!("every w.xs.v is at least $params.min"),
+            json!({"ws": [{"xs": [{}]}]}),
+            json!({"min": "s"}),
+        ),
+        [
+            format!(
+                "assertion every w.xs.v is at least $params.min [unusable] \"$params.min is \\\"s\\\", which isn't a number\" {MIN_S}"
+            ),
+            "  item item 1 of ws [absent] \"\" ()".to_string(),
+            "    item item 1 of w.xs [absent] \"v is missing\" (\"w.xs[0].v\" \"absent\")"
+                .to_string(),
+        ]
+    );
+}
