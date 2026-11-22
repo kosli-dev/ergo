@@ -159,7 +159,7 @@ _m_clause_kept(u, pieces, kept) if {
 
 _m_clauses_ahead(once) := [c | some i, c in ahead; not c.text in {a.text | some a in array.slice(ahead, 0, i)}] if {
 	ahead := array.concat(
-		[x[3] | some x in sort([[object.get(_m_clause_ranks, c.cause, 6), c.name, c.text, c] | some c in once; c.kind == "root"])],
+		[x[4] | some x in sort([[object.get(c, "group", 0), object.get(_m_clause_ranks, c.cause, 6), c.name, c.text, c] | some c in once; c.kind == "root"])],
 		[c | some c in once; c.kind == "list"],
 	)
 }
