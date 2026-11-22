@@ -500,6 +500,15 @@ test_an_item_that_says_only_what_a_sentence_that_reads_no_alias_said_is_left_out
 	_row_tree_text("every ks as k", ["count of es is 1", "every es.m named by k is 1"], {"ks": ["v"], "es": null}, {}) == "es is null"
 }
 
+test_a_count_over_a_list_the_item_cant_give_joins_the_items_other_sentences if {
+	_row_tree_text("every xs as x", ["count of x.ys is 1", "x.w exists"], {"xs": [{"ys": null}]}, {}) == "item 1 of xs: x.ys is null, and x.w is missing"
+	_row_tree_text("every xs as x", ["x.w exists", "count of x.ys is 1"], {"xs": [{"ys": null}]}, {}) == "item 1 of xs: x.w is missing, and x.ys is null"
+	_row_tree_text("every xs as x", ["count of x.ys is 1", "x.w exists"], {"xs": [{}]}, {}) == "item 1 of xs: x.ys is missing, and x.w is missing"
+	_row_tree_text("every xs as x", ["count of x.ys is 1", "x.w exists"], {"xs": [{"ys": "s"}]}, {}) == `item 1 of xs: x.ys is "s", which isn't a list or an object, and x.w is missing`
+	_row_tree_text("every xs as x", ["count of x.ys whose n is 1 is 1", "x.w exists"], {"xs": [{"ys": null}]}, {}) == "item 1 of xs: x.ys is null, and x.w is missing"
+	_row_tree_text("every xs as x", ["sum of x.ys.n is 1", "x.w is 1"], {"xs": [{"ys": null, "w": 2}]}, {}) == "item 1 of xs: x.ys is null, and x.w is 2"
+}
+
 test_an_item_keeps_only_what_the_row_hasnt_said_already if {
 	said := {"z is 5"}
 	not ergo._for_unrooted(ergo._m_clause("item", "item 1 of xs", "value", "z is 5"), said)
