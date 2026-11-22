@@ -2153,7 +2153,7 @@ fn an_empty_walked_list_after_is_in_ignoring_case_fails_every_item_as_value_as_w
 
 #[test]
 fn a_walked_list_after_is_in_ignoring_case_it_cant_use_is_said_even_when_an_item_fails_on_its_own()
- {
+{
     for (sentence, xs, cs, cause, message) in [
         (
             "every xs.v is in $input.cs.name ignoring case",

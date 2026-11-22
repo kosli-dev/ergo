@@ -2344,7 +2344,7 @@ fn roots_with(checks: &[&Check], ctx: &Ctx, item_keys: bool, keep_lists: bool) -
         .filter_map(|check| lists::flawed_text_list(check, ctx))
         .map(name::name)
         .collect();
-    let said: Vec<Clause> = said
+    let mut said: Vec<Clause> = said
         .into_iter()
         .map(|clause| {
             if clause.kind == clause::Kind::Root && text_lists.contains(&clause.name) {
@@ -2354,13 +2354,10 @@ fn roots_with(checks: &[&Check], ctx: &Ctx, item_keys: bool, keep_lists: bool) -
             }
         })
         .collect();
-    let mut said = said;
     said.sort_by(|a, b| match (a.kind, b.kind) {
-        (clause::Kind::Root, clause::Kind::Root) => (a.cause, a.last_of_cause, &a.name).cmp(&(
-            b.cause,
-            b.last_of_cause,
-            &b.name,
-        )),
+        (clause::Kind::Root, clause::Kind::Root) => {
+            (a.cause, a.last_of_cause, &a.name).cmp(&(b.cause, b.last_of_cause, &b.name))
+        }
         (clause::Kind::Root, _) => std::cmp::Ordering::Less,
         (_, clause::Kind::Root) => std::cmp::Ordering::Greater,
         _ => std::cmp::Ordering::Equal,
