@@ -327,17 +327,20 @@ _tally_keyed_root_states(subj, side, items) := {f.cause | some f in b.faults} | 
 
 _keyed_own_cause(c, e, paths) := _worst_of(states) if {
 	o := _keyed_own(c, e, paths)
-	states := {s | some s in [o.operand, o.key]; not s in _tally_decided_causes}
+	states := {s | some s in array.concat([o.operand], o.keys); not s in _tally_decided_causes}
 	states != set()
 }
 
-_keyed_own(c, e, paths) := {"side": f, "stand": s, "operand": _tally_focus_cause(s, e, ""), "key": _keyed_key_state(_keyed_focus_value(e), c[f])} if {
+_keyed_own(c, e, paths) := {"sides": sides, "stand": s, "operand": _tally_focus_cause(s, e, ""), "keys": [_keyed_key_state(_keyed_focus_value(e), c[f]) | some f in sides]} if {
 	c.op in _two_sided_ops
 	sides := [x | some x in _compare_side_list; c[x] in paths]
 	sides != []
-	f := sides[0]
-	s := _keyed_stand_in(c, f)
+	s := _keyed_stand_in_all(c, sides)
 }
+
+_keyed_stand_in_all(c, [f]) := _keyed_stand_in(c, f)
+
+_keyed_stand_in_all(c, [_, _]) := object.union(c, {"op": "compare", "cmp": "eq", "left": {"literal": 0}, "right": {"literal": 0}})
 
 _keyed_stand_in(c, f) := _typed_stand_in(c.cmp, c.left) if {
 	f == "right"

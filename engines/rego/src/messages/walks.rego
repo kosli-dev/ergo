@@ -696,15 +696,17 @@ _m_keyed_said_item(c, e, o, roots) := [[_m_focus_state(e, c, _worst_of({t[0] | s
 	ts != []
 } else := []
 
-_m_keyed_own_parts(c, o, item) := array.concat(_m_keyed_key_part(c, o, item), _m_keyed_operand_part(o, item)) if o.side == "left"
-
-else := array.concat(_m_keyed_operand_part(o, item), _m_keyed_key_part(c, o, item))
+_m_keyed_own_parts(c, o, item) := _once(array.concat(array.concat(_m_keyed_key_part(c, o, item, "left"), _m_keyed_operand_part(o, item)), _m_keyed_key_part(c, o, item, "right")))
 
 _m_keyed_operand_part(o, item) := [[o.operand, _m_cond_message(o.stand, item, o.operand)]] if not o.operand in _tally_decided_causes
 
 else := []
 
-_m_keyed_key_part(c, o, item) := [_keyed_key(item, c[o.side][count(c[o.side]) - 1])] if o.key != "satisfied"
+_m_keyed_key_part(c, o, item, f) := [_keyed_key(item, c[f][count(c[f]) - 1])] if {
+	some i, g in o.sides
+	g == f
+	o.keys[i] != "satisfied"
+}
 
 else := []
 
