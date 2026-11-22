@@ -2093,6 +2093,45 @@ fn row_on(sentence: &str, subject: Value, input: Value, params: Value) -> Run {
 }
 
 #[test]
+fn a_root_beside_a_walked_list_after_is_in_ignoring_case_in_a_whose_is_said_before_the_list_unless_the_list_fails_worse()
+ {
+    for (params, cs, cause, message) in [
+        (
+            json!({"k": 3}),
+            json!([{"name": 3}]),
+            Cause::Unusable,
+            "$params.k is 3, which isn't text; item 1 of $input.cs: name is 3, which isn't text",
+        ),
+        (
+            json!({}),
+            json!([{"name": "a"}, {}]),
+            Cause::Absent,
+            "$params.k is missing; item 2 of $input.cs: name is missing",
+        ),
+        (
+            json!({"k": null}),
+            json!([{"name": "a"}, {"name": null}]),
+            Cause::Null,
+            "$params.k is null; item 2 of $input.cs: name is null",
+        ),
+    ] {
+        for xs in [json!([]), json!([{"v": "a"}, {}]), json!([{"v": 3}])] {
+            let out = row_on(
+                "every xs whose $params.k is in $input.cs.name ignoring case, if any, exists",
+                json!({ "xs": xs }),
+                json!({ "cs": cs }),
+                params.clone(),
+            );
+            assert_eq!(
+                (out.verdict.cause, out.message.as_deref()),
+                (cause, Some(message)),
+                "{params} {cs} {xs}"
+            );
+        }
+    }
+}
+
+#[test]
 fn an_empty_walked_list_after_is_in_ignoring_case_fails_every_item_as_value_as_without_the_words() {
     for sentence in [
         "every xs.v is in $input.cs.name ignoring case",
