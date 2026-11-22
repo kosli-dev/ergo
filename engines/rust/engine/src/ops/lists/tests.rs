@@ -749,6 +749,17 @@ fn a_ref_that_reads_the_wrong_kind_of_value_is_a_flaw_and_a_missing_one_is_not()
 }
 
 #[test]
+fn a_ref_after_is_in_ignoring_case_that_isnt_a_list_is_a_flaw_and_a_list_with_null_is_not() {
+    let in_list = lowered_check("x is in $params.l ignoring case");
+    assert!(flawed_with(&in_list, json!({"l": "a"})));
+    assert!(flawed_with(&in_list, json!({"l": {}})));
+    assert!(!flawed_with(&in_list, json!({"l": ["a", null]})));
+    assert!(!flawed_with(&in_list, json!({"l": ["a"]})));
+    assert!(!flawed_with(&in_list, json!({})));
+    assert!(!flawed_with(&in_list, json!({"l": null})));
+}
+
+#[test]
 fn a_written_list_or_a_field_on_the_right_is_never_a_flaw() {
     assert!(!flawed_with(
         &lowered_check("x is one of \"a\", \"b\""),
