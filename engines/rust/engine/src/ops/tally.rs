@@ -412,9 +412,6 @@ fn whose_roots(check: &Tally, ctx: &Ctx) -> Vec<Clause> {
         .collect()
 }
 
-/// The names of the roots the `whose` of `check` reads that fail it as
-/// `unusable`, like `$input.m` holding `3` in
-/// `count of xs whose v is $input.m named by key is 1`.
 pub fn unusable_whose_roots(check: &Tally, ctx: &Ctx) -> Vec<String> {
     whose_roots(check, ctx)
         .into_iter()
