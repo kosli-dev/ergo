@@ -124,6 +124,8 @@ This file is about `ergo.rego` only. The Rust engine's changes are in [engines/r
 - `first of` and `last of` on an empty second `for` list say the list after a root of the wrong type that their `whose` reads, as spec 0.7 says ([problems.all_said](spec/semantics.md#which-problems-a-message-says)). `every ws as w, first of ys whose n is in $params.z sorted by n as y` with `$params.z` holding `"s"` and `ys` holding `[]` says `$params.z is "s", which isn't a list; ys is []`, where it said only the root. The same goes for an object, for `$input.z` and for a one-line `first of ys whose n is in $params.z as y`. The Rust engine already did this. Changes the message of such rows.
 - An item of a `count of` or a `sum of` whose path meets `null` before its end fails as `null` and names the step that is `null`, as spec 0.7 says ([tally.walk](spec/semantics.md#counts-and-sums-in-sentences)). With `items` holding `[{"m": null}]`, `sum of items.m.n is 3` says `item 1 of items: m is null`, where it failed as `absent` with `item 1 of items: m.n is missing`. Changes the report of such a check.
 
+- A `count of`, a `sum of`, an `every`, a `some` and a `for` line whose `whose` or `that` reads an empty list on the right of a phrase, like `count of xs whose v is in $input.cs.name is 0` with `cs` holding `[]`, fail as `value` and say `$input.cs is []` once, before any item, as spec 0.7 says ([walk.right.fail](spec/semantics.md#every-and-some)). The count and an `every` with `, if any,` passed before. Each item that can't be read is still said after the list.
+
 ## 0.6.0
 
 ### Changed

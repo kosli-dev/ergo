@@ -10666,6 +10666,72 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    (
+        "count of member of m whose v is in $input.cs.name is 0",
+        "count of member of m whose v is in $input.cs.name is 0",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose tags contains all of $input.cs.name is 0",
+        "count of xs whose tags contains all of $input.cs.name is 0",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose v is in $input.cs.name is 0",
+        "count of xs whose v is in $input.cs.name is 0",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose v is in pl.name is 0",
+        "count of xs whose v is in pl.name is 0",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose v is not one of $params.cs.name is 0",
+        "count of xs whose v is not in $params.cs.name is 0",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose v matches $input.cs.name is 0",
+        "count of xs whose v matches $input.cs.name is 0",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs.v that is in $input.cs.name is 0",
+        "count of xs.v that is in $input.cs.name is 0",
+        &[],
+        &[],
+    ),
+    (
+        "every xs whose v is in $input.cs.name exists",
+        "every xs whose v is in $input.cs.name exists",
+        &[],
+        &[],
+    ),
+    (
+        "every xs whose v is not one of $input.cs.name, if any, exists",
+        "every xs whose v is not in $input.cs.name, if any, exists",
+        &[],
+        &[],
+    ),
+    (
+        "some xs whose v is in $input.cs.name exists",
+        "some xs whose v is in $input.cs.name exists",
+        &[],
+        &[],
+    ),
+    (
+        "sum of xs.n that is in $input.cs.name is 0",
+        "sum of xs.n that is in $input.cs.name is 0",
+        &[],
+        &[],
+    ),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
