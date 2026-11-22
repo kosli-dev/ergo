@@ -3677,3 +3677,49 @@ fn a_second_lines_whose_key_that_is_the_first_alias_fails_the_row_on_an_empty_li
         assert_eq!(row["message"], message, "{for_line}");
     }
 }
+
+#[test]
+fn a_count_under_a_for_line_says_an_empty_list_once_and_each_item_under_its_item() {
+    for (xs, said) in [
+        (
+            json!([{"ys": [{}]}]),
+            "$params.cs is []; item 1 of xs: item 1 of m.ys: v is missing",
+        ),
+        (
+            json!([{}]),
+            "$params.cs is []; item 1 of xs: m.ys is missing",
+        ),
+        (json!([null]), "$params.cs is []; item 1 of xs: m is null"),
+    ] {
+        let found = row_with(
+            "every xs as m",
+            json!("count of m.ys whose v is in $params.cs.name is 0"),
+            json!({"xs": xs}),
+            json!({"cs": []}),
+        );
+        assert_eq!(found["message"], said, "{xs}");
+    }
+}
+
+#[test]
+fn a_for_lines_whose_says_an_empty_list_on_a_list_entry_as_a_null_list() {
+    for (cs, root) in [(json!(null), "null"), (json!([]), "[]")] {
+        let found = row_with(
+            "every xs whose v is in $params.cs.name as m",
+            json!("m.v exists"),
+            json!({"xs": []}),
+            json!({"cs": cs}),
+        );
+        assert_eq!(
+            entries(&found["failures"]),
+            [
+                format!(
+                    "list xs {}: $params.cs is {root}",
+                    found["cause"].as_str().unwrap()
+                ),
+                "list xs value: xs is []".to_string(),
+            ],
+            "{cs}"
+        );
+    }
+}

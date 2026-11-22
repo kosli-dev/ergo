@@ -2999,3 +2999,17 @@ fn an_empty_list_on_the_right_of_a_whose_is_said_once_whatever_the_items() {
         );
     }
 }
+
+#[test]
+fn a_plus_beside_an_empty_list_on_the_right_of_a_whose_says_only_the_list() {
+    for k in [json!(0), json!(5)] {
+        assert_eq!(
+            row_says(
+                "k plus count of xs whose v is in $input.cs.name is 0",
+                json!({"cs": [], "things": [{"id": 1, "k": k, "xs": [{"v": "a"}]}]})
+            ),
+            ("value".to_string(), "$input.cs is []".to_string()),
+            "{k}"
+        );
+    }
+}
