@@ -490,20 +490,13 @@ test_a_list_phrase_with_a_field_runs_in_a_from_lines_whose if {
 	[r[0] | some r in _from_rows(rep); r[1] == "c"] == [1]
 }
 
-test_a_whose_of_a_count_with_a_field_after_a_list_phrase_decides_each_item_as_the_same_whose_with_params_does if {
-	every _, words in _list_phrases {
-		every right in [{}, {"v": null}, {"v": 3}, {"v": []}, {"v": ["a"]}, {"v": ["^a"]}, {"v": ["^a", "("]}] {
-			items := [{"s": "a", "l": ["a"]}, {"s": "b", "l": ["a"]}, {"s": null, "l": "a"}]
-			by_field := _tally_rows(concat("", ["count of xs whose s ", words, " k is at least 1"]), [{"id": 1, "xs": [object.union(i, object.filter(_list_item_right(right), ["k"])) | some i in items]}], {})
-			by_params := _tally_rows(concat("", ["count of xs whose s ", words, " $params.k is at least 1"]), [{"id": 1, "xs": items}], _list_params(right))
-			[r[1] | some r in by_field] == [r[1] | some r in by_params]
-		}
-	}
+test_a_whose_of_a_count_with_params_after_a_list_phrase_says_the_root_and_then_each_item_that_cant_be_read if {
+	items := [{"s": "a", "l": ["a"]}, {"s": "b", "l": ["a"]}, {"s": null, "l": "a"}]
+	doc := {"things": [{"id": 1, "xs": items}]}
+	said := "$params.k is missing; item 1 of xs: s is \"a\", which isn't a list; item 2 of xs: s is \"b\", which isn't a list; item 3 of xs: s is null"
+	_whose_key_row(doc, {}, "count of xs whose s contains all of $params.k is at least 1") == [["unusable", said]]
+	_whose_key_row(doc, {"k": null}, "count of xs whose s contains none of $params.k is at least 1") == [["unusable", replace(said, "$params.k is missing", "$params.k is null")]]
 }
-
-_list_item_right(right) := {"k": right.v} if "v" in object.keys(right)
-
-_list_item_right(right) := {} if not "v" in object.keys(right)
 
 test_an_elapsed_time_goes_in_a_plus_on_either_side_of_a_phrase if {
 	doc := [{"id": 1, "n": 3, "p": 0, "q": 86400}, {"id": 2, "n": 3, "p": 0, "q": "1970-01-02T00:00:00Z"}, {"id": 3, "n": 3, "p": null, "q": 86400}, {"id": 4, "n": "3", "p": 0, "q": 86400}, {"id": 5, "n": 3, "p": 86400, "q": 0}]
