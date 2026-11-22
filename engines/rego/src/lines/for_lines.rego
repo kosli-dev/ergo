@@ -48,7 +48,7 @@ _for_row_raw(check, subj) := object.union(r, {"cause": _for_shape_cause(r), "nat
 	_walk_flawed(check)
 	_walk_root_flaw(check, subj) != ""
 	r := _for_rooted(check, subj, _for_outer(check, subj, _for_names))
-} else := object.union(r, {"root_msgs": ms | ms := array.concat(_flawed_root_msgs(check, subj, _for_message(check, subj, r)), [m | some x in _for_second_roots(check, subj); some m in x.ms]); ms != []}) if {
+} else := object.union(r, {"root_msgs": ms | ms := array.concat(_flawed_root_msgs(check, subj), [m | some x in _for_second_roots(check, subj); some m in x.ms]); ms != []}) if {
 	_walk_flawed(check)
 	r := object.union(_for_outer(check, subj, _for_names), {"cause": "unusable", "failed": []})
 } else := {"cause": "not_an_object", "inputs": [], "failed": []} if {
@@ -101,12 +101,7 @@ _params_shape_only_unreadable(check) if {
 	not _m_reads_params(check)
 }
 
-_flawed_root_msgs(check, subj, said) := _with_roots(split(said, "; "), roots) if {
-	walked := _m_for_said(check)
-	roots := _once(array.concat(_walk_root_msgs(check, subj), sort(walked)))
-	some m in roots
-	not m in walked
-} else := roots if {
+_flawed_root_msgs(check, subj) := roots if {
 	roots := _once(array.concat(_walk_root_msgs(check, subj), sort(_m_for_said(check))))
 	roots != []
 } else := []

@@ -79,7 +79,6 @@ _for_row_message -> _m_unskipped
 _for_row_of -> _m_fallback
 _for_row_of -> _m_params_unread
 _for_row_of -> _m_strip
-_for_row_raw -> _for_message
 _for_row_text -> _m_fallback
 _for_second_roots -> _m_aliased
 _for_second_roots -> _m_under
