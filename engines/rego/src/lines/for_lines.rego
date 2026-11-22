@@ -47,7 +47,6 @@ _for_on_tree(check, subj, r) if {
 	count(check.items) == 1
 	object.get(r, "natural", null) != "satisfied"
 	not _walk_flawed(check)
-	not _for_walked_root_fails(check, subj)
 	not _for_key_not_text(check)
 	not _for_key_is_alias(check)
 	count([c | some c in check.checks; _for_reads_an_alias(check, c); _for_reads_a_list(c)]) < 2
@@ -59,11 +58,6 @@ _for_on_tree(check, subj, r) if {
 	every step in array.concat(check.items[0].path, object.get(object.get(check.items[0], "pick", {}), "by", [])) {
 		_for_plain_step(step)
 	}
-}
-
-_for_walked_root_fails(check, subj) if {
-	_walk_roots_on
-	_walk_root_flaw(check, subj) != ""
 }
 
 _for_key_is_alias(check) if {
