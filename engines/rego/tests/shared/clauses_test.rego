@@ -27,6 +27,17 @@ test_a_clause_holds_its_kind_name_cause_text_and_what_it_says if {
 	ergo._m_clause_more(2) == {"kind": "more", "count": 2, "name": "", "cause": "value", "text": "", "said": []}
 }
 
+test_a_root_clause_of_a_for_line_holds_the_group_it_is_said_in if {
+	ergo._m_root_in("$params.b", "absent", "$params.b is missing", 2) == {
+		"kind": "root",
+		"name": "$params.b",
+		"cause": "absent",
+		"text": "$params.b is missing",
+		"said": [],
+		"group": 2,
+	}
+}
+
 _clause_root(name, cause, text) := ergo._m_clause("root", name, cause, text)
 
 _clause_missing(name) := _clause_root(name, "absent", concat("", [name, " is missing"]))
