@@ -26,11 +26,9 @@ derived / a count whose whose reads a part of the subject that is a path, with a
 derived / a count whose whose reads a part of the subject that is a path, with a named by key from the item, says the part once, first / names the part when the start of its path is null
 derived / a count whose whose reads a part of the subject with a named by key from the item says the part once, first / names a missing part, not the path past it
 derived / a count whose whose reads a part of the subject with a named by key from the item says the part once, first / names a null part, not the path past it
-derived / a count whose whose reads a root outside the item through a key the item holds and another root from the params says the other root as before / the root is missing and the param is missing
 derived / a count whose whose reads a root outside the item through a key the item holds and reads params that aren't an object says the params / the root is null, the first item is null and the second item's key isn't text
 derived / a count whose whose reads a root outside the item through a key the item holds says each item's own problems after the root, and stops after three problems / the root is 3 and four items each have a problem, so the last one is counted
 derived / a count whose whose reads a root outside the item through a key the item holds says each item's own problems after the root, and stops after three problems / the root is null and an item's tags and v are of the wrong kind
-derived / a count whose whose reads a root outside the item through a key the item holds says each item's own problems after the root, and stops after three problems / the root is null and an item's tags mix kinds, so the count says what it says when the root reads
 derived / a count whose whose reads a root outside the item through a key the item holds says each item's own problems after the root, and stops after three problems / the root is null and the item's key and field print with a semicolon and a comma
 derived / a count whose whose reads a root outside the item through a key the item holds says the root once and first / a root further back is null and the items have no key
 derived / a count whose whose reads a root outside the item through a key the item holds says the root once and first / the root is missing and the first item is null
