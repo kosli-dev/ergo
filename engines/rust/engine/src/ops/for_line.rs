@@ -204,9 +204,12 @@ pub fn rendered(name: &str, texts: &[String]) -> String {
 
 /// Whether `check` reads the `for` alias `alias`.
 pub fn reads_alias(check: &Check, alias: &str) -> bool {
-    all_paths(check)
-        .into_iter()
-        .any(|path| reads_path(path, alias))
+    nested_checks(check).into_iter().any(|inner| {
+        all_paths(inner)
+            .into_iter()
+            .chain(inner.paths())
+            .any(|path| reads_path(path, alias))
+    })
 }
 
 fn reads_path(path: &Path, alias: &str) -> bool {
