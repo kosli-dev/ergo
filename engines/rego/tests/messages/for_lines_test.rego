@@ -463,6 +463,28 @@ test_a_second_alias_read_whole_is_named_by_its_item if {
 	_item_texts("every ws as w, every member of w.ms as m", ["m is 1"], {"ws": [{"ms": {"a": 2, "b": 1}}]}, {}) == [["item 1 of ws: member a of w.ms is 2"]]
 }
 
+_row_tree(line, sentences, subj, params) := tree if {
+	check := ergo._s_written_check({"for": line, "assert": sentences})
+	names := {"ergo/subject": subj, "$at": {"names": {}}}
+	r := ergo._for_freed(check, subj, ergo._for_row_raw(check, subj)) with input as {"ergo/names": names} with data.ergo_params as params
+	tree := ergo._for_row_clauses(check, subj, r) with input as {"ergo/names": names} with data.ergo_params as params
+}
+
+_row_tree_text(line, sentences, subj, params) := ergo._m_aliased(ergo._m_clauses_text(ergo._m_clauses_shown(_row_tree(line, sentences, subj, params))))
+
+test_sentences_that_read_no_alias_are_said_in_the_order_written_whatever_clause_they_give if {
+	_row_tree_text("every ks as k", ["every es.zz is 1", "z is 1"], {"ks": ["a"], "es": [{"zz": 2}], "z": 2}, {}) == "item 1 of es: zz is 2; z is 2"
+}
+
+test_a_value_a_sentence_that_reads_no_alias_said_is_not_said_again_under_each_item if {
+	_row_tree_text("every xs as x", ["x.v is at least z", "z is 1"], {"xs": [{"v": 1}, {"v": 3}], "z": 5}, {}) == "z is 5; item 1 of xs: x.v is 1; item 2 of xs: x.v is 3"
+}
+
+test_the_list_a_line_picks_nothing_from_comes_after_a_sentence_that_reads_no_alias if {
+	_row_tree_text("every xs whose v is 1 as x", ["x.v is 1", "z is 1"], {"xs": [{"v": 3}], "z": 3}, {}) == `z is 3; xs is [{"v": 3}]`
+	_row_tree_text("first of xs sorted by v as x", ["x.v is 1", "z is 1"], {"xs": [], "z": 3}, {}) == "z is 3; xs is []"
+}
+
 test_items_of_an_inner_list_that_tie_are_said_under_their_item if {
 	_item_texts("every ws as w, first of w.ys sorted by t as y", ["y.v is 1"], {"ws": [{"ys": [{"t": 1, "v": 2}, {"t": 1, "v": 3}]}]}, {}) == [["item 1 of ws: item 1 and item 2 of w.ys tie on t"]]
 }
