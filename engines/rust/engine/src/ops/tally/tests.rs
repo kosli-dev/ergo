@@ -3003,9 +3003,18 @@ fn two_reads_of_the_same_value_merge_into_one_input_with_the_worst_outcome() {
     let absent = read_of(Outcome::Absent, &[]);
     let elsewhere = read_of(Outcome::Absent, &["/m"]);
     for (entries, wanted) in [
-        (vec![usable.clone(), unusable.clone()], vec![unusable.clone()]),
-        (vec![unusable.clone(), usable.clone()], vec![unusable.clone()]),
-        (vec![absent, unusable.clone(), usable.clone()], vec![unusable.clone()]),
+        (
+            vec![usable.clone(), unusable.clone()],
+            vec![unusable.clone()],
+        ),
+        (
+            vec![unusable.clone(), usable.clone()],
+            vec![unusable.clone()],
+        ),
+        (
+            vec![absent, unusable.clone(), usable.clone()],
+            vec![unusable.clone()],
+        ),
         (vec![usable.clone(), usable.clone()], vec![usable]),
         (
             vec![unusable.clone(), elsewhere.clone()],
