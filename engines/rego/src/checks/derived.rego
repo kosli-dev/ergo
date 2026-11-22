@@ -321,7 +321,7 @@ _tally_alone_states(subj, side, w) := {s |
 
 else := set()
 
-_tally_keyed_root_states(subj, side) := {b.fault.cause} if {
+_tally_keyed_root_states(subj, side) := {f.cause | some f in b.faults} if {
 	b := _m_tally_keyed_base(subj, side)
 } else := set()
 

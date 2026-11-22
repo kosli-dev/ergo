@@ -50,20 +50,6 @@ _keyed_list(check) := {"path": check.path, "clause": c} if {
 	c := _keyed_clause(check.path, check.whose)
 }
 
-_keyed_list(check) := k if {
-	check.op == "compare"
-	k := _keyed_side(object.get(check, "left", null), object.get(check, "right", null))
-}
-
-_keyed_side(side, other) := {"path": side.count_of, "clause": c} if {
-	is_object(side)
-	is_array(object.get(side, "whose", null))
-	object.keys(side) == {"count_of", "text", "whose"}
-	is_object(other)
-	object.keys(other) == {"literal"}
-	c := _keyed_clause(side.count_of, side.whose)
-}
-
 _keyed_clause(path, whose) := c if {
 	c := _keyed_clause_of(path, whose)
 	c.cmp in {"includes", "matches_any"}
@@ -121,11 +107,18 @@ _keyed_prefix_fault(subj, p, j, k) := {"cause": st, "text": concat("", [_input_n
 	st := _any_read_state(subj, shown)
 	st in {"absent", "null"}
 } else := {"cause": "unusable", "text": _m_isnt(_input_name(shown), v, "an object")} if {
-	j == k
 	shown := _as_subject_part(array.slice(p, 0, j))
 	_any_read_state(subj, shown) == "value"
 	v := _value_at(subj, shown)
 	not is_object(v)
+	_keyed_prefix_stops(j, k, v)
+}
+
+_keyed_prefix_stops(j, k, _) if j == k
+
+_keyed_prefix_stops(j, k, v) if {
+	j < k
+	not is_array(v)
 }
 
 _keyed_item(e, k) := {"text": _m_isnt(_m_item_name(e.i, _dotted_roots([k.path])), e.iv, "an object"), "causes": {"not_an_object"}} if not is_object(e.iv)
