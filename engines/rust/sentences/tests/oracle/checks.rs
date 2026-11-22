@@ -10469,6 +10469,18 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
+        "every w.xs.v is at least $params.min",
+        "every w.xs.v is at least $params.min",
+        &[],
+        &[],
+    ),
+    (
+        "some w.xs.v is at least $params.min",
+        "some w.xs.v is at least $params.min",
+        &[],
+        &[],
+    ),
+    (
         "every xs whose v is in $input.os.name and whose w is at least $params.z exists",
         "every xs whose v is in $input.os.name and whose w is at least $params.z exists",
         &[],

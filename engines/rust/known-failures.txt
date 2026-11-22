@@ -209,6 +209,7 @@ for / a walk on a for line whose path is named with a character that sorts befor
 for / a walk on a for line whose whose reads $input after the item's alias / lists the alias first, then what the whose reads
 for / a walk on a for line whose whose reads $input on its left / lists the alias first, then what the whose reads
 for / a walk over the second item of a for line whose whose reads $input / lists the alias first in the inputs of each second item
+for / a walk through a for line's alias leaves a root after the phrase to the assertion, and each item keeps its own cause and the items of its list / an item whose list holds five items without v
 for / a whose on the second for item that reads $params text after is in says the root once, with no item of its list / fails as unusable with the root once
 for / a whose on the second for item that reads $params text after is in says the root once, with no item of its list / fails as unusable with the root once and then the item that can't be read on its own
 for / a whose on the second for item that reads a $params object after is in says the root once, with no item of its list / fails as unusable with the root once
@@ -561,6 +562,8 @@ walks / a count whose whose reads two named by keys that aren't text names both,
 walks / a count whose whose reads two named by keys that aren't text names both, sorted by name, when the list is missing, null or text / the list is text
 walks / a for line whose whose reads a named by key from $params that isn't text says only the items whose own value can't take the key, the last one fine / an item without m before an item whose m is an object
 walks / a for line with a walk next to a parent / lists the for line's list and the parent's value, and never the alias's value
+walks / a from line whose every reads a root after the phrase of a type the phrase can't use says the root first, and each item that fails on its own has an entry / an item whose v is null and an item that reads only the root
+walks / a from line whose every reads a root after the phrase of a type the phrase can't use says the root first, and each item that fails on its own has an entry / five items without v
 walks / a one-line every whose whose reads a named by key from $params that is missing / says the key once and then an item whose value before the key isn't an object, which makes the row worse
 walks / a one-line walk whose whose reads a named by key from $params that is missing says the key once and each item's own problem / an item without m and an item whose m is null
 walks / a one-line walk whose whose reads a named by key from $params that isn't text says the key once, with no item in front / two items without m
