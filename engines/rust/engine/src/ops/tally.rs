@@ -730,19 +730,22 @@ fn walked_list(walked: &walk::Walked, path: &Path, outer: &Ctx) -> Input {
             .map(|item| item.end_location.render())
             .collect(),
         part: path::part_tag(path, outer).map(|(name, id)| Part { name, id }),
-        state: walked.unreadable.or_else(|| walk::stopped_state(walked, path, outer)).unwrap_or_else(|| {
-            walked
-                .failures
-                .iter()
-                .find(|f| !f.path.contains('['))
-                .map(|f| match f.cause {
-                    Cause::Absent => crate::path::Outcome::Absent,
-                    Cause::Null => crate::path::Outcome::Null,
-                    Cause::NotAnObject => crate::path::Outcome::NotAnObject,
-                    _ => crate::path::Outcome::Found,
-                })
-                .unwrap_or(crate::path::Outcome::Found)
-        }),
+        state: walked
+            .unreadable
+            .or_else(|| walk::stopped_state(walked, path, outer))
+            .unwrap_or_else(|| {
+                walked
+                    .failures
+                    .iter()
+                    .find(|f| !f.path.contains('['))
+                    .map(|f| match f.cause {
+                        Cause::Absent => crate::path::Outcome::Absent,
+                        Cause::Null => crate::path::Outcome::Null,
+                        Cause::NotAnObject => crate::path::Outcome::NotAnObject,
+                        _ => crate::path::Outcome::Found,
+                    })
+                    .unwrap_or(crate::path::Outcome::Found)
+            }),
         null_at: None,
         worked: false,
     }
