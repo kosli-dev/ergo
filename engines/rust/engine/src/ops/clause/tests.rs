@@ -334,6 +334,29 @@ fn and_n_more_comes_after_the_roots_and_the_lists_in_a_count() {
 }
 
 #[test]
+fn a_list_isnt_counted_and_comes_after_the_items_of_an_earlier_group() {
+    let es = |n: usize| {
+        item(
+            &format!("item {n} of es"),
+            Cause::Value,
+            vec![root("zz", Cause::Value, &format!("zz is {}", n + 1))],
+        )
+    };
+    let list = |name: &str| read(Kind::List, name, Cause::Null, &format!("{name} is null"));
+    assert_eq!(
+        text(&shown(&with(
+            (1..=4).map(es).collect(),
+            vec![list("ks").in_group(1)]
+        ))),
+        "item 1 of es: zz is 2; item 2 of es: zz is 3; item 3 of es: zz is 4; ks is null; and 1 more"
+    );
+    assert_eq!(
+        text(&shown(&with(vec![list("ks")], (1..=3).map(es).collect()))),
+        "ks is null; item 1 of es: zz is 2; item 2 of es: zz is 3; item 3 of es: zz is 4"
+    );
+}
+
+#[test]
 fn the_cap_counts_leaf_items_not_outer_items() {
     let rs = || {
         vec![
