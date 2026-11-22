@@ -632,7 +632,7 @@ else := x
 
 _m_tally_items(subj, side) := [x[2] | some x in _m_tally_items_at(subj, side)]
 
-_m_tally_items_at(subj, side) := [[_m_positions(e.i), [1, k], array.concat(x, [{"item": e}])] | some e in w.items; some k, x in array.concat(_m_whose_undecided(subj, alone, e, flaws, roots), [y | _tally_judge(side, e, flaws, w, long).read; some y in _m_tally_item(f, e, roots)]); not x[1] in {concat("", [_m_item_name(e.i, roots), ": ", t]) | some t in keyed}] if {
+_m_tally_items_at(subj, side) := [[_m_positions(e.i), [1, k], array.concat(x, [{"item": e}])] | some e in w.items; some k, x in array.concat(_m_whose_undecided(subj, alone, e, flaws, roots), [y | _tally_judge(side, e, flaws, w, long).read; some y in _m_tally_item(f, e, roots)]); not x[1] in {concat("", [_m_item_name(i, roots), ": ", t]) | some t in keyed; some i in {e.i, object.get(e, "c", e.i)}}] if {
 	f := _basic_form(side)
 	w := _tally_walk(subj, side)
 	alone := _whose_alone(subj, side)
