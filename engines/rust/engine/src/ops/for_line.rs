@@ -2737,10 +2737,15 @@ impl For {
             };
         }
         let text = self.dead_text(dead).replace(FREE, "");
-        if dead.list {
-            return Clause::list(dead.shown(), dead.cause, text);
-        }
         Clause::item(dead.shown(), dead.cause, text, Vec::new())
+    }
+
+    fn line_dead_clause(&self, dead: &Dead, ctx: &Ctx) -> Clause {
+        let clause = self.dead_clause(dead, ctx);
+        if dead.list {
+            return Clause::list(&clause.name, clause.cause, clause.text);
+        }
+        clause
     }
 
     fn unsorted_own(&self, dead: &Dead, ctx: &Ctx) -> Option<Option<(String, Cause, Input)>> {
@@ -3013,7 +3018,7 @@ impl For {
                 .dead
                 .iter()
                 .filter(|d| d.cause != Cause::Ambiguous)
-                .map(|d| self.dead_clause(d, ctx).in_group(walk))
+                .map(|d| self.line_dead_clause(d, ctx).in_group(walk))
                 .filter_map(|clause| unrooted(clause, &texts))
                 .collect();
         }
@@ -3021,7 +3026,7 @@ impl For {
             .dead
             .iter()
             .filter(|d| d.cause != Cause::Ambiguous)
-            .map(|d| (d.order.clone(), self.dead_clause(d, ctx)))
+            .map(|d| (d.order.clone(), self.line_dead_clause(d, ctx)))
             .collect();
         let ties: Vec<&Dead> = level
             .dead
@@ -3067,7 +3072,7 @@ impl For {
             hoisted
                 .iter()
                 .filter(|d| d.cause != Cause::Ambiguous)
-                .map(|d| (d.order.clone(), self.dead_clause(d, ctx))),
+                .map(|d| (d.order.clone(), self.line_dead_clause(d, ctx))),
         );
         first.sort_by(|a, b| a.0.cmp(&b.0));
         first

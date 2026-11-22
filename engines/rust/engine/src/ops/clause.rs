@@ -111,10 +111,11 @@ fn said_once(clauses: &[Clause]) -> Vec<Clause> {
 }
 
 fn says_alike(a: &Clause, b: &Clause) -> bool {
+    let bare = |clause: &Clause| clause.kind != Kind::Item || clause.said.is_empty();
     match (a.kind, b.kind) {
         (Kind::Item, Kind::Item) => pieces(a) == pieces(b),
-        (Kind::Root | Kind::List, Kind::Root | Kind::List) => a.text == b.text,
-        _ => false,
+        (Kind::More(_), _) | (_, Kind::More(_)) => false,
+        _ => bare(a) && bare(b) && a.text == b.text,
     }
 }
 
@@ -151,20 +152,15 @@ fn pieces(item: &Clause) -> Vec<String> {
         }
     };
     for clause in &item.said {
-        match clause.kind {
-            Kind::Item => {
-                flush(&mut own, &mut out);
-                out.extend(
-                    pieces(clause)
-                        .into_iter()
-                        .map(|piece| format!("{}: {piece}", item.name)),
-                );
-            }
-            Kind::List => {
-                flush(&mut own, &mut out);
-                out.push(format!("{}: {}", item.name, clause.text));
-            }
-            _ => own.push(&clause.text),
+        if clause.kind == Kind::Item {
+            flush(&mut own, &mut out);
+            out.extend(
+                pieces(clause)
+                    .into_iter()
+                    .map(|piece| format!("{}: {piece}", item.name)),
+            );
+        } else {
+            own.push(&clause.text);
         }
     }
     flush(&mut own, &mut out);

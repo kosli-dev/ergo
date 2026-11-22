@@ -3721,6 +3721,34 @@ fn a_pairs_part_that_holds_a_sentence_that_doesnt_read_the_second_item_gives_no_
 }
 
 #[test]
+fn a_list_a_sentence_walks_joins_the_items_own_part_where_the_lines_second_list_has_its_own() {
+    assert_eq!(
+        for_row(
+            "every ws as w",
+            &["every es whose v is in w.z, if any, exists"],
+            json!({"es": null, "ws": [{}]}),
+            json!({}),
+        ),
+        (
+            "absent".to_string(),
+            "item 1 of ws: w.z is missing, and es is null".to_string()
+        )
+    );
+    assert_eq!(
+        for_row(
+            "every ws as w, every w.items as i",
+            &["w.n is 1", "i.k is 1"],
+            json!({"ws": [{"items": null}]}),
+            json!({}),
+        ),
+        (
+            "absent".to_string(),
+            "item 1 of ws: w.n is missing; item 1 of ws: w.items is null".to_string()
+        )
+    );
+}
+
+#[test]
 fn a_list_the_line_cant_walk_isnt_counted_as_an_item() {
     let zz = |n: usize| {
         (1..=n)
