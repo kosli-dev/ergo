@@ -183,6 +183,11 @@ _for_own_said(c, fe, subj) := [_m_clause("root", m, cause, m) |
 
 _for_own_check(c, subj) := c if {
 	not _for_blocks(c, subj)
+} else := object.union(c, {"right": {"literal": []}}) if {
+	c.op == "compare"
+	c.cmp in {"in", "not_in"}
+	not _for_side_blocked(c, c.left, subj)
+	_for_side_blocked(c, c.right, subj)
 } else := object.union(c, {"left": c[f], "right": c[f]}) if {
 	c.op == "compare"
 	some f in _compare_side_list
