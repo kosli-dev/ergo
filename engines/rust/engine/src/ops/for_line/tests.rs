@@ -2695,20 +2695,49 @@ fn a_key_read_from_a_field_isnt_said_when_the_list_before_it_is_null() {
 }
 
 #[test]
-#[ignore = "the clause tree says a count of a list outside the item once, without the item of ks, when it reads the alias only as a named by key in its whose; R5-6 left it, and the row now says less than main did"]
 fn a_sentence_that_reads_the_alias_only_as_a_key_of_a_count_is_said_for_each_item() {
-    let (cause, message) = for_row(
-        "every ks as k",
-        &["count of es whose zz is m named by k is 0"],
-        json!({"ks": ["a", 3, null], "es": [{"zz": 1}]}),
-        json!({}),
-    );
-    assert_eq!(cause, "unusable");
-    assert!(
-        message.contains("item 2 of ks: k is 3, which isn't text")
-            && message.contains("item 3 of ks: k is null"),
-        "{message}"
-    );
+    for (for_line, assertion, subject, said) in [
+        (
+            "every ks as k",
+            "count of es whose zz is m named by k is 0",
+            json!({"ks": ["a", 3, null], "es": [{"zz": 1}]}),
+            "item 1 of ks: item 1 of es: m named by k is missing; item 2 of ks: k is 3, which isn't text; item 3 of ks: k is null",
+        ),
+        (
+            "every ks as k",
+            "count of es whose zz is m named by k is 0",
+            json!({"ks": [3], "es": [{"zz": 1, "m": {"a": 1}}]}),
+            "item 1 of ks: k is 3, which isn't text",
+        ),
+        (
+            "every xs as x",
+            "count of es whose zz is m named by x.k is 0",
+            json!({"xs": [{"k": 3}], "es": [{"zz": 1, "m": {"a": 1}}]}),
+            "item 1 of xs: x.k is 3, which isn't text",
+        ),
+    ] {
+        assert_eq!(
+            for_row(for_line, &[assertion], subject, json!({})),
+            ("unusable".to_string(), said.to_string()),
+            "{for_line} {assertion}"
+        );
+    }
+}
+
+#[test]
+fn a_sentence_that_reads_the_alias_only_as_a_key_of_a_count_isnt_run_on_an_empty_list() {
+    for (for_line, cause) in [("every xs as x", "null"), ("first of xs as x", "absent")] {
+        assert_eq!(
+            for_row(
+                for_line,
+                &["count of es whose zz is m named by x.k is 0", "z is 1"],
+                json!({"xs": [], "es": [null, {"zz": null, "m": null}], "z": null}),
+                json!({}),
+            ),
+            (cause.to_string(), "z is null; xs is []".to_string()),
+            "{for_line}"
+        );
+    }
 }
 
 #[test]
