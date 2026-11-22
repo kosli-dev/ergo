@@ -82,7 +82,9 @@ else := array.concat(ends, [n])
 
 _m_clause(kind, name, cause, text) := {"kind": kind, "name": name, "cause": cause, "text": text, "said": []}
 
-_m_item_clause(name, cause, said) := {"kind": "item", "name": name, "cause": cause, "text": "", "said": said}
+_m_root_in(name, cause, text, group) := {"kind": "root", "name": name, "cause": cause, "text": text, "said": [], "group": group}
+
+_m_item_clause(name, cause, said) :={"kind": "item", "name": name, "cause": cause, "text": "", "said": said}
 
 _m_clause_more(n) := {"kind": "more", "count": n, "name": "", "cause": "value", "text": "", "said": []}
 
