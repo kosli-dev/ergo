@@ -201,7 +201,7 @@ _walk_parts_of(check, _, _, r) := ms if {
 	r.cause != "satisfied"
 	fails := object.get(r, "fails", [])
 	roots := _dotted_roots([check.path])
-	ms := [_m_fail_clause(f, roots, check) | some p in sort({f.path | some f in fails}); some f in fails; f.path == p]
+	ms := [_m_fail_clause(f, roots, check) | some p in sort({[f.item, f.path] | some f in fails}); some f in fails; [f.item, f.path] == p]
 	ms != []
 } else := [_m_part_clause(object.get(f, "item", f.path), f.cause, _m_named_fail(f), check) | some f in r.failed] if r.failed != []
 
