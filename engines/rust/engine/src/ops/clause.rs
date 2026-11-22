@@ -65,18 +65,27 @@ pub fn shown(clauses: &[Clause]) -> Vec<Clause> {
             None => once.push(clause.clone()),
         }
     }
-    let of_kind = |kind: Kind| once.iter().filter(move |clause| clause.kind == kind);
-    let mut out: Vec<Clause> = of_kind(Kind::Root).cloned().collect();
+    let (mut out, mut rest): (Vec<Clause>, Vec<Clause>) =
+        once.into_iter().partition(|clause| clause.kind == Kind::Root);
     out.sort_by(|a, b| (a.group, a.cause, &a.name).cmp(&(b.group, b.cause, &b.name)));
-    out.extend(of_kind(Kind::List).cloned());
-    let items: Vec<&Clause> = of_kind(Kind::Item).collect();
-    let leaves: usize = items.iter().map(|item| leaves(item)).sum();
+    rest.sort_by_key(|clause| (clause.group, clause.kind == Kind::Item));
+    let leaves: usize = rest
+        .iter()
+        .filter(|clause| clause.kind == Kind::Item)
+        .map(leaves)
+        .sum();
     if leaves <= SHOWN_ITEMS {
-        out.extend(items.into_iter().cloned());
+        out.extend(rest);
         return out;
     }
     let mut left = SHOWN_ITEMS;
-    out.extend(items.into_iter().filter_map(|item| cut(item, &mut left)));
+    for clause in rest {
+        if clause.kind == Kind::Item {
+            out.extend(cut(&clause, &mut left));
+        } else {
+            out.push(clause);
+        }
+    }
     out.push(Clause {
         kind: Kind::More(leaves - SHOWN_ITEMS),
         name: String::new(),
@@ -125,15 +134,20 @@ fn pieces(item: &Clause) -> Vec<String> {
         }
     };
     for clause in &item.said {
-        if clause.kind == Kind::Item {
-            flush(&mut own, &mut out);
-            out.extend(
-                pieces(clause)
-                    .into_iter()
-                    .map(|piece| format!("{}: {piece}", item.name)),
-            );
-        } else {
-            own.push(&clause.text);
+        match clause.kind {
+            Kind::Item => {
+                flush(&mut own, &mut out);
+                out.extend(
+                    pieces(clause)
+                        .into_iter()
+                        .map(|piece| format!("{}: {piece}", item.name)),
+                );
+            }
+            Kind::List => {
+                flush(&mut own, &mut out);
+                out.push(format!("{}: {}", item.name, clause.text));
+            }
+            _ => own.push(&clause.text),
         }
     }
     flush(&mut own, &mut out);

@@ -403,6 +403,7 @@ struct Dead {
     told: Option<Option<Clause>>,
     bare: Option<String>,
     shared: bool,
+    list: bool,
     order: Vec<Seg>,
     name: String,
     said: String,
@@ -422,6 +423,7 @@ impl Dead {
             msg: None,
             told: None,
             shared: false,
+            list: false,
             order: Vec::new(),
             path: name.clone(),
             name,
@@ -441,13 +443,14 @@ impl Dead {
         }
     }
 
-    fn of_failure(failure: &Failure) -> Dead {
+    fn of_failure(failure: &Failure, list: bool) -> Dead {
         Dead {
             wants_object: failure.wants_object,
             bare: None,
             msg: None,
             told: None,
             shared: false,
+            list,
             order: failure.order.clone(),
             name: failure.item.clone(),
             said: failure.said.clone(),
@@ -468,6 +471,7 @@ impl Dead {
             msg: self.msg.clone(),
             told: self.told.clone(),
             shared: self.shared,
+            list: self.list,
             order: self.order.clone(),
             name: self.name.clone(),
             said: self.said.clone(),
@@ -600,7 +604,14 @@ impl For {
             };
             return Cands {
                 live: Vec::new(),
-                dead: walked.failures.iter().map(Dead::of_failure).collect(),
+                dead: walked
+                    .failures
+                    .iter()
+                    .map(|failure| {
+                        let list = !failure.order.iter().any(|seg| matches!(seg, Seg::Index(_)));
+                        Dead::of_failure(failure, list)
+                    })
+                    .collect(),
                 list: Input {
                     state,
                     ..empty_list(walked.name)
@@ -625,7 +636,15 @@ impl For {
             null_at: None,
             worked: false,
         };
-        let mut dead: Vec<Dead> = walked.failures.iter().map(Dead::of_failure).collect();
+        let first_walked = walked.walked.iter().next().copied();
+        let mut dead: Vec<Dead> = walked
+            .failures
+            .iter()
+            .map(|failure| {
+                let list = first_walked.is_none_or(|level| failure.order.len() <= level);
+                Dead::of_failure(failure, list)
+            })
+            .collect();
         let from_list = walked.failures.len();
         let mut live = Vec::new();
         let mut kept = 0;
@@ -1193,6 +1212,7 @@ impl For {
                 vec![Dead {
                     msg: (!keyed.is_empty()).then(|| keyed.join(", and ")),
                     shared: !reads_path(&item.path, &self.items[0].alias),
+                    list: true,
                     ..Dead::at(shown, cause, Value::Null, read.location)
                 }]
             } else {
@@ -2298,7 +2318,7 @@ impl For {
                 super::message::for_empty(&listed, &outer, cause)
                     .into_iter()
                     .filter(|text| !roots.contains(text))
-                    .map(|text| Clause::list(&text.clone(), cause, text)),
+                    .map(|text| Clause::list(&text.clone(), cause, text).in_group(self.sentences.len())),
             );
         }
         Run {
@@ -2698,6 +2718,9 @@ impl For {
             };
         }
         let text = self.dead_text(dead).replace(FREE, "");
+        if dead.list {
+            return Clause::list(dead.shown(), dead.cause, text);
+        }
         Clause::item(dead.shown(), dead.cause, text, Vec::new())
     }
 
@@ -2965,12 +2988,13 @@ impl For {
     ) -> Vec<Clause> {
         let lines = root_lines(roots);
         let texts: Vec<&str> = lines.iter().map(String::as_str).collect();
+        let walk = self.sentences.len();
         if level.unreadable {
             let dead: Vec<Clause> = level
                 .dead
                 .iter()
                 .filter(|d| d.cause != Cause::Ambiguous)
-                .map(|d| self.dead_clause(d, ctx))
+                .map(|d| self.dead_clause(d, ctx).in_group(walk))
                 .collect();
             return free
                 .iter()
@@ -3034,7 +3058,12 @@ impl For {
         first.sort_by(|a, b| a.0.cmp(&b.0));
         free.iter()
             .cloned()
-            .chain(first.into_iter().chain(items).map(|(_, clause)| clause))
+            .chain(
+                first
+                    .into_iter()
+                    .chain(items)
+                    .map(|(_, clause)| clause.in_group(walk)),
+            )
             .filter_map(|clause| unrooted(clause, &texts))
             .collect()
     }
