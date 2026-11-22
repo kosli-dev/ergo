@@ -2442,6 +2442,440 @@ fn a_root_compared_ignoring_case_stands_in_as_text_so_each_item_is_read_on_its_o
     assert!(without_roots(&lowered("v is $input.r")).is_none());
 }
 
+fn lowered_in(scope: &Scope, sentence: &str) -> Check {
+    let tree = s::parse_check(sentence).unwrap();
+    crate::lower::lower_assertion(&tree.assertions[0], scope).unwrap()
+}
+
+fn derived_left(check: &Check) -> &Derived {
+    let Check::Tally(tally) = check else {
+        panic!("not a count or a sum");
+    };
+    let Side::Derived(derived) = &tally.left else {
+        panic!("no count or sum on the left");
+    };
+    derived
+}
+
+#[test]
+fn a_count_reads_a_hidden_alias_when_a_ref_step_of_its_list_names_it() {
+    let scope = Scope::new().with_for_alias("g");
+    let check = lowered_in(&scope, "count of xs named by g.k is 1");
+    assert!(reads_derived(derived_left(&check), &["g"]));
+    assert!(!reads_derived(derived_left(&check), &["h"]));
+}
+
+#[test]
+fn a_whose_that_reads_no_hidden_alias_does_not_make_its_count_read_one() {
+    let scope = Scope::new().with_for_alias("g");
+    let check = lowered_in(&scope, "count of rs whose v is \"a\" is 1");
+    assert!(!reads_derived(derived_left(&check), &["g"]));
+}
+
+#[test]
+fn a_whose_that_reads_a_hidden_alias_makes_its_count_read_it() {
+    let scope = Scope::new().with_for_alias("g");
+    let check = lowered_in(&scope, "count of rs whose n is count of g is 1");
+    assert!(reads_derived(derived_left(&check), &["g"]));
+    assert!(!reads_derived(derived_left(&check), &["h"]));
+}
+
+#[test]
+fn an_elapsed_term_reads_a_hidden_alias_named_on_either_end() {
+    let scope = Scope::new().with_for_alias("g");
+    let from = lowered_in(&scope, "days elapsed from g.a to y plus 1 is 2");
+    let to = lowered_in(&scope, "days elapsed from x to g.b plus 1 is 2");
+    let neither = lowered_in(&scope, "days elapsed from x to y plus 1 is 2");
+    assert!(reads_derived(derived_left(&from), &["g"]));
+    assert!(reads_derived(derived_left(&to), &["g"]));
+    assert!(!reads_derived(derived_left(&neither), &["g"]));
+}
+
+fn report_row(sentence: &str, input: Value) -> Value {
+    let policy = json!({
+        "ergo_spec": SPEC,
+        "subjects": {"thing": {"from": "things", "identified_by": "id"}},
+        "requirements": {"r": {"subject": "thing", "checks": {"c": sentence}}}
+    });
+    let report = crate::report(&input, &policy, &json!({}));
+    report["results"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|row| row["check"] == "c")
+        .unwrap()
+        .clone()
+}
+
+fn row_says(sentence: &str, input: Value) -> (String, String) {
+    let row = report_row(sentence, input);
+    (
+        row["cause"].as_str().unwrap().to_string(),
+        row["message"].as_str().unwrap().to_string(),
+    )
+}
+
+const IN_ROOT_LIST: &str = "count of xs whose v is in $input.rs.k is 2";
+
+fn times(text: &str, part: &str) -> usize {
+    text.matches(part).count()
+}
+
+#[test]
+fn a_walked_root_that_is_not_an_object_is_said_once_and_before_the_count() {
+    let message = row_says(
+        IN_ROOT_LIST,
+        json!({"rs": [1], "things": [{"id": 1, "xs": []}]}),
+    )
+    .1;
+    assert!(message.starts_with("item 1 of $input.rs is 1, which isn't an object"));
+    assert_eq!(times(&message, "item 1 of $input.rs"), 1);
+}
+
+#[test]
+fn a_walked_root_item_that_lacks_the_field_is_said_once_and_before_the_item_that_lacks_its_own() {
+    let (cause, message) = row_says(
+        IN_ROOT_LIST,
+        json!({"rs": [{"k": 1}, {}], "things": [{"id": 1, "xs": [{"v": 1}, {}]}]}),
+    );
+    assert_eq!(cause, "absent");
+    assert!(message.starts_with("item 2 of $input.rs: k is missing"));
+    assert_eq!(times(&message, "item 2 of $input.rs"), 1);
+}
+
+#[test]
+fn a_walked_root_that_is_unusable_and_an_item_that_is_null_fail_as_unusable() {
+    let (cause, message) = row_says(
+        IN_ROOT_LIST,
+        json!({"rs": [1], "things": [{"id": 1, "xs": [{"v": null}]}]}),
+    );
+    assert_eq!(cause, "unusable");
+    assert!(message.starts_with("item 1 of $input.rs is 1, which isn't an object"));
+    assert_eq!(times(&message, "item 1 of $input.rs"), 1);
+}
+
+#[test]
+fn a_walked_root_in_a_second_whose_is_said_with_the_one_in_the_first_and_not_its_items() {
+    assert_eq!(
+        row_says(
+            "count of xs whose v is in $input.rs.k and whose w is in $input.q.k is 2",
+            json!({"rs": [1], "q": "x", "things": [{"id": 1}]})
+        )
+        .1,
+        "$input.q is \"x\", which isn't an object; xs is missing"
+    );
+}
+
+#[test]
+fn a_sum_says_the_items_that_are_not_numbers_and_not_the_walked_root_that_reads_fine() {
+    assert_eq!(
+        row_says(
+            "sum of xs.n that is in $input.rs.k is 3",
+            json!({"rs": [{"k": "s"}], "things": [{"id": 1, "xs": [{"n": "s"}]}]})
+        )
+        .1,
+        "item 1 of xs: n is \"s\", which isn't a number"
+    );
+}
+
+fn all_items(sentence: &str, items: Value, params: Value, cause: Cause, said: Said) -> String {
+    let check = lowered(sentence);
+    let Check::Tally(tally) = &check else {
+        panic!("{sentence} is not a count or a sum");
+    };
+    let input = json!({"things": [{"items": items}]});
+    let ctx = Ctx {
+        label: None,
+        item_by_item: false,
+        subject: Located {
+            value: &input["things"][0],
+            location: Location::input_root().key("things").index(0),
+        },
+        input: &input,
+        params: Some(&params),
+        aliases: BTreeMap::new(),
+    };
+    super::super::message::said_text(&with_all_items(tally, &ctx, cause, said))
+}
+
+#[test]
+fn a_row_that_is_not_failing_gets_no_items_added_to_what_it_says() {
+    assert_eq!(
+        all_items(
+            "count of items whose v is 1 is $params.n",
+            json!([{}]),
+            json!({}),
+            Cause::Satisfied,
+            Vec::new(),
+        ),
+        ""
+    );
+    assert_eq!(
+        all_items(
+            "count of items whose v is 1 is $params.n",
+            json!([{}]),
+            json!({}),
+            Cause::Absent,
+            Vec::new(),
+        ),
+        "item 1 of items: v is missing"
+    );
+}
+
+#[test]
+fn params_that_are_a_list_are_said_first_when_the_count_reads_them_whole() {
+    let said = all_items(
+        "count of $params is 1",
+        json!([]),
+        json!([1, 2]),
+        Cause::Unusable,
+        Vec::new(),
+    );
+    assert!(said.starts_with("$params is [1, 2], which isn't an object"));
+}
+
+#[test]
+fn params_that_are_a_list_are_not_said_first_when_the_count_reads_a_key_of_them() {
+    assert_eq!(
+        all_items(
+            "count of $params.xs is 1",
+            json!([]),
+            json!([1, 2]),
+            Cause::Unusable,
+            Vec::new(),
+        ),
+        "$params is [1, 2], which isn't an object"
+    );
+}
+
+const ROOT_NOT_AN_OBJECT: &str = "item 1 of $input.rs is 1, which isn't an object";
+
+fn with_roots_said(said: Said) -> String {
+    let check = lowered(IN_ROOT_LIST);
+    let Check::Tally(tally) = &check else {
+        panic!("not a count");
+    };
+    let input = json!({"rs": [1], "things": [{"xs": []}]});
+    let ctx = Ctx {
+        label: None,
+        item_by_item: false,
+        subject: Located {
+            value: &input["things"][0],
+            location: Location::input_root().key("things").index(0),
+        },
+        input: &input,
+        params: None,
+        aliases: BTreeMap::new(),
+    };
+    super::super::message::said_text(&with_walked_roots(tally, &ctx, said))
+}
+
+#[test]
+fn a_walked_root_the_row_already_says_is_said_once_and_first() {
+    assert_eq!(
+        with_roots_said(vec![
+            vec![Piece::Said("other".to_string())],
+            vec![Piece::Said(ROOT_NOT_AN_OBJECT.to_string())],
+        ]),
+        format!("{ROOT_NOT_AN_OBJECT}; other")
+    );
+}
+
+#[test]
+fn a_root_clause_of_the_row_that_is_not_a_walked_root_stays() {
+    let missing = Clause::root("$input.q", Cause::Absent, "$input.q is missing".to_string());
+    let walked = Clause::root("$input.rs", Cause::Unusable, ROOT_NOT_AN_OBJECT.to_string());
+    assert_eq!(
+        with_roots_said(vec![vec![Piece::Counted(vec![missing, walked])]]),
+        format!("{ROOT_NOT_AN_OBJECT}; $input.q is missing")
+    );
+}
+
+#[test]
+fn a_walked_root_is_not_added_again_when_the_roots_already_have_it() {
+    let check = lowered(IN_ROOT_LIST);
+    let Check::Tally(tally) = &check else {
+        panic!("not a count");
+    };
+    let input = json!({"rs": [1], "things": [{"xs": []}]});
+    let ctx = Ctx {
+        label: None,
+        item_by_item: false,
+        subject: Located {
+            value: &input["things"][0],
+            location: Location::input_root().key("things").index(0),
+        },
+        input: &input,
+        params: None,
+        aliases: BTreeMap::new(),
+    };
+    let outer = outer_ctx(&ctx);
+    let whose: Vec<&Check> = tally.counted_whose().collect();
+    let roots = super::super::message::walked_root_clauses(&whose, &outer);
+    assert_eq!(roots.len(), 1);
+    assert_eq!(and_walked_roots(roots.clone(), &whose, &outer).len(), 1);
+    assert_eq!(and_walked_roots(Vec::new(), &whose, &outer).len(), 1);
+}
+
+fn item_clause(name: &str) -> Clause {
+    Clause::item(name, Cause::Absent, String::new(), Vec::new())
+}
+
+#[test]
+fn an_item_is_its_own_when_it_is_the_item_or_one_of_its_parts() {
+    assert!(own_item(&item_clause("item 1 of xs"), "item 1 of xs"));
+    assert!(own_item(&item_clause("item 1 of xs: ys"), "item 1 of xs"));
+}
+
+#[test]
+fn an_item_is_not_its_own_when_another_item_starts_with_the_same_text() {
+    assert!(!own_item(&item_clause("item 10 of xs"), "item 1 of xs"));
+    assert!(!own_item(&item_clause("item 1 of xs2: ys"), "item 1 of xs"));
+}
+
+#[test]
+fn a_list_with_the_name_of_an_item_is_not_that_item() {
+    let list = Clause::list("item 1 of xs", Cause::Absent, String::new());
+    assert!(!own_item(&list, "item 1 of xs"));
+}
+
+fn counted_text(sentence: &str, items: Value) -> String {
+    clause::text(&clause::shown(&tally_clauses(sentence, items, json!({}))))
+}
+
+#[test]
+fn an_item_that_stops_before_its_end_says_what_it_met() {
+    assert_eq!(
+        counted_text("sum of items.n is 3", json!([{}])),
+        "item 1 of items: n is missing"
+    );
+    assert_eq!(
+        counted_text("count of items.m.n is 3", json!([{"m": 1}])),
+        "item 1 of items: m is 1, which isn't an object"
+    );
+}
+
+fn faults_of(sentence: &str, input: Value) -> Vec<(Cause, String)> {
+    let Check::Tally(tally) = lowered(sentence) else {
+        panic!("{sentence} is not a count or a sum");
+    };
+    let ctx = Ctx {
+        label: None,
+        item_by_item: false,
+        subject: Located {
+            value: &input["things"][0],
+            location: Location::input_root().key("things").index(0),
+        },
+        input: &input,
+        params: None,
+        aliases: BTreeMap::new(),
+    };
+    let path = tally.counted_paths()[0].clone();
+    counted_faults(&tally, &path, &ctx)
+}
+
+#[test]
+fn a_counted_list_that_cannot_be_read_is_a_fault_of_its_path() {
+    assert_eq!(
+        faults_of("count of xs whose v is 1 is 2", json!({"things": [{}]})),
+        [(Cause::Absent, "xs is missing".to_string())]
+    );
+    assert_eq!(
+        faults_of(
+            "count of xs whose v is 1 is 2",
+            json!({"things": [{"xs": null}]})
+        ),
+        [(Cause::Null, "xs is null".to_string())]
+    );
+    assert!(
+        faults_of(
+            "count of xs whose v is 1 is 2",
+            json!({"things": [{"xs": [{"v": 1}]}]})
+        )
+        .is_empty()
+    );
+}
+
+#[test]
+fn the_refs_a_whose_walks_are_the_refs_the_count_walks() {
+    let walking = |sentence: &str| -> Vec<String> {
+        lowered(sentence)
+            .walking_refs()
+            .iter()
+            .map(crate::name::name)
+            .collect()
+    };
+    assert_eq!(
+        walking("count of xs whose v is in $input.rs.k is 2"),
+        ["$input.rs.k"]
+    );
+    assert!(walking("count of xs whose v is 1 is 2").is_empty());
+}
+
+fn list_state(sentence: &str, subject: Value) -> crate::path::Outcome {
+    let Check::Tally(tally) = lowered(sentence) else {
+        panic!("{sentence} is not a count or a sum");
+    };
+    let input = json!({"things": [subject]});
+    let ctx = Ctx {
+        label: None,
+        item_by_item: false,
+        subject: Located {
+            value: &input["things"][0],
+            location: Location::input_root().key("things").index(0),
+        },
+        input: &input,
+        params: None,
+        aliases: BTreeMap::new(),
+    };
+    let outer = outer_ctx(&ctx);
+    let path = tally.counted_paths()[0].clone();
+    let walked = walk::walk(
+        &path,
+        &outer,
+        Options {
+            if_any: false,
+            empty_adds_nothing: true,
+        },
+    );
+    walked_list(&walked, &path, &outer).state
+}
+
+#[test]
+fn a_walked_list_is_absent_when_the_object_it_walks_has_no_such_field() {
+    assert_eq!(
+        list_state("count of xs.ys is 1", json!({"xs": {"a": {}}})),
+        crate::path::Outcome::Absent
+    );
+}
+
+#[test]
+fn a_walked_list_is_found_when_only_an_item_of_it_lacks_the_field() {
+    assert_eq!(
+        list_state("count of xs.ys is 1", json!({"xs": [{"ys": [1]}, {}]})),
+        crate::path::Outcome::Found
+    );
+}
+
+#[test]
+fn half_a_microsecond_rounds_up_and_less_rounds_down_whatever_its_length() {
+    for (from, to, wanted) in [
+        (0.0, 0.0000005, "0.000001"),
+        (0.0, 0.0000004, "0"),
+        (0.0, 0.00000004, "0"),
+        (0.0, 0.00000005, "0"),
+    ] {
+        assert_eq!(
+            cause(
+                &format!("seconds elapsed from x to y is {wanted}"),
+                json!({"x": from, "y": to})
+            ),
+            Cause::Satisfied,
+            "{from} {to}"
+        );
+    }
+}
+
 #[test]
 fn a_count_or_a_sum_fails_an_item_whose_path_meets_null_before_its_end_as_null_naming_that_step() {
     for sentence in [
@@ -2460,6 +2894,20 @@ fn a_count_or_a_sum_fails_an_item_whose_path_meets_null_before_its_end_as_null_n
             "{sentence}"
         );
     }
+}
+
+#[test]
+fn a_sum_of_one_number_with_fifteen_decimals_is_that_number() {
+    assert_eq!(sum_text(&["1e-15"]), "0.000000000000001");
+    assert_eq!(sum_text(&["1e-15", "1e-15"]), "0.000000000000002");
+}
+
+#[test]
+fn text_that_is_not_digits_has_no_parts() {
+    for text in ["", ".", "-", "e5", "1x", "1.5y", "x"] {
+        assert!(Parts::of(text).is_none(), "{text}");
+    }
+    assert!(Parts::of("1.5").is_some());
 }
 
 #[test]
