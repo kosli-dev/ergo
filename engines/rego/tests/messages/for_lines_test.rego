@@ -265,3 +265,22 @@ test_a_whose_item_that_isnt_an_object_says_so_beside_a_root if {
 test_an_item_the_whose_decides_has_no_whose_item_clause if {
 	_whose_item_texts("every xs whose v is 1 as x", {"xs": [{"v": 1}, {"v": 2}]}, {}) == []
 }
+
+_item_clauses(line, sentences, subj, params) := [c |
+	check := ergo._s_written_check({"for": line, "assert": sentences})
+	names := {"ergo/subject": subj, "$at": {"names": {}}}
+	r := ergo._for_row_raw(check, subj) with input as {"ergo/names": names} with data.ergo_params as params
+	some k, _ in r.failed
+	c := ergo._for_item_clause(check, r.failed, k) with input as {"ergo/names": names} with data.ergo_params as params
+]
+
+_item_texts(line, sentences, subj, params) := [[ergo._m_aliased(t) | some t in ergo._m_clause_texts([c])] | some c in _item_clauses(line, sentences, subj, params)]
+
+test_an_item_says_what_each_sentence_says_of_it_in_the_order_written if {
+	[c] := _item_clauses("every xs as x", ["x.v is 1", "x.w is 1"], {"xs": [{"v": "a, and b"}]}, {})
+	c.kind == "item"
+	c.name == "item 1 of xs"
+	c.cause == "unusable"
+	[ergo._m_aliased(s.text) | some s in c.said] == [`x.v is "a, and b", which isn't a number`, "x.w is missing"]
+	_item_texts("every xs as x", ["x.v is 1", "x.w is 1"], {"xs": [{"v": "a, and b"}]}, {}) == [[`item 1 of xs: x.v is "a, and b", which isn't a number, and x.w is missing`]]
+}
