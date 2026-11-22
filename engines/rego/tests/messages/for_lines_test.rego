@@ -295,3 +295,31 @@ test_a_walk_and_a_plain_sentence_keep_the_order_written if {
 	_item_texts("every xs as x", ["every x.ys.n is 1", "x.v is 1"], subj, {}) == [["item 1 of xs: item 1 of x.ys: n is 2", "item 1 of xs: x.v is 2"]]
 	_item_texts("every xs as x", ["x.v is 1", "every x.ys.n is 1"], subj, {}) == [["item 1 of xs: x.v is 2", "item 1 of xs: item 1 of x.ys: n is 2"]]
 }
+
+test_an_item_that_isnt_an_object_says_so_as_its_own_text if {
+	cs := _item_clauses("every xs as x", ["x.v is 1"], {"xs": [1, {}, null]}, {})
+	[[c.cause, ergo._m_aliased(c.text)] | some c in cs] == [["not_an_object", "item 1 of xs is 1, which isn't an object"], ["absent", ""], ["not_an_object", "item 3 of xs is null, which isn't an object"]]
+	_item_texts("every xs as x", ["x.v is 1"], {"xs": [1, {}, null]}, {}) == [["item 1 of xs is 1, which isn't an object"], ["item 2 of xs: x.v is missing"], ["item 3 of xs is null, which isn't an object"]]
+}
+
+test_an_item_the_line_cant_reach_says_what_it_found_there if {
+	_item_texts("every xs.ys as y", ["y.v is 1"], {"xs": [{"ys": [{"v": 2}]}, {}, {"ys": null}]}, {}) == [["item 1 of xs: item 1 of ys: y.v is 2"], ["item 2 of xs: ys is missing"], ["item 3 of xs: ys is null"]]
+}
+
+test_an_item_the_whose_cant_decide_says_its_whose_clause if {
+	_item_texts("every xs whose v is 1 as x", ["x.w is 1"], {"xs": [{"w": 2}, {"v": 1, "w": 2}]}, {}) == [["item 1 of xs: v is missing"], ["item 2 of xs: x.w is 2"]]
+}
+
+test_an_item_the_whose_cant_decide_beside_a_root_says_only_its_own_read if {
+	_item_texts("every xs whose v is at least $params.min as x", ["x.w is 1"], {"xs": [{"v": 1}, {}]}, {"min": "s"}) == [["item 2 of xs: v is missing"]]
+}
+
+test_items_that_tie_give_their_tie_once if {
+	_item_texts("first of xs sorted by t as x", ["x.v is 1"], {"xs": [{"t": 1, "v": 2}, {"t": 1, "v": 3}]}, {}) == [["item 1 and item 2 of xs tie on t"]]
+	[c] := _item_clauses("first of xs sorted by t as x", ["x.v is 1"], {"xs": [{"t": 1, "v": 2}, {"t": 1, "v": 3}]}, {})
+	c.cause == "ambiguous"
+}
+
+test_items_of_an_inner_list_that_tie_are_said_under_their_item if {
+	_item_texts("every ws as w, first of w.ys sorted by t as y", ["y.v is 1"], {"ws": [{"ys": [{"t": 1, "v": 2}, {"t": 1, "v": 3}]}]}, {}) == [["item 1 of ws: item 1 and item 2 of w.ys tie on t"]]
+}
