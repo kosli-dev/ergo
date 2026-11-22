@@ -956,7 +956,7 @@ _for_pairs_said(check, f, names) := array.concat([x | firsts == []; some p in ri
 	own := [[j, _for_pair_parts(check, f, names, w, e)] | some j, e in w.items]
 	firsts := [j | some [j, ps] in own; ps != []]
 	riders := _for_rider_parts(check, f, names)
-	pairs := [[j, 0, 0, _m_item_clause(_for_item_name(check, w.items[j].i), _for_said_cause(said), said)] |
+	pairs := [[j, 0, 0, _for_pair_clause(f, _for_item_name(check, w.items[j].i), said)] |
 		some [j, ps] in own
 		said := [x | some p in sort(array.concat(ps, [r | j == firsts[0]; some r in riders])); some x in p[1]]
 		said != []
@@ -967,6 +967,15 @@ _for_pairs_said(check, f, names) := array.concat([x | firsts == []; some p in ri
 		some t in _m_inner_fail(x)
 	]
 }
+
+_for_pair_clause(f, name, said) := _m_clause("item", name, _for_said_cause(said), concat(", and ", owns)) if {
+	_m_pair_owns(f, name)
+	owns := _once([t | some l in f.failed_assertions; some x in l.items; x.item == name; some t in x.own])
+	owns != []
+	every t in owns {
+		not startswith(t, concat("", [name, ": "]))
+	}
+} else := _m_item_clause(name, _for_said_cause(said), said)
 
 _for_pair_parts(check, f, names, w, e) := [[i, cs] |
 	name := _for_item_name(check, e.i)
