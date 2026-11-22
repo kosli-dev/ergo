@@ -4319,3 +4319,26 @@ fn a_sort_key_from_params_that_arent_an_object_says_only_the_params_once() {
         );
     }
 }
+
+#[test]
+fn a_root_a_sentence_that_reads_no_alias_reads_is_said_with_it_though_another_sentence_cant_read_it()
+ {
+    for assertions in [
+        ["x.m named by z is 1", "z is in $params.l"],
+        ["z is in $params.l", "x.m named by z is 1"],
+    ] {
+        assert_eq!(
+            for_row(
+                "every o named by $params.k as x",
+                &assertions,
+                json!({"z": 1, "o": {"a": [{"m": {"a": 1}}]}}),
+                json!({}),
+            ),
+            (
+                "unusable".to_string(),
+                "z is 1, which isn't text; $params.l is missing; $params.k is missing".to_string()
+            ),
+            "{assertions:?}"
+        );
+    }
+}
