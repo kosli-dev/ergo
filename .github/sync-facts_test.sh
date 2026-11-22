@@ -15,12 +15,13 @@ git config commit.gpgsign false
 printf '[{"description":"g","cases":[{"description":"a"},{"description":"b"}]}]\n' > spec/cases/t/cases.json
 printf '[{"description":"g","cases":[{"description":"x"}]},{"description":"h","cases":[{"description":"y"},{"description":"z"}]}]\n' > spec/cases/u/cases.json
 printf 't / g / a\nu / h / y\n' > engines/rust/known-failures.txt
-printf 'package spec_test\n\nknown_differences := {\n\t"t / g / a",\n}\n' > engines/rego/tests/spec_test.rego
+printf 'package spec_test\n\nknown_differences := {\n\t# not a row\n\t"t / g / a",\n}\n' > engines/rego/tests/spec_test.rego
 cat > spec/OPEN.md << 'DOC'
 # Open questions
 
 ## Where ergo.rego and the Rust engine differ
 
+- plain text, not an entry
 - **One.** Text.
 - **Two.** Text.
 
@@ -46,7 +47,7 @@ git checkout -q -b feature
 
 printf '[{"description":"g","cases":[{"description":"a"},{"description":"b"},{"description":"c"}]}]\n' > spec/cases/t/cases.json
 printf 't / g / a\nt / g / c\nu / h / y\nu / h / z\n' > engines/rust/known-failures.txt
-printf 'package spec_test\n\nknown_differences := {\n\t"t / g / a",\n\t"t / g / c",\n}\n' > engines/rego/tests/spec_test.rego
+printf 'package spec_test\n\nknown_differences := {\n\t# not a row\n\t"t / g / a",\n\t"t / g / c",\n}\n' > engines/rego/tests/spec_test.rego
 python3 - << 'PY'
 text = open("spec/OPEN.md").read().replace("- **Two.** Text.\n\n## Where both", "- **Two.** Text.\n- **Three.** Text.\n\n## Where both")
 open("spec/OPEN.md", "w").write(text)
