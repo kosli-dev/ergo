@@ -855,6 +855,21 @@ pub fn null_key_parts(path: &Path, ctx: &Ctx) -> Vec<String> {
     vec![format!("{} is null", name::name(&prefix)), key]
 }
 
+fn text_side_unread(check: &Check, ctx: &Ctx, verdict: &Verdict) -> Vec<String> {
+    let Check::In(within) = check else {
+        return Vec::new();
+    };
+    if !lists::text_list_flawed(check, ctx) {
+        return Vec::new();
+    }
+    let side = name::name(&within.path);
+    sources(check, ctx, verdict)
+        .iter()
+        .filter(|i| i.name == side && matches!(i.state, Outcome::Absent | Outcome::Null))
+        .map(|i| format!("{} is {}", i.stopped_at(), state_word(i.state)))
+        .collect()
+}
+
 pub fn message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
     said_text(&said(check, ctx, verdict))
 }
@@ -937,7 +952,8 @@ pub fn pieces(check: &Check, ctx: &Ctx, verdict: &Verdict) -> Vec<Piece> {
                         .filter(|i| {
                             i.state == want
                                 || ctx.label.is_some()
-                                    && !roots.contains(&i.name)
+                                    && (!roots.contains(&i.name)
+                                        || lists::text_list_flawed(check, ctx))
                                     && matches!(i.state, Outcome::Absent | Outcome::Null)
                         })
                         .map(|i| format!("{} is {}", i.stopped_at(), state_word(i.state))),
@@ -945,7 +961,12 @@ pub fn pieces(check: &Check, ctx: &Ctx, verdict: &Verdict) -> Vec<Piece> {
                 .collect();
                 found.extend(said_all(
                     lists::walk_fault(check, ctx)
-                        .filter(|(cause, _)| *cause == verdict.cause)
+                        .filter(|(cause, _)| {
+                            *cause == verdict.cause
+                                || ctx.label.is_some()
+                                    && matches!(cause, Cause::Absent | Cause::Null)
+                                    && lists::text_list_flawed(check, ctx)
+                        })
                         .map(|(_, text)| text),
                 ));
                 if let Check::Tally(tally_check) = check {
@@ -968,6 +989,7 @@ pub fn pieces(check: &Check, ctx: &Ctx, verdict: &Verdict) -> Vec<Piece> {
             let mut all: Vec<Piece> = said_all(key_faults(check, ctx)).collect();
             all.extend(said_all(blocked(check, ctx, false)));
             all.extend(said_all(params_position_fault(check, ctx)));
+            all.extend(said_all(text_side_unread(check, ctx, verdict)));
             match check {
                 Check::Tally(tally_check) => {
                     all.extend(tally_faults(tally_check, ctx).into_iter().map(|(_, p)| p));
@@ -977,7 +999,11 @@ pub fn pieces(check: &Check, ctx: &Ctx, verdict: &Verdict) -> Vec<Piece> {
             all.extend(said_all(blocked(check, ctx, true)));
             all.extend(said_all(
                 lists::walk_fault(check, ctx)
-                    .filter(|(cause, _)| *cause == Cause::Unusable)
+                    .filter(|(cause, _)| {
+                        *cause == Cause::Unusable
+                            || matches!(cause, Cause::Absent | Cause::Null)
+                                && lists::text_list_flawed(check, ctx)
+                    })
                     .map(|(_, text)| text),
             ));
             let input_key = lists::input_key_fault(check, ctx);

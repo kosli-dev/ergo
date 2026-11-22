@@ -314,6 +314,16 @@ fn text_walk(check: &super::Check, path: &Path, ctx: &Ctx) -> Option<Walked> {
     })
 }
 
+pub(super) fn text_list_flawed(check: &super::Check, ctx: &Ctx) -> bool {
+    let Some(list) = text_right(check) else {
+        return false;
+    };
+    text_fault(check, list, ctx).is_some() || {
+        let read = read_path(list, ctx);
+        read.outcome == Outcome::Found && read.value.as_ref().is_some_and(|v| !v.is_array())
+    }
+}
+
 pub(super) fn text_fault(check: &super::Check, path: &Path, ctx: &Ctx) -> Option<(Cause, String)> {
     text_walk(check, path, ctx).and_then(|walk| walk.cause.map(|cause| (cause, walk.text)))
 }
@@ -575,12 +585,26 @@ where
     let read = read_right_as(right, ctx, walks, text);
     let left = read_path(path, ctx);
     let inputs = left.inputs.into_iter().chain(read.inputs).collect();
-    let cause = match (read.forced.or(read.outcome.cause()), &read.value) {
-        (Some(cause), _) => cause,
-        (None, Some(right_value)) => decide(right_value, &left.outcome, left.value.as_ref()),
-        (None, None) => Cause::Unusable,
+    let cause = match (read.forced, read.outcome.cause(), &read.value) {
+        (Some(forced), _, _) if text => Cause::worst(
+            [Some(forced), text_side_cause(&left.outcome, left.value.as_ref())]
+                .into_iter()
+                .flatten(),
+        )
+        .unwrap_or(forced),
+        (Some(cause), _, _) | (None, Some(cause), _) => cause,
+        (None, None, Some(right_value)) => decide(right_value, &left.outcome, left.value.as_ref()),
+        (None, None, None) => Cause::Unusable,
     };
     Verdict { cause, inputs }
+}
+
+fn text_side_cause(outcome: &Outcome, found: Option<&Value>) -> Option<Cause> {
+    match left_cause(outcome, found) {
+        Ok(Value::String(_)) => None,
+        Ok(_) => Some(Cause::Unusable),
+        Err(cause) => Some(cause),
+    }
 }
 
 fn left_cause(outcome: &Outcome, found: Option<&Value>) -> Result<Value, Cause> {
@@ -663,7 +687,8 @@ fn in_text(
     found: Option<&Value>,
 ) -> Cause {
     if let Some(cause) = text_items_cause(values) {
-        return cause;
+        return Cause::worst([Some(cause), text_side_cause(outcome, found)].into_iter().flatten())
+            .unwrap_or(cause);
     }
     let text = match left_cause(outcome, found) {
         Ok(Value::String(text)) => text,

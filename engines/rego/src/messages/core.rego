@@ -356,6 +356,8 @@ _m_side_said(s, cause, check) if {
 	object.get(check, "ergo/row", false) == true
 	check.ignoring
 	check.op in _membership_ops
+	_is_ref(check.values)
+	_text_ref_state(check.values.ref)
 	s.state != cause
 	s.state in _no_value_states
 }
