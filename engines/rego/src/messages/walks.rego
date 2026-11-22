@@ -537,6 +537,7 @@ _m_tally_keyed_base(subj, side) := object.union({"faults": fs}, _m_tally_keyed_c
 	not _unreadable_input
 	whose := object.get(side, "whose", null)
 	is_array(whose)
+	_whose_reads_keyed_root(whose)
 	fs := _once([x[2] | some x in sort([[i, f.text, f] |
 		some c in whose
 		object.get(c, "op", null) == "compare"
@@ -547,6 +548,17 @@ _m_tally_keyed_base(subj, side) := object.union({"faults": fs}, _m_tally_keyed_c
 		st == f.cause
 	])])
 	fs != []
+}
+
+_whose_reads_keyed_root(whose) if {
+	some c in whose
+	some p in [object.get(c, "left", null), object.get(c, "right", null)]
+	is_array(p)
+	count(p) > 2
+	last := p[count(p) - 1]
+	is_object(last)
+	"named_by_field" in object.keys(last)
+	_keyed_root_path(p)
 }
 
 _m_tally_keyed_clause(side, fs) := {"k": {"path": side.count_of, "clause": c}, "fault": fs[0]} if {
