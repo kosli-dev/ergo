@@ -542,3 +542,15 @@ test_a_second_whose_that_reads_a_list_input_key_through_an_alias_never_says_an_o
 	listed := `$input is [{"id": "t", "k": "a", "rs": [{"m": {"a": "a"}}], "xs": [{"v": "a"}]}], which isn't an object`
 	[[r.cause, r.message] | some r in ergo.report(doc, policy, {}).results; r.check == "c"] == [["not_an_object", concat("", [listed, "; item 1 of rs: ", listed])]]
 }
+
+_for_said_beside_empty(line, xs) := [[r.cause, r.message] | some r in ergo.report({"things": [{"id": 1, "xs": xs}]}, _sentence_policy({"c": {"for": line, "assert": "m.v exists"}}), {"cs": []}).results; r.check == "c"]
+
+test_a_for_line_whose_says_an_empty_list_on_the_right_then_the_list_or_each_item_as_a_null_list_does if {
+	every line in ["every xs whose v is in $params.cs.name as m", "some xs whose v is in $params.cs.name as m"] {
+		_for_said_beside_empty(line, []) == [["value", "$params.cs is []; xs is []"]]
+		_for_said_beside_empty(line, [{"v": "a"}, {}]) == [["value", "$params.cs is []; item 2 of xs: v is missing"]]
+		_for_said_beside_empty(line, [null]) == [["value", "$params.cs is []; item 1 of xs is null, which isn't an object"]]
+	}
+	_for_said_beside_empty("every xs whose v is in $params.cs.name, if any, as m", []) == [["value", "$params.cs is []"]]
+	_for_said_beside_empty("every xs whose v is in $params.cs.name, if any, as m", [{"v": "a"}, {}]) == [["value", "$params.cs is []; item 2 of xs: v is missing"]]
+}
