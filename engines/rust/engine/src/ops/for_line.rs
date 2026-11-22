@@ -3091,14 +3091,15 @@ impl For {
             }
         }
         let second = self.shared_second();
-        if nothing_checked {
-            clauses.extend(
-                nested
-                    .dead
-                    .iter()
-                    .filter(|d| !(second && d.shared) && d.cause != Cause::Ambiguous)
-                    .map(|d| self.dead_clause(d, ctx)),
-            );
+        clauses.extend(
+            nested
+                .dead
+                .iter()
+                .filter(|d| !(second && d.shared) && d.cause != Cause::Ambiguous)
+                .map(|d| self.dead_clause(d, ctx)),
+        );
+        if !nothing_checked {
+            in_list_order(&mut clauses);
         }
         let ties: Vec<&Dead> = nested
             .dead
