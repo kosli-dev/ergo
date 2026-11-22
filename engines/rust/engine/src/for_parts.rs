@@ -728,24 +728,20 @@ pub fn for_failures(
                         }
                     }
                 }
-                let mut said_by_items: Vec<String> = Vec::new();
-                for entry in &items {
-                    said_by(entry, &[], &mut said_by_items);
-                }
-                let mut own: Vec<String> = Vec::new();
-                let said = clause::text(&clause::shown(&roots));
-                if !said.is_empty() {
-                    own.push(said);
-                }
-                for piece in clauses(message) {
-                    let mine = owned[i].iter().any(|o| o == piece);
-                    let elsewhere = !odd_params && root_texts.iter().any(|t| t == piece)
-                        || !roots.is_empty() && said_by_items.iter().any(|t| t == piece);
-                    if mine && !elsewhere {
-                        ops::push_new(&mut own, piece.to_string());
+                if !roots.is_empty() {
+                    clause::text(&clause::shown(&roots))
+                } else {
+                    let mut own: Vec<String> = Vec::new();
+                    for piece in clauses(message) {
+                        let a_root = !odd_params
+                            && (root_texts.iter().any(|t| t == piece)
+                                || owns.iter().flatten().any(|t| t == piece));
+                        if owned[i].iter().any(|o| o == piece) && !a_root {
+                            ops::push_new(&mut own, piece.to_string());
+                        }
                     }
+                    own.join("; ")
                 }
-                own.join("; ")
             }
         };
         let mut named: Vec<String> = Vec::new();
