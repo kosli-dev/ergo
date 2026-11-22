@@ -2414,6 +2414,11 @@ const ROWS_THE_CLAUSES_DONT_SAY_YET: &[(&str, usize, &str)] = &[
         SAID_NOWHERE,
     ),
     (
+        "for / a for line whose second list has a named by key from $params that is missing / says the key once and then each item's list that fails whatever the key",
+        1,
+        ENTRY_CAUSE,
+    ),
+    (
         "for / a for line whose second list has a named by key from $params that isn't text / says the key once on the row, after the sentence that doesn't read x",
         1,
         ENTRY_CAUSE,

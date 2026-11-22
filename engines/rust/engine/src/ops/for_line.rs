@@ -1180,13 +1180,11 @@ impl For {
                     .take_while(|step| matches!(step, Step::Key(_) | Step::Index(_)))
                     .cloned()
                     .collect();
-                let read = path::read(
-                    &Path {
-                        start: item.path.start.clone(),
-                        steps: before,
-                    },
-                    ctx,
-                );
+                let prefix = Path {
+                    start: item.path.start.clone(),
+                    steps: before,
+                };
+                let read = path::read(&prefix, ctx);
                 let shown = crate::name::name(&item.path);
                 let outer = outer_ctx(ctx);
                 let named_by_a_field = item.path.steps.iter().any(|step| {
@@ -1214,11 +1212,33 @@ impl For {
                         _ => Vec::new(),
                     }
                 };
-                let root_key = read.outcome == crate::path::Outcome::Found
-                    && !self.later_keys(depth, ctx).is_empty();
-                collect.keyed |= root_key;
+                let key = self.later_key(depth, ctx).is_some();
+                let root_key = key && read.value.is_some_and(Value::is_object);
+                collect.keyed |= key;
+                let (cause, msg) = if key && !root_key {
+                    let before = crate::name::name(&prefix);
+                    match (read.outcome, read.value) {
+                        (crate::path::Outcome::Found, Some(value)) => (
+                            Cause::Unusable,
+                            Some(super::message::isnt(&before, value, "a list or an object")),
+                        ),
+                        (outcome, _) => (
+                            outcome.cause().unwrap_or(cause),
+                            Some(format!(
+                                "{before} is {}",
+                                if outcome == crate::path::Outcome::Null {
+                                    "null"
+                                } else {
+                                    "missing"
+                                }
+                            )),
+                        ),
+                    }
+                } else {
+                    (cause, (!keyed.is_empty()).then(|| keyed.join(", and ")))
+                };
                 vec![Dead {
-                    msg: (!keyed.is_empty()).then(|| keyed.join(", and ")),
+                    msg,
                     told: root_key.then_some(None),
                     shared: !reads_path(&item.path, &self.items[0].alias),
                     list: true,
@@ -3088,12 +3108,19 @@ impl For {
         if let Some(first) = ties.first() {
             items.push((first.order.clone(), tie_clause(self.tie_text(&ties, 0))));
         }
+        let keyed = (1..self.items.len()).any(|depth| self.later_key(depth, ctx).is_some());
         let mut hoisted: Vec<&Dead> = Vec::new();
         for child in &level.children {
-            items.extend(
-                self.child_clause(child, None)
-                    .map(|clause| (child.order.clone(), clause)),
-            );
+            let after_key = keyed
+                && child
+                    .failed
+                    .iter()
+                    .flat_map(|outcome| &outcome.inner)
+                    .any(|dead| dead.list && dead.told.is_none());
+            items.extend(self.child_clause(child, None).map(|clause| {
+                let group = if after_key { walk + 2 } else { walk };
+                (child.order.clone(), clause.in_group(group))
+            }));
             if !self.shared_second() {
                 continue;
             }
@@ -3130,7 +3157,10 @@ impl For {
         first
             .into_iter()
             .chain(items)
-            .map(|(_, clause)| clause.in_group(walk))
+            .map(|(_, clause)| {
+                let group = clause.group.max(walk);
+                clause.in_group(group)
+            })
             .filter_map(|clause| unrooted(clause, &texts))
             .collect()
     }
