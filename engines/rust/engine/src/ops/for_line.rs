@@ -1992,6 +1992,23 @@ impl For {
                 None => once.push(clause),
             }
         }
+        let free: Vec<(usize, Vec<String>)> = self
+            .sentences
+            .iter()
+            .enumerate()
+            .filter(|(_, sentence)| self.reads_no_alias(sentence))
+            .map(|(at, sentence)| (at, read_names(&sentence.check)))
+            .collect();
+        for clause in &mut once {
+            let root = clause.name.as_str();
+            if let Some((at, _)) = free.iter().find(|(_, names)| {
+                names.iter().any(|name| {
+                    name == root || name.strip_prefix(root).is_some_and(|rest| rest.starts_with('.'))
+                })
+            }) {
+                clause.group = clause.group.min(*at);
+            }
+        }
         listed_roots(once)
     }
 
@@ -3989,7 +4006,7 @@ fn sentence_root_clauses(forms: &[(Check, bool)], ctx: &Ctx) -> Vec<Clause> {
                 .flat_map(|root| {
                     std::iter::once(crate::name::name(root)).chain(root.steps.iter().filter_map(
                         |step| match step {
-                            Step::Ref(key) => Some(crate::name::name(key)),
+                            Step::Ref(key) | Step::Field(key) => Some(crate::name::name(key)),
                             _ => None,
                         },
                     ))
@@ -4140,6 +4157,29 @@ fn unread_key<'p>(root: &'p Path, keys: &[&Path], ctx: &Ctx) -> Option<&'p Path>
 
 fn is_text(read: &path::Read<'_>) -> bool {
     read.outcome == crate::path::Outcome::Found && read.value.is_some_and(Value::is_string)
+}
+
+fn read_names(check: &Check) -> Vec<String> {
+    let mut paths: Vec<&Path> = check.paths();
+    paths.extend(walk::listed_refs(check));
+    let mut names: Vec<String> = Vec::new();
+    for path in paths {
+        names.push(crate::name::name(path));
+        for step in &path.steps {
+            if let Step::Ref(key) | Step::Field(key) = step {
+                names.push(crate::name::name(key));
+            }
+        }
+    }
+    names.extend(check.refs().iter().map(crate::name::name));
+    if let Check::Walk(walk) = check {
+        names.push(crate::name::name(&walk.path));
+        names.extend(read_names(&walk.check));
+    }
+    for nested in nested_whose(check, false) {
+        names.extend(read_names(nested));
+    }
+    names
 }
 
 fn nested_whose(check: &Check, counts_only: bool) -> Vec<&Check> {
