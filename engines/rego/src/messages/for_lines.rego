@@ -350,15 +350,7 @@ _m_strip_line(l) := object.union(object.remove(l, _line_internal_keys), {"items"
 
 else := object.remove(l, _line_internal_keys)
 
-_for_message(check, subj, r) := _m_not_object(check, subj) if {
-	r.cause == "not_an_object"
-	r.failed == []
-}
-
-_for_message(check, subj, r) := _m_joined(_m_for_empty(object.union(check, {"items": object.get(r, "said_items", check.items)}), subj, r.cause)) if {
-	r.cause != "not_an_object"
-	r.failed == []
-}
+_for_message(check, subj, r) := _m_joined(_for_empty_texts(check, subj, r)) if r.failed == []
 
 _m_for_empty(check, subj, cause) := cs if {
 	ls := [t | some item in check.items; some t in _m_key_list_texts(subj, item.path, object.get(item, "if_any", false) == true)]
@@ -1053,6 +1045,56 @@ _for_numbered(c) if {
 }
 
 _for_list_rank(lists, l) := [i | some i, x in lists; x == l][0]
+
+_for_row_clauses(check, subj, r) := array.concat(array.concat(free, items), [_m_clause("list", t, r.cause, t) | some t in _for_list_texts(check, subj, r)]) if {
+	free := _for_free_clauses(check, subj, r)
+	said := {t | some c in free; some t in _m_clause_lines(c)}
+	items := [x | some k, _ in r.failed; x := _for_unrooted(_for_item_clause(check, r.failed, k), said)]
+}
+
+_for_free_clauses(check, subj, r) := [object.union(x, {"group": i - count(check.checks)}) |
+	some i, c in check.checks
+	not _for_reads_an_alias(check, c)
+	ls := array.concat([l | some f in r.failed; some l in object.get(f, "failed_assertions", []); l.assertion == check.assertions[i]], [l | some l in object.get(r, "free_lines", []); l.assertion == check.assertions[i]])
+	ls != []
+	some x in _for_sentence_clauses(check, c, subj, ls[0].cause)
+]
+
+_for_unrooted(c, said) := object.union(c, {"said": kept}) if {
+	kept := [x | some x in c.said; not _for_said_by_row(x, said)]
+	_for_still_says(c, kept, said)
+}
+
+_for_said_by_row(x, said) if {
+	x.said == []
+	x.text in said
+}
+
+_for_said_by_row(x, _) if {
+	x.kind == "item"
+	x.said == []
+	x.text == ""
+}
+
+_for_still_says(_, kept, _) if kept != []
+
+_for_still_says(c, _, said) if {
+	c.text != ""
+	not c.text in said
+}
+
+_for_list_texts(check, subj, r) := [] if {
+	r.failed != []
+	_ = [check, subj]
+} else := _for_empty_texts(check, subj, r.unfreed) if "unfreed" in object.keys(r)
+
+else := [] if "free_lines" in object.keys(r)
+
+else := _for_empty_texts(check, subj, r)
+
+_for_empty_texts(check, subj, r) := [_m_not_object(check, subj)] if r.cause == "not_an_object"
+
+else := _m_for_empty(object.union(check, {"items": object.get(r, "said_items", check.items)}), subj, r.cause)
 
 _m_leaf_message(_, leaf, cause, _) := _m_root_alone(leaf, cause)
 
