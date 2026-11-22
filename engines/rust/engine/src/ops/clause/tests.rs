@@ -477,6 +477,24 @@ fn roots_of_a_later_sentence_come_after_the_roots_of_an_earlier_one() {
 }
 
 #[test]
+fn a_sentences_items_come_before_what_a_later_sentence_says() {
+    let es = item(
+        "item 1 of es",
+        Cause::Value,
+        vec![root("zz", Cause::Value, "zz is 2")],
+    );
+    let z = || root("z is 2", Cause::Value, "z is 2");
+    assert_eq!(
+        text(&shown(&[es.clone(), z().in_group(1)])),
+        "item 1 of es: zz is 2; z is 2"
+    );
+    assert_eq!(
+        text(&shown(&[es.in_group(1), z()])),
+        "z is 2; item 1 of es: zz is 2"
+    );
+}
+
+#[test]
 fn a_root_two_sentences_say_is_said_once_in_the_first() {
     let clauses = vec![
         missing("zz").in_group(1),

@@ -3891,3 +3891,82 @@ fn a_list_the_line_cant_walk_isnt_counted_as_an_item() {
         );
     }
 }
+
+#[test]
+fn sentences_that_read_no_alias_are_said_first_in_the_order_they_are_written_with_their_roots() {
+    let subject =
+        |ks: Value| json!({"ks": ks, "xs": [{"v": 2, "w": 3}], "es": [{"zz": 2}], "z": 2});
+    for (for_line, assertions, ks, said) in [
+        (
+            "every ks as k",
+            &["every es.zz is 1", "z is 1"][..],
+            json!(["a"]),
+            ("value", "item 1 of es: zz is 2; z is 2"),
+        ),
+        (
+            "every ks as k",
+            &["every es.zz is 1", "z is 1"][..],
+            json!([]),
+            ("value", "item 1 of es: zz is 2; z is 2; ks is []"),
+        ),
+        (
+            "every ks, if any, as k",
+            &["every es.zz is 1", "z is 1"][..],
+            json!([]),
+            ("value", "item 1 of es: zz is 2; z is 2"),
+        ),
+        (
+            "every ks as k",
+            &["some es.zz is 5", "z is 1"][..],
+            json!(["a"]),
+            ("value", "item 1 of es: zz is 2; z is 2"),
+        ),
+        (
+            "every ks as k",
+            &["every es.zz is 1", "z is 1", "k is 1"][..],
+            json!(["a"]),
+            (
+                "unusable",
+                "item 1 of es: zz is 2; z is 2; item 1 of ks: k is \"a\", which isn't a number",
+            ),
+        ),
+        (
+            "every ks as k",
+            &["every es.zz is 1", "z is 1", "z is at least $params.min"][..],
+            json!(["a"]),
+            (
+                "unusable",
+                "item 1 of es: zz is 2; z is 2; $params.min is \"s\", which isn't a number",
+            ),
+        ),
+        (
+            "every xs as x",
+            &["x.v is 1", "x.w is at least $params.min"][..],
+            json!(["a"]),
+            (
+                "unusable",
+                "$params.min is \"s\", which isn't a number; item 1 of xs: x.v is 2",
+            ),
+        ),
+        (
+            "every xs as x",
+            &[
+                "x.v is 1",
+                "every es.zz is 1",
+                "x.w is at least $params.min",
+                "z is 1",
+            ][..],
+            json!(["a"]),
+            (
+                "unusable",
+                "item 1 of es: zz is 2; z is 2; $params.min is \"s\", which isn't a number; item 1 of xs: x.v is 2",
+            ),
+        ),
+    ] {
+        assert_eq!(
+            for_row(for_line, assertions, subject(ks), json!({"min": "s"})),
+            (said.0.to_string(), said.1.to_string()),
+            "{for_line} {assertions:?}"
+        );
+    }
+}
