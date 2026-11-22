@@ -403,6 +403,15 @@ _worst_of(states) := _cause_precedence[i] if {
 	])
 }
 
+_stopped_list_outcome(items, fails) := _worst_of(states) if {
+	items == []
+	every f in fails {
+		f.cause != "value"
+	}
+	states := {f.cause | some f in fails; f.cause in _failed_read_states}
+	states != set()
+}
+
 _row_cause(_, _, flaw) := flaw if flaw != ""
 
 _row_cause(check, subj, "") := c if {

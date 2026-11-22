@@ -18,12 +18,26 @@ if sys.argv[1] == "--version":
 args = dict(zip(sys.argv[2::2], sys.argv[3::2]))
 policy = json.load(open(args["--policy"]))
 data = json.load(open(args["--input"]))
+order = os.environ.get("FAKE_ORDER")
 results = []
 for requirement in policy["requirements"].values():
-    for name in requirement["checks"]:
+    problems = {}
+    for name, check in requirement["checks"].items():
+        if "for" not in check:
+            problem = "item 1 of es: z" + name + " is missing"
+            if order == "same":
+                problem += "; item 1 of es: zshared is missing"
+            problems[check["assert"]] = problem
+    for name, check in requirement["checks"].items():
+        said = os.environ.get("FAKE_MESSAGE", "")
+        if order:
+            sentences = check["assert"] if isinstance(check["assert"], list) else [check["assert"]]
+            if order == "reversed":
+                sentences = sentences[::-1]
+            said = "; ".join(problems[x] for x in sentences if x in problems)
         for subject in data["things"]:
             results.append({"requirement": "r", "check": name, "subject": {"id": subject["id"]},
-                            "passed": os.environ.get("FAKE_PASSED") == "1", "cause": "satisfied", "message": os.environ.get("FAKE_MESSAGE", "")})
+                            "passed": os.environ.get("FAKE_PASSED") == "1", "cause": "satisfied", "message": said})
 print(json.dumps({"results": results}))
 PY
 printf '#!/bin/sh\nexec python3 %s "$@"\n' "$dir/fake.py" > "$dir/ergo"
@@ -92,6 +106,17 @@ fi
 echo "property-check.py flags a problem said twice"
 FAKE_PASSED=0 FAKE_MESSAGE="x; x" run --probes 30 --out "$dir/out3" > "$dir/twice.txt"
 grep -q "SAID_TWICE" "$dir/twice.txt" || { echo "no flag: $(cat "$dir/twice.txt")" >&2; exit 1; }
+
+echo "property-check.py doesn't flag sentences that say one problem between them, in the order they are written"
+FAKE_PASSED=0 FAKE_ORDER=same run --probes 600 --out "$dir/same" > "$dir/same.txt"
+if grep -q "ORDER_FREE" "$dir/same.txt"; then
+  echo "flagged: $(cat "$dir/same.txt")" >&2
+  exit 1
+fi
+
+echo "property-check.py still flags problems that come in another order from the sentences"
+FAKE_PASSED=0 FAKE_ORDER=reversed run --probes 600 --out "$dir/reversed" > "$dir/reversed.txt"
+grep -q "ORDER_FREE" "$dir/reversed.txt" || { echo "no flag: $(cat "$dir/reversed.txt")" >&2; exit 1; }
 
 echo "property-check.py lists the rows that gained a flag between two runs"
 FAKE_PASSED=0 run --probes 30 --out "$dir/before" > /dev/null

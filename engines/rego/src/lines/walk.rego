@@ -607,6 +607,8 @@ else := [trim_suffix(a, trim_prefix(f.at, f.iat)) | some a in f.ats]
 
 _walk_inputs(check, w) := [{"name": _walk_name(check.path, w.walked), "value": [], "locations": [], "ergo/outcome": _walk_stop_state(_walk_stopped_at(w.trail).v)}] if w.walked == set()
 
+else := [{"name": _walk_name(check.path, w.walked), "value": [], "locations": [], "ergo/outcome": o}] if o := _stopped_list_outcome(w.items, w.fails)
+
 else := [{"name": _walk_name(check.path, w.walked), "value": [_walk_value(e.v, e, w) | some e in w.items], "locations": _walk_locations(w)}]
 
 _walk_name(path, walked) := _walk_shown_name(_walk_unaliased(path, _walk_crossed(path, walked)), walked)

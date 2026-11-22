@@ -70,6 +70,28 @@ fn row(walk: &Walk, subject: Value) -> Run {
     run(walk, &ctx(&subject, &input, Some(&params)))
 }
 
+fn member_list_state(subject: Value) -> Outcome {
+    let input = json!({});
+    let context = ctx(&subject, &input, None);
+    let mut path = at(Start::Subject, &["xs", "ys"]);
+    path.steps.push(Step::Members);
+    list_state(&walk(&path, &context, Options::default()))
+}
+
+#[test]
+fn a_member_walk_whose_every_end_stops_reads_the_list_as_its_worst_stop_in_any_order() {
+    for (xs, wanted) in [
+        (json!([{"ys": 3}]), Outcome::Unusable),
+        (json!([{"ys": null}, {"ys": 3}]), Outcome::Unusable),
+        (json!([{"ys": 3}, {"ys": null}]), Outcome::Unusable),
+        (json!([{"ys": null}, {}]), Outcome::Absent),
+        (json!([{}, {"ys": null}]), Outcome::Absent),
+        (json!([{"ys": {}}, {"ys": null}]), Outcome::Found),
+    ] {
+        assert_eq!(member_list_state(json!({"xs": xs})), wanted, "{xs}");
+    }
+}
+
 #[test]
 fn a_walk_without_a_flawed_check_is_not_flawed_and_one_inside_an_any_of_is_asked_too() {
     let inner = every(&["ys"], vec![], equals(json!(1)), false);

@@ -279,6 +279,15 @@ def tag_row(row, m):
     return tags
 
 
+def first_hit(last, tiers):
+    for start in (max(last, 0), 0):
+        for hits in tiers:
+            at = next((j for j in range(start, len(hits)) if hits[j]), None)
+            if at is not None:
+                return at
+    return None
+
+
 def order_tags(row, m, ub):
     tags = []
     frees = [s for s in m["sentences"] if not reads_alias(s, m["kind"])]
@@ -291,11 +300,10 @@ def order_tags(row, m, ub):
     seq = [pre + name_of(c) for _, pre, c in ub]
     last, ended, bad = -1, False, False
     for (_, pre, c), x in zip(ub, seq):
-        at = next((j for j, (ex, _) in enumerate(sets) if pre + c in ex), None)
-        if at is None:
-            at = next((j for j, (_, nm) in enumerate(sets) if x in nm), None)
-        if at is None and not pre and name_of(c) not in m["lists"]:
-            at = next((j for j, f in enumerate(frees) if token_in(name_of(c), f)), None)
+        tiers = [[pre + c in ex for ex, _ in sets], [x in nm for _, nm in sets]]
+        if not pre and name_of(c) not in m["lists"]:
+            tiers.append([token_in(name_of(c), f) for f in frees])
+        at = first_hit(last, tiers)
         if at is None:
             ended = True
         elif ended or at < last:

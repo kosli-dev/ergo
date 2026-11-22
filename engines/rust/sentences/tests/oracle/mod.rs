@@ -5,6 +5,10 @@ pub mod checks;
 pub const FROM_OK: &[(&str, &str)] = &[
     ("commits", "commits"),
     (
+        "things whose count of member of m is 1 and whose sum of m.v is 1",
+        "things whose count of member of m is 1 and whose sum of m.v is 1",
+    ),
+    (
         "things whose every xs.v is at least $params.min",
         "things whose every xs.v is at least $params.min",
     ),
