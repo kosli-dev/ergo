@@ -128,13 +128,31 @@ _for_whose_own(_, e) := _m_clause("item", name, "not_an_object", _m_isnt(name, e
 
 _for_whose_own(item, e) := clauses[0] if {
 	is_object(e.iv)
-	clauses := [_m_item_clause(_m_item_name(e.i, set()), cause, said) |
+	clauses := [x |
 		some c in item.whose
 		not _for_focus_cause(c, e) in _not_failing_causes
-		said := _once(_for_cond_own(c, _focus_of(e, c), object.get(_for_names, "ergo/subject", null)))
-		cause := _for_said_cause(said)
-		cause != "satisfied"
+		x := _for_cond_clause(c, e)
 	]
+}
+
+_for_cond_clause(c, e) := _m_item_clause(_m_item_name(e.i, set()), cause, [_m_clause("root", m, cause, m)]) if {
+	_focus_lost(e, c)
+	p := {"op": "present", "path": e.r}
+	cause := _row_cause(p, e.iv, "")
+	m := _message(p, e.iv, cause)
+} else := _m_clause("item", name, "not_an_object", _m_isnt(name, fe.iv, "an object")) if {
+	e.r != []
+	fe := _focus_of(e, c)
+	fe.r == []
+	not is_object(fe.iv)
+	some p in _condition_paths(c)
+	p != []
+	not _walk_outside(p)
+	name := _m_item_name(fe.i, set())
+} else := _m_item_clause(_m_item_name(e.i, set()), cause, said) if {
+	said := _once(_for_cond_own(c, _focus_of(e, c), object.get(_for_names, "ergo/subject", null)))
+	cause := _for_said_cause(said)
+	cause != "satisfied"
 }
 
 _for_said_cause(said) := _worst_or_value({x.cause | some x in said}) if said != []
@@ -171,10 +189,33 @@ _for_own_check(c, subj) := c if {
 	some g in _compare_side_list
 	g != f
 	_for_side_blocked(c, c[g], subj)
+} else := object.union(c, {"left": c[f], "right": {"literal": "1970-01-01T00:00:00Z"}}) if {
+	c.op == "compare_time"
+	some f in _compare_side_list
+	not _for_side_blocked(c, c[f], subj)
+	some g in _compare_side_list
+	g != f
+	_for_side_blocked(c, c[g], subj)
+} else := object.union(c, {f: stand_ins[f]}) if {
+	stand_ins := _for_stand_ins[c.op]
+	some f, _ in stand_ins
+	_for_blocked(c, c[f].ref, subj)
+	not _for_blocked(c, c.path, subj)
+}
+
+_for_stand_ins := {
+	"includes": {"value": null, "values": [null]},
+	"excludes": {"value": null, "values": [null]},
+	"includes_some": {"values": [null]},
+	"not_includes_all": {"values": [null]},
+	"in": {"values": []},
+	"not_in": {"values": []},
+	"matches_any": {"patterns": ["x"]},
+	"not_matches_any": {"patterns": ["x"]},
 }
 
 _for_blocks(c, subj) if {
-	some p in _condition_paths(c)
+	some p in array.concat(_condition_paths(c), [c[f].ref | some f in ["value", "values", "patterns"]; _is_ref(object.get(c, f, null))])
 	_for_blocked(c, p, subj)
 }
 
@@ -845,6 +886,173 @@ _for_said_by_root(x, roots) if {
 	x.kind != "item"
 	x.text in roots
 }
+
+_for_item_clause(check, failed, k) := _m_clause("item", t, "ambiguous", t) if {
+	failed[k].cause == "ambiguous"
+	not _m_nested_tie(failed[k])
+	not _m_earlier_tie(failed, k)
+	t := _m_tie(check, 0, failed)
+}
+
+_for_item_clause(check, failed, k) := _m_item_clause(f.said, "ambiguous", [_m_clause("item", t, "ambiguous", t)]) if {
+	f := failed[k]
+	f.cause == "ambiguous"
+	_m_nested_tie(f)
+	t := _m_tie(check, 1, f.failed_items)
+}
+
+_for_item_clause(check, failed, k) := c if {
+	failed[k].cause != "ambiguous"
+	c := _for_item_own(check, failed[k])
+}
+
+_for_item_own(check, f) := _for_whose_item_clause(check.items[0], e, _for_names, wh) if {
+	[e, _] := _for_item_walked(check, f)
+	wh := _for_whose(check.items[0], e, _for_names)
+	wh.undecided != []
+}
+
+_for_item_own(check, f) := c if {
+	not _for_item_undecided(check, f)
+	c := _for_item_kept(check, f)
+}
+
+_for_item_undecided(check, f) if {
+	[e, _] := _for_item_walked(check, f)
+	_for_whose(check.items[0], e, _for_names).undecided != []
+}
+
+_for_item_kept(check, f) := _m_clause("item", f.said, f.cause, concat("; ", _m_for_fail(_m_with_why(f)))) if _for_said_why(f)
+
+else := _m_clause("item", f.said, "not_an_object", _m_isnt(object.get(f, "bare", f.said), object.get(f, "raw", f.value), "an object")) if {
+	f.cause == "not_an_object"
+	not is_object(object.get(f, "raw", f.value))
+}
+
+else := _m_clause("item", f.said, f.cause, _m_named_item(f)) if {
+	object.get(f, "failed_assertions", []) == []
+	object.get(f, "failed_items", []) == []
+}
+
+else := object.union(_m_item_clause(f.said, _worst_or_value({own[0]} | {x.cause | some x in said}), said), {"text": own[1]}) if {
+	count(check.items) == 1
+	own := _for_owned_text(f)
+	rest := [l | some l in array.slice(f.failed_assertions, 1, count(f.failed_assertions)); object.get(l, "own_msg", []) != f.failed_assertions[0].own_msg]
+	said := _for_item_sentences(check, object.union(f, {"failed_assertions": rest}), _for_item_bound(check, f))
+}
+
+else := _m_item_clause(f.said, _for_said_cause(said), said) if {
+	f.failed_assertions != []
+	count(check.items) == 1
+	said := _for_item_sentences(check, f, _for_item_bound(check, f))
+	said != []
+}
+
+else := _m_item_clause(f.said, _for_said_cause(said), said) if {
+	count(check.items) == 2
+	said := _for_pairs_said(check, f, _for_item_bound(check, f))
+	said != []
+}
+
+_for_owned_text(f) := [l.cause, _m_under(f.said, l.own_msg[0])] if {
+	_m_all_owned(f)
+	l := f.failed_assertions[0]
+	count(l.own_msg) == 1
+	startswith(l.own_msg[0], "\u0001")
+}
+
+_for_pairs_said(check, f, names) := array.concat([x | firsts == []; some p in riders; some x in p[1]], [x[3] | some x in sort(array.concat(pairs, dead))]) if {
+	w := _for_walk(check.items[1], object.get(names, "ergo/subject", null), names)
+	own := [[j, _for_pair_parts(check, f, names, w, e)] | some j, e in w.items]
+	firsts := [j | some [j, ps] in own; ps != []]
+	riders := _for_rider_parts(check, f, names)
+	pairs := [[j, 0, 0, _for_pair_clause(f, _for_item_name(check, w.items[j].i), said)] |
+		some [j, ps] in own
+		said := [x | some p in sort(array.concat(ps, [r | j == firsts[0]; some r in riders])); some x in p[1]]
+		said != []
+	]
+	dead := [[_for_inner_at(check, w, x), 1, k, _m_clause("item", x.item, x.cause, t)] |
+		some k, x in object.get(f, "failed_items", [])
+		object.get(x, "free", false) != true
+		some t in _m_inner_fail(x)
+	]
+}
+
+_for_pair_clause(f, name, said) := _m_clause("item", name, _for_said_cause(said), concat(", and ", owns)) if {
+	_m_pair_owns(f, name)
+	owns := _once([t | some l in f.failed_assertions; some x in l.items; x.item == name; some t in x.own])
+	owns != []
+	every t in owns {
+		not startswith(t, concat("", [name, ": "]))
+	}
+} else := _m_item_clause(name, _for_said_cause(said), said)
+
+_for_pair_parts(check, f, names, w, e) := [[i, cs] |
+	name := _for_item_name(check, e.i)
+	some i, c in check.checks
+	some l in f.failed_assertions
+	l.assertion == check.assertions[i]
+	some x in object.get(l, "items", [])
+	x.item == name
+	cs := _for_sentence_clauses(check, c, object.get(names, "ergo/subject", null), x.cause) with input as {"ergo/names": _bound(names, check.items[1].as, e.v, _walk_at(w, e))}
+	cs != []
+]
+
+_for_rider_parts(check, f, names) := [[i, cs] |
+	some i, c in check.checks
+	_for_reads_an_alias(check, c)
+	some l in f.failed_assertions
+	l.assertion == check.assertions[i]
+	not "items" in object.keys(l)
+	cs := _for_sentence_clauses(check, c, object.get(names, "ergo/subject", null), l.cause) with input as {"ergo/names": names}
+	cs != []
+]
+
+_for_inner_at(check, w, x) := min({j | some j, e in w.items; _for_item_name(check, e.i) == x.path} | {count(w.items)})
+
+_for_item_walked(check, f) := [e, w] if {
+	w := _for_walk(check.items[0], object.get(_for_names, "ergo/subject", null), _for_names)
+	some e in w.items
+	_failed_name(e.i, _for_dotted(check)) == f.path
+}
+
+_for_item_bound(check, f) := _bound(_for_names, check.items[0].as, e.v, _walk_at(w, e)) if [e, w] := _for_item_walked(check, f)
+
+_for_item_sentences(check, f, names) := _for_in_list_order(_once([x |
+	some i, c in check.checks
+	_for_reads_an_alias(check, c)
+	some l in f.failed_assertions
+	l.assertion == check.assertions[i]
+	some x in _for_sentence_clauses(check, c, object.get(names, "ergo/subject", null), l.cause) with input as {"ergo/names": names}
+]))
+
+_for_in_list_order(said) := [_for_slot(said, sorted, i) | some i, _ in said] if {
+	items := [c | some c in said; c.kind == "item"]
+	lists := _once([_for_item_list(c) | some c in items])
+	sorted := [x[3] | some x in sort([[_for_list_rank(lists, _for_item_list(c)), _for_item_number(c), j, c] | some j, c in items])]
+}
+
+_for_slot(said, sorted, i) := said[i] if {
+	said[i].kind != "item"
+	_ = sorted
+}
+
+else := sorted[count([j | some j, c in said; j < i; c.kind == "item"])]
+
+_for_item_list(c) := array.slice(c.name, 0, count(c.name) - 1) if _for_numbered(c)
+
+else := c.name
+
+_for_item_number(c) := c.name[count(c.name) - 1] if _for_numbered(c)
+
+else := 0
+
+_for_numbered(c) if {
+	is_array(c.name)
+	is_number(c.name[count(c.name) - 1])
+}
+
+_for_list_rank(lists, l) := [i | some i, x in lists; x == l][0]
 
 _m_leaf_message(_, leaf, cause, _) := _m_root_alone(leaf, cause)
 

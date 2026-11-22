@@ -203,7 +203,11 @@ _m_clause_item_node(v) if {
 _m_clause_node_units(key, lead, n) := array.concat(
 	[{"key": key, "counted": true, "clause": _m_clause("item", name, n.cause, concat(": ", array.concat(lead, [n.text])))} | n.text != ""],
 	[{"key": array.concat(key, ["said", i]), "counted": _m_clause_leaf(n), "clause": _m_item_clause(name, n.cause, run)} | some [i, run] in _m_clause_runs(n.said)],
-) if name := concat(": ", array.concat(lead, [n.name]))
+) if name := _m_clause_unit_name(lead, n.name)
+
+_m_clause_unit_name(lead, name) := concat(": ", array.concat(lead, [name])) if is_string(name)
+
+else := array.concat(lead, [name])
 
 _m_clause_leaf(n) := false if {
 	some c in n.said

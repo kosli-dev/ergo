@@ -275,6 +275,194 @@ test_a_whose_item_that_isnt_an_object_says_so_beside_a_root if {
 	_whose_item_texts("every xs whose v is at least $params.min as x", {"xs": [3]}, {"min": "s"}) == [["item 1 of xs is 3, which isn't an object"]]
 }
 
+test_a_whose_item_beside_a_time_root_says_its_own_read_against_a_stand_in_time if {
+	subj := {"xs": [{}, {"v": null}, {"v": 1}, {"v": "2020-01-01T00:00:00Z"}]}
+	_whose_item_texts("every xs whose v is after $params.t as x", subj, {"t": "s"}) == [["item 1 of xs: v is missing"], ["item 2 of xs: v is null"], [`item 3 of xs: v is 1, which isn't a time written like "1970-01-01T00:00:00Z"`]]
+}
+
+test_a_whose_item_beside_a_list_root_says_only_its_own_read if {
+	subj := {"xs": [{"v": 1}, {}, {"v": null}, {"v": ["a"]}]}
+	own := [["item 1 of xs: v is 1, which isn't a list"], ["item 2 of xs: v is missing"], ["item 3 of xs: v is null"]]
+	_whose_item_texts("every xs whose v contains $params.t as x", subj, {}) == own
+	_whose_item_texts("every xs whose v contains $params.t as x", subj, {"t": null}) == own
+	_whose_item_texts("every xs whose v contains all of $params.t as x", subj, {"t": 3}) == own
+	_whose_item_texts("every xs whose v is in $params.l as x", {"xs": [{"v": 1}, {}, {"v": null}]}, {"l": "s"}) == [["item 2 of xs: v is missing"], ["item 3 of xs: v is null"]]
+	_whose_item_texts("every xs whose v matches $params.p as x", {"xs": [{"v": 1}, {}, {"v": null}, {"v": "a"}]}, {"p": 3}) == [["item 1 of xs: v is 1, which isn't text"], ["item 2 of xs: v is missing"], ["item 3 of xs: v is null"]]
+}
+
+test_a_whose_item_whose_focus_is_missing_says_the_path_to_it if {
+	_whose_item_texts("every xs.t whose n is 1 as x", {"xs": [{"t": {"n": 1}}, {}]}, {}) == [["item 2 of xs: t is missing"]]
+	_whose_item_texts("every xs.t.u whose n is 1 as x", {"xs": [{"t": {"u": {"n": 1}}}, {"t": {}}, {}]}, {}) == [["item 2 of xs: t.u is missing"], ["item 3 of xs: t.u is missing"]]
+	_whose_item_texts("every xs.t.u whose n is 1 as x", {"xs": [{"t": 3}, {"t": null}]}, {}) == [["item 1 of xs: t is 3, which isn't an object"], ["item 2 of xs: t is null"]]
+}
+
+test_a_whose_item_whose_focus_isnt_an_object_says_so_by_its_path if {
+	_whose_item_texts("every xs.t whose n is 1 as x", {"xs": [{"t": null}, {"t": 2}]}, {}) == [["item 1 of xs: t is null, which isn't an object"], ["item 2 of xs: t is 2, which isn't an object"]]
+}
+
 test_an_item_the_whose_decides_has_no_whose_item_clause if {
 	_whose_item_texts("every xs whose v is 1 as x", {"xs": [{"v": 1}, {"v": 2}]}, {}) == []
+}
+
+_item_clauses(line, sentences, subj, params) := [c |
+	check := ergo._s_written_check({"for": line, "assert": sentences})
+	names := {"ergo/subject": subj, "$at": {"names": {}}}
+	r := ergo._for_row_raw(check, subj) with input as {"ergo/names": names} with data.ergo_params as params
+	some k, _ in r.failed
+	c := ergo._for_item_clause(check, r.failed, k) with input as {"ergo/names": names} with data.ergo_params as params
+]
+
+_item_texts(line, sentences, subj, params) := [[ergo._m_aliased(t) | some t in ergo._m_clause_texts([c])] | some c in _item_clauses(line, sentences, subj, params)]
+
+test_an_item_says_what_each_sentence_says_of_it_in_the_order_written if {
+	[c] := _item_clauses("every xs as x", ["x.v is 1", "x.w is 1"], {"xs": [{"v": "a, and b"}]}, {})
+	c.kind == "item"
+	c.name == "item 1 of xs"
+	c.cause == "unusable"
+	[ergo._m_aliased(s.text) | some s in c.said] == [`x.v is "a, and b", which isn't a number`, "x.w is missing"]
+	_item_texts("every xs as x", ["x.v is 1", "x.w is 1"], {"xs": [{"v": "a, and b"}]}, {}) == [[`item 1 of xs: x.v is "a, and b", which isn't a number, and x.w is missing`]]
+}
+
+test_an_item_a_sentence_reads_whole_is_named_by_the_item if {
+	_item_texts("every member of ms as m", ["m is 1"], {"ms": {"a": 0, "b": 0}}, {}) == [["member a of ms is 0"], ["member b of ms is 0"]]
+	[c, _] := _item_clauses("every member of ms as m", ["m is 1"], {"ms": {"a": 0, "b": 0}}, {})
+	c.text == "member a of ms is 0"
+	c.said == []
+	c.cause == "value"
+}
+
+test_an_item_two_sentences_read_whole_is_said_once if {
+	_item_texts("every member of ms as m", ["m is 1", "m is 2"], {"ms": {"a": 3}}, {}) == [["member a of ms is 3"]]
+}
+
+test_two_sentences_walking_one_list_say_its_items_in_list_order if {
+	subj := {"xs": [{"ys": [{"n": 1, "m": 2}, {"m": 1}]}]}
+	_item_texts("every xs as x", ["every x.ys.n is 1", "every x.ys.m is 1"], subj, {}) == [["item 1 of xs: item 1 of x.ys: m is 2", "item 1 of xs: item 2 of x.ys: n is missing"]]
+}
+
+test_a_walk_and_a_plain_sentence_keep_the_order_written if {
+	subj := {"xs": [{"v": 2, "ys": [{"n": 2}]}]}
+	_item_texts("every xs as x", ["every x.ys.n is 1", "x.v is 1"], subj, {}) == [["item 1 of xs: item 1 of x.ys: n is 2", "item 1 of xs: x.v is 2"]]
+	_item_texts("every xs as x", ["x.v is 1", "every x.ys.n is 1"], subj, {}) == [["item 1 of xs: x.v is 2", "item 1 of xs: item 1 of x.ys: n is 2"]]
+}
+
+test_a_member_walk_and_a_plain_sentence_keep_the_order_written if {
+	subj := {"xs": [{"v": 2, "ms": {"a": 2, "b": 1}}]}
+	_item_texts("every xs as x", ["every member of x.ms is 1", "x.v is 1"], subj, {}) == [["item 1 of xs: member a of x.ms is 2", "item 1 of xs: x.v is 2"]]
+}
+
+test_an_item_whose_sort_key_is_of_another_kind_says_why if {
+	subj := {"xs": [{"t": 1, "v": 2}, {"t": "a", "v": 3}]}
+	_item_texts("first of xs sorted by t as x", ["x.v is 1"], subj, {}) == [[`item 2 of xs: t is "a", which isn't a number, a time or a date`]]
+}
+
+test_an_item_that_isnt_an_object_says_so_as_its_own_text if {
+	cs := _item_clauses("every xs as x", ["x.v is 1"], {"xs": [1, {}, null]}, {})
+	[[c.cause, ergo._m_aliased(c.text)] | some c in cs] == [["not_an_object", "item 1 of xs is 1, which isn't an object"], ["absent", ""], ["not_an_object", "item 3 of xs is null, which isn't an object"]]
+	_item_texts("every xs as x", ["x.v is 1"], {"xs": [1, {}, null]}, {}) == [["item 1 of xs is 1, which isn't an object"], ["item 2 of xs: x.v is missing"], ["item 3 of xs is null, which isn't an object"]]
+}
+
+test_an_item_the_line_cant_reach_says_what_it_found_there if {
+	_item_texts("every xs.ys as y", ["y.v is 1"], {"xs": [{"ys": [{"v": 2}]}, {}, {"ys": null}]}, {}) == [["item 1 of xs: item 1 of ys: y.v is 2"], ["item 2 of xs: ys is missing"], ["item 3 of xs: ys is null"]]
+}
+
+test_an_item_the_whose_cant_decide_says_its_whose_clause if {
+	_item_texts("every xs whose v is 1 as x", ["x.w is 1"], {"xs": [{"w": 2}, {"v": 1, "w": 2}]}, {}) == [["item 1 of xs: v is missing"], ["item 2 of xs: x.w is 2"]]
+}
+
+test_an_item_the_whose_cant_decide_beside_a_root_says_only_its_own_read if {
+	_item_texts("every xs whose v is at least $params.min as x", ["x.w is 1"], {"xs": [{"v": 1}, {}]}, {"min": "s"}) == [["item 2 of xs: v is missing"]]
+}
+
+test_items_that_tie_give_their_tie_once if {
+	_item_texts("first of xs sorted by t as x", ["x.v is 1"], {"xs": [{"t": 1, "v": 2}, {"t": 1, "v": 3}]}, {}) == [["item 1 and item 2 of xs tie on t"]]
+	[c] := _item_clauses("first of xs sorted by t as x", ["x.v is 1"], {"xs": [{"t": 1, "v": 2}, {"t": 1, "v": 3}]}, {})
+	c.cause == "ambiguous"
+}
+
+_item_texts_today(line, sentences, subj, params) := [[e.t | some e in ents; e.i == k] | some k, _ in r.failed] if {
+	check := ergo._s_written_check({"for": line, "assert": sentences})
+	names := {"ergo/subject": subj, "$at": {"names": {}}}
+	r := ergo._for_row_raw(check, subj) with input as {"ergo/names": names} with data.ergo_params as params
+	ents := ergo._for_ents(check, r) with input as {"ergo/names": names} with data.ergo_params as params
+}
+
+test_the_items_clause_says_what_the_row_says_today if {
+	shapes := [
+		["every xs as x", ["x.v is 1", "x.w is 1"], {"xs": [{}, {}, {}, {}, {}]}],
+		["every xs as x", ["every x.ys.n is 1"], {"xs": [{"ys": [{"n": 2}, {}]}, {"ys": [{"n": 3}, {}]}]}],
+		["every xs as x", ["x.v is 1"], {"xs": [1, {}, null]}],
+		["every xs as x", ["x.v is 1", "x.w is 1"], {"xs": [{"v": "a, and b"}]}],
+		["every xs as x", ["every x.ys.n is 1", "every x.ys.m is 1"], {"xs": [{"ys": [{"n": 1, "m": 2}, {"m": 1}]}]}],
+		["every prs as pr, every pr.as as ap", ["ap.state is 1", "ap.user is 1", "pr.ok is true"], {"prs": [{"ok": false, "as": [{"state": 2, "user": 1}, {"state": 1, "user": 3}]}]}],
+		["every cs as c", ["every c.reviews.ok is true", "c.a is 1"], {"cs": [{"a": 2, "reviews": [{"ok": true}, {"ok": false}]}, {"a": 2, "reviews": [{"ok": false}]}, {"a": 2, "reviews": [{"ok": false}]}, {"a": 2, "reviews": [{"ok": false}]}, {"a": 2, "reviews": [{"ok": false}]}]}],
+	]
+	every s in shapes {
+		_item_texts(s[0], s[1], s[2], {}) == _item_texts_today(s[0], s[1], s[2], {})
+	}
+}
+
+test_an_items_clause_leaves_its_roots_to_the_row if {
+	_item_texts("every xs as x", ["x.v is at least $params.min"], {"xs": [{"v": "a"}, {}, {"v": 1}]}, {"min": "s"}) == [[`item 1 of xs: x.v is "a", which isn't a number`], ["item 2 of xs: x.v is missing"]]
+	_item_texts("every xs as x", ["x.v is at least $params.min"], {"xs": [{"v": 1}, {}]}, "s") == []
+}
+
+test_an_item_clause_is_given_only_for_an_item_in_the_failed_list if {
+	check := ergo._s_written_check({"for": "every xs as x", "assert": ["x.v is 1"]})
+	names := {"ergo/subject": {"xs": [{}]}, "$at": {"names": {}}}
+	r := ergo._for_row_raw(check, {"xs": [{}]}) with input as {"ergo/names": names}
+	not ergo._for_item_clause(check, r.failed, 1) with input as {"ergo/names": names}
+	not ergo._for_item_clause(check, r.failed, "0") with input as {"ergo/names": names}
+	not ergo._for_item_clause(check, null, 0) with input as {"ergo/names": names}
+}
+
+test_a_sentence_that_reads_no_alias_is_not_said_under_an_item if {
+	_item_texts("every xs as x", ["x.v is 1", "z is 1"], {"xs": [{"v": 2}, {}]}, {}) == [["item 1 of xs: x.v is 2"], ["item 2 of xs: x.v is missing"]]
+}
+
+test_a_sentence_that_doesnt_read_the_second_alias_rides_with_the_first_pair if {
+	subj := {"prs": [{"ok": false, "as": [{"state": 2, "user": 1}, {"state": 1, "user": 3}]}]}
+	_item_texts("every prs as pr, every pr.as as ap", ["ap.state is 1", "ap.user is 1", "pr.ok is true"], subj, {}) == [["item 1 of prs: item 1 of pr.as: ap.state is 2, and pr.ok is false", "item 1 of prs: item 2 of pr.as: ap.user is 3"]]
+}
+
+test_a_rider_written_first_is_said_first_in_its_pair if {
+	subj := {"prs": [{"ok": false, "as": [{"state": 2}, {"state": 3}]}]}
+	_item_texts("every prs as pr, every pr.as as ap", ["pr.ok is true", "ap.state is 1"], subj, {}) == [["item 1 of prs: item 1 of pr.as: pr.ok is false, and ap.state is 2", "item 1 of prs: item 2 of pr.as: ap.state is 3"]]
+}
+
+test_a_rider_with_no_pair_is_said_under_the_first_item if {
+	_item_texts("every prs as pr, every pr.as as ap", ["ap.state is 1", "pr.ok is true"], {"prs": [{"ok": false, "as": [{"state": 1}]}]}, {}) == [["item 1 of prs: pr.ok is false"]]
+}
+
+test_a_pair_says_a_walk_apart_from_its_other_sentences if {
+	subj := {"xs": [{"ys": [{"m": 2, "zs": [{"n": 2}]}]}]}
+	_item_texts("every xs as x, every x.ys as y", ["every y.zs.n is 1", "y.m is 1"], subj, {}) == [["item 1 of xs: item 1 of x.ys: item 1 of y.zs: n is 2", "item 1 of xs: item 1 of x.ys: y.m is 2"]]
+}
+
+test_items_of_the_second_list_the_line_cant_check_come_in_list_order if {
+	line := "every xs as x, every x.ys whose n is 1 as y"
+	_item_texts(line, ["y.m is 1", "x.k is 1"], {"xs": [{"k": 2, "ys": [{}, {"n": 1, "m": 2}]}]}, {}) == [["item 1 of xs: item 1 of x.ys: n is missing", "item 1 of xs: item 2 of x.ys: y.m is 2, and x.k is 2"]]
+	_item_texts(line, ["y.m is 1"], {"xs": [{"ys": [{"n": 1, "m": 2}, {}]}]}, {}) == [["item 1 of xs: item 1 of x.ys: y.m is 2", "item 1 of xs: item 2 of x.ys: n is missing"]]
+}
+
+test_items_of_the_second_list_the_line_cant_check_are_said_with_no_pair_beside_them if {
+	_item_texts("every ws as w, every member of w.ms as m", ["m is 1"], {"ws": [{"ms": [1]}]}, {}) == [["item 1 of ws: w.ms is [1], which isn't an object"]]
+	subj := {"ws": [{"z": "p; q"}], "ys": [{"n": 1}, {"n": 2}]}
+	_item_texts("every ws as w, some ys whose n is at least w.z and whose n is at most u as y", ["y.n exists"], subj, {}) == [["item 1 of ws: item 1 of ys: u is missing", "item 1 of ws: item 2 of ys: u is missing"]]
+}
+
+test_a_second_list_item_that_isnt_an_object_is_named_by_the_item if {
+	_item_texts("every prs as pr, every pr.as as ap", ["ap.state is 1"], {"prs": [{"as": [3, {"state": 2}, null]}]}, {}) == [[
+		"item 1 of prs: item 1 of pr.as is 3, which isn't an object",
+		"item 1 of prs: item 2 of pr.as: ap.state is 2",
+		"item 1 of prs: item 3 of pr.as is null, which isn't an object",
+	]]
+}
+
+test_a_second_alias_read_whole_is_named_by_its_item if {
+	_item_texts("every ws as w, every member of w.ms as m", ["m is 1"], {"ws": [{"ms": {"a": 2, "b": 1}}]}, {}) == [["item 1 of ws: member a of w.ms is 2"]]
+}
+
+test_items_of_an_inner_list_that_tie_are_said_under_their_item if {
+	_item_texts("every ws as w, first of w.ys sorted by t as y", ["y.v is 1"], {"ws": [{"ys": [{"t": 1, "v": 2}, {"t": 1, "v": 3}]}]}, {}) == [["item 1 of ws: item 1 and item 2 of w.ys tie on t"]]
 }
