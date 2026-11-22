@@ -302,6 +302,47 @@ fn root_clauses_keep_each_item_of_a_count_a_root_reads() {
 }
 
 #[test]
+fn root_clauses_say_a_root_before_is_in_ignoring_case_that_isnt_text() {
+    let subject = json!({"id": "t", "xs": [], "ys": ["a"]});
+    let input = json!({"cs": [{"name": "a"}]});
+    let params = json!({"k": 3, "l": ["a"]});
+    for sentence in [
+        "every xs whose $params.k is in $params.l ignoring case, if any, exists",
+        "every xs whose $params.k is in $input.cs.name ignoring case, if any, exists",
+        "every xs whose $params.k is not in $params.l ignoring case, if any, exists",
+    ] {
+        let said = root_clauses_of(sentence, &subject, &input, Some(&params));
+        assert_eq!(
+            said,
+            vec![(
+                "$params.k".to_string(),
+                "$params.k is 3, which isn't text".to_string()
+            )],
+            "{sentence}"
+        );
+    }
+    let text = json!({"k": "a", "l": ["a"]});
+    assert_eq!(
+        root_clauses_of(
+            "every xs whose $params.k is in $params.l ignoring case, if any, exists",
+            &subject,
+            &input,
+            Some(&text),
+        ),
+        vec![]
+    );
+    assert_eq!(
+        root_clauses_of(
+            "every xs whose $params.k is in $params.l, if any, exists",
+            &subject,
+            &input,
+            Some(&params),
+        ),
+        vec![]
+    );
+}
+
+#[test]
 fn walked_root_clauses_say_a_walked_root_that_holds_values_of_more_than_one_kind() {
     let super::Check::Walk(walk) = lowered("every items whose v is in $params.os.name exists")
     else {
