@@ -366,6 +366,10 @@ test_an_item_the_line_cant_reach_says_what_it_found_there if {
 	_item_texts("every xs.ys as y", ["y.v is 1"], {"xs": [{"ys": [{"v": 2}]}, {}, {"ys": null}]}, {}) == [["item 1 of xs: item 1 of ys: y.v is 2"], ["item 2 of xs: ys is missing"], ["item 3 of xs: ys is null"]]
 }
 
+test_an_item_the_whose_cant_decide_is_named_by_the_path_its_whose_reads if {
+	_item_texts("every xs.meta whose k is 1 as m", ["m exists"], {"xs": [{"meta": {"k": 1}}, {"meta": {"n": 1}, "k": 1}]}, {}) == [["item 2 of xs: meta: k is missing"]]
+}
+
 test_a_problem_an_earlier_sentence_said_of_an_item_is_not_said_again if {
 	_item_texts("every xs as x", ["x.e exists", "x.e is after x.a"], {"xs": [{}]}, {}) == [["item 1 of xs: x.e is missing, and x.a is missing"]]
 }
