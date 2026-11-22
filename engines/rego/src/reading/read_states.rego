@@ -306,6 +306,10 @@ _clear_path_states(subj, check) := set() if {
 } else := _list_flaw(check, subj) - {"value"} if {
 	_list_cmp(check)
 	_list_flawed(check, subj)
+} else := _list_flaw(check, subj) if {
+	check.op in _membership_ops
+	check.ignoring
+	_list_flawed(check, subj)
 } else := {s |
 	_two_sided(check)
 	some p in _read_paths(check)
