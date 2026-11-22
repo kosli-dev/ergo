@@ -58,13 +58,7 @@ impl Clause {
 const SHOWN_ITEMS: usize = 3;
 
 pub fn shown(clauses: &[Clause]) -> Vec<Clause> {
-    let mut once: Vec<Clause> = Vec::new();
-    for clause in clauses {
-        match once.iter_mut().find(|seen| same_but_group(seen, clause)) {
-            Some(seen) => seen.group = seen.group.min(clause.group),
-            None => once.push(clause.clone()),
-        }
-    }
+    let once = said_once(clauses);
     let (mut out, mut rest): (Vec<Clause>, Vec<Clause>) =
         once.into_iter().partition(|clause| clause.kind == Kind::Root);
     out.sort_by(|a, b| (a.group, a.cause, &a.name).cmp(&(b.group, b.cause, &b.name)));
@@ -97,8 +91,31 @@ pub fn shown(clauses: &[Clause]) -> Vec<Clause> {
     out
 }
 
-fn same_but_group(a: &Clause, b: &Clause) -> bool {
-    (a.kind, &a.name, a.cause, &a.text, &a.said) == (b.kind, &b.name, b.cause, &b.text, &b.said)
+fn said_once(clauses: &[Clause]) -> Vec<Clause> {
+    let mut once: Vec<Clause> = Vec::new();
+    for clause in clauses {
+        let clause = if clause.kind == Kind::Item {
+            Clause {
+                said: said_once(&clause.said),
+                ..clause.clone()
+            }
+        } else {
+            clause.clone()
+        };
+        match once.iter_mut().find(|seen| says_alike(seen, &clause)) {
+            Some(seen) => seen.group = seen.group.min(clause.group),
+            None => once.push(clause),
+        }
+    }
+    once
+}
+
+fn says_alike(a: &Clause, b: &Clause) -> bool {
+    match (a.kind, b.kind) {
+        (Kind::Item, Kind::Item) => pieces(a) == pieces(b),
+        (Kind::Root | Kind::List, Kind::Root | Kind::List) => a.text == b.text,
+        _ => false,
+    }
 }
 
 pub fn text(clauses: &[Clause]) -> String {
