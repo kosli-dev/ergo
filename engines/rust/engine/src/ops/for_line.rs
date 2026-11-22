@@ -1872,9 +1872,17 @@ impl For {
             .chain(run.items.iter().cloned())
             .collect();
         let shown = super::clause::shown(&clauses);
+        let walked = run.verdict.cause;
         run.verdict.cause =
             Cause::worst(tree_causes(&clauses).into_iter().chain([run.verdict.cause]))
                 .unwrap_or(Cause::Satisfied);
+        if run.verdict.cause != Cause::Satisfied
+            && walked == Cause::Satisfied
+            && !super::walked_roots_on()
+        {
+            run.verdict.inputs =
+                super::reading_walked_roots(|| self.run_items(ctx)).verdict.inputs;
+        }
         if run.verdict.cause != Cause::Satisfied {
             self.key_inputs(&mut run, ctx);
             run.message = (!shown.is_empty()).then(|| super::clause::text(&shown));
