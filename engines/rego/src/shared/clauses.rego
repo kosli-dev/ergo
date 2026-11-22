@@ -109,7 +109,7 @@ _m_clauses_order(clauses) := array.concat(array.concat(_m_clauses_ahead(once), [
 
 _m_walk_said(clauses, items) := {
 	"message": concat("; ", ts),
-	"ergo/own": [t | some t in ts; not t in {c.text | some c in items}],
+	"ergo/own": [t | some t in ts; not t in said],
 	"ergo/texts": items,
 	"ergo/heads": [],
 } if {
@@ -119,13 +119,15 @@ _m_walk_said(clauses, items) := {
 		c.said == []
 	}
 	ts := _once([c.text | some c in clauses])
+	said := {c.text | some c in items}
 } else := {
 	"message": _m_clauses_text(_m_clauses_cut(ordered)),
-	"ergo/own": [t | some t in _m_clause_texts(ordered); not t in {c.text | some c in items}],
+	"ergo/own": [t | some t in _m_clause_texts(ordered); not t in said],
 	"ergo/texts": items,
 	"ergo/heads": [c | some c in ordered; c.kind != "item"],
 } if {
 	ordered := _m_clauses_order(clauses)
+	said := {c.text | some c in items}
 }
 
 _m_clauses_cut(ordered) := ordered if count(_m_clause_counted_names(_m_clause_units([c | some c in ordered; c.kind == "item"]))) <= 3
