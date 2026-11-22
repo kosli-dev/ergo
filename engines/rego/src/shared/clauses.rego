@@ -122,7 +122,9 @@ _m_walk_said(clauses, items) := {
 	"message": _m_clauses_text(_m_clauses_cut(ordered)),
 	"ergo/own": [t | some t in _m_clause_texts(ordered); not t in items],
 	"ergo/texts": items,
-} if ordered := _m_clauses_order(clauses)
+} if {
+	ordered := _m_clauses_order(clauses)
+}
 
 _m_clauses_cut(ordered) := ordered if count(_m_clause_counted_names(_m_clause_units([c | some c in ordered; c.kind == "item"]))) <= 3
 
