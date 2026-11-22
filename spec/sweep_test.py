@@ -86,9 +86,9 @@ class StaleBinaryTest(unittest.TestCase):
         head = subprocess.run(["git", "-C", tree, "rev-parse", "HEAD"], check=True, capture_output=True, text=True).stdout.strip()
         return tree, head
 
-    def refused(self, version, tree, environ=None):
-        with mock.patch.dict(os.environ, environ or {}, clear=False):
-            os.environ.pop(sweep.ALLOW_STALE, None) if not environ else None
+    def refused(self, version, tree):
+        with mock.patch.dict(os.environ, {}, clear=False):
+            os.environ.pop(sweep.ALLOW_STALE, None)
             with self.assertRaises(SystemExit) as caught:
                 sweep.check_commit(version, tree)
         return str(caught.exception)

@@ -757,4 +757,3 @@ fn version_commit_is_the_commit_of_the_tree_it_was_built_in() {
         head.trim()
     );
 }
-
