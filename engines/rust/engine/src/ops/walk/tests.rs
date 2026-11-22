@@ -2005,6 +2005,41 @@ fn a_list_after_is_in_ignoring_case_that_cant_be_used_doesnt_hide_the_items_whos
 }
 
 #[test]
+fn a_root_compared_with_a_list_after_is_in_ignoring_case_is_said_once_and_names_no_item() {
+    use crate::ops::clause::Kind;
+    for (params, cause, message) in [
+        (
+            json!({"l": ["a", null]}),
+            Cause::Absent,
+            "$params.k is missing; item 2 of $params.l is null",
+        ),
+        (
+            json!({"k": null, "l": ["a", null]}),
+            Cause::Null,
+            "$params.k is null; item 2 of $params.l is null",
+        ),
+        (
+            json!({"l": ["a", 3]}),
+            Cause::Unusable,
+            "item 2 of $params.l is 3, which isn't text; $params.k is missing",
+        ),
+    ] {
+        let out = row_of(
+            "every xs whose $params.k is in $params.l ignoring case, if any, exists",
+            json!({"xs": [{"v": "a"}]}),
+            params.clone(),
+        );
+        assert_eq!(
+            (out.verdict.cause, out.message.as_deref()),
+            (cause, Some(message)),
+            "{params}"
+        );
+        let kinds: Vec<Kind> = out.parts.iter().map(|part| part.kind).collect();
+        assert!(!kinds.contains(&Kind::Item), "{params} {kinds:?}");
+    }
+}
+
+#[test]
 fn a_one_line_walk_count_or_sum_says_a_counted_root_once_and_then_each_item_its_own_value() {
     let policy = serde_json::json!({
         "ergo_spec": crate::SPEC,
