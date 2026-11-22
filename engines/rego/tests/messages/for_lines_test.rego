@@ -318,6 +318,10 @@ test_an_item_a_sentence_reads_whole_is_named_by_the_item if {
 	c.cause == "value"
 }
 
+test_an_item_two_sentences_read_whole_is_said_once if {
+	_item_texts("every member of ms as m", ["m is 1", "m is 2"], {"ms": {"a": 3}}, {}) == [["member a of ms is 3"]]
+}
+
 test_two_sentences_walking_one_list_say_its_items_in_list_order if {
 	subj := {"xs": [{"ys": [{"n": 1, "m": 2}, {"m": 1}]}]}
 	_item_texts("every xs as x", ["every x.ys.n is 1", "every x.ys.m is 1"], subj, {}) == [["item 1 of xs: item 1 of x.ys: m is 2", "item 1 of xs: item 2 of x.ys: n is missing"]]
