@@ -165,6 +165,7 @@ pub fn min_subjects_row(
     );
     if cause != Cause::Satisfied {
         row.message = Some(crate::ops::message::is(&label, &json!(count)));
+        row.failures = Some(Value::Array(Vec::new()));
     }
     row
 }

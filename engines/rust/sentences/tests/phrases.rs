@@ -375,6 +375,7 @@ fn an_operand_can_add_terms_with_plus() {
                 Term::Number("1".into()),
                 Term::Derived(Derived {
                     distinct: false,
+                    member: false,
                     kind: DerivedKind::Count,
                     path: key("l"),
                     whose: vec![]
@@ -416,6 +417,7 @@ fn terms_can_be_a_sum_an_elapsed_time_or_a_position() {
             operand: Operand::Field(vec![
                 Term::Derived(Derived {
                     distinct: false,
+                    member: false,
                     kind: DerivedKind::Sum,
                     path: with_steps(key("l"), vec![dot("m")]),
                     whose: vec![]
@@ -469,6 +471,7 @@ fn count_and_sum_on_the_left_take_a_compare_phrase_only() {
         read.left,
         Left::Derived(Derived {
             distinct: false,
+            member: false,
             kind: DerivedKind::Count,
             path: key("l"),
             whose: vec![]
@@ -494,6 +497,7 @@ fn a_condition_may_start_with_some_or_every() {
         vec![FromCondition::Quantified {
             options: ListOptions {
                 distinct: false,
+                member: false,
                 if_any: true
             },
             quantifier: Quantifier::Some,

@@ -219,13 +219,17 @@ _for_deduped(m) := concat("; ", [c | some c in cs; not _for_led_more(c); not _fo
 } else := m
 
 _for_led_once(t, once) if {
-	startswith(t, "item ")
+	_walk_kind(t) == "item"
 	some o in once
-	startswith(o, "item ")
+	_walk_kind(o) == "item"
 	endswith(t, concat("", [": ", o]))
 }
 
-_for_led_more(t) if regex.match(`^item [^;]*: and [0-9]+ more$`, t)
+_for_led_more(t) if {
+	_walk_kind(t) == "item"
+	regex.match(`: and [0-9]+ more$`, t)
+	not contains(t, ";")
+}
 
 _m_root_skip(rs) := [x | some m in rs; some x in split(m, "; ")] if _walk_roots_on
 
@@ -978,7 +982,7 @@ _for_failed_base(check, f) := {
 	"bare": _m_rest_named(_m_for_item_name(check, f.item), f),
 }
 
-_for_failed_flags(f) := object.union(object.union(object.union(object.union({"msg": f.why | "why" in object.keys(f)}, {"raw": f.raw | "raw" in object.keys(f)}), {"hoisted": true | object.get(f, "hoisted", false) == true}), {"whose_of": f.whose_of | "whose_of" in object.keys(f)}), object.union(_fail_levels(f), {"ergo/sorted": f.sorted | "sorted" in object.keys(f)}))
+_for_failed_flags(f) := object.union(object.union(object.union(object.union({"msg": f.why | "why" in object.keys(f)}, {"raw": f.raw | "raw" in object.keys(f)}), {"hoisted": true | object.get(f, "hoisted", false) == true}), {"whose_of": f.whose_of | "whose_of" in object.keys(f)}), object.union(object.union(_fail_levels(f), {"ergo/sorted": f.sorted | "sorted" in object.keys(f)}), {"wants": f.msg | object.get(f, "msg", "") == "an object"}))
 
 _fail_levels(f) := {"ergo/levels": f.lv} if {
 	"lv" in object.keys(f)
@@ -993,7 +997,7 @@ _for_unchecked(check, inner) := {"failed_items": [_for_unchecked_item(check, f) 
 	f.path == p
 ]} if inner != []
 
-_for_unchecked_item(check, f) := object.union({"path": _for_item_name(check, f.path), "item": _for_item_name(check, f.item), "cause": f.cause, "value": f.value, "locations": _fail_locations(f), "msg": _m_rest_named(_m_for_item_name(check, f.path), f), "text": _m_inner_text(check, f), "free": _m_inner_free(f)}, {"ergo/sorted": f.sorted | "sorted" in object.keys(f)})
+_for_unchecked_item(check, f) := object.union({"path": _for_item_name(check, f.path), "item": _for_item_name(check, f.item), "cause": f.cause, "value": f.value, "locations": _fail_locations(f), "msg": _m_rest_named(_m_for_item_name(check, f.path), f), "text": _m_inner_text(check, f), "free": _m_inner_free(f)}, object.union({"ergo/sorted": f.sorted | "sorted" in object.keys(f)}, {"wants": f.msg | object.get(f, "msg", "") == "an object"}))
 
 _for_inputs(check, subj, names, item, w) := _merged_inputs([_for_input_of(t) | some t in ((_for_input_pairs(check, subj, names, item, w) | _for_listed_pairs(check, subj)) | _for_whose_pairs(check, subj))])
 

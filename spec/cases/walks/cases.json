@@ -25313,7 +25313,55 @@
               "failures": [
                 {
                   "cause": "absent",
-                  "failures": [],
+                  "failures": [
+                    {
+                      "cause": "absent",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/xs/0"
+                          ],
+                          "name": "xs[0].m",
+                          "outcome": "absent",
+                          "value": null
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": [
+                        "/things/0/xs/0"
+                      ],
+                      "message": "m is missing",
+                      "name": "item 1 of xs",
+                      "value": {
+                        "v": 1
+                      }
+                    },
+                    {
+                      "cause": "null",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/xs/1/m"
+                          ],
+                          "name": "xs[1].m",
+                          "outcome": "absent",
+                          "value": null
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": [
+                        "/things/0/xs/1"
+                      ],
+                      "message": "m is null",
+                      "name": "item 2 of xs",
+                      "value": {
+                        "m": null,
+                        "v": 1
+                      }
+                    }
+                  ],
                   "inputs": [
                     {
                       "locations": [
@@ -25336,7 +25384,7 @@
                   "locations": [
                     "$policy:/requirements/s/checks/count"
                   ],
-                  "message": "$params.k is missing; item 1 of xs: m is missing; item 2 of xs: m is null",
+                  "message": "$params.k is missing",
                   "name": "count of xs whose v equals m named by $params.k is 1"
                 }
               ],
@@ -25723,7 +25771,54 @@
               "failures": [
                 {
                   "cause": "unusable",
-                  "failures": [],
+                  "failures": [
+                    {
+                      "cause": "absent",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/xs/0"
+                          ],
+                          "name": "xs[0].m",
+                          "outcome": "unusable",
+                          "value": null
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": [
+                        "/things/0/xs/0"
+                      ],
+                      "message": "m is missing",
+                      "name": "item 1 of xs",
+                      "value": {
+                        "v": 1
+                      }
+                    },
+                    {
+                      "cause": "absent",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/xs/1"
+                          ],
+                          "name": "xs[1].m",
+                          "outcome": "unusable",
+                          "value": null
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": [
+                        "/things/0/xs/1"
+                      ],
+                      "message": "m is missing",
+                      "name": "item 2 of xs",
+                      "value": {
+                        "v": 1
+                      }
+                    }
+                  ],
                   "inputs": [
                     {
                       "locations": [
@@ -25746,7 +25841,7 @@
                   "locations": [
                     "$policy:/requirements/s/checks/count"
                   ],
-                  "message": "$params.k is 3, which isn't text; item 1 of xs: m is missing; item 2 of xs: m is missing",
+                  "message": "$params.k is 3, which isn't text",
                   "name": "count of xs whose v equals m named by $params.k is 1"
                 }
               ],
@@ -27052,7 +27147,32 @@
               "failures": [
                 {
                   "cause": "absent",
-                  "failures": [],
+                  "failures": [
+                    {
+                      "cause": "absent",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/xs/0"
+                          ],
+                          "name": "xs[0].m",
+                          "outcome": "absent",
+                          "value": null
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": [
+                        "/things/0/xs/0"
+                      ],
+                      "message": "m is missing",
+                      "name": "item 1 of xs",
+                      "value": {
+                        "u": 1,
+                        "v": 1
+                      }
+                    }
+                  ],
                   "inputs": [
                     {
                       "locations": [
@@ -27082,7 +27202,7 @@
                   "locations": [
                     "$policy:/requirements/s/checks/count"
                   ],
-                  "message": "$params.k is missing; item 1 of xs: m is missing",
+                  "message": "$params.k is missing",
                   "name": "count of xs whose v equals $params.z and whose u equals $input.z and whose v equals m named by $params.k is 1"
                 }
               ],
@@ -27219,7 +27339,32 @@
               "failures": [
                 {
                   "cause": "absent",
-                  "failures": [],
+                  "failures": [
+                    {
+                      "cause": "absent",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/xs/0"
+                          ],
+                          "name": "xs[0].m",
+                          "outcome": "absent",
+                          "value": null
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": [
+                        "/things/0/xs/0"
+                      ],
+                      "message": "m is missing",
+                      "name": "item 1 of xs",
+                      "value": {
+                        "u": 1,
+                        "v": 1
+                      }
+                    }
+                  ],
                   "inputs": [
                     {
                       "locations": [
@@ -27249,7 +27394,7 @@
                   "locations": [
                     "$policy:/requirements/s/checks/input_left"
                   ],
-                  "message": "$params.k is missing; item 1 of xs: m is missing",
+                  "message": "$params.k is missing",
                   "name": "count of xs whose $input.z equals m named by $params.k is 1"
                 }
               ],
@@ -27297,7 +27442,32 @@
               "failures": [
                 {
                   "cause": "absent",
-                  "failures": [],
+                  "failures": [
+                    {
+                      "cause": "absent",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/xs/0"
+                          ],
+                          "name": "xs[0].m",
+                          "outcome": "absent",
+                          "value": null
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": [
+                        "/things/0/xs/0"
+                      ],
+                      "message": "m is missing",
+                      "name": "item 1 of xs",
+                      "value": {
+                        "u": 1,
+                        "v": 1
+                      }
+                    }
+                  ],
                   "inputs": [
                     {
                       "locations": [
@@ -27319,7 +27489,7 @@
                   "locations": [
                     "$policy:/requirements/s/checks/params_left"
                   ],
-                  "message": "$params.k is missing; item 1 of xs: m is missing",
+                  "message": "$params.k is missing",
                   "name": "count of xs whose $params.z equals m named by $params.k is 1"
                 }
               ],
@@ -27548,7 +27718,34 @@
               "failures": [
                 {
                   "cause": "unusable",
-                  "failures": [],
+                  "failures": [
+                    {
+                      "cause": "absent",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/es/0/v"
+                          ],
+                          "name": "es[0].v.m",
+                          "outcome": "unusable",
+                          "value": null
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": [
+                        "/things/0/es/0"
+                      ],
+                      "message": "v: m is missing",
+                      "name": "item 1 of es",
+                      "value": {
+                        "m": {
+                          "a": 1
+                        },
+                        "v": {}
+                      }
+                    }
+                  ],
                   "inputs": [
                     {
                       "locations": [
@@ -27570,7 +27767,7 @@
                   "locations": [
                     "$policy:/requirements/s/checks/count"
                   ],
-                  "message": "$params.k is 3, which isn't text; item 1 of es: v: m is missing",
+                  "message": "$params.k is 3, which isn't text",
                   "name": "count of es.v that equals m named by $params.k is 0"
                 }
               ],
@@ -27706,7 +27903,56 @@
               "failures": [
                 {
                   "cause": "unusable",
-                  "failures": [],
+                  "failures": [
+                    {
+                      "cause": "absent",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/es/0/v"
+                          ],
+                          "name": "es[0].v.m",
+                          "outcome": "unusable",
+                          "value": null
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": [
+                        "/things/0/es/0"
+                      ],
+                      "message": "v: m is missing",
+                      "name": "item 1 of es",
+                      "value": {
+                        "v": {}
+                      }
+                    },
+                    {
+                      "cause": "null",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/es/1/v/m"
+                          ],
+                          "name": "es[1].v.m",
+                          "outcome": "unusable",
+                          "value": null
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": [
+                        "/things/0/es/1"
+                      ],
+                      "message": "v: m is null",
+                      "name": "item 2 of es",
+                      "value": {
+                        "v": {
+                          "m": null
+                        }
+                      }
+                    }
+                  ],
                   "inputs": [
                     {
                       "locations": [
@@ -27729,7 +27975,7 @@
                   "locations": [
                     "$policy:/requirements/s/checks/count"
                   ],
-                  "message": "$params.k is 3, which isn't text; item 1 of es: v: m is missing; item 2 of es: v: m is null",
+                  "message": "$params.k is 3, which isn't text",
                   "name": "count of es.v that equals m named by $params.k is 0"
                 }
               ],
@@ -28050,7 +28296,31 @@
               "failures": [
                 {
                   "cause": "absent",
-                  "failures": [],
+                  "failures": [
+                    {
+                      "cause": "absent",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/es/0/v"
+                          ],
+                          "name": "es[0].v.m",
+                          "outcome": "absent",
+                          "value": null
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": [
+                        "/things/0/es/0"
+                      ],
+                      "message": "v: m is missing",
+                      "name": "item 1 of es",
+                      "value": {
+                        "v": {}
+                      }
+                    }
+                  ],
                   "inputs": [
                     {
                       "locations": [
@@ -28072,7 +28342,7 @@
                   "locations": [
                     "$policy:/requirements/s/checks/count"
                   ],
-                  "message": "$params.k is missing; item 1 of es: v: m is missing",
+                  "message": "$params.k is missing",
                   "name": "count of es.v that equals m named by $params.k is 0"
                 }
               ],
@@ -31927,7 +32197,123 @@
                 "failures": [
                   {
                     "cause": "unusable",
-                    "failures": [],
+                    "failures": [
+                      {
+                        "cause": "absent",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/es/0"
+                            ],
+                            "name": "es[0].m",
+                            "outcome": "unusable",
+                            "value": null
+                          }
+                        ],
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/es/0"
+                        ],
+                        "message": "m is missing",
+                        "name": "item 1 of es",
+                        "value": {
+                          "zz": 2
+                        }
+                      },
+                      {
+                        "cause": "absent",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/es/1"
+                            ],
+                            "name": "es[1].m",
+                            "outcome": "unusable",
+                            "value": null
+                          }
+                        ],
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/es/1"
+                        ],
+                        "message": "m is missing",
+                        "name": "item 2 of es",
+                        "value": {
+                          "zz": 2
+                        }
+                      },
+                      {
+                        "cause": "absent",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/es/2"
+                            ],
+                            "name": "es[2].m",
+                            "outcome": "unusable",
+                            "value": null
+                          }
+                        ],
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/es/2"
+                        ],
+                        "message": "m is missing",
+                        "name": "item 3 of es",
+                        "value": {
+                          "zz": 2
+                        }
+                      },
+                      {
+                        "cause": "absent",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/es/3"
+                            ],
+                            "name": "es[3].m",
+                            "outcome": "unusable",
+                            "value": null
+                          }
+                        ],
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/es/3"
+                        ],
+                        "message": "m is missing",
+                        "name": "item 4 of es",
+                        "value": {
+                          "zz": 2
+                        }
+                      },
+                      {
+                        "cause": "absent",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/es/4"
+                            ],
+                            "name": "es[4].m",
+                            "outcome": "unusable",
+                            "value": null
+                          }
+                        ],
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/es/4"
+                        ],
+                        "message": "m is missing",
+                        "name": "item 5 of es",
+                        "value": {
+                          "zz": 2
+                        }
+                      }
+                    ],
                     "inputs": [
                       {
                         "locations": [
@@ -31953,7 +32339,7 @@
                     "locations": [
                       "$policy:/requirements/s/checks/any_of/any_of/a/0"
                     ],
-                    "message": "$params.k is 3, which isn't text; item 1 of es: m is missing; item 2 of es: m is missing; item 3 of es: m is missing; and 2 more",
+                    "message": "$params.k is 3, which isn't text",
                     "name": "count of es whose zz equals m named by $params.k is 0"
                   }
                 ],
@@ -32061,7 +32447,123 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/0"
+                        ],
+                        "name": "es[0].m",
+                        "outcome": "unusable",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/0"
+                    ],
+                    "message": "m is missing",
+                    "name": "item 1 of es",
+                    "value": {
+                      "zz": 2
+                    }
+                  },
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/1"
+                        ],
+                        "name": "es[1].m",
+                        "outcome": "unusable",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/1"
+                    ],
+                    "message": "m is missing",
+                    "name": "item 2 of es",
+                    "value": {
+                      "zz": 2
+                    }
+                  },
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/2"
+                        ],
+                        "name": "es[2].m",
+                        "outcome": "unusable",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/2"
+                    ],
+                    "message": "m is missing",
+                    "name": "item 3 of es",
+                    "value": {
+                      "zz": 2
+                    }
+                  },
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/3"
+                        ],
+                        "name": "es[3].m",
+                        "outcome": "unusable",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/3"
+                    ],
+                    "message": "m is missing",
+                    "name": "item 4 of es",
+                    "value": {
+                      "zz": 2
+                    }
+                  },
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/4"
+                        ],
+                        "name": "es[4].m",
+                        "outcome": "unusable",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/4"
+                    ],
+                    "message": "m is missing",
+                    "name": "item 5 of es",
+                    "value": {
+                      "zz": 2
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -32087,7 +32589,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/count"
                 ],
-                "message": "$params.k is 3, which isn't text; item 1 of es: m is missing; item 2 of es: m is missing; item 3 of es: m is missing; and 2 more",
+                "message": "$params.k is 3, which isn't text",
                 "name": "count of es whose zz equals m named by $params.k is 0"
               }
             ],
@@ -32491,7 +32993,123 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/0"
+                        ],
+                        "name": "es[0].m",
+                        "outcome": "unusable",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/0"
+                    ],
+                    "message": "m is missing",
+                    "name": "item 1 of es",
+                    "value": {
+                      "zz": 2
+                    }
+                  },
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/1"
+                        ],
+                        "name": "es[1].m",
+                        "outcome": "unusable",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/1"
+                    ],
+                    "message": "m is missing",
+                    "name": "item 2 of es",
+                    "value": {
+                      "zz": 2
+                    }
+                  },
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/2"
+                        ],
+                        "name": "es[2].m",
+                        "outcome": "unusable",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/2"
+                    ],
+                    "message": "m is missing",
+                    "name": "item 3 of es",
+                    "value": {
+                      "zz": 2
+                    }
+                  },
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/3"
+                        ],
+                        "name": "es[3].m",
+                        "outcome": "unusable",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/3"
+                    ],
+                    "message": "m is missing",
+                    "name": "item 4 of es",
+                    "value": {
+                      "zz": 2
+                    }
+                  },
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/4"
+                        ],
+                        "name": "es[4].m",
+                        "outcome": "unusable",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/4"
+                    ],
+                    "message": "m is missing",
+                    "name": "item 5 of es",
+                    "value": {
+                      "zz": 2
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -32525,7 +33143,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/n"
                 ],
-                "message": "$params.k is 3, which isn't text; item 1 of es: m is missing; item 2 of es: m is missing; item 3 of es: m is missing; and 2 more",
+                "message": "$params.k is 3, which isn't text",
                 "name": "count of es whose zz equals m named by $params.k equals $params.n"
               }
             ],
@@ -32805,7 +33423,100 @@
                 "failures": [
                   {
                     "cause": "unusable",
-                    "failures": [],
+                    "failures": [
+                      {
+                        "cause": "absent",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/es/0"
+                            ],
+                            "name": "es[0].m",
+                            "outcome": "unusable",
+                            "value": null
+                          }
+                        ],
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/es/0"
+                        ],
+                        "message": "m is missing",
+                        "name": "item 1 of es",
+                        "value": {
+                          "zz": 2
+                        }
+                      },
+                      {
+                        "cause": "absent",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/es/1"
+                            ],
+                            "name": "es[1].m",
+                            "outcome": "unusable",
+                            "value": null
+                          }
+                        ],
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/es/1"
+                        ],
+                        "message": "m is missing",
+                        "name": "item 2 of es",
+                        "value": {
+                          "zz": 2
+                        }
+                      },
+                      {
+                        "cause": "absent",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/es/2"
+                            ],
+                            "name": "es[2].m",
+                            "outcome": "unusable",
+                            "value": null
+                          }
+                        ],
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/es/2"
+                        ],
+                        "message": "m is missing",
+                        "name": "item 3 of es",
+                        "value": {
+                          "zz": 2
+                        }
+                      },
+                      {
+                        "cause": "absent",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/es/3"
+                            ],
+                            "name": "es[3].m",
+                            "outcome": "unusable",
+                            "value": null
+                          }
+                        ],
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/es/3"
+                        ],
+                        "message": "m is missing",
+                        "name": "item 4 of es",
+                        "value": {
+                          "zz": 2
+                        }
+                      }
+                    ],
                     "inputs": [
                       {
                         "locations": [
@@ -32830,7 +33541,7 @@
                     "locations": [
                       "$policy:/requirements/s/checks/any_of/any_of/a/0"
                     ],
-                    "message": "$params.k is 3, which isn't text; item 1 of es: m is missing; item 2 of es: m is missing; item 3 of es: m is missing; and 1 more",
+                    "message": "$params.k is 3, which isn't text",
                     "name": "count of es whose zz equals m named by $params.k is 0"
                   }
                 ],
@@ -32933,7 +33644,100 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/0"
+                        ],
+                        "name": "es[0].m",
+                        "outcome": "unusable",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/0"
+                    ],
+                    "message": "m is missing",
+                    "name": "item 1 of es",
+                    "value": {
+                      "zz": 2
+                    }
+                  },
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/1"
+                        ],
+                        "name": "es[1].m",
+                        "outcome": "unusable",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/1"
+                    ],
+                    "message": "m is missing",
+                    "name": "item 2 of es",
+                    "value": {
+                      "zz": 2
+                    }
+                  },
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/2"
+                        ],
+                        "name": "es[2].m",
+                        "outcome": "unusable",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/2"
+                    ],
+                    "message": "m is missing",
+                    "name": "item 3 of es",
+                    "value": {
+                      "zz": 2
+                    }
+                  },
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/3"
+                        ],
+                        "name": "es[3].m",
+                        "outcome": "unusable",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/3"
+                    ],
+                    "message": "m is missing",
+                    "name": "item 4 of es",
+                    "value": {
+                      "zz": 2
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -32958,7 +33762,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/count"
                 ],
-                "message": "$params.k is 3, which isn't text; item 1 of es: m is missing; item 2 of es: m is missing; item 3 of es: m is missing; and 1 more",
+                "message": "$params.k is 3, which isn't text",
                 "name": "count of es whose zz equals m named by $params.k is 0"
               }
             ],
@@ -33303,7 +34107,100 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/0"
+                        ],
+                        "name": "es[0].m",
+                        "outcome": "unusable",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/0"
+                    ],
+                    "message": "m is missing",
+                    "name": "item 1 of es",
+                    "value": {
+                      "zz": 2
+                    }
+                  },
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/1"
+                        ],
+                        "name": "es[1].m",
+                        "outcome": "unusable",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/1"
+                    ],
+                    "message": "m is missing",
+                    "name": "item 2 of es",
+                    "value": {
+                      "zz": 2
+                    }
+                  },
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/2"
+                        ],
+                        "name": "es[2].m",
+                        "outcome": "unusable",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/2"
+                    ],
+                    "message": "m is missing",
+                    "name": "item 3 of es",
+                    "value": {
+                      "zz": 2
+                    }
+                  },
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/3"
+                        ],
+                        "name": "es[3].m",
+                        "outcome": "unusable",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/3"
+                    ],
+                    "message": "m is missing",
+                    "name": "item 4 of es",
+                    "value": {
+                      "zz": 2
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -33336,7 +34233,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/n"
                 ],
-                "message": "$params.k is 3, which isn't text; item 1 of es: m is missing; item 2 of es: m is missing; item 3 of es: m is missing; and 1 more",
+                "message": "$params.k is 3, which isn't text",
                 "name": "count of es whose zz equals m named by $params.k equals $params.n"
               }
             ],
@@ -33581,7 +34478,77 @@
                 "failures": [
                   {
                     "cause": "unusable",
-                    "failures": [],
+                    "failures": [
+                      {
+                        "cause": "absent",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/es/0"
+                            ],
+                            "name": "es[0].m",
+                            "outcome": "unusable",
+                            "value": null
+                          }
+                        ],
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/es/0"
+                        ],
+                        "message": "m is missing",
+                        "name": "item 1 of es",
+                        "value": {
+                          "zz": 2
+                        }
+                      },
+                      {
+                        "cause": "absent",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/es/1"
+                            ],
+                            "name": "es[1].m",
+                            "outcome": "unusable",
+                            "value": null
+                          }
+                        ],
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/es/1"
+                        ],
+                        "message": "m is missing",
+                        "name": "item 2 of es",
+                        "value": {
+                          "zz": 2
+                        }
+                      },
+                      {
+                        "cause": "absent",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/es/2"
+                            ],
+                            "name": "es[2].m",
+                            "outcome": "unusable",
+                            "value": null
+                          }
+                        ],
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/es/2"
+                        ],
+                        "message": "m is missing",
+                        "name": "item 3 of es",
+                        "value": {
+                          "zz": 2
+                        }
+                      }
+                    ],
                     "inputs": [
                       {
                         "locations": [
@@ -33605,7 +34572,7 @@
                     "locations": [
                       "$policy:/requirements/s/checks/any_of/any_of/a/0"
                     ],
-                    "message": "$params.k is 3, which isn't text; item 1 of es: m is missing; item 2 of es: m is missing; item 3 of es: m is missing",
+                    "message": "$params.k is 3, which isn't text",
                     "name": "count of es whose zz equals m named by $params.k is 0"
                   }
                 ],
@@ -33703,7 +34670,77 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/0"
+                        ],
+                        "name": "es[0].m",
+                        "outcome": "unusable",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/0"
+                    ],
+                    "message": "m is missing",
+                    "name": "item 1 of es",
+                    "value": {
+                      "zz": 2
+                    }
+                  },
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/1"
+                        ],
+                        "name": "es[1].m",
+                        "outcome": "unusable",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/1"
+                    ],
+                    "message": "m is missing",
+                    "name": "item 2 of es",
+                    "value": {
+                      "zz": 2
+                    }
+                  },
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/2"
+                        ],
+                        "name": "es[2].m",
+                        "outcome": "unusable",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/2"
+                    ],
+                    "message": "m is missing",
+                    "name": "item 3 of es",
+                    "value": {
+                      "zz": 2
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -33727,7 +34764,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/count"
                 ],
-                "message": "$params.k is 3, which isn't text; item 1 of es: m is missing; item 2 of es: m is missing; item 3 of es: m is missing",
+                "message": "$params.k is 3, which isn't text",
                 "name": "count of es whose zz equals m named by $params.k is 0"
               }
             ],
@@ -34013,7 +35050,77 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/0"
+                        ],
+                        "name": "es[0].m",
+                        "outcome": "unusable",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/0"
+                    ],
+                    "message": "m is missing",
+                    "name": "item 1 of es",
+                    "value": {
+                      "zz": 2
+                    }
+                  },
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/1"
+                        ],
+                        "name": "es[1].m",
+                        "outcome": "unusable",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/1"
+                    ],
+                    "message": "m is missing",
+                    "name": "item 2 of es",
+                    "value": {
+                      "zz": 2
+                    }
+                  },
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/2"
+                        ],
+                        "name": "es[2].m",
+                        "outcome": "unusable",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/2"
+                    ],
+                    "message": "m is missing",
+                    "name": "item 3 of es",
+                    "value": {
+                      "zz": 2
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -34045,7 +35152,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/n"
                 ],
-                "message": "$params.k is 3, which isn't text; item 1 of es: m is missing; item 2 of es: m is missing; item 3 of es: m is missing",
+                "message": "$params.k is 3, which isn't text",
                 "name": "count of es whose zz equals m named by $params.k equals $params.n"
               }
             ],
@@ -34304,7 +35411,123 @@
                 "failures": [
                   {
                     "cause": "absent",
-                    "failures": [],
+                    "failures": [
+                      {
+                        "cause": "absent",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/es/0"
+                            ],
+                            "name": "es[0].m",
+                            "outcome": "absent",
+                            "value": null
+                          }
+                        ],
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/es/0"
+                        ],
+                        "message": "m is missing",
+                        "name": "item 1 of es",
+                        "value": {
+                          "zz": 2
+                        }
+                      },
+                      {
+                        "cause": "absent",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/es/1"
+                            ],
+                            "name": "es[1].m",
+                            "outcome": "absent",
+                            "value": null
+                          }
+                        ],
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/es/1"
+                        ],
+                        "message": "m is missing",
+                        "name": "item 2 of es",
+                        "value": {
+                          "zz": 2
+                        }
+                      },
+                      {
+                        "cause": "absent",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/es/2"
+                            ],
+                            "name": "es[2].m",
+                            "outcome": "absent",
+                            "value": null
+                          }
+                        ],
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/es/2"
+                        ],
+                        "message": "m is missing",
+                        "name": "item 3 of es",
+                        "value": {
+                          "zz": 2
+                        }
+                      },
+                      {
+                        "cause": "absent",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/es/3"
+                            ],
+                            "name": "es[3].m",
+                            "outcome": "absent",
+                            "value": null
+                          }
+                        ],
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/es/3"
+                        ],
+                        "message": "m is missing",
+                        "name": "item 4 of es",
+                        "value": {
+                          "zz": 2
+                        }
+                      },
+                      {
+                        "cause": "absent",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/es/4"
+                            ],
+                            "name": "es[4].m",
+                            "outcome": "absent",
+                            "value": null
+                          }
+                        ],
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/es/4"
+                        ],
+                        "message": "m is missing",
+                        "name": "item 5 of es",
+                        "value": {
+                          "zz": 2
+                        }
+                      }
+                    ],
                     "inputs": [
                       {
                         "locations": [
@@ -34330,7 +35553,7 @@
                     "locations": [
                       "$policy:/requirements/s/checks/any_of/any_of/a/0"
                     ],
-                    "message": "$params.k is missing; item 1 of es: m is missing; item 2 of es: m is missing; item 3 of es: m is missing; and 2 more",
+                    "message": "$params.k is missing",
                     "name": "count of es whose zz equals m named by $params.k is 0"
                   }
                 ],
@@ -34438,7 +35661,123 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/0"
+                        ],
+                        "name": "es[0].m",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/0"
+                    ],
+                    "message": "m is missing",
+                    "name": "item 1 of es",
+                    "value": {
+                      "zz": 2
+                    }
+                  },
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/1"
+                        ],
+                        "name": "es[1].m",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/1"
+                    ],
+                    "message": "m is missing",
+                    "name": "item 2 of es",
+                    "value": {
+                      "zz": 2
+                    }
+                  },
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/2"
+                        ],
+                        "name": "es[2].m",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/2"
+                    ],
+                    "message": "m is missing",
+                    "name": "item 3 of es",
+                    "value": {
+                      "zz": 2
+                    }
+                  },
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/3"
+                        ],
+                        "name": "es[3].m",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/3"
+                    ],
+                    "message": "m is missing",
+                    "name": "item 4 of es",
+                    "value": {
+                      "zz": 2
+                    }
+                  },
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/4"
+                        ],
+                        "name": "es[4].m",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/4"
+                    ],
+                    "message": "m is missing",
+                    "name": "item 5 of es",
+                    "value": {
+                      "zz": 2
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -34464,7 +35803,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/count"
                 ],
-                "message": "$params.k is missing; item 1 of es: m is missing; item 2 of es: m is missing; item 3 of es: m is missing; and 2 more",
+                "message": "$params.k is missing",
                 "name": "count of es whose zz equals m named by $params.k is 0"
               }
             ],
@@ -34868,7 +36207,123 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/0"
+                        ],
+                        "name": "es[0].m",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/0"
+                    ],
+                    "message": "m is missing",
+                    "name": "item 1 of es",
+                    "value": {
+                      "zz": 2
+                    }
+                  },
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/1"
+                        ],
+                        "name": "es[1].m",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/1"
+                    ],
+                    "message": "m is missing",
+                    "name": "item 2 of es",
+                    "value": {
+                      "zz": 2
+                    }
+                  },
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/2"
+                        ],
+                        "name": "es[2].m",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/2"
+                    ],
+                    "message": "m is missing",
+                    "name": "item 3 of es",
+                    "value": {
+                      "zz": 2
+                    }
+                  },
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/3"
+                        ],
+                        "name": "es[3].m",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/3"
+                    ],
+                    "message": "m is missing",
+                    "name": "item 4 of es",
+                    "value": {
+                      "zz": 2
+                    }
+                  },
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/4"
+                        ],
+                        "name": "es[4].m",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/4"
+                    ],
+                    "message": "m is missing",
+                    "name": "item 5 of es",
+                    "value": {
+                      "zz": 2
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -34902,7 +36357,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/n"
                 ],
-                "message": "$params.n is missing, and $params.k is missing; item 1 of es: m is missing; item 2 of es: m is missing; item 3 of es: m is missing; and 2 more",
+                "message": "$params.n is missing, and $params.k is missing",
                 "name": "count of es whose zz equals m named by $params.k equals $params.n"
               }
             ],

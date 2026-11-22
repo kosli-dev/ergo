@@ -323,7 +323,10 @@ pub fn lower_for(
         let walk_path = match here.path(path) {
             Ok(found) => {
                 problems.extend(lower::walk_too_long(&found));
-                Some(found)
+                Some(lower::with_members(
+                    found,
+                    matches!(item, s::ForItem::Walk { member: true, .. }),
+                ))
             }
             Err(found) => {
                 problems.extend(found);
@@ -409,8 +412,10 @@ struct RunItems {
 
 #[derive(Clone)]
 struct Dead {
+    wants_object: bool,
     raw: Option<Value>,
     msg: Option<String>,
+    told: Option<Option<Clause>>,
     bare: Option<String>,
     shared: bool,
     order: Vec<Seg>,
@@ -426,9 +431,11 @@ struct Dead {
 impl Dead {
     fn at(name: String, cause: Cause, value: Value, location: Option<Location>) -> Dead {
         Dead {
+            wants_object: false,
             raw: None,
             bare: None,
             msg: None,
+            told: None,
             shared: false,
             order: Vec::new(),
             path: name.clone(),
@@ -451,8 +458,10 @@ impl Dead {
 
     fn of_failure(failure: &Failure) -> Dead {
         Dead {
+            wants_object: failure.wants_object,
             bare: None,
             msg: None,
+            told: None,
             shared: false,
             order: failure.order.clone(),
             name: failure.item.clone(),
@@ -468,9 +477,11 @@ impl Dead {
 
     fn copy(&self) -> Dead {
         Dead {
+            wants_object: self.wants_object,
             raw: self.raw.clone(),
             bare: self.bare.clone(),
             msg: self.msg.clone(),
+            told: self.told.clone(),
             shared: self.shared,
             order: self.order.clone(),
             name: self.name.clone(),
@@ -638,187 +649,66 @@ impl For {
             at.subject = w.item.clone();
             at.label = None;
             let focus = walk::focus_ctx(w, &outer);
-            let read: Vec<(Verdict, bool)> = item
+            let verdicts: Vec<Verdict> = item
                 .whose
                 .iter()
-                .map(|check| walk::focus_verdict(check, w, &at, &focus))
+                .map(|check| walk::focus_verdict(check, w, &at, &focus).0)
                 .collect();
-            let lost = read.iter().any(|(_, lost)| *lost);
-            let verdicts: Vec<Verdict> = read.into_iter().map(|(verdict, _)| verdict).collect();
             let causes: Vec<Cause> = verdicts.iter().map(|v| v.cause).collect();
             let name = walked.name_of(&w.item_segs, w.unaliased);
             let undecided = Cause::worst(causes.iter().copied().filter(|c| c.is_failure()));
-            let first_alias = self.items[0].alias.as_str();
-            let rooted = item
-                .whose
-                .iter()
-                .zip(&verdicts)
-                .filter(|(_, verdict)| verdict.cause.is_failure())
-                .any(|(check, verdict)| root_fails(check, &outer, verdict.cause));
-            let own_text = item
-                .whose
-                .iter()
-                .zip(&verdicts)
-                .filter(|(_, verdict)| verdict.cause.is_failure())
-                .find_map(|(check, verdict)| {
-                    if lost || !rooted {
-                        return None;
-                    }
-                    let said = own_beside_root(check, &outer, &focus, verdict.cause)?;
-                    let name = walked.item_name_dotted(walk::focus_segs(w, check));
-                    let name = if depth > 0 { self.strip(&name) } else { name };
-                    Some(super::message::prefixed(&name, &said))
-                });
-            let fault = item
-                .whose
-                .iter()
-                .zip(&verdicts)
-                .find(|(_, verdict)| verdict.cause.is_failure())
-                .and_then(|(check, verdict)| {
-                    let text = (!lost)
-                        .then(|| {
-                            super::message::root_flaw(&[check], &outer)
-                                .filter(|(cause, _)| {
-                                    depth > 0
-                                        && *cause == verdict.cause
-                                        && !own_read_fails(check, &focus)
-                                })
-                                .and_then(|(_, text)| text.split("; ").next().map(str::to_string))
-                                .or_else(|| {
-                                    super::message::root_fault(check, &outer, verdict.cause)
-                                })
-                                .or_else(|| {
-                                    (verdict.cause == Cause::Unusable)
-                                        .then(|| {
-                                            check
-                                                .paths()
-                                                .into_iter()
-                                                .chain(walk::listed_refs(check))
-                                                .find_map(|path| {
-                                                    super::message::reads_from_a_root(path)
-                                                        .then(|| {
-                                                            super::message::root_kind_fault(
-                                                                check, path, &outer,
-                                                            )
-                                                        })
-                                                        .flatten()
-                                                })
-                                        })
-                                        .flatten()
-                                })
-                        })
-                        .flatten()?;
-                    Some(if depth > 0 && !reads_alias(check, first_alias) {
-                        format!("{FREE}{text}")
-                    } else {
-                        text
-                    })
-                });
-            let own = |check: &Check, verdict: &Verdict| {
-                let roots = super::message::root_flaw(&[check], &outer)
-                    .map(|(_, text)| text)
-                    .unwrap_or_default();
-                super::message::message(check, &focus, verdict)
-                    .split("; ")
-                    .flat_map(|part| part.split(", and "))
-                    .any(|part| !roots.split("; ").any(|root| root == part))
-            };
             let undecided_whose = || {
                 item.whose
                     .iter()
                     .zip(&verdicts)
                     .filter(|(_, verdict)| verdict.cause.is_failure())
             };
-            let why = undecided_whose()
-                .find_map(|(check, verdict)| {
-                    super::message::root_flaw(&[check], &outer)
-                        .filter(|(cause, _)| {
-                            !lost && *cause == verdict.cause && !own_read_fails(check, &focus)
-                        })
-                        .map(|(_, text)| text)
+            let told =
+                undecided_whose().find_map(|(check, _)| walk::item_own(check, w, &walked, &outer));
+            let first_alias = self.items[0].alias.as_str();
+            let root = undecided_whose().find_map(|(check, _)| {
+                let keys = super::key_base::unreadable_keys(check, &outer);
+                let roots: Vec<Clause> =
+                    super::message::listed_root_clauses(&[check], &outer, true)
+                        .into_iter()
+                        .chain(super::message::walked_root_clauses(&[check], &outer))
+                        .filter(|root| !keys.iter().any(|(_, key)| *key == root.text))
+                        .collect();
+                let line = super::clause::lines(&roots).into_iter().next()?;
+                Some(if reads_alias(check, first_alias) {
+                    line
+                } else {
+                    format!("{FREE}{line}")
                 })
-                .or_else(|| {
-                    undecided_whose()
-                        .find(|(check, verdict)| !lost && own(check, verdict))
-                        .map(|(check, verdict)| {
-                            super::message::prefixed(
-                                &walked.item_name_dotted(walk::focus_segs(w, check)),
-                                &super::message::message(check, &focus, verdict),
-                            )
-                        })
-                })
-                .or_else(|| {
-                    undecided_whose().next().map(|(check, verdict)| {
-                        if !lost
-                            && let Some(fault) =
-                                super::message::root_fault(check, &outer, verdict.cause)
-                        {
-                            return fault;
-                        }
-                        if lost {
-                            let lost_check = walk::focus_check(w);
-                            let verdict = walk::lost_verdict(w, &at);
-                            super::message::prefixed(
-                                &walked.item_name_dotted(&w.item_segs),
-                                &super::message::message(&lost_check, &at, &verdict),
-                            )
-                        } else {
-                            super::message::prefixed(
-                                &walked.item_name_dotted(walk::focus_segs(w, check)),
-                                &super::message::message(check, &focus, verdict),
-                            )
-                        }
-                    })
-                });
+            });
+            let unread_key = undecided_whose()
+                .any(|(check, _)| !super::key_base::unreadable_keys(check, &outer).is_empty());
+            let rootless = root.is_none()
+                && !unread_key
+                && !undecided_whose().any(|(check, _)| check.flawed(&outer));
             let keyed_input = undecided_whose().find_map(|(check, _)| {
                 super::lists::input_key_fault(check, &outer)
                     .into_iter()
                     .next()
             });
-            let fault = keyed_input.clone().or(own_text.clone()).or(fault);
-            let why = keyed_input.or(own_text).or(why);
-            let key_base = item
-                .whose
-                .iter()
-                .zip(&verdicts)
-                .filter(|(_, verdict)| verdict.cause.is_failure())
-                .find_map(|(check, _)| {
-                    check
-                        .paths()
-                        .into_iter()
-                        .find_map(|path| super::key_base::of_path(path, false, &at))
-                });
-            let (why, fault, undecided) = match key_base {
-                None => (why, fault, undecided),
-                Some(kb) => {
-                    let missing = matches!(kb.key_cause, Cause::Absent | Cause::Null);
-                    let (text, cause) = match (&kb.base, missing) {
-                        (None, true) => continue,
-                        (Some((base, cause, _)), true) => (
-                            base.clone(),
-                            Cause::worst([kb.key_cause, *cause]).unwrap_or(*cause),
-                        ),
-                        (Some((base, cause, _)), false) => (
-                            format!("{}; {base}", kb.key),
-                            Cause::worst([kb.key_cause, *cause]).unwrap_or(*cause),
-                        ),
-                        (None, false) => (kb.key.clone(), kb.key_cause),
-                    };
-                    let named = walked.item_name_dotted(&w.item_segs);
-                    let named = if depth > 0 { self.strip(&named) } else { named };
-                    let said = Some(super::message::prefixed(&named, &text));
-                    (said.clone(), said, Some(cause))
-                }
+            let said = match (&keyed_input, &told) {
+                (Some(text), _) => Some(text.clone()),
+                (None, Some(clause)) => Some(super::clause::text(std::slice::from_ref(clause))),
+                (None, None) if rootless => undecided_whose().next().map(|(check, verdict)| {
+                    super::message::prefixed(
+                        &walked.item_name_dotted(walk::focus_segs(w, check)),
+                        &super::message::message(check, &focus, verdict),
+                    )
+                }),
+                (None, None) if depth > 0 => root.clone().or_else(|| unread_key.then(String::new)),
+                (None, None) => Some(String::new()),
             };
+            let says = undecided.is_some() && (depth > 0 || !matches!(item.how, How::Pick { .. }));
             let dead_item = |cause: Cause| Dead {
                 raw: (w.end.is_none() && !w.item.value.is_object()).then(|| w.item.value.clone()),
-                msg: if undecided.is_some() && depth == 0 && !matches!(item.how, How::Pick { .. }) {
-                    why.clone()
-                } else if undecided.is_some() && depth > 0 {
-                    fault.clone().or_else(|| why.clone())
-                } else {
-                    None
-                },
+                msg: if says { said.clone() } else { None },
+                told: (says && keyed_input.is_none() && (told.is_some() || !rootless))
+                    .then(|| told.clone()),
                 order: w.item_segs.clone(),
                 said: if !w.rest.is_empty() && w.item.value.is_object() && cause != Cause::Unusable
                 {
@@ -829,7 +719,14 @@ impl For {
                 ..Dead::at(name.clone(), cause, w.shown(), Some(w.end_location.clone()))
             };
             if let Some(cause) = undecided {
-                dead.push(dead_item(cause));
+                let keyed = undecided_whose().any(|(check, _)| {
+                    check
+                        .paths()
+                        .into_iter()
+                        .any(|path| super::key_base::of_path(path, false, &at).is_some())
+                });
+                let own = told.as_ref().filter(|_| keyed).map(|clause| clause.cause);
+                dead.push(dead_item(own.unwrap_or(cause)));
                 continue;
             }
             if causes.contains(&Cause::Value) {
@@ -1197,6 +1094,7 @@ struct Child {
     failed: Option<Outcome>,
     sfails: Vec<Sfail>,
     copies: Vec<String>,
+    rooted: Vec<Clause>,
 }
 
 struct Outcome {
@@ -1390,6 +1288,7 @@ impl For {
                             failed: Some(failed),
                             sfails,
                             copies: Vec::new(),
+                            rooted: Vec::new(),
                         }],
                         unreadable: false,
                     };
@@ -1419,7 +1318,8 @@ impl For {
                                 .dead
                                 .iter()
                                 .filter(|d| !(second && d.shared) && d.cause != Cause::Ambiguous)
-                                .map(|d| self.dead_text(d)),
+                                .map(|d| self.dead_text(d))
+                                .filter(|text| !text.is_empty()),
                         );
                     }
                     let ties: Vec<&Dead> = nested
@@ -1437,11 +1337,16 @@ impl For {
                     let lifted = self.item_roots(depth, &bound);
                     let texts: Vec<&str> = lifted.iter().map(|root| root.text.as_str()).collect();
                     let clauses: Vec<Clause> = self
-                        .nested_clauses(&nested, assertions.is_empty(), depth + 1)
+                        .nested_clauses(&nested, assertions.is_empty(), depth + 1, &bound)
                         .into_iter()
                         .filter_map(|clause| unrooted(clause, &texts))
                         .collect();
-                    let clauses: Vec<Clause> = lifted.iter().cloned().chain(clauses).collect();
+                    let clauses: Vec<Clause> = lifted
+                        .iter()
+                        .cloned()
+                        .chain(self.first_alias_clauses(&nested, depth, &bound))
+                        .chain(clauses)
+                        .collect();
                     let said = if leaf.is_empty() {
                         parts.join("; ").replace(FREE, "")
                     } else {
@@ -1465,6 +1370,11 @@ impl For {
                     )
                 }
             };
+            let rooted = if outcome.is_none() && !last && live.at.value.is_object() {
+                self.item_roots(depth, &bound)
+            } else {
+                Vec::new()
+            };
             if outcome.is_none() {
                 passed += 1;
             }
@@ -1474,6 +1384,7 @@ impl For {
                 failed: outcome,
                 sfails,
                 copies: live.copies,
+                rooted,
             });
         }
         let _ = list_name;
@@ -1979,12 +1890,12 @@ impl For {
                 .iter()
                 .flat_map(|s| nested_whose(&s.check, true))
                 .collect();
-            run.message = super::message::walked_roots_ahead(
-                run.message.take(),
-                &whose,
-                &outer_ctx(ctx),
-                &counted,
-            );
+            let outer = outer_ctx(ctx);
+            let message = run
+                .message
+                .take()
+                .or_else(|| super::message::walks_a_root(&whose, &outer).then(String::new));
+            run.message = super::message::walked_roots_ahead(message, &whose, &outer, &counted);
             self.key_base_after_key(&mut run, ctx);
             self.whose_keys_first(&mut run, ctx);
             self.free_first(&mut run, ctx);
@@ -2018,8 +1929,25 @@ impl For {
             .iter()
             .flat_map(|item| item.whose.iter())
             .collect();
-        let mut clauses = super::message::root_clauses(&whose, &outer);
+        let mut clauses = super::message::listed_root_clauses(&whose, &outer, true);
         clauses.extend(super::message::walked_root_clauses(&whose, &outer));
+        for key in self.items.iter().flat_map(|item| sort_keys(&item.how)) {
+            if let Some((outcome, text, input)) = super::key_base::key_flaw(key, &outer) {
+                let cause = outcome.cause().unwrap_or(Cause::Unusable);
+                clauses.push(Clause::root(&input.name, cause, text));
+            }
+        }
+        if let Some(first) = self.items.first()
+            && matches!(first.path.start, Start::Subject | Start::Own)
+            && let Some((outcome, text, input)) =
+                first.path.steps.iter().find_map(|step| match step {
+                    Step::Field(key) => super::key_base::key_flaw(key, &outer),
+                    _ => None,
+                })
+        {
+            let cause = outcome.cause().unwrap_or(Cause::Unusable);
+            clauses.push(Clause::root(&input.name, cause, text));
+        }
         if let Some(found) = self.first_key(ctx) {
             let cause = found.key.state.cause().unwrap_or(Cause::Unusable);
             clauses.push(Clause::root(&found.key.name, cause, found.key_text));
@@ -2032,7 +1960,7 @@ impl For {
             .map(|clause| clause.in_group(1))
             .collect();
         for (at, sentence) in self.sentences.iter().enumerate() {
-            let said = sentence_roots_said(&sentence.check, &outer);
+            let said = sentence_roots_listed(&sentence.check, &outer);
             clauses.extend(said.into_iter().map(|clause| clause.in_group(at + 2)));
         }
         let mut once: Vec<Clause> = Vec::new();
@@ -2045,7 +1973,7 @@ impl For {
                 once.push(clause);
             }
         }
-        once
+        listed_roots(once)
     }
 
     #[cfg_attr(not(test), expect(dead_code))]
@@ -2080,20 +2008,47 @@ impl For {
             .into_iter()
             .flat_map(|root| [Clause::said(Cause::Value, root.text.clone()), root])
             .collect();
-        let mut clauses: Vec<Clause> = Vec::new();
-        for piece in super::message::unsaid_clauses(&said, &mut seen)
-            .into_iter()
-            .flatten()
-        {
-            match piece {
-                Piece::Said(text) => push_new(&mut clauses, Clause::said(cause, text)),
-                Piece::Counted(counted) => {
-                    for clause in counted {
-                        push_new(&mut clauses, clause);
+        let roots: Vec<String> = seen.iter().map(|root| root.text.clone()).collect();
+        for group in &said {
+            if roots.contains(&super::message::pieces_text(group)) {
+                for piece in group {
+                    if let Piece::Said(text) = piece {
+                        seen.push(Clause::said(Cause::Value, text.clone()));
                     }
                 }
             }
         }
+        let whole = !self
+            .items
+            .iter()
+            .any(|item| reads_alias(&sentence.check, &item.alias));
+        let mut clauses: Vec<Clause> = Vec::new();
+        for group in super::message::unsaid_clauses(&said, &mut seen) {
+            let mut texts: Vec<String> = Vec::new();
+            for piece in group {
+                match piece {
+                    Piece::Said(text) if whole => texts.push(text),
+                    Piece::Said(text) => push_new(&mut clauses, Clause::said(cause, text)),
+                    Piece::Counted(counted) => {
+                        for clause in counted {
+                            push_new(&mut clauses, clause);
+                        }
+                    }
+                }
+            }
+            if !texts.is_empty() {
+                push_new(&mut clauses, Clause::said(cause, texts.join(", and ")));
+            }
+        }
+        let said_texts: Vec<&str> = seen.iter().map(|clause| clause.text.as_str()).collect();
+        let again: Vec<String> = key_paths_said(&sentence.check, ctx)
+            .into_iter()
+            .filter(|(key, _)| said_texts.contains(&key.as_str()))
+            .map(|(_, path)| path)
+            .collect();
+        clauses.retain(|clause| {
+            clause.kind == super::clause::Kind::Item || !again.contains(&clause.text)
+        });
         if !walks
             && let Some((key, base, worse)) = sentence
                 .check
@@ -2109,22 +2064,22 @@ impl For {
     }
 
     fn whose_keys_first(&self, run: &mut Run, ctx: &Ctx) {
-        let outer = outer_ctx(ctx);
-        let keys: Vec<(Cause, String)> = self
-            .items
-            .iter()
-            .flat_map(|item| item.whose.iter())
-            .flat_map(|check| super::key_base::missing_keys(check, &outer))
-            .collect();
-        if keys.is_empty()
-            || self
-                .items
+        let mut keys: Vec<(Cause, String)> = Vec::new();
+        for (cause, text, input) in self.whose_keys(ctx) {
+            if !run
+                .verdict
+                .inputs
                 .iter()
-                .flat_map(|item| item.whose.iter())
-                .any(|check| !super::key_base::unusable_keys(check, &outer).is_empty())
-        {
+                .any(|seen| seen.name == input.name)
+            {
+                run.verdict.inputs.push(input);
+            }
+            keys.push((cause, text));
+        }
+        if keys.is_empty() {
             return;
         }
+        keys.sort();
         let said = run.message.clone().unwrap_or_default();
         let mut pieces: Vec<String> = keys.iter().map(|(_, text)| text.clone()).collect();
         pieces.extend(
@@ -2139,6 +2094,24 @@ impl For {
                 .chain([run.verdict.cause]),
         )
         .unwrap_or(run.verdict.cause);
+    }
+
+    /// Each `$params` or `$input` key the lines' `whose` checks read that
+    /// can't be read, once, with its cause, what is said and its read.
+    pub fn whose_keys(&self, ctx: &Ctx) -> Vec<(Cause, String, Input)> {
+        let outer = outer_ctx(ctx);
+        let mut keys: Vec<(Cause, String, Input)> = Vec::new();
+        for key in self
+            .items
+            .iter()
+            .flat_map(|item| item.whose.iter())
+            .flat_map(|check| super::key_base::unreadable_key_reads(check, &outer))
+        {
+            if !keys.iter().any(|(_, said, _)| *said == key.1) {
+                keys.push(key);
+            }
+        }
+        keys
     }
 
     fn key_base_after_key(&self, run: &mut Run, ctx: &Ctx) {
@@ -2560,7 +2533,10 @@ impl For {
             bound.aliases.insert(first.alias.clone(), live.at.clone());
             let bound = outer_ctx(&bound);
             for cond in second.whose.iter().chain(nested.iter().copied()) {
-                let Some((cause, text)) = super::message::root_flaw(&[cond], &bound) else {
+                let flaw = super::message::root_texts(&[cond], &bound);
+                let Some((cause, text)) =
+                    super::key_base::with_alias_keys(flaw, cond, &first.alias, &bound)
+                else {
                     continue;
                 };
                 if cause == Cause::NotAnObject {
@@ -2569,9 +2545,11 @@ impl For {
                 let said = super::message::root_flaw(&[cond], &outer)
                     .map(|(_, said)| said)
                     .unwrap_or_default();
+                let keys = super::key_base::unreadable_keys(cond, &outer);
                 let extra: Vec<&str> = text
                     .split("; ")
                     .filter(|part| !said.split("; ").any(|old| old == *part))
+                    .filter(|part| !keys.iter().any(|(_, key)| key == part))
                     .collect();
                 if !extra.is_empty() {
                     causes.push(cause);
@@ -2701,7 +2679,7 @@ impl For {
                 let mut run = run;
                 run.verdict.cause = cause;
                 run.message = Some(super::message::joined(texts.clone()));
-                let lines = super::clause::lines(&self.root_clauses(ctx));
+                let lines = root_lines(&self.root_clauses(ctx));
                 let roots: Vec<&str> = lines.iter().map(String::as_str).collect();
                 run.items = self
                     .free_clauses(ctx)
@@ -2839,10 +2817,22 @@ impl For {
         } else {
             second.as_ref().map_or(level.cause, |(cause, _)| *cause)
         };
-        let items = if second.is_some() || cause == Cause::Satisfied || flawed {
+        let unread = |child: &Child| child.failed.is_none() && !child.rooted.is_empty();
+        let rooted = level.children.iter().any(unread)
+            && (!matches!(first.how, How::Some { .. })
+                || level
+                    .children
+                    .iter()
+                    .all(|child| child.failed.is_some() || unread(child)));
+        let items = if second.is_some() || flawed || cause == Cause::Satisfied && !rooted {
             Vec::new()
         } else {
-            self.level_clauses(&level, &self.free_clauses(ctx), &self.root_clauses(ctx))
+            self.level_clauses(
+                &level,
+                &self.free_clauses(ctx),
+                &self.root_clauses(ctx),
+                ctx,
+            )
         };
         let (failed, said, hoisted) = if let Some((_, listed)) = second {
             (listed, Vec::new(), Vec::new())
@@ -2992,7 +2982,9 @@ impl For {
         if let Some(text) = &dead.msg {
             return text.clone();
         }
-        let kind = if matches!(dead.value, Value::Object(_)) {
+        let kind = if dead.wants_object {
+            "an object"
+        } else if matches!(dead.value, Value::Object(_)) {
             "a list"
         } else {
             "a list or an object"
@@ -3303,9 +3295,52 @@ impl For {
                 .any(|item| reads_alias(&self.sentences[fail.idx].check, &item.alias))
     }
 
-    fn dead_clause(&self, dead: &Dead) -> Clause {
+    fn dead_clause(&self, dead: &Dead, ctx: &Ctx) -> Clause {
+        if let Some(own) = self.unsorted_own(dead, ctx) {
+            let (cause, text) = own.map_or((dead.cause, String::new()), |(text, cause, _)| {
+                (cause, super::message::prefixed(dead.shown(), &text))
+            });
+            return Clause::item(dead.shown(), cause, text, Vec::new());
+        }
+        if let Some(told) = &dead.told {
+            return match told {
+                Some(clause) => Clause {
+                    cause: dead.cause,
+                    ..clause.clone()
+                },
+                None => Clause::item(dead.shown(), dead.cause, String::new(), Vec::new()),
+            };
+        }
         let text = self.dead_text(dead).replace(FREE, "");
         Clause::item(dead.shown(), dead.cause, text, Vec::new())
+    }
+
+    fn unsorted_own(&self, dead: &Dead, ctx: &Ctx) -> Option<Option<(String, Cause, Input)>> {
+        let stash = dead.sorted.as_ref()?;
+        let item = stash.get("value").filter(|value| value.is_object())?;
+        let (path, keys) = self.items.iter().find_map(|line| match &line.how {
+            How::Pick {
+                sorted: Some(sorted),
+                ..
+            } if Some(crate::name::name(&sorted.path).as_str()) == stash["key"].as_str() => {
+                Some((&sorted.path, sort_keys(&line.how)))
+            }
+            _ => None,
+        })?;
+        let outer = outer_ctx(ctx);
+        if !keys
+            .into_iter()
+            .any(|key| super::key_base::key_flaw(key, &outer).is_some())
+        {
+            return None;
+        }
+        let mut at = outer;
+        at.subject = Located {
+            value: item,
+            location: Location::input_root(),
+        };
+        at.label = None;
+        Some(super::key_base::of_path(path, false, &at).and_then(|found| found.base))
     }
 
     fn child_clause(
@@ -3313,8 +3348,16 @@ impl For {
         child: &Child,
         mut riders: Option<&mut Vec<(usize, Clause)>>,
     ) -> Option<Clause> {
-        let outcome = child.failed.as_ref()?;
         let name = child.entry.shown();
+        let Some(outcome) = child.failed.as_ref() else {
+            let cause = Cause::worst(child.rooted.iter().map(|clause| clause.cause))?;
+            return Some(Clause::item(
+                name,
+                cause,
+                String::new(),
+                child.rooted.clone(),
+            ));
+        };
         if bare_item(outcome, &child.entry) {
             let bare = child.entry.bare.as_deref().unwrap_or(name);
             let value = child.entry.raw.as_ref().unwrap_or(&child.entry.value);
@@ -3374,6 +3417,14 @@ impl For {
                     .into_iter()
                     .chain(said.iter().skip(outcome.lifted).map(|clause| clause.cause)),
             )
+            .or_else(|| {
+                Cause::worst(
+                    said.iter()
+                        .take(outcome.lifted)
+                        .map(|clause| clause.cause)
+                        .chain([outcome.cause]),
+                )
+            })
             .unwrap_or(outcome.cause);
             return Some(Clause::item(name, cause, text, said));
         }
@@ -3395,6 +3446,25 @@ impl For {
             {
                 continue;
             }
+            let (_, clauses) = self.said_clauses(sentence, &run_full(&sentence.check, ctx), ctx);
+            for clause in clauses {
+                merge_clause(&mut out, &clause);
+            }
+        }
+        out
+    }
+
+    fn first_alias_clauses(&self, nested: &Level, depth: usize, ctx: &Ctx) -> Vec<Clause> {
+        let mut out: Vec<Clause> = Vec::new();
+        if !nested.children.is_empty() || nested.cause == Cause::Satisfied {
+            return out;
+        }
+        let alias = &self.items[depth].alias;
+        for sentence in self
+            .sentences
+            .iter()
+            .filter(|sentence| !sentence.reads_last && reads_alias(&sentence.check, alias))
+        {
             let (_, clauses) = self.said_clauses(sentence, &run_full(&sentence.check, ctx), ctx);
             for clause in clauses {
                 merge_clause(&mut out, &clause);
@@ -3429,7 +3499,13 @@ impl For {
         out
     }
 
-    fn nested_clauses(&self, nested: &Level, nothing_checked: bool, depth: usize) -> Vec<Clause> {
+    fn nested_clauses(
+        &self,
+        nested: &Level,
+        nothing_checked: bool,
+        depth: usize,
+        ctx: &Ctx,
+    ) -> Vec<Clause> {
         let mut riders: Vec<(usize, Clause)> = Vec::new();
         let mut clauses: Vec<Clause> = nested
             .children
@@ -3437,7 +3513,16 @@ impl For {
             .filter_map(|child| self.child_clause(child, Some(&mut riders)))
             .collect();
         riders.sort_by_key(|(idx, _)| *idx);
-        let mut riders: Vec<Clause> = riders.into_iter().map(|(_, clause)| clause).collect();
+        let (walked, mut riders): (Vec<Clause>, Vec<Clause>) = riders
+            .into_iter()
+            .map(|(_, clause)| clause)
+            .partition(|clause| clause.kind == super::clause::Kind::Item);
+        if !walked.is_empty() {
+            for clause in &walked {
+                merge_clause(&mut clauses, clause);
+            }
+            in_list_order(&mut clauses);
+        }
         match clauses.iter_mut().find(|clause| !clause.said.is_empty()) {
             Some(first) => {
                 for rider in riders {
@@ -3456,7 +3541,7 @@ impl For {
                     .dead
                     .iter()
                     .filter(|d| !(second && d.shared) && d.cause != Cause::Ambiguous)
-                    .map(|d| self.dead_clause(d)),
+                    .map(|d| self.dead_clause(d, ctx)),
             );
         }
         let ties: Vec<&Dead> = nested
@@ -3470,8 +3555,14 @@ impl For {
         clauses
     }
 
-    fn level_clauses(&self, level: &Level, free: &[Clause], roots: &[Clause]) -> Vec<Clause> {
-        let lines = super::clause::lines(roots);
+    fn level_clauses(
+        &self,
+        level: &Level,
+        free: &[Clause],
+        roots: &[Clause],
+        ctx: &Ctx,
+    ) -> Vec<Clause> {
+        let lines = root_lines(roots);
         let texts: Vec<&str> = lines.iter().map(String::as_str).collect();
         if level.unreadable {
             return free
@@ -3484,7 +3575,7 @@ impl For {
             .dead
             .iter()
             .filter(|d| d.cause != Cause::Ambiguous)
-            .map(|d| (d.order.clone(), self.dead_clause(d)))
+            .map(|d| (d.order.clone(), self.dead_clause(d, ctx)))
             .collect();
         let ties: Vec<&Dead> = level
             .dead
@@ -3530,7 +3621,7 @@ impl For {
             hoisted
                 .iter()
                 .filter(|d| d.cause != Cause::Ambiguous)
-                .map(|d| (d.order.clone(), self.dead_clause(d))),
+                .map(|d| (d.order.clone(), self.dead_clause(d, ctx))),
         );
         first.sort_by(|a, b| a.0.cmp(&b.0));
         free.iter()
@@ -3568,8 +3659,53 @@ impl For {
     }
 }
 
+fn root_lines(roots: &[Clause]) -> Vec<String> {
+    let mut out: Vec<String> = Vec::new();
+    for line in super::clause::lines(roots) {
+        for piece in line.split("; ") {
+            push_new(&mut out, piece.to_string());
+        }
+        push_new(&mut out, line);
+    }
+    out
+}
+
+fn listed_roots(clauses: Vec<Clause>) -> Vec<Clause> {
+    let mut out: Vec<Clause> = Vec::new();
+    let mut lists: Vec<(usize, String, Vec<Clause>)> = Vec::new();
+    for clause in clauses {
+        if clause.kind != super::clause::Kind::Root || clause.said.is_empty() {
+            out.push(clause);
+            continue;
+        }
+        let list = lists
+            .iter_mut()
+            .find(|(group, name, _)| *group == clause.group && *name == clause.name);
+        let Some((_, _, items)) = list else {
+            lists.push((clause.group, clause.name, clause.said));
+            continue;
+        };
+        for item in clause.said {
+            let line = super::clause::text(std::slice::from_ref(&item));
+            if !items
+                .iter()
+                .any(|seen| super::clause::text(std::slice::from_ref(seen)) == line)
+            {
+                items.push(item);
+            }
+        }
+    }
+    for (group, list, items) in lists {
+        let cause = Cause::worst(items.iter().map(|item| item.cause)).unwrap_or(Cause::Value);
+        let text = super::clause::text(&super::clause::shown(&items));
+        out.push(Clause::root(&list, cause, text).in_group(group));
+    }
+    out
+}
+
 fn unrooted(clause: Clause, roots: &[&str]) -> Option<Clause> {
-    let rooted = clause.text.split("; ").all(|piece| roots.contains(&piece));
+    let rooted = roots.contains(&clause.text.as_str())
+        || clause.text.split("; ").all(|piece| roots.contains(&piece));
     if rooted && clause.said.is_empty() {
         return None;
     }
@@ -3581,6 +3717,50 @@ fn unrooted(clause: Clause, roots: &[&str]) -> Option<Clause> {
     let empty =
         clause.kind == super::clause::Kind::Item && clause.text.is_empty() && said.is_empty();
     (!empty).then_some(Clause { said, ..clause })
+}
+
+fn sort_keys(how: &How) -> Vec<&Path> {
+    let How::Pick {
+        sorted: Some(sorted),
+        ..
+    } = how
+    else {
+        return Vec::new();
+    };
+    sorted
+        .path
+        .steps
+        .iter()
+        .filter_map(|step| match step {
+            Step::Ref(key) if matches!(key.start, Start::Params | Start::Input) => Some(&**key),
+            _ => None,
+        })
+        .collect()
+}
+
+fn key_paths_said(check: &Check, ctx: &Ctx) -> Vec<(String, String)> {
+    let mut out: Vec<(String, String)> = Vec::new();
+    for path in check.paths() {
+        for (at, step) in path.steps.iter().enumerate() {
+            let (Step::Ref(key) | Step::Field(key)) = step else {
+                continue;
+            };
+            let word = match path::read(key, ctx).outcome {
+                path::Outcome::Absent => "missing",
+                path::Outcome::Null => "null",
+                _ => continue,
+            };
+            let through = Path {
+                start: path.start.clone(),
+                steps: path.steps[..=at].to_vec(),
+            };
+            out.push((
+                format!("{} is {word}", crate::name::name(key)),
+                format!("{} is {word}", crate::name::name(&through)),
+            ));
+        }
+    }
+    out
 }
 
 fn tie_clause(text: String) -> Clause {
@@ -3621,18 +3801,23 @@ fn in_list_order(said: &mut [Clause]) {
 }
 
 fn merge_clause(said: &mut Vec<Clause>, clause: &Clause) {
+    let item = clause.kind == super::clause::Kind::Item;
     let same = said.iter_mut().find(|seen| {
-        clause.kind == super::clause::Kind::Item
-            && seen.kind == super::clause::Kind::Item
-            && seen.name == clause.name
+        seen.kind == clause.kind
+            && if item {
+                seen.name == clause.name
+            } else {
+                seen.text == clause.text
+            }
     });
     match same {
-        Some(seen) => {
+        Some(seen) if item => {
             for inner in &clause.said {
                 push_new(&mut seen.said, inner.clone());
             }
         }
-        None => push_new(said, clause.clone()),
+        Some(seen) => seen.cause = Cause::worst([seen.cause, clause.cause]).unwrap_or(seen.cause),
+        None => said.push(clause.clone()),
     }
 }
 
@@ -3723,7 +3908,7 @@ fn foreign_step(path: &Path, alias: &str) -> bool {
             !matches!(&reference.start, Start::Alias(name) if name == alias)
                 || foreign_step(reference, alias)
         }
-        Step::Key(_) | Step::Index(_) => false,
+        Step::Key(_) | Step::Index(_) | Step::Members => false,
     })
 }
 
@@ -3784,54 +3969,8 @@ fn unskipped(text: &str, skip: &[String]) -> String {
         .join("; ")
 }
 
-fn root_fails(check: &Check, outer: &Ctx, cause: Cause) -> bool {
-    super::message::root_flaw(&[check], outer).is_some()
-        || super::message::root_fault(check, outer, cause).is_some()
-}
-
-fn own_beside_root(check: &Check, outer: &Ctx, focus: &Ctx, cause: Cause) -> Option<String> {
-    let flaw = super::message::root_flaw(&[check], outer);
-    let fault = super::message::root_fault(check, outer, cause);
-    let own = check.paths().into_iter().find_map(|path| {
-        if !matches!(path.start, Start::Subject | Start::Own) {
-            return None;
-        }
-        path::read(path, focus).outcome.cause()
-    })?;
-    let mut roots: Vec<String> = flaw
-        .map(|(_, text)| text)
-        .into_iter()
-        .chain(fault)
-        .collect();
-    roots.extend(super::message::root_fault(check, outer, own));
-    let roots: Vec<&str> = roots.iter().flat_map(|text| text.split("; ")).collect();
-    let verdict = Verdict {
-        cause: own,
-        inputs: Vec::new(),
-    };
-    let said = super::message::message(check, focus, &verdict);
-    let parts: Vec<&str> = said
-        .split("; ")
-        .flat_map(|part| part.split(", and "))
-        .filter(|part| !roots.contains(part) && super::message::cap_note(part).is_none())
-        .collect();
-    (!parts.is_empty()).then(|| parts.join(", and "))
-}
-
-fn own_read_fails(check: &Check, focus: &Ctx) -> bool {
-    let counts_a_root = matches!(check, Check::Tally(tally) if tally
-        .counted_paths()
-        .iter()
-        .any(|path| super::message::reads_from_a_root(path)));
-    !counts_a_root
-        || check.paths().into_iter().any(|path| {
-            matches!(path.start, Start::Subject | Start::Own)
-                && path::read(path, focus).outcome.cause().is_some()
-        })
-}
-
 fn unled(roots: &[String], text: &str) -> Vec<String> {
-    if !text.starts_with("item ") {
+    if !crate::parts::is_item(text) {
         return vec![text.to_string()];
     }
     if let Some(root) = roots
@@ -3922,7 +4061,7 @@ fn outside_quotes(text: &str) -> bool {
 }
 
 fn lead_of(text: &str) -> String {
-    if !text.starts_with("item ") {
+    if !crate::parts::is_item(text) {
         return String::new();
     }
     let cuts = text
@@ -4294,11 +4433,21 @@ fn bound_alias(root: &Path, ctx: &Ctx) -> bool {
 }
 
 fn sentence_roots_said(check: &Check, ctx: &Ctx) -> Vec<Clause> {
+    sentence_roots_listed(check, ctx)
+        .into_iter()
+        .flat_map(super::message::unlisted)
+        .collect()
+}
+
+fn sentence_roots_listed(check: &Check, ctx: &Ctx) -> Vec<Clause> {
     let nested = nested_whose(check, false);
     let mut said = sentence_root_clauses(&root_forms(check), ctx);
-    said.extend(super::message::side_root_clauses(&nested, ctx));
+    said.extend(super::message::listed_root_clauses(&nested, ctx, false));
     said.extend(super::message::walked_root_clauses(&nested, ctx));
     said.extend(super::message::walked_root_clauses(&[check], ctx));
+    if let Check::Walk(walk) = check {
+        said.extend(super::message::walked_root_clauses(&[&*walk.check], ctx));
+    }
     said
 }
 

@@ -124,16 +124,23 @@ _s_text_names(text) := {concat("", ["unknown name ", m[1]]) |
 
 else := set()
 
-_s_base_problems(parsed) := ((((((((((((((((({concat("", [node.bare_word, " is a word of the grammar: write .", node.bare_word]) |
-	some node in _s_nodes(parsed)
+_s_base_problems(parsed) := (((((((((((((((((({concat("", [node.bare_word, " is a word of the grammar: write .", node.bare_word]) |
+	some node in nodes
 	is_object(node)
 	"bare_word" in object.keys(node)
-} | {concat("", [node.bad_name, " can't be an alias"]) |
-	some node in _s_nodes(parsed)
+} | {"distinct can't go with every member of" |
+	some node in nodes
+	is_object(node)
+	object.get(node, "member", false) == true
+	object.get(node, "distinct", false) == true
+	some k in {"every", "some", "count", "sum"}
+	is_object(object.get(node, k, null))
+}) | {concat("", [node.bad_name, " can't be an alias"]) |
+	some node in nodes
 	is_object(node)
 	"bad_name" in object.keys(node)
 }) | {concat("", [node.as, " can't be an alias"]) |
-	some node in _s_nodes(parsed)
+	some node in nodes
 	is_object(node)
 	_s_bad_name(object.get(node, "as", ""))
 }) | {concat("", [name, " is given twice"]) |
@@ -142,84 +149,84 @@ _s_base_problems(parsed) := ((((((((((((((((({concat("", [node.bare_word, " is a
 	parsed.items[j].as == name
 	j < i
 }) | _s_pick_problems(parsed)) | {"if any can't go with some" |
-	some node in _s_nodes(parsed)
+	some node in nodes
 	is_object(node)
 	"some" in object.keys(node)
 	object.get(node, "if_any", false) == true
 }) | {concat("", ["a ", _s_place_word(node), " goes after every, some, count of or sum of"]) |
-	some node in _s_nodes(parsed)
+	some node in nodes
 	node != parsed
 	is_object(node)
 	"where" in object.keys(node)
 	object.keys(node) & _item_quantifier_keys == set()
 	not _s_derived_term(object.get(node, "terms", [null])[count(object.get(node, "terms", [null])) - 1])
 }) | {concat("", [node.phrase.op, " can't follow a count of, a sum of or a plus"]) |
-	some node in _s_nodes(parsed)
+	some node in nodes
 	is_object(node)
 	"terms" in object.keys(node)
 	not node.phrase.op in {"is", "is not", "is at least", "is at most", "is more than", "is less than", "is between", "is not between"}
 }) | {"a number can't start a sentence" |
-	some node in _s_nodes(parsed)
+	some node in nodes
 	is_object(node)
 	node.terms == [node.terms[0]]
 	is_number(node.terms[0])
 }) | {"min above max" |
-	some node in _s_nodes(parsed)
+	some node in nodes
 	is_object(node)
 	node.op in _between_phrases
 	is_number(node.min)
 	is_number(node.max)
 	node.min > node.max
 }) | {concat("", [node.bad_index, " can't be a list position"]) |
-	some node in _s_nodes(parsed)
+	some node in nodes
 	is_object(node)
 	"bad_index" in object.keys(node)
 }) | {concat("", [_s_number_problem(object.get(node, "too_long", false)), node.out_of_range]) |
-	some node in _s_nodes(parsed)
+	some node in nodes
 	is_object(node)
 	"out_of_range" in object.keys(node)
 }) | {concat("", ["invalid pattern ", _json_text(v)]) |
-	some node in _s_nodes(parsed)
+	some node in nodes
 	is_object(node)
 	node.op in _matches_phrases
 	some v in object.get(node, "values", [])
 	not is_object(v)
 	not _s_valid_pattern(v)
 }) | {`"is not null" is written "exists"` |
-	some node in _s_nodes(parsed)
+	some node in nodes
 	is_object(node)
 	node.op == "is not"
 	"value" in object.keys(node)
 	node.value == null
 }) | {concat("", [`"`, node.op, `" takes text`]) |
-	some node in _s_nodes(parsed)
+	some node in nodes
 	is_object(node)
 	node.op in _s_text_ops
 	"value" in object.keys(node)
 	not is_string(node.value)
 }) | {concat("", [`"`, node.op, `" takes `, _s_takes[node.op]]) |
-	some node in _s_nodes(parsed)
+	some node in nodes
 	is_object(node)
 	node.op in object.keys(_s_takes)
 	"value" in object.keys(node)
 	not _s_takes_value(node.op, node.value)
 }) | {concat("", [`"`, node.phrase.op, `" after every or some would check each item of the last list, not the list: put the walk on a for line`]) |
-	some node in _s_nodes(parsed)
+	some node in nodes
 	is_object(node)
 	object.keys(node) & _quantifier_keys != set()
 	node.phrase.op in {"contains", "does not contain", "contains all of", "contains none of", "contains some of", "does not contain all of"}
 }) | {`"within" only compares numbers` |
-	some node in _s_nodes(parsed)
+	some node in nodes
 	is_object(node)
 	"within" in object.keys(node)
 	"value" in object.keys(node)
 	not is_number(node.value)
 }) | {`"within" needs a number of 0 or more` |
-	some node in _s_nodes(parsed)
+	some node in nodes
 	is_object(node)
 	is_number(node.within)
 	node.within < 0
-}
+} if nodes := _s_nodes(parsed)
 
 _s_valid_pattern(v) if {
 	is_string(v)
@@ -407,8 +414,6 @@ _s_problems(text, pat) := [concat("", ["unclosed quote at column ", _json_text(c
 		not regex.match(pat.string, token)
 	]
 	count(invalid) > 0
-} else := [_s_member_misplaced] if {
-	_s_member_after_a_word(text, pat)
 } else := sort(problems) if {
 	problems := _s_sentence_problems(_s_parsed_anyway(text, pat), pat) | _s_text_names(text)
 	count(problems) > 0
@@ -427,32 +432,6 @@ _s_problems(text, pat) := [concat("", ["unclosed quote at column ", _json_text(c
 } else := ["doesn't parse"]
 
 _s_distinct_misplaced := "distinct goes after every, some, count of or sum of"
-
-_s_member_misplaced := "every member of only goes on a from line for now"
-
-_s_member_after_a_word(text, pat) if {
-	tokens := [m[0] | some m in regex.find_all_string_submatch_n(concat("", [`(?:`, pat.strings, `|[^ ])+`]), trim_space(text), -1)]
-	some i, word in tokens
-	word == "member"
-	tokens[i + 1] == "of"
-	_s_member_after(_s_before_member(tokens, i))
-}
-
-_s_before_member(tokens, i) := array.slice(tokens, max([0, i - 3]), i - 1) if {
-	i > 1
-	tokens[i - 1] == "distinct"
-} else := array.slice(tokens, max([0, i - 2]), i)
-
-_s_member_after(before) if {
-	count(before) > 0
-	before[count(before) - 1] in _quantifier_words
-}
-
-_s_member_after(before) if {
-	count(before) == 2
-	before[0] in _term_tally_keys
-	before[1] == "of"
-}
 
 _s_distinct_misplaced_in(text, pat) if {
 	tokens := [m[0] | some m in regex.find_all_string_submatch_n(concat("", [`(?:`, pat.strings, `|[^ ])+`]), trim_space(text), -1)]

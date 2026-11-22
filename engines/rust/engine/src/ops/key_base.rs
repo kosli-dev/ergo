@@ -589,29 +589,64 @@ pub fn alias_base(path: &Path, ctx: &Ctx) -> Option<(String, String, Cause)> {
 }
 
 /// What a `whose` check says about each `$params` or `$input` key it reads
-/// that is missing or `null`, with the cause: said once, before any item.
-pub fn missing_keys(check: &Check, ctx: &Ctx) -> Vec<(Cause, String)> {
-    let mut out: Vec<(Cause, String)> = Vec::new();
+/// that is missing, `null` or not text, with the cause: said once, before
+/// any item.
+pub fn unreadable_keys(check: &Check, ctx: &Ctx) -> Vec<(Cause, String)> {
+    unreadable_key_reads(check, ctx)
+        .into_iter()
+        .map(|(cause, text, _)| (cause, text))
+        .collect()
+}
+
+/// [`unreadable_keys`], with each key's read.
+pub fn unreadable_key_reads(check: &Check, ctx: &Ctx) -> Vec<(Cause, String, Input)> {
+    let mut out: Vec<(Cause, String, Input)> = Vec::new();
     for path in check.paths() {
         for step in &path.steps {
-            let Step::Ref(key) = step else {
-                continue;
-            };
-            if !matches!(key.start, path::Start::Params | path::Start::Input) {
-                continue;
-            }
-            match key_flaw(key, ctx) {
-                Some((outcome @ (Outcome::Absent | Outcome::Null), text, _)) => {
-                    if !out.iter().any(|(_, t)| *t == text) {
-                        out.push((outcome.cause().unwrap_or(Cause::Absent), text));
-                    }
-                }
-                Some(_) => return Vec::new(),
-                None => {}
+            if let Step::Ref(key) = step
+                && matches!(key.start, path::Start::Params | path::Start::Input)
+                && let Some((outcome, text, input)) = key_flaw(key, ctx)
+                && !out.iter().any(|(_, said, _)| *said == text)
+            {
+                out.push((outcome.cause().unwrap_or(Cause::Unusable), text, input));
             }
         }
     }
     out
+}
+
+/// `flaw`, the problems of a check's roots, with each `named by` key the
+/// check reads whole from `alias` that is missing, `null` or not text, worst
+/// cause first and then by name.
+pub fn with_alias_keys(
+    flaw: Option<(Cause, Vec<String>)>,
+    check: &Check,
+    alias: &str,
+    ctx: &Ctx,
+) -> Option<(Cause, String)> {
+    let mut said: Vec<(Cause, String)> = flaw
+        .into_iter()
+        .flat_map(|(cause, texts)| texts.into_iter().map(move |text| (cause, text)))
+        .collect();
+    for path in check.paths() {
+        for step in &path.steps {
+            if let Step::Ref(key) = step
+                && matches!(&key.start, path::Start::Alias(name) if name == alias)
+                && let Some((outcome, text, _)) = key_flaw(key, ctx)
+                && !said.iter().any(|(_, seen)| *seen == text)
+            {
+                let key = (outcome.cause().unwrap_or(Cause::Unusable), text);
+                let at = said
+                    .iter()
+                    .position(|part| *part > key)
+                    .unwrap_or(said.len());
+                said.insert(at, key);
+            }
+        }
+    }
+    let cause = said.iter().map(|(cause, _)| *cause).min()?;
+    let texts: Vec<String> = said.into_iter().map(|(_, text)| text).collect();
+    Some((cause, texts.join("; ")))
 }
 
 /// What a check says about each `$params` or `$input` key it reads that

@@ -26,6 +26,7 @@ pub enum Step {
     Index(u64),
     Ref(Box<Path>),
     Field(Box<Path>),
+    Members,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -239,6 +240,7 @@ pub fn step_refs(path: &Path) -> Vec<Path> {
 
 pub fn resolve(step: &Step, ctx: &Ctx) -> Result<Resolved, Outcome> {
     match step {
+        Step::Members => Err(Outcome::Unusable),
         Step::Key(key) => Ok(Resolved::Key(key.clone())),
         Step::Index(index) => Ok(Resolved::Index(*index)),
         Step::Field(field) => {
@@ -370,6 +372,9 @@ fn walk<'a>(path: &Path, ctx: &Ctx<'a>) -> Read<'a> {
     };
     let steps = leading_steps(&path.start).iter().chain(path.steps.iter());
     for (at, step) in steps.enumerate() {
+        if matches!(step, Step::Members) {
+            continue;
+        }
         if at == 0 && reads_a_list_input(path, ctx) && matches!(step, Step::Ref(_)) {
             return ended(Outcome::NotAnObject, location);
         }

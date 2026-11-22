@@ -113,7 +113,7 @@ fn once<'a>(locations: impl IntoIterator<Item = &'a String>) -> Vec<String> {
     out
 }
 
-fn side_paths(side: &Side) -> Vec<&Path> {
+pub(super) fn side_paths(side: &Side) -> Vec<&Path> {
     match side {
         Side::Plain(plain) => plain.paths(),
         Side::Derived(derived) => {
@@ -679,7 +679,7 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
         }
         match item.end {
             Some(end) => numbers.push(end.clone()),
-            None => causes.push(item.miss),
+            None => causes.push(item_miss(item, &at)),
         }
     }
     if any_undecided {
@@ -709,6 +709,14 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
         entries,
         located,
         result,
+    }
+}
+
+fn item_miss(item: &walk::WalkItem, at: &Ctx) -> Cause {
+    if item.miss == Cause::Absent && walk::lost_verdict(item, at).cause == Cause::Null {
+        Cause::Null
+    } else {
+        item.miss
     }
 }
 
@@ -1026,7 +1034,7 @@ fn lower_counted(
     let path = match scope.counted_path(&derived.path) {
         Ok(path) => {
             problems.extend(crate::lower::walk_too_long(&path));
-            Some(path)
+            Some(crate::lower::with_members(path, derived.member))
         }
         Err(found) => {
             problems.extend(found);
@@ -1761,12 +1769,13 @@ pub fn counted_said(counted: &Counted, ctx: &Ctx) -> (Vec<Clause>, Vec<Value>) {
                     Value::Null,
                 ))
             } else {
+                let miss = item_miss(item, &at);
                 match item.end {
-                    None if item.miss == Cause::Unusable => Some((
-                        item.miss,
+                    None if matches!(miss, Cause::Unusable | Cause::Null) => Some((
+                        miss,
                         told(
                             &name,
-                            item.miss,
+                            miss,
                             &super::message::message(
                                 &walk::focus_check(item),
                                 &at,

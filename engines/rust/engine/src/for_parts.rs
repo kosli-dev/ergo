@@ -93,9 +93,13 @@ fn item(
     }
 }
 
+fn clauses(text: &str) -> Vec<&str> {
+    ops::message::split_outside_quotes(text, "; ")
+}
+
 fn without_roots(message: &str, roots: &[String], moved: &mut Vec<String>) -> String {
-    message
-        .split("; ")
+    clauses(message)
+        .into_iter()
         .map(|part| {
             part.split(", and ")
                 .filter(|piece| {
@@ -240,7 +244,7 @@ fn whose_reads(whose: &[Check], f: &Value, ctx: &Ctx) -> Vec<Value> {
     let Some(object) = f.get("value").filter(|v| v.is_object()) else {
         return Vec::new();
     };
-    let base = parts_base(&text(f, "item"));
+    let base = crate::parts::position_name(&text(f, "item"));
     let mut out = Vec::new();
     let place = strings(f, "locations").first().cloned().unwrap_or_default();
     let mut at = ctx.clone();
@@ -302,17 +306,6 @@ fn whose_reads(whose: &[Check], f: &Value, ctx: &Ctx) -> Vec<Value> {
     out
 }
 
-fn parts_base(item: &str) -> String {
-    let Some(rest) = item.strip_prefix("item ") else {
-        return item.to_string();
-    };
-    let Some((number, list)) = rest.split_once(" of ") else {
-        return item.to_string();
-    };
-    let at = number.parse::<u64>().unwrap_or(1).saturating_sub(1);
-    format!("{list}[{at}]")
-}
-
 fn whose_of<'a>(line: &'a For, f: &Value) -> &'a [Check] {
     let base = crate::parts::list_base(&text(f, "item"));
     let names: Vec<String> = line
@@ -337,7 +330,7 @@ fn dead_entry(line: &For, f: &Value, ctx: &Ctx) -> Option<Failure> {
             .filter_map(|x| {
                 let said = entry_text(&text(x, "ergo/text"), &said_name(x));
                 (!said.is_empty()).then(|| {
-                    if text(x, "item").starts_with("item ") {
+                    if crate::parts::is_item(&text(x, "item")) {
                         item(
                             text(x, "item"),
                             cause_of(x),
@@ -366,7 +359,7 @@ fn dead_entry(line: &For, f: &Value, ctx: &Ctx) -> Option<Failure> {
     }
     if let Some(sorted) = f.get("ergo/sorted") {
         let input = json!({
-            "name": format!("{}.{}", parts_base(&name), text(sorted, "key")),
+            "name": format!("{}.{}", crate::parts::position_name(&name), text(sorted, "key")),
             "value": f.get("value").cloned().unwrap_or(Value::Null),
             "locations": f.get("locations").cloned().unwrap_or(json!([])),
             "outcome": text(sorted, "outcome"),
@@ -383,7 +376,7 @@ fn dead_entry(line: &For, f: &Value, ctx: &Ctx) -> Option<Failure> {
             locations: vec![text(sorted, "at")],
         });
     }
-    if name.starts_with("item ") {
+    if crate::parts::is_item(&name) {
         Some(item(
             name.clone(),
             cause_of(f),
@@ -418,6 +411,30 @@ fn item_read(f: &Value) -> Value {
     })
 }
 
+fn item_made(failed: &[Value], key_texts: &[String]) -> Vec<String> {
+    let mut made: Vec<String> = Vec::new();
+    for f in failed {
+        let mut after_key = false;
+        for piece in clauses(&text(f, "ergo/text")) {
+            if after_key || crate::parts::is_item(piece) || !crate::parts::is_item(&text(f, "item"))
+            {
+                ops::push_new(&mut made, piece.to_string());
+            }
+            after_key = crate::parts::is_item(piece)
+                && key_texts.iter().any(|k| piece.ends_with(k.as_str()));
+        }
+    }
+    made
+}
+
+fn row_roots(message: &str, item_made: &[String]) -> Vec<String> {
+    clauses(message)
+        .into_iter()
+        .filter(|m| !m.is_empty() && !item_made.iter().any(|t| t == m))
+        .map(str::to_string)
+        .collect()
+}
+
 /// The entries of a failed `for` row's `failures`.
 pub fn for_failures(
     line: &For,
@@ -434,23 +451,13 @@ pub fn for_failures(
             && !f.get("value").is_some_and(Value::is_object)
             && !list(f, "failed_assertions").is_empty()
     };
-    let mut item_made: Vec<String> = Vec::new();
     let key_texts: Vec<String> = line
         .items
         .iter()
         .flat_map(|i| i.whose.iter())
         .flat_map(|check| ops::key_base::unusable_keys(check, ctx))
         .collect();
-    for f in failed {
-        let mut after_key = false;
-        for piece in text(f, "ergo/text").split("; ") {
-            if after_key || piece.starts_with("item ") || !text(f, "item").starts_with("item ") {
-                ops::push_new(&mut item_made, piece.to_string());
-            }
-            after_key =
-                piece.starts_with("item ") && key_texts.iter().any(|k| piece.ends_with(k.as_str()));
-        }
-    }
+    let item_made = item_made(failed, &key_texts);
     let whose_roots = line.whose_roots(ctx);
     let list_names: Vec<String> = line
         .items
@@ -499,7 +506,12 @@ pub fn for_failures(
     let free_said: Vec<String> = frees
         .iter()
         .flatten()
-        .flat_map(|(_, said, _)| said.split("; ").map(str::to_string).collect::<Vec<_>>())
+        .flat_map(|(_, said, _)| {
+            clauses(said)
+                .into_iter()
+                .map(str::to_string)
+                .collect::<Vec<_>>()
+        })
         .collect();
     let off_subject = row_cause == Cause::NotAnObject && !ctx.subject.value.is_object();
     let owns: Vec<Vec<String>> = (0..line.sentences.len())
@@ -514,23 +526,20 @@ pub fn for_failures(
     let mut owned: Vec<Vec<String>> = vec![Vec::new(); line.sentences.len()];
     let mut walk_texts: Vec<String> = Vec::new();
     let first_key = line.first_key(ctx);
+    let whose_keys = line.whose_keys(ctx);
     let key_said: Vec<&str> = first_key
         .iter()
         .flat_map(|k| {
             std::iter::once(k.key_text.as_str()).chain(k.base.iter().map(|(t, _, _)| t.as_str()))
         })
+        .chain(whose_keys.iter().map(|(_, text, _)| text.as_str()))
         .collect();
-    let first_reads: Option<(String, String)> = (line.items.len() == 2
+    let first_reads: Option<String> = (line.items.len() == 2
         && matches!(line.items[0].how, for_line::How::Some { .. }))
-    .then(|| {
-        (
-            "item ".to_string(),
-            format!(" of {}: {}.", list_names[0], line.items[0].alias),
-        )
-    });
-    for clause in message.split("; ") {
-        if let Some((lead, middle)) = &first_reads
-            && clause.starts_with(lead.as_str())
+    .then(|| format!(" of {}: {}.", list_names[0], line.items[0].alias));
+    for clause in clauses(message) {
+        if let Some(middle) = &first_reads
+            && crate::parts::is_item(clause)
             && clause.contains(middle.as_str())
             && (clause.ends_with(" is missing")
                 || clause.ends_with(" is null")
@@ -549,13 +558,15 @@ pub fn for_failures(
             || key_said.contains(&clause)
             || failed.iter().any(|f| {
                 let named = text(f, "item");
-                named.starts_with("item ")
+                crate::parts::is_item(&named)
                     && clause
                         .strip_prefix(&format!("{named}: "))
                         .is_some_and(|rest| {
-                            list(f, "failed_assertions")
-                                .iter()
-                                .any(|l| texts(l).iter().any(|t| t.split("; ").any(|p| p == rest)))
+                            list(f, "failed_assertions").iter().any(|l| {
+                                texts(l)
+                                    .iter()
+                                    .any(|t| clauses(t).into_iter().any(|p| p == rest))
+                            })
                         })
             })
             || ops::message::cap_note(clause).is_some()
@@ -580,11 +591,7 @@ pub fn for_failures(
             ops::push_new(&mut owned[0], clause.to_string());
         }
     }
-    let roots: Vec<String> = message
-        .split("; ")
-        .filter(|m| !m.is_empty() && !item_made.iter().any(|t| t == m))
-        .map(str::to_string)
-        .collect();
+    let roots = row_roots(message, &item_made);
     let mut out: Vec<Failure> = Vec::new();
     for (i, sentence) in line.sentences.iter().enumerate() {
         let first = line
@@ -619,10 +626,8 @@ pub fn for_failures(
                             for kid in &n.part().failures {
                                 said_by(kid, &[], &mut said);
                             }
-                            let mut want: Vec<String> = m
-                                .part()
-                                .message
-                                .split("; ")
+                            let mut want: Vec<String> = clauses(&m.part().message)
+                                .into_iter()
                                 .filter(|p| !p.is_empty() && ops::message::cap_note(p).is_none())
                                 .map(str::to_string)
                                 .collect();
@@ -648,7 +653,7 @@ pub fn for_failures(
             }
             None => {
                 let mut own: Vec<String> = Vec::new();
-                for clause in message.split("; ") {
+                for clause in clauses(message) {
                     if owned[i].iter().any(|o| o == clause) || moved.iter().any(|m| m == clause) {
                         ops::push_new(&mut own, clause.to_string());
                     }
@@ -692,15 +697,17 @@ pub fn for_failures(
         let said = text(f, "ergo/text");
         if !said.is_empty()
             && list(f, "failed_items").is_empty()
-            && said.split("; ").all(|p| whose_roots.iter().any(|t| t == p))
+            && clauses(&said)
+                .into_iter()
+                .all(|p| whose_roots.iter().any(|t| t == p))
         {
-            for p in said.split("; ") {
+            for p in clauses(&said) {
                 ops::push_new(&mut walk_texts, p.to_string());
             }
             let second = line.items.len() == 2
                 && !matches!(line.items[1].how, for_line::How::Pick { .. })
                 && cause_of(f) != Cause::NotAnObject
-                && text(f, "item").starts_with("item ")
+                && crate::parts::is_item(&text(f, "item"))
                 && crate::parts::list_base(&text(f, "item")) == list_names[1];
             if !second {
                 continue;
@@ -746,8 +753,28 @@ pub fn for_failures(
         );
     }
     out.extend(lists);
-    out.extend(rest);
+    out.extend(rest.into_iter().filter_map(said_item));
     out
+}
+
+fn said_item(entry: Failure) -> Option<Failure> {
+    let Failure::Item {
+        mut part,
+        value,
+        locations,
+    } = entry
+    else {
+        return Some(entry);
+    };
+    part.failures = std::mem::take(&mut part.failures)
+        .into_iter()
+        .filter_map(said_item)
+        .collect();
+    (!part.message.is_empty() || !part.failures.is_empty()).then_some(Failure::Item {
+        part,
+        value,
+        locations,
+    })
 }
 
 fn list_label(line: &For, said: &str) -> String {
@@ -759,3 +786,6 @@ fn list_label(line: &For, said: &str) -> String {
     }
     crate::name::name(&line.items[0].path)
 }
+
+#[cfg(test)]
+mod tests;

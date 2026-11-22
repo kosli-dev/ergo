@@ -977,3 +977,17 @@ test_a_count_or_sum_of_a_missing_or_null_list_says_the_list_is_absent_or_null if
 	outcomes := {[x.check, i.name, i.outcome] | some x in r.results; x.check in {"a", "b", "c", "d"}; some i in x.inputs; i.value == []}
 	outcomes == {["a", "zz", "absent"], ["b", "zz", "absent"], ["c", "n", "null"], ["d", "o.zz", "absent"]}
 }
+
+_null_step_row(check, items) := [[r.cause, r.message] | some r in _dot_plain_rows(check, {"repos": [{"id": "r", "items": items}]})]
+
+test_a_count_or_a_sum_fails_an_item_whose_path_meets_null_before_its_end_as_null_naming_that_step if {
+	_null_step_row("count of items.m.n is 3", [{"m": null}]) == [["null", "item 1 of items: m is null"]]
+	_null_step_row("sum of items.m.n is 3", [{"m": null}]) == [["null", "item 1 of items: m is null"]]
+	_null_step_row("count of items.m.n.o is 3", [{"m": null}]) == [["null", "item 1 of items: m is null"]]
+	_null_step_row("sum of items.m.n.o is 3", [{"m": {"n": null}}]) == [["null", "item 1 of items: m.n is null"]]
+}
+
+test_a_count_or_a_sum_still_says_a_missing_step_as_missing_beside_one_that_is_null if {
+	_null_step_row("count of items.m.n is 3", [{}, {"m": null}]) == [["absent", "item 1 of items: m.n is missing; item 2 of items: m is null"]]
+	_null_step_row("sum of items.m.n is 3", [{}, {"m": null}]) == [["absent", "item 1 of items: m.n is missing; item 2 of items: m is null"]]
+}

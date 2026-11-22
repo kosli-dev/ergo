@@ -49,7 +49,7 @@ pub fn print_left_term(term: &Term, aliases: &[&str], parents: &[&str]) -> Strin
             };
             format!(
                 "{word} {}{}{}",
-                distinct_text(derived.distinct),
+                walk_words(derived.distinct, derived.member),
                 left_of_whose(&derived.path, aliases, parents, true),
                 whose_text(&derived.whose, aliases)
             )
@@ -122,7 +122,7 @@ fn from_condition_text(
         } => format!(
             "{} {}{}{} {}",
             quantifier_text(*quantifier),
-            distinct_text(options.distinct),
+            walk_words(options.distinct, options.member),
             left_of_whose(path, aliases, parents, false),
             if_any_text(options.if_any),
             phrase_text(phrase, aliases)
@@ -175,6 +175,14 @@ pub fn print_from(line: &FromLine, aliases: &[&str], parents: &[&str]) -> String
         out.push_str(&parts.join(" and "));
     }
     out
+}
+
+fn walk_words(distinct: bool, member: bool) -> String {
+    format!(
+        "{}{}",
+        distinct_text(distinct),
+        if member { "member of " } else { "" }
+    )
 }
 
 fn distinct_text(distinct: bool) -> &'static str {
@@ -398,7 +406,7 @@ fn derived_text(derived: &Derived, aliases: &[&str], own: bool) -> String {
     };
     format!(
         "{word} {}{}{}",
-        distinct_text(derived.distinct),
+        walk_words(derived.distinct, derived.member),
         path_text(&derived.path, Side::Left, aliases, own),
         whose_text(&derived.whose, aliases)
     )
@@ -618,7 +626,7 @@ pub fn print_assertion(assertion: &Assertion, aliases: &[&str]) -> String {
         } => format!(
             "{} {}{}{}{} {}",
             quantifier_text(*quantifier),
-            distinct_text(options.distinct),
+            walk_words(options.distinct, options.member),
             path_text(path, Side::Left, aliases, false),
             whose_text(whose, aliases),
             if_any_text(options.if_any),
@@ -657,13 +665,14 @@ fn for_item_text(item: &ForItem, names: &[&str], sorted_names: &[&str]) -> Strin
             quantifier,
             path,
             distinct,
+            member,
             whose,
             if_any,
             alias,
         } => format!(
             "{} {}{}{}{} as {alias}",
             quantifier_text(*quantifier),
-            distinct_text(*distinct),
+            walk_words(*distinct, *member),
             path_text(path, Side::Left, names, false),
             whose_text(whose, names),
             if_any_text(*if_any)

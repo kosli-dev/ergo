@@ -219,7 +219,7 @@
             },
             "for": {
               "type": "string",
-              "description": "A for line: one or two items, each every or some, optionally distinct, a path, an optional whose or that and as a name."
+              "description": "A for line: one or two items, each every or some, optionally distinct or member of, a path, an optional whose or that and as a name."
             },
             "description": {
               "type": [

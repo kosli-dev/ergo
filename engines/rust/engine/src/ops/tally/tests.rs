@@ -2877,6 +2877,26 @@ fn half_a_microsecond_rounds_up_and_less_rounds_down_whatever_its_length() {
 }
 
 #[test]
+fn a_count_or_a_sum_fails_an_item_whose_path_meets_null_before_its_end_as_null_naming_that_step() {
+    for sentence in [
+        "count of items.m.n is 3",
+        "sum of items.m.n is 3",
+        "count of items.m.n.o is 3",
+    ] {
+        assert_eq!(
+            cause(sentence, json!({"items": [{"m": null}]})),
+            Cause::Null,
+            "{sentence}"
+        );
+        assert_eq!(
+            kinds_causes_and_texts(&tally_clauses(sentence, json!([{"m": null}]), json!({}))),
+            [item_said(Cause::Null, "item 1 of items: m is null")],
+            "{sentence}"
+        );
+    }
+}
+
+#[test]
 fn a_sum_of_one_number_with_fifteen_decimals_is_that_number() {
     assert_eq!(sum_text(&["1e-15"]), "0.000000000000001");
     assert_eq!(sum_text(&["1e-15", "1e-15"]), "0.000000000000002");
@@ -2888,4 +2908,27 @@ fn text_that_is_not_digits_has_no_parts() {
         assert!(Parts::of(text).is_none(), "{text}");
     }
     assert!(Parts::of("1.5").is_some());
+}
+
+#[test]
+fn a_count_or_a_sum_still_says_a_missing_step_as_missing_beside_one_that_is_null() {
+    for sentence in ["count of items.m.n is 3", "sum of items.m.n is 3"] {
+        assert_eq!(
+            cause(sentence, json!({"items": [{}, {"m": null}]})),
+            Cause::Absent,
+            "{sentence}"
+        );
+        assert_eq!(
+            kinds_causes_and_texts(&tally_clauses(
+                sentence,
+                json!([{}, {"m": null}]),
+                json!({})
+            )),
+            [
+                item_said(Cause::Absent, "item 1 of items: m.n is missing"),
+                item_said(Cause::Null, "item 2 of items: m is null"),
+            ],
+            "{sentence}"
+        );
+    }
 }

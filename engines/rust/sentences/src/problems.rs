@@ -40,9 +40,6 @@ fn messages(text: &str, kind: Kind) -> Vec<String> {
     if !invalid.is_empty() {
         return invalid;
     }
-    if kind != Kind::Path && member_after_a_word(&c) {
-        return vec![MEMBER_PLACE.to_string()];
-    }
     let mut lenient = lenient_problems(text, kind);
     if lenient.is_empty() && kind == Kind::From {
         lenient = lenient_problems(text, Kind::For);
@@ -82,29 +79,6 @@ fn messages(text: &str, kind: Kind) -> Vec<String> {
 }
 
 const BARE_AND: &str = "a condition after and starts with whose or that";
-
-const MEMBER_PLACE: &str = "every member of only goes on a from line for now";
-
-fn member_after_a_word(c: &[char]) -> bool {
-    let blanked = blanked(c);
-    let tokens: Vec<&str> = blanked
-        .split(' ')
-        .filter(|token| !token.is_empty())
-        .collect();
-    tokens.windows(2).enumerate().any(|(i, pair)| {
-        if pair != ["member", "of"] || i == 0 {
-            return false;
-        }
-        let mut before = i - 1;
-        if tokens[before] == "distinct" && before > 0 {
-            before -= 1;
-        }
-        ["every", "some"].contains(&tokens[before])
-            || (before > 0
-                && ["count", "sum"].contains(&tokens[before - 1])
-                && tokens[before] == "of")
-    })
-}
 
 fn distinct_misplaced(c: &[char]) -> bool {
     let blanked = blanked(c);
@@ -272,6 +246,13 @@ fn after_distinct(c: &[char], i: usize) -> Option<usize> {
     word_at(c, i, "distinct").and_then(|j| spaces(c, j))
 }
 
+fn after_member_of(c: &[char], i: usize) -> Option<usize> {
+    word_at(c, i, "member")
+        .and_then(|j| spaces(c, j))
+        .and_then(|j| word_at(c, j, "of"))
+        .and_then(|j| spaces(c, j))
+}
+
 fn lone_path(text: &str) -> Option<(Path, bool)> {
     let parser = Parser::new(text, true);
     let c: Vec<char> = text.chars().collect();
@@ -285,6 +266,11 @@ fn lone_path(text: &str) -> Option<(Path, bool)> {
             starts.push((j, false));
         }
     }
+    let members: Vec<(usize, bool)> = starts
+        .iter()
+        .filter_map(|&(i, leading)| after_member_of(&c, i).map(|j| (j, leading)))
+        .collect();
+    starts.extend(members);
     starts.into_iter().find_map(|(i, leading)| {
         parser
             .path(i, Side::Left)

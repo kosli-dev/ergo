@@ -21,15 +21,21 @@ _input_path_name([]) := "$input"
 
 _input_path_name(path) := _visible_path_name(_visible(path), "$input") if path != []
 
-_visible_path_name(path, root) := concat("", ["item ", _literal_text(path[count(path) - 1] + 1), " of ", _rooted_steps_name(array.slice(path, 0, count(path) - 1), root)]) if {
+_visible_path_name(path, root) := n if {
 	is_array(path)
 	count(path) > 1
-	_index_step(path[count(path) - 1])
+	n := _last_step_path_name(path, path[count(path) - 1], root)
 } else := concat("", ["item ", _literal_text(path[0] + 1), " of ", root]) if {
 	is_array(path)
 	count(path) == 1
 	_index_step(path[0])
 } else := _rooted_steps_name(path, root)
+
+_last_step_path_name(path, last, root) := concat("", ["item ", _literal_text(last + 1), " of ", _rooted_steps_name(array.slice(path, 0, count(path) - 1), root)]) if {
+	_index_step(last)
+} else := concat("", ["member ", substring(_plain_step_name(1, last), 1, -1), " of ", _rooted_steps_name(array.slice(path, 0, count(path) - 1), root)]) if {
+	is_string(last.member)
+}
 
 _ref_name(path) := concat("", ["item ", _literal_text(path[count(path) - 1] + 1), " of ", _plain_steps_name(array.slice(path, 0, count(path) - 1))]) if {
 	_builtin(path)
@@ -92,6 +98,8 @@ _nameable_step(p) if _index_step(p)
 _nameable_step(p) if _parent_step_form(p)
 
 _nameable_step(p) if _plain_step_form(p)
+
+_nameable_step(p) if is_string(p.member)
 
 _nameable_step(p) if {
 	_is_literal(p)
@@ -177,6 +185,11 @@ _plain_step_name(i, step) := concat("", [".", _s_key_text(step.literal)]) if {
 
 _plain_step_name(_, step) := concat("", ["[", _literal_text(step), "]"]) if _index_step(step)
 
+_plain_step_name(i, step) := concat("", [".", _s_key_text(step.member)]) if {
+	is_string(step.member)
+	i > 0
+}
+
 _step_dot(i) := "." if i > 0
 
 _string_literal(p) if {
@@ -243,3 +256,20 @@ _plain_number(t) := t if regex.match(`^(?:0|-?[1-9][0-9]*|-?(?:0|[1-9][0-9]*)\.[
 else := t if not _fits_a_float(json.unmarshal(t))
 
 else := _number_text(t)
+
+_walk_kind(name) := "item" if startswith(name, "item ")
+
+else := "item" if _member_parts(name)
+
+else := "list"
+
+_item_parts(name) := [ps[0], concat(" of ", array.slice(ps, 1, count(ps)))] if {
+	startswith(name, "item ")
+	ps := split(name, " of ")
+	count(ps) > 1
+} else := _member_parts(name)
+
+_member_parts(name) := [m[1], m[2]] if {
+	startswith(name, "member ")
+	m := regex.find_all_string_submatch_n(`(?s)^(member (?:[A-Za-z_][A-Za-z0-9_-]*|"(?:[^"\\]|\\.)*")) of (.*)$`, name, 1)[0]
+}

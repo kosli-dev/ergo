@@ -31,3 +31,16 @@ test_every_and_some_read_into_a_walk_with_its_conditions if {
 	c.check.op == "in"
 	c.if_any == true
 }
+
+test_member_of_reads_into_a_walk_a_tally_and_a_for_item_that_say_member if {
+	c := ergo._s_written_check(`every member of statuses whose k is 1 is "DONE"`)
+	c.op == "every"
+	c.path == ["statuses"]
+	c.member == true
+	t := ergo._s_written_check(`count of member of evidence is 1`)
+	t.left == {"count_of": ["evidence"], "whose": [], "text": "count of member of evidence", "member": true}
+	ergo._basic_form(t.left) == "count_of"
+	f := ergo._s_written_check({"for": "every records as r, every member of r.evidence as e", "assert": "e.status is 1"})
+	f.items[1].member == true
+	not f.items[0].member
+}

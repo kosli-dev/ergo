@@ -4021,34 +4021,7 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [
-                  {
-                    "cause": "absent",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/s/xs/0/k",
-                          "/s/xs/1/k"
-                        ],
-                        "name": "xs[0].k",
-                        "outcome": "absent",
-                        "value": 5
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/s/xs/0",
-                      "/s/xs/1"
-                    ],
-                    "message": "lo is missing",
-                    "name": "item 1 of xs",
-                    "value": {
-                      "k": 5,
-                      "lo": 1
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -4063,7 +4036,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/lines/assert/1"
                 ],
-                "message": "",
+                "message": "lo is missing",
                 "name": "every distinct xs.k equals lo"
               }
             ],
@@ -4443,34 +4416,7 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [
-                  {
-                    "cause": "absent",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/s/xs/0/k",
-                          "/s/xs/1/k"
-                        ],
-                        "name": "xs[0].k",
-                        "outcome": "absent",
-                        "value": 5
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/s/xs/0",
-                      "/s/xs/1"
-                    ],
-                    "message": "lo is missing",
-                    "name": "item 1 of xs",
-                    "value": {
-                      "k": 5,
-                      "lo": 1
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -4485,7 +4431,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/lines/assert/1"
                 ],
-                "message": "",
+                "message": "lo is missing",
                 "name": "every distinct xs.k equals lo"
               }
             ],
@@ -4865,34 +4811,7 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [
-                  {
-                    "cause": "absent",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/s/xs/0/k",
-                          "/s/xs/1/k"
-                        ],
-                        "name": "xs[0].k",
-                        "outcome": "absent",
-                        "value": 5
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/s/xs/0",
-                      "/s/xs/1"
-                    ],
-                    "message": "lo is missing",
-                    "name": "item 1 of xs",
-                    "value": {
-                      "k": 5,
-                      "lo": 1
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -4907,7 +4826,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/lines/assert/1"
                 ],
-                "message": "",
+                "message": "lo is missing",
                 "name": "every distinct xs.k equals lo"
               }
             ],
@@ -5290,34 +5209,7 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [
-                  {
-                    "cause": "absent",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/s/xs/0/k",
-                          "/s/xs/1/k"
-                        ],
-                        "name": "xs[0].k",
-                        "outcome": "absent",
-                        "value": 5
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/s/xs/0",
-                      "/s/xs/1"
-                    ],
-                    "message": "lo is missing",
-                    "name": "item 1 of xs",
-                    "value": {
-                      "k": 5,
-                      "lo": 1
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -5332,7 +5224,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/lines/assert/1"
                 ],
-                "message": "",
+                "message": "lo is missing",
                 "name": "every distinct xs.k equals lo"
               }
             ],

@@ -5373,6 +5373,7 @@
         {
           "cause": "value",
           "check": "$min_subjects",
+          "failures": [],
           "inputs": [
             {
               "locations": [],
@@ -6644,6 +6645,7 @@
         {
           "cause": "value",
           "check": "$min_subjects",
+          "failures": [],
           "inputs": [
             {
               "locations": [],

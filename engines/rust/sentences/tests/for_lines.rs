@@ -9,6 +9,7 @@ fn a_walk_item_has_a_quantifier_a_path_and_an_alias() {
         for_line("every items.x as i").items,
         vec![ForItem::Walk {
             distinct: false,
+            member: false,
             quantifier: Quantifier::Every,
             path: with_steps(key("items"), vec![dot("x")]),
             whose: vec![],

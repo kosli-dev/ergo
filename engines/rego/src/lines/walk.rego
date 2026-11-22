@@ -223,10 +223,16 @@ _read_off_item(p) if {
 
 _read_off_item(p) if p[0] == "$$input"
 
-_walk_keys(check, subj) := ks if {
+_walk_keys(check, subj) := _walk_member_keys(check, ks) if {
 	_ := _start_of(subj, check.path)
 	ks := _keys_in(subj, check.path)
 }
+
+_tally_walk(subj, side) := _walk(_walk_start({"path": p}, subj), _walk_keys(_tally_walked(side, p), subj), true) if p := side[_basic_form(side)]
+
+_walk_member_keys(check, ks) := array.concat(ks, [_fm_mark]) if check.member == true
+
+else := ks
 
 _walk_start(check, subj) := {"c": _walk_root(check.path), "v": _walk_start_value(subj, check.path), "i": null, "iv": null, "r": [], "a": _walk_base(check.path)}
 
@@ -244,7 +250,9 @@ else := _pointer(w.trail[0].a, w.trail[0].v, array.slice(e.c, count(w.trail[0].c
 
 _walk_locations(w) := [_walk_at(w, e) | some e in w.items]
 
-_item_at(w, e) := _pointer(w.trail[0].a, w.trail[0].v, array.slice(e.i, count(w.trail[0].c), count(e.i)))
+_item_at(w, e) := _walk_at(w, e) if w.members == true
+
+else := _pointer(w.trail[0].a, w.trail[0].v, array.slice(e.i, count(w.trail[0].c), count(e.i)))
 
 _fail_locations(f) := f.ats if "ats" in object.keys(f)
 
@@ -258,7 +266,9 @@ _walk_root(path) := [path[0]] if _named(path)
 
 _walk_root(path) := [] if not _named(path)
 
-_walk(start, keys, if_any) := {"items": items, "fails": fails, "walked": walked, "trail": trail} if {
+_walk(start, keys, if_any) := _member_walk(start, keys, if_any) if {
+	keys[count(keys) - 1] == _fm_mark
+} else := {"items": items, "fails": fails, "walked": walked, "trail": trail} if {
 	r0 := _walk_level([start], keys, 0, if_any, start)
 	r1 := _walk_level(r0.entries, keys, 1, if_any, start)
 	r2 := _walk_level(r1.entries, keys, 2, if_any, start)
@@ -738,7 +748,7 @@ _key_item_row(check, subj) := {"cause": cause, "inputs": raw.inputs, "failed": _
 	w.items != []
 	w.fails == []
 	_key_items_clean(w, _key_item_conds(check))
-	fails := [{"path": array.concat(e.c, f.prefix), "item": e.i, "cause": f.cause, "value": _key_list_value(f.value), "at": _item_read_at(w, e, array.concat(object.get(e, "r", []), f.prefix)), "iv": e.iv, "iat": _item_at(w, e), "lv": _item_levels(w, e), "msg": "", "ergo/base": f, "read_outcome": _worst_of({f.cause} | {x | some seg in p; x := _ref_step_flaw(seg); x in _value_fault_causes})} |
+	fails := [{"path": array.concat(e.c, f.prefix), "item": e.i, "cause": f.cause, "value": _key_list_value(f.value), "at": _item_read_at(w, e, array.concat(object.get(e, "r", []), f.prefix)), "iv": e.iv, "iat": _item_at(w, e), "lv": _item_levels(w, e), "msg": "", "ergo/base": f, "read_outcome": _key_flaw_outcome(f, p)} |
 		some e in w.items
 		some c in _key_item_conds(check)
 		some [p, mode] in _key_base_reads(c)
@@ -749,6 +759,8 @@ _key_item_row(check, subj) := {"cause": cause, "inputs": raw.inputs, "failed": _
 	raw := _walk_read_row(check, subj)
 	cause := _worst_of(flaws | {f.cause | some f in fails})
 }
+
+_key_flaw_outcome(f, p) := _worst_of({f.cause} | {x | some seg in p; x := _ref_step_flaw(seg); x in _value_fault_causes})
 
 _key_list_fail_row(check, subj) := raw if {
 	check.op in _walk_ops

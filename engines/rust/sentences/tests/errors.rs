@@ -386,50 +386,6 @@ fn a_condition_after_a_count_with_a_phrase_it_cannot_take_is_reported() {
 }
 
 #[test]
-fn every_member_of_anywhere_but_the_start_of_a_from_line_says_it_only_goes_there() {
-    let said = vec!["every member of only goes on a from line for now"];
-    let messages = |errors: Vec<SyntaxError>| -> Vec<String> {
-        errors.into_iter().map(|e| e.message).collect()
-    };
-    assert_eq!(
-        messages(parse_check("every member of xs is 1").unwrap_err()),
-        said
-    );
-    assert_eq!(
-        messages(parse_check("some member of xs.y exists").unwrap_err()),
-        said
-    );
-    assert_eq!(
-        messages(parse_check("count of member of xs is 1").unwrap_err()),
-        said
-    );
-    assert_eq!(
-        messages(parse_check("sum of member of xs is 1").unwrap_err()),
-        said
-    );
-    assert_eq!(
-        messages(parse_check("every distinct member of xs is 1").unwrap_err()),
-        said
-    );
-    assert_eq!(
-        messages(parse_check("x is count of member of xs").unwrap_err()),
-        said
-    );
-    assert_eq!(
-        messages(parse_for("every member of xs as m").unwrap_err()),
-        said
-    );
-    assert_eq!(
-        messages(parse_from("xs whose every member of t is 1").unwrap_err()),
-        said
-    );
-    assert_eq!(
-        messages(parse_from("every member of xs whose some member of t is 1").unwrap_err()),
-        said
-    );
-}
-
-#[test]
 fn errors_say_nothing_about_a_line_that_parses() {
     assert!(parse_from("x whose y is \"a\"").is_ok());
     assert!(parse_from("x whose y is 'a'").is_ok());
@@ -510,6 +466,25 @@ fn a_line_that_is_only_a_path_written_well_says_nothing_follows_it() {
 #[test]
 fn a_lone_path_after_every_or_some_says_nothing_follows_it_whatever_it_holds() {
     for (line, column) in [("every it", 9), ("every last", 11), ("some   it", 10)] {
+        assert_eq!(
+            check_failure(line),
+            [format!(
+                "nothing after the path at column {column}: expected a phrase, like \"is\" or \"exists\""
+            )],
+            "{line}"
+        );
+    }
+}
+
+#[test]
+fn a_lone_path_after_member_of_says_nothing_follows_it() {
+    for (line, column) in [
+        ("every member of xs", 19),
+        ("some  member of xs.y", 21),
+        ("member of xs", 13),
+        ("every distinct member of xs", 28),
+        ("distinct member of xs", 22),
+    ] {
         assert_eq!(
             check_failure(line),
             [format!(
