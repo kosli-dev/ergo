@@ -98,8 +98,6 @@ _m_cond_root_said(subj, c) := _once([[st, m] |
 
 else := _m_root_said_all(subj, c)
 
-_m_root_texts_all(subj, c) := _once([x[1] | some x in _m_root_said_all(subj, c)])
-
 _m_root_said_all(subj, c) := [[st, m] |
 	states := _named_root_states(subj, c)
 	ys := _walked_tallies(c)
