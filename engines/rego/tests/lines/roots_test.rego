@@ -37,6 +37,34 @@ test_a_part_root_after_any_list_phrase_stands_in_for_a_value_so_each_item_is_sti
 	}
 }
 
+test_a_root_stand_in_after_a_phrase_that_needs_a_list_still_fails_an_item_that_isnt_one if {
+	part := [`${"alias":"pl","n":1,"of":null,"old":true}`, "p", "name"]
+	ref := {"ref": ["$$params[]", "cs", "name"]}
+	conds := array.concat(
+		[{"op": op, "path": ["tags"], "values": ref} | some op in ["includes", "excludes", "includes_some", "not_includes_all"]],
+		[{"op": "compare", "cmp": cmp, "left": ["tags"], "right": part} | some cmp in ["includes_all", "excludes_all", "includes_some", "not_includes_all"]],
+	)
+	every c in conds {
+		[ergo._row_cause(ergo._root_stand_in(c), item, "") | some item in [{"tags": "a"}, {"tags": 3}, {"tags": {}}, {}, {"tags": null}]] == ["unusable", "unusable", "unusable", "absent", "null"]
+		every tags in [[], ["a"], [1, "a"], [null]] {
+			ergo._row_cause(ergo._root_stand_in(c), {"tags": tags}, "") in {"satisfied", "value"}
+		}
+	}
+}
+
+test_a_root_stand_in_after_a_pattern_phrase_still_fails_an_item_that_isnt_text if {
+	part := [`${"alias":"pl","n":1,"of":null,"old":true}`, "p", "name"]
+	ref := {"ref": ["$$params[]", "cs", "name"]}
+	conds := array.concat(
+		[{"op": op, "path": ["v"], "patterns": ref} | some op in ["matches_any", "not_matches_any"]],
+		[{"op": "compare", "cmp": cmp, "left": ["v"], "right": part} | some cmp in ["matches_any", "not_matches_any"]],
+	)
+	every c in conds {
+		[ergo._row_cause(ergo._root_stand_in(c), item, "") | some item in [{"v": 3}, {"v": [1]}, {"v": {}}, {}, {"v": null}]] == ["unusable", "unusable", "unusable", "absent", "null"]
+		ergo._row_cause(ergo._root_stand_in(c), {"v": "s"}, "") in {"satisfied", "value"}
+	}
+}
+
 test_a_root_on_the_left_of_a_list_phrase_has_no_stand_in_so_the_item_is_still_read_as_a_list if {
 	part := [`${"alias":"pl","n":1,"of":null,"old":true}`, "p", "name"]
 	every cmp in ["not_in", "matches_any", "not_matches_any", "includes_all", "excludes_all", "includes_some", "not_includes_all"] {
