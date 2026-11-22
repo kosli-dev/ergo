@@ -220,3 +220,15 @@ test_the_object_a_count_of_member_of_reads_is_its_own_read_as_a_walked_list_is i
 	ergo._tally_own_read({"name": "costs[]"}, items, set(), [{"kind": "item"}])
 	ergo._tally_own_read({"name": "costs"}, items, set(), [{"kind": "item"}])
 }
+
+test_a_for_sentence_reads_the_list_a_part_holds_on_the_right_of_its_whose if {
+	part := [`${"alias":"pl","n":1,"of":null,"old":true}`, "c", "z"]
+	whose := [{"op": "compare", "cmp": "in", "left": ["v"], "right": part}]
+	counted := {"op": "compare", "cmp": "eq", "left": {"count_of": ["$m", "ys"], "text": "count of m.ys whose v is in pl.z", "whose": whose}, "right": {"literal": 0}}
+	walked := {"op": "every", "path": ["$m", "ys"], "check": {"op": "present", "path": ["x"]}, "if_any": false, "whose": whose}
+	every c in [counted, walked] {
+		ergo._for_sentence_read("pl[].z", c)
+		not ergo._for_sentence_read("xs[]", c)
+		not ergo._for_sentence_read("pl[].y", c)
+	}
+}
