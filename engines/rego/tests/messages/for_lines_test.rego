@@ -251,6 +251,12 @@ test_a_whose_item_says_the_first_condition_that_says_something if {
 	_whose_item_texts("every xs whose v is at least $params.min and whose w is at least $params.min as x", {"xs": [{"v": 1}]}, {"min": "s"}) == [["item 1 of xs: w is missing"]]
 }
 
+test_a_whose_item_beside_a_list_it_cant_read_from_a_part_is_checked_against_an_empty_list if {
+	c := {"cmp": "in", "left": ["k"], "op": "compare", "right": ["${\"alias\":\"pl\",\"n\":1,\"of\":null,\"old\":true}", "c", "z"]}
+	ergo._for_own_check(c, {"c": {"z": "s"}, "xs": [{"k": "a"}]}) == {"cmp": "in", "left": ["k"], "op": "compare", "right": {"literal": []}}
+	ergo._for_own_check(object.union(c, {"cmp": "not_in"}), {"c": {"z": "s"}, "xs": [{"k": "a"}]}) == {"cmp": "not_in", "left": ["k"], "op": "compare", "right": {"literal": []}}
+}
+
 test_a_whose_item_beside_a_root_says_a_value_of_the_wrong_kind_and_a_null if {
 	_whose_item_texts("every xs whose v is at least $params.min as x", {"xs": [{"v": "a"}, {"v": null}]}, {"min": "s"}) == [[`item 1 of xs: v is "a", which isn't a number`], ["item 2 of xs: v is null"]]
 }
