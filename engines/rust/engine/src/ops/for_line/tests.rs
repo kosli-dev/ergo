@@ -1830,16 +1830,8 @@ fn params_that_are_not_an_object_still_fail_a_check_without_a_tie_as_unusable() 
 fn a_part_that_holds_a_list_is_walked_by_a_count_of_whose_under_a_for_line() {
     let xs = json!([{"v": 1, "ys": [{"v": 1}]}]);
     for (part, assertion, cause) in [
-        (
-            json!([]),
-            "count of xs whose v is in pl.z is 0",
-            "satisfied",
-        ),
-        (
-            json!([]),
-            "count of m.ys whose v is in pl.z is 0",
-            "satisfied",
-        ),
+        (json!([]), "count of xs whose v is in pl.z is 0", "value"),
+        (json!([]), "count of m.ys whose v is in pl.z is 0", "value"),
         (
             json!([{"z": 1}]),
             "count of xs whose v is in pl.z is 0",
@@ -4697,4 +4689,50 @@ fn an_alias_key_read_whole_counts_before_its_item_when_a_row_says_and_n_more() {
                 .to_string()
         )
     );
+}
+
+#[test]
+fn a_count_under_a_for_line_says_an_empty_list_once_and_each_item_under_its_item() {
+    for (xs, said) in [
+        (
+            json!([{"ys": [{}]}]),
+            "$params.cs is []; item 1 of xs: item 1 of m.ys: v is missing",
+        ),
+        (
+            json!([{}]),
+            "$params.cs is []; item 1 of xs: m.ys is missing",
+        ),
+        (json!([null]), "$params.cs is []; item 1 of xs: m is null"),
+    ] {
+        let found = row_with(
+            "every xs as m",
+            json!("count of m.ys whose v is in $params.cs.name is 0"),
+            json!({"xs": xs}),
+            json!({"cs": []}),
+        );
+        assert_eq!(found["message"], said, "{xs}");
+    }
+}
+
+#[test]
+fn a_for_lines_whose_says_an_empty_list_on_a_list_entry_as_a_null_list() {
+    for (cs, root) in [(json!(null), "null"), (json!([]), "[]")] {
+        let found = row_with(
+            "every xs whose v is in $params.cs.name as m",
+            json!("m.v exists"),
+            json!({"xs": []}),
+            json!({"cs": cs}),
+        );
+        assert_eq!(
+            entries(&found["failures"]),
+            [
+                format!(
+                    "list xs {}: $params.cs is {root}",
+                    found["cause"].as_str().unwrap()
+                ),
+                "list xs value: xs is []".to_string(),
+            ],
+            "{cs}"
+        );
+    }
 }

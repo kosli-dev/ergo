@@ -918,7 +918,31 @@ pub fn pieces(check: &Check, ctx: &Ctx, verdict: &Verdict) -> Vec<Piece> {
                     .filter(|(cause, _)| *cause == Cause::Value)
                     .map(|(_, text)| text),
             );
-            said_all(said).collect()
+            let mut counted: Vec<Piece> = Vec::new();
+            let mut emptied = false;
+            if let Check::Tally(tally_check) = check {
+                for side in tally::tally_sides(tally_check) {
+                    if let TallySide::Derived(derived) = side {
+                        for clauses in tally::derived_clauses(derived, ctx) {
+                            let kept: Vec<Clause> = clauses
+                                .into_iter()
+                                .filter(|clause| clause.cause == Cause::Value)
+                                .collect();
+                            emptied |= kept.iter().any(|c| c.kind == clause::Kind::Root);
+                            if !kept.is_empty() {
+                                counted.push(Piece::Counted(kept));
+                            }
+                        }
+                    }
+                }
+            }
+            let mut found: Vec<Piece> = if emptied {
+                Vec::new()
+            } else {
+                said_all(said).collect()
+            };
+            found.extend(counted);
+            found
         }
         Cause::Absent | Cause::Null => {
             let want = state_of(verdict.cause).unwrap_or(Outcome::Absent);
@@ -1857,9 +1881,7 @@ pub fn walked_roots_ahead(
 pub fn walks_a_root(checks: &[&Check], ctx: &Ctx) -> bool {
     checks.iter().any(|check| {
         lists::right_paths(check).into_iter().any(|path| {
-            reads_from_a_root(path)
-                && lists::walked_root_fault(check, path, ctx)
-                    .is_some_and(|(cause, _)| cause != Cause::Value)
+            reads_from_a_root(path) && lists::walked_root_fault(check, path, ctx).is_some()
         })
     })
 }
@@ -1874,8 +1896,7 @@ pub fn ordered_roots(checks: &[&Check], ctx: &Ctx, refs_first: &[&Check]) -> Vec
             .unwrap_or_default();
         for path in lists::right_paths(check) {
             if reads_from_a_root(path)
-                && let Some((cause, text)) = lists::walked_root_fault(check, path, ctx)
-                && cause != Cause::Value
+                && let Some((_, text)) = lists::walked_root_fault(check, path, ctx)
             {
                 texts.push(text);
             }
@@ -1988,7 +2009,6 @@ fn root_reads_with(
                     if super::walked_roots_on()
                         && !is_key
                         && let Some((cause, text)) = lists::walked_root_fault(check, &root, ctx)
-                        && cause != Cause::Value
                     {
                         let said = one(&root, cause, &text);
                         found.push((at, cause, text, false, said));
@@ -2091,9 +2111,11 @@ fn root_reads_with(
 }
 
 pub fn walked_root_clauses(checks: &[&Check], ctx: &Ctx) -> Vec<Clause> {
-    walked_root_clauses_with(checks, ctx, false)
+    walked_root_clauses_with(checks, ctx, true)
 }
 
+/// The roots `walked_root_clauses` gives, with a list that is empty only
+/// when `empty` is true.
 pub fn walked_root_clauses_with(checks: &[&Check], ctx: &Ctx, empty: bool) -> Vec<Clause> {
     checks
         .iter()

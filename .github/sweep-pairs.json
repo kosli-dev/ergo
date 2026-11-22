@@ -11822,5 +11822,882 @@
    ]
   },
   "want": "$params.k is 3, which isn't text; xs is []"
+ },
+ {
+  "name": "empty right list/count is in",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id",
+     "has": {
+      "pl": "p"
+     }
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of xs whose v is in $input.cs.name is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "cs": [],
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": "a",
+       "tags": [
+        "a"
+       ],
+       "n": 1
+      }
+     ],
+     "ws": [
+      {}
+     ],
+     "m": {
+      "k": {
+       "v": "a",
+       "tags": [
+        "a"
+       ],
+       "n": 1
+      }
+     },
+     "p": []
+    }
+   ]
+  },
+  "params": {
+   "cs": []
+  },
+  "want": "$input.cs is []"
+ },
+ {
+  "name": "empty right list/count is not one of",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id",
+     "has": {
+      "pl": "p"
+     }
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of xs whose v is not one of $params.cs.name is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "cs": [],
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": "a",
+       "tags": [
+        "a"
+       ],
+       "n": 1
+      }
+     ],
+     "ws": [
+      {}
+     ],
+     "m": {
+      "k": {
+       "v": "a",
+       "tags": [
+        "a"
+       ],
+       "n": 1
+      }
+     },
+     "p": []
+    }
+   ]
+  },
+  "params": {
+   "cs": []
+  },
+  "want": "$params.cs is []"
+ },
+ {
+  "name": "empty right list/count of a part",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id",
+     "has": {
+      "pl": "p"
+     }
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of xs whose v is in pl.name is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "cs": [],
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": "a",
+       "tags": [
+        "a"
+       ],
+       "n": 1
+      }
+     ],
+     "ws": [
+      {}
+     ],
+     "m": {
+      "k": {
+       "v": "a",
+       "tags": [
+        "a"
+       ],
+       "n": 1
+      }
+     },
+     "p": []
+    }
+   ]
+  },
+  "params": {
+   "cs": []
+  },
+  "want": "pl is []"
+ },
+ {
+  "name": "empty right list/count that",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id",
+     "has": {
+      "pl": "p"
+     }
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of xs.v that is in $input.cs.name is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "cs": [],
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": "a",
+       "tags": [
+        "a"
+       ],
+       "n": 1
+      }
+     ],
+     "ws": [
+      {}
+     ],
+     "m": {
+      "k": {
+       "v": "a",
+       "tags": [
+        "a"
+       ],
+       "n": 1
+      }
+     },
+     "p": []
+    }
+   ]
+  },
+  "params": {
+   "cs": []
+  },
+  "want": "$input.cs is []"
+ },
+ {
+  "name": "empty right list/sum that",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id",
+     "has": {
+      "pl": "p"
+     }
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "sum of xs.n that is in $input.cs.name is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "cs": [],
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": "a",
+       "tags": [
+        "a"
+       ],
+       "n": 1
+      }
+     ],
+     "ws": [
+      {}
+     ],
+     "m": {
+      "k": {
+       "v": "a",
+       "tags": [
+        "a"
+       ],
+       "n": 1
+      }
+     },
+     "p": []
+    }
+   ]
+  },
+  "params": {
+   "cs": []
+  },
+  "want": "$input.cs is []"
+ },
+ {
+  "name": "empty right list/count matches",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id",
+     "has": {
+      "pl": "p"
+     }
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of xs whose v matches $input.cs.name is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "cs": [],
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": "a",
+       "tags": [
+        "a"
+       ],
+       "n": 1
+      }
+     ],
+     "ws": [
+      {}
+     ],
+     "m": {
+      "k": {
+       "v": "a",
+       "tags": [
+        "a"
+       ],
+       "n": 1
+      }
+     },
+     "p": []
+    }
+   ]
+  },
+  "params": {
+   "cs": []
+  },
+  "want": "$input.cs is []"
+ },
+ {
+  "name": "empty right list/count contains all of",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id",
+     "has": {
+      "pl": "p"
+     }
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of xs whose tags contains all of $input.cs.name is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "cs": [],
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": "a",
+       "tags": [
+        "a"
+       ],
+       "n": 1
+      }
+     ],
+     "ws": [
+      {}
+     ],
+     "m": {
+      "k": {
+       "v": "a",
+       "tags": [
+        "a"
+       ],
+       "n": 1
+      }
+     },
+     "p": []
+    }
+   ]
+  },
+  "params": {
+   "cs": []
+  },
+  "want": "$input.cs is []"
+ },
+ {
+  "name": "empty right list/count of member of",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id",
+     "has": {
+      "pl": "p"
+     }
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of member of m whose v is in $input.cs.name is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "cs": [],
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": "a",
+       "tags": [
+        "a"
+       ],
+       "n": 1
+      }
+     ],
+     "ws": [
+      {}
+     ],
+     "m": {
+      "k": {
+       "v": "a",
+       "tags": [
+        "a"
+       ],
+       "n": 1
+      }
+     },
+     "p": []
+    }
+   ]
+  },
+  "params": {
+   "cs": []
+  },
+  "want": "$input.cs is []"
+ },
+ {
+  "name": "empty right list/count, item without the field",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id",
+     "has": {
+      "pl": "p"
+     }
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of xs whose v is in $input.cs.name is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "cs": [],
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {}
+     ],
+     "ws": [
+      {}
+     ],
+     "m": {
+      "k": {}
+     },
+     "p": []
+    }
+   ]
+  },
+  "params": {
+   "cs": []
+  },
+  "want": "$input.cs is []; item 1 of xs: v is missing"
+ },
+ {
+  "name": "empty right list/every",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id",
+     "has": {
+      "pl": "p"
+     }
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every xs whose v is in $input.cs.name exists"
+     }
+    }
+   }
+  },
+  "input": {
+   "cs": [],
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": "a",
+       "tags": [
+        "a"
+       ],
+       "n": 1
+      }
+     ],
+     "ws": [
+      {}
+     ],
+     "m": {
+      "k": {
+       "v": "a",
+       "tags": [
+        "a"
+       ],
+       "n": 1
+      }
+     },
+     "p": []
+    }
+   ]
+  },
+  "params": {
+   "cs": []
+  },
+  "want": "$input.cs is []"
+ },
+ {
+  "name": "empty right list/every if any",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id",
+     "has": {
+      "pl": "p"
+     }
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every xs whose v is not one of $input.cs.name, if any, exists"
+     }
+    }
+   }
+  },
+  "input": {
+   "cs": [],
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": "a",
+       "tags": [
+        "a"
+       ],
+       "n": 1
+      }
+     ],
+     "ws": [
+      {}
+     ],
+     "m": {
+      "k": {
+       "v": "a",
+       "tags": [
+        "a"
+       ],
+       "n": 1
+      }
+     },
+     "p": []
+    }
+   ]
+  },
+  "params": {
+   "cs": []
+  },
+  "want": "$input.cs is []"
+ },
+ {
+  "name": "empty right list/some",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id",
+     "has": {
+      "pl": "p"
+     }
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "some xs whose v is in $input.cs.name exists"
+     }
+    }
+   }
+  },
+  "input": {
+   "cs": [],
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": "a",
+       "tags": [
+        "a"
+       ],
+       "n": 1
+      }
+     ],
+     "ws": [
+      {}
+     ],
+     "m": {
+      "k": {
+       "v": "a",
+       "tags": [
+        "a"
+       ],
+       "n": 1
+      }
+     },
+     "p": []
+    }
+   ]
+  },
+  "params": {
+   "cs": []
+  },
+  "want": "$input.cs is []"
+ },
+ {
+  "name": "empty right list/every on an empty list",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id",
+     "has": {
+      "pl": "p"
+     }
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every xs whose v is in $input.cs.name exists"
+     }
+    }
+   }
+  },
+  "input": {
+   "cs": [],
+   "things": [
+    {
+     "id": "t",
+     "xs": [],
+     "ws": [
+      {}
+     ],
+     "m": {},
+     "p": []
+    }
+   ]
+  },
+  "params": {
+   "cs": []
+  },
+  "want": "$input.cs is []; xs is []"
+ },
+ {
+  "name": "empty right list/for line count",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id",
+     "has": {
+      "pl": "p"
+     }
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every ws as w",
+       "assert": "count of xs whose v is in $input.cs.name is 0"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "cs": [],
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": "a",
+       "tags": [
+        "a"
+       ],
+       "n": 1
+      }
+     ],
+     "ws": [
+      {}
+     ],
+     "m": {
+      "k": {
+       "v": "a",
+       "tags": [
+        "a"
+       ],
+       "n": 1
+      }
+     },
+     "p": []
+    }
+   ]
+  },
+  "params": {
+   "cs": []
+  },
+  "want": "$input.cs is []"
+ },
+ {
+  "name": "empty right list/for line whose",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id",
+     "has": {
+      "pl": "p"
+     }
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs whose v is in pl.name, if any, as x",
+       "assert": "x.v exists"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "cs": [],
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": "a",
+       "tags": [
+        "a"
+       ],
+       "n": 1
+      }
+     ],
+     "ws": [
+      {}
+     ],
+     "m": {
+      "k": {
+       "v": "a",
+       "tags": [
+        "a"
+       ],
+       "n": 1
+      }
+     },
+     "p": []
+    }
+   ]
+  },
+  "params": {
+   "cs": []
+  },
+  "want": "pl is []"
+ },
+ {
+  "name": "empty right list/for line count of an alias's list",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id",
+     "has": {
+      "pl": "p"
+     }
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs as m",
+       "assert": "count of m.ys whose v is in pl.name is 0"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "cs": [],
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "ys": [
+        {
+         "v": "a"
+        }
+       ]
+      }
+     ],
+     "ws": [
+      {}
+     ],
+     "m": {
+      "k": {
+       "ys": [
+        {
+         "v": "a"
+        }
+       ]
+      }
+     },
+     "p": []
+    }
+   ]
+  },
+  "params": {
+   "cs": []
+  },
+  "want": "pl is []"
  }
 ]

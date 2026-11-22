@@ -376,6 +376,9 @@ _m_tally_side(side) if _basic_form(side) in _tally_forms
 _m_message_pieces(check, subj, "value") := clauses if {
 	clauses := _once([c | some side in _m_sides(check); some c in _m_value_clauses(subj, side)])
 	count(clauses) > 0
+} else := tallies if {
+	tallies := _m_tally_lists(subj, check, "value")
+	count(tallies) > 0
 } else := [_m_fallback(check)]
 
 _m_message_pieces(check, subj, cause) := ps if {

@@ -670,6 +670,11 @@ impl For {
         let mut live = Vec::new();
         let mut kept = 0;
         let mut at = outer.clone();
+        let emptied: Vec<bool> = item
+            .whose
+            .iter()
+            .map(|check| walk::empty_root(check, &outer))
+            .collect();
         for w in &walked.items {
             at.subject = w.item.clone();
             at.label = None;
@@ -681,12 +686,20 @@ impl For {
                 .collect();
             let causes: Vec<Cause> = verdicts.iter().map(|v| v.cause).collect();
             let name = walked.name_of(&w.item_segs, w.unaliased);
-            let undecided = Cause::worst(causes.iter().copied().filter(|c| c.is_failure()));
+            let undecided = Cause::worst(
+                causes
+                    .iter()
+                    .zip(&emptied)
+                    .filter(|(cause, empty)| cause.is_failure() || **empty)
+                    .map(|(cause, _)| *cause),
+            );
             let undecided_whose = || {
                 item.whose
                     .iter()
                     .zip(&verdicts)
-                    .filter(|(_, verdict)| verdict.cause.is_failure())
+                    .zip(&emptied)
+                    .filter(|((_, verdict), empty)| verdict.cause.is_failure() || **empty)
+                    .map(|(pair, _)| pair)
             };
             let told =
                 undecided_whose().find_map(|(check, _)| walk::item_own(check, w, &walked, &outer));
@@ -1905,6 +1918,7 @@ impl For {
                 &outer,
                 &[],
             ));
+            found.extend(empty_roots(&[check], &outer));
             for text in found {
                 for piece in text.split("; ") {
                     push_new(&mut texts, piece.to_string());
@@ -4034,6 +4048,16 @@ fn bound_alias(root: &Path, ctx: &Ctx) -> bool {
     }
 }
 
+fn empty_roots(checks: &[&Check], ctx: &Ctx) -> Vec<String> {
+    let mut texts: Vec<String> = Vec::new();
+    for clause in super::message::walked_root_clauses(checks, ctx) {
+        if clause.cause == Cause::Value {
+            push_new(&mut texts, clause.text);
+        }
+    }
+    texts
+}
+
 fn sentence_roots_said(check: &Check, ctx: &Ctx) -> Vec<Clause> {
     sentence_roots_listed(check, ctx)
         .into_iter()
@@ -4046,9 +4070,17 @@ fn sentence_roots_listed(check: &Check, ctx: &Ctx) -> Vec<Clause> {
     let mut said = sentence_root_clauses(&root_forms(check), ctx);
     said.extend(super::message::listed_root_clauses(&nested, ctx, false));
     said.extend(super::message::walked_root_clauses(&nested, ctx));
-    said.extend(super::message::walked_root_clauses(&[check], ctx));
+    said.extend(super::message::walked_root_clauses_with(
+        &[check],
+        ctx,
+        false,
+    ));
     if let Check::Walk(walk) = check {
-        said.extend(super::message::walked_root_clauses(&[&*walk.check], ctx));
+        said.extend(super::message::walked_root_clauses_with(
+            &[&*walk.check],
+            ctx,
+            false,
+        ));
     }
     said
 }

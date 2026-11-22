@@ -2983,6 +2983,87 @@ fn a_count_or_a_sum_still_says_a_missing_step_as_missing_beside_one_that_is_null
     }
 }
 
+#[test]
+fn an_empty_list_on_the_right_of_a_whose_or_a_that_fails_the_count_as_value() {
+    for sentence in [
+        "count of xs whose v is in $input.cs.name is 0",
+        "count of xs whose v is not one of $input.cs.name is 0",
+        "count of xs whose v matches $input.cs.name is 0",
+        "count of xs.v that is in $input.cs.name is 0",
+        "sum of xs.n that is in $input.cs.name is 0",
+    ] {
+        for xs in [json!([]), json!([{"v": "a", "n": 1}])] {
+            let input = json!({"cs": [], "things": [{"xs": xs}]});
+            assert_eq!(
+                verdict_on_input(sentence, input).cause,
+                Cause::Value,
+                "{sentence} on {xs}"
+            );
+        }
+    }
+}
+
+#[test]
+fn an_empty_list_on_the_right_of_a_whose_still_lets_each_item_say_its_own_problem() {
+    for sentence in [
+        "count of xs whose v is in $input.cs.name is 0",
+        "count of xs whose v is not one of $input.cs.name is 0",
+        "count of xs.v that is in $input.cs.name is 0",
+    ] {
+        let input = json!({"cs": [], "things": [{"xs": [{}]}]});
+        assert_eq!(
+            verdict_on_input(sentence, input.clone()).cause,
+            Cause::Absent,
+            "{sentence}"
+        );
+        assert_eq!(
+            kinds_causes_and_texts(&tally_clauses_in(sentence, input, json!({}))),
+            [
+                (
+                    clause::Kind::Root,
+                    Cause::Value,
+                    "$input.cs is []".to_string()
+                ),
+                item_said(Cause::Absent, "item 1 of xs: v is missing"),
+            ],
+            "{sentence}"
+        );
+    }
+}
+
+#[test]
+fn an_empty_list_on_the_right_of_a_whose_is_said_once_whatever_the_items() {
+    for xs in [json!([]), json!([{"v": "a"}, {"v": "b"}])] {
+        assert_eq!(
+            kinds_causes_and_texts(&tally_clauses_in(
+                "count of xs whose v is in $input.cs.name is 0",
+                json!({"cs": [], "things": [{"xs": xs}]}),
+                json!({})
+            )),
+            [(
+                clause::Kind::Root,
+                Cause::Value,
+                "$input.cs is []".to_string()
+            )],
+            "{xs}"
+        );
+    }
+}
+
+#[test]
+fn a_plus_beside_an_empty_list_on_the_right_of_a_whose_says_only_the_list() {
+    for k in [json!(0), json!(5)] {
+        assert_eq!(
+            row_says(
+                "k plus count of xs whose v is in $input.cs.name is 0",
+                json!({"cs": [], "things": [{"id": 1, "k": k, "xs": [{"v": "a"}]}]})
+            ),
+            ("value".to_string(), "$input.cs is []".to_string()),
+            "{k}"
+        );
+    }
+}
+
 fn read_of(state: crate::path::Outcome, locations: &[&str]) -> Input {
     Input {
         name: "m".to_string(),

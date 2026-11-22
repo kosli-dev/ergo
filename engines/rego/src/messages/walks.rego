@@ -639,7 +639,7 @@ _m_tally_keyed(side) if {
 
 _m_tally_walked(c, w) := _m_cond_walked_said(c) if array.concat(w.fails, _walk_stop(w)) == []
 
-else := []
+else := [x | some x in _m_cond_walked_said(c); x[0] == "value"]
 
 _m_positions(path) := [_m_position(x) | some x in path; _item_step(x)]
 
