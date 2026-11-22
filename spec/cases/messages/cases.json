@@ -34253,7 +34253,7 @@
             "check": "one",
             "failures": [
               {
-                "cause": "absent",
+                "cause": "unusable",
                 "failures": [
                   {
                     "cause": "null",
@@ -34361,7 +34361,7 @@
             "check": "two",
             "failures": [
               {
-                "cause": "absent",
+                "cause": "unusable",
                 "failures": [
                   {
                     "cause": "null",

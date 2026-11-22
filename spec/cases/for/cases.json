@@ -108753,7 +108753,7 @@
             "check": "every",
             "failures": [
               {
-                "cause": "absent",
+                "cause": "unusable",
                 "failures": [
                   {
                     "cause": "absent",
@@ -108882,7 +108882,16 @@
                     }
                   }
                 ],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/min"
+                    ],
+                    "name": "$params.min",
+                    "outcome": "unusable",
+                    "value": "s"
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/every/assert"
@@ -108924,7 +108933,7 @@
             "check": "some",
             "failures": [
               {
-                "cause": "absent",
+                "cause": "unusable",
                 "failures": [
                   {
                     "cause": "absent",
@@ -109053,7 +109062,16 @@
                     }
                   }
                 ],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/min"
+                    ],
+                    "name": "$params.min",
+                    "outcome": "unusable",
+                    "value": "s"
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/some/assert"
