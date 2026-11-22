@@ -348,3 +348,9 @@ test_a_null_params_before_a_key_from_the_item_is_named_as_the_part_before_the_ke
 	ergo._m_null_before_key({"v": 1}, c) == ["$params is null"] with data.ergo_params as null
 	ergo._m_null_before_key({"v": 1, "key": "a"}, c) == [] with data.ergo_params as null
 }
+
+test_a_null_alias_before_a_key_from_the_item_is_named_as_the_part_before_the_key if {
+	c := {"op": "compare", "cmp": "eq", "left": ["v"], "right": ["$w", {"named_by_field": "key"}]}
+	ergo._m_null_before_key({"v": 1}, c) == ["$w is null"] with input as {"ergo/names": {"w": null}}
+	ergo._m_null_before_key({"v": 1, "key": "a"}, c) == [] with input as {"ergo/names": {"w": null}}
+}
