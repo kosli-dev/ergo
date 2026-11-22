@@ -9827,6 +9827,201 @@
   "want": "item 1 of ws: w.ms is [1], which isn't an object"
  },
  {
+  "name": "keyed root every/$input.m=null",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every xs whose v is $input.m named by key exists"
+     }
+    }
+   }
+  },
+  "input": {
+   "m": null,
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "key": "a",
+       "v": 1,
+       "tags": [
+        "x"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "note": "problems.where_said and tally.whose: a root read from outside the item is said once, with no item in front; walk.every: an item a whose can't decide fails the every, with if any too.",
+  "want": "$input.m is null"
+ },
+ {
+  "name": "keyed root every/$input.m=none/if any",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every xs whose v is $input.m named by key, if any, exists"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "key": "a",
+       "v": 1,
+       "tags": [
+        "x"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "note": "problems.where_said and tally.whose: a root read from outside the item is said once, with no item in front; walk.every: an item a whose can't decide fails the every, with if any too.",
+  "want": "$input.m is missing"
+ },
+ {
+  "name": "keyed root every/$input.m=3/contains",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every xs whose tags contains $input.m named by key exists"
+     }
+    }
+   }
+  },
+  "input": {
+   "m": 3,
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "key": "a",
+       "v": 1,
+       "tags": [
+        "x"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "note": "problems.where_said and tally.whose: a root read from outside the item is said once, with no item in front; walk.every: an item a whose can't decide fails the every, with if any too.",
+  "want": "$input.m is 3, which isn't an object"
+ },
+ {
+  "name": "keyed root every/$params.m=[]/is not",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every xs whose v is not $params.m named by key exists"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "key": "a",
+       "v": 1,
+       "tags": [
+        "x"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "m": []
+  },
+  "note": "problems.where_said and tally.whose: a root read from outside the item is said once, with no item in front; walk.every: an item a whose can't decide fails the every, with if any too.",
+  "want": "$params.m is [], which isn't an object"
+ },
+ {
+  "name": "keyed root every/$input.d=null",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every xs whose v is $input.d.m named by key, if any, exists"
+     }
+    }
+   }
+  },
+  "input": {
+   "d": null,
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "key": "a",
+       "v": 1,
+       "tags": [
+        "x"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "note": "problems.where_said and tally.whose: a root read from outside the item is said once, with no item in front; walk.every: an item a whose can't decide fails the every, with if any too.",
+  "want": "$input.d is null"
+ },
+ {
   "name": "empty right list/count is in",
   "policy": {
    "subjects": {

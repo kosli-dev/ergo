@@ -1613,7 +1613,9 @@ fn cause_of(walk: &Walk, walked: &Walked, judged: &[Judged], fails: &[&Failure])
     let worst = || Cause::worst(fails.iter().map(|f| f.cause)).unwrap_or(Cause::Value);
     match walk.quantifier {
         Quantifier::Every if fails.is_empty() => {
-            if walk.if_any || judged.iter().any(|j| j.kept) {
+            if judged.iter().any(|j| !j.decided) {
+                Cause::Value
+            } else if walk.if_any || judged.iter().any(|j| j.kept) {
                 Cause::Satisfied
             } else {
                 Cause::Value
