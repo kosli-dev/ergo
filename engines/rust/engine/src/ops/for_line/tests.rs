@@ -2725,16 +2725,17 @@ fn a_sentence_that_reads_the_alias_only_as_a_key_of_a_count_is_said_for_each_ite
             "{for_line} {assertion}"
         );
     }
-    let (cause, message) = for_row(
-        "every xs as x",
-        &["count of es whose zz is m named by x.k is 0"],
-        json!({"xs": [{"k": 3}], "es": [{"zz": 1, "m": {"a": 1}}]}),
-        json!({}),
-    );
-    assert_eq!(cause, "unusable");
-    assert!(
-        message.starts_with("item 1 of xs: ") && message.ends_with(", which isn't text"),
-        "{message}"
+    assert_eq!(
+        for_row(
+            "every xs as x",
+            &["count of es whose zz is m named by x.k is 0"],
+            json!({"xs": [{"k": 3}], "es": [{"zz": 1, "m": {"a": 1}}]}),
+            json!({}),
+        ),
+        (
+            "unusable".to_string(),
+            "item 1 of xs: x is {\"k\": 3}, which isn't text".to_string()
+        )
     );
 }
 
