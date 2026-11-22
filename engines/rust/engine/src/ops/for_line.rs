@@ -2280,16 +2280,20 @@ impl For {
                     .children
                     .iter()
                     .all(|child| child.failed.is_some() || unread(child)));
-        let mut items = if second.is_some() || flawed || cause == Cause::Satisfied && !rooted {
-            Vec::new()
-        } else {
-            self.level_clauses(
-                &level,
-                &self.free_clauses(ctx),
-                &self.root_clauses(ctx),
-                ctx,
-            )
-        };
+        let (free, mut items) =
+            if second.is_some() || flawed || cause == Cause::Satisfied && !rooted {
+                (Vec::new(), Vec::new())
+            } else {
+                let roots = root_lines(&self.root_clauses(ctx));
+                let texts: Vec<&str> = roots.iter().map(String::as_str).collect();
+                (
+                    self.free_clauses(ctx)
+                        .into_iter()
+                        .filter_map(|clause| unrooted(clause, &texts))
+                        .collect(),
+                    self.level_clauses(&level, &self.root_clauses(ctx), ctx),
+                )
+            };
         let failed = if let Some((_, listed)) = second {
             listed
         } else if cause == Cause::Satisfied || flawed {
@@ -2325,7 +2329,7 @@ impl For {
             verdict: Verdict { cause, inputs },
             failed_items: failed,
             message: None,
-            items,
+            items: free.into_iter().chain(items).collect(),
         }
     }
 
@@ -2979,27 +2983,16 @@ impl For {
         clauses
     }
 
-    fn level_clauses(
-        &self,
-        level: &Level,
-        free: &[Clause],
-        roots: &[Clause],
-        ctx: &Ctx,
-    ) -> Vec<Clause> {
+    fn level_clauses(&self, level: &Level, roots: &[Clause], ctx: &Ctx) -> Vec<Clause> {
         let lines = root_lines(roots);
         let texts: Vec<&str> = lines.iter().map(String::as_str).collect();
         let walk = self.sentences.len();
         if level.unreadable {
-            let dead: Vec<Clause> = level
+            return level
                 .dead
                 .iter()
                 .filter(|d| d.cause != Cause::Ambiguous)
                 .map(|d| self.dead_clause(d, ctx).in_group(walk))
-                .collect();
-            return free
-                .iter()
-                .cloned()
-                .chain(dead)
                 .filter_map(|clause| unrooted(clause, &texts))
                 .collect();
         }
@@ -3056,14 +3049,10 @@ impl For {
                 .map(|d| (d.order.clone(), self.dead_clause(d, ctx))),
         );
         first.sort_by(|a, b| a.0.cmp(&b.0));
-        free.iter()
-            .cloned()
-            .chain(
-                first
-                    .into_iter()
-                    .chain(items)
-                    .map(|(_, clause)| clause.in_group(walk)),
-            )
+        first
+            .into_iter()
+            .chain(items)
+            .map(|(_, clause)| clause.in_group(walk))
             .filter_map(|clause| unrooted(clause, &texts))
             .collect()
     }
