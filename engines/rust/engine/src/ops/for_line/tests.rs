@@ -4593,7 +4593,7 @@ fn an_alias_read_whole_keeps_its_problem_beside_an_item_a_later_lines_whose_cant
                 ),
                 (
                     "not_an_object".to_string(),
-                    format!("item 1 of xs is 3, which isn't an object; item 1 of xs: {said}")
+                    format!("item 1 of xs: {said}; item 1 of xs is 3, which isn't an object")
                 ),
                 "{for_line} {assertions:?}"
             );
@@ -4609,7 +4609,7 @@ fn an_alias_read_whole_that_can_be_read_isnt_said_beside_an_item_a_later_lines_w
         &["m named by x is 1", "x is 1"][..],
     ] {
         let said = if assertions.len() == 2 {
-            "item 1 of xs is 3, which isn't an object; item 1 of xs: x is 3, which isn't text"
+            "item 1 of xs: x is 3, which isn't text; item 1 of xs is 3, which isn't an object"
         } else {
             "item 1 of xs is 3, which isn't an object"
         };
@@ -4650,11 +4650,34 @@ fn an_alias_read_whole_keeps_its_problem_beside_an_item_a_later_lines_path_cant_
                 ),
                 (
                     "not_an_object".to_string(),
-                    "item 1 of xs is 3, which isn't an object; item 1 of xs: x is 3, which isn't text"
+                    "item 1 of xs: x is 3, which isn't text; item 1 of xs is 3, which isn't an object"
                         .to_string()
                 ),
                 "{for_line} {assertions:?}"
             );
         }
+    }
+}
+
+#[test]
+fn an_alias_read_whole_is_said_before_an_item_that_only_a_sentence_finds_isnt_an_object() {
+    for for_line in [
+        "every xs as x, every es as e",
+        "every xs as x, every es whose zz is 1 as e",
+    ] {
+        assert_eq!(
+            for_row(
+                for_line,
+                &["m named by x is 1", "x.v is 1"],
+                json!({"xs": [3], "es": [{"zz": 1}], "m": {"a": 1}}),
+                json!({}),
+            ),
+            (
+                "not_an_object".to_string(),
+                "item 1 of xs: x is 3, which isn't text; item 1 of xs is 3, which isn't an object"
+                    .to_string()
+            ),
+            "{for_line}"
+        );
     }
 }
