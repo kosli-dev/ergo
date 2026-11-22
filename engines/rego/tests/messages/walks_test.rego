@@ -249,6 +249,13 @@ test_a_count_says_the_root_a_key_from_the_item_is_read_in_once_and_then_what_eac
 	}
 }
 
+test_an_item_says_its_missing_key_once_when_both_sides_are_roots_read_through_it if {
+	side := _keyed_count_side("count of xs whose $input.m named by key is $input.n named by key is 0")
+	subj := {"xs": [{"key": "a"}, {"v": 1}]}
+	[x[1] | some x in ergo._m_tally(subj, side)] == ["$input.m is null", "item 2 of xs: key is missing"] with data.ergo_document as {"m": null, "n": {"a": 1}}
+	[x[1] | some x in ergo._m_tally(subj, side)] == ["$input.m is null", "$input.n is null", "item 2 of xs: key is missing"] with data.ergo_document as {"m": null, "n": null}
+}
+
 test_a_count_says_the_root_a_key_from_the_item_is_read_in_once_and_then_the_items_without_their_own_value_with_a_phrase_that_takes_any_kind if {
 	every s in [
 		"count of xs whose v is not one of $input.m named by key is 0",
