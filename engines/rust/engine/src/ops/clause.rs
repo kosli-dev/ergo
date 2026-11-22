@@ -17,6 +17,7 @@ pub struct Clause {
     pub text: String,
     pub said: Vec<Clause>,
     pub group: usize,
+    pub last_of_cause: bool,
 }
 
 impl Clause {
@@ -28,6 +29,7 @@ impl Clause {
             text,
             said: Vec::new(),
             group: 0,
+            last_of_cause: false,
         }
     }
 
@@ -53,6 +55,13 @@ impl Clause {
     pub fn in_group(self, group: usize) -> Clause {
         Clause { group, ..self }
     }
+
+    pub fn last_of_its_cause(self) -> Clause {
+        Clause {
+            last_of_cause: true,
+            ..self
+        }
+    }
 }
 
 const SHOWN_ITEMS: usize = 3;
@@ -67,7 +76,14 @@ pub fn shown(clauses: &[Clause]) -> Vec<Clause> {
     }
     let of_kind = |kind: Kind| once.iter().filter(move |clause| clause.kind == kind);
     let mut out: Vec<Clause> = of_kind(Kind::Root).cloned().collect();
-    out.sort_by(|a, b| (a.group, a.cause, &a.name).cmp(&(b.group, b.cause, &b.name)));
+    out.sort_by(|a, b| {
+        (a.group, a.cause, a.last_of_cause, &a.name).cmp(&(
+            b.group,
+            b.cause,
+            b.last_of_cause,
+            &b.name,
+        ))
+    });
     out.extend(of_kind(Kind::List).cloned());
     let items: Vec<&Clause> = of_kind(Kind::Item).collect();
     let leaves: usize = items.iter().map(|item| leaves(item)).sum();
@@ -84,6 +100,7 @@ pub fn shown(clauses: &[Clause]) -> Vec<Clause> {
         text: String::new(),
         said: Vec::new(),
         group: 0,
+        last_of_cause: false,
     });
     out
 }
@@ -234,6 +251,7 @@ pub fn of_value(value: &Value) -> Option<Vec<Clause>> {
                 text: text(clause, "text")?,
                 said: of_value(clause.get("said")?)?,
                 group: number(clause, "group")?,
+                last_of_cause: false,
             })
         })
         .collect()

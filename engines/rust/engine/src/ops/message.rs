@@ -2198,9 +2198,17 @@ pub fn walked_root_clauses_with(checks: &[&Check], ctx: &Ctx, empty: bool) -> Ve
                     reads_from_a_root(root) && lists::walked_in(check, root, ctx).is_some()
                 })
                 .filter_map(|root| {
+                    let text_list = lists::flawed_text_list(check, ctx) == Some(root);
                     lists::walked_root_fault(check, root, ctx)
                         .filter(|(cause, _)| empty || *cause != Cause::Value)
                         .map(|(cause, text)| Clause::root(&name::name(root), cause, text))
+                        .map(|clause| {
+                            if text_list {
+                                clause.last_of_its_cause()
+                            } else {
+                                clause
+                            }
+                        })
                 })
         })
         .collect()
@@ -2331,8 +2339,28 @@ fn roots_with(checks: &[&Check], ctx: &Ctx, item_keys: bool, keep_lists: bool) -
             said.push(clause);
         }
     }
+    let text_lists: Vec<String> = checks
+        .iter()
+        .filter_map(|check| lists::flawed_text_list(check, ctx))
+        .map(name::name)
+        .collect();
+    let said: Vec<Clause> = said
+        .into_iter()
+        .map(|clause| {
+            if clause.kind == clause::Kind::Root && text_lists.contains(&clause.name) {
+                clause.last_of_its_cause()
+            } else {
+                clause
+            }
+        })
+        .collect();
+    let mut said = said;
     said.sort_by(|a, b| match (a.kind, b.kind) {
-        (clause::Kind::Root, clause::Kind::Root) => (a.cause, &a.name).cmp(&(b.cause, &b.name)),
+        (clause::Kind::Root, clause::Kind::Root) => (a.cause, a.last_of_cause, &a.name).cmp(&(
+            b.cause,
+            b.last_of_cause,
+            &b.name,
+        )),
         (clause::Kind::Root, _) => std::cmp::Ordering::Less,
         (_, clause::Kind::Root) => std::cmp::Ordering::Greater,
         _ => std::cmp::Ordering::Equal,

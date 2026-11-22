@@ -315,13 +315,16 @@ fn text_walk(check: &super::Check, path: &Path, ctx: &Ctx) -> Option<Walked> {
 }
 
 pub(super) fn text_list_flawed(check: &super::Check, ctx: &Ctx) -> bool {
-    let Some(list) = text_right(check) else {
-        return false;
-    };
-    text_fault(check, list, ctx).is_some() || {
+    flawed_text_list(check, ctx).is_some()
+}
+
+pub(super) fn flawed_text_list<'a>(check: &'a super::Check, ctx: &Ctx) -> Option<&'a Path> {
+    let list = text_right(check)?;
+    let flawed = text_fault(check, list, ctx).is_some() || {
         let read = read_path(list, ctx);
         read.outcome == Outcome::Found && read.value.as_ref().is_some_and(|v| !v.is_array())
-    }
+    };
+    flawed.then_some(list)
 }
 
 pub(super) fn text_fault(check: &super::Check, path: &Path, ctx: &Ctx) -> Option<(Cause, String)> {
