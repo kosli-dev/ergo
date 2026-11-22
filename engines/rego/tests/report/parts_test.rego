@@ -227,8 +227,10 @@ test_a_for_sentence_reads_the_list_a_part_holds_on_the_right_of_its_whose if {
 	counted := {"op": "compare", "cmp": "eq", "left": {"count_of": ["$m", "ys"], "text": "count of m.ys whose v is in pl.z", "whose": whose}, "right": {"literal": 0}}
 	walked := {"op": "every", "path": ["$m", "ys"], "check": {"op": "present", "path": ["x"]}, "if_any": false, "whose": whose}
 	every c in [counted, walked] {
-		ergo._for_sentence_read("pl[].z", c)
-		not ergo._for_sentence_read("xs[]", c)
-		not ergo._for_sentence_read("pl[].y", c)
+		ergo._for_part_list_read("pl[].z", c)
+		not ergo._for_part_list_read("xs[]", c)
+		not ergo._for_part_list_read("pl[].y", c)
+		ergo._for_row_read("pl[].z", c, {"failed_items": []})
+		not ergo._for_row_read("pl[].z", c, {"failed_items": [{"item": "xs", "failed_assertions": []}]})
 	}
 }
