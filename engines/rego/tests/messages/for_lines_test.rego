@@ -126,3 +126,10 @@ test_message_for_item_reads_each_member_when_it_asks_whether_an_item_cant_take_t
 	not ergo._for_list_unclean({"path": ["ev"], "member": true}, {"ev": [{"m": {}}]}, _unclean_key_whose) with data.ergo_params as {"k": 3}
 	not ergo._for_list_unclean({"path": ["ev"]}, {"ev": {"b": {"m": {}}}}, _unclean_key_whose) with data.ergo_params as {"k": 3}
 }
+
+test_a_walked_list_after_is_in_ignoring_case_alone_names_every_item_that_cant_be_used_once_with_its_worst_cause if {
+	leaf := {"op": "in", "path": ["x"], "values": {"ref": ["$$input[]", "cs", "name"]}, "ignoring": "case"}
+	ergo._m_root_alone(leaf, "unusable") == "item 1 of $input.cs: name is 3, which isn't text; item 2 of $input.cs: name is null" with data.ergo_document as {"cs": [{"name": 3}, {"name": null}]} with input as {}
+	not ergo._m_root_alone(leaf, "null") with data.ergo_document as {"cs": [{"name": 3}, {"name": null}]} with input as {}
+	ergo._m_root_alone(leaf, "null") == "item 2 of $input.cs: name is null" with data.ergo_document as {"cs": [{"name": "a"}, {"name": null}]} with input as {}
+}
