@@ -199,3 +199,8 @@ test_the_object_a_count_of_member_of_reads_is_its_own_read_as_a_walked_list_is i
 	ergo._tally_own_read({"name": "costs[]"}, items, set(), [{"kind": "item"}])
 	ergo._tally_own_read({"name": "costs"}, items, set(), [{"kind": "item"}])
 }
+
+test_an_item_record_that_only_repeats_what_the_row_already_says_gives_no_entry if {
+	ergo._tally_unrooted(["null", "item 1 of xs: $input.m is null", {}], "$input.m is null") == null
+	ergo._tally_unrooted(["absent", "item 1 of xs: $input.m is null; key is missing", {}], "$input.m is null") == ["absent", "item 1 of xs: key is missing", {}]
+}
