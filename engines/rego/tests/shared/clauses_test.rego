@@ -27,6 +27,39 @@ test_a_clause_holds_its_kind_name_cause_text_and_what_it_says if {
 	ergo._m_clause_more(2) == {"kind": "more", "count": 2, "name": "", "cause": "value", "text": "", "said": []}
 }
 
+test_a_root_clause_of_a_for_line_holds_the_group_it_is_said_in if {
+	ergo._m_root_in("$params.b", "absent", "$params.b is missing", 2) == {
+		"kind": "root",
+		"name": "$params.b",
+		"cause": "absent",
+		"text": "$params.b is missing",
+		"said": [],
+		"group": 2,
+	}
+}
+
+test_roots_of_a_later_group_come_after_the_roots_of_an_earlier_group if {
+	ergo._m_clauses_text(ergo._m_clauses_order([
+		ergo._m_root_in("$params.a", "unusable", `$params.a is "s", which isn't a number`, 3),
+		ergo._m_root_in("$params.b", "absent", "$params.b is missing", 2),
+	])) == `$params.b is missing; $params.a is "s", which isn't a number`
+}
+
+test_a_root_two_groups_give_is_said_once_in_the_first if {
+	ergo._m_clauses_text(ergo._m_clauses_order([
+		ergo._m_root_in("$params.b", "unusable", `$params.b is "s", which isn't a number`, 2),
+		ergo._m_root_in("$params.a", "null", "$params.a is null", 3),
+		ergo._m_root_in("$params.a", "null", "$params.a is null", 1),
+	])) == `$params.a is null; $params.b is "s", which isn't a number`
+}
+
+test_a_clause_without_a_group_sorts_as_group_zero if {
+	ergo._m_clauses_text(ergo._m_clauses_order([
+		ergo._m_root_in("$params.a", "not_an_object", "$params.a is 3, which isn't an object", 1),
+		_clause_null("$params.b"),
+	])) == "$params.b is null; $params.a is 3, which isn't an object"
+}
+
 _clause_root(name, cause, text) := ergo._m_clause("root", name, cause, text)
 
 _clause_missing(name) := _clause_root(name, "absent", concat("", [name, " is missing"]))

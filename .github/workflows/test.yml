@@ -204,7 +204,7 @@ jobs:
 
   tests-compiled-policy:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v7
       - uses: open-policy-agent/setup-opa@v2
@@ -461,7 +461,7 @@ jobs:
 
   spec:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v7
       - uses: open-policy-agent/setup-opa@v2

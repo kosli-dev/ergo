@@ -23569,7 +23569,7 @@
             }
           },
           {
-            "cause": "value",
+            "cause": "absent",
             "check": "for_every",
             "failures": [
               {
@@ -23603,7 +23603,7 @@
                 "name": "xs"
               },
               {
-                "cause": "value",
+                "cause": "absent",
                 "failures": [],
                 "inputs": [
                   {
@@ -23662,7 +23662,7 @@
             }
           },
           {
-            "cause": "value",
+            "cause": "absent",
             "check": "for_some",
             "failures": [
               {
@@ -23696,7 +23696,7 @@
                 "name": "xs"
               },
               {
-                "cause": "value",
+                "cause": "absent",
                 "failures": [],
                 "inputs": [
                   {
