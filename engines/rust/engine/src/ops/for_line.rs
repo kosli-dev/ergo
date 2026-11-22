@@ -1985,11 +1985,12 @@ impl For {
         let mut once: Vec<Clause> = Vec::new();
         for clause in clauses {
             let line = super::clause::text(std::slice::from_ref(&clause));
-            if !once
-                .iter()
-                .any(|seen| super::clause::text(std::slice::from_ref(seen)) == line)
+            match once
+                .iter_mut()
+                .find(|seen| super::clause::text(std::slice::from_ref(seen)) == line)
             {
-                once.push(clause);
+                Some(seen) => seen.group = seen.group.min(clause.group),
+                None => once.push(clause),
             }
         }
         listed_roots(once)
