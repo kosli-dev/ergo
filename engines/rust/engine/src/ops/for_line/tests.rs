@@ -4562,3 +4562,44 @@ fn sentences_that_say_two_problems_of_one_item_of_a_list_under_the_item_say_each
         );
     }
 }
+
+#[test]
+fn an_alias_read_whole_keeps_its_problem_beside_an_item_a_later_lines_whose_cant_read() {
+    for for_line in [
+        "every xs as x, every es whose zz is x.v as e",
+        "every xs as x, some es whose zz is x.v as e",
+        "every xs as x, first of es whose zz is x.v as e",
+        "some xs as x, every es whose zz is x.v as e",
+        "first of xs as x, every es whose zz is x.v as e",
+    ] {
+        for (assertions, said) in [
+            (&["m named by x is 1"][..], "x is 3, which isn't text"),
+            (
+                &["x.m named by x.k is 1"][..],
+                "x is 3, which isn't text, and x is 3, which isn't an object",
+            ),
+            (
+                &["m named by x is 1", "count of x.ys is 1"][..],
+                "x is 3, which isn't text",
+            ),
+            (
+                &["count of x.ys is 1", "m named by x is 1"][..],
+                "x is 3, which isn't text",
+            ),
+        ] {
+            assert_eq!(
+                for_row(
+                    for_line,
+                    assertions,
+                    json!({"xs": [3], "es": [{"zz": 1}], "m": {"a": 1}}),
+                    json!({}),
+                ),
+                (
+                    "not_an_object".to_string(),
+                    format!("item 1 of xs is 3, which isn't an object; item 1 of xs: {said}")
+                ),
+                "{for_line} {assertions:?}"
+            );
+        }
+    }
+}
