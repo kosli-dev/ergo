@@ -207,6 +207,12 @@ test_a_walked_root_after_is_in_ignoring_case_names_each_item_that_isnt_text if {
 	not ergo._m_walked_root_text(object.remove(c, ["ignoring"]), "unusable") with data.ergo_document as {"cs": [{"name": 3}]} with input as {}
 }
 
+test_a_walked_root_after_is_in_ignoring_case_is_said_once_with_its_worst_cause if {
+	c := {"op": "in", "path": ["v"], "values": {"ref": ["$$input[]", "cs", "name"]}, "ignoring": "case"}
+	not ergo._m_walked_root_text(c, "null") with data.ergo_document as {"cs": [{"name": 3}, {"name": null}]} with input as {}
+	ergo._m_walked_root_text(c, "null") == "item 2 of $input.cs: name is null" with data.ergo_document as {"cs": [{"name": "a"}, {"name": null}]} with input as {}
+}
+
 test_a_list_after_is_in_ignoring_case_that_holds_null_is_said_with_the_roots_that_are_null_and_no_item_is_named_for_it if {
 	c := {"op": "compare", "cmp": "in", "left": ["$$params", "k"], "right": [`${"alias":"","n":-1,"of":null,"old":true}`, "ys"], "ignoring": "case"}
 	ergo._m_keyed_off({"ys": ["a", null]}, c, "null") == ["item 2 of ys is null"] with data.ergo_params as {}
