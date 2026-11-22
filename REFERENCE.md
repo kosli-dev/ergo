@@ -2444,7 +2444,7 @@ the row fails as `unusable` with:
 $params.min is "s", which isn't a number; item 1 of xs: x.v is null; item 2 of xs: x.v is missing
 ```
 
-A root reached through a key the item holds is said once too, in a one-line `every … exists`, `some … exists` or `count of` compared with a value over a list like `xs`, when the `whose` uses `contains` or `matches`, and in such a `count of` when it uses `is`. With `count of xs whose tags contains $input.m named by key is 1` and this input:
+A root reached through a key the item holds is said once too, in a one-line `every … exists`, `some … exists` or `count of` compared with a value over a list like `xs`, when the `whose` uses `contains` or `matches`, and in such a `count of` whatever its phrase. With `count of xs whose tags contains $input.m named by key is 1` and this input:
 
 ```json
 {"m": null, "things": [{"id": "a", "xs": [null, {"key": 3, "tags": ["x"]}]}]}
@@ -2456,7 +2456,7 @@ the row fails as `not_an_object` with:
 $input.m is null; item 1 of xs is null, which isn't an object; item 2 of xs: key is 3, which isn't text
 ```
 
-With `count of xs whose v is $params.m named by key is 1`, `m` `null` in the params and `xs` holding `[{"key": "a", "v": 1}, {}]`, the row fails as `absent` with `$params.m is null; item 2 of xs: v is missing, and key is missing`. Other sentences that read such a root, like one with a second `whose`, still say it in each item.
+With `count of xs whose v is $params.m named by key is 1`, `m` `null` in the params and `xs` holding `[{"key": "a", "v": 1}, {}]`, the row fails as `absent` with `$params.m is null; item 2 of xs: v is missing, and key is missing`. On an empty list such a `count of` says only the root and has no number: with `xs` holding `[]` and `$input.m` holding `3`, `count of xs whose v is not $input.m named by key is 0` fails as `unusable` with `$input.m is 3, which isn't an object`, and its count is `null`. Some other sentences still say the root in an item as well, like `every xs whose v is $params.m named by key exists`.
 
 A path can break in more than one place, and then each problem is said. When a `named by` key from `$params` or `$input` can't be read, the value before it is read too, and if it is missing, `null` or can't take a key, that is said after the key. The row takes the worst cause, and the assertion's `inputs` list the key and that value, each with its own `outcome`. With no `k` in the params, `k is m named by $params.k` and this input:
 
