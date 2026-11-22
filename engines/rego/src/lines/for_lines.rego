@@ -51,6 +51,7 @@ _for_on_tree(check, subj, r) if {
 	not _walk_flawed(check)
 	_walk_root_flaw(check, subj) == ""
 	not _for_key_not_text(check)
+	not _for_key_is_alias(check)
 	count([c | some c in check.checks; _for_reads_an_alias(check, c); _for_reads_a_list(c)]) < 2
 	every c in object.get(check.items[0], "whose", []) {
 		every p in _condition_paths(c) {
@@ -60,6 +61,13 @@ _for_on_tree(check, subj, r) if {
 	every step in array.concat(check.items[0].path, object.get(object.get(check.items[0], "pick", {}), "by", [])) {
 		_for_plain_step(step)
 	}
+}
+
+_for_key_is_alias(check) if {
+	walk(check.checks, [_, y])
+	is_object(y)
+	some item in check.items
+	object.get(y, "named_by", null) == item.as
 }
 
 _for_reads_a_list(c) if _walks(c)
