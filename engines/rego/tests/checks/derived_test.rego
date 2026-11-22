@@ -66,6 +66,19 @@ test_a_count_says_an_empty_list_on_the_right_once_and_then_each_items_own_proble
 	}
 }
 
+_rows_said(sentence, xs) := [[r.cause, r.message] | some r in ergo.report({"things": [{"id": 1, "xs": xs}]}, _sentence_policy({"c": sentence}), {"cs": []}).results; r.check == "c"]
+
+test_an_every_or_a_some_says_an_empty_list_on_the_right_of_its_whose_once_and_fails if {
+	every sentence in [
+		"every xs whose v is in $params.cs.name exists",
+		"every xs whose v is in $params.cs.name, if any, exists",
+		"some xs whose v is in $params.cs.name exists",
+	] {
+		_rows_said(sentence, [{"v": "a"}]) == [["value", "$params.cs is []"]]
+		_rows_said(sentence, [{}]) == [["absent", "$params.cs is []; item 1 of xs: v is missing"]]
+	}
+}
+
 test_a_count_or_sum_of_member_of_walks_each_member_of_the_object_as_an_item if {
 	side := {"sum_of": ["costs"], "whose": [], "text": "sum of member of costs", "member": true}
 	t := ergo._tally({"costs": {"b": 5, "a": 1, "c": "x"}}, side)
