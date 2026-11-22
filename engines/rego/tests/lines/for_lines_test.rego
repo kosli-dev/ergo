@@ -151,6 +151,19 @@ test_a_for_row_whose_named_by_key_is_its_alias_read_whole_keeps_its_message_off_
 	_on_tree("every xs as m", ["m.v named by z is 1"], {"z": "a", "xs": [{"v": {"a": 2}}]}, {})
 }
 
+test_a_compiled_for_row_whose_item_leaves_whose_out_says_what_the_written_row_says_on_the_tree if {
+	written := ergo._s_written_check({"for": "every xs as x", "assert": ["x.v is 1", "z is 1"]})
+	compiled := object.union(written, {"items": [object.remove(written.items[0], ["whose"])]})
+	subj := {"xs": [{"v": 2}, {"v": 1}], "z": 3}
+	names := {"ergo/subject": subj, "$at": {"names": {}}}
+	said := [ergo._for_said(row) |
+		some check in [written, compiled]
+		row := ergo._for_row(check, subj) with input as {"ergo/names": names}
+		row["ergo/for_raw"].tree == true
+	] with input as {"ergo/names": names}
+	[s.message | some s in said] == ["z is 3; item 1 of xs: x.v is 2", "z is 3; item 1 of xs: x.v is 2"]
+}
+
 test_a_for_row_whose_item_walks_one_list_takes_its_message_from_the_tree if {
 	_on_tree("every xs as x", ["every x.ys.n is 1", "x.v is 1"], {"xs": [{"v": 2, "ys": [{"n": 2}]}]}, {})
 	_on_tree("every xs as x", ["count of x.ys is 1", "every es.n is 1"], {"xs": [{"ys": []}], "es": [{"n": 2}]}, {})
