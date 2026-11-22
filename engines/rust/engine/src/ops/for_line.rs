@@ -2339,10 +2339,14 @@ impl For {
             if second.is_some() || flawed || cause == Cause::Satisfied && !rooted {
                 (Vec::new(), Vec::new())
             } else {
-                (
-                    self.free_clauses(ctx),
-                    self.level_clauses(&level, &self.root_clauses(ctx), ctx),
-                )
+                let free = self.free_clauses(ctx);
+                let earlier: Vec<Clause> = self
+                    .root_clauses(ctx)
+                    .into_iter()
+                    .chain(free.iter().cloned())
+                    .collect();
+                let items = self.level_clauses(&level, &earlier, ctx);
+                (free, items)
             };
         let failed = if let Some((_, listed)) = second {
             listed
