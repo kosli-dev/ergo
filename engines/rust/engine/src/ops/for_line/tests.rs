@@ -4334,24 +4334,74 @@ fn a_sort_key_from_params_that_arent_an_object_says_only_the_params_once() {
 }
 
 #[test]
-fn a_root_a_sentence_that_reads_no_alias_reads_is_said_with_it_though_another_sentence_cant_read_it()
+fn a_root_is_said_with_the_sentence_that_cant_read_it_and_not_with_a_sentence_that_reads_no_alias_and_reads_it_fine()
  {
-    for assertions in [
-        ["x.m named by z is 1", "z is in $params.l"],
-        ["z is in $params.l", "x.m named by z is 1"],
+    for (for_line, assertions, subject, params, message) in [
+        (
+            "every o named by $params.k as x",
+            vec!["x.m named by z is 1", "z is in $params.l"],
+            json!({"z": 1, "o": {"a": [{"m": {"a": 1}}]}}),
+            json!({}),
+            "$params.l is missing; $params.k is missing; z is 1, which isn't text",
+        ),
+        (
+            "every o named by $params.k as x",
+            vec!["z is in $params.l", "x.m named by z is 1"],
+            json!({"z": 1, "o": {"a": [{"m": {"a": 1}}]}}),
+            json!({}),
+            "$params.l is missing; $params.k is missing; z is 1, which isn't text",
+        ),
+        (
+            "every ks as k",
+            vec!["z is in $params.l", "w is 1", "z is at least 1"],
+            json!({"ks": ["a"], "z": "s"}),
+            json!({}),
+            "$params.l is missing; w is missing; z is \"s\", which isn't a number",
+        ),
+        (
+            "every xs as x",
+            vec!["z is in $params.l", "w is 1", "x.m named by z is 1"],
+            json!({"z": 1, "xs": [{"m": {"a": 1}}]}),
+            json!({"l": [1, 2]}),
+            "w is missing; z is 1, which isn't text",
+        ),
+        (
+            "every xs as x",
+            vec!["w is 1", "z is in $params.l", "x.m named by z is 1"],
+            json!({"z": 1, "xs": [{"m": {"a": 1}}]}),
+            json!({"l": [1, 2]}),
+            "w is missing; z is 1, which isn't text",
+        ),
+        (
+            "every xs as x",
+            vec!["z is 1", "w is 1", "x.m named by z is 1"],
+            json!({"z": 1, "xs": [{"m": {"a": 1}}]}),
+            json!({}),
+            "w is missing; z is 1, which isn't text",
+        ),
+        (
+            "every xs as x",
+            vec!["z exists", "w is 1", "x.m named by z is 1"],
+            json!({"z": 1, "xs": [{"m": {"a": 1}}]}),
+            json!({}),
+            "w is missing; z is 1, which isn't text",
+        ),
+        (
+            "every xs as x",
+            vec![
+                "count of es whose zz is z is 0",
+                "w is 1",
+                "x.m named by z is 1",
+            ],
+            json!({"z": 1, "xs": [{"m": {"a": 1}}], "es": []}),
+            json!({}),
+            "w is missing; z is 1, which isn't text",
+        ),
     ] {
         assert_eq!(
-            for_row(
-                "every o named by $params.k as x",
-                &assertions,
-                json!({"z": 1, "o": {"a": [{"m": {"a": 1}}]}}),
-                json!({}),
-            ),
-            (
-                "unusable".to_string(),
-                "z is 1, which isn't text; $params.l is missing; $params.k is missing".to_string()
-            ),
-            "{assertions:?}"
+            for_row(for_line, &assertions, subject, params),
+            ("unusable".to_string(), message.to_string()),
+            "{for_line} {assertions:?}"
         );
     }
 }
