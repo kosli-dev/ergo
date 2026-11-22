@@ -685,7 +685,7 @@ else := side
 
 _root_stand_in(c) := object.union(c, {"cmp": "eq", f: c[g]}) if {
 	c.op == "compare"
-	c.cmp in {"eq", "ne", "in", "includes"}
+	c.cmp in ({"eq", "ne"} | _list_cmps)
 	some f in _compare_side_list
 	is_array(c[f])
 	_walk_outside(c[f])
