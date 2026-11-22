@@ -837,6 +837,31 @@ _for_said_by_root(x, roots) if {
 	x.text in roots
 }
 
+_for_item_clause(check, failed, k) := _m_item_clause(f.said, _for_said_cause(said), said) if {
+	f := failed[k]
+	f.cause != "ambiguous"
+	not _m_bare_item(f)
+	object.get(f, "failed_assertions", []) != []
+	not _m_two_list(f)
+	said := _for_item_sentences(check, f, _for_item_bound(check, f))
+	said != []
+}
+
+_for_item_bound(check, f) := _bound(_for_names, item.as, e.v, _walk_at(w, e)) if {
+	item := check.items[0]
+	w := _for_walk(item, object.get(_for_names, "ergo/subject", null), _for_names)
+	some e in w.items
+	_failed_name(e.i, _for_dotted(check)) == f.path
+}
+
+_for_item_sentences(check, f, names) := _once([x |
+	some i, c in check.checks
+	_for_reads_an_alias(check, c)
+	some l in f.failed_assertions
+	l.assertion == check.assertions[i]
+	some x in _for_sentence_clauses(check, c, object.get(names, "ergo/subject", null), l.cause) with input as {"ergo/names": names}
+])
+
 _m_leaf_message(_, leaf, cause, _) := _m_root_alone(leaf, cause)
 
 _m_leaf_message(e, leaf, cause, path) := _m_clash_named(_m_walk_leaf(e, leaf, cause, _dotted_roots([path])), e, leaf, path) if not _m_root_alone(leaf, cause)
