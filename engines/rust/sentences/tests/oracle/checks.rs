@@ -5571,6 +5571,12 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
+        "count of xs.v whose v does not equal $input.m named by key is 0",
+        "count of xs.v whose v does not equal $input.m named by key is 0",
+        &[],
+        &[],
+    ),
+    (
         "some xs.v whose tags contains $input.m named by key exists",
         "some xs.v whose tags contains $input.m named by key exists",
         &[],
