@@ -569,6 +569,13 @@ pub fn for_failures(
                             })
                         })
             })
+            || failed.iter().any(|f| {
+                list(f, "failed_assertions").iter().any(|l| {
+                    list(l, "items").iter().any(|pair| {
+                        clause.starts_with(&format!("{}: {}: ", text(f, "item"), text(pair, "item")))
+                    })
+                })
+            })
             || ops::message::cap_note(clause).is_some()
             || item_made.iter().any(|t| t == clause)
             || free_said.iter().any(|t| t == clause)
