@@ -1303,7 +1303,10 @@ fn stood_in(check: &Check, focus: &Ctx, blocked: impl Fn(&Path) -> bool) -> Opti
             .collect();
         kinds.len() > 1
     };
-    if let Some(stand_in) = super::lists::text_stand_in(check, focus) {
+    if let Check::In(within) = check
+        && !blocked(&within.path)
+        && let Some(stand_in) = super::lists::text_stand_in(check, focus)
+    {
         return Some(stand_in);
     }
     let side_blocked = |side: &Side| side.paths().into_iter().any(&blocked);

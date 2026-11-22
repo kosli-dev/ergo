@@ -1207,7 +1207,12 @@ pub fn walked_in(check: &super::Check, path: &Path, ctx: &Ctx) -> Option<Walked>
     if one_rights(check).contains(&path) {
         return None;
     }
-    walked_from(path, ctx, right_paths(check).contains(&path), false)
+    walked_from(
+        path,
+        ctx,
+        right_paths(check).contains(&path),
+        text_right(check) == Some(path),
+    )
 }
 
 pub(super) fn walked_root_fault(
