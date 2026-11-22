@@ -171,10 +171,33 @@ _for_own_check(c, subj) := c if {
 	some g in _compare_side_list
 	g != f
 	_for_side_blocked(c, c[g], subj)
+} else := object.union(c, {"left": c[f], "right": {"literal": "1970-01-01T00:00:00Z"}}) if {
+	c.op == "compare_time"
+	some f in _compare_side_list
+	not _for_side_blocked(c, c[f], subj)
+	some g in _compare_side_list
+	g != f
+	_for_side_blocked(c, c[g], subj)
+} else := object.union(c, {f: stand_ins[f]}) if {
+	stand_ins := _for_stand_ins[c.op]
+	some f, _ in stand_ins
+	_for_blocked(c, c[f].ref, subj)
+	not _for_blocked(c, c.path, subj)
+}
+
+_for_stand_ins := {
+	"includes": {"value": null, "values": [null]},
+	"excludes": {"value": null, "values": [null]},
+	"includes_some": {"values": [null]},
+	"not_includes_all": {"values": [null]},
+	"in": {"values": []},
+	"not_in": {"values": []},
+	"matches_any": {"patterns": ["x"]},
+	"not_matches_any": {"patterns": ["x"]},
 }
 
 _for_blocks(c, subj) if {
-	some p in _condition_paths(c)
+	some p in array.concat(_condition_paths(c), [c[f].ref | some f in ["value", "values", "patterns"]; _is_ref(object.get(c, f, null))])
 	_for_blocked(c, p, subj)
 }
 
