@@ -4161,3 +4161,22 @@ fn a_root_that_a_sentence_reading_no_alias_reads_is_said_with_that_sentence() {
         );
     }
 }
+
+#[test]
+fn a_problem_a_sentence_that_reads_no_alias_gave_isnt_said_again_under_an_item() {
+    for assertions in [
+        ["count of es is 1", "every es.m named by k is 1"],
+        ["every es.m named by k is 1", "count of es is 1"],
+    ] {
+        assert_eq!(
+            for_row(
+                "every ks as k",
+                &assertions,
+                json!({"ks": ["v"], "es": null}),
+                json!({}),
+            ),
+            ("null".to_string(), "es is null".to_string()),
+            "{assertions:?}"
+        );
+    }
+}
