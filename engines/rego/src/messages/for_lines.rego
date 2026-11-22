@@ -1409,8 +1409,13 @@ _for_said(raw) := object.union(object.remove(raw, ["ergo/for_raw"]), {
 }) if {
 	s := raw["ergo/for_raw"]
 	s.tree == true
+	count(_m_for_said(s.check) | _m_for_tally_said(s.check)) == 0
 	p := _for_row_parts(s.check, s.subj, s.r)
 	tree := array.concat(array.concat(p.free, p.items), p.lists)
+} else := object.union(object.remove(raw, ["ergo/for_raw"]), {"message": said.message, "ergo/for_texts": _for_texts(s.check, s.subj, s.r, said.once, said.line)}) if {
+	s := raw["ergo/for_raw"]
+	s.tree == true
+	said := _for_row_text(s.check, s.subj, s.r)
 } else := object.union(object.remove(raw, ["ergo/for_raw"]), {"ergo/for_texts": _for_texts(s.check, s.subj, s.r, s.once, s.line)}) if s := raw["ergo/for_raw"]
 
 else := raw
