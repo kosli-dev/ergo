@@ -1992,26 +1992,6 @@ impl For {
                 None => once.push(clause),
             }
         }
-        let free: Vec<(usize, Vec<String>)> = self
-            .sentences
-            .iter()
-            .enumerate()
-            .filter(|(_, sentence)| self.reads_no_alias(sentence))
-            .map(|(at, sentence)| (at, root_names(&sentence.check)))
-            .collect();
-        for clause in &mut once {
-            let root = clause.name.as_str();
-            if let Some((at, _)) = free.iter().find(|(_, names)| {
-                names.iter().any(|name| {
-                    name == root
-                        || name
-                            .strip_prefix(root)
-                            .is_some_and(|rest| rest.starts_with('.'))
-                })
-            }) {
-                clause.group = clause.group.min(*at);
-            }
-        }
         listed_roots(once)
     }
 
