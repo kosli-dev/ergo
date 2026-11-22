@@ -483,8 +483,9 @@ test_params_that_arent_an_object_name_themselves_in_a_for_line_that_reads_them_w
 test_a_part_that_holds_a_list_is_walked_by_a_count_of_whose_under_a_for_line if {
 	xs := [{"v": 1, "ys": [{"v": 1}]}]
 	empty := _item_rows(_count_part_policy, {"prs": [{"id": "p0", "c": [], "xs": xs}]}, {})
-	empty.xs[0] == "satisfied"
-	empty.ys[0] == "satisfied"
+	empty == {"xs": ["value", "pl is []"], "ys": ["value", "pl is []"], "at_least": ["value", "pl is []"]}
+	no_item := _item_rows(_count_part_policy, {"prs": [{"id": "p0", "c": [], "xs": []}]}, {})
+	no_item.ys == ["value", "pl is []; xs is []"]
 	objects := _item_rows(_count_part_policy, {"prs": [{"id": "p0", "c": [{"z": 1}], "xs": xs}]}, {})
 	objects.xs == ["value", "count of xs whose v is in pl.z is 1"]
 	objects.ys == ["value", "item 1 of xs: count of m.ys whose v is in pl.z is 1"]
