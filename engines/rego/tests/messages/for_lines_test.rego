@@ -540,6 +540,29 @@ test_the_list_a_line_picks_nothing_from_comes_after_a_sentence_that_reads_no_ali
 	_row_tree_text("first of xs sorted by v as x", ["x.v is 1", "z is 1"], {"xs": [], "z": 3}, {}) == "z is 3; xs is []"
 }
 
+test_a_for_rows_roots_keep_the_order_of_their_sentences if {
+	_row_tree_text("every xs as x", ["x.v is $params.a", "x.v is $params.b"], {"xs": [{"v": 1}]}, {"a": null}) == "$params.a is null; $params.b is missing"
+	_row_tree_text("every xs as x", ["x.v is $params.b", "x.v is $params.a"], {"xs": [{"v": 1}]}, {}) == "$params.b is missing; $params.a is missing"
+}
+
+test_the_roots_of_the_lines_own_whose_come_before_the_sentences_roots if {
+	_row_tree_text("every xs whose v is at least $params.min as x", ["x.w is at least $params.a"], {"xs": [{"v": 1, "w": 1}]}, {"a": "s"}) == `$params.min is missing; $params.a is "s", which isn't a number`
+}
+
+test_a_sentence_that_reads_no_alias_comes_first_with_its_roots if {
+	_row_tree_text("every xs, if any, as x", ["w exists", "y is at least 1", "z is 1"], {"xs": [], "y": "s", "z": 3}, {}) == `w is missing; y is "s", which isn't a number; z is 3`
+}
+
+test_a_root_is_said_with_the_sentence_that_cant_read_it if {
+	_row_tree_text("every xs as x", ["z is in $params.l", "w is 1", "x.m named by z is 1"], {"xs": [{"m": {"a": 1}}], "z": 1}, {"l": [1, 2]}) == "w is missing; z is 1, which isn't text"
+}
+
+test_a_for_rows_roots_come_before_its_items if {
+	_row_tree_text("every xs as x", ["x.v is at least $params.min", "x.w is 1"], {"xs": [{"v": 1, "w": 2}, {}]}, {"min": "s"}) == `$params.min is "s", which isn't a number; item 1 of xs: x.w is 2; item 2 of xs: x.v is missing, and x.w is missing`
+	_row_tree_text("every xs whose v is at least $params.min as x", ["x.w is 1"], {"xs": [{"v": 1, "w": 2}, {"w": 1}]}, {"min": "s"}) == `$params.min is "s", which isn't a number; item 2 of xs: v is missing`
+	_row_tree_text("every xs as x", ["x.v is at least $params.min", "z is 1"], {"xs": [{"v": 1}, {}], "z": 2}, {"min": null}) == "z is 2; $params.min is null; item 2 of xs: x.v is missing"
+}
+
 _tree_said(line, sentences, subj, params, cause) := said if {
 	check := ergo._s_written_check({"for": line, "assert": sentences})
 	names := {"ergo/subject": subj, "$at": {"names": {}}}
