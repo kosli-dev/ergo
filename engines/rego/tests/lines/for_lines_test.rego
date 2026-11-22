@@ -144,6 +144,13 @@ test_a_for_row_whose_line_reads_its_item_whole_keeps_its_message_off_the_tree if
 	_on_tree("every xs whose n is at least c as x", ["x.n is 1"], {"c": 0, "xs": [1, {"c": 0, "n": 2}]}, {})
 }
 
+test_a_for_row_whose_named_by_key_is_its_alias_read_whole_keeps_its_message_off_the_tree if {
+	not _on_tree("every xs as m", ["m.k named by m.k is 1"], {"xs": [{"k": null}, {}, {"k": 1}]}, {})
+	not _on_tree("every xs as m", ["m is $params.l", "m.v named by m.v is 1"], {"xs": [null]}, {"l": 1})
+	not _on_tree("every xs as m", ["m.k is 2", "m.v named by m.k is 1"], {"xs": [{"k": null}]}, {})
+	_on_tree("every xs as m", ["m.v named by z is 1"], {"z": "a", "xs": [{"v": {"a": 2}}]}, {})
+}
+
 test_a_for_row_whose_item_walks_one_list_takes_its_message_from_the_tree if {
 	_on_tree("every xs as x", ["every x.ys.n is 1", "x.v is 1"], {"xs": [{"v": 2, "ys": [{"n": 2}]}]}, {})
 	_on_tree("every xs as x", ["count of x.ys is 1", "every es.n is 1"], {"xs": [{"ys": []}], "es": [{"n": 2}]}, {})
