@@ -97,3 +97,12 @@ test_is_in_ignoring_case_with_an_empty_list_from_a_field_still_fails_a_field_tha
 	}
 	ergo._leaf_cause({"op": "compare", "left": ["x"], "cmp": "in", "right": ["ys"], "ignoring": "case"}, {"x": "a", "ys": []}) == "value"
 }
+
+test_is_in_ignoring_case_fails_as_unusable_on_a_list_from_a_path_that_isnt_a_list if {
+	every cmp in ["in", "not_in"] {
+		ref := {"op": cmp, "path": ["type"], "values": {"ref": ["$$params[]", "l"]}, "ignoring": "case"}
+		ergo._leaf_cause(ref, {"type": "a"}) == "unusable" with data.ergo_params as {"l": "a"}
+		field := {"op": "compare", "left": ["type"], "cmp": cmp, "right": ["ys"], "ignoring": "case"}
+		ergo._leaf_cause(field, {"type": "a", "ys": "a"}) == "unusable"
+	}
+}
