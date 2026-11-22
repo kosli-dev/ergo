@@ -73,6 +73,68 @@ test_an_item_two_conditions_of_a_count_cant_decide_is_one_entry_that_says_both i
 	[[p.name, p.cause, p.message] | some p in parts] == [["item 1 of es", "absent", "v is missing; w is missing"]]
 }
 
+test_a_counted_list_named_by_a_key_is_never_an_input_of_the_assertion_even_with_no_failed_items if {
+	field := ergo._s_written_check("count of m named by p is at least 3")
+	ergo._tally_own_read({"name": "m named by p[]", "value": [1, 2]}, field, set(), [])
+	param := ergo._s_written_check("q is sum of m named by $params.k")
+	ergo._tally_own_read({"name": "m named by $params.k[]", "value": [1, 2]}, param, set(), [])
+}
+
+test_a_summed_field_of_each_item_is_never_an_input_of_the_assertion if {
+	c := ergo._s_written_check("sum of xs.n is 1")
+	ergo._tally_own_read({"name": "xs[].n", "value": [1, 2]}, c, set(), [])
+}
+
+test_a_counted_list_that_failed_under_an_item_is_never_an_input_of_the_assertion if {
+	c := ergo._s_written_check("count of y[0].v is 1")
+	ergo._tally_own_read({"name": "y[0].v", "value": 1}, c, set(), [{"kind": "item", "name": "item 1 of y"}])
+}
+
+test_a_counted_list_that_failed_with_no_entry_of_its_own_stays_on_the_assertion if {
+	c := ergo._s_written_check("count of xs.n is 1")
+	not ergo._tally_own_read({"name": "xs.n", "value": null}, c, set(), [])
+}
+
+test_a_root_an_option_cant_use_is_unusable_on_the_row_as_on_the_assertion if {
+	z := {"name": "art.cov.z", "value": "s", "locations": ["/arts/0/c/z"]}
+	x := {"name": "x", "value": null, "locations": ["/arts/0/xs/0"], "outcome": "absent"}
+	assertion := {"kind": "assertion", "name": "every ys whose n is at least art.cov.z, if any, exists", "cause": "unusable", "inputs": [object.union(z, {"outcome": "unusable"})], "failures": [], "message": "art.cov.z is \"s\", which isn't a number"}
+	option := {"kind": "option", "name": "a", "cause": "unusable", "inputs": [], "failures": [assertion], "message": ""}
+	row := {"passed": false, "cause": "unusable", "message": "a: art.cov.z is \"s\", which isn't a number; b: x is missing", "inputs": [object.union(z, {"outcome": "usable"}), x], "failures": [option]}
+	[[i.name, i.outcome] | some i in ergo._said_outcomes(row).inputs] == [["art.cov.z", "unusable"], ["x", "absent"]]
+}
+
+test_a_root_read_fine_by_every_assertion_stays_usable_on_the_row if {
+	z := {"name": "z", "value": 1, "locations": ["/z"], "outcome": "usable"}
+	assertion := {"kind": "assertion", "name": "z is 2", "cause": "value", "inputs": [z], "failures": [], "message": "z is 1"}
+	other := {"kind": "assertion", "name": "y is at least 1", "cause": "unusable", "inputs": [{"name": "y", "value": "s", "locations": ["/y"], "outcome": "unusable"}], "failures": [], "message": "y is \"s\", which isn't a number"}
+	row := {"passed": false, "cause": "unusable", "message": "z is 1; y is \"s\", which isn't a number", "inputs": [z, {"name": "y", "value": "s", "locations": ["/y"], "outcome": "usable"}], "failures": [assertion, other]}
+	[[i.name, i.outcome] | some i in ergo._said_outcomes(row).inputs] == [["z", "usable"], ["y", "unusable"]]
+}
+
+_tag_each(inputs, check, req, subj) := [object.union(i, {"part": {"id": null, "name": "lock"}}) | some i in inputs] if {
+	is_object(check)
+	is_object(req)
+	is_object(subj)
+}
+
+test_a_walk_in_an_option_or_among_several_assertions_tags_the_parts_it_reads_and_a_for_line_is_left_as_it_was if {
+	c := ergo._s_written_check("every xs.k is 1")
+	subj := {"id": "t1", "xs": [{"k": 5}]}
+	scope := {"ergo/names": {"$at": {"names": {}}}}
+	option := ergo._scoped_walk_outcome(c, {}, subj, "sentence_any_of") with ergo._scoped as true with ergo._scope_of as scope with ergo._tagged as _tag_each
+	[[i.name, i.part] | some i in option.inputs] == [["xs[].k", {"id": null, "name": "lock"}]]
+	line := ergo._scoped_walk_outcome(c, {}, subj, "for") with ergo._scoped as true with ergo._scope_of as scope with ergo._tagged as _tag_each
+	[i.name | some i in line.inputs; not i.part] == ["xs[].k"]
+}
+
+test_a_counted_list_written_with_a_dot_is_never_an_input_of_an_assertion_in_an_option_or_among_several if {
+	c := {"cmp": "eq", "left": {"count_of": [{"literal": "lock"}, "pkgs"], "text": "count of .lock.pkgs", "whose": []}, "op": "compare", "right": {"literal": 1}}
+	e := {"kind": "assertion", "name": "count of .lock.pkgs is 1", "cause": "value", "inputs": [{"name": "count of .lock.pkgs", "value": 2}, {"name": ".lock.pkgs[]", "outcome": "usable", "value": [{"n": 1}, {"n": 2}]}], "failures": [], "message": "count of .lock.pkgs is 2"}
+	row := {"ergo/subj": {"id": "t1", "lock": {"pkgs": [{"n": 1}, {"n": 2}]}}, "ergo/req": {}}
+	[i.name | some i in ergo._tallied_entry(e, c, {"cause": "value"}, "/repos/0", {"check": {"op": "sentence_any_of"}}, row).inputs] == ["count of .lock.pkgs"]
+}
+
 test_a_count_gives_an_item_entry_for_each_item_beside_a_key_it_cant_read if {
 	check := ergo._s_written_check("count of es whose zz is m named by $params.k is 0")
 	m := "$params.k is missing; item 1 of es: m is missing; item 2 of es: m is missing; item 3 of es: m is missing; and 1 more"
@@ -115,9 +177,30 @@ test_the_list_of_a_member_is_what_follows_its_key if {
 }
 
 test_a_text_beside_a_member_that_names_no_item_is_a_root_text if {
-	ergo._root_text("member b of xs", "$params.k is missing")
-	not ergo._root_text("member b of xs", "member b of xs is 1")
-	not ergo._root_text("member b of xs", "")
+	row := {"failed_items": [{"item": "member b of xs"}, {"item": "member c of xs"}, {"item": "member d of xs"}]}
+	clauses := [
+		ergo._m_clause("root", "$params.k", "absent", "$params.k is missing"),
+		ergo._m_clause("item", ["xs", "c"], "value", "member c of xs is 1"),
+		ergo._m_clause("root", "", "value", ""),
+	]
+	ergo._walk_root_texts(row, clauses) == ["$params.k is missing"]
+	ergo._walk_owned_texts(row, clauses) == ["", "member c of xs is 1", ""]
+}
+
+test_a_list_entry_of_a_walk_with_no_items_takes_its_name_and_cause_from_its_clause if {
+	row := {"ergo/subj": {"xs": "s", "ys": null}, "ergo/heads": [
+		ergo._m_clause("list", "xs", "absent", "xs is gone"),
+		ergo._m_clause("root", "$params.k", "unusable", "$params.k is 3, which isn't text"),
+	]}
+	[[e.kind, e.name, e.cause, e.message] | some e in ergo._walk_flaw_lists(row, "s", {"path": ["xs"]}, [])] == [["list", "xs", "absent", "xs is gone"]]
+	ergo._walk_flaw_lists(row, "s", {"path": ["xs"]}, [{"kind": "item"}]) == []
+}
+
+test_an_item_clause_is_the_items_own_text_whatever_its_words_say if {
+	row := {"failed_items": [{"item": "item 1 of xs"}, {"item": "xs"}]}
+	clauses := [ergo._m_clause("item", ["xs", 0], "absent", "cov.z is missing"), ergo._m_clause("list", "xs", "absent", "xs is missing")]
+	ergo._walk_root_texts(row, clauses) == []
+	ergo._walk_owned_texts(row, clauses) == ["cov.z is missing", "xs is missing"]
 }
 
 test_a_member_read_by_its_key_is_its_list_and_its_key if {
@@ -132,10 +215,10 @@ test_the_object_a_count_of_member_of_reads_is_its_own_read_as_a_walked_list_is i
 	ergo._tally_own_read({"name": "costs", "value": []}, members, set(), [])
 	not ergo._tally_own_read({"name": "costs", "value": 5}, members, set(), [])
 	not ergo._tally_own_read({"name": "costs.x", "value": [1]}, members, set(), [])
-	not ergo._tally_own_read({"name": "costs[]", "value": [1]}, members, set(), [{"kind": "item"}])
+	ergo._tally_own_read({"name": "costs[]", "value": [1]}, members, set(), [{"kind": "item"}])
 	items := ergo._s_written_check("sum of costs is at most 3")
 	ergo._tally_own_read({"name": "costs[]"}, items, set(), [{"kind": "item"}])
-	not ergo._tally_own_read({"name": "costs"}, items, set(), [{"kind": "item"}])
+	ergo._tally_own_read({"name": "costs"}, items, set(), [{"kind": "item"}])
 }
 
 test_a_list_after_is_in_ignoring_case_that_holds_an_item_that_isnt_text_is_an_unusable_input_even_when_the_row_fails_as_null if {

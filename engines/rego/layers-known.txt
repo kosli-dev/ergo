@@ -79,7 +79,6 @@ _for_row_message -> _m_unskipped
 _for_row_of -> _m_fallback
 _for_row_of -> _m_params_unread
 _for_row_of -> _m_strip
-_for_row_raw -> _for_message
 _for_row_text -> _m_fallback
 _for_second_roots -> _m_aliased
 _for_second_roots -> _m_under
@@ -126,7 +125,6 @@ _m_sort_text -> _m_isnt
 _m_sort_text -> _m_key_faults
 _m_sort_text -> _message
 _m_sort_why -> _m_leaf
-_m_walk_outcome -> _m_joined
 _m_walk_outcome -> _parts_ahead
 _m_walk_outcome -> _walk_parts
 _m_walked_tally_texts -> _m_fail
@@ -266,7 +264,6 @@ _walk_failure -> _m_leaf_message
 _walk_failure -> _m_undecided
 _walk_failure -> _m_walk_leaf
 _walk_list_ref -> _right_ref_ops
-_walk_root_msgs -> _m_ref_first
 _walk_rooted_outcome -> _messaged
 _walk_row -> _m_walk_blocked
 _walk_row -> _walk_message

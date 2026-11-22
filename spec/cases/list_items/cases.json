@@ -1397,7 +1397,7 @@
                           "/things/0/rows/0/v"
                         ],
                         "name": "count of rows.v that is in d.name",
-                        "value": 0
+                        "value": null
                       },
                       {
                         "locations": [],
@@ -1410,7 +1410,7 @@
                     "locations": [
                       "/things/0/deps/0"
                     ],
-                    "message": "count of rows.v that is in d.name is 0",
+                    "message": "d is []",
                     "name": "item 1 of deps",
                     "value": []
                   }
@@ -1446,7 +1446,7 @@
                 ]
               }
             ],
-            "message": "item 1 of deps: count of rows.v that is in d.name is 0",
+            "message": "item 1 of deps: d is []",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -1470,7 +1470,7 @@
                           "/things/0/rows/0"
                         ],
                         "name": "count of rows whose v is in d.name",
-                        "value": 0
+                        "value": null
                       },
                       {
                         "locations": [],
@@ -1483,7 +1483,7 @@
                     "locations": [
                       "/things/0/deps/0"
                     ],
-                    "message": "count of rows whose v is in d.name is 0",
+                    "message": "d is []",
                     "name": "item 1 of deps",
                     "value": []
                   }
@@ -1521,7 +1521,7 @@
                 ]
               }
             ],
-            "message": "item 1 of deps: count of rows whose v is in d.name is 0",
+            "message": "item 1 of deps: d is []",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -9561,7 +9561,31 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/cs/0/rows/1/v"
+                        ],
+                        "name": "rows[1].v",
+                        "outcome": "unusable",
+                        "value": 5
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/cs/0/rows/1"
+                    ],
+                    "message": "v is 5, which isn't text",
+                    "name": "item 2 of rows",
+                    "value": {
+                      "v": 5
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -9592,7 +9616,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/count"
                 ],
-                "message": "item 2 of rows: v is 5, which isn't text",
+                "message": "",
                 "name": "count of rows whose v matches pos.p is 1"
               }
             ],
@@ -9893,7 +9917,31 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/cs/0/kids/0/rows/1/v"
+                        ],
+                        "name": "rows[1].v",
+                        "outcome": "unusable",
+                        "value": 5
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/cs/0/kids/0/rows/1"
+                    ],
+                    "message": "v is 5, which isn't text",
+                    "name": "item 2 of rows",
+                    "value": {
+                      "v": 5
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -9920,7 +9968,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/count"
                 ],
-                "message": "item 2 of rows: v is 5, which isn't text",
+                "message": "",
                 "name": "count of rows whose v matches c.os.p is 1"
               }
             ],
@@ -10213,7 +10261,31 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/cs/0/kids/0/rows/1/v"
+                        ],
+                        "name": "rows[1].v",
+                        "outcome": "unusable",
+                        "value": 5
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/cs/0/kids/0/rows/1"
+                    ],
+                    "message": "v is 5, which isn't text",
+                    "name": "item 2 of rows",
+                    "value": {
+                      "v": 5
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -10244,7 +10316,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/part_count"
                 ],
-                "message": "item 2 of rows: v is 5, which isn't text",
+                "message": "",
                 "name": "count of rows whose v matches c.pos.p is 1"
               }
             ],
@@ -35841,18 +35913,18 @@
       },
       {
         "description": "a null part fails as null",
-        "rules": ["walk.start", "parts.swap"],
+        "rules": ["walk.start", "parts.swap", "tally.walk", "path.null"],
         "input": {"things": [[{"c": null}]]},
         "results": [
           {
-            "cause": "absent",
+            "cause": "null",
             "check": "count",
             "failures": [
               {
-                "cause": "absent",
+                "cause": "null",
                 "failures": [
                   {
-                    "cause": "absent",
+                    "cause": "null",
                     "failures": [],
                     "inputs": [
                       {
@@ -35868,7 +35940,7 @@
                     "locations": [
                       "/things/0/0"
                     ],
-                    "message": "c.name is missing",
+                    "message": "c is null",
                     "name": "item 1 of t",
                     "value": {
                       "c": null
@@ -35921,7 +35993,7 @@
                 ]
               }
             ],
-            "message": "item 1 of t: c.name is missing",
+            "message": "item 1 of t: c is null",
             "passed": false,
             "requirement": "r",
             "subject": {

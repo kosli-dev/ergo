@@ -48,3 +48,82 @@ test_an_item_of_the_second_list_keeps_that_a_member_walk_wanted_an_object if {
 	ergo._for_unchecked_item(check, f).wants == "an object"
 	not ergo._for_unchecked_item(check, object.union(f, {"msg": "a list"})).wants
 }
+
+_second_list_outcome(line, subj) := object.get([i | some i in ergo._for_inputs(check, subj, {}, check.items[0], ergo._for_walk(check.items[0], subj, {})); startswith(i.name, "x.ys")][0], "ergo/outcome", "usable") if {
+	check := ergo._s_written_check({"for": line, "assert": "y is 1"})
+}
+
+test_a_second_member_walk_that_finds_no_object_at_any_end_says_its_worst_stop_in_any_order if {
+	member := "every xs as x, every member of x.ys as y"
+	_second_list_outcome(member, {"xs": [{"ys": [1]}]}) == "unusable"
+	_second_list_outcome(member, {"xs": [{"ys": 3}, {"ys": null}]}) == "unusable"
+	_second_list_outcome(member, {"xs": [{"ys": null}, {"ys": 3}]}) == "unusable"
+	_second_list_outcome(member, {"xs": [{"ys": null}, {}]}) == "absent"
+	_second_list_outcome(member, {"xs": [{"ys": {"a": 1}}, {"ys": 3}]}) == "usable"
+	_second_list_outcome(member, {"xs": [{"ys": {}}, {"ys": 3}]}) == "usable"
+	_second_list_outcome(member, {"xs": [null, {"ys": 3}]}) == "usable"
+}
+
+_root_clauses_of(line, sentences, subj, params) := cs if {
+	check := ergo._s_written_check({"for": line, "assert": sentences})
+	cs := ergo._for_root_clauses(check, subj) with input as {"ergo/names": {"ergo/subject": subj}} with data.ergo_params as params
+}
+
+test_for_root_clauses_give_each_sentence_its_own_group if {
+	_root_clauses_of("every xs as x", ["x.v is at least $params.b", "x.w is at least $params.a"], {"xs": [{"v": 1, "w": 1}]}, {"a": "s"}) == [
+		ergo._m_root_in("$params.b", "absent", "$params.b is missing", 3),
+		ergo._m_root_in("$params.a", "unusable", `$params.a is "s", which isn't a number`, 4),
+	]
+}
+
+test_for_root_clauses_put_the_lines_whose_roots_first if {
+	_root_clauses_of("every xs whose v is at least $params.min as x", ["x.w is at least $params.a"], {"xs": [{"v": 1, "w": 1}]}, {"a": "s"}) == [
+		ergo._m_root_in("$params.min", "absent", "$params.min is missing", 1),
+		ergo._m_root_in("$params.a", "unusable", `$params.a is "s", which isn't a number`, 2),
+	]
+}
+
+test_for_root_clauses_put_the_sentences_that_read_no_alias_before_the_lines_whose if {
+	_root_clauses_of("every xs whose v is at least $params.min as x", ["x.w is at least $params.a", "$params.b is 1"], {"xs": [{"v": 1, "w": 1}]}, {"a": "s"}) == [
+		ergo._m_root_in("$params.min", "absent", "$params.min is missing", 2),
+		ergo._m_root_in("$params.a", "unusable", `$params.a is "s", which isn't a number`, 3),
+		ergo._m_root_in("$params.b", "absent", "$params.b is missing", 1),
+	]
+}
+
+test_for_root_clauses_say_a_root_the_whose_and_a_sentence_without_an_alias_read_in_the_sentences_group if {
+	_root_clauses_of("every xs whose v is at least $params.min as x", ["$params.min is at least 1", "x.w is 1"], {"xs": [{"v": 1, "w": 1}]}, {}) == [ergo._m_root_in("$params.min", "absent", "$params.min is missing", 0)]
+}
+
+test_for_root_clauses_keep_a_value_that_holds_a_semicolon_whole if {
+	_root_clauses_of("every xs as x", ["x.v is at least $params.min"], {"xs": [{"v": "a; b"}]}, {"min": "s; t"}) == [ergo._m_root_in("$params.min", "unusable", `$params.min is "s; t", which isn't a number`, 2)]
+}
+
+_roots_said_today(line, sentences, subj, params) := {x[1] | some x in said} if {
+	check := ergo._s_written_check({"for": line, "assert": sentences})
+	said := ergo._walk_root_said(check, subj) with input as {"ergo/names": {"ergo/subject": subj}} with data.ergo_params as params
+}
+
+test_for_root_clauses_name_the_roots_the_row_names_today if {
+	rows := [
+		["every xs as x", ["x.v is at least $params.b", "x.w is at least $params.a"], {"xs": [{"v": 1, "w": 1}]}, {"a": "s"}],
+		["every xs whose v is at least $params.min as x", ["x.w is at least $params.a"], {"xs": [{"v": 1, "w": 1}]}, {"a": "s"}],
+		["every xs as x", ["x.v is at least $params.min"], {"xs": [{"v": "a; b"}]}, {"min": "s; t"}],
+		["every xs as x", ["x.v is in $params.l", "count of x.ys whose n is at least $params.m is 0"], {"xs": [{"v": 1, "ys": [{"n": 1}]}]}, {"l": 3}],
+		["every xs as x, every x.ys as y", ["y.n is at least $params.m", "x.v is $params.a"], {"xs": [{"v": 1, "ys": [{"n": 1}]}]}, {"a": null}],
+		["every xs whose v is at least $params.min as x", ["every x.ys whose n is at least $params.k exists", "x.w is at least $params.min"], {"xs": [{"v": 1, "w": 1, "ys": [{"n": 1, "m": 1}]}]}, {"min": [1]}],
+		["every xs whose v is at least $params.min as x", ["x.w is at least $params.a", "$params.b is 1", "$params.min is at least 1"], {"xs": [{"v": 1, "w": 1}]}, {"a": "s"}],
+	]
+	every row in rows {
+		texts := {c.text | some c in _root_clauses_of(row[0], row[1], row[2], row[3])}
+		count(texts) > 0
+		texts == _roots_said_today(row[0], row[1], row[2], row[3])
+	}
+}
+
+test_for_root_clauses_say_a_root_two_sentences_read_once_in_the_first_of_their_groups if {
+	_root_clauses_of("every xs as x", ["x.v is at least $params.b", "x.w is at least $params.a", "x.u is at least $params.b"], {"xs": [{"v": 1, "w": 1, "u": 1}]}, {"a": null}) == [
+		ergo._m_root_in("$params.b", "absent", "$params.b is missing", 4),
+		ergo._m_root_in("$params.a", "null", "$params.a is null", 5),
+	]
+}

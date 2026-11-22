@@ -14977,5 +14977,101 @@
         ]
       }
     ]
+  },
+  {
+    "description": "every with if any through a list whose ends give no item",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "thing", "checks": {"c": "every rs.m, if any, is 1"}}}},
+    "cases": [
+      {
+        "description": "says the worst of what the ends hold on the list's input when one end is empty and the other isn't a list",
+        "rules": [
+          "row.parts",
+          "walk.lists",
+          "walk.inputs"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "rs": [
+                {
+                  "m": []
+                },
+                {
+                  "m": 3
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [
+                      {
+                        "cause": "unusable",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/rs/1/m"
+                            ],
+                            "name": "rs[1].m",
+                            "outcome": "unusable",
+                            "value": 3
+                          }
+                        ],
+                        "kind": "list",
+                        "message": "m is 3, which isn't a list",
+                        "name": "m"
+                      }
+                    ],
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/rs/1"
+                    ],
+                    "message": "",
+                    "name": "item 2 of rs",
+                    "value": {
+                      "m": 3
+                    }
+                  }
+                ],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/c"
+                ],
+                "message": "",
+                "name": "every rs.m, if any, is 1"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "rs[].m[]",
+                "outcome": "unusable",
+                "value": []
+              }
+            ],
+            "message": "item 2 of rs: m is 3, which isn't a list",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]

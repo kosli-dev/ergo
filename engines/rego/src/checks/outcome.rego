@@ -243,38 +243,16 @@ _check_outcome(check, subj, _) := object.union(
 
 _m_walk_outcome(_, _, r) := {} if r.cause == "satisfied"
 
-_m_walk_outcome(check, _, r) := {"message": concat("; ", array.concat(own, [_m_joined(said) | said := [m | some m in ms; m in items]; said != []])), "ergo/own": own, "ergo/texts": items} if {
+_m_walk_outcome(_, _, r) := _m_walk_said(r.root_msgs, object.get(r, "ergo/alone_items", [])) if {
 	r.cause != "satisfied"
 	"root_msgs" in object.keys(r)
-	ms := _walk_roots_sorted(r.root_msgs, check)
-	items := object.get(r, "ergo/alone_items", [])
-	items != []
-	own := _once([m | some m in ms; not m in items])
-} else := {"message": _m_joined(ms), "ergo/own": ms, "ergo/texts": []} if {
-	r.cause != "satisfied"
-	"root_msgs" in object.keys(r)
-	ms := _walk_roots_sorted(r.root_msgs, check)
-	object.get(r, "ergo/alone_items", []) == []
 }
 
-_m_walk_outcome(check, subj, r) := {"message": _m_joined(ps), "ergo/own": [p | some p in ps; not p in items], "ergo/texts": items} if {
+_m_walk_outcome(check, subj, r) := _m_walk_said(_parts_ahead(parts, r), _walk_item_texts(parts, r)) if {
 	r.cause != "satisfied"
 	not "root_msgs" in object.keys(r)
 	parts := _walk_parts(check, subj, r, r)
-	items := _walk_item_texts(parts, r)
-	ps := _walk_roots_sorted(_parts_ahead(parts, r), check)
 }
-
-_walk_roots_sorted(ps, check) := ps if {
-	count([p | some p in ps; _walk_kind(p) == "list"]) == 0
-	count({_m_item_list_of(p) | some p in ps}) < 2
-} else := _walk_roots_sorted_in(ps, _walk_list_names(check))
-
-_m_item_list_of(p) := split(split(_item_parts(p)[1], ":")[0], " ")[0]
-
-_walk_roots_sorted_in(ps, lists) := ps if count([p | some p in ps; _m_root_clause(p, lists)]) < 2
-
-else := _roots_then_lists(ps, lists)
 
 _walk_list_names(check) := {_input_name(array.slice(p, 0, i)) |
 	p := check.path

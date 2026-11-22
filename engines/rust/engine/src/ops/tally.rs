@@ -430,7 +430,7 @@ fn decide(test: &Test, left: &Value, right: Option<Value>, ctx: &Ctx) -> Cause {
 fn merged(entries: Vec<Input>) -> Vec<Input> {
     let mut out: Vec<Input> = Vec::new();
     for entry in entries {
-        push_new(&mut out, entry);
+        super::push_read(&mut out, entry);
     }
     out
 }
@@ -652,7 +652,12 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
     );
     let mut numbers: Vec<Value> = Vec::new();
     let mut at = outer.clone();
-    let mut any_undecided = false;
+    let emptied: Vec<&Check> = whose
+        .iter()
+        .copied()
+        .filter(|check| walk::empty_root(check, &outer))
+        .collect();
+    let mut any_undecided = !emptied.is_empty();
     for item in &walked.items {
         at.subject = item.item.clone();
         at.label = None;
@@ -664,7 +669,7 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
             .collect();
         let mut undecided = false;
         for (check, cause) in &verdicts {
-            if cause.is_failure() {
+            if cause.is_failure() || emptied.iter().any(|empty| std::ptr::eq(*empty, *check)) {
                 undecided = true;
                 match walk::item_own(check, item, &walked, &outer) {
                     Some(said) => causes.push(said.cause),
@@ -679,7 +684,7 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
         }
         match item.end {
             Some(end) => numbers.push(end.clone()),
-            None => causes.push(item.miss),
+            None => causes.push(item_miss(item, &at)),
         }
     }
     if any_undecided {
@@ -712,6 +717,14 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
     }
 }
 
+fn item_miss(item: &walk::WalkItem, at: &Ctx) -> Cause {
+    if item.miss == Cause::Absent && walk::lost_verdict(item, at).cause == Cause::Null {
+        Cause::Null
+    } else {
+        item.miss
+    }
+}
+
 fn walked_list(walked: &walk::Walked, path: &Path, outer: &Ctx) -> Input {
     Input {
         name: walked.name.clone(),
@@ -722,19 +735,22 @@ fn walked_list(walked: &walk::Walked, path: &Path, outer: &Ctx) -> Input {
             .map(|item| item.end_location.render())
             .collect(),
         part: path::part_tag(path, outer).map(|(name, id)| Part { name, id }),
-        state: walked.unreadable.unwrap_or_else(|| {
-            walked
-                .failures
-                .iter()
-                .find(|f| !f.path.contains('['))
-                .map(|f| match f.cause {
-                    Cause::Absent => crate::path::Outcome::Absent,
-                    Cause::Null => crate::path::Outcome::Null,
-                    Cause::NotAnObject => crate::path::Outcome::NotAnObject,
-                    _ => crate::path::Outcome::Found,
-                })
-                .unwrap_or(crate::path::Outcome::Found)
-        }),
+        state: walked
+            .unreadable
+            .or_else(|| walk::stopped_state(walked, path, outer))
+            .unwrap_or_else(|| {
+                walked
+                    .failures
+                    .iter()
+                    .find(|f| !f.path.contains('['))
+                    .map(|f| match f.cause {
+                        Cause::Absent => crate::path::Outcome::Absent,
+                        Cause::Null => crate::path::Outcome::Null,
+                        Cause::NotAnObject => crate::path::Outcome::NotAnObject,
+                        _ => crate::path::Outcome::Found,
+                    })
+                    .unwrap_or(crate::path::Outcome::Found)
+            }),
         null_at: None,
         worked: false,
     }
@@ -1712,7 +1728,12 @@ pub fn counted_said(counted: &Counted, ctx: &Ctx) -> (Vec<Clause>, Vec<Value>) {
             })
             .collect();
         let mut at = outer.clone();
-        let mut any_undecided = false;
+        let emptied: Vec<&Check> = whose
+            .iter()
+            .copied()
+            .filter(|check| walk::empty_root(check, &outer))
+            .collect();
+        let mut any_undecided = !emptied.is_empty();
         for item in &walked.items {
             at.subject = item.item.clone();
             at.label = None;
@@ -1721,7 +1742,9 @@ pub fn counted_said(counted: &Counted, ctx: &Ctx) -> (Vec<Clause>, Vec<Value>) {
             let mut undecided = false;
             for check in &counted.whose {
                 let (verdict, lost) = walk::focus_verdict(check, item, &at, &focus);
-                if !verdict.cause.is_failure() {
+                if !verdict.cause.is_failure()
+                    && !emptied.iter().any(|empty| std::ptr::eq(*empty, check))
+                {
                     continue;
                 }
                 undecided = true;
@@ -1761,12 +1784,13 @@ pub fn counted_said(counted: &Counted, ctx: &Ctx) -> (Vec<Clause>, Vec<Value>) {
                     Value::Null,
                 ))
             } else {
+                let miss = item_miss(item, &at);
                 match item.end {
-                    None if item.miss == Cause::Unusable => Some((
-                        item.miss,
+                    None if matches!(miss, Cause::Unusable | Cause::Null) => Some((
+                        miss,
                         told(
                             &name,
-                            item.miss,
+                            miss,
                             &super::message::message(
                                 &walk::focus_check(item),
                                 &at,

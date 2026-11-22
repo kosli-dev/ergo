@@ -48,6 +48,33 @@ test_message_of_exists_on_a_null_field_says_it_is_null_whatever_cause_the_line_h
 	ergo._m_message(check, {"x": null}, "absent") == "x is null"
 }
 
+_said_of(sentence, subj, cause, params) := said if {
+	said := ergo._message_said(ergo._s_written_check(sentence), subj, cause) with input as {"ergo/names": {"ergo/subject": subj}} with data.ergo_params as params
+}
+
+_message_of(sentence, subj, cause, params) := m if {
+	m := ergo._message(ergo._s_written_check(sentence), subj, cause) with input as {"ergo/names": {"ergo/subject": subj}} with data.ergo_params as params
+}
+
+test_a_message_is_its_pieces_joined_with_and if {
+	_said_of("v is w", {"v": 3, "w": 4}, "value", {}) == [["v is 3", "w is 4"]]
+	_message_of("v is w", {"v": 3, "w": 4}, "value", {}) == "v is 3, and w is 4"
+}
+
+test_a_message_keeps_what_a_count_says_as_its_clauses if {
+	subj := {"es": [{}, {}]}
+	[[counted]] := _said_of("count of es whose v is at least $params.min is 0", subj, "unusable", {"min": "s"})
+	[c.kind | some c in counted] == ["root", "item", "item"]
+	text := `$params.min is "s", which isn't a number; item 1 of es: v is missing; item 2 of es: v is missing`
+	ergo._m_clauses_text(ergo._m_clauses_shown(counted)) == text
+	_message_of("count of es whose v is at least $params.min is 0", subj, "unusable", {"min": "s"}) == text
+}
+
+test_a_key_that_cant_be_read_and_the_value_before_it_are_two_groups_of_the_message if {
+	_said_of("m named by $params.k is 1", {"m": 3}, "unusable", {}) == [["$params.k is missing"], ["m is 3, which isn't an object"]]
+	_message_of("m named by $params.k is 1", {"m": 3}, "unusable", {}) == "$params.k is missing; m is 3, which isn't an object"
+}
+
 test_a_row_says_what_else_it_cant_read_beside_a_key_it_cant_read if {
 	check := {"op": "compare", "cmp": "eq", "left": ["k"], "right": ["m", {"ref": ["$$params", "k"]}], "expression": "k is m named by $params.k"}
 	row := object.union(check, {"ergo/row": true})

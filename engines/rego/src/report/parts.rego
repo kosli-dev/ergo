@@ -2,7 +2,7 @@ package ergo
 
 import rego.v1
 
-_row_stash_keys := ["failed_items", "failed_assertions", "ergo/texts", "ergo/own", "ergo/outs", "ergo/for_texts", "ergo/key_lists", "ergo/key_bases", "ergo/subj", "ergo/req"]
+_row_stash_keys := ["failed_items", "failed_assertions", "ergo/texts", "ergo/own", "ergo/heads", "ergo/outs", "ergo/for_texts", "ergo/key_lists", "ergo/key_bases", "ergo/subj", "ergo/req"]
 
 _parted(row, _, _) := _passed_row(row) if row.passed == true
 
@@ -277,7 +277,7 @@ _alias_unmarked(o) := object.union(o, object.filter(
 		"message": _m_aliased(o.message),
 		"inputs": [object.union(x, {"name": _m_aliased(x.name)}) | some x in o.inputs],
 		"failed_items": [object.union(f, object.filter({"item": _m_aliased(f.item), "path": _m_aliased(f.path), "ergo/read": _m_aliased(object.get(f, "ergo/read", ""))}, object.keys(f))) | some f in object.get(o, "failed_items", [])],
-		"ergo/texts": [_m_aliased(t) | some t in object.get(o, "ergo/texts", [])],
+		"ergo/texts": [object.union(c, {"text": _m_aliased(c.text)}) | some c in object.get(o, "ergo/texts", [])],
 		"ergo/own": [_m_aliased(t) | some t in object.get(o, "ergo/own", [])],
 	},
 	object.keys(o),
@@ -527,13 +527,21 @@ else := concat("; ", [c |
 
 _and_more(q) if regex.match(`^and [0-9]+ more$`, q)
 
+_tally_own_read(i, c, _, _) if {
+	contains(i.name, "[]")
+	some side in _m_tally_parts(c)
+	p := side[_basic_form(side)]
+	is_array(p)
+	_walked_path_read({"name": _m_aliased(i.name)}, _m_aliased(_input_name(p)))
+}
+
 _tally_own_read(i, c, _, items) if {
 	items != []
 	some side in _m_tally_parts(c)
 	not side.member
 	p := side[_basic_form(side)]
 	is_array(p)
-	_m_aliased(i.name) == concat("", [_m_aliased(_input_name(p)), "[]"])
+	_m_aliased(i.name) == _m_aliased(_input_name(p))
 }
 
 _tally_own_read(i, c, _, _) if {
@@ -718,13 +726,21 @@ _row_failures(row, at, where, _) := [_tallied_entry(
 	some k, fa in row.failed_assertions
 ] if _all_of_run(where.check)
 
+_scoped_walk_outcome(c, req, subj, op) := o if {
+	op != "for"
+	_scoped(req)
+	s := _scope_of(req, subj)
+	r := _keyed_rooted(_for_said(_check_outcome(c, subj, "")), c, subj) with input as s
+	o := object.union(r, {"inputs": _tagged(r.inputs, c, req, subj)}) with input as s
+} else := _keyed_rooted(_for_said(_check_outcome(c, subj, "")), c, subj)
+
 _tallied_entry(e, c, o, at, where, row) := object.union(e, {"inputs": x.inputs, "failures": x.failures, "message": x.message}) if {
 	_walks(c)
 	c.op != "for"
 	_ = o
-	raw := _check_outcome(c, row["ergo/subj"], "")
+	raw := _scoped_walk_outcome(c, row["ergo/req"], row["ergo/subj"], where.check.op)
 	raw.passed == false
-	wrow := object.union(_anchored(_keyed_rooted(_for_said(raw), c, row["ergo/subj"]), at), {"ergo/subj": row["ergo/subj"], "ergo/req": row["ergo/req"]})
+	wrow := object.union(_anchored(raw, at), {"ergo/subj": row["ergo/subj"], "ergo/req": row["ergo/req"]})
 	x := _walk_assertion_entry(wrow, at, object.union(where, {"check": object.union(c, {"expression": e.name}), "ats": {"": e.locations}}), _with_outcomes(wrow.inputs))
 } else := object.union(e, {"inputs": [i | some i in e.inputs; not i.name in names; not _item_input(i, lists); not _tally_own_read(i, c, names, items)], "failures": array.concat(ls, items), "message": _tally_rest_of(e.message, names, texts)}) if {
 	not _walks(c)
@@ -739,8 +755,8 @@ _tallied_entry(e, c, o, at, where, row) := object.union(e, {"inputs": x.inputs, 
 	count(names) + count(items) > 0
 } else := object.union(e, {"inputs": [i | some i in e.inputs; not _item_input(i, lists); not _tally_own_read(i, c, set(), [])]}) if {
 	not _walks(c)
+	count(_m_tally_parts(c)) > 0
 	lists := _tally_list_names(c)
-	count(lists) > 0
 }
 
 else := e
@@ -781,13 +797,13 @@ _walk_assertion_entry(row, at, where, ins) := _policy_entry(
 	row.cause,
 	_once(array.concat(array.concat(array.concat([ins[j] | some j, i in row.inputs; not _item_input(i, lists); not _walked_path_read(i, wname)], _key_flaw_entries(where.check.path)), _walk_cond_ref_entries(_walk_cond_refs(where.check), row.inputs)), _walk_param_entries(where.check, row.inputs))),
 	array.concat([_keyed_walk_entry(x, where.check, row) | some x in entries], flaws),
-	_tally_rest(concat("; ", [m | some m in _once(array.concat(object.get(row, "ergo/own", [row.message]), _root_texts(row, texts))); not m in {e.message | some e in kls}]), {e.name | some e in flaws}),
+	_tally_rest(concat("; ", [m | some m in _once(array.concat(object.get(row, "ergo/own", [row.message]), _walk_root_texts(row, clauses))); not m in {e.message | some e in kls}]), {e.name | some e in flaws}),
 	[_assertion_at(where, null, 0)],
 ) if {
-	texts := object.get(row, "ergo/texts", [])
+	clauses := object.get(row, "ergo/texts", [])
 	lists := {_list_base(f.item) | some f in row.failed_items}
 	kls := _key_list_parts(row, at)
-	entries := array.concat(_walk_entries(row, _item_owned(row, texts), at), kls)
+	entries := array.concat(_walk_entries(row, _walk_owned_texts(row, clauses), at), kls)
 	wname := _m_aliased(_walked_name(where.check.path))
 	flaws := _walk_flaw_lists(row, at, where.check, entries)
 }
@@ -825,15 +841,17 @@ _walk_item_outcome(v, q, true) := _key_read_outcome(_probe(v, q))
 _walk_item_outcome(v, q, false) := _tally_read_outcome(v, q, "usable")
 
 _walk_flaw_lists(row, at, check, entries) := [_entry("list", n, cause, [object.union(object.remove(x, _input_stash_keys), {"value": _flaw_list_value(cause, x.value), "outcome": _key_list_outcome(cause)}) | some x in _anchored_all([_path_input(subj, p)], at)], [], c) |
-	some c in _tally_clauses(row.message)
-	n := _m_clause_name(c)
+	some h in object.get(row, "ergo/heads", [])
+	is_string(h.name)
+	n := _m_aliased(h.name)
 	some k in numbers.range(1, count(check.path))
 	p := array.slice(check.path, 0, k)
 	every seg in p {
 		_plain_or_field_step(seg)
 	}
 	_m_aliased(_input_name(p)) == n
-	cause := _walk_clause_cause(c)
+	cause := h.cause
+	c := _m_aliased(h.text)
 ] if {
 	entries == []
 	is_array(check.path)
@@ -847,12 +865,6 @@ _plain_or_field_step(seg) if _field_step(seg)
 _flaw_list_subject(row, path) := row["ergo/subj"] if _ = path
 
 else := null if path[0] in {"$$input", "$$params"}
-
-_walk_clause_cause(c) := "value" if {
-	not endswith(c, " is missing")
-	not endswith(c, " is null")
-	not contains(c, ", which isn't ")
-} else := _clause_cause(c)
 
 _flaw_list_value(cause, _) := null if cause in _no_value_states
 
@@ -944,22 +956,18 @@ else := name
 
 _walk_entries(_, [], _) := []
 
-_item_owned(row, texts) := texts if {
-	every k, t in texts {
-		not _root_text(row.failed_items[k].item, t)
-	}
-} else := [_owned_text(row.failed_items[k].item, t) | some k, t in texts]
+_walk_owned_texts(row, clauses) := [_walk_owned_text(row, k, c) | some k, c in clauses]
 
-_owned_text(name, t) := "" if _root_text(name, t)
+_walk_owned_text(row, k, c) := "" if _walk_root_clause(row, k, c)
 
-else := t
+else := c.text
 
-_root_texts(row, texts) := [t | some k, t in texts; _root_text(row.failed_items[k].item, t)]
+_walk_root_texts(row, clauses) := [c.text | some k, c in clauses; _walk_root_clause(row, k, c)]
 
-_root_text(name, t) if {
-	t != ""
-	_walk_kind(name) == "item"
-	_walk_kind(t) == "list"
+_walk_root_clause(row, k, c) if {
+	c.text != ""
+	c.kind != "item"
+	_walk_kind(row.failed_items[k].item) == "item"
 }
 
 _walk_entries(row, texts, at) := _nested_items([_leveled(_walk_entry(row, texts, name, at), row, name, at) |
@@ -1235,7 +1243,7 @@ _applies_outcomes(ins, row, req) := _tally_outcomes(ins, row, c) if {
 } else := ins
 
 _applies_entries(row, at, evals, req, conds, ins, subj) := [_walk_assertion_entry(
-	object.union(row, {"cause": e.assertion_cause, "ergo/own": object.get(e, "ergo/own", [row.message]), "ergo/texts": object.get(e, "ergo/texts", [])}),
+	object.union(row, {"cause": e.assertion_cause, "ergo/own": object.get(e, "ergo/own", [row.message]), "ergo/texts": object.get(e, "ergo/texts", []), "ergo/heads": object.get(e, "ergo/heads", [])}),
 	at,
 	{"check": object.union(_applies_to_of(req)[name], {"expression": conds[name].expression}), "ats": {"": [conds[name].at]}, "subj": subj},
 	ins,
@@ -1274,7 +1282,7 @@ _applies_entries(_, at, evals, req, conds, _, subj) := [_applies_cond_entry(eval
 }
 
 _applies_cond_entry(e, c, cond, text, at, subj) := _walk_assertion_entry(
-	{"inputs": _anchored_all(e.inputs, at), "failed_items": [_anchored_failed(f, at) | some f in e.failed_items], "message": text, "cause": e.assertion_cause, "ergo/own": object.get(e, "ergo/own", [text]), "ergo/texts": object.get(e, "ergo/texts", [])},
+	{"inputs": _anchored_all(e.inputs, at), "failed_items": [_anchored_failed(f, at) | some f in e.failed_items], "message": text, "cause": e.assertion_cause, "ergo/own": object.get(e, "ergo/own", [text]), "ergo/texts": object.get(e, "ergo/texts", []), "ergo/heads": object.get(e, "ergo/heads", [])},
 	at,
 	{"check": object.union(c, {"expression": cond.expression}), "ats": {"": [cond.at]}, "subj": subj},
 	_with_outcomes(_anchored_all(e.inputs, at)),
@@ -1329,9 +1337,30 @@ _said_outcomes(row) := row if row.passed == true
 else := _said_outcomes_of(_unled_dropped(row))
 
 _said_outcomes_of(row) := object.union(row, {
-	"inputs": _said_unusable(row.inputs, row.message),
-	"failures": [_said_entry(e) | some e in row.failures],
-})
+	"inputs": [_unfit_on_entry(i, unfit) | some i in _said_unusable(row.inputs, row.message)],
+	"failures": fs,
+}) if {
+	fs := [_said_entry(e) | some e in row.failures]
+	unfit := _entries_unfit(fs)
+}
+
+_entries_unfit(entries) := {[i.name, i.value, i.locations] |
+	some e in entries
+	some a in _entry_assertions(e)
+	some i in a.inputs
+	i.outcome == "unusable"
+}
+
+_entry_assertions(e) := [e] if e.kind == "assertion"
+
+else := [a | some a in e.failures; a.kind == "assertion"] if e.kind == "option"
+
+else := []
+
+_unfit_on_entry(i, unfit) := object.union(i, {"outcome": "unusable"}) if {
+	i.outcome == "usable"
+	[i.name, i.value, i.locations] in unfit
+} else := i
 
 _unled_dropped(row) := object.union(row, {
 	"message": concat("; ", [x | some x in ps; not endswith(x, ": ")]),
@@ -1386,21 +1415,8 @@ _parted_applies_in(raw, at, evals, req, conds, subj) := p if {
 	unfit := {u | some n, _ in evals; some u in conds[n].unfit}
 	lists := {u | some n, _ in evals; some u in conds[n].text_lists}
 	count(unfit) + count(lists) > 0
-	p := _parted_applies(_applies_deduped(raw), at, evals, req, conds, subj) with data.ergo_unfit as unfit with data.ergo_text_lists as lists
-} else := _parted_applies(_applies_deduped(raw), at, evals, req, conds, subj) if {
-	_m_marked_cause(raw.cause)
+	p := _parted_applies(raw, at, evals, req, conds, subj) with data.ergo_unfit as unfit with data.ergo_text_lists as lists
 } else := _parted_applies(raw, at, evals, req, conds, subj)
-
-_applies_deduped(raw) := object.union(raw, {"inputs": [i | some i in raw.inputs; not _unusable_twin(i, raw.inputs)]})
-
-_unusable_twin(i, ins) if {
-	not i["ergo/outcome"]
-	some j in ins
-	j["ergo/outcome"] == "unusable"
-	j.name == i.name
-	j.value == i.value
-	j.locations == i.locations
-}
 
 _tally_item_parts(c, subj, cause, at, m) := _nested_items(_tally_one_per_item(array.concat(xs, _tally_keyed_extra(c, subj, at, m, xs)))) if {
 	xs := _tally_item_records(c, subj, cause, at, m)

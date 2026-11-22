@@ -40600,12 +40600,6 @@
                     "locations": [],
                     "name": "count of $params[0].v",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "$params[0].v",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -40625,7 +40619,7 @@
               {
                 "locations": [],
                 "name": "$params[0].v",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -55094,7 +55088,7 @@
                       {
                         "locations": [],
                         "name": "k",
-                        "outcome": "usable",
+                        "outcome": "unusable",
                         "value": []
                       }
                     ],
@@ -55310,7 +55304,7 @@
                       {
                         "locations": [],
                         "name": "k",
-                        "outcome": "usable",
+                        "outcome": "unusable",
                         "value": []
                       }
                     ],
@@ -62551,7 +62545,8 @@
         "rules": [
           "for.roots",
           "walk.right",
-          "tally.whose"
+          "tally.whose",
+          "walk.right.fail"
         ],
         "input": {
           "prs": [
@@ -62573,19 +62568,51 @@
         },
         "results": [
           {
-            "cause": "satisfied",
+            "cause": "value",
             "check": "c",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/prs/0/xs/0"
+                    ],
+                    "name": "count of xs whose v is in pl.z",
+                    "value": null
+                  },
+                  {
+                    "locations": [],
+                    "name": "pl[].z",
+                    "outcome": "usable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/c/assert"
+                ],
+                "message": "pl is []",
+                "name": "count of xs whose v is in pl.z is 0"
+              }
+            ],
             "inputs": [
               {
                 "locations": [
                   "/prs/0/xs/0"
                 ],
                 "name": "count of xs whose v is in pl.z",
-                "value": 0
+                "value": null
               },
               {
                 "locations": [],
                 "name": "pl[].z",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "pl"
@@ -62597,6 +62624,7 @@
                   "/prs/0/xs/0"
                 ],
                 "name": "xs[]",
+                "outcome": "usable",
                 "value": [
                   {
                     "v": 1,
@@ -62609,7 +62637,8 @@
                 ]
               }
             ],
-            "passed": true,
+            "message": "pl is []",
+            "passed": false,
             "requirement": "r",
             "subject": {
               "id": "p0",
@@ -62623,7 +62652,8 @@
         "rules": [
           "for.roots",
           "walk.right",
-          "tally.whose"
+          "tally.whose",
+          "walk.right.fail"
         ],
         "input": {
           "prs": [
@@ -62639,6 +62669,33 @@
             "cause": "value",
             "check": "c",
             "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "count of xs whose v is in pl.z",
+                    "value": null
+                  },
+                  {
+                    "locations": [],
+                    "name": "pl[].z",
+                    "outcome": "usable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/c/assert"
+                ],
+                "message": "pl is []",
+                "name": "count of xs whose v is in pl.z is 0"
+              },
               {
                 "cause": "value",
                 "failures": [],
@@ -62661,8 +62718,7 @@
               {
                 "locations": [],
                 "name": "count of xs whose v is in pl.z",
-                "outcome": "usable",
-                "value": 0
+                "value": null
               },
               {
                 "locations": [],
@@ -62681,7 +62737,7 @@
                 "value": []
               }
             ],
-            "message": "xs is []",
+            "message": "pl is []; xs is []",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -63679,7 +63735,8 @@
         "rules": [
           "for.roots",
           "walk.right",
-          "tally.whose"
+          "tally.whose",
+          "walk.right.fail"
         ],
         "input": {
           "prs": [
@@ -63701,12 +63758,37 @@
         },
         "results": [
           {
-            "cause": "satisfied",
+            "cause": "value",
             "check": "c",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "pl[].z",
+                    "outcome": "usable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/c/assert"
+                ],
+                "message": "pl is []",
+                "name": "count of m.ys whose v is in pl.z is 0"
+              }
+            ],
             "inputs": [
               {
                 "locations": [],
                 "name": "pl[].z",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "pl"
@@ -63718,6 +63800,7 @@
                   "/prs/0/xs/0"
                 ],
                 "name": "xs[]",
+                "outcome": "usable",
                 "value": [
                   {
                     "v": 1,
@@ -63730,7 +63813,8 @@
                 ]
               }
             ],
-            "passed": true,
+            "message": "pl is []",
+            "passed": false,
             "requirement": "r",
             "subject": {
               "id": "p0",
@@ -63744,7 +63828,8 @@
         "rules": [
           "for.roots",
           "walk.right",
-          "tally.whose"
+          "tally.whose",
+          "walk.right.fail"
         ],
         "input": {
           "prs": [
@@ -63760,6 +63845,17 @@
             "cause": "value",
             "check": "c",
             "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/c/assert"
+                ],
+                "message": "pl is []",
+                "name": "count of m.ys whose v is in pl.z is 0"
+              },
               {
                 "cause": "value",
                 "failures": [],
@@ -63796,7 +63892,7 @@
                 "value": []
               }
             ],
-            "message": "xs is []",
+            "message": "pl is []; xs is []",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -75121,7 +75217,7 @@
         ]
       },
       {
-        "description": "an empty part leaves every item out",
+        "description": "an empty part fails as value",
         "rules": ["walk.right", "walk.right.fail", "walk.right.inputs", "for.roots", "for.inputs", "for.walk"],
         "input": {"prs": [{"id": "p0", "xs": [{"v": 1}], "c": []}]},
         "results": [
@@ -75147,21 +75243,11 @@
                   }
                 ],
                 "kind": "list",
-                "message": "xs is [{\"v\": 1}]",
+                "message": "pl is []",
                 "name": "xs"
               }
             ],
             "inputs": [
-              {
-                "locations": [],
-                "name": "pl[].z",
-                "outcome": "usable",
-                "part": {
-                  "id": null,
-                  "name": "pl"
-                },
-                "value": []
-              },
               {
                 "locations": [
                   "/prs/0/xs/0"
@@ -75175,7 +75261,7 @@
                 ]
               }
             ],
-            "message": "xs is [{\"v\": 1}]",
+            "message": "pl is []",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -75184,23 +75270,38 @@
             }
           },
           {
-            "cause": "satisfied",
+            "cause": "value",
             "check": "every_if_any",
-            "inputs": [
+            "failures": [
               {
-                "locations": [],
-                "name": "pl[].z",
-                "part": {
-                  "id": null,
-                  "name": "pl"
-                },
-                "value": []
-              },
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/prs/0/xs/0"
+                    ],
+                    "name": "xs[]",
+                    "outcome": "usable",
+                    "value": [
+                      {
+                        "v": 1
+                      }
+                    ]
+                  }
+                ],
+                "kind": "list",
+                "message": "pl is []",
+                "name": "xs"
+              }
+            ],
+            "inputs": [
               {
                 "locations": [
                   "/prs/0/xs/0"
                 ],
                 "name": "xs[]",
+                "outcome": "usable",
                 "value": [
                   {
                     "v": 1
@@ -75208,7 +75309,8 @@
                 ]
               }
             ],
-            "passed": true,
+            "message": "pl is []",
+            "passed": false,
             "requirement": "r",
             "subject": {
               "id": "p0",
@@ -75237,21 +75339,11 @@
                   }
                 ],
                 "kind": "list",
-                "message": "xs is [{\"v\": 1}]",
+                "message": "pl is []",
                 "name": "xs"
               }
             ],
             "inputs": [
-              {
-                "locations": [],
-                "name": "pl[].z",
-                "outcome": "usable",
-                "part": {
-                  "id": null,
-                  "name": "pl"
-                },
-                "value": []
-              },
               {
                 "locations": [
                   "/prs/0/xs/0"
@@ -75265,7 +75357,7 @@
                 ]
               }
             ],
-            "message": "xs is [{\"v\": 1}]",
+            "message": "pl is []",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -75282,19 +75374,21 @@
                 "failures": [],
                 "inputs": [
                   {
-                    "locations": [
-                      "/prs/0/c"
-                    ],
-                    "name": "pl.z",
-                    "outcome": "unusable",
-                    "value": null
+                    "locations": [],
+                    "name": "pl[].z",
+                    "outcome": "usable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/some_exists/assert"
                 ],
-                "message": "pl is [], which isn't an object",
+                "message": "pl is []",
                 "name": "some xs whose v is in pl.z exists"
               }
             ],
@@ -75322,7 +75416,7 @@
                 ]
               }
             ],
-            "message": "xs is [{\"v\": 1}]",
+            "message": "pl is []",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -85297,7 +85391,7 @@
                       {
                         "locations": [],
                         "name": "approver.subs",
-                        "outcome": "usable",
+                        "outcome": "unusable",
                         "value": []
                       }
                     ],
@@ -108598,6 +108692,408 @@
         }
       ]
     },
+  {
+    "description": "a walk through a for line's alias leaves a root after the phrase to the assertion, and each item keeps its own cause and the items of its list",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "every": {
+              "for": "every ws as w",
+              "assert": "every w.xs.v is at least $params.min"
+            },
+            "some": {
+              "for": "every ws as w",
+              "assert": "some w.xs.v is at least $params.min"
+            }
+          }
+        }
+      }
+    },
+    "params": {
+      "min": "s"
+    },
+    "cases": [
+      {
+        "description": "an item whose list holds five items without v",
+        "rules": [
+          "for.roots",
+          "problems.where_said",
+          "row.parts"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t",
+              "ws": [
+                {
+                  "xs": [
+                    {},
+                    {},
+                    {},
+                    {},
+                    {}
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "every",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [
+                      {
+                        "cause": "absent",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/ws/0/xs/0"
+                            ],
+                            "name": "w.xs[0].v",
+                            "outcome": "absent",
+                            "value": null
+                          }
+                        ],
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/ws/0/xs/0"
+                        ],
+                        "message": "v is missing",
+                        "name": "item 1 of w.xs",
+                        "value": {}
+                      },
+                      {
+                        "cause": "absent",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/ws/0/xs/1"
+                            ],
+                            "name": "w.xs[1].v",
+                            "outcome": "absent",
+                            "value": null
+                          }
+                        ],
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/ws/0/xs/1"
+                        ],
+                        "message": "v is missing",
+                        "name": "item 2 of w.xs",
+                        "value": {}
+                      },
+                      {
+                        "cause": "absent",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/ws/0/xs/2"
+                            ],
+                            "name": "w.xs[2].v",
+                            "outcome": "absent",
+                            "value": null
+                          }
+                        ],
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/ws/0/xs/2"
+                        ],
+                        "message": "v is missing",
+                        "name": "item 3 of w.xs",
+                        "value": {}
+                      },
+                      {
+                        "cause": "absent",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/ws/0/xs/3"
+                            ],
+                            "name": "w.xs[3].v",
+                            "outcome": "absent",
+                            "value": null
+                          }
+                        ],
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/ws/0/xs/3"
+                        ],
+                        "message": "v is missing",
+                        "name": "item 4 of w.xs",
+                        "value": {}
+                      },
+                      {
+                        "cause": "absent",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/ws/0/xs/4"
+                            ],
+                            "name": "w.xs[4].v",
+                            "outcome": "absent",
+                            "value": null
+                          }
+                        ],
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/ws/0/xs/4"
+                        ],
+                        "message": "v is missing",
+                        "name": "item 5 of w.xs",
+                        "value": {}
+                      }
+                    ],
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/ws/0"
+                    ],
+                    "message": "",
+                    "name": "item 1 of ws",
+                    "value": {
+                      "xs": [
+                        {},
+                        {},
+                        {},
+                        {},
+                        {}
+                      ]
+                    }
+                  }
+                ],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/every/assert"
+                ],
+                "message": "$params.min is \"s\", which isn't a number",
+                "name": "every w.xs.v is at least $params.min"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "ws[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "xs": [
+                      {},
+                      {},
+                      {},
+                      {},
+                      {}
+                    ]
+                  }
+                ]
+              }
+            ],
+            "message": "$params.min is \"s\", which isn't a number; item 1 of ws: item 1 of w.xs: v is missing; item 1 of ws: item 2 of w.xs: v is missing; item 1 of ws: item 3 of w.xs: v is missing; and 2 more",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "some",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [
+                      {
+                        "cause": "absent",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/ws/0/xs/0"
+                            ],
+                            "name": "w.xs[0].v",
+                            "outcome": "absent",
+                            "value": null
+                          }
+                        ],
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/ws/0/xs/0"
+                        ],
+                        "message": "v is missing",
+                        "name": "item 1 of w.xs",
+                        "value": {}
+                      },
+                      {
+                        "cause": "absent",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/ws/0/xs/1"
+                            ],
+                            "name": "w.xs[1].v",
+                            "outcome": "absent",
+                            "value": null
+                          }
+                        ],
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/ws/0/xs/1"
+                        ],
+                        "message": "v is missing",
+                        "name": "item 2 of w.xs",
+                        "value": {}
+                      },
+                      {
+                        "cause": "absent",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/ws/0/xs/2"
+                            ],
+                            "name": "w.xs[2].v",
+                            "outcome": "absent",
+                            "value": null
+                          }
+                        ],
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/ws/0/xs/2"
+                        ],
+                        "message": "v is missing",
+                        "name": "item 3 of w.xs",
+                        "value": {}
+                      },
+                      {
+                        "cause": "absent",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/ws/0/xs/3"
+                            ],
+                            "name": "w.xs[3].v",
+                            "outcome": "absent",
+                            "value": null
+                          }
+                        ],
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/ws/0/xs/3"
+                        ],
+                        "message": "v is missing",
+                        "name": "item 4 of w.xs",
+                        "value": {}
+                      },
+                      {
+                        "cause": "absent",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/ws/0/xs/4"
+                            ],
+                            "name": "w.xs[4].v",
+                            "outcome": "absent",
+                            "value": null
+                          }
+                        ],
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/ws/0/xs/4"
+                        ],
+                        "message": "v is missing",
+                        "name": "item 5 of w.xs",
+                        "value": {}
+                      }
+                    ],
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/ws/0"
+                    ],
+                    "message": "",
+                    "name": "item 1 of ws",
+                    "value": {
+                      "xs": [
+                        {},
+                        {},
+                        {},
+                        {},
+                        {}
+                      ]
+                    }
+                  }
+                ],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/some/assert"
+                ],
+                "message": "$params.min is \"s\", which isn't a number",
+                "name": "some w.xs.v is at least $params.min"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "ws[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "xs": [
+                      {},
+                      {},
+                      {},
+                      {},
+                      {}
+                    ]
+                  }
+                ]
+              }
+            ],
+            "message": "$params.min is \"s\", which isn't a number; item 1 of ws: item 1 of w.xs: v is missing; item 1 of ws: item 2 of w.xs: v is missing; item 1 of ws: item 3 of w.xs: v is missing; and 2 more",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
   {
     "description": "the roots of the line's own whose come before the roots of its sentences, whatever their causes",
     "params": {

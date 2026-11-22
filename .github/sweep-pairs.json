@@ -9825,5 +9825,2879 @@
   },
   "note": "for.second_failures and row.parts give the `item 1 of ws: ` lead (row.parts: `item 2 of ws: w.o is missing`); problems.where_said rules out the same message without the item, because `w.ms` depends on the item. walk.member.not_an_object: a list where an object is expected \"fails as `unusable`, named with the message a check gives where it needs an object\". for.walk: \"The second item's path and its `whose` checks can start at the first item's alias\". Naming the value as written, `w.ms`, follows message.items (`item 1 of prs: item 1 of pr.meta.cs`); no case pins this exact form, so it is derived by combining the rules.",
   "want": "item 1 of ws: w.ms is [1], which isn't an object"
+ },
+ {
+  "name": "keyed root every/$input.m=null",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every xs whose v is $input.m named by key exists"
+     }
+    }
+   }
+  },
+  "input": {
+   "m": null,
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "key": "a",
+       "v": 1,
+       "tags": [
+        "x"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "note": "problems.where_said and tally.whose: a root read from outside the item is said once, with no item in front; walk.every: an item a whose can't decide fails the every, with if any too.",
+  "want": "$input.m is null"
+ },
+ {
+  "name": "keyed root every/$input.m=none/if any",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every xs whose v is $input.m named by key, if any, exists"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "key": "a",
+       "v": 1,
+       "tags": [
+        "x"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "note": "problems.where_said and tally.whose: a root read from outside the item is said once, with no item in front; walk.every: an item a whose can't decide fails the every, with if any too.",
+  "want": "$input.m is missing"
+ },
+ {
+  "name": "keyed root every/$input.m=3/contains",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every xs whose tags contains $input.m named by key exists"
+     }
+    }
+   }
+  },
+  "input": {
+   "m": 3,
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "key": "a",
+       "v": 1,
+       "tags": [
+        "x"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "note": "problems.where_said and tally.whose: a root read from outside the item is said once, with no item in front; walk.every: an item a whose can't decide fails the every, with if any too.",
+  "want": "$input.m is 3, which isn't an object"
+ },
+ {
+  "name": "keyed root every/$params.m=[]/is not",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every xs whose v is not $params.m named by key exists"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "key": "a",
+       "v": 1,
+       "tags": [
+        "x"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "m": []
+  },
+  "note": "problems.where_said and tally.whose: a root read from outside the item is said once, with no item in front; walk.every: an item a whose can't decide fails the every, with if any too.",
+  "want": "$params.m is [], which isn't an object"
+ },
+ {
+  "name": "keyed root every/$input.d=null",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every xs whose v is $input.d.m named by key, if any, exists"
+     }
+    }
+   }
+  },
+  "input": {
+   "d": null,
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "key": "a",
+       "v": 1,
+       "tags": [
+        "x"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "note": "problems.where_said and tally.whose: a root read from outside the item is said once, with no item in front; walk.every: an item a whose can't decide fails the every, with if any too.",
+  "want": "$input.d is null"
+ },
+ {
+  "name": "for r5/free sentence roots [for.roots]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs, if any, as x",
+       "assert": [
+        "w exists",
+        "y is at least 1",
+        "z is 1"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [],
+     "z": 3,
+     "y": "s"
+    }
+   ]
+  },
+  "want": "w is missing; y is \"s\", which isn't a number; z is 3"
+ },
+ {
+  "name": "for r5/free sentence before a key [for.pass]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every o named by $params.k as x",
+       "assert": [
+        "x is 1",
+        "z is 3"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "o": {
+      "a": [
+       1
+      ]
+     },
+     "z": 2
+    }
+   ]
+  },
+  "want": "z is 2; $params.k is missing"
+ },
+ {
+  "name": "for r5-6/first-alias root beside a root [problems.all_said]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs as x, every es as e",
+       "assert": "x.v is at least z"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": "s"
+      },
+      {
+       "v": null
+      },
+      {}
+     ],
+     "es": [
+      {
+       "n": 1
+      }
+     ]
+    }
+   ]
+  },
+  "want": "z is missing; item 1 of xs: x.v is \"s\", which isn't a number; item 2 of xs: x.v is null; item 3 of xs: x.v is missing"
+ },
+ {
+  "name": "for r5-6/first-alias root beside a param, if any [problems.all_said]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "some xs as x, every es, if any, as e",
+       "assert": "x.v is at least $params.min"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": "s"
+      },
+      {
+       "v": null
+      },
+      {}
+     ],
+     "es": [
+      {
+       "n": 1
+      }
+     ]
+    }
+   ]
+  },
+  "want": "$params.min is missing; item 1 of xs: x.v is \"s\", which isn't a number; item 2 of xs: x.v is null; item 3 of xs: x.v is missing"
+ },
+ {
+  "name": "for r5-6/inner list said once [problems.all_said]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs as x, every x.ys as y",
+       "assert": "every x.ys.n is 1"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "ys": []
+      },
+      {
+       "ys": null
+      }
+     ]
+    }
+   ]
+  },
+  "want": "item 1 of xs: x.ys is []; item 2 of xs: x.ys is null"
+ },
+ {
+  "name": "for r5-6/second list said once [problems.all_said]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs as x, every es as e",
+       "assert": "every es.zz is 1"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": 1
+      }
+     ],
+     "es": null
+    }
+   ]
+  },
+  "want": "es is null"
+ },
+ {
+  "name": "for r5-6/list after a free sentence, whose [message.empty]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs whose v is 1 as x",
+       "assert": [
+        "x.v is 1",
+        "z is 1"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": 3
+      }
+     ],
+     "z": 3
+    }
+   ]
+  },
+  "want": "z is 3; xs is [{\"v\": 3}]"
+ },
+ {
+  "name": "for r5-6/list after a free sentence, sorted pick [message.empty]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "first of xs sorted by v as x",
+       "assert": [
+        "x.v is 1",
+        "z is 1"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [],
+     "z": 3
+    }
+   ]
+  },
+  "want": "z is 3; xs is []"
+ },
+ {
+  "name": "for r5-6/tie beside params that aren't an object [for.roots]",
+  "params": 3,
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "first of xs sorted by v as x",
+       "assert": [
+        "x.v is at least $params.min",
+        "count of es whose zz is m named by $params.k is 0"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": 1
+      },
+      {
+       "v": 1
+      }
+     ],
+     "es": [
+      null,
+      {
+       "zz": 2,
+       "m": 3
+      }
+     ]
+    }
+   ]
+  },
+  "want": "$params is 3, which isn't an object; item 1 and item 2 of xs tie on v"
+ },
+ {
+  "name": "for r5-6/alias read only as a count's key [for.roots]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every ks as k",
+       "assert": "count of es whose zz is m named by k is 0"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "ks": [
+      3
+     ],
+     "es": [
+      {
+       "zz": 1,
+       "m": {
+        "a": 1
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "want": "item 1 of ks: k is 3, which isn't text"
+ },
+ {
+  "name": "for r5-6/alias read only as a count's key, empty list [for.pass]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs as x",
+       "assert": [
+        "count of es whose zz is m named by x.k is 0",
+        "z is 1"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [],
+     "es": [
+      null,
+      {
+       "zz": null,
+       "m": null
+      }
+     ],
+     "z": null
+    }
+   ]
+  },
+  "want": "z is null; xs is []"
+ },
+ {
+  "name": "for r5-6/second list not counted [message.items]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs as x, every es as e",
+       "assert": "x.v is 1"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": 2
+      },
+      {
+       "v": 3
+      },
+      {
+       "v": 4
+      }
+     ],
+     "es": null
+    }
+   ]
+  },
+  "want": "es is null; item 1 of xs: x.v is 2; item 2 of xs: x.v is 3; item 3 of xs: x.v is 4"
+ },
+ {
+  "name": "for r5-6/first list not counted after a free sentence [message.items]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every ks, if any, as k",
+       "assert": "every es.zz is 1"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "ks": null,
+     "es": [
+      {
+       "zz": 2
+      },
+      {
+       "zz": 3
+      },
+      {
+       "zz": 4
+      }
+     ]
+    }
+   ]
+  },
+  "want": "item 1 of es: zz is 2; item 2 of es: zz is 3; item 3 of es: zz is 4; ks is null"
+ },
+ {
+  "name": "for r5-6/empty first list not counted [message.items]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every ks as k",
+       "assert": "every es.zz is 1"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "ks": [],
+     "es": [
+      {
+       "zz": 2
+      },
+      {
+       "zz": 3
+      },
+      {
+       "zz": 4
+      }
+     ]
+    }
+   ]
+  },
+  "want": "item 1 of es: zz is 2; item 2 of es: zz is 3; item 3 of es: zz is 4; ks is []"
+ },
+ {
+  "name": "for r5-6/item that isn't an object beside a failing second list [message.items]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "some xs as x, every es, if any, as e",
+       "assert": "x.v exists"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {},
+      [
+       1
+      ]
+     ],
+     "es": null
+    }
+   ]
+  },
+  "want": "es is null; item 1 of xs: x.v is missing; item 2 of xs is [1], which isn't an object"
+ },
+ {
+  "name": "for r5-6/item that isn't an object under a later whose [for.roots]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "some xs as x, every es whose zz is x.v, if any, as e",
+       "assert": "e.n exists"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": null
+      },
+      [
+       1
+      ]
+     ],
+     "es": null
+    }
+   ]
+  },
+  "want": "es is null; item 1 of xs: x.v is null"
+ },
+ {
+  "name": "for r5-6/pair part in sentence order [message.join]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs as x, every es as e",
+       "assert": [
+        "x.v is 1",
+        "e.n is 1"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": 2
+      }
+     ],
+     "es": [
+      {
+       "n": 1
+      },
+      {
+       "n": 2
+      }
+     ]
+    }
+   ]
+  },
+  "want": "item 1 of xs: item 2 of es: x.v is 2, and e.n is 2"
+ },
+ {
+  "name": "for r5-6/sentences that read no alias in order across kinds [for.pass]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every ks as k",
+       "assert": [
+        "every es.zz is 1",
+        "z is 1"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "ks": [
+      "a"
+     ],
+     "es": [
+      {
+       "zz": 2
+      }
+     ],
+     "z": 2
+    }
+   ]
+  },
+  "want": "item 1 of es: zz is 2; z is 2"
+ },
+ {
+  "name": "for r5-6/key that isn't text said once beside each item [problems.all_said]",
+  "params": {
+   "k": 3
+  },
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs as x, every es as e",
+       "assert": [
+        "x.m named by $params.k is 1"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "m": {
+        "a": 1
+       }
+      },
+      {
+       "m": null
+      },
+      {}
+     ],
+     "es": [
+      {
+       "zz": 1
+      }
+     ]
+    }
+   ]
+  },
+  "want": "$params.k is 3, which isn't text; item 2 of xs: x.m is null; item 3 of xs: x.m is missing"
+ },
+ {
+  "name": "for r5-6/item that isn't an object not said again by the second list [problems.all_said]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs as x, every x.ys as y",
+       "assert": [
+        "x.m named by z is 1"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      [
+       1
+      ],
+      {
+       "m": {
+        "a": 1
+       },
+       "ys": [
+        {}
+       ]
+      }
+     ],
+     "z": "a"
+    }
+   ]
+  },
+  "want": "item 1 of xs is [1], which isn't an object"
+ },
+ {
+  "name": "for r5-6/item's own problem beside second-list items that aren't objects, key not text [problems.all_said]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs as x, every es as e",
+       "assert": [
+        "x.m named by z is 1",
+        "e.zz is x.v"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": "s",
+       "k": "a"
+      },
+      {
+       "v": 1,
+       "m": [
+        5
+       ]
+      }
+     ],
+     "es": [
+      3
+     ],
+     "z": 3
+    }
+   ]
+  },
+  "want": "z is 3, which isn't text; item 1 of xs: x.m named by z is missing; item 1 of xs: item 1 of es is 3, which isn't an object; item 2 of xs: item 1 of es is 3, which isn't an object"
+ },
+ {
+  "name": "for r5-6/item's own problem beside second-list items that aren't objects, params key not text [problems.all_said]",
+  "params": {
+   "k": 3
+  },
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs as x, every es as e",
+       "assert": [
+        "x.m named by $params.k is 1",
+        "e.zz is x.v"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": "s",
+       "k": "a"
+      },
+      {
+       "v": 1,
+       "m": [
+        5
+       ]
+      }
+     ],
+     "es": [
+      3
+     ]
+    }
+   ]
+  },
+  "want": "$params.k is 3, which isn't text; item 1 of xs: x.m is missing; item 1 of xs: item 1 of es is 3, which isn't an object; item 2 of xs: x.m is [5], which isn't an object; item 2 of xs: item 1 of es is 3, which isn't an object"
+ },
+ {
+  "name": "for r5-6/item that isn't an object beside a sort key that can't be read [row.parts]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "first of xs sorted by m named by $params.k as x",
+       "assert": "x.v exists"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": 1
+      },
+      "str"
+     ]
+    }
+   ]
+  },
+  "want": "$params.k is missing; item 1 of xs: m is missing; item 2 of xs is \"str\", which isn't an object"
+ },
+ {
+  "name": "for r5-6/root shared with a sentence that reads no alias said with it [for.roots]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs as x",
+       "assert": [
+        "x.v is at least zb",
+        "zb is at least 1",
+        "w is 1"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "zb": "s",
+     "xs": [
+      {
+       "v": 1
+      }
+     ]
+    }
+   ]
+  },
+  "want": "zb is \"s\", which isn't a number; w is missing"
+ },
+ {
+  "name": "for r5-6/line key shared with a sentence that reads no alias said with it [for.roots]",
+  "params": {
+   "k": 3
+  },
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every o named by $params.k as x",
+       "assert": [
+        "$params.k is \"a\"",
+        "w is 1",
+        "x is 1"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "o": {
+      "a": [
+       1
+      ]
+     }
+    }
+   ]
+  },
+  "want": "$params.k is 3, which isn't text; w is missing"
+ },
+ {
+  "name": "for r5-6/sentences that read no alias and walk one list keep their own parts [message.join]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every ks as k",
+       "assert": [
+        "count of es whose zz is at least $params.min is 1",
+        "count of es whose zz is m named by $params.k is 0"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "ks": [
+      "a"
+     ],
+     "es": [
+      {
+       "m": null
+      },
+      {
+       "zz": "s",
+       "m": null
+      }
+     ]
+    }
+   ]
+  },
+  "want": "$params.min is missing; item 1 of es: zz is missing; item 2 of es: zz is \"s\", which isn't a number; $params.k is missing; item 1 of es: zz is missing, and m is null; and 1 more"
+ },
+ {
+  "name": "for r5-6/problem a sentence that reads no alias gave not said again under an item [problems.all_said]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every ks as k",
+       "assert": [
+        "count of es is 1",
+        "every es.m named by k is 1"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "ks": [
+      "v"
+     ],
+     "es": null
+    }
+   ]
+  },
+  "want": "es is null"
+ },
+ {
+  "name": "for r5-6/problem two sentences that read no alias give said with the first [for.pass]",
+  "params": {
+   "k": 3
+  },
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every ks as k",
+       "assert": [
+        "every es.zz is 1",
+        "count of es whose zz is m named by $params.k is 0"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "ks": [
+      "a"
+     ],
+     "es": null
+    }
+   ]
+  },
+  "want": "es is null; $params.k is 3, which isn't text"
+ },
+ {
+  "name": "for r5-6/item a second line's whose can't decide said beside a pair that fails [problems.all_said]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs as x, every x.ys whose n is at least x.v as y",
+       "assert": "y.n is 1"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      [
+       1
+      ],
+      {
+       "v": 1,
+       "ys": [
+        {
+         "n": "s"
+        },
+        {
+         "n": 3
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "want": "item 1 of xs is [1], which isn't an object; item 2 of xs: item 1 of x.ys: n is \"s\", which isn't a number; item 2 of xs: item 2 of x.ys: y.n is 3"
+ },
+ {
+  "name": "for r5-6/sort key from params that aren't an object said once [problems.all_said]",
+  "params": 3,
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "first of xs sorted by m named by $params.k as x",
+       "assert": "x.v exists"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": 1,
+       "m": null
+      },
+      {
+       "v": 2,
+       "m": null
+      }
+     ]
+    }
+   ]
+  },
+  "want": "$params is 3, which isn't an object"
+ },
+ {
+  "name": "plain r5-6/a null list two sentences read said once [problems.all_said]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "assert": [
+        "every es.zz is 1",
+        "count of es whose zz is m named by $params.k is 0"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": null
+    }
+   ]
+  },
+  "want": "es is null; $params.k is missing"
+ },
+ {
+  "name": "for r5-6/a root said with the sentence that can't read it, not an earlier one that reads it fine [for.pass]",
+  "params": {
+   "l": [
+    1,
+    2
+   ]
+  },
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs as x",
+       "assert": [
+        "z is in $params.l",
+        "w is 1",
+        "x.m named by z is 1"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "z": 1,
+     "xs": [
+      {
+       "m": {
+        "a": 1
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "want": "w is missing; z is 1, which isn't text"
+ },
+ {
+  "name": "for r5-6/a value a sentence that reads no alias said not said again under each item [message.join]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs as x",
+       "assert": [
+        "x.v is at least z",
+        "z is 1"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": 1
+      },
+      {
+       "v": 3
+      }
+     ],
+     "z": 5
+    }
+   ]
+  },
+  "want": "z is 5; item 1 of xs: x.v is 1; item 2 of xs: x.v is 3"
+ },
+ {
+  "name": "for r5-6/a list a sentence that reads no alias said not said again under each item [message.join]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every ks as k",
+       "assert": [
+        "every es.zz is 1",
+        "sum of es.m named by k is 1"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": null,
+     "ks": [
+      "a",
+      "v"
+     ]
+    }
+   ]
+  },
+  "want": "es is null"
+ },
+ {
+  "name": "for r5-6/two problems of one item of a list under the item both said [message.join]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs as x",
+       "assert": [
+        "every x.ys exists",
+        "sum of x.ys.n is 3"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": 2,
+       "ys": [
+        {
+         "n": 1
+        },
+        null
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "want": "item 1 of xs: item 2 of x.ys is null, and item 2 of x.ys is null, which isn't an object"
+ },
+ {
+  "name": "for r5-6/alias key read whole beside an item a second line's whose can't read [for.roots]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs as x, every es whose zz is x.v as e",
+       "assert": "m named by x is 1"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      3
+     ],
+     "es": [
+      {
+       "zz": 1
+      }
+     ],
+     "m": {
+      "a": 1
+     }
+    }
+   ]
+  },
+  "want": "item 1 of xs: x is 3, which isn't text; item 1 of xs is 3, which isn't an object"
+ },
+ {
+  "name": "for r5-6/alias key read whole after a field of it beside an item a second line's whose can't read [path.ref_step]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs as x, every es whose zz is x.v as e",
+       "assert": "x.m named by x.k is 1"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      3
+     ],
+     "es": [
+      {
+       "zz": 1
+      }
+     ],
+     "m": {
+      "a": 1
+     }
+    }
+   ]
+  },
+  "want": "item 1 of xs: x is 3, which isn't text; item 1 of xs is 3, which isn't an object"
+ },
+ {
+  "name": "for r5-6/alias key read whole beside count of a field of it, second line's whose can't read [for.roots]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs as x, every es whose zz is x.v as e",
+       "assert": [
+        "m named by x is 1",
+        "count of x.ys is 1"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      3
+     ],
+     "es": [
+      {
+       "zz": 1
+      }
+     ],
+     "m": {
+      "a": 1
+     }
+    }
+   ]
+  },
+  "want": "item 1 of xs: x is 3, which isn't text; item 1 of xs is 3, which isn't an object"
+ },
+ {
+  "name": "for r5-6/alias key read whole beside an item a second line's path can't walk [for.roots]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs as x, every x.ys as y",
+       "assert": [
+        "m named by x is 1",
+        "y.n is 1"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      3
+     ],
+     "m": {
+      "a": 1
+     }
+    }
+   ]
+  },
+  "want": "item 1 of xs: x is 3, which isn't text; item 1 of xs is 3, which isn't an object"
+ },
+ {
+  "name": "for r5-6/alias key read whole beside a field of it on one list, said by no engine [for.roots]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs as x",
+       "assert": [
+        "x.v is 1",
+        "x.m named by x.k is 1"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      3
+     ],
+     "m": {
+      "a": 1
+     }
+    }
+   ]
+  }
+ },
+ {
+  "name": "for r5-6/sort key from params missing, first of an empty list [path.ref_step]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "first of xs sorted by m named by $params.k as x",
+       "assert": "x.v is 1"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": []
+    }
+   ]
+  },
+  "want": "$params.k is missing; xs is []"
+ },
+ {
+  "name": "for r5-6/sort key from params not text, last of an empty list [path.ref_step]",
+  "params": {
+   "k": 3
+  },
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "last of xs sorted by m named by $params.k as x",
+       "assert": "x.v is 1"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": []
+    }
+   ]
+  },
+  "want": "$params.k is 3, which isn't text; xs is []"
+ },
+ {
+  "name": "for r5-6/sort key from params not text, first of an empty second list [path.ref_step]",
+  "params": {
+   "k": 3
+  },
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every ws as w, first of xs sorted by m named by $params.k as x",
+       "assert": "x.v is 1"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "ws": [
+      {}
+     ],
+     "xs": []
+    }
+   ]
+  },
+  "want": "$params.k is 3, which isn't text; xs is []"
+ },
+ {
+  "name": "empty right list/count is in",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id",
+     "has": {
+      "pl": "p"
+     }
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of xs whose v is in $input.cs.name is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "cs": [],
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": "a",
+       "tags": [
+        "a"
+       ],
+       "n": 1
+      }
+     ],
+     "ws": [
+      {}
+     ],
+     "m": {
+      "k": {
+       "v": "a",
+       "tags": [
+        "a"
+       ],
+       "n": 1
+      }
+     },
+     "p": []
+    }
+   ]
+  },
+  "params": {
+   "cs": []
+  },
+  "want": "$input.cs is []"
+ },
+ {
+  "name": "empty right list/count is not one of",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id",
+     "has": {
+      "pl": "p"
+     }
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of xs whose v is not one of $params.cs.name is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "cs": [],
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": "a",
+       "tags": [
+        "a"
+       ],
+       "n": 1
+      }
+     ],
+     "ws": [
+      {}
+     ],
+     "m": {
+      "k": {
+       "v": "a",
+       "tags": [
+        "a"
+       ],
+       "n": 1
+      }
+     },
+     "p": []
+    }
+   ]
+  },
+  "params": {
+   "cs": []
+  },
+  "want": "$params.cs is []"
+ },
+ {
+  "name": "empty right list/count of a part",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id",
+     "has": {
+      "pl": "p"
+     }
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of xs whose v is in pl.name is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "cs": [],
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": "a",
+       "tags": [
+        "a"
+       ],
+       "n": 1
+      }
+     ],
+     "ws": [
+      {}
+     ],
+     "m": {
+      "k": {
+       "v": "a",
+       "tags": [
+        "a"
+       ],
+       "n": 1
+      }
+     },
+     "p": []
+    }
+   ]
+  },
+  "params": {
+   "cs": []
+  },
+  "want": "pl is []"
+ },
+ {
+  "name": "empty right list/count that",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id",
+     "has": {
+      "pl": "p"
+     }
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of xs.v that is in $input.cs.name is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "cs": [],
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": "a",
+       "tags": [
+        "a"
+       ],
+       "n": 1
+      }
+     ],
+     "ws": [
+      {}
+     ],
+     "m": {
+      "k": {
+       "v": "a",
+       "tags": [
+        "a"
+       ],
+       "n": 1
+      }
+     },
+     "p": []
+    }
+   ]
+  },
+  "params": {
+   "cs": []
+  },
+  "want": "$input.cs is []"
+ },
+ {
+  "name": "empty right list/sum that",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id",
+     "has": {
+      "pl": "p"
+     }
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "sum of xs.n that is in $input.cs.name is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "cs": [],
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": "a",
+       "tags": [
+        "a"
+       ],
+       "n": 1
+      }
+     ],
+     "ws": [
+      {}
+     ],
+     "m": {
+      "k": {
+       "v": "a",
+       "tags": [
+        "a"
+       ],
+       "n": 1
+      }
+     },
+     "p": []
+    }
+   ]
+  },
+  "params": {
+   "cs": []
+  },
+  "want": "$input.cs is []"
+ },
+ {
+  "name": "empty right list/count matches",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id",
+     "has": {
+      "pl": "p"
+     }
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of xs whose v matches $input.cs.name is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "cs": [],
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": "a",
+       "tags": [
+        "a"
+       ],
+       "n": 1
+      }
+     ],
+     "ws": [
+      {}
+     ],
+     "m": {
+      "k": {
+       "v": "a",
+       "tags": [
+        "a"
+       ],
+       "n": 1
+      }
+     },
+     "p": []
+    }
+   ]
+  },
+  "params": {
+   "cs": []
+  },
+  "want": "$input.cs is []"
+ },
+ {
+  "name": "empty right list/count contains all of",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id",
+     "has": {
+      "pl": "p"
+     }
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of xs whose tags contains all of $input.cs.name is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "cs": [],
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": "a",
+       "tags": [
+        "a"
+       ],
+       "n": 1
+      }
+     ],
+     "ws": [
+      {}
+     ],
+     "m": {
+      "k": {
+       "v": "a",
+       "tags": [
+        "a"
+       ],
+       "n": 1
+      }
+     },
+     "p": []
+    }
+   ]
+  },
+  "params": {
+   "cs": []
+  },
+  "want": "$input.cs is []"
+ },
+ {
+  "name": "empty right list/count of member of",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id",
+     "has": {
+      "pl": "p"
+     }
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of member of m whose v is in $input.cs.name is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "cs": [],
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": "a",
+       "tags": [
+        "a"
+       ],
+       "n": 1
+      }
+     ],
+     "ws": [
+      {}
+     ],
+     "m": {
+      "k": {
+       "v": "a",
+       "tags": [
+        "a"
+       ],
+       "n": 1
+      }
+     },
+     "p": []
+    }
+   ]
+  },
+  "params": {
+   "cs": []
+  },
+  "want": "$input.cs is []"
+ },
+ {
+  "name": "empty right list/count, item without the field",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id",
+     "has": {
+      "pl": "p"
+     }
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of xs whose v is in $input.cs.name is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "cs": [],
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {}
+     ],
+     "ws": [
+      {}
+     ],
+     "m": {
+      "k": {}
+     },
+     "p": []
+    }
+   ]
+  },
+  "params": {
+   "cs": []
+  },
+  "want": "$input.cs is []; item 1 of xs: v is missing"
+ },
+ {
+  "name": "empty right list/every",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id",
+     "has": {
+      "pl": "p"
+     }
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every xs whose v is in $input.cs.name exists"
+     }
+    }
+   }
+  },
+  "input": {
+   "cs": [],
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": "a",
+       "tags": [
+        "a"
+       ],
+       "n": 1
+      }
+     ],
+     "ws": [
+      {}
+     ],
+     "m": {
+      "k": {
+       "v": "a",
+       "tags": [
+        "a"
+       ],
+       "n": 1
+      }
+     },
+     "p": []
+    }
+   ]
+  },
+  "params": {
+   "cs": []
+  },
+  "want": "$input.cs is []"
+ },
+ {
+  "name": "empty right list/every if any",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id",
+     "has": {
+      "pl": "p"
+     }
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every xs whose v is not one of $input.cs.name, if any, exists"
+     }
+    }
+   }
+  },
+  "input": {
+   "cs": [],
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": "a",
+       "tags": [
+        "a"
+       ],
+       "n": 1
+      }
+     ],
+     "ws": [
+      {}
+     ],
+     "m": {
+      "k": {
+       "v": "a",
+       "tags": [
+        "a"
+       ],
+       "n": 1
+      }
+     },
+     "p": []
+    }
+   ]
+  },
+  "params": {
+   "cs": []
+  },
+  "want": "$input.cs is []"
+ },
+ {
+  "name": "empty right list/some",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id",
+     "has": {
+      "pl": "p"
+     }
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "some xs whose v is in $input.cs.name exists"
+     }
+    }
+   }
+  },
+  "input": {
+   "cs": [],
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": "a",
+       "tags": [
+        "a"
+       ],
+       "n": 1
+      }
+     ],
+     "ws": [
+      {}
+     ],
+     "m": {
+      "k": {
+       "v": "a",
+       "tags": [
+        "a"
+       ],
+       "n": 1
+      }
+     },
+     "p": []
+    }
+   ]
+  },
+  "params": {
+   "cs": []
+  },
+  "want": "$input.cs is []"
+ },
+ {
+  "name": "empty right list/every on an empty list",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id",
+     "has": {
+      "pl": "p"
+     }
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every xs whose v is in $input.cs.name exists"
+     }
+    }
+   }
+  },
+  "input": {
+   "cs": [],
+   "things": [
+    {
+     "id": "t",
+     "xs": [],
+     "ws": [
+      {}
+     ],
+     "m": {},
+     "p": []
+    }
+   ]
+  },
+  "params": {
+   "cs": []
+  },
+  "want": "$input.cs is []; xs is []"
+ },
+ {
+  "name": "empty right list/for line count",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id",
+     "has": {
+      "pl": "p"
+     }
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every ws as w",
+       "assert": "count of xs whose v is in $input.cs.name is 0"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "cs": [],
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": "a",
+       "tags": [
+        "a"
+       ],
+       "n": 1
+      }
+     ],
+     "ws": [
+      {}
+     ],
+     "m": {
+      "k": {
+       "v": "a",
+       "tags": [
+        "a"
+       ],
+       "n": 1
+      }
+     },
+     "p": []
+    }
+   ]
+  },
+  "params": {
+   "cs": []
+  },
+  "want": "$input.cs is []"
+ },
+ {
+  "name": "empty right list/for line whose",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id",
+     "has": {
+      "pl": "p"
+     }
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs whose v is in pl.name, if any, as x",
+       "assert": "x.v exists"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "cs": [],
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": "a",
+       "tags": [
+        "a"
+       ],
+       "n": 1
+      }
+     ],
+     "ws": [
+      {}
+     ],
+     "m": {
+      "k": {
+       "v": "a",
+       "tags": [
+        "a"
+       ],
+       "n": 1
+      }
+     },
+     "p": []
+    }
+   ]
+  },
+  "params": {
+   "cs": []
+  },
+  "want": "pl is []"
+ },
+ {
+  "name": "empty right list/for line count of an alias's list",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id",
+     "has": {
+      "pl": "p"
+     }
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs as m",
+       "assert": "count of m.ys whose v is in pl.name is 0"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "cs": [],
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "ys": [
+        {
+         "v": "a"
+        }
+       ]
+      }
+     ],
+     "ws": [
+      {}
+     ],
+     "m": {
+      "k": {
+       "ys": [
+        {
+         "v": "a"
+        }
+       ]
+      }
+     },
+     "p": []
+    }
+   ]
+  },
+  "params": {
+   "cs": []
+  },
+  "want": "pl is []"
  }
 ]

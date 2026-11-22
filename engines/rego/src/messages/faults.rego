@@ -45,7 +45,7 @@ _m_params_unread(check) if {
 _m_list_items(check, subj) if {
 	is_array(subj)
 	not _m_list_read_plain(check, subj)
-	count(_m_tallies(subj, check, "not_an_object")) > 0
+	count(_m_tally_lists(subj, check, "not_an_object")) > 0
 }
 
 _m_list_read_plain(check, subj) if {

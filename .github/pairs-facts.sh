@@ -55,11 +55,11 @@ def read(path):
         return json.load(handle)
 
 
-def run_with_path(directory, ids):
+def run_with_path(directory, ids, tree, allow_old=False):
     saved = os.environ["PATH"]
     os.environ["PATH"] = directory + os.pathsep + saved
     try:
-        return sweep.run_rust("sh -s", ids)[1]
+        return sweep.run_rust("sh -s", ids, tree, allow_old)[1]
     finally:
         os.environ["PATH"] = saved
 
@@ -103,13 +103,13 @@ else:
     subprocess.run([os.path.join(root, ".github", "build-ergo.sh")], cwd=root, check=True, stdout=subprocess.DEVNULL)
     sweep.write_cells(pairs)
     rego = sweep.run_rego(os.environ.get("OPA", "opa"), ids)
-    head = run_with_path(os.environ["PAIRS_FACTS_HEAD_BIN"], ids)
+    head = run_with_path(os.environ["PAIRS_FACTS_HEAD_BIN"], ids, root)
     with open(os.path.join(os.environ["PAIRS_FACTS_BASE_TREE"], "engines", "rego", "src", "shared", "basics.rego")) as handle:
         base_spec = re.search(r'^_spec := "([^"]*)"', handle.read(), re.M).group(1)
     for pair in pairs:
         pair["policy"] = dict(pair["policy"], ergo_spec=base_spec)
     sweep.write_cells(pairs)
-    before = run_with_path(os.environ["PAIRS_FACTS_BASE_BIN"], ids)
+    before = run_with_path(os.environ["PAIRS_FACTS_BASE_BIN"], ids, os.environ["PAIRS_FACTS_BASE_TREE"], True)
 
 base = os.environ["PAIRS_FACTS_BASE_NAME"]
 total = len(pairs)

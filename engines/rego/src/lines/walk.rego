@@ -6,13 +6,13 @@ _walk_row(check, subj) := object.union(r, {"other_roots": _walk_parts(check, sub
 	r := _key_item_row(check, subj)
 } else := object.union(r, {"cause": _worst_of(_key_item_flaws(check) | {r.cause}), "other_roots": _walk_parts(check, subj, {"ergo/key_texts": true}, r)}) if {
 	r := _key_list_fail_row(check, subj)
-} else := object.union(raw, {"cause": "unusable", "failed": a.failed, "root_msgs": _with_roots(ps, ms), "ergo/alone_items": [p | some p in ps; not p in ms]}) if {
+} else := object.union(raw, {"cause": "unusable", "failed": a.failed, "root_msgs": _with_roots(ps, ms), "ergo/alone_items": [p | some p in ps; not p.text in {m.text | some m in ms}]}) if {
 	_walk_flawed(check)
 	not _unreadable_input
 	not _walk_keyed(check)
 	_m_walk_blocked(subj, check) == []
 	_walk_root_flaw(check, subj) != ""
-	ms := _walk_root_msgs(check, subj)
+	ms := _walk_root_clauses(check, subj)
 	ms != []
 	_items_judged_alone(subj, check)
 	raw := _walk_read_row(check, subj)
@@ -30,9 +30,9 @@ _walk_row(check, subj) := object.union(r, {"other_roots": _walk_parts(check, sub
 	_walk_root_flaw(check, subj) != ""
 	_walk_root_msgs(check, subj) != []
 	r := object.union(raw, {"cause": "unusable", "failed": []})
-	ms := _flawed_root_msgs(check, subj, _walk_message(check, subj, r, r))
+	ms := _walk_message(check, subj, r, r)
 	ms != []
-} else := object.union(r, {"root_msgs": ms | ms := _flawed_root_msgs(check, subj, _walk_message(check, subj, r, r)); ms != []}) if {
+} else := object.union(r, {"root_msgs": ms | ms := _walk_message(check, subj, r, r); ms != []}) if {
 	_walk_flawed(check)
 	r := object.union(_walk_read_row(check, subj), {"cause": "unusable", "failed": []})
 } else := {"cause": "not_an_object", "inputs": [], "failed": []} if {
@@ -586,9 +586,9 @@ _walk_worst(fails) := [c | some c in array.concat(_cause_precedence, ["value"]);
 _walk_failed("satisfied", _, _) := []
 
 _walk_failed(cause, fails, path) := [object.union({"path": _failed_name(f.path, _dotted_roots([path])), "item": _failed_name(f.item, _dotted_roots([path])), "cause": f.cause, "value": f.value, "locations": _fail_locations(f), "ergo/item": _fail_item(f)}, object.union(_plain_item_read(f, path), _fail_read_outcome(f))) |
-	some p in sort({f.path | some f in fails})
+	some p in sort({[f.item, f.path] | some f in fails})
 	some f in fails
-	f.path == p
+	[f.item, f.path] == p
 ] if cause != "satisfied"
 
 _plain_item_read(f, path) := {"ergo/read": _failed_read_name(f.path, _dotted_roots([path]))} if f.path == f.item
@@ -607,6 +607,8 @@ _item_locations(f) := [f.iat] if not "ats" in object.keys(f)
 else := [trim_suffix(a, trim_prefix(f.at, f.iat)) | some a in f.ats]
 
 _walk_inputs(check, w) := [{"name": _walk_name(check.path, w.walked), "value": [], "locations": [], "ergo/outcome": _walk_stop_state(_walk_stopped_at(w.trail).v)}] if w.walked == set()
+
+else := [{"name": _walk_name(check.path, w.walked), "value": [], "locations": [], "ergo/outcome": o}] if o := _stopped_list_outcome(w.items, w.fails)
 
 else := [{"name": _walk_name(check.path, w.walked), "value": [_walk_value(e.v, e, w) | some e in w.items], "locations": _walk_locations(w)}]
 

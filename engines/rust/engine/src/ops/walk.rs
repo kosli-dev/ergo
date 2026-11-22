@@ -997,6 +997,16 @@ pub(super) fn focus_check(item: &WalkItem) -> Check {
     })
 }
 
+/// Whether `check` reads a list from outside the item, after a phrase that
+/// takes a list, that is empty, like `$input.cs.name` with `cs` holding `[]`.
+pub(super) fn empty_root(check: &Check, outer: &Ctx) -> bool {
+    super::lists::right_paths(check).into_iter().any(|path| {
+        message::reads_from_a_root(path)
+            && super::lists::walked_root_fault(check, path, outer)
+                .is_some_and(|(cause, _)| cause == Cause::Value)
+    })
+}
+
 pub(super) fn focus_verdict(
     check: &Check,
     item: &WalkItem,
@@ -1439,7 +1449,12 @@ fn before_key<'a>(path: &Path, at: &Ctx<'a>) -> Option<(Path, path::Read<'a>, Ca
 fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
     let mut at = ctx.clone();
     let leaf_roots = message::root_clauses(&[&*walk.check], ctx);
-    let leaf_walked = message::walked_root_clauses_with(&[&*walk.check], ctx, true);
+    let leaf_walked = message::walked_root_clauses(&[&*walk.check], ctx);
+    let emptied: Vec<&Check> = walk
+        .whose
+        .iter()
+        .filter(|check| empty_root(check, ctx))
+        .collect();
     walked
         .items
         .iter()
@@ -1455,7 +1470,11 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
                     (check, verdict, lost)
                 })
                 .collect();
-            let failing = || verdicts.iter().filter(|(_, v, _)| v.cause.is_failure());
+            let failing = || {
+                verdicts.iter().filter(|(check, v, _)| {
+                    v.cause.is_failure() || emptied.iter().any(|empty| std::ptr::eq(*empty, *check))
+                })
+            };
             let undecided = failing().next().is_some();
             let own = failing()
                 .filter(|(check, _, _)| !check.flawed(ctx))
@@ -1632,7 +1651,9 @@ fn cause_of(walk: &Walk, walked: &Walked, judged: &[Judged], fails: &[&Failure])
     let worst = || Cause::worst(fails.iter().map(|f| f.cause)).unwrap_or(Cause::Value);
     match walk.quantifier {
         Quantifier::Every if fails.is_empty() => {
-            if walk.if_any || judged.iter().any(|j| j.kept) {
+            if judged.iter().any(|j| !j.decided) {
+                Cause::Value
+            } else if walk.if_any || judged.iter().any(|j| j.kept) {
                 Cause::Satisfied
             } else {
                 Cause::Value
@@ -1655,20 +1676,56 @@ fn with_fields(inputs: &mut Vec<Input>, list: &str, path: &Path, ctx: &Ctx) {
     }
 }
 
-/// How reading a walked list ended, from the failure that names the list
-/// itself when it has no items.
-pub fn list_state(walked: &Walked) -> crate::path::Outcome {
-    walked
+/// `Unusable` when a walk with no list along its path gives no item because
+/// the path reads a value that can't be walked, and `None` otherwise.
+pub fn stopped_state(walked: &Walked, path: &Path, ctx: &Ctx) -> Option<Outcome> {
+    if !walked.items.is_empty()
+        || walked.failures.is_empty()
+        || walked.walked.iter().any(|at| *at != walked.steps)
+    {
+        return None;
+    }
+    let read = path::read(&member::split(path).0, ctx);
+    (read.outcome == Outcome::Found && read.value.is_some()).then_some(Outcome::Unusable)
+}
+
+fn worst_stop(walked: &Walked) -> Option<Outcome> {
+    if walked
         .failures
         .iter()
-        .find(|f| walked.items.is_empty() && !crate::parts::is_item(&f.item))
-        .map_or(crate::path::Outcome::Found, |f| match f.cause {
-            Cause::Absent => crate::path::Outcome::Absent,
-            Cause::Null => crate::path::Outcome::Null,
-            Cause::Unusable => crate::path::Outcome::Unusable,
-            Cause::NotAnObject => crate::path::Outcome::NotAnObject,
-            _ => crate::path::Outcome::Found,
-        })
+        .any(|f| f.cause == Cause::Value && !crate::parts::is_item(&f.item))
+    {
+        return None;
+    }
+    let worst = Cause::worst(
+        walked
+            .failures
+            .iter()
+            .filter(|f| !crate::parts::is_item(&f.item))
+            .map(|f| f.cause)
+            .filter(|cause| {
+                matches!(
+                    cause,
+                    Cause::Absent | Cause::Null | Cause::Unusable | Cause::NotAnObject
+                )
+            }),
+    )?;
+    Some(match worst {
+        Cause::Absent => Outcome::Absent,
+        Cause::Null => Outcome::Null,
+        Cause::NotAnObject => Outcome::NotAnObject,
+        _ => Outcome::Unusable,
+    })
+}
+
+/// How reading a walked list ended when it has no items: the worst of the
+/// ways the reads of the list itself stopped, whatever their order, or
+/// `Found` when one of its ends is empty.
+pub fn list_state(walked: &Walked) -> Outcome {
+    if !walked.items.is_empty() {
+        return Outcome::Found;
+    }
+    worst_stop(walked).unwrap_or(Outcome::Found)
 }
 
 fn read_row(walk: &Walk, ctx: &Ctx) -> Run {

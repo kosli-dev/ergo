@@ -722,11 +722,38 @@ fn no_arguments_prints_usage_on_stderr_and_fails() {
 }
 
 #[test]
-fn version_prints_the_crate_version() {
+fn version_prints_the_crate_version_and_the_commit_it_was_built_from() {
     let output = ergo(&["--version"]);
     assert_eq!(output.status.code(), Some(0));
-    assert_eq!(
+    let text = out(&output);
+    let prefix = format!("ergo {} (commit ", env!("CARGO_PKG_VERSION"));
+    let commit = text
+        .strip_prefix(&prefix)
+        .and_then(|rest| rest.strip_suffix(")\n"))
+        .unwrap_or_else(|| panic!("unexpected version line: {text:?}"));
+    let looks_like_a_commit = commit.len() == 40 && commit.bytes().all(|b| b.is_ascii_hexdigit());
+    assert!(
+        looks_like_a_commit || commit == "unknown",
+        "unexpected commit: {commit:?}"
+    );
+}
+
+#[test]
+fn version_commit_is_the_commit_of_the_tree_it_was_built_in() {
+    let head = Command::new("git")
+        .args(["rev-parse", "HEAD"])
+        .current_dir(env!("CARGO_MANIFEST_DIR"))
+        .output();
+    let Ok(head) = head else { return };
+    if !head.status.success() {
+        return;
+    }
+    let head = String::from_utf8(head.stdout).unwrap();
+    let output = ergo(&["--version"]);
+    assert!(
+        out(&output).contains(&format!("(commit {})", head.trim())),
+        "{} should name {}",
         out(&output),
-        format!("ergo {}\n", env!("CARGO_PKG_VERSION"))
+        head.trim()
     );
 }

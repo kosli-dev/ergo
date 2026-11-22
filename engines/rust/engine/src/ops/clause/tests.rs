@@ -9,6 +9,7 @@ fn read(kind: Kind, name: &str, cause: Cause, text: &str) -> Clause {
         said: Vec::new(),
         group: 0,
         last_of_cause: false,
+        said_first: false,
     }
 }
 
@@ -335,6 +336,65 @@ fn and_n_more_comes_after_the_roots_and_the_lists_in_a_count() {
 }
 
 #[test]
+fn a_list_isnt_counted_and_comes_after_the_items_of_an_earlier_group() {
+    let es = |n: usize| {
+        item(
+            &format!("item {n} of es"),
+            Cause::Value,
+            vec![root("zz", Cause::Value, &format!("zz is {}", n + 1))],
+        )
+    };
+    let list = |name: &str| read(Kind::List, name, Cause::Null, &format!("{name} is null"));
+    assert_eq!(
+        text(&shown(&with(
+            (1..=4).map(es).collect(),
+            vec![list("ks").in_group(1)]
+        ))),
+        "item 1 of es: zz is 2; item 2 of es: zz is 3; item 3 of es: zz is 4; ks is null; and 1 more"
+    );
+    assert_eq!(
+        text(&shown(&with(vec![list("ks")], (1..=3).map(es).collect()))),
+        "ks is null; item 1 of es: zz is 2; item 2 of es: zz is 3; item 3 of es: zz is 4"
+    );
+}
+
+#[test]
+fn a_problem_two_clauses_say_alike_is_said_once() {
+    let empty = || read(Kind::List, "x.ys", Cause::Value, "x.ys is []");
+    let told = Clause {
+        said: vec![root("es is null", Cause::Null, "es is null")],
+        ..read(Kind::List, "es", Cause::Null, "es is null")
+    };
+    let clauses = vec![
+        told,
+        read(Kind::List, "es", Cause::Null, "es is null").in_group(1),
+        item(
+            "item 1 of xs",
+            Cause::Value,
+            vec![
+                Clause {
+                    said: vec![root("x.ys is []", Cause::Value, "x.ys is []")],
+                    ..empty()
+                },
+                empty(),
+            ],
+        ),
+        item(
+            "item 2 of xs",
+            Cause::Null,
+            vec![
+                root("x", Cause::Null, "x is null"),
+                root("x is null", Cause::Null, "x is null"),
+            ],
+        ),
+    ];
+    assert_eq!(
+        text(&shown(&clauses)),
+        "es is null; item 1 of xs: x.ys is []; item 2 of xs: x is null"
+    );
+}
+
+#[test]
 fn the_cap_counts_leaf_items_not_outer_items() {
     let rs = || {
         vec![
@@ -415,6 +475,24 @@ fn roots_of_a_later_sentence_come_after_the_roots_of_an_earlier_one() {
     assert_eq!(
         text(&shown(&clauses)),
         "$params.b is missing; $params.a is \"s\", which isn't a number"
+    );
+}
+
+#[test]
+fn a_sentences_items_come_before_what_a_later_sentence_says() {
+    let es = item(
+        "item 1 of es",
+        Cause::Value,
+        vec![root("zz", Cause::Value, "zz is 2")],
+    );
+    let z = || root("z is 2", Cause::Value, "z is 2");
+    assert_eq!(
+        text(&shown(&[es.clone(), z().in_group(1)])),
+        "item 1 of es: zz is 2; z is 2"
+    );
+    assert_eq!(
+        text(&shown(&[es.in_group(1), z()])),
+        "z is 2; item 1 of es: zz is 2"
     );
 }
 

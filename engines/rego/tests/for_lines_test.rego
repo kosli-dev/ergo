@@ -483,8 +483,9 @@ test_params_that_arent_an_object_name_themselves_in_a_for_line_that_reads_them_w
 test_a_part_that_holds_a_list_is_walked_by_a_count_of_whose_under_a_for_line if {
 	xs := [{"v": 1, "ys": [{"v": 1}]}]
 	empty := _item_rows(_count_part_policy, {"prs": [{"id": "p0", "c": [], "xs": xs}]}, {})
-	empty.xs[0] == "satisfied"
-	empty.ys[0] == "satisfied"
+	empty == {"xs": ["value", "pl is []"], "ys": ["value", "pl is []"], "at_least": ["value", "pl is []"]}
+	no_item := _item_rows(_count_part_policy, {"prs": [{"id": "p0", "c": [], "xs": []}]}, {})
+	no_item.ys == ["value", "pl is []; xs is []"]
 	objects := _item_rows(_count_part_policy, {"prs": [{"id": "p0", "c": [{"z": 1}], "xs": xs}]}, {})
 	objects.xs == ["value", "count of xs whose v is in pl.z is 1"]
 	objects.ys == ["value", "item 1 of xs: count of m.ys whose v is in pl.z is 1"]
@@ -506,7 +507,7 @@ test_host_data_cannot_turn_on_reading_walked_roots if {
 	doc := {"cs": [{"id": "c1", "rows": [{"tags": ["bob"]}]}]}
 	params := {"os": [{"name": "bob"}, {}]}
 	plain := ergo.report(doc, policy, params)
-	[[r.cause, r.message] | some r in plain.results; r.check == "c"] == [["absent", "item 1 of rows: item 2 of $params.os: name is missing"]]
+	[[r.cause, r.message] | some r in plain.results; r.check == "c"] == [["absent", "item 2 of $params.os: name is missing"]]
 	hosted := ergo.report(doc, policy, params) with data.ergo_walk_roots as true
 	hosted == plain
 }
@@ -541,4 +542,32 @@ test_a_second_whose_that_reads_a_list_input_key_through_an_alias_never_says_an_o
 	policy := object.union(_sentence_policy({"c": {"for": "every rs as r, every xs whose v is r.m named by $input.k as x", "assert": "x.v is \"a\""}}), {"subjects": {"thing": {"from": "$input"}}})
 	listed := `$input is [{"id": "t", "k": "a", "rs": [{"m": {"a": "a"}}], "xs": [{"v": "a"}]}], which isn't an object`
 	[[r.cause, r.message] | some r in ergo.report(doc, policy, {}).results; r.check == "c"] == [["not_an_object", concat("", [listed, "; item 1 of rs: ", listed])]]
+}
+
+_for_said_beside_empty(line, xs) := [[r.cause, r.message] | some r in ergo.report({"things": [{"id": 1, "xs": xs}]}, _sentence_policy({"c": {"for": line, "assert": "m.v exists"}}), {"cs": []}).results; r.check == "c"]
+
+test_a_for_line_whose_says_an_empty_list_on_the_right_then_the_list_or_each_item_as_a_null_list_does if {
+	every line in ["every xs whose v is in $params.cs.name as m", "some xs whose v is in $params.cs.name as m"] {
+		_for_said_beside_empty(line, []) == [["value", "$params.cs is []; xs is []"]]
+		_for_said_beside_empty(line, [{"v": "a"}, {}]) == [["value", "$params.cs is []; item 2 of xs: v is missing"]]
+		_for_said_beside_empty(line, [null]) == [["value", "$params.cs is []; item 1 of xs is null, which isn't an object"]]
+	}
+	_for_said_beside_empty("every xs whose v is in $params.cs.name, if any, as m", []) == [["value", "$params.cs is []"]]
+	_for_said_beside_empty("every xs whose v is in $params.cs.name, if any, as m", [{"v": "a"}, {}]) == [["value", "$params.cs is []; item 2 of xs: v is missing"]]
+}
+
+test_a_for_lines_whose_leaves_an_empty_part_out_of_the_rows_inputs_as_a_null_part if {
+	policy := _item_policy({"has": {"pl": "c"}}, {"every": {"for": "every xs whose v is in pl.z as m", "assert": "m.v is 1"}})
+	every part in [[], null] {
+		rows := [r | some r in ergo.report({"prs": [{"id": "p0", "c": part, "xs": [{"v": 1}]}]}, policy, {}).results; r.check == "every"]
+		[i.name | some i in rows[0].inputs] == ["xs[]"]
+	}
+}
+
+test_a_sentence_under_a_for_line_over_an_empty_list_lists_no_input_on_its_assertion_entry_for_an_empty_part_as_for_a_null_one if {
+	policy := _item_policy({"has": {"pl": "c"}}, {"c": {"for": "every xs as m", "assert": "count of m.ys whose v is in pl.z is 0"}})
+	every part in [[], null] {
+		rows := [r | some r in ergo.report({"prs": [{"id": "p0", "c": part, "xs": []}]}, policy, {}).results; r.check == "c"]
+		[[e.kind, [i.name | some i in e.inputs]] | some e in rows[0].failures] == [["assertion", []], ["list", ["xs"]]]
+	}
 }

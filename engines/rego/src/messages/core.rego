@@ -203,11 +203,23 @@ _m_with_sides(check) := object.union(check, {"$sides": sides}) if {
 	sides := _m_found_sides(check)
 }
 
-_message(check, subj, cause) := concat("; ", ps) if {
+_message(check, subj, cause) := concat("; ", [_m_pieces_text(ps) | some ps in said]) if said := _message_said(check, subj, cause)
+
+_message_said(check, subj, cause) := [[p] | some p in ps] if {
 	cause in _value_fault_causes
 	ps := _m_null_key_parts(subj, check)
 	ps != []
-} else := _m_message(_m_with_sides(_m_walked(check, subj)), subj, cause)
+} else := [_m_message_pieces(_m_with_sides(_m_walked(check, subj)), subj, cause)]
+
+_m_message(check, subj, cause) := _m_pieces_text(_m_message_pieces(check, subj, cause))
+
+_m_pieces_text(ps) := concat(", and ", [_m_piece_text(p) | some p in ps])
+
+_m_piece_text(p) := p if is_string(p)
+
+else := _m_clauses_text(_m_clauses_shown(p))
+
+_m_pieces_once(ps) := [ps[i] | some i, t in ts; not t in array.slice(ts, 0, i)] if ts := [_m_piece_text(p) | some p in ps]
 
 _m_null_key_parts(subj, check) := _once([x |
 	some [p, mode] in _m_key_paths(check)
@@ -416,27 +428,28 @@ _m_side_sources(_, side) := [] if _m_tally_side(side)
 
 _m_tally_side(side) if _basic_form(side) in _tally_forms
 
-_m_message(check, subj, "value") := m if {
+_m_message_pieces(check, subj, "value") := clauses if {
 	clauses := _once([c | some side in _m_sides(check); some c in _m_value_clauses(subj, side)])
 	count(clauses) > 0
-	m := concat(", and ", clauses)
-} else := _m_fallback(check)
+} else := tallies if {
+	tallies := _m_tally_lists(subj, check, "value")
+	count(tallies) > 0
+} else := [_m_fallback(check)]
 
-_m_message(check, subj, cause) := m if {
+_m_message_pieces(check, subj, cause) := ps if {
 	cause in _no_value_states
 	keys := _m_key_states(subj, check, cause)
 	count(keys) > 0
-	m := concat(", and ", _once(array.concat(keys, _m_unkeyed_said(subj, check, cause))))
-} else := m if {
+	ps := _m_pieces_once(array.concat(keys, _m_unkeyed_said(subj, check, cause)))
+} else := clauses if {
 	cause in _no_value_states
-	clauses := _once(array.concat(array.concat([_m_state_clause(s) | some s in _m_sources(subj, check); _m_side_said(s, cause, check)], _m_tallies(subj, check, cause)), _m_text_list_said(subj, check, cause)))
+	clauses := _m_pieces_once(array.concat(array.concat([_m_state_clause(s) | some s in _m_sources(subj, check); _m_side_said(s, cause, check)], _m_tally_lists(subj, check, cause)), _m_text_list_said(subj, check, cause)))
 	count(clauses) > 0
-	m := concat(", and ", clauses)
-} else := _m_fallback(check) if cause in _no_value_states
+} else := [_m_fallback(check)] if cause in _no_value_states
 
 _m_unusable_before_faults(subj, check, kf) := array.concat(array.concat(array.concat(kf, _m_blocked_early(subj, check)), _m_params_faults_early(subj, check)), _m_text_side_said(subj, check))
 
-_m_unusable_after_faults(subj, check) := array.concat(array.concat(array.concat(array.concat(_m_blocked_late(subj, check), _m_walk_ref_faults(subj, check)), _m_tallies(subj, check, "unusable")), _m_params_beside_input(check)), _m_text_list_said(subj, check, "null"))
+_m_unusable_after_faults(subj, check) := array.concat(array.concat(array.concat(array.concat(_m_blocked_late(subj, check), _m_walk_ref_faults(subj, check)), _m_tally_lists(subj, check, "unusable")), _m_params_beside_input(check)), _m_text_list_said(subj, check, "null"))
 
 _m_params_beside_input(check) := array.concat([_m_isnt("$input", data.ergo_document, "an object")], sort({c | walk(check, [_, v]); some c in _m_params_break(v)})) if {
 	_reads_input_key(check)
@@ -450,9 +463,8 @@ _m_unkeyed_said(subj, check, cause) := [] if {
 	[c |
 		some side in _m_tally_parts(check)
 		not _m_keyed_unread(subj, side[_basic_form(side)])
-		cs := _m_tally_said(subj, side, cause)
-		count(cs) > 0
-		c := _m_clauses_text(_m_clauses_shown(cs))
+		c := _m_tally_said(subj, side, cause)
+		count(c) > 0
 	],
 )
 
@@ -478,17 +490,15 @@ _m_unusable_beside_keys(subj, check, kf) := [_m_state_clause(s) |
 	not _m_keyed_unread(subj, s.side)
 ]
 
-_m_message(check, subj, "unusable") := m if {
+_m_message_pieces(check, subj, "unusable") := clauses if {
 	kf := _m_key_faults(subj, check)
-	clauses := _once(array.concat(array.concat(array.concat(_m_unusable_before_faults(subj, check, kf), _m_faults(subj, check)), _m_unusable_after_faults(subj, check)), _m_unusable_beside_keys(subj, check, kf)))
+	clauses := _m_pieces_once(array.concat(array.concat(array.concat(_m_unusable_before_faults(subj, check, kf), _m_faults(subj, check)), _m_unusable_after_faults(subj, check)), _m_unusable_beside_keys(subj, check, kf)))
 	count(clauses) > 0
-	m := concat(", and ", clauses)
-} else := m if {
+} else := clauses if {
 	count(_m_tally_parts(check)) > 0
 	clauses := _m_ref_blocked(check)
 	count(clauses) > 0
-	m := concat(", and ", clauses)
-} else := m if {
+} else := clauses if {
 	clauses := [concat("", [side.text, " needs more than 15 digits"]) |
 		some side in _m_sides(check)
 		_side_form(side) in {"add", "sum_of"}
@@ -496,31 +506,29 @@ _m_message(check, subj, "unusable") := m if {
 		not _m_params_unread(check)
 	]
 	count(clauses) > 0
-	m := concat(", and ", clauses)
-} else := _m_fallback(check)
+} else := [_m_fallback(check)]
 
-_m_message(check, subj, "not_an_object") := _m_isnt(_m_label(check), subj, "an object") if {
+_m_message_pieces(check, subj, "not_an_object") := [_m_isnt(_m_label(check), subj, "an object")] if {
 	not is_object(subj)
 	not _m_list_items(check, subj)
 	_m_input_one_refs(check) == []
 }
 
-_m_message(check, subj, "not_an_object") := concat(", and ", _m_input_one_refs(check)) if {
+_m_message_pieces(check, subj, "not_an_object") := _m_input_one_refs(check) if {
 	not is_object(subj)
 	not _m_list_items(check, subj)
 	_m_input_one_refs(check) != []
 }
 
-_m_message(check, subj, "not_an_object") := concat(", and ", _m_tallies(subj, check, "not_an_object")) if {
+_m_message_pieces(check, subj, "not_an_object") := _m_tally_lists(subj, check, "not_an_object") if {
 	_m_list_items(check, subj)
 }
 
-_m_message(check, subj, "not_an_object") := m if {
+_m_message_pieces(check, subj, "not_an_object") := clauses if {
 	is_object(subj)
-	clauses := _once(array.concat(array.concat(_m_aliases_blocked(check), _m_input_one_refs(check)), _m_tallies(subj, check, "not_an_object")))
+	clauses := _m_pieces_once(array.concat(array.concat(_m_aliases_blocked(check), _m_input_one_refs(check)), _m_tally_lists(subj, check, "not_an_object")))
 	count(clauses) > 0
-	m := concat(", and ", clauses)
-} else := _m_fallback(check) if is_object(subj)
+} else := [_m_fallback(check)] if is_object(subj)
 
 _m_list_names(check) := _m_tally_list_names(check) | _m_text_list_names(check)
 

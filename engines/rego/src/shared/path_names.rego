@@ -21,18 +21,21 @@ _input_path_name([]) := "$input"
 
 _input_path_name(path) := _visible_path_name(_visible(path), "$input") if path != []
 
-_visible_path_name(path, root) := concat("", ["item ", _literal_text(path[count(path) - 1] + 1), " of ", _rooted_steps_name(array.slice(path, 0, count(path) - 1), root)]) if {
+_visible_path_name(path, root) := n if {
 	is_array(path)
 	count(path) > 1
-	_index_step(path[count(path) - 1])
+	n := _last_step_path_name(path, path[count(path) - 1], root)
 } else := concat("", ["item ", _literal_text(path[0] + 1), " of ", root]) if {
 	is_array(path)
 	count(path) == 1
 	_index_step(path[0])
-} else := concat("", ["member ", substring(_plain_step_name(1, path[count(path) - 1]), 1, -1), " of ", _rooted_steps_name(array.slice(path, 0, count(path) - 1), root)]) if {
-	is_string(path[count(path) - 1].member)
-	count(path) > 1
 } else := _rooted_steps_name(path, root)
+
+_last_step_path_name(path, last, root) := concat("", ["item ", _literal_text(last + 1), " of ", _rooted_steps_name(array.slice(path, 0, count(path) - 1), root)]) if {
+	_index_step(last)
+} else := concat("", ["member ", substring(_plain_step_name(1, last), 1, -1), " of ", _rooted_steps_name(array.slice(path, 0, count(path) - 1), root)]) if {
+	is_string(last.member)
+}
 
 _ref_name(path) := concat("", ["item ", _literal_text(path[count(path) - 1] + 1), " of ", _plain_steps_name(array.slice(path, 0, count(path) - 1))]) if {
 	_builtin(path)

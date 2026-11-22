@@ -18,6 +18,7 @@ pub struct Clause {
     pub said: Vec<Clause>,
     pub group: usize,
     pub last_of_cause: bool,
+    pub said_first: bool,
 }
 
 impl Clause {
@@ -30,6 +31,7 @@ impl Clause {
             said: Vec::new(),
             group: 0,
             last_of_cause: false,
+            said_first: false,
         }
     }
 
@@ -62,37 +64,50 @@ impl Clause {
             ..self
         }
     }
+
+    pub fn said_first(self) -> Clause {
+        Clause {
+            said_first: true,
+            ..self
+        }
+    }
 }
 
 const SHOWN_ITEMS: usize = 3;
 
 pub fn shown(clauses: &[Clause]) -> Vec<Clause> {
-    let mut once: Vec<Clause> = Vec::new();
-    for clause in clauses {
-        match once.iter_mut().find(|seen| same_but_group(seen, clause)) {
-            Some(seen) => seen.group = seen.group.min(clause.group),
-            None => once.push(clause.clone()),
+    let mut once = said_once(clauses);
+    let rank = |clause: &Clause| match clause.kind {
+        Kind::Root => 0,
+        Kind::List => 1,
+        Kind::Item | Kind::More(_) => 2,
+    };
+    once.sort_by(|a, b| {
+        (a.group, rank(a)).cmp(&(b.group, rank(b))).then_with(|| {
+            if a.kind == Kind::Root && b.kind == Kind::Root {
+                (a.cause, a.last_of_cause, &a.name).cmp(&(b.cause, b.last_of_cause, &b.name))
+            } else {
+                std::cmp::Ordering::Equal
+            }
+        })
+    });
+    let leaves: usize = once
+        .iter()
+        .filter(|clause| clause.kind == Kind::Item)
+        .map(leaves)
+        .sum();
+    if leaves <= SHOWN_ITEMS {
+        return once;
+    }
+    let mut out: Vec<Clause> = Vec::new();
+    let mut left = SHOWN_ITEMS;
+    for clause in once {
+        if clause.kind == Kind::Item {
+            out.extend(cut(&clause, &mut left));
+        } else {
+            out.push(clause);
         }
     }
-    let of_kind = |kind: Kind| once.iter().filter(move |clause| clause.kind == kind);
-    let mut out: Vec<Clause> = of_kind(Kind::Root).cloned().collect();
-    out.sort_by(|a, b| {
-        (a.group, a.cause, a.last_of_cause, &a.name).cmp(&(
-            b.group,
-            b.cause,
-            b.last_of_cause,
-            &b.name,
-        ))
-    });
-    out.extend(of_kind(Kind::List).cloned());
-    let items: Vec<&Clause> = of_kind(Kind::Item).collect();
-    let leaves: usize = items.iter().map(|item| leaves(item)).sum();
-    if leaves <= SHOWN_ITEMS {
-        out.extend(items.into_iter().cloned());
-        return out;
-    }
-    let mut left = SHOWN_ITEMS;
-    out.extend(items.into_iter().filter_map(|item| cut(item, &mut left)));
     out.push(Clause {
         kind: Kind::More(leaves - SHOWN_ITEMS),
         name: String::new(),
@@ -101,12 +116,37 @@ pub fn shown(clauses: &[Clause]) -> Vec<Clause> {
         said: Vec::new(),
         group: 0,
         last_of_cause: false,
+        said_first: false,
     });
     out
 }
 
-fn same_but_group(a: &Clause, b: &Clause) -> bool {
-    (a.kind, &a.name, a.cause, &a.text, &a.said) == (b.kind, &b.name, b.cause, &b.text, &b.said)
+fn said_once(clauses: &[Clause]) -> Vec<Clause> {
+    let mut once: Vec<Clause> = Vec::new();
+    for clause in clauses {
+        let clause = if clause.kind == Kind::Item {
+            Clause {
+                said: said_once(&clause.said),
+                ..clause.clone()
+            }
+        } else {
+            clause.clone()
+        };
+        match once.iter_mut().find(|seen| says_alike(seen, &clause)) {
+            Some(seen) => seen.group = seen.group.min(clause.group),
+            None => once.push(clause),
+        }
+    }
+    once
+}
+
+fn says_alike(a: &Clause, b: &Clause) -> bool {
+    let bare = |clause: &Clause| clause.kind != Kind::Item || clause.said.is_empty();
+    match (a.kind, b.kind) {
+        (Kind::Item, Kind::Item) => pieces(a) == pieces(b),
+        (Kind::More(_), _) | (_, Kind::More(_)) => false,
+        _ => bare(a) && bare(b) && a.text == b.text,
+    }
 }
 
 pub fn text(clauses: &[Clause]) -> String {
@@ -131,7 +171,7 @@ pub fn lines(clauses: &[Clause]) -> Vec<String> {
 
 fn pieces(item: &Clause) -> Vec<String> {
     let mut out: Vec<String> = Vec::new();
-    if !item.text.is_empty() {
+    if !item.text.is_empty() && !item.said_first {
         out.push(item.text.clone());
     }
     let mut own: Vec<&str> = Vec::new();
@@ -154,6 +194,9 @@ fn pieces(item: &Clause) -> Vec<String> {
         }
     }
     flush(&mut own, &mut out);
+    if !item.text.is_empty() && item.said_first {
+        out.push(item.text.clone());
+    }
     out
 }
 
@@ -162,11 +205,8 @@ fn cut(item: &Clause, left: &mut usize) -> Option<Clause> {
         said: Vec::new(),
         ..item.clone()
     };
-    if !item.text.is_empty() {
-        if *left == 0 {
-            kept.text.clear();
-        }
-        *left = left.saturating_sub(1);
+    if !item.said_first {
+        cut_text(item, &mut kept, left);
     }
     if has_items(item) {
         for clause in &item.said {
@@ -185,7 +225,19 @@ fn cut(item: &Clause, left: &mut usize) -> Option<Clause> {
         }
         *left = left.saturating_sub(1);
     }
+    if item.said_first {
+        cut_text(item, &mut kept, left);
+    }
     (!kept.text.is_empty() || !kept.said.is_empty()).then_some(kept)
+}
+
+fn cut_text(item: &Clause, kept: &mut Clause, left: &mut usize) {
+    if !item.text.is_empty() {
+        if *left == 0 {
+            kept.text.clear();
+        }
+        *left = left.saturating_sub(1);
+    }
 }
 
 fn has_items(item: &Clause) -> bool {
@@ -252,6 +304,7 @@ pub fn of_value(value: &Value) -> Option<Vec<Clause>> {
                 said: of_value(clause.get("said")?)?,
                 group: number(clause, "group")?,
                 last_of_cause: false,
+                said_first: false,
             })
         })
         .collect()

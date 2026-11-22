@@ -307,7 +307,7 @@ _tally(subj, side) := {"states": {"not_an_object"}, "list": _path_name(path), "v
 	flaw_states := {fl | some fl in flaws; fl != ""}
 	root_flaw_states := {fl | some c in side.whose; fl := _root_read_flaw(subj, c); fl != ""}
 	states := (((((walk_states | judged_states) | _tally_number_states(f, _tally_distinct(side, read, subj, "read"))) | flaw_states) | root_flaw_states) | _tally_alone_states(subj, side, w)) | _tally_keyed_root_states(subj, side)
-	r := object.union(object.union({"states": states, "list": _walk_name(side[f], w.walked), "values": [_walk_value(e.v, e, w) | some e in w.items], "locations": _walk_locations(w)}, _tally_value(f, _tally_distinct(side, kept, subj, "kept"), states)), _tally_stop_outcome(stop))
+	r := object.union(object.union({"states": states, "list": _walk_name(side[f], w.walked), "values": [_walk_value(e.v, e, w) | some e in w.items], "locations": _walk_locations(w)}, _tally_value(f, _tally_distinct(side, kept, subj, "kept"), states)), _tally_stop_outcome(subj, side[f], stop))
 }
 
 _tally_alone_states(subj, side, w) := {s |
@@ -329,9 +329,12 @@ _tally_walked(side, p) := {"path": p, "member": true} if side.member == true
 
 else := {"path": p}
 
-_tally_stop_outcome(stop) := {"ergo/outcome": stop[0].cause} if {
+_tally_stop_outcome(subj, path, stop) := {"ergo/outcome": stop[0].cause} if {
 	stop != []
 	stop[0].cause in _no_value_states
+} else := {"ergo/outcome": "unusable"} if {
+	stop != []
+	_tally_list_state(subj, path) == "value"
 } else := {}
 
 _tally_judge(side, e, flaws, w, true) := j if {
@@ -451,6 +454,18 @@ _tally_mark(true, e) := {"not_an_object"} if {
 _tally_mark(true, e) := {"absent"} if {
 	e.v == _absent
 	is_object(e.iv)
+	not _tally_null_step(e)
+}
+
+_tally_mark(true, e) := {"null"} if {
+	e.v == _absent
+	is_object(e.iv)
+	_tally_null_step(e)
+}
+
+_tally_null_step(e) := min(steps) if {
+	steps := {j | some j in numbers.range(1, count(e.r)); _read_state(e.iv, array.slice(e.r, 0, j)) == "null"}
+	steps != set()
 }
 
 _tally_mark(true, e) := {_read_state(e.iv, e.r)} if e.v == _unusable_mark

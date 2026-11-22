@@ -1959,14 +1959,14 @@ test_a_path_that_walks_on_the_left_stays_unusable_even_when_the_right_is_the_sam
 	_walk_right_rows("deps.name is in deps.name", {"things": [{"id": "t1", "deps": [{"name": "a"}]}]}, {}) == [[false, "unusable", "deps is [{\"name\": \"a\"}], which isn't an object"]]
 }
 
-test_a_whose_that_reads_a_ref_that_walks_an_empty_list_leaves_the_item_out_as_a_value if {
+test_a_whose_that_reads_a_ref_that_walks_an_empty_list_says_the_list_then_each_item if {
 	rows := _walk_right_rows("every deps.name whose x is in $input.sbom.components.name is \"a\"", {"sbom": {"components": []}, "things": [{"id": "t1", "deps": [{"name": "a", "x": "a"}]}]}, {})
-	rows == [[false, "value", "deps is [{\"name\": \"a\", \"x\": \"a\"}]"]]
+	rows == [[false, "not_an_object", "$input.sbom.components is []; item 1 of deps: name is \"a\", which isn't an object"]]
 }
 
-test_a_whose_that_reads_a_ref_that_walks_an_empty_list_decides_before_its_left_side_is_looked_at if {
+test_a_whose_that_reads_a_ref_that_walks_an_empty_list_after_contains_some_of_says_the_item_it_cant_read if {
 	rows := _walk_right_rows("every deps.name whose tags contains some of $input.sbom.components.name is \"a\"", {"sbom": {"components": []}, "things": [{"id": "t1", "deps": [{"name": "a", "tags": "text"}]}]}, {})
-	[row[1] | some row in rows] == ["value"]
+	rows == [[false, "not_an_object", "$input.sbom.components is []; item 1 of deps: name is \"a\", which isn't an object"]]
 }
 
 test_a_path_that_starts_at_a_part_walks_and_names_the_part if {
@@ -2211,5 +2211,14 @@ test_an_item_that_fails_on_its_own_field_keeps_a_whose_key_that_isnt_text_in_eac
 	checks := {"every": "every es whose zz is m named by $params.k exists", "some": "some es whose zz is m named by $params.k exists", "for": {"for": "every es whose zz is m named by $params.k as e", "assert": "e.v exists"}}
 	said := "item 1 of es: $params.k is 3, which isn't text; item 2 of es: $params.k is 3, which isn't text"
 	_key_rows(checks, {"es": [{"v": 1}, {"v": 2}]}, {"k": 3}) == {c: ["unusable", said] | some c in ["every", "some", "for"]}
-	_key_rows({"every": checks.every}, {"es": [{"v": 2}, {"zz": 2, "m": null}]}, {"k": null}) == {"every": ["absent", "item 1 of es: zz is missing; $params.k is null"]}
+	_key_rows({"every": checks.every}, {"es": [{"v": 2}, {"zz": 2, "m": null}]}, {"k": null}) == {"every": ["absent", "$params.k is null; item 1 of es: zz is missing"]}
+}
+
+test_a_walk_among_several_assertions_says_a_missing_subject_field_once_on_its_assertion_with_no_item if {
+	things := {"things": [{"id": "t1", "xs": [{"k": 5}, {"k": 6}]}]}
+	rows := _walk_rows({"lines": {"assert": ["xs exists", "every xs.k is lo"]}, "one": "every xs.k is lo"}, things, {})
+	[[r[1], e.kind, e.message, [i.name | some i in e.inputs], e.failures] | some r in rows; some e in r[3]] == [
+		["lines", "assertion", "lo is missing", ["lo"], []],
+		["one", "assertion", "lo is missing", ["lo"], []],
+	]
 }

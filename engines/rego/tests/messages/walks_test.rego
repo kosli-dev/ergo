@@ -7,6 +7,15 @@ test_message_of_a_passed_walk_has_no_parts if {
 	ergo._m_fail_parts("satisfied", [], set()) == []
 }
 
+test_a_walk_says_its_items_in_list_order_in_the_order_of_its_failed_items_even_when_a_later_item_failed_on_a_read_outside_it if {
+	check := ergo._s_written_check({"assert": "every xs whose tags contains $input.m named by key exists"})
+	subj := {"xs": [null, {"key": "a", "tags": ["x"]}, {"tags": ["x"]}]}
+	r := ergo._walk_row(check, subj) with data.ergo_document as {"m": {"a": "x"}}
+	parts := ergo._walk_parts(check, subj, r, r) with data.ergo_document as {"m": {"a": "x"}}
+	[p.text | some p in parts] == ["item 1 of xs is null, which isn't an object", "item 3 of xs: key is missing"]
+	[f.item | some f in r.failed] == ["item 1 of xs", "item 3 of xs"]
+}
+
 test_a_clause_an_earlier_sentence_gave_is_left_out_but_a_quoted_value_is_one_clause if {
 	ergo._m_said_new(["x is missing", "x is missing, and y is missing", "y is missing"]) == ["x is missing", "y is missing"]
 	ergo._m_said_new(["x is \"a, and b\"", "x is \"a, and b\", and z is 1"]) == ["x is \"a, and b\"", "z is 1"]
@@ -33,7 +42,21 @@ test_message_of_a_walk_whose_path_is_not_a_path_names_no_blocked_parent if {
 
 test_message_of_a_walk_that_failed_without_a_list_to_show_repeats_its_expression if {
 	check := {"path": ["xs"], "expression": "every xs.ok is true"}
-	ergo._walk_parts(check, {}, {"cause": "value"}, {"failed": []}) == ["every xs.ok is true is false"]
+	ergo._walk_parts(check, {}, {"cause": "value"}, {"failed": []}) == [ergo._m_clause("root", "every xs.ok", "value", "every xs.ok is true is false")]
+}
+
+test_a_walk_part_is_a_clause_that_keeps_the_path_of_its_item_and_the_cause_of_its_failure if {
+	check := ergo._s_written_check("every xs.ok is true")
+	subj := {"xs": [{"ok": false}, {}, 3]}
+	r := ergo._walk_row(check, subj) with input as {"ergo/names": {"ergo/subject": subj}}
+	ergo._walk_parts(check, subj, r, r) == [
+		ergo._m_clause("item", ["xs", 0], "value", "item 1 of xs: ok is false"),
+		ergo._m_clause("item", ["xs", 1], "absent", "item 2 of xs: ok is missing"),
+		ergo._m_clause("item", ["xs", 2], "not_an_object", "item 3 of xs is 3, which isn't an object"),
+	] with input as {"ergo/names": {"ergo/subject": subj}}
+	keyed := ergo._s_written_check("every xs whose v is m named by $params.k exists")
+	k := ergo._walk_row(keyed, {"xs": [{"v": 1}]}) with input as {"ergo/names": {"ergo/subject": {"xs": [{"v": 1}]}}} with data.ergo_params as {"k": 3}
+	k.other_roots == [ergo._m_clause("root", "$params.k", "unusable", "$params.k is 3, which isn't text")]
 }
 
 test_message_names_an_item_by_the_part_of_the_subject_it_goes_through if {

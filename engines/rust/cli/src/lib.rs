@@ -42,7 +42,7 @@ Commands:
   violations   print what failed in the report as JSON
   help         print this text
 
-ergo --version prints the version.
+ergo --version prints the version and the commit it was built from.
 
 Files can be .json, .yaml or .yml. Without --params the params are {}.
 The output is pretty-printed with sorted keys; --compact prints one line.
@@ -86,8 +86,9 @@ pub fn run(arguments: &[String]) -> Result<Outcome, Failure> {
         Parsed::Help => return Ok(Outcome::Print(USAGE.to_string())),
         Parsed::Version => {
             return Ok(Outcome::Print(format!(
-                "ergo {}\n",
-                env!("CARGO_PKG_VERSION")
+                "ergo {} (commit {})\n",
+                env!("CARGO_PKG_VERSION"),
+                env!("ERGO_BUILD_COMMIT")
             )));
         }
         Parsed::Run(options) => options,
