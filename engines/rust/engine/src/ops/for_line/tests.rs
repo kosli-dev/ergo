@@ -3545,6 +3545,33 @@ fn a_list_that_a_sentence_and_the_line_both_cant_walk_is_said_once() {
 }
 
 #[test]
+fn a_list_the_line_picks_nothing_from_is_said_after_a_sentence_that_reads_no_alias() {
+    let kept = json!({"xs": [{"v": 3}], "z": 3});
+    for (for_line, subject, cause, list) in [
+        ("every xs whose v is 1 as x", &kept, "value", "xs is [{\"v\": 3}]"),
+        ("some xs whose v is 1 as x", &kept, "value", "xs is [{\"v\": 3}]"),
+        ("first of xs whose v is 1 as x", &kept, "absent", "xs is [{\"v\": 3}]"),
+        (
+            "first of xs sorted by v as x",
+            &json!({"xs": [], "z": 3}),
+            "absent",
+            "xs is []",
+        ),
+    ] {
+        assert_eq!(
+            for_row(
+                for_line,
+                &["x.v is 1", "z is 1"],
+                subject.clone(),
+                json!({})
+            ),
+            (cause.to_string(), format!("z is 3; {list}")),
+            "{for_line}"
+        );
+    }
+}
+
+#[test]
 fn a_list_the_line_cant_walk_isnt_counted_as_an_item() {
     let zz = |n: usize| {
         (1..=n)
