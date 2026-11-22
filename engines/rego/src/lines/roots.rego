@@ -5,6 +5,8 @@ import rego.v1
 _root_read_flaw(subj, c) := _worst_of(states) if {
 	states := _root_states(subj, c)
 	count(states) > 0
+} else := "value" if {
+	"value" in _walked_root_states(c)
 } else := ""
 
 _plain_root_flaw(subj, c) := _worst_of(states) if {
@@ -19,7 +21,7 @@ _plain_root_states(subj, c) := {st |
 	st in _failed_read_states
 }
 
-_root_states(subj, c) := _named_root_states(subj, c) | _walked_root_states(c) if _walk_roots_on
+_root_states(subj, c) := _named_root_states(subj, c) | (_walked_root_states(c) & _failed_read_states) if _walk_roots_on
 
 else := _named_root_states(subj, c)
 
@@ -36,7 +38,6 @@ _walked_root_states(c) := {st |
 	is_object(x)
 	some p in _m_walked_roots(x)
 	st := _walked_root_state(x, _rwalk_run(object.get(input, ["ergo/names", "ergo/subject"], null), _dotted_root_part(p)))
-	st in _failed_read_states
 }
 
 _dotted_root_part(p) := rest if {
@@ -51,7 +52,7 @@ else := _as_subject_part(p)
 
 _walked_root_state(x, w) := _walked_state_of(x, w, _rwalk_states(w))
 
-_walked_state_of(_, _, states) := _worst_of(states) if count(states) > 0
+_walked_state_of(_, _, states) := _worst_or_value(states) if count(states) > 0
 
 _walked_state_of(x, w, states) := "unusable" if {
 	count(states) == 0
@@ -535,7 +536,7 @@ _leaf_root_flaw(check, subj) := fl if {
 	_walk_roots_on
 	check.op in _walk_ops
 	is_object(object.get(check, "check", null))
-	states := _walked_root_states(check.check)
+	states := _walked_root_states(check.check) & _failed_read_states
 	count(states) > 0
 } else := ""
 
