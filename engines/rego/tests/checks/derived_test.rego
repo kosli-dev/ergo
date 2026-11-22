@@ -79,6 +79,19 @@ test_an_every_or_a_some_says_an_empty_list_on_the_right_of_its_whose_once_and_fa
 	}
 }
 
+test_an_empty_list_after_contains_all_of_or_none_of_is_said_once_and_fails_the_row if {
+	every sentence in [
+		"count of xs whose tags contains all of $params.cs.name is 0",
+		"count of xs whose tags contains none of $params.cs.name is 0",
+		"every xs whose tags contains all of $params.cs.name exists",
+		"every xs whose tags contains all of $params.cs.name, if any, exists",
+		"some xs whose tags contains none of $params.cs.name exists",
+	] {
+		_rows_said(sentence, [{"tags": ["a"]}]) == [["value", "$params.cs is []"]]
+		_rows_said(sentence, [{}]) == [["absent", "$params.cs is []; item 1 of xs: tags is missing"]]
+	}
+}
+
 test_a_count_or_sum_of_member_of_walks_each_member_of_the_object_as_an_item if {
 	side := {"sum_of": ["costs"], "whose": [], "text": "sum of member of costs", "member": true}
 	t := ergo._tally({"costs": {"b": 5, "a": 1, "c": "x"}}, side)
