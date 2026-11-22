@@ -116,6 +116,18 @@ test_a_count_on_an_empty_list_says_a_root_further_back_than_the_key_that_isnt_an
 	said == ["$input.m is 3, which isn't an object"]
 }
 
+test_an_item_whose_field_is_of_the_wrong_kind_for_contains_or_matches_gets_its_own_item_entry_beside_the_root_a_key_from_it_is_read_in if {
+	every c in [
+		["count of xs whose tags contains $input.m named by key is 1", "x", "item 1 of xs: tags is \"x\", which isn't a list"],
+		["count of xs whose tags matches $input.m named by key is 1", 3, "item 1 of xs: tags is 3, which isn't text"],
+	] {
+		side := _keyed_count_side(c[0])
+		ts := ergo._m_tally({"xs": [{"key": "a", "tags": c[1]}]}, side) with data.ergo_document as {"m": 3}
+		[x[1] | some x in ts] == ["$input.m is 3, which isn't an object", c[2]]
+		[x | some x in ts; count(x) == 3] != []
+	}
+}
+
 test_an_item_doesnt_say_again_the_root_a_key_from_it_is_read_in if {
 	every s in [
 		"count of xs whose v is not $input.m named by key is 0",
