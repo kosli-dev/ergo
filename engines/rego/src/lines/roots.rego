@@ -361,7 +361,14 @@ else := seg
 _walk_root_flaw(check, subj) := _worst_of(states) if {
 	states := {fl | some c in _walk_root_conds(check); fl := _root_read_flaw(subj, c); fl != ""}
 	count(states) > 0
+} else := "value" if {
+	some c in _walk_item_conds(check)
+	_root_read_flaw(subj, c) == "value"
 } else := ""
+
+_walk_item_conds(check) := [c | some item in check.items; some c in object.get(item, "whose", [])] if check.op == "for"
+
+else := object.get(check, "whose", [])
 
 _walk_root_conds(check) := array.concat(_walk_whose_conds(check), _for_sentence_conds(check))
 
@@ -557,7 +564,7 @@ _leaf_root_msgs(check, flaw) := [m] if {
 	is_string(m)
 }
 
-_rooted_row(check, subj, r) := object.union(object.remove(a, ["other_roots"]), {"cause": _worst_of({flaw, a.cause}), "inputs": r.inputs, "failed": a.failed, "root_msgs": _with_roots(ps, ms), "ergo/alone_items": [p.text | some p in ps; not p.text in {m.text | some m in ms}]}) if {
+_rooted_row(check, subj, r) := object.union(object.remove(a, ["other_roots"]), {"cause": _worst_or_value({flaw, a.cause}), "inputs": r.inputs, "failed": a.failed, "root_msgs": _with_roots(ps, ms), "ergo/alone_items": [p.text | some p in ps; not p.text in {m.text | some m in ms}]}) if {
 	check.op != "for"
 	not _walk_keyed(check)
 	_items_judged_alone(subj, check)
@@ -568,7 +575,7 @@ _rooted_row(check, subj, r) := object.union(object.remove(a, ["other_roots"]), {
 	ms != []
 	a := _alone_read(check, subj)
 	ps := _walk_parts(check, subj, a, a)
-} else := object.union(object.remove(_rooted_main(check, subj, r), ["other_roots"]), {"cause": _worst_of({flaw, r.cause}), "root_msgs": _with_roots(_walk_parts(check, subj, r, r), ms)}) if {
+} else := object.union(object.remove(_rooted_main(check, subj, r), ["other_roots"]), {"cause": _worst_or_value({flaw, r.cause}), "root_msgs": _with_roots(_walk_parts(check, subj, r, r), ms)}) if {
 	check.op != "for"
 	_walk_list_fails(r)
 	not _walk_keyed(check)
@@ -576,7 +583,7 @@ _rooted_row(check, subj, r) := object.union(object.remove(a, ["other_roots"]), {
 	flaw != ""
 	ms := _walk_root_clauses(check, subj)
 	ms != []
-} else := object.union(r, {"cause": _worst_of({flaw, r.cause}), "root_msgs": _with_roots(ps, ms), "ergo/alone_items": [_unrooted_text(t, ms) | some t in _walk_item_texts(ps, r)]}) if {
+} else := object.union(r, {"cause": _worst_or_value({flaw, r.cause}), "root_msgs": _with_roots(ps, ms), "ergo/alone_items": [_unrooted_text(t, ms) | some t in _walk_item_texts(ps, r)]}) if {
 	r.cause in _value_fault_causes
 	check.op != "for"
 	not _walk_keyed(check)
