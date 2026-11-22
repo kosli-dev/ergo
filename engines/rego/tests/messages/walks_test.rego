@@ -365,3 +365,9 @@ test_a_named_failure_a_member_walk_wanted_as_an_object_says_it_isnt_one if {
 	ergo._m_named_fail({"path": "r.s", "cause": "unusable", "value": [1], "wants": "an object"}) == "r.s is [1], which isn't an object"
 	ergo._m_named_fail({"path": "r.s", "cause": "unusable", "value": [1]}) == "r.s is [1], which isn't a list or an object"
 }
+
+test_a_null_params_before_a_key_from_the_item_is_named_as_the_part_before_the_key if {
+	c := {"op": "compare", "cmp": "eq", "left": ["v"], "right": ["$$params", {"named_by_field": "key"}]}
+	ergo._m_null_before_key({"v": 1}, c) == ["$params is null"] with data.ergo_params as null
+	ergo._m_null_before_key({"v": 1, "key": "a"}, c) == [] with data.ergo_params as null
+}
