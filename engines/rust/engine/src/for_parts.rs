@@ -1,4 +1,5 @@
 use crate::cause::Cause;
+use crate::ops::clause::{self, Clause, Kind};
 use crate::ops::for_line::{self, For};
 use crate::ops::{self, Check};
 use crate::parts::{Failure, Part};
@@ -118,25 +119,6 @@ fn without_roots(message: &str, roots: &[String], moved: &mut Vec<String>) -> St
         .join("; ")
 }
 
-fn said_by(entry: &Failure, lead: &[String], out: &mut Vec<String>) {
-    let part = entry.part();
-    let mut here = lead.to_vec();
-    if let Failure::Item { .. } = entry {
-        here.push(part.name.clone());
-    }
-    if !part.message.is_empty() {
-        let mut names = here.clone();
-        if matches!(entry, Failure::Item { .. }) && part.message.starts_with(&part.name) {
-            names.pop();
-        }
-        names.push(part.message.clone());
-        out.push(names.join(": "));
-    }
-    for kid in &part.failures {
-        said_by(kid, &here, out);
-    }
-}
-
 fn walked_under(
     line: &For,
     sentence: &Check,
@@ -238,6 +220,134 @@ fn line_item(
         message,
         f,
     ))
+}
+
+fn said_clauses(record: &Value) -> Vec<Clause> {
+    record
+        .get("ergo/clauses")
+        .and_then(clause::of_value)
+        .unwrap_or_default()
+}
+
+fn own_said(record: &Value, roots: &[String]) -> Vec<Clause> {
+    said_clauses(record)
+        .into_iter()
+        .filter(|piece| {
+            !matches!(piece.kind, Kind::More(_))
+                && !roots.contains(&clause::text(std::slice::from_ref(piece)))
+        })
+        .collect()
+}
+
+fn own_text(record: &Value, said: &[Clause]) -> String {
+    for_line::rendered(&said_name(record), &clause::lines(said))
+}
+
+fn item_entry(
+    f: &Value,
+    l: &Value,
+    aliases: &[&str],
+    roots: &[String],
+    walked: Option<Failure>,
+) -> Option<Failure> {
+    if let Some(pairs) = l.get("items").and_then(Value::as_array) {
+        let inner: Vec<Failure> = pairs
+            .iter()
+            .filter_map(|y| {
+                let said = own_said(y, roots);
+                let message = own_text(y, &said);
+                (!message.is_empty()).then(|| {
+                    item(
+                        text(y, "item"),
+                        Cause::worst(said.iter().map(|piece| piece.cause))
+                            .unwrap_or_else(|| cause_of(y)),
+                        list(y, "inputs"),
+                        Vec::new(),
+                        message,
+                        y,
+                    )
+                })
+            })
+            .collect();
+        let cause = Cause::worst(inner.iter().map(|y| y.part().cause))?;
+        return Some(item(
+            text(f, "item"),
+            cause,
+            alias_inputs(l, aliases),
+            inner,
+            String::new(),
+            f,
+        ));
+    }
+    let said = own_said(l, roots);
+    let message = own_text(f, &said);
+    let walked = walked.filter(|walked| {
+        let mut lines: Vec<String> = Vec::new();
+        for kid in &walked.part().failures {
+            said_by(kid, &[], &mut lines);
+        }
+        !message.is_empty() && said.iter().all(|piece| covered(piece, &lines))
+    });
+    if let Some(walked) = walked {
+        let part = walked.part().clone();
+        let cause = Cause::worst(part.failures.iter().map(|kid| kid.part().cause))?;
+        return Some(item(
+            text(f, "item"),
+            cause,
+            part.inputs,
+            part.failures,
+            String::new(),
+            f,
+        ));
+    }
+    let cause = Cause::worst(said.iter().map(|piece| piece.cause))?;
+    (!message.is_empty()).then(|| {
+        item(
+            text(f, "item"),
+            cause,
+            alias_inputs(l, aliases),
+            Vec::new(),
+            message,
+            f,
+        )
+    })
+}
+
+fn covered(piece: &Clause, lines: &[String]) -> bool {
+    match piece.kind {
+        Kind::More(_) => true,
+        Kind::Item if !piece.said.is_empty() => {
+            piece.said.iter().all(|inner| covered(inner, lines))
+        }
+        _ => lines.contains(&piece.text),
+    }
+}
+
+fn said_by(entry: &Failure, lead: &[String], out: &mut Vec<String>) {
+    let part = entry.part();
+    let mut here = lead.to_vec();
+    if let Failure::Item { .. } = entry {
+        here.push(part.name.clone());
+    }
+    if !part.message.is_empty() {
+        let mut names = here.clone();
+        if matches!(entry, Failure::Item { .. }) && part.message.starts_with(&part.name) {
+            names.pop();
+        }
+        names.push(part.message.clone());
+        out.push(names.join(": "));
+        out.push(part.message.clone());
+    }
+    for kid in &part.failures {
+        said_by(kid, &here, out);
+    }
+}
+
+fn alias_inputs(l: &Value, aliases: &[&str]) -> Vec<Value> {
+    list(l, "inputs")
+        .into_iter()
+        .filter(|x| alias_named(&text(x, "name"), aliases))
+        .collect()
 }
 
 fn whose_reads(whose: &[Check], f: &Value, ctx: &Ctx) -> Vec<Value> {
@@ -603,6 +713,7 @@ pub fn for_failures(
         }
     }
     let roots = row_roots(message, &item_made);
+    let root_texts = line.root_texts(ctx);
     let mut out: Vec<Failure> = Vec::new();
     for (i, sentence) in line.sentences.iter().enumerate() {
         let first = line
@@ -629,24 +740,9 @@ pub fn for_failures(
                     }
                 }
                 if frees[i].is_none() {
-                    let nested = walked_under(line, &sentence.check, f, &l, &aliases, ctx);
-                    let made = line_item(f, &l, &aliases, &roots, &mut moved);
-                    let same = |n: &Failure| {
-                        made.as_ref().is_some_and(|m| {
-                            let mut said: Vec<String> = Vec::new();
-                            for kid in &n.part().failures {
-                                said_by(kid, &[], &mut said);
-                            }
-                            let mut want: Vec<String> = clauses(&m.part().message)
-                                .into_iter()
-                                .filter(|p| !p.is_empty() && ops::message::cap_note(p).is_none())
-                                .map(str::to_string)
-                                .collect();
-                            want.dedup();
-                            !want.is_empty() && want.iter().all(|w| said.contains(w))
-                        })
-                    };
-                    if let Some(entry) = nested.filter(same).or(made) {
+                    let _ = line_item(f, &l, &aliases, &roots, &mut moved);
+                    let walked = walked_under(line, &sentence.check, f, &l, &aliases, ctx);
+                    if let Some(entry) = item_entry(f, &l, &aliases, &root_texts, walked) {
                         items.push(entry);
                     }
                 }

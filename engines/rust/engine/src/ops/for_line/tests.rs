@@ -2520,24 +2520,9 @@ const ROWS_THE_CLAUSES_DONT_SAY_YET: &[(&str, usize, &str)] = &[
         ROW_LEAVES_OUT_AN_ITEM,
     ),
     (
-        "messages / a for item with a whose that reads a part over items that aren't all objects / names the part first, once, then each item in turn",
-        1,
-        ENTRY_CAUSE,
-    ),
-    (
         "messages / a root that reads the alias of the first item of a for line, in the second item / fails before any item of the second list, naming each first item, on an empty list too",
         5,
         OTHER_SUBJECTS_CAUSE,
-    ),
-    (
-        "for / a walk through a for line's alias leaves a root after the phrase to the assertion, and each item keeps its own cause and the items of its list / an item whose list holds five items without v",
-        1,
-        ENTRY_CAUSE,
-    ),
-    (
-        "for / a walk through a for line's alias leaves a root after the phrase to the assertion, and each item keeps its own cause and the items of its list / an item whose list holds five items without v",
-        2,
-        ENTRY_CAUSE,
     ),
 ];
 

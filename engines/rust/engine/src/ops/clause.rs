@@ -271,7 +271,6 @@ pub fn to_value(clauses: &[Clause]) -> Value {
     )
 }
 
-#[cfg_attr(not(test), expect(dead_code))]
 pub fn of_value(value: &Value) -> Option<Vec<Clause>> {
     let number = |clause: &Value, key: &str| usize::try_from(clause.get(key)?.as_u64()?).ok();
     let text = |clause: &Value, key: &str| clause.get(key)?.as_str().map(str::to_string);

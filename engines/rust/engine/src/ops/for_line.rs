@@ -1116,6 +1116,7 @@ struct Sfail {
     cause: Cause,
     inputs: Vec<Value>,
     clauses: Vec<Clause>,
+    named: Vec<Clause>,
 }
 
 struct Child {
@@ -1575,6 +1576,7 @@ impl For {
                     cause: verdict.cause,
                     inputs,
                     clauses,
+                    named: Vec::new(),
                 });
             }
         }
@@ -1602,6 +1604,17 @@ impl For {
                 }
             }
             f.said = own;
+            f.named = f
+                .clauses
+                .iter()
+                .map(|clause| match clause.kind {
+                    super::clause::Kind::Root | super::clause::Kind::List if all_own => Clause {
+                        text: own_text(&clause.text, alias, f.one),
+                        ..clause.clone()
+                    },
+                    _ => clause.clone(),
+                })
+                .collect();
         }
         let assertions = sfails
             .iter()
@@ -1611,7 +1624,7 @@ impl For {
                     "cause": f.cause.name(),
                     "inputs": f.inputs,
                     "ergo/texts": f.said,
-                    "ergo/clauses": super::clause::to_value(&f.clauses),
+                    "ergo/clauses": super::clause::to_value(&f.named),
                 })
             })
             .collect();
@@ -1695,7 +1708,7 @@ impl For {
                             "cause": f.cause.name(),
                             "inputs": f.inputs,
                             "ergo/texts": f.said,
-                            "ergo/clauses": super::clause::to_value(&f.clauses),
+                            "ergo/clauses": super::clause::to_value(&f.named),
                             "ergo/said": child.entry.shown(),
                             "value": child.entry.value,
                             "locations": locations,
@@ -1713,7 +1726,7 @@ impl For {
                     "cause": cause.name(),
                     "inputs": found[0].1.inputs,
                     "ergo/texts": found[0].1.said,
-                    "ergo/clauses": super::clause::to_value(&found[0].1.clauses),
+                    "ergo/clauses": super::clause::to_value(&found[0].1.named),
                 }));
             }
         }
@@ -2034,6 +2047,29 @@ impl For {
             &sentence.check,
             &outer_ctx(ctx),
         )))
+    }
+
+    /// What each root of the line says, and each item under a root that
+    /// walks a list, as a row would say it alone.
+    pub fn root_texts(&self, ctx: &Ctx) -> Vec<String> {
+        let outer = outer_ctx(ctx);
+        let whose: Vec<&Check> = self
+            .items
+            .iter()
+            .flat_map(|item| item.whose.iter())
+            .collect();
+        let mut clauses = self.root_clauses(ctx);
+        clauses.extend(super::message::listed_root_clauses(&whose, &outer, true));
+        for sentence in &self.sentences {
+            clauses.extend(sentence_roots_listed(&sentence.check, &outer));
+        }
+        let mut out: Vec<String> = Vec::new();
+        for clause in &clauses {
+            for said in std::iter::once(clause).chain(clause.said.iter()) {
+                push_new(&mut out, super::clause::text(std::slice::from_ref(said)));
+            }
+        }
+        out
     }
 
     #[cfg_attr(not(test), expect(dead_code))]
