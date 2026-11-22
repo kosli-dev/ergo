@@ -10798,12 +10798,7 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
-    (
-        "m.v exists",
-        "m.v exists",
-        &[],
-        &[],
-    ),
+    ("m.v exists", "m.v exists", &[], &[]),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
