@@ -362,13 +362,9 @@ _walk_root_flaw(check, subj) := _worst_of(states) if {
 	states := {fl | some c in _walk_root_conds(check); fl := _root_read_flaw(subj, c); fl != ""}
 	count(states) > 0
 } else := "value" if {
-	some c in _walk_item_conds(check)
+	some c in _walk_whose_conds(check)
 	_root_read_flaw(subj, c) == "value"
 } else := ""
-
-_walk_item_conds(check) := [c | some item in check.items; some c in object.get(item, "whose", [])] if check.op == "for"
-
-else := object.get(check, "whose", [])
 
 _walk_root_conds(check) := array.concat(_walk_whose_conds(check), _for_sentence_conds(check))
 
