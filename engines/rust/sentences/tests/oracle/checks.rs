@@ -10878,6 +10878,42 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     ("m.v exists", "m.v exists", &[], &[]),
+    (
+        "count of xs whose tags contains none of $params.cs.name is 0",
+        "count of xs whose tags contains none of $params.cs.name is 0",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose tags contains none of pl.name is 0",
+        "count of xs whose tags contains none of pl.name is 0",
+        &[],
+        &[],
+    ),
+    (
+        "every xs whose tags does not contain all of $input.cs.name exists",
+        "every xs whose tags does not contain all of $input.cs.name exists",
+        &[],
+        &[],
+    ),
+    (
+        "every xs whose v does not match $input.cs.name, if any, exists",
+        "every xs whose v does not match $input.cs.name, if any, exists",
+        &[],
+        &[],
+    ),
+    (
+        "some xs whose tags contains some of $input.cs.name exists",
+        "some xs whose tags contains some of $input.cs.name exists",
+        &[],
+        &[],
+    ),
+    (
+        "some xs whose v matches pl.name exists",
+        "some xs whose v matches pl.name exists",
+        &[],
+        &[],
+    ),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
