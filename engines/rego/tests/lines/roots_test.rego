@@ -30,6 +30,13 @@ test_a_root_a_whose_cant_read_stands_in_for_a_value_so_each_item_is_still_read i
 	ergo._root_stand_in(listed) == {"op": "compare", "cmp": "eq", "left": ["v"], "right": ["v"]}
 }
 
+test_a_part_root_after_any_list_phrase_stands_in_for_a_value_so_each_item_is_still_read if {
+	part := [`${"alias":"pl","n":1,"of":null,"old":true}`, "p", "name"]
+	every cmp in ["in", "not_in", "matches_any", "not_matches_any", "includes", "excludes", "includes_all", "excludes_all", "includes_some", "not_includes_all"] {
+		ergo._root_stand_in({"op": "compare", "cmp": cmp, "left": ["v"], "right": part}) == {"op": "compare", "cmp": "eq", "left": ["v"], "right": ["v"]}
+	}
+}
+
 test_a_root_a_whose_cant_read_has_no_stand_in_after_a_key_or_a_phrase_b9_leaves_out if {
 	keyed := {"op": "compare", "cmp": "eq", "left": ["v"], "right": ["$$params", "m", {"ref": ["$$params", "k"]}]}
 	ergo._root_stand_in(keyed) == keyed
