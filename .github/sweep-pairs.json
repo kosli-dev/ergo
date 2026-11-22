@@ -10674,5 +10674,438 @@
    ]
   },
   "want": "item 1 of xs is [1], which isn't an object"
+ },
+ {
+  "name": "for r5-6/item's own problem beside second-list items that aren't objects, key not text [problems.all_said]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs as x, every es as e",
+       "assert": [
+        "x.m named by z is 1",
+        "e.zz is x.v"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": "s",
+       "k": "a"
+      },
+      {
+       "v": 1,
+       "m": [
+        5
+       ]
+      }
+     ],
+     "es": [
+      3
+     ],
+     "z": 3
+    }
+   ]
+  },
+  "want": "z is 3, which isn't text; item 1 of xs: x.m named by z is missing; item 1 of xs: item 1 of es is 3, which isn't an object; item 2 of xs: item 1 of es is 3, which isn't an object"
+ },
+ {
+  "name": "for r5-6/item's own problem beside second-list items that aren't objects, params key not text [problems.all_said]",
+  "params": {
+   "k": 3
+  },
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs as x, every es as e",
+       "assert": [
+        "x.m named by $params.k is 1",
+        "e.zz is x.v"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": "s",
+       "k": "a"
+      },
+      {
+       "v": 1,
+       "m": [
+        5
+       ]
+      }
+     ],
+     "es": [
+      3
+     ]
+    }
+   ]
+  },
+  "want": "$params.k is 3, which isn't text; item 1 of xs: x.m is missing; item 1 of xs: item 1 of es is 3, which isn't an object; item 2 of xs: x.m is [5], which isn't an object; item 2 of xs: item 1 of es is 3, which isn't an object"
+ },
+ {
+  "name": "for r5-6/item that isn't an object beside a sort key that can't be read [row.parts]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "first of xs sorted by m named by $params.k as x",
+       "assert": "x.v exists"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": 1
+      },
+      "str"
+     ]
+    }
+   ]
+  },
+  "want": "$params.k is missing; item 1 of xs: m is missing; item 2 of xs is \"str\", which isn't an object"
+ },
+ {
+  "name": "for r5-6/root shared with a sentence that reads no alias said with it [for.roots]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs as x",
+       "assert": [
+        "x.v is at least zb",
+        "zb is at least 1",
+        "w is 1"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "zb": "s",
+     "xs": [
+      {
+       "v": 1
+      }
+     ]
+    }
+   ]
+  },
+  "want": "zb is \"s\", which isn't a number; w is missing"
+ },
+ {
+  "name": "for r5-6/line key shared with a sentence that reads no alias said with it [for.roots]",
+  "params": {
+   "k": 3
+  },
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every o named by $params.k as x",
+       "assert": [
+        "$params.k is \"a\"",
+        "w is 1",
+        "x is 1"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "o": {
+      "a": [
+       1
+      ]
+     }
+    }
+   ]
+  },
+  "want": "$params.k is 3, which isn't text; w is missing"
+ },
+ {
+  "name": "for r5-6/sentences that read no alias and walk one list keep their own parts [message.join]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every ks as k",
+       "assert": [
+        "count of es whose zz is at least $params.min is 1",
+        "count of es whose zz is m named by $params.k is 0"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "ks": [
+      "a"
+     ],
+     "es": [
+      {
+       "m": null
+      },
+      {
+       "zz": "s",
+       "m": null
+      }
+     ]
+    }
+   ]
+  },
+  "want": "$params.min is missing; item 1 of es: zz is missing; item 2 of es: zz is \"s\", which isn't a number; $params.k is missing; item 1 of es: zz is missing, and m is null; and 1 more"
+ },
+ {
+  "name": "for r5-6/problem a sentence that reads no alias gave not said again under an item [problems.all_said]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every ks as k",
+       "assert": [
+        "count of es is 1",
+        "every es.m named by k is 1"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "ks": [
+      "v"
+     ],
+     "es": null
+    }
+   ]
+  },
+  "want": "es is null"
+ },
+ {
+  "name": "for r5-6/problem two sentences that read no alias give said with the first [for.pass]",
+  "params": {
+   "k": 3
+  },
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every ks as k",
+       "assert": [
+        "every es.zz is 1",
+        "count of es whose zz is m named by $params.k is 0"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "ks": [
+      "a"
+     ],
+     "es": null
+    }
+   ]
+  },
+  "want": "es is null; $params.k is 3, which isn't text"
+ },
+ {
+  "name": "for r5-6/item a second line's whose can't decide said beside a pair that fails [problems.all_said]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs as x, every x.ys whose n is at least x.v as y",
+       "assert": "y.n is 1"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      [
+       1
+      ],
+      {
+       "v": 1,
+       "ys": [
+        {
+         "n": "s"
+        },
+        {
+         "n": 3
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "want": "item 1 of xs is [1], which isn't an object; item 2 of xs: item 1 of x.ys: n is \"s\", which isn't a number; item 2 of xs: item 2 of x.ys: y.n is 3"
+ },
+ {
+  "name": "for r5-6/sort key from params that aren't an object said once [problems.all_said]",
+  "params": 3,
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "first of xs sorted by m named by $params.k as x",
+       "assert": "x.v exists"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": 1,
+       "m": null
+      },
+      {
+       "v": 2,
+       "m": null
+      }
+     ]
+    }
+   ]
+  },
+  "want": "$params is 3, which isn't an object"
  }
 ]
