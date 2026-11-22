@@ -1003,7 +1003,7 @@ _m_filter(check, subj, row) := object.union(object.union(row, {"message": _m_joi
 
 _m_filter_walk(_, _, true, _, _) := {}
 
-_m_filter_walk(_, _, false, _, w) := _m_walk_said(w.root_msgs, []) if "root_msgs" in object.keys(w)
+_m_filter_walk(_, _, false, _, w) := _m_walk_said(w.root_msgs, object.get(w, "ergo/alone_items", [])) if "root_msgs" in object.keys(w)
 
 _m_filter_walk(check, subj, false, cause, w) := _m_walk_said(parts, _walk_item_texts(parts, w)) if {
 	not "root_msgs" in object.keys(w)
