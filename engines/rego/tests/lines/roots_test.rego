@@ -101,3 +101,10 @@ test_a_walked_list_after_is_in_ignoring_case_takes_the_worst_cause_of_its_values
 	ergo._walked_root_states(ref) == set() with data.ergo_document as {"cs": [{"name": "a"}]} with input as {}
 	ergo._walked_root_states(object.remove(ref, ["ignoring"])) == set() with data.ergo_document as {"cs": [{"name": 3}]} with input as {}
 }
+
+test_a_row_whose_items_fail_worse_than_its_roots_keeps_its_items if {
+	c := {"op": "in", "path": ["$$params", "k"], "values": {"ref": ["$$params[]", "l"]}, "ignoring": "case"}
+	check := {"op": "every", "path": ["xs"], "whose": [c], "check": {"op": "present", "path": ["x"]}, "if_any": true}
+	ergo._rooted_cause_said(check, {"xs": [{"v": "a"}]}, {"cause": "null", "fails": [{"msg": "$params.k is missing"}]}, "absent") with data.ergo_params as {"l": ["a"]} with input as {}
+	not ergo._rooted_cause_said(check, {"xs": [{"v": "a"}]}, {"cause": "unusable", "fails": [{"msg": "$params.k is missing"}]}, "absent") with data.ergo_params as {"l": ["a"]} with input as {}
+}
