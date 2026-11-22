@@ -685,8 +685,8 @@ else := side
 
 _root_stand_in(c) := object.union(c, {"cmp": "eq", f: c[g]}) if {
 	c.op == "compare"
-	c.cmp in ({"eq", "ne"} | _list_cmps)
 	some f in _compare_side_list
+	_stand_in_side(c.cmp, f)
 	is_array(c[f])
 	_walk_outside(c[f])
 	not _stand_in_keyed(c[f])
@@ -711,6 +711,10 @@ _root_stand_in(c) := object.union(c, {"cmp": "eq", f: c[g]}) if {
 	is_array(c.path)
 	not _walk_outside(c.path)
 } else := c
+
+_stand_in_side(cmp, _) if cmp in {"eq", "ne", "in", "includes"}
+
+_stand_in_side(cmp, "right") if cmp in _list_cmps
 
 _stand_in_keyed(p) if {
 	some step in p
