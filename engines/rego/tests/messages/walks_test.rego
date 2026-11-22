@@ -115,6 +115,25 @@ test_a_count_on_an_empty_list_says_a_root_further_back_than_the_key_that_isnt_an
 	said == ["$input.m is 3, which isn't an object"]
 }
 
+test_an_item_doesnt_say_again_the_root_a_key_from_it_is_read_in if {
+	every s in [
+		"count of xs whose v is not $input.m named by key is 0",
+		"count of xs that is $input.m named by key is 0",
+		"count of xs whose v is $input.m named by key and whose w equals 1 is 0",
+		"count of xs whose $input.m named by key is v is 0",
+	] {
+		side := _keyed_count_side(s)
+		said := [x[1] | some x in ergo._m_tally({"xs": [{"key": "a", "v": 1, "w": 1}]}, side)] with data.ergo_document as {"m": null}
+		said == ["$input.m is null"]
+	}
+}
+
+test_an_item_still_says_its_own_key_beside_the_root_a_key_from_it_is_read_in if {
+	side := _keyed_count_side("count of xs whose v is not $input.m named by key is 0")
+	said := [x[1] | some x in ergo._m_tally({"xs": [{"v": 1}]}, side)] with data.ergo_document as {"m": 3}
+	said == ["$input.m is 3, which isn't an object", "item 1 of xs: key is missing"]
+}
+
 test_a_count_on_an_empty_list_doesnt_add_its_root_again_after_the_root_it_already_says if {
 	check := ergo._s_written_check("count of xs whose tags contains $input.m named by key is 1")
 	o := {"passed": false, "cause": "null", "message": "$input.m is null"}
