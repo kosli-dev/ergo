@@ -200,6 +200,13 @@ _for_sentence_read(name, c) if {
 	name == _ref_label(r)
 }
 
+_for_sentence_read(name, c) if {
+	contains(name, "[]")
+	some p in _root_reads(c)
+	_subject_part(p)
+	replace(name, "[]", "") == _input_name(p)
+}
+
 _alias_named(name, aliases) if {
 	some a in aliases
 	some w in split(name, " ")
