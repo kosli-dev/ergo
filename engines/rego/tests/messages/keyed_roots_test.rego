@@ -3,9 +3,9 @@ package ergo_test
 import data.ergo
 import rego.v1
 
-test_keyed_list_leaves_a_count_to_say_its_own_root if {
+test_keyed_side_checks_a_path_side_is_an_object_before_reading_its_whose if {
+	not ergo._keyed_side(["approvals"], {"literal": 1})
 	not ergo._keyed_list({"op": "compare", "cmp": "gte", "left": ["approvals"], "right": {"literal": 1}})
-	not ergo._keyed_list(ergo._s_written_check("count of xs whose tags contains $input.m named by key is 1"))
 }
 
 test_an_item_under_a_root_said_once_takes_the_cause_of_its_own_missing_key_not_the_roots_null if {

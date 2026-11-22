@@ -121,8 +121,9 @@ _phrases_keyed_by_item := [
 
 test_a_count_on_an_empty_list_fails_on_the_root_a_key_from_the_item_is_read_in_whatever_the_phrase if {
 	every s in _phrases_keyed_by_item {
+		side := _count_keyed(s)
 		every pair in [[{}, "absent"], [{"m": null}, "null"], [{"m": 3}, "unusable"]] {
-			t := ergo._tally({"xs": []}, _count_keyed(s)) with data.ergo_document as pair[0]
+			t := ergo._tally({"xs": []}, side) with data.ergo_document as pair[0]
 			t.states == {pair[1]}
 			not "value" in object.keys(t)
 		}

@@ -18,6 +18,7 @@ _keyed_said(o, k, fault, subj) := object.union(object.union(o, {"cause": _worst_
 	said := [x.text | some x in items; x.text != ""]
 	failed := [_keyed_failed(f, items) | some f in object.get(o, "failed_items", [])]
 } else := object.union(o, {"cause": _worst_of({fault.cause, o.cause}), "message": _m_joined([fault.text, o.message]), "ergo/own": array.concat([fault.text], object.get(o, "ergo/own", [o.message]))}) if {
+	object.get(k, "count", false) == false
 	is_string(object.get(o, "message", null))
 	w := _walk(_walk_start({"path": k.path}, subj), _walk_keys({"path": k.path}, subj), true)
 	not _keyed_list_read(w)
@@ -48,6 +49,20 @@ _keyed_list(check) := {"path": check.path, "clause": c} if {
 	object.get(check, "distinct", false) != true
 	object.get(check, "check", null) == {"op": "present", "path": ["x"]}
 	c := _keyed_clause(check.path, check.whose)
+}
+
+_keyed_list(check) := k if {
+	check.op == "compare"
+	k := _keyed_side(object.get(check, "left", null), object.get(check, "right", null))
+}
+
+_keyed_side(side, other) := {"path": side.count_of, "clause": c, "count": true} if {
+	is_object(side)
+	is_array(object.get(side, "whose", null))
+	object.keys(side) == {"count_of", "text", "whose"}
+	is_object(other)
+	object.keys(other) == {"literal"}
+	c := _keyed_clause(side.count_of, side.whose)
 }
 
 _keyed_clause(path, whose) := c if {
