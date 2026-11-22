@@ -2018,25 +2018,19 @@ impl For {
             let group = self.sentence_group(at);
             clauses.extend(said.into_iter().map(|clause| clause.in_group(group)));
         }
-        let mut once: Vec<Clause> = Vec::new();
-        for clause in clauses {
-            let line = super::clause::text(std::slice::from_ref(&clause));
-            match once
-                .iter_mut()
-                .find(|seen| super::clause::text(std::slice::from_ref(seen)) == line)
-            {
-                Some(seen) => seen.group = seen.group.min(clause.group),
-                None => once.push(clause),
-            }
-        }
-        listed_roots(once)
+        listed_roots(lines_once(clauses))
     }
 
     /// The roots the sentence at `idx` reads outside the items and can't
     /// read, each said once, whichever other sentence reads them too.
     pub fn assertion_roots(&self, idx: usize, ctx: &Ctx) -> Vec<Clause> {
-        let _ = (idx, ctx);
-        Vec::new()
+        let Some(sentence) = self.sentences.get(idx) else {
+            return Vec::new();
+        };
+        listed_roots(lines_once(sentence_roots_listed(
+            &sentence.check,
+            &outer_ctx(ctx),
+        )))
     }
 
     #[cfg_attr(not(test), expect(dead_code))]
@@ -3361,6 +3355,21 @@ fn root_lines(roots: &[Clause]) -> Vec<String> {
         push_new(&mut out, line);
     }
     out
+}
+
+fn lines_once(clauses: Vec<Clause>) -> Vec<Clause> {
+    let mut once: Vec<Clause> = Vec::new();
+    for clause in clauses {
+        let line = super::clause::text(std::slice::from_ref(&clause));
+        match once
+            .iter_mut()
+            .find(|seen| super::clause::text(std::slice::from_ref(seen)) == line)
+        {
+            Some(seen) => seen.group = seen.group.min(clause.group),
+            None => once.push(clause),
+        }
+    }
+    once
 }
 
 fn listed_roots(clauses: Vec<Clause>) -> Vec<Clause> {
