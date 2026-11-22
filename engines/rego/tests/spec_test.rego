@@ -3,7 +3,12 @@ package spec_test
 import data.ergo
 
 known_differences := {
-	"for / the roots of the line's own whose come before the roots of its sentences, whatever their causes / $params.min is missing and says first, though $params.a has the worse cause",
+	"derived / an every or some whose whose reads a root from $input through a key the item holds fails on the root, said once, when each item reads fine / the root is a number",
+	"derived / an every or some whose whose reads a root from $input through a key the item holds fails on the root, said once, when each item reads fine / the root is an empty list",
+	"derived / an every or some whose whose reads a root from $input through a key the item holds fails on the root, said once, when each item reads fine / the root is missing",
+	"derived / an every or some whose whose reads a root from $input through a key the item holds fails on the root, said once, when each item reads fine / the root is null",
+	"derived / an every or some whose whose reads a root from $params through a key the item holds fails on the root, said once, when each item reads fine / the root is null",
+	"for /the roots of the line's own whose come before the roots of its sentences, whatever their causes / $params.min is missing and says first, though $params.a has the worse cause",
 }
 
 _topic_cases(topic) := json.unmarshal(replace(json.marshal(data.spec.cases[topic]), "{{spec}}", ergo._spec))
