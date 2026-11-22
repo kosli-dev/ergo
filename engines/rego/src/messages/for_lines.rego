@@ -928,7 +928,8 @@ else := _m_clause("item", f.said, f.cause, _m_named_item(f)) if {
 else := object.union(_m_item_clause(f.said, _worst_or_value({own[0]} | {x.cause | some x in said}), said), {"text": own[1]}) if {
 	count(check.items) == 1
 	own := _for_owned_text(f)
-	said := _for_item_sentences(check, object.union(f, {"failed_assertions": array.slice(f.failed_assertions, 1, count(f.failed_assertions))}), _for_item_bound(check, f))
+	rest := [l | some l in array.slice(f.failed_assertions, 1, count(f.failed_assertions)); object.get(l, "own_msg", []) != f.failed_assertions[0].own_msg]
+	said := _for_item_sentences(check, object.union(f, {"failed_assertions": rest}), _for_item_bound(check, f))
 }
 
 else := _m_item_clause(f.said, _for_said_cause(said), said) if {
