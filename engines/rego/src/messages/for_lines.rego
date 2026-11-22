@@ -1019,7 +1019,7 @@ _for_items_walked(check) := {"w": w, "items": {_failed_name(e.i, d): e | some e 
 _for_item_bound(check, f, walked) := _bound(_for_names, check.items[0].as, e.v, _walk_at(walked.w, e)) if e := walked.items[f.path]
 
 _for_item_sentences(check, f, names) := _for_in_list_order([x | some i, x in said; not _for_said_earlier(x, array.slice(said, 0, i))]) if {
-	said := _once([x |
+	said := _once([_for_whole_list(x) |
 		some i, c in check.checks
 		_for_reads_an_alias(check, c)
 		some l in f.failed_assertions
@@ -1027,6 +1027,13 @@ _for_item_sentences(check, f, names) := _for_in_list_order([x | some i, x in sai
 		some x in _for_sentence_clauses(check, c, object.get(names, "ergo/subject", null), l.cause) with input as {"ergo/names": names}
 	])
 }
+
+_for_whole_list(x) := object.union(x, {"kind": "list"}) if {
+	x.kind == "item"
+	x.said == []
+	is_string(x.name)
+	_walk_kind(x.name) == "list"
+} else := x
 
 _for_said_earlier(x, earlier) if {
 	x.kind != "item"
