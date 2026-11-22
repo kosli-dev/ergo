@@ -1428,13 +1428,13 @@ _m_applies(evals, req, false) := {"message": concat("; ", ms)} if {
 _for_said(raw) := object.union(object.remove(raw, ["ergo/for_raw"]), {
 	"message": _m_aliased(_m_clauses_text(_m_clauses_shown(tree))),
 	"cause": _worst_or_value({raw.cause} | {v.cause | walk(tree, [_, v]); is_object(v); "cause" in object.keys(v)}),
-	"ergo/for_texts": _for_texts(s.check, s.subj, s.r, _m_clause_texts(p.free), _m_clause_texts(p.line)),
+	"ergo/for_texts": _for_texts(s.check, s.subj, s.r, _m_clause_texts(array.concat(p.roots, p.free)), _m_clause_texts(p.line)),
 }) if {
 	s := raw["ergo/for_raw"]
 	s.tree == true
 	count(_m_for_said(s.check) | _m_for_tally_said(s.check)) == 0
 	p := _for_row_parts(s.check, s.subj, s.r)
-	tree := array.concat(array.concat(p.free, p.items), p.lists)
+	tree := array.concat(array.concat(array.concat(p.roots, p.free), p.items), p.lists)
 } else := object.union(object.remove(raw, ["ergo/for_raw"]), {"message": said.message, "ergo/for_texts": _for_texts(s.check, s.subj, s.r, said.once, said.line)}) if {
 	s := raw["ergo/for_raw"]
 	s.tree == true

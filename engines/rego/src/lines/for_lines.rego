@@ -46,10 +46,7 @@ _for_row_of(check, subj, r) := r if {
 _for_on_tree(check, subj, r) if {
 	count(check.items) == 1
 	object.get(r, "natural", null) != "satisfied"
-	not "root_msgs" in object.keys(r)
-	not "other_roots" in object.keys(r)
 	not _walk_flawed(check)
-	_walk_root_flaw(check, subj) == ""
 	not _for_key_not_text(check)
 	not _for_key_is_alias(check)
 	count([c | some c in check.checks; _for_reads_an_alias(check, c); _for_reads_a_list(c)]) < 2
