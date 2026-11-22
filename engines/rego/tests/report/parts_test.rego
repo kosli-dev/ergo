@@ -240,3 +240,8 @@ test_the_lists_a_check_compares_ignoring_case_are_named_as_its_inputs_name_them 
 	root := {"op": "compare", "left": ["x"], "cmp": "not_in", "right": [`${"alias":"","n":-1,"of":null,"old":true}`, "ys"], "ignoring": "case"}
 	ergo._text_list_names({"op": "every", "path": ["xs", "v"], "check": root}) == {"ys"}
 }
+
+test_an_item_record_that_only_repeats_what_the_row_already_says_gives_no_entry if {
+	ergo._tally_unrooted(["null", "item 1 of xs: $input.m is null", {}], "$input.m is null") == null
+	ergo._tally_unrooted(["absent", "item 1 of xs: $input.m is null; key is missing", {}], "$input.m is null") == ["absent", "item 1 of xs: key is missing", {}]
+}

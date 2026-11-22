@@ -33,6 +33,27 @@ test_a_count_takes_the_cause_of_the_root_a_key_from_the_item_is_read_in if {
 	ergo._tally({"xs": [{}]}, _count_keyed_by_item("$input.m")).states == {"absent", "unusable"} with data.ergo_document as {"m": true}
 }
 
+test_a_count_takes_the_cause_of_what_each_item_cant_read_on_its_own_beside_the_root_a_key_from_it_is_read_in if {
+	side := ergo._m_tally_parts(ergo._s_written_check("count of xs whose v is not $input.d.m named by key is 0"))[0]
+	ergo._tally({"xs": [{"v": 1}]}, side).states == {"null", "absent"} with data.ergo_document as {"d": null}
+	ergo._tally({"xs": [{"key": "a", "v": null}]}, side).states == {"absent", "null"} with data.ergo_document as {}
+	ergo._tally({"xs": [{"key": "a", "v": 1}]}, side).states == {"unusable"} with data.ergo_document as {"d": 3}
+	ergo._tally({"xs": [{"key": "a"}]}, side).states == {"unusable", "absent"} with data.ergo_document as {"d": 3}
+}
+
+test_a_count_takes_the_cause_of_what_each_item_cant_read_on_its_own_beside_the_root_a_key_from_it_is_read_in_whatever_the_phrase if {
+	every pair in [
+		["count of xs whose s starts with $input.m named by key is 0", {"s": 3}],
+		["count of xs whose s does not match $input.m named by key is 0", {"s": 3}],
+		["count of xs whose tags contains $input.m named by key is 0", {"tags": "x"}],
+		["count of xs whose tags contains all of $input.m named by key is 0", {"tags": "x"}],
+		["count of xs whose $input.m named by key starts with s is 0", {"s": 3}],
+	] {
+		side := ergo._m_tally_parts(ergo._s_written_check(pair[0]))[0]
+		ergo._tally({"xs": [object.union({"key": "a"}, pair[1])]}, side).states == {"null", "unusable"} with data.ergo_document as {"m": null}
+	}
+}
+
 test_a_count_fails_on_the_root_a_key_from_the_item_is_read_in_even_when_the_list_is_empty if {
 	ergo._tally({"xs": []}, _count_keyed_by_item("$params.m")).states == {"absent"} with data.ergo_params as {}
 	ergo._tally({"xs": []}, _count_keyed_by_item("$params.m")).states == {"null"} with data.ergo_params as {"m": null}
@@ -106,6 +127,34 @@ test_a_count_or_a_sum_says_an_empty_list_on_the_right_before_its_own_list_that_c
 		_said_beside_list(sentence, {}) == [["absent", "$params.cs is []; xs is missing"]]
 		_said_beside_list(sentence, {"xs": null}) == [["null", "$params.cs is []; xs is null"]]
 	}
+}
+
+_count_keyed(sentence) := ergo._m_tally_parts(ergo._s_written_check(sentence))[0]
+
+_phrases_keyed_by_item := [
+	"count of xs whose v is not $input.m named by key is 0",
+	"count of xs that is $input.m named by key is 0",
+	"count of xs whose v is $input.m named by key and whose w equals 1 is 0",
+	"count of xs whose tags contains $input.m named by key is 0",
+	"count of xs whose v matches $input.m named by key is 0",
+	"count of xs whose $input.m named by key is v is 0",
+]
+
+test_a_count_on_an_empty_list_fails_on_the_root_a_key_from_the_item_is_read_in_whatever_the_phrase if {
+	every s in _phrases_keyed_by_item {
+		side := _count_keyed(s)
+		every pair in [[{}, "absent"], [{"m": null}, "null"], [{"m": 3}, "unusable"]] {
+			t := ergo._tally({"xs": []}, side) with data.ergo_document as pair[0]
+			t.states == {pair[1]}
+			not "value" in object.keys(t)
+		}
+	}
+}
+
+test_a_count_on_an_empty_list_fails_on_a_root_further_back_than_the_key_that_isnt_an_object if {
+	t := ergo._tally({"xs": []}, _count_keyed("count of xs whose v is $input.m.a named by key is 0")) with data.ergo_document as {"m": 3}
+	t.states == {"unusable"}
+	not "value" in object.keys(t)
 }
 
 test_a_count_or_sum_of_member_of_walks_each_member_of_the_object_as_an_item if {

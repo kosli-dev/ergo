@@ -3,16 +3,9 @@ package spec_test
 import data.ergo
 
 known_differences := {
-	"derived / a count on an empty list whose whose reads a root through a key the item holds says only that root and has no number, whatever the phrase / the root is a number and the list is empty",
-	"derived / a count on an empty list whose whose reads a root through a key the item holds says only that root and has no number, whatever the phrase / the root is an empty list and the list is empty",
-	"derived / a count on an empty list whose whose reads a root through a key the item holds says only that root and has no number, whatever the phrase / the root is missing and the list is empty",
-	"derived / a count on an empty list whose whose reads a root through a key the item holds says only that root and has no number, whatever the phrase / the root is null and the list is empty",
-	"derived / a count on an empty list whose whose reads a root through a key the item holds says only that root and has no number, whatever the phrase / the root is text and the list is empty",
-	"derived / a count on an empty list whose whose reads a root through a key the item holds says the first step of that root that can't be read and has no number / the root is a number and the list is empty",
-	"derived / a count on an empty list whose whose reads a root through a key the item holds says the first step of that root that can't be read and has no number / the root's parent is a number and the list is empty",
-	"derived / a count on an empty list whose whose reads a root through a key the item holds says the first step of that root that can't be read and has no number / the root's parent is null and the list is empty",
-	"derived / a count or every whose whose reads a root outside the item through a key the item holds says the root and then the list's own problem / the root is null and the list is empty",
-	"derived / a count over a list reached through a list, whose whose reads a root through a key the item holds, says that root once and in no item / the root is a number",
+	"derived / a count over a list reached through a list, whose whose compares the item's value with a root read through a key the item holds, puts in each item entry the field the whose read inside the item / the root is missing and the items have the key but their own value is missing or null",
+	"derived / a count over a list reached through a list, whose whose compares the item's value with a root read through a key the item holds, puts in each item entry the field the whose read inside the item / the root is null and the items have the key but their own value is missing or null",
+	"derived / a count over a list reached through a list, whose whose compares the item's value with a root read through a key the item holds, puts in each item entry the field the whose read inside the item / the root isn't an object and the items have the key but their own value is missing or null",
 	"derived / an every or some whose whose reads a root from $input through a key the item holds fails on the root, said once, when each item reads fine / the root is a number",
 	"derived / an every or some whose whose reads a root from $input through a key the item holds fails on the root, said once, when each item reads fine / the root is an empty list",
 	"derived / an every or some whose whose reads a root from $input through a key the item holds fails on the root, said once, when each item reads fine / the root is missing",

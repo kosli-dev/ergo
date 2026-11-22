@@ -473,3 +473,22 @@ test_a_second_alias_read_whole_is_named_by_its_item if {
 test_items_of_an_inner_list_that_tie_are_said_under_their_item if {
 	_item_texts("every ws as w, first of w.ys sorted by t as y", ["y.v is 1"], {"ws": [{"ys": [{"t": 1, "v": 2}, {"t": 1, "v": 3}]}]}, {}) == [["item 1 of ws: item 1 and item 2 of w.ys tie on t"]]
 }
+
+test_a_for_item_keeps_the_cut_of_its_count_after_its_items_and_apart_from_a_root_it_says if {
+	f := {
+		"bare": "item 1 of ws", "cause": "not_an_object", "item": "item 1 of ws", "said": "item 1 of ws", "path": "item 1 of ws",
+		"value": {"xs": [null, 3, "s", []]},
+		"failed_assertions": [{
+			"assertion": "count of w.xs whose v does not equal $input.m named by key is 0",
+			"cause": "not_an_object",
+			"msg": ["$input.m is null; item 1 of w.xs is null, which isn't an object; item 2 of w.xs is 3, which isn't an object; item 3 of w.xs is \"s\", which isn't an object; and 1 more"],
+		}],
+	}
+	ergo._m_for_fail(f) == [
+		"item 1 of ws: $input.m is null",
+		"item 1 of ws: item 1 of w.xs is null, which isn't an object",
+		"item 1 of ws: item 2 of w.xs is 3, which isn't an object",
+		"item 1 of ws: item 3 of w.xs is \"s\", which isn't an object",
+		"item 1 of ws: and 1 more",
+	]
+}
