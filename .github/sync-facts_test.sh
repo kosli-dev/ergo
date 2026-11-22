@@ -42,12 +42,13 @@ DOC
 git add -A
 git commit -q -m base
 git branch -M main
+git checkout -q -b feature
 
 printf '[{"description":"g","cases":[{"description":"a"},{"description":"b"},{"description":"c"}]}]\n' > spec/cases/t/cases.json
 printf 't / g / a\nt / g / c\nu / h / y\nu / h / z\n' > engines/rust/known-failures.txt
 printf 'package spec_test\n\nknown_differences := {\n\t"t / g / a",\n\t"t / g / c",\n}\n' > engines/rego/tests/spec_test.rego
 python3 - << 'PY'
-text = open("spec/OPEN.md").read().replace("- **One.** Text.\n\n## Where both", "- **One.** Text.\n- **Three.** Text.\n\n## Where both")
+text = open("spec/OPEN.md").read().replace("- **Two.** Text.\n\n## Where both", "- **Two.** Text.\n- **Three.** Text.\n\n## Where both")
 open("spec/OPEN.md", "w").write(text)
 PY
 git add -A
