@@ -1785,6 +1785,14 @@ fn root_kind_text(check: &Check, root: &Path, ctx: &Ctx) -> Option<String> {
         });
         return root_kind_text(&compare, root, ctx);
     }
+    if let Check::In(within) = check
+        && within.ignoring.is_some()
+        && &within.path == root
+    {
+        let read = path::read(root, ctx);
+        let value = read.value.filter(|_| read.outcome == Outcome::Found)?;
+        return (!value.is_string()).then(|| isnt(&name::name(root), value, "text"));
+    }
     let sides = match check {
         Check::Compare(c) => [&c.left, &c.right],
         Check::CompareTime(c) => [&c.left, &c.right],

@@ -1255,6 +1255,12 @@ fn roots_written_in(check: &Check, focus: &Ctx, blocked: impl Fn(&Path) -> bool)
         _ => None,
     };
     match check {
+        Check::In(within)
+            if blocked(&within.path)
+                && message::root_kind_fault(check, &within.path, focus).is_some() =>
+        {
+            None
+        }
         Check::In(within) => Some(Check::In(In {
             values: written(&within.values)?,
             ..within.clone()
