@@ -86,6 +86,7 @@ fn a_member_walk_whose_every_end_stops_reads_the_list_as_its_worst_stop_in_any_o
         (json!([{"ys": 3}, {"ys": null}]), Outcome::Unusable),
         (json!([{"ys": null}, {}]), Outcome::Absent),
         (json!([{}, {"ys": null}]), Outcome::Absent),
+        (json!([{"ys": {}}, {"ys": null}]), Outcome::Found),
     ] {
         assert_eq!(member_list_state(json!({"xs": xs})), wanted, "{xs}");
     }

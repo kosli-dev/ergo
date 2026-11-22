@@ -20,6 +20,7 @@ test_a_member_walk_whose_every_end_stops_reads_the_list_as_its_worst_stop_in_any
 	_member_list_outcome({"xs": [{"ys": null}, {}]}) == "absent"
 	_member_list_outcome({"xs": [{}, {"ys": null}]}) == "absent"
 	_member_list_outcome({"xs": [{"ys": {"a": 1}}, {"ys": 3}]}) == "usable"
+	_member_list_outcome({"xs": [{"ys": {}}, {"ys": null}]}) == "usable"
 }
 
 test_a_walk_that_ends_with_member_of_reads_each_member_of_the_object_in_key_order if {

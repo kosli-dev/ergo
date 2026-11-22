@@ -1195,9 +1195,11 @@ _for_inner_pairs(check, subj, names, item, w) := {object.get(iw, "input", _for_i
 	inner := [_for_walk(check.items[1], subj, _bound(names, item.as, e.v, _walk_at(w, e))) | some i, e in w.items; not i in dropped]
 }
 
-_for_inner_read(t, inner) := array.concat(t, [o]) if {
+_for_inner_read(t, inner) := array.concat(t, [_worst_of({s | some s in stops})]) if {
 	t[1] == []
-	o := _worst_of({s | some iw in inner; s := _stopped_list_outcome(iw.items, array.concat(iw.fails, _walk_stop(iw)))})
+	stops := [s | some iw in inner; s := _stopped_list_outcome(iw.items, array.concat(iw.fails, _walk_stop(iw)))]
+	count(stops) == count(inner)
+	stops != []
 } else := t
 
 _for_inner_stopped(check, t) := [t[0], [], [], s] if {

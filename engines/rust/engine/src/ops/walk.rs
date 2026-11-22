@@ -1617,23 +1617,27 @@ fn with_fields(inputs: &mut Vec<Input>, list: &str, path: &Path, ctx: &Ctx) {
     }
 }
 
-/// How reading a walked list with no items ended, or `None` when it has items
-/// or no read stopped. With no list along the path, it is `Unusable` when the
-/// path reads a value that can't be walked; otherwise it is the worst of the
-/// ways its reads stopped.
+/// `Unusable` when a walk with no list along its path gives no item because
+/// the path reads a value that can't be walked, and `None` otherwise.
 pub fn stopped_state(walked: &Walked, path: &Path, ctx: &Ctx) -> Option<Outcome> {
-    if !walked.items.is_empty() || walked.failures.is_empty() {
+    if !walked.items.is_empty()
+        || walked.failures.is_empty()
+        || walked.walked.iter().any(|at| *at != walked.steps)
+    {
         return None;
     }
-    if walked.walked.is_empty() {
-        let read = path::read(&member::split(path).0, ctx);
-        return (read.outcome == Outcome::Found && read.value.is_some())
-            .then_some(Outcome::Unusable);
-    }
-    worst_stop(walked)
+    let read = path::read(&member::split(path).0, ctx);
+    (read.outcome == Outcome::Found && read.value.is_some()).then_some(Outcome::Unusable)
 }
 
 fn worst_stop(walked: &Walked) -> Option<Outcome> {
+    if walked
+        .failures
+        .iter()
+        .any(|f| f.cause == Cause::Value && !crate::parts::is_item(&f.item))
+    {
+        return None;
+    }
     let worst = Cause::worst(
         walked
             .failures
@@ -1656,7 +1660,8 @@ fn worst_stop(walked: &Walked) -> Option<Outcome> {
 }
 
 /// How reading a walked list ended when it has no items: the worst of the
-/// ways the reads of the list itself stopped, whatever their order.
+/// ways the reads of the list itself stopped, whatever their order, or
+/// `Found` when one of its ends is empty.
 pub fn list_state(walked: &Walked) -> Outcome {
     if !walked.items.is_empty() {
         return Outcome::Found;

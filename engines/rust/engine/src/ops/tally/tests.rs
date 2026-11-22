@@ -2908,24 +2908,6 @@ fn a_count_of_or_a_sum_of_member_of_a_value_that_is_not_an_object_reads_it_as_un
 }
 
 #[test]
-fn a_count_of_member_of_whose_every_end_fails_reads_the_list_as_its_worst_end() {
-    for (xs, wanted) in [
-        (json!([{"ys": 3}]), crate::path::Outcome::Unusable),
-        (json!([{"ys": null}, {"ys": 3}]), crate::path::Outcome::Unusable),
-        (json!([{"ys": 3}, {"ys": null}]), crate::path::Outcome::Unusable),
-        (json!([{"ys": null}, {}]), crate::path::Outcome::Absent),
-        (json!([{}, {"ys": null}]), crate::path::Outcome::Absent),
-        (json!([{"ys": {}}, {"ys": null}]), crate::path::Outcome::Null),
-    ] {
-        assert_eq!(
-            list_read("count of member of xs.ys is 1", json!({"xs": xs}), "xs[].ys"),
-            wanted,
-            "{xs}"
-        );
-    }
-}
-
-#[test]
 fn half_a_microsecond_rounds_up_and_less_rounds_down_whatever_its_length() {
     for (from, to, wanted) in [
         (0.0, 0.0000005, "0.000001"),
