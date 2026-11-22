@@ -3520,6 +3520,31 @@ fn a_sentence_that_reads_only_the_first_alias_says_each_items_own_read_beside_a_
 }
 
 #[test]
+fn a_list_that_a_sentence_and_the_line_both_cant_walk_is_said_once() {
+    assert_eq!(
+        for_row(
+            "every xs as x, every x.ys as y",
+            &["every x.ys.n is 1"],
+            json!({"xs": [{"ys": []}, {"ys": null}]}),
+            json!({}),
+        ),
+        (
+            "null".to_string(),
+            "item 1 of xs: x.ys is []; item 2 of xs: x.ys is null".to_string()
+        )
+    );
+    assert_eq!(
+        for_row(
+            "every xs as x, every es as e",
+            &["every es.zz is 1"],
+            json!({"xs": [{"v": 1}], "es": null}),
+            json!({}),
+        ),
+        ("null".to_string(), "es is null".to_string())
+    );
+}
+
+#[test]
 fn a_list_the_line_cant_walk_isnt_counted_as_an_item() {
     let zz = |n: usize| {
         (1..=n)

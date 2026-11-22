@@ -357,6 +357,42 @@ fn a_list_isnt_counted_and_comes_after_the_items_of_an_earlier_group() {
 }
 
 #[test]
+fn a_problem_two_clauses_say_alike_is_said_once() {
+    let empty = || read(Kind::List, "x.ys", Cause::Value, "x.ys is []");
+    let told = Clause {
+        said: vec![root("es is null", Cause::Null, "es is null")],
+        ..read(Kind::List, "es", Cause::Null, "es is null")
+    };
+    let clauses = vec![
+        told,
+        read(Kind::List, "es", Cause::Null, "es is null").in_group(1),
+        item(
+            "item 1 of xs",
+            Cause::Value,
+            vec![
+                Clause {
+                    said: vec![root("x.ys is []", Cause::Value, "x.ys is []")],
+                    ..empty()
+                },
+                empty(),
+            ],
+        ),
+        item(
+            "item 2 of xs",
+            Cause::Null,
+            vec![
+                root("x", Cause::Null, "x is null"),
+                root("x is null", Cause::Null, "x is null"),
+            ],
+        ),
+    ];
+    assert_eq!(
+        text(&shown(&clauses)),
+        "es is null; item 1 of xs: x.ys is []; item 2 of xs: x is null"
+    );
+}
+
+#[test]
 fn the_cap_counts_leaf_items_not_outer_items() {
     let rs = || {
         vec![
