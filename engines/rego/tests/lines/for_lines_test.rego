@@ -124,7 +124,13 @@ test_a_for_row_keeps_its_message_off_the_tree_while_the_tree_cant_say_its_roots_
 	not _on_tree("every o named by $params.k as x", ["x is 1"], {"o": {"a": [2]}}, {"k": "a"})
 	not _on_tree("first of xs sorted by m named by $params.k as x", ["x.v is 1"], {"xs": [{"m": {"a": 1}, "v": 2}]}, {"k": "a"})
 	not _on_tree("every es whose zz is m named by $params.k as e", ["e.v is 1"], {"es": [{"zz": 1}]}, {"k": 3})
-	not _on_tree("every xs as x", ["x.v is 1"], {"xs": [{"v": 1}]}, {})
+	not _on_tree("every xs as x", ["every x.ys.n is 1", "every x.ys.m is 1"], {"xs": [{"ys": [{"n": 2, "m": 2}]}]}, {})
+	not _on_tree("every xs as x", ["every x.ys exists", "sum of x.ys.n is 3"], {"xs": [{"ys": [{"n": 1}, null]}]}, {})
+}
+
+test_a_for_row_whose_item_walks_one_list_takes_its_message_from_the_tree if {
+	_on_tree("every xs as x", ["every x.ys.n is 1", "x.v is 1"], {"xs": [{"v": 2, "ys": [{"n": 2}]}]}, {})
+	_on_tree("every xs as x", ["count of x.ys is 1", "every es.n is 1"], {"xs": [{"ys": []}], "es": [{"n": 2}]}, {})
 }
 
 test_for_root_clauses_name_the_roots_the_row_names_today if {

@@ -1046,10 +1046,15 @@ _for_numbered(c) if {
 
 _for_list_rank(lists, l) := [i | some i, x in lists; x == l][0]
 
-_for_row_clauses(check, subj, r) := array.concat(array.concat(free, items), [_m_clause("list", t, r.cause, t) | some t in _for_list_texts(check, subj, r)]) if {
+_for_row_clauses(check, subj, r) := array.concat(array.concat(p.free, p.items), p.lists) if p := _for_row_parts(check, subj, r)
+
+_for_row_parts(check, subj, r) := {"free": free, "items": items, "lists": array.concat(listed, line), "line": line} if {
 	free := _for_free_clauses(check, subj, r)
 	said := {t | some c in free; some t in _m_clause_lines(c)}
-	items := [x | some k, _ in r.failed; x := _for_unrooted(_for_item_clause(check, r.failed, k), said)]
+	name := _input_name(check.items[0].path)
+	items := [x | some k, f in r.failed; f.path != name; x := _for_unrooted(_for_item_clause(check, r.failed, k), said)]
+	listed := [object.union(_for_item_clause(check, r.failed, k), {"kind": "list"}) | some k, f in r.failed; f.path == name]
+	line := [_m_clause("list", t, r.cause, t) | some t in _for_list_texts(check, subj, r)]
 }
 
 _for_free_clauses(check, subj, r) := [object.union(x, {"group": i - count(check.checks)}) |
@@ -1395,7 +1400,16 @@ _m_applies(evals, req, false) := {"message": concat("; ", ms)} if {
 	ms != []
 } else := {"message": concat("", [_text(object.get(req, "subject", null)), " doesn't match"])}
 
-_for_said(raw) := object.union(object.remove(raw, ["ergo/for_raw"]), {"ergo/for_texts": _for_texts(s.check, s.subj, s.r, s.once, s.line)}) if s := raw["ergo/for_raw"]
+_for_said(raw) := object.union(object.remove(raw, ["ergo/for_raw"]), {
+	"message": _m_aliased(_m_clauses_text(_m_clauses_shown(tree))),
+	"cause": _worst_or_value({raw.cause} | {v.cause | walk(tree, [_, v]); is_object(v); "cause" in object.keys(v)}),
+	"ergo/for_texts": _for_texts(s.check, s.subj, s.r, _m_clause_texts(p.free), _m_clause_texts(p.line)),
+}) if {
+	s := raw["ergo/for_raw"]
+	s.tree == true
+	p := _for_row_parts(s.check, s.subj, s.r)
+	tree := array.concat(array.concat(p.free, p.items), p.lists)
+} else := object.union(object.remove(raw, ["ergo/for_raw"]), {"ergo/for_texts": _for_texts(s.check, s.subj, s.r, s.once, s.line)}) if s := raw["ergo/for_raw"]
 
 else := raw
 
