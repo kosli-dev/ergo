@@ -3241,12 +3241,44 @@ fn row_clauses(roots: Vec<Clause>, items: &[Clause], free: usize) -> Vec<Clause>
         .into_iter()
         .partition(|root| root.kind == super::clause::Kind::Root);
     read.into_iter()
-        .chain(
-            broke
-                .iter()
-                .chain(items)
-                .map(|clause| clause.clone().in_group(walked(clause))),
-        )
+        .chain(broke.iter().chain(items).map(|clause| Clause {
+            said: named_once(clause.said.clone()),
+            ..clause.clone().in_group(walked(clause))
+        }))
+        .collect()
+}
+
+fn named_once(clauses: Vec<Clause>) -> Vec<Clause> {
+    let alone = |clause: &Clause| {
+        clause.kind == super::clause::Kind::Item
+            && !clause.text.is_empty()
+            && clause.said.is_empty()
+    };
+    let mut out: Vec<(Clause, Vec<String>)> = Vec::new();
+    for clause in clauses {
+        let clause = Clause {
+            said: named_once(clause.said),
+            ..clause
+        };
+        match out
+            .iter_mut()
+            .find(|(seen, _)| alone(seen) && alone(&clause) && seen.name == clause.name)
+        {
+            Some((seen, texts)) => {
+                seen.cause = Cause::worst([seen.cause, clause.cause]).unwrap_or(seen.cause);
+                push_new(texts, clause.text);
+            }
+            None => {
+                let texts = vec![clause.text.clone()];
+                out.push((clause, texts));
+            }
+        }
+    }
+    out.into_iter()
+        .map(|(clause, texts)| Clause {
+            text: texts.join(", and "),
+            ..clause
+        })
         .collect()
 }
 
@@ -3430,12 +3462,16 @@ fn merge_clause(said: &mut Vec<Clause>, clause: &Clause) {
         seen.kind == clause.kind
             && if item {
                 seen.name == clause.name
+                    && (seen.text == clause.text || seen.text.is_empty() || clause.text.is_empty())
             } else {
                 seen.text == clause.text
             }
     });
     match same {
         Some(seen) if item => {
+            if seen.text.is_empty() {
+                seen.text = clause.text.clone();
+            }
             for inner in &clause.said {
                 push_new(&mut seen.said, inner.clone());
             }
