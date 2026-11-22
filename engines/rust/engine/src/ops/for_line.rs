@@ -2776,9 +2776,7 @@ impl For {
 
     fn dead_clause(&self, dead: &Dead, ctx: &Ctx) -> Clause {
         if let Some(own) = self.unsorted_own(dead, ctx) {
-            let (cause, text) = own.map_or((dead.cause, String::new()), |(text, cause, _)| {
-                (cause, super::message::prefixed(dead.shown(), &text))
-            });
+            let (cause, text) = own.unwrap_or((dead.cause, String::new()));
             return Clause::item(dead.shown(), cause, text, Vec::new());
         }
         if let Some(told) = &dead.told {
@@ -2802,9 +2800,9 @@ impl For {
         clause
     }
 
-    fn unsorted_own(&self, dead: &Dead, ctx: &Ctx) -> Option<Option<(String, Cause, Input)>> {
+    fn unsorted_own(&self, dead: &Dead, ctx: &Ctx) -> Option<Option<(Cause, String)>> {
         let stash = dead.sorted.as_ref()?;
-        let item = stash.get("value").filter(|value| value.is_object())?;
+        let item = stash.get("value")?;
         let (path, keys) = self.items.iter().find_map(|line| match &line.how {
             How::Pick {
                 sorted: Some(sorted),
@@ -2821,13 +2819,21 @@ impl For {
         {
             return None;
         }
+        if !item.is_object() {
+            let text = super::message::isnt(dead.shown(), item, "an object");
+            return Some(Some((Cause::NotAnObject, text)));
+        }
         let mut at = outer;
         at.subject = Located {
             value: item,
             location: Location::input_root(),
         };
         at.label = None;
-        Some(super::key_base::of_path(path, false, &at).and_then(|found| found.base))
+        Some(
+            super::key_base::of_path(path, false, &at)
+                .and_then(|found| found.base)
+                .map(|(text, cause, _)| (cause, super::message::prefixed(dead.shown(), &text))),
+        )
     }
 
     fn child_clause(
