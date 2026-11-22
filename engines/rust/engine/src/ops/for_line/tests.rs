@@ -1901,6 +1901,32 @@ fn for_root_clauses(
     subject: Value,
     params: Value,
 ) -> Vec<crate::ops::clause::Clause> {
+    on_line(for_line, assertions, subject, params, |line, ctx| {
+        line.root_clauses(ctx)
+    })
+}
+
+fn for_assertion_roots(
+    for_line: &str,
+    assertions: &[&str],
+    subject: Value,
+    params: Value,
+    idx: usize,
+) -> String {
+    on_line(for_line, assertions, subject, params, |line, ctx| {
+        crate::ops::clause::text(&crate::ops::clause::shown(
+            &line.assertion_roots(idx, ctx),
+        ))
+    })
+}
+
+fn on_line<T>(
+    for_line: &str,
+    assertions: &[&str],
+    subject: Value,
+    params: Value,
+    with: impl FnOnce(&super::For, &crate::path::Ctx) -> T,
+) -> T {
     let line = ergo_policy_sentences::parse_for(for_line).unwrap();
     let parsed: Vec<_> = assertions
         .iter()
@@ -1927,7 +1953,38 @@ fn for_root_clauses(
         params: Some(&params),
         aliases: std::collections::BTreeMap::new(),
     };
-    line.root_clauses(&ctx)
+    with(&line, &ctx)
+}
+
+#[test]
+fn each_sentence_that_reads_a_root_gives_it() {
+    let roots = |idx| {
+        for_assertion_roots(
+            "every xs as x",
+            &["x.v is at least $params.min", "x.w is at least $params.min"],
+            json!({"xs": [{"v": 1}, {}]}),
+            json!({"min": "s"}),
+            idx,
+        )
+    };
+    assert_eq!(roots(0), "$params.min is \"s\", which isn't a number");
+    assert_eq!(roots(1), "$params.min is \"s\", which isn't a number");
+}
+
+#[test]
+fn a_sentence_gives_only_the_roots_it_reads() {
+    let roots = |idx| {
+        for_assertion_roots(
+            "every xs as x",
+            &["x.v is at least $params.a", "x.w is at least $params.b", "x.u is 1"],
+            json!({"xs": [{}]}),
+            json!({"a": "s"}),
+            idx,
+        )
+    };
+    assert_eq!(roots(0), "$params.a is \"s\", which isn't a number");
+    assert_eq!(roots(1), "$params.b is missing");
+    assert_eq!(roots(2), "");
 }
 
 #[test]

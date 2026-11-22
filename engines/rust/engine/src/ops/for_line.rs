@@ -2032,6 +2032,13 @@ impl For {
         listed_roots(once)
     }
 
+    /// The roots the sentence at `idx` reads outside the items and can't
+    /// read, each said once, whichever other sentence reads them too.
+    pub fn assertion_roots(&self, idx: usize, ctx: &Ctx) -> Vec<Clause> {
+        let _ = (idx, ctx);
+        Vec::new()
+    }
+
     #[cfg_attr(not(test), expect(dead_code))]
     pub fn sentence_clauses(&self, idx: usize, ctx: &Ctx) -> (Cause, Vec<Clause>) {
         let Some(sentence) = self.sentences.get(idx) else {
