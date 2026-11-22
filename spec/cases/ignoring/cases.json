@@ -9817,5 +9817,130 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a root in a whose beside a list walked from the input after is in ignoring case that can't be used",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"w": "every xs whose $params.k is in $input.cs.name ignoring case, if any, exists"}}}},
+    "params": {"k": 3},
+    "cases": [
+      {
+        "description": "says the root before the list when both fail with the same cause",
+        "rules": ["text.not_text", "problems.item_order"],
+        "input": {"cs": [{"name": 3}], "things": [{"id": "t1", "xs": []}]},
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0"
+                ],
+                "name": "in-scope thing count",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated thing ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "w",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/name"
+                    ],
+                    "name": "$input.cs[].name",
+                    "outcome": "unusable",
+                    "value": [
+                      3
+                    ]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/w"
+                ],
+                "message": "$params.k is 3, which isn't text; item 1 of $input.cs: name is 3, which isn't text",
+                "name": "every xs whose $params.k is in $input.cs.name ignoring case, if any, exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/name"
+                ],
+                "name": "$input.cs[].name",
+                "outcome": "unusable",
+                "value": [
+                  3
+                ]
+              },
+              {
+                "locations": [],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "$params.k is 3, which isn't text; item 1 of $input.cs: name is 3, which isn't text",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]

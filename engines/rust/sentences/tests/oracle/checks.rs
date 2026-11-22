@@ -10743,6 +10743,12 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
+        "every xs whose $params.k is in $input.cs.name ignoring case, if any, exists",
+        "every xs whose $params.k is in $input.cs.name ignoring case, if any, exists",
+        &[],
+        &[],
+    ),
+    (
         "count of xs whose $params.k is in $params.l ignoring case is 0",
         "count of xs whose $params.k is in $params.l ignoring case is 0",
         &[],
