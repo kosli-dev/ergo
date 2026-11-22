@@ -2083,3 +2083,58 @@ fn a_one_line_walk_count_or_sum_says_a_counted_root_once_and_then_each_item_its_
         );
     }
 }
+
+fn row_on(sentence: &str, subject: Value, input: Value, params: Value) -> Run {
+    let Check::Walk(walk_check) = lowered(sentence) else {
+        panic!("{sentence} is not every or some");
+    };
+    let context = ctx(&subject, &input, Some(&params));
+    run(&walk_check, &context)
+}
+
+#[test]
+fn a_walked_list_after_is_in_ignoring_case_it_cant_use_is_said_even_when_an_item_fails_on_its_own()
+ {
+    for (sentence, xs, cs, cause, message) in [
+        (
+            "every xs.v is in $input.cs.name ignoring case",
+            json!([{"v": "a"}, {}]),
+            json!([{"name": "a"}, {"name": 3}]),
+            Cause::Unusable,
+            "item 2 of $input.cs: name is 3, which isn't text",
+        ),
+        (
+            "some xs.v is in $input.cs.name ignoring case",
+            json!([{"v": "a"}, {}]),
+            json!([{"name": "a"}, {"name": 3}]),
+            Cause::Unusable,
+            "item 2 of $input.cs: name is 3, which isn't text",
+        ),
+        (
+            "some xs.v is in $input.cs.name ignoring case",
+            json!([{"v": "a"}]),
+            json!([{"name": 3}]),
+            Cause::Unusable,
+            "item 1 of $input.cs: name is 3, which isn't text",
+        ),
+        (
+            "some xs.v is in $input.cs.name ignoring case",
+            json!([{"v": "a"}]),
+            json!([{"name": "a"}, {"name": null}]),
+            Cause::Null,
+            "item 2 of $input.cs: name is null",
+        ),
+    ] {
+        let out = row_on(
+            sentence,
+            json!({ "xs": xs }),
+            json!({ "cs": cs }),
+            json!({}),
+        );
+        assert_eq!(
+            (out.verdict.cause, out.message.as_deref()),
+            (cause, Some(message)),
+            "{sentence} {xs} {cs}"
+        );
+    }
+}
