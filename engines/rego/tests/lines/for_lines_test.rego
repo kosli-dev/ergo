@@ -120,13 +120,18 @@ test_a_one_list_for_row_with_nothing_read_outside_it_that_fails_takes_its_messag
 
 test_a_for_row_keeps_its_message_off_the_tree_while_the_tree_cant_say_its_roots_keys_or_second_list if {
 	not _on_tree("every xs as x, every x.ys as y", ["y.v is 1"], {"xs": [{"ys": [{"v": 2}]}]}, {})
-	not _on_tree("every xs as x", ["x.v is at least $params.min"], {"xs": [{"v": 0}]}, {"min": "s"})
-	not _on_tree("every xs as x", ["x.v is at least $params.min"], {"xs": [{"v": 0}]}, {})
 	not _on_tree("every o named by $params.k as x", ["x is 1"], {"o": {"a": [2]}}, {"k": "a"})
 	not _on_tree("first of xs sorted by m named by $params.k as x", ["x.v is 1"], {"xs": [{"m": {"a": 1}, "v": 2}]}, {"k": "a"})
 	not _on_tree("every es whose zz is m named by $params.k as e", ["e.v is 1"], {"es": [{"zz": 1}]}, {"k": 3})
 	not _on_tree("every xs as x", ["every x.ys.n is 1", "every x.ys.m is 1"], {"xs": [{"ys": [{"n": 2, "m": 2}]}]}, {})
 	not _on_tree("every xs as x", ["every x.ys exists", "sum of x.ys.n is 3"], {"xs": [{"ys": [{"n": 1}, null]}]}, {})
+}
+
+test_a_one_list_for_row_with_a_root_that_fails_takes_its_message_from_the_tree if {
+	_on_tree("every xs as x", ["x.v is at least $params.min"], {"xs": [{"v": 0}]}, {"min": "s"})
+	_on_tree("every xs as x", ["x.v is at least $params.min"], {"xs": [{"v": 0}]}, {})
+	_on_tree("every xs whose v is at least $params.min as x", ["x.w is 1"], {"xs": [{"v": 1, "w": 2}, {"w": 1}]}, {"min": "s"})
+	_on_tree("every xs as x", ["x.v is $params.a", "x.v is $params.b"], {"xs": [{"v": 1}]}, {"a": null})
 }
 
 test_a_for_row_on_the_tree_leaves_its_message_to_the_tree if {
