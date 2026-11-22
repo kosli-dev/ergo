@@ -34,7 +34,7 @@ package ergo
 
 import rego.v1
 
-report(inp, pol, _) := {"results": [{"requirement": "r", "check": name, "subject": {"id": subject.id}, "passed": false, "cause": "absent", "message": "x"} |
+report(inp, pol, _) := {"results": [{"requirement": "r", "check": name, "subject": {"id": subject.id}, "passed": false, "cause": "absent", "message": ""} |
 	some requirement in pol.requirements
 	some name, _ in requirement.checks
 	some subject in inp.things
@@ -42,7 +42,7 @@ report(inp, pol, _) := {"results": [{"requirement": "r", "check": name, "subject
 REGO
 
 run() {
-  FAKE_COMMIT=$head python3 "$tool" run --out "$dir/out" --main-bin "$dir/ergo" --branch-bin "$dir/ergo" --main-tree "$root" --branch-tree "$root" --rego "$dir/fake.rego" "$@"
+  FAKE_COMMIT=${FAKE_COMMIT:-$head} python3 "$tool" run --out "$dir/out" --main-bin "$dir/ergo" --branch-bin "$dir/ergo" --main-tree "$root" --branch-tree "$root" --rego "$dir/fake.rego" "$@"
 }
 
 echo "property-check.py runs a few probes and finds nothing when both builds agree with the Rego engine"
