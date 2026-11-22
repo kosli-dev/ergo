@@ -4603,3 +4603,28 @@ fn an_alias_read_whole_keeps_its_problem_beside_an_item_a_later_lines_whose_cant
         }
     }
 }
+
+#[test]
+fn an_alias_read_whole_that_can_be_read_isnt_said_beside_an_item_a_later_lines_whose_cant_read() {
+    for assertions in [
+        &["x is 1"][..],
+        &["x is m"][..],
+        &["m named by x is 1", "x is 1"][..],
+    ] {
+        let said = if assertions.len() == 2 {
+            "item 1 of xs is 3, which isn't an object; item 1 of xs: x is 3, which isn't text"
+        } else {
+            "item 1 of xs is 3, which isn't an object"
+        };
+        assert_eq!(
+            for_row(
+                "every xs as x, every es whose zz is x.v as e",
+                assertions,
+                json!({"xs": [3], "es": [{"zz": 1}], "m": {"a": 1}}),
+                json!({}),
+            ),
+            ("not_an_object".to_string(), said.to_string()),
+            "{assertions:?}"
+        );
+    }
+}
