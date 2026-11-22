@@ -136,6 +136,23 @@ fn a_key_of_the_wrong_kind_stays_usable() {
 }
 
 #[test]
+fn a_root_a_count_whose_reads_is_unusable_when_it_cant_take_a_key() {
+    for sentence in [
+        "count of xs whose v is $input.m named by key is 1",
+        "count of xs whose v is not $input.m named by key is 0",
+        "count of xs that is $input.m named by key is 1",
+    ] {
+        for xs in [json!([{}]), json!([])] {
+            assert_eq!(
+                outcome_of(&[sentence], &json!({"m": 3, "xs": xs}), None, "$input.m"),
+                Some("unusable"),
+                "{sentence}"
+            );
+        }
+    }
+}
+
+#[test]
 fn a_walked_root_stays_usable_when_another_clause_of_the_message_says_which_isnt() {
     assert_eq!(
         outcome_of(

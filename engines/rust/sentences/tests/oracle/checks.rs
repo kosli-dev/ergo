@@ -5403,6 +5403,60 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
+        "count of xs that equals $input.m named by key is 0",
+        "count of xs that equals $input.m named by key is 0",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose $input.m named by key equals v is 0",
+        "count of xs whose $input.m named by key equals v is 0",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose tags contains $input.m named by key is 0",
+        "count of xs whose tags contains $input.m named by key is 0",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose v does not equal $input.m named by key is 0",
+        "count of xs whose v does not equal $input.m named by key is 0",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose v does not equal $input.m.a named by key is 0",
+        "count of xs whose v does not equal $input.m.a named by key is 0",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose v equals $input.m named by key and whose w is 1 is 0",
+        "count of xs whose v equals $input.m named by key and whose w is 1 is 0",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose v equals $input.m.a named by key is 0",
+        "count of xs whose v equals $input.m.a named by key is 0",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose v matches $input.m named by key is 0",
+        "count of xs whose v matches $input.m named by key is 0",
+        &[],
+        &[],
+    ),
+    (
+        "count of ys plus count of xs whose v equals $input.m named by key is 1",
+        "count of ys plus count of xs whose v equals $input.m named by key is 1",
+        &[],
+        &[],
+    ),
+    (
         "count of xs whose tags contains art.m named by key is 1",
         "count of xs whose tags contains art.m named by key is 1",
         &[],
@@ -5513,6 +5567,12 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "count of xs.v whose tags contains $input.m named by key is 1",
         "count of xs.v whose tags contains $input.m named by key is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs.v whose v does not equal $input.m named by key is 0",
+        "count of xs.v whose v does not equal $input.m named by key is 0",
         &[],
         &[],
     ),

@@ -527,6 +527,11 @@ pub(crate) fn input_unfit(checks: &[&Check], input: &crate::ops::Input, ctx: &Ct
             let inner: Vec<&Check> = any.options.iter().flatten().collect();
             input_unfit(&inner, input, ctx)
         }
+        Check::Tally(tally) => {
+            said_unfit(check, input, ctx)
+                || walked_root_unfit(check, input, ctx)
+                || crate::ops::tally::unusable_whose_roots(tally, ctx).contains(&input.name)
+        }
         _ => said_unfit(check, input, ctx) || walked_root_unfit(check, input, ctx),
     })
 }
