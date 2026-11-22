@@ -1413,13 +1413,16 @@ _tally_item_parts(c, subj, cause, at, m) := _nested_items(_tally_one_per_item(_t
 
 _tally_merged(xs, [], _, _) := xs
 
-_tally_merged(xs, extra, c, subj) := [es[p[1]] | some p in sort({[_tally_rank(e, order), i] | some i, e in es})] if {
+_tally_merged(xs, extra, c, subj) := array.concat(array.concat(array.slice(xs, 0, first), keyed), [x | some x in array.slice(xs, first, count(xs)); _tally_rank(x, order) < 0]) if {
 	extra != []
-	es := array.concat(xs, extra)
 	order := _tally_item_order(c, subj)
+	first := array.concat([i | some i, x in xs; _tally_rank(x, order) >= 0], [count(xs)])[0]
+	es := array.concat(xs, extra)
+	keyed := [es[p[1]] | some p in sort({[r, i] | some i, e in es; r := _tally_rank(e, order); r >= 0})]
 }
 
 _tally_rank(e, order) := rs[0] if {
+	not _has_levels(e)
 	rs := [i | some i, n in order; n == e.name]
 	rs != []
 } else := -1

@@ -275,7 +275,8 @@ test_a_count_keeps_a_nested_list_on_the_other_side_after_its_own_items_though_it
 	[e.name | some e in es] == ["item 2 of xs", "item 4 of xs", "item 1 of gs", "item 2 of gs"]
 }
 
-test_a_count_puts_an_entry_that_is_not_an_item_of_its_list_before_the_items_as_the_list_comes_first if {
+test_a_count_ranks_only_the_items_of_its_keyed_list_so_the_list_and_an_inner_item_of_another_list_keep_their_place if {
 	ergo._tally_rank({"name": "xs"}, ["item 1 of xs", "item 2 of xs"]) == -1
+	ergo._tally_rank({"name": "item 2 of xs", "ergo/levels": [{"name": "item 1 of gs"}]}, ["item 1 of xs", "item 2 of xs"]) == -1
 	ergo._tally_rank({"name": "item 2 of xs"}, ["item 1 of xs", "item 2 of xs"]) == 1
 }
