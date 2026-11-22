@@ -1,5 +1,6 @@
 import json
 import os
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -73,6 +74,81 @@ class PairsTest(unittest.TestCase):
     def test_a_failed_pairs_run_leaves_no_sweep_folder_in_dist(self):
         self.run_pairs_with({"side_effect": RuntimeError("boom")})
         self.assertFalse(os.path.exists(sweep.WORK))
+
+
+class StaleBinaryTest(unittest.TestCase):
+    def make_tree(self, directory):
+        tree = os.path.join(directory, "tree")
+        os.makedirs(tree)
+        env = dict(os.environ, GIT_AUTHOR_NAME="t", GIT_AUTHOR_EMAIL="t@t", GIT_COMMITTER_NAME="t", GIT_COMMITTER_EMAIL="t@t")
+        for argv in (["init", "-q"], ["commit", "-q", "--allow-empty", "-m", "one"]):
+            subprocess.run(["git", "-C", tree] + argv, check=True, env=env)
+        head = subprocess.run(["git", "-C", tree, "rev-parse", "HEAD"], check=True, capture_output=True, text=True).stdout.strip()
+        return tree, head
+
+    def refused(self, version, tree, environ=None):
+        with mock.patch.dict(os.environ, environ or {}, clear=False):
+            os.environ.pop(sweep.ALLOW_STALE, None) if not environ else None
+            with self.assertRaises(SystemExit) as caught:
+                sweep.check_commit(version, tree)
+        return str(caught.exception)
+
+    def test_a_binary_built_from_the_commit_of_the_tree_is_accepted(self):
+        with tempfile.TemporaryDirectory() as directory:
+            tree, head = self.make_tree(directory)
+            sweep.check_commit(f"ergo 0.5.0-dev (commit {head})", tree)
+
+    def test_a_binary_built_from_another_commit_stops_with_both_commits_and_the_way_to_skip(self):
+        with tempfile.TemporaryDirectory() as directory:
+            tree, head = self.make_tree(directory)
+            message = self.refused("ergo 0.5.0-dev (commit " + "a" * 40 + ")", tree)
+        self.assertIn("a" * 40, message)
+        self.assertIn(head, message)
+        self.assertIn(sweep.ALLOW_STALE, message)
+        self.assertIn("rebuild", message.lower())
+
+    def test_a_binary_that_does_not_say_its_commit_stops(self):
+        with tempfile.TemporaryDirectory() as directory:
+            tree, _ = self.make_tree(directory)
+            self.assertIn("commit", self.refused("ergo 0.5.0-dev", tree))
+            self.assertIn("unknown", self.refused("ergo 0.5.0-dev (commit unknown)", tree))
+
+    def test_the_variable_in_the_message_lets_a_stale_binary_run(self):
+        with tempfile.TemporaryDirectory() as directory:
+            tree, _ = self.make_tree(directory)
+            with mock.patch.dict(os.environ, {sweep.ALLOW_STALE: "1"}):
+                sweep.check_commit("ergo 0.5.0-dev (commit " + "a" * 40 + ")", tree)
+                sweep.check_commit("ergo 0.5.0-dev", tree)
+
+    def test_a_dirty_tree_is_said_in_the_message_and_only_the_commit_is_compared(self):
+        with tempfile.TemporaryDirectory() as directory:
+            tree, head = self.make_tree(directory)
+            with open(os.path.join(tree, "new.txt"), "w") as handle:
+                handle.write("x")
+            sweep.check_commit(f"ergo 0.5.0-dev (commit {head})", tree)
+            message = self.refused("ergo 0.5.0-dev (commit " + "a" * 40 + ")", tree)
+        self.assertIn("uncommitted changes", message)
+
+    def test_a_clean_tree_does_not_mention_uncommitted_changes(self):
+        with tempfile.TemporaryDirectory() as directory:
+            tree, _ = self.make_tree(directory)
+            self.assertNotIn("uncommitted", self.refused("ergo 0.5.0-dev (commit " + "a" * 40 + ")", tree))
+
+    def test_running_the_rust_engine_stops_before_any_cell_when_the_binary_is_stale(self):
+        with tempfile.TemporaryDirectory() as directory:
+            tree, _ = self.make_tree(directory)
+            seen = []
+
+            def fake(argv, shell, script):
+                seen.append(script)
+                return mock.Mock(stdout="ergo 0.5.0-dev (commit " + "a" * 40 + ")\n")
+
+            with mock.patch.object(sweep, "run_command", side_effect=fake), \
+                    mock.patch.dict(os.environ, {}, clear=False):
+                os.environ.pop(sweep.ALLOW_STALE, None)
+                with self.assertRaises(SystemExit):
+                    sweep.run_rust("sh -s", ["0"], tree)
+        self.assertEqual(seen, ["ergo --version"])
 
 
 if __name__ == "__main__":
