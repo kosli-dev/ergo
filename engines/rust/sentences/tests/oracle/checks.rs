@@ -10817,6 +10817,66 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    (
+        "count of xs whose v is not one of pl.name is 0",
+        "count of xs whose v is not in pl.name is 0",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose v matches pl.name is 0",
+        "count of xs whose v matches pl.name is 0",
+        &[],
+        &[],
+    ),
+    (
+        "every xs whose v does not match pl.name exists",
+        "every xs whose v does not match pl.name exists",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose tags contains all of pl.name is 0",
+        "count of xs whose tags contains all of pl.name is 0",
+        &[],
+        &[],
+    ),
+    (
+        "some xs whose tags contains none of pl.name exists",
+        "some xs whose tags contains none of pl.name exists",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose tags contains some of pl.name is 0",
+        "count of xs whose tags contains some of pl.name is 0",
+        &[],
+        &[],
+    ),
+    (
+        "every xs whose tags does not contain all of pl.name, if any, exists",
+        "every xs whose tags does not contain all of pl.name, if any, exists",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs.v that is not one of pl.name is 0",
+        "count of xs.v that is not in pl.name is 0",
+        &[],
+        &[],
+    ),
+    (
+        "k plus count of xs whose v is not one of pl.name is 0",
+        "k plus count of xs whose v is not in pl.name is 0",
+        &[],
+        &[],
+    ),
+    (
+        "count of m.ys whose v is not one of pl.name is 0",
+        "count of m.ys whose v is not in pl.name is 0",
+        &[],
+        &[],
+    ),
     ("m.v exists", "m.v exists", &[], &[]),
 ];
 
