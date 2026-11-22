@@ -456,11 +456,10 @@ _m_tally_shown(state, _) if startswith(state, "list ")
 
 _m_tally_shown(state, _) if startswith(state, "focus ")
 
-_m_tallies(subj, check, cause) := [c |
+_m_tally_lists(subj, check, cause) := [cs |
 	some side in _m_tally_parts(check)
 	cs := _m_tally_said(subj, side, cause)
 	count(cs) > 0
-	c := _m_clauses_text(_m_clauses_shown(cs))
 ]
 
 _m_tally_said(subj, side, cause) := [_m_record_clause(x, side) | some x in _m_tally_records(subj, side, cause)]
@@ -940,9 +939,11 @@ _m_line_sorted(c, subj, cause) := [_m_top_sorted(_message(c, subj, cause), _m_li
 
 _m_sentence(c, subj, cause) := _m_walk_sentence(c, subj, cause, _walk_row(c, subj)) if _walks(c)
 
-_m_walk_sentence(c, subj, cause, r) := _m_clause_texts(_m_clauses_order(r.root_msgs)) if "root_msgs" in object.keys(r)
+_m_walk_sentence(c, subj, cause, r) := _m_clause_texts(_m_walk_clauses(c, subj, cause, r))
 
-else := _m_clause_texts(_m_clauses_order(_parts_ahead(_walk_parts(c, subj, {"cause": cause}, r), r)))
+_m_walk_clauses(c, subj, cause, r) := _m_clauses_order(r.root_msgs) if "root_msgs" in object.keys(r)
+
+else := _m_clauses_order(_parts_ahead(_walk_parts(c, subj, {"cause": cause}, r), r))
 
 _m_own_msg(check, c, m, [read, subj, cause]) := object.union(_m_own_part(check, c, m, count(read) == 1), {"read": _m_marked(read, _m_unusable_names_of(c, subj, cause))})
 

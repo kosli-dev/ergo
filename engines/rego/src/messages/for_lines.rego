@@ -720,6 +720,42 @@ else := ""
 
 _m_line(c, subj, cause) := _m_sentence(c, subj, cause)
 
+_for_sentence_clauses(_, _, _, "satisfied") := []
+
+_for_sentence_clauses(check, c, subj, cause) := [x | some x in _m_walk_clauses(c, subj, cause, _walk_row(c, subj)); not _for_said_by_root(x, roots)] if {
+	cause != "satisfied"
+	_walks(c)
+	roots := _for_sentence_roots(check, c, subj)
+}
+
+_for_sentence_clauses(check, c, subj, cause) := _once([x | some g in said; some x in _for_group_clauses(g, roots, cause, whole)]) if {
+	cause != "satisfied"
+	not _walks(c)
+	said := _message_said(c, subj, cause)
+	roots := _for_sentence_roots(check, c, subj)
+	whole := _for_says_whole(check, c)
+}
+
+_for_says_whole(check, c) := false if _for_reads_an_alias(check, c)
+
+else := true
+
+_for_group_clauses(g, roots, cause, false) := [x | some p in g; some x in _for_piece_clauses(p, roots, cause)]
+
+_for_group_clauses(g, roots, cause, true) := array.concat(
+	[x | some p in g; not is_string(p); some x in _for_piece_clauses(p, roots, cause)],
+	[_m_clause("root", t, cause, t) | ts := [p | some p in g; is_string(p); not p in roots]; ts != []; t := concat(", and ", ts)],
+)
+
+_for_piece_clauses(p, roots, cause) := [_m_clause("root", p, cause, p) | not p in roots] if is_string(p)
+
+else := [x | some x in p; not _for_said_by_root(x, roots)]
+
+_for_said_by_root(x, roots) if {
+	x.kind != "item"
+	x.text in roots
+}
+
 _m_leaf_message(_, leaf, cause, _) := _m_root_alone(leaf, cause)
 
 _m_leaf_message(e, leaf, cause, path) := _m_clash_named(_m_walk_leaf(e, leaf, cause, _dotted_roots([path])), e, leaf, path) if not _m_root_alone(leaf, cause)

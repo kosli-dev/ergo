@@ -185,7 +185,7 @@ test_a_walk_sentence_leaves_out_its_root if {
 test_a_count_under_the_line_gives_its_items_as_clauses if {
 	cs := _sentence_clauses("every gs as g", ["count of g.es whose v is at least $params.min is 0"], {"gs": [{"es": [{}, {}]}]}, 0, 0, {"min": "s"})
 	[c.kind | some c in cs] == ["item", "item"]
-	[ergo._m_aliased(c.text) | some c in cs] == ["item 1 of g.es: v is missing", "item 2 of g.es: v is missing"]
+	[ergo._m_aliased(t) | some t in ergo._m_clause_texts(cs)] == ["item 1 of g.es: v is missing", "item 2 of g.es: v is missing"]
 }
 
 test_a_sum_under_the_line_gives_its_items_as_clauses if {
