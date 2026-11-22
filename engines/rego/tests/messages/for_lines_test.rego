@@ -546,6 +546,12 @@ test_an_empty_list_a_line_tolerates_is_not_said_beside_a_root_that_fails if {
 	_row_tree_text("every xs as x", ["x.v is at least $params.min"], {"xs": []}, {"min": "s"}) == `$params.min is "s", which isn't a number; xs is []`
 }
 
+test_a_for_rows_list_is_not_said_when_a_root_failed_beside_a_sentence_that_reads_no_alias if {
+	check := ergo._s_written_check({"for": "every xs as m", "assert": "count of xs whose v is in $input.z is 0"})
+	unfreed := {"cause": "value", "failed": [], "root_msgs": ["$input.z is []"]}
+	ergo._for_list_texts(check, {"xs": [{"v": 1}]}, object.union(unfreed, {"free_lines": [], "unfreed": unfreed})) == []
+}
+
 test_the_list_a_line_picks_nothing_from_comes_after_a_sentence_that_reads_no_alias if {
 	_row_tree_text("every xs whose v is 1 as x", ["x.v is 1", "z is 1"], {"xs": [{"v": 3}], "z": 3}, {}) == `z is 3; xs is [{"v": 3}]`
 	_row_tree_text("first of xs sorted by v as x", ["x.v is 1", "z is 1"], {"xs": [], "z": 3}, {}) == "z is 3; xs is []"
