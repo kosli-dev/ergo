@@ -220,3 +220,13 @@ test_the_object_a_count_of_member_of_reads_is_its_own_read_as_a_walked_list_is i
 	ergo._tally_own_read({"name": "costs[]"}, items, set(), [{"kind": "item"}])
 	ergo._tally_own_read({"name": "costs"}, items, set(), [{"kind": "item"}])
 }
+
+test_a_count_lists_its_items_in_list_order_when_one_comes_from_a_key_the_item_holds_for_a_part if {
+	written := ergo._s_written_check("count of xs whose tags contains $input.m named by key is 1")
+	part := ergo._p_marker("cov", 1, null, false)
+	c := json.patch(written, [{"op": "replace", "path": "/left/whose/0/right", "value": [part, "c", "m", {"named_by_field": "key"}]}])
+	subj := {"c": {"m": {"a": "x"}}, "xs": [{"key": "a", "tags": ["x"]}, {"tags": ["x"]}, {"key": null, "tags": ["x"]}, null]}
+	m := "item 2 of xs: key is missing; item 3 of xs: key is null; item 4 of xs is null, which isn't an object"
+	es := ergo._tally_item_parts(c, subj, "not_an_object", {}, m) with input as {"ergo/names": {"ergo/subject": subj}}
+	[e.name | some e in es] == ["item 2 of xs", "item 3 of xs", "item 4 of xs"]
+}
