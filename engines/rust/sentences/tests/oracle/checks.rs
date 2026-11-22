@@ -1624,6 +1624,18 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
+        "count of items.m.n is 3",
+        "count of items.m.n is 3",
+        &[],
+        &[],
+    ),
+    (
+        "count of items.m.n is 1",
+        "count of items.m.n is 1",
+        &[],
+        &[],
+    ),
+    (
         "count of items whose k is 1 equals x1",
         "count of items whose k is 1 equals x1",
         &[],
@@ -3765,6 +3777,7 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    ("sum of items.m.n is 3", "sum of items.m.n is 3", &[], &[]),
     (
         "sum of items.p does not equal y",
         "sum of items.p does not equal y",
