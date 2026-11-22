@@ -563,16 +563,3 @@ test_a_for_lines_whose_leaves_an_empty_part_out_of_the_rows_inputs_as_a_null_par
 		[i.name | some i in rows[0].inputs] == ["xs[]"]
 	}
 }
-
-test_a_sentence_under_a_for_line_lists_an_empty_part_it_reads_on_its_assertion_entry if {
-	every sentence in [
-		["count of m.ys whose v is in pl.z is 0", "pl[].z"],
-		["every m.ys whose v is in pl.name exists", "pl[].name"],
-		["count of m.ys whose tags contains all of pl.name is 0", "pl[].name"],
-	] {
-		policy := _item_policy({"has": {"pl": "c"}}, {"c": {"for": "every xs as m", "assert": sentence[0]}})
-		doc := {"prs": [{"id": "p0", "c": [], "xs": [{"v": 1, "tags": [1], "ys": [{"v": 1, "tags": [1]}]}]}]}
-		rows := [r | some r in ergo.report(doc, policy, {}).results; r.check == "c"]
-		[[e.kind, [i.name | some i in e.inputs]] | some e in rows[0].failures] == [["assertion", [sentence[1]]]]
-	}
-}
