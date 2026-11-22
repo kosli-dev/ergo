@@ -543,28 +543,14 @@ _m_tally(subj, side) := [["unusable", c] | some c in _m_parent_clause(subj, {"op
 }
 
 _m_tally(subj, side) := ts if {
-	ts := _m_tally_keyed_base_items(subj, side)
-} else := ts if {
 	ts := _m_tally_key_items(subj, side)
 } else := array.concat(_m_tally_keyed_root(subj, side), _m_tally_walked_side(subj, side))
-
-_m_tally_keyed_base_items(subj, side) := array.concat(
-	[[concat("", ["root ", b.fault.cause]), b.fault.text]],
-	[[_worst_of(x.causes), x.text, {"item": e}] | some x in xs; x.text != ""; e := x.e],
-) if {
-	b := _m_tally_keyed_base(subj, side)
-	w := _walk(_walk_start({"path": b.k.path}, subj), _walk_keys({"path": b.k.path}, subj), true)
-	w.fails == []
-	w.walked != set()
-	xs := [object.union(x, {"e": e}) | some e in w.items; x := _keyed_item(e, b.k)]
-	count(xs) == count(w.items)
-}
 
 _m_tally_keyed_root(subj, side) := [[concat("", ["root ", f.cause]), f.text] | some f in b.faults] if {
 	b := _m_tally_keyed_base(subj, side)
 } else := []
 
-_m_tally_keyed_base(subj, side) := object.union({"faults": fs, "paths": _m_keyed_fault_paths(subj, whose)}, _m_tally_keyed_clause(side, fs)) if {
+_m_tally_keyed_base(subj, side) := {"faults": fs, "paths": _m_keyed_fault_paths(subj, whose)} if {
 	not _unreadable_input
 	whose := object.get(side, "whose", null)
 	is_array(whose)
@@ -599,11 +585,6 @@ _whose_reads_keyed_root(whose) if {
 	"named_by_field" in object.keys(last)
 	_keyed_root_path(p)
 }
-
-_m_tally_keyed_clause(side, fs) := {"k": {"path": side.count_of, "clause": c}, "fault": fs[0]} if {
-	c := _keyed_clause_of(object.get(side, "count_of", null), object.get(side, "whose", null))
-	c.cmp == "eq"
-} else := {}
 
 _m_tally_fail_state(side, x) := concat("", ["root ", x.cause]) if {
 	count(_key_item_flaws(side)) > 0
@@ -699,15 +680,16 @@ _m_keyed_paths(subj, side) := b.paths if {
 
 _m_whose_undecided(subj, side, e, flaws, roots, paths) := _once([x |
 	some i, c in side.whose
-	cause := _tally_focus_cause(c, e, flaws[i])
-	not cause in _tally_decided_causes
-	some x in _m_undecided_said(subj, c, e, cause, roots, paths)
+	some x in _m_undecided_said(subj, c, e, flaws[i], roots, paths)
 ])
 
-_m_undecided_said(subj, c, e, cause, roots, paths) := _m_keyed_said_item(c, e, o, roots) if {
+_m_undecided_said(subj, c, e, flaw, roots, paths) := _m_keyed_said_item(c, e, o, roots) if {
 	o := _keyed_own(c, e, paths)
 	is_object(_keyed_focus_value(e))
-} else := [[_m_focus_state(e, c, cause), _m_focus_text(subj, c, e, cause, roots)]]
+} else := [[_m_focus_state(e, c, cause), _m_focus_text(subj, c, e, cause, roots)]] if {
+	cause := _tally_focus_cause(c, e, flaw)
+	not cause in _tally_decided_causes
+} else := []
 
 _m_keyed_said_item(c, e, o, roots) := [[_m_focus_state(e, c, _worst_of({t[0] | some t in ts})), _m_leaf_in(_focus_of(e, c).i, concat(", and ", [t[1] | some t in ts]), roots)]] if {
 	ts := _m_keyed_own_parts(c, o, _keyed_focus_value(e))

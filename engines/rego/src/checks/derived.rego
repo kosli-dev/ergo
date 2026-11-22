@@ -332,21 +332,28 @@ _keyed_own_cause(c, e, paths) := _worst_of(states) if {
 }
 
 _keyed_own(c, e, paths) := {"side": f, "stand": s, "operand": _tally_focus_cause(s, e, ""), "key": _keyed_key_state(_keyed_focus_value(e), c[f])} if {
-	c.cmp in {"eq", "ne", "in", "gt", "gte", "lt", "lte", "includes", "matches_any"}
+	c.op in _two_sided_ops
 	sides := [x | some x in _compare_side_list; c[x] in paths]
 	sides != []
 	f := sides[0]
 	s := _keyed_stand_in(c, f)
 }
 
-_keyed_stand_in(c, f) := object.union(c, {f: {"literal": _keyed_stand_value[c.cmp]}}) if {
+_keyed_stand_in(c, f) := _typed_stand_in(c.cmp, c.left) if {
 	f == "right"
-	c.cmp in object.keys(_keyed_stand_value)
+	c.cmp in ((_contain_ops | _all_cmps) | _pattern_ops)
+} else := _typed_stand_in("excludes", c.right) if {
+	f == "left"
+	c.cmp in ((_all_cmps | _membership_ops) | _pattern_ops)
 } else := object.union(c, {f: {"literal": _stand_in_value[c.op]}}) if {
-	c.cmp in {"gt", "gte", "lt", "lte"}
+	_keyed_ordered(c)
+} else := object.union(c, {f: {"literal": "x"}}) if {
+	c.cmp in _text_cmps
 } else := object.union(c, {"cmp": "eq", f: c[_keyed_other_side(f)]})
 
-_keyed_stand_value := {"includes": null, "matches_any": "x"}
+_keyed_ordered(c) if c.cmp in {"gt", "gte", "lt", "lte"}
+
+_keyed_ordered(c) if "within" in object.keys(c)
 
 _keyed_other_side("left") := "right"
 
