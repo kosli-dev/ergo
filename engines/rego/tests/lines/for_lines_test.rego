@@ -71,8 +71,8 @@ _root_clauses_of(line, sentences, subj, params) := cs if {
 
 test_for_root_clauses_give_each_sentence_its_own_group if {
 	_root_clauses_of("every xs as x", ["x.v is at least $params.b", "x.w is at least $params.a"], {"xs": [{"v": 1, "w": 1}]}, {"a": "s"}) == [
-		ergo._m_root_in("$params.b", "absent", "$params.b is missing", 2),
-		ergo._m_root_in("$params.a", "unusable", `$params.a is "s", which isn't a number`, 3),
+		ergo._m_root_in("$params.b", "absent", "$params.b is missing", 3),
+		ergo._m_root_in("$params.a", "unusable", `$params.a is "s", which isn't a number`, 4),
 	]
 }
 
@@ -81,6 +81,18 @@ test_for_root_clauses_put_the_lines_whose_roots_first if {
 		ergo._m_root_in("$params.min", "absent", "$params.min is missing", 1),
 		ergo._m_root_in("$params.a", "unusable", `$params.a is "s", which isn't a number`, 2),
 	]
+}
+
+test_for_root_clauses_put_the_sentences_that_read_no_alias_before_the_lines_whose if {
+	_root_clauses_of("every xs whose v is at least $params.min as x", ["x.w is at least $params.a", "$params.b is 1"], {"xs": [{"v": 1, "w": 1}]}, {"a": "s"}) == [
+		ergo._m_root_in("$params.min", "absent", "$params.min is missing", 2),
+		ergo._m_root_in("$params.a", "unusable", `$params.a is "s", which isn't a number`, 3),
+		ergo._m_root_in("$params.b", "absent", "$params.b is missing", 1),
+	]
+}
+
+test_for_root_clauses_say_a_root_the_whose_and_a_sentence_without_an_alias_read_in_the_sentences_group if {
+	_root_clauses_of("every xs whose v is at least $params.min as x", ["$params.min is at least 1", "x.w is 1"], {"xs": [{"v": 1, "w": 1}]}, {}) == [ergo._m_root_in("$params.min", "absent", "$params.min is missing", 0)]
 }
 
 test_for_root_clauses_keep_a_value_that_holds_a_semicolon_whole if {
@@ -100,6 +112,7 @@ test_for_root_clauses_name_the_roots_the_row_names_today if {
 		["every xs as x", ["x.v is in $params.l", "count of x.ys whose n is at least $params.m is 0"], {"xs": [{"v": 1, "ys": [{"n": 1}]}]}, {"l": 3}],
 		["every xs as x, every x.ys as y", ["y.n is at least $params.m", "x.v is $params.a"], {"xs": [{"v": 1, "ys": [{"n": 1}]}]}, {"a": null}],
 		["every xs whose v is at least $params.min as x", ["every x.ys whose n is at least $params.k exists", "x.w is at least $params.min"], {"xs": [{"v": 1, "w": 1, "ys": [{"n": 1, "m": 1}]}]}, {"min": [1]}],
+		["every xs whose v is at least $params.min as x", ["x.w is at least $params.a", "$params.b is 1", "$params.min is at least 1"], {"xs": [{"v": 1, "w": 1}]}, {"a": "s"}],
 	]
 	every row in rows {
 		texts := {c.text | some c in _root_clauses_of(row[0], row[1], row[2], row[3])}
@@ -110,7 +123,7 @@ test_for_root_clauses_name_the_roots_the_row_names_today if {
 
 test_for_root_clauses_say_a_root_two_sentences_read_once_in_the_first_of_their_groups if {
 	_root_clauses_of("every xs as x", ["x.v is at least $params.b", "x.w is at least $params.a", "x.u is at least $params.b"], {"xs": [{"v": 1, "w": 1, "u": 1}]}, {"a": null}) == [
-		ergo._m_root_in("$params.b", "absent", "$params.b is missing", 2),
-		ergo._m_root_in("$params.a", "null", "$params.a is null", 3),
+		ergo._m_root_in("$params.b", "absent", "$params.b is missing", 4),
+		ergo._m_root_in("$params.a", "null", "$params.a is null", 5),
 	]
 }
