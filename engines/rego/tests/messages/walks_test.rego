@@ -243,3 +243,9 @@ test_a_list_after_is_in_ignoring_case_that_holds_null_is_said_with_the_roots_tha
 	ergo._m_keyed_off({"ys": ["a", null]}, c, "absent") == ["$params.k is missing"] with data.ergo_params as {}
 	ergo._m_keyed_off({"ys": ["a", 3]}, c, "null") == [] with data.ergo_params as {}
 }
+
+test_an_empty_list_after_is_in_ignoring_case_is_said_as_a_walked_root_as_without_the_words if {
+	c := {"op": "in", "path": ["v"], "values": {"ref": ["$$input[]", "cs", "name"]}, "ignoring": "case"}
+	ergo._m_walked_root_text(object.remove(c, ["ignoring"]), "value") == "$input.cs is []" with data.ergo_document as {"cs": []} with input as {}
+	ergo._m_walked_root_text(c, "value") == "$input.cs is []" with data.ergo_document as {"cs": []} with input as {}
+}
