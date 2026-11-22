@@ -52,6 +52,11 @@ _for_on_tree(check, subj, r) if {
 	_walk_root_flaw(check, subj) == ""
 	not _for_key_not_text(check)
 	count([c | some c in check.checks; _for_reads_an_alias(check, c); _for_reads_a_list(c)]) < 2
+	every c in check.items[0].whose {
+		every p in _condition_paths(c) {
+			p != []
+		}
+	}
 	every step in array.concat(check.items[0].path, object.get(object.get(check.items[0], "pick", {}), "by", [])) {
 		_for_plain_step(step)
 	}
