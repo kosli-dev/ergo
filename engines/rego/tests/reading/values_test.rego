@@ -36,4 +36,9 @@ test_two_reads_of_the_same_value_merge_into_one_input_with_the_worst_outcome if 
 	ergo._merged_inputs([usable, usable]) == [usable]
 	other := {"name": "m", "value": [], "locations": ["/m"], "ergo/outcome": "absent"}
 	ergo._merged_inputs([other, unusable]) == [unusable, other]
+	said := {"name": "m", "value": [], "locations": [], "ergo/outcome": "usable"}
+	ergo._merged_inputs([said, usable]) == [said]
+	ergo._merged_inputs([said, unusable]) == [unusable]
+	worked := {"name": "count of m", "value": 0, "locations": [], "ergo/worked": true}
+	ergo._merged_inputs([worked, worked, unusable]) == [worked, unusable]
 }

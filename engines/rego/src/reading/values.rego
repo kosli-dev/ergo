@@ -305,7 +305,20 @@ _dot_kept(path) if {
 
 _merged_inputs(inputs) := [object.union(_with_part({"name": t[0], "value": t[1]}, t[2]), {"locations": t[3]}) | some t in sort({[i.name, i.value, object.get(i, "part", null), i.locations] | some i in inputs})] if not _some_stashed(inputs)
 
-else := [object.union(object.union(_with_part({"name": t[0], "value": t[1]}, t[2]), {"locations": t[3]}), t[4]) | some t in sort({[i.name, i.value, object.get(i, "part", null), i.locations, object.filter(i, _input_stash_keys)] | some i in inputs})]
+else := [object.union(object.union(_with_part({"name": t[0], "value": t[1]}, t[2]), {"locations": t[3]}), object.union(_merged_worked(t[4]), _merged_outcome({o | some i in inputs; _merged_key(i) == t; o := i["ergo/outcome"]}))) | some t in sort({_merged_key(i) | some i in inputs})]
+
+_merged_key(i) := [i.name, i.value, object.get(i, "part", null), i.locations, object.get(i, "ergo/worked", null)]
+
+_merged_worked(null) := {}
+
+_merged_worked(w) := {"ergo/worked": w} if w != null
+
+_merged_outcome(outcomes) := {"ergo/outcome": _worst_of(outcomes)} if {
+	some o in outcomes
+	o in _cause_precedence
+} else := {"ergo/outcome": "usable"} if "usable" in outcomes
+
+else := {}
 
 _some_stashed(inputs) if {
 	some i in inputs

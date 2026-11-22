@@ -430,7 +430,7 @@ fn decide(test: &Test, left: &Value, right: Option<Value>, ctx: &Ctx) -> Cause {
 fn merged(entries: Vec<Input>) -> Vec<Input> {
     let mut out: Vec<Input> = Vec::new();
     for entry in entries {
-        push_new(&mut out, entry);
+        super::push_read(&mut out, entry);
     }
     out
 }
