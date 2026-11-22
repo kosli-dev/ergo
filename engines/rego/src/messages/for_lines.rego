@@ -925,6 +925,12 @@ else := _m_clause("item", f.said, f.cause, _m_named_item(f)) if {
 	object.get(f, "failed_items", []) == []
 }
 
+else := object.union(_m_item_clause(f.said, _worst_or_value({own[0]} | {x.cause | some x in said}), said), {"text": own[1]}) if {
+	count(check.items) == 1
+	own := _for_owned_text(f)
+	said := _for_item_sentences(check, object.union(f, {"failed_assertions": array.slice(f.failed_assertions, 1, count(f.failed_assertions))}), _for_item_bound(check, f))
+}
+
 else := _m_item_clause(f.said, _for_said_cause(said), said) if {
 	f.failed_assertions != []
 	count(check.items) == 1
@@ -936,6 +942,13 @@ else := _m_item_clause(f.said, _for_said_cause(said), said) if {
 	count(check.items) == 2
 	said := _for_pairs_said(check, f, _for_item_bound(check, f))
 	said != []
+}
+
+_for_owned_text(f) := [l.cause, _m_under(f.said, l.own_msg[0])] if {
+	_m_all_owned(f)
+	l := f.failed_assertions[0]
+	count(l.own_msg) == 1
+	startswith(l.own_msg[0], "\u0001")
 }
 
 _for_pairs_said(check, f, names) := array.concat([x | firsts == []; some p in riders; some x in p[1]], [x[3] | some x in sort(array.concat(pairs, dead))]) if {
