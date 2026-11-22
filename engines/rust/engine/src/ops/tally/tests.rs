@@ -1923,49 +1923,148 @@ fn a_count_says_a_that_key_from_params_that_is_missing_or_null_once_beside_each_
     }
 }
 
-#[test]
-fn a_count_on_an_empty_list_says_a_null_root_before_an_item_key_and_then_that_it_is_0() {
-    let sentence = "count of items whose tags contains $input.m named by key is 1";
-    let input = json!({"things": [{"items": []}], "m": null});
-    assert_eq!(
-        cause_and_row_in(sentence, input.clone(), json!({})),
-        (
-            Cause::Null,
-            "$input.m is null; count of items whose tags contains $input.m named by key is 0"
-                .to_string()
-        )
-    );
-    assert_eq!(entries_on_input(sentence, input)[0]["value"], json!(0));
+fn said_and_count(sentence: &str, input: Value, params: Value) -> (Cause, String, Value) {
+    let (cause, said) = cause_and_row_in(sentence, input.clone(), params.clone());
+    let ctx = Ctx {
+        label: None,
+        item_by_item: false,
+        subject: Located {
+            value: &input["things"][0],
+            location: Location::input_root().key("things").index(0),
+        },
+        input: &input,
+        params: Some(&params),
+        aliases: BTreeMap::new(),
+    };
+    let verdict = crate::ops::run(&lowered(sentence), &ctx);
+    (cause, said, verdict.inputs[0].to_json()["value"].clone())
+}
+
+fn with_m(m: Option<Value>) -> Value {
+    let mut input = json!({"things": [{"xs": [], "ys": [1]}]});
+    if let Some(m) = m {
+        input["m"] = m;
+    }
+    input
 }
 
 #[test]
-fn a_count_on_an_empty_list_whose_field_is_a_root_through_an_item_key_says_only_the_root() {
-    let sentence = "count of xs whose v is $input.m named by key is 1";
-    for (m, cause, said) in [
-        (
-            json!(3),
-            Cause::Unusable,
-            "$input.m is 3, which isn't an object",
-        ),
-        (json!(null), Cause::Null, "$input.m is null"),
+fn a_count_on_an_empty_list_says_only_the_root_a_key_from_the_item_is_read_in_whatever_the_phrase()
+{
+    for sentence in [
+        "count of xs whose v is $input.m named by key is 1",
+        "count of xs whose v is not $input.m named by key is 0",
+        "count of xs that is $input.m named by key is 1",
+        "count of xs that is $input.m named by key is 0",
+        "count of xs whose v is $input.m named by key and whose w equals 1 is 0",
+        "count of xs whose tags contains $input.m named by key is 1",
+        "count of xs whose v matches $input.m named by key is 1",
+        "count of xs whose v is $input.m named by key within 1 is 1",
+        "count of xs whose $input.m named by key is v is 0",
     ] {
-        let input = json!({"things": [{"xs": []}], "m": m});
+        for (m, cause, said) in [
+            (None, Cause::Absent, "$input.m is missing"),
+            (Some(json!(null)), Cause::Null, "$input.m is null"),
+            (
+                Some(json!(3)),
+                Cause::Unusable,
+                "$input.m is 3, which isn't an object",
+            ),
+        ] {
+            assert_eq!(
+                said_and_count(sentence, with_m(m.clone()), json!({})),
+                (cause, said.to_string(), Value::Null),
+                "{sentence} with {m:?}"
+            );
+        }
+    }
+}
+
+#[test]
+fn a_count_on_an_empty_list_says_only_a_root_further_back_than_the_key() {
+    for (sentence, m, cause, said) in [
+        "count of xs whose v is $input.m.a named by key is 0",
+        "count of xs whose v is not $input.m.a named by key is 0",
+    ]
+    .into_iter()
+    .flat_map(|sentence| {
+        [
+            (
+                json!(3),
+                Cause::Unusable,
+                "$input.m is 3, which isn't an object",
+            ),
+            (json!(null), Cause::Null, "$input.m is null"),
+            (
+                json!({"a": 3}),
+                Cause::Unusable,
+                "$input.m.a is 3, which isn't an object",
+            ),
+        ]
+        .map(|(m, cause, said)| (sentence, m, cause, said))
+    }) {
         assert_eq!(
-            cause_and_row_in(sentence, input, json!({})),
-            (cause, said.to_string())
+            said_and_count(sentence, with_m(Some(m.clone())), json!({})),
+            (cause, said.to_string(), Value::Null),
+            "{sentence} with {m}"
         );
     }
 }
 
 #[test]
-fn a_count_on_an_empty_list_whose_field_is_a_root_through_an_item_key_has_no_number() {
-    let sentence = "count of xs whose v is $input.m named by key is 1";
-    for m in [json!(3), json!(null)] {
-        let input = json!({"things": [{"xs": []}], "m": m});
-        assert_eq!(entries_on_input(sentence, input)[0]["value"], json!(null));
+fn a_count_on_an_empty_list_says_only_a_params_root_a_key_from_the_item_is_read_in() {
+    let sentence = "count of xs whose v is not $params.m named by key is 0";
+    for (params, cause, said) in [
+        (json!({}), Cause::Absent, "$params.m is missing"),
+        (json!({"m": null}), Cause::Null, "$params.m is null"),
+    ] {
+        assert_eq!(
+            said_and_count(sentence, with_m(None), params),
+            (cause, said.to_string(), Value::Null)
+        );
     }
-    let input = json!({"things": [{"xs": []}], "m": {}});
-    assert_eq!(entries_on_input(sentence, input)[0]["value"], json!(0));
+}
+
+#[test]
+fn a_count_on_an_empty_list_is_0_when_the_root_a_key_from_the_item_is_read_in_is_an_object() {
+    for sentence in [
+        "count of xs whose v is not $input.m named by key is 0",
+        "count of xs that is $input.m named by key is 0",
+    ] {
+        let (cause, _, count) = said_and_count(sentence, with_m(Some(json!({}))), json!({}));
+        assert_eq!((cause, count), (Cause::Satisfied, json!(0)));
+    }
+}
+
+#[test]
+fn a_plus_leaves_out_only_the_number_of_the_count_whose_root_fails() {
+    let sentence = "count of ys plus count of xs whose v is $input.m named by key is 1";
+    for m in [None, Some(json!(null)), Some(json!(3))] {
+        let values: Vec<(String, Value)> = entries_on_input(sentence, with_m(m))
+            .iter()
+            .map(|entry| {
+                (
+                    entry["name"].as_str().unwrap().to_string(),
+                    entry["value"].clone(),
+                )
+            })
+            .filter(|(name, _)| name.starts_with("count of"))
+            .collect();
+        assert_eq!(
+            values,
+            vec![
+                (
+                    "count of ys plus count of xs whose v equals $input.m named by key".to_string(),
+                    Value::Null
+                ),
+                ("count of ys".to_string(), json!(1)),
+                (
+                    "count of xs whose v equals $input.m named by key".to_string(),
+                    Value::Null
+                ),
+            ]
+        );
+    }
 }
 
 #[test]
