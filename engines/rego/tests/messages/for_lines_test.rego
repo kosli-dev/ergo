@@ -409,6 +409,12 @@ test_items_of_the_second_list_the_line_cant_check_come_in_list_order if {
 	_item_texts(line, ["y.m is 1"], {"xs": [{"ys": [{"n": 1, "m": 2}, {}]}]}, {}) == [["item 1 of xs: item 1 of x.ys: y.m is 2", "item 1 of xs: item 2 of x.ys: n is missing"]]
 }
 
+test_items_of_the_second_list_the_line_cant_check_are_said_with_no_pair_beside_them if {
+	_item_texts("every ws as w, every member of w.ms as m", ["m is 1"], {"ws": [{"ms": [1]}]}, {}) == [["item 1 of ws: w.ms is [1], which isn't an object"]]
+	subj := {"ws": [{"z": "p; q"}], "ys": [{"n": 1}, {"n": 2}]}
+	_item_texts("every ws as w, some ys whose n is at least w.z and whose n is at most u as y", ["y.n exists"], subj, {}) == [["item 1 of ws: item 1 of ys: u is missing", "item 1 of ws: item 2 of ys: u is missing"]]
+}
+
 test_items_of_an_inner_list_that_tie_are_said_under_their_item if {
 	_item_texts("every ws as w, first of w.ys sorted by t as y", ["y.v is 1"], {"ws": [{"ys": [{"t": 1, "v": 2}, {"t": 1, "v": 3}]}]}, {}) == [["item 1 of ws: item 1 and item 2 of w.ys tie on t"]]
 }
