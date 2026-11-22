@@ -509,6 +509,14 @@ test_a_count_over_a_list_the_item_cant_give_joins_the_items_other_sentences if {
 	_row_tree_text("every xs as x", ["sum of x.ys.n is 1", "x.w is 1"], {"xs": [{"ys": null, "w": 2}]}, {}) == "item 1 of xs: x.ys is null, and x.w is 2"
 }
 
+test_a_part_that_walks_no_list_stays_with_its_item_when_the_cap_cuts_an_inner_list if {
+	check := ergo._s_written_check({"for": "every xs as x", "assert": ["every x.ys.n is 1", "count of x.zs is 1", "x.v is 1"]})
+	subj := {"xs": [{"v": 2, "zs": [], "ys": [{"n": 2}, {"n": 3}, {"n": 4}, {"n": 5}]}]}
+	row := ergo._for_row(check, subj) with input as {"ergo/names": {"ergo/subject": subj, "$at": {"names": {}}}}
+	not row["ergo/for_raw"].tree
+	ergo._m_aliased(row.message) == "item 1 of xs: item 1 of x.ys: n is 2; item 1 of xs: item 2 of x.ys: n is 3; item 1 of xs: item 3 of x.ys: n is 4; item 1 of xs: count of x.zs is 0, and x.v is 2; and 1 more"
+}
+
 test_an_item_keeps_only_what_the_row_hasnt_said_already if {
 	said := {"z is 5"}
 	not ergo._for_unrooted(ergo._m_clause("item", "item 1 of xs", "value", "z is 5"), said)
