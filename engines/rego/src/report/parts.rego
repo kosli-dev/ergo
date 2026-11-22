@@ -1394,37 +1394,9 @@ _parted_applies_in(raw, at, evals, req, conds, subj) := p if {
 	p := _parted_applies(raw, at, evals, req, conds, subj) with data.ergo_unfit as unfit
 } else := _parted_applies(raw, at, evals, req, conds, subj)
 
-_tally_item_parts(c, subj, cause, at, m) := _nested_items(_tally_one_per_item(_tally_merged(xs, _tally_keyed_extra(c, subj, at, m, xs), c, subj))) if {
+_tally_item_parts(c, subj, cause, at, m) := _nested_items(_tally_one_per_item(array.concat(xs, _tally_keyed_extra(c, subj, at, m, xs)))) if {
 	xs := _tally_item_records(c, subj, cause, at, m)
 }
-
-_tally_merged(xs, [], _, _) := xs
-
-_tally_merged(xs, extra, c, subj) := array.concat(array.concat(array.slice(xs, 0, first), keyed), array.slice(xs, end, count(xs))) if {
-	extra != []
-	order := _tally_item_order(c, subj)
-	rs := [_tally_rank(x, order) | some x in xs]
-	first := array.concat([i | some i, r in rs; r >= 0], [count(xs)])[0]
-	end := min({count(xs)} | {j | some j, r in rs; j > first; r <= rs[j - 1]})
-	es := array.concat(array.slice(xs, first, end), extra)
-	ers := array.concat(array.slice(rs, first, end), [_tally_rank(e, order) | some e in extra])
-	keyed := [es[p[1]] | some p in sort({[ers[i], i] | some i, _ in es})]
-}
-
-_tally_rank(e, order) := rs[0] if {
-	not _has_levels(e)
-	rs := [i | some i, n in order; n == e.name]
-	rs != []
-} else := -1
-
-_tally_item_order(c, subj) := [_m_item_name(e.i, roots) |
-	mc := object.union(_m_with_sides(_m_walked(c, subj)), {"ergo/row": true})
-	some side in _m_tally_parts(mc)
-	_tally_outside_keyed(side, subj)
-	w := _tally_walk(subj, side)
-	roots := _dotted_roots([side[_basic_form(side)]])
-	some e in w.items
-]
 
 _tally_one_per_item(es) := [_tally_joined_item(e, [y | some y in es; _tally_same_item(y, e)]) |
 	some k, e in es
