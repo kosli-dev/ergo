@@ -11511,5 +11511,316 @@
    ]
   },
   "want": "item 1 of xs: item 2 of x.ys is null, and item 2 of x.ys is null, which isn't an object"
+ },
+ {
+  "name": "for r5-6/alias key read whole beside an item a second line's whose can't read [for.roots]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs as x, every es whose zz is x.v as e",
+       "assert": "m named by x is 1"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      3
+     ],
+     "es": [
+      {
+       "zz": 1
+      }
+     ],
+     "m": {
+      "a": 1
+     }
+    }
+   ]
+  },
+  "want": "item 1 of xs is 3, which isn't an object; item 1 of xs: x is 3, which isn't text"
+ },
+ {
+  "name": "for r5-6/alias key read whole after a field of it beside an item a second line's whose can't read [path.ref_step]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs as x, every es whose zz is x.v as e",
+       "assert": "x.m named by x.k is 1"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      3
+     ],
+     "es": [
+      {
+       "zz": 1
+      }
+     ],
+     "m": {
+      "a": 1
+     }
+    }
+   ]
+  },
+  "want": "item 1 of xs is 3, which isn't an object; item 1 of xs: x is 3, which isn't text"
+ },
+ {
+  "name": "for r5-6/alias key read whole beside count of a field of it, second line's whose can't read [for.roots]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs as x, every es whose zz is x.v as e",
+       "assert": [
+        "m named by x is 1",
+        "count of x.ys is 1"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      3
+     ],
+     "es": [
+      {
+       "zz": 1
+      }
+     ],
+     "m": {
+      "a": 1
+     }
+    }
+   ]
+  },
+  "want": "item 1 of xs is 3, which isn't an object; item 1 of xs: x is 3, which isn't text"
+ },
+ {
+  "name": "for r5-6/alias key read whole beside an item a second line's path can't walk [for.roots]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs as x, every x.ys as y",
+       "assert": [
+        "m named by x is 1",
+        "y.n is 1"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      3
+     ],
+     "m": {
+      "a": 1
+     }
+    }
+   ]
+  },
+  "want": "item 1 of xs is 3, which isn't an object; item 1 of xs: x is 3, which isn't text"
+ },
+ {
+  "name": "for r5-6/alias key read whole beside a field of it on one list, said by no engine [for.roots]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs as x",
+       "assert": [
+        "x.v is 1",
+        "x.m named by x.k is 1"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      3
+     ],
+     "m": {
+      "a": 1
+     }
+    }
+   ]
+  }
+ },
+ {
+  "name": "for r5-6/sort key from params missing, first of an empty list [path.ref_step]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "first of xs sorted by m named by $params.k as x",
+       "assert": "x.v is 1"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": []
+    }
+   ]
+  },
+  "want": "$params.k is missing; xs is []"
+ },
+ {
+  "name": "for r5-6/sort key from params not text, last of an empty list [path.ref_step]",
+  "params": {
+   "k": 3
+  },
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "last of xs sorted by m named by $params.k as x",
+       "assert": "x.v is 1"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": []
+    }
+   ]
+  },
+  "want": "$params.k is 3, which isn't text; xs is []"
+ },
+ {
+  "name": "for r5-6/sort key from params not text, first of an empty second list [path.ref_step]",
+  "params": {
+   "k": 3
+  },
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every ws as w, first of xs sorted by m named by $params.k as x",
+       "assert": "x.v is 1"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "ws": [
+      {}
+     ],
+     "xs": []
+    }
+   ]
+  },
+  "want": "$params.k is 3, which isn't text; xs is []"
  }
 ]
