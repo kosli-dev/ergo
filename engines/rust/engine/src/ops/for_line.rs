@@ -1105,6 +1105,7 @@ struct Outcome {
     inner: Vec<Dead>,
     clauses: Vec<Clause>,
     lifted: usize,
+    bare: bool,
 }
 
 struct Level {
@@ -1265,6 +1266,7 @@ impl For {
                         inner: Vec::new(),
                         clauses: Vec::new(),
                         lifted: 0,
+                        bare: false,
                     }),
                     Vec::new(),
                 )
@@ -1333,8 +1335,13 @@ impl For {
                     }
                     let lifted = self.item_roots(depth, &bound);
                     let texts: Vec<&str> = lifted.iter().map(|root| root.text.as_str()).collect();
-                    let clauses: Vec<Clause> = self
-                        .first_alias_clauses(&nested, depth, &bound)
+                    let mut first_alias = self.first_alias_clauses(&nested, depth, &bound);
+                    let bare = !live.at.value.is_object()
+                        && first_alias
+                            .iter()
+                            .any(|clause| clause.cause == Cause::NotAnObject);
+                    first_alias.retain(|clause| !bare || clause.cause != Cause::NotAnObject);
+                    let clauses: Vec<Clause> = first_alias
                         .into_iter()
                         .chain(self.nested_clauses(
                             &nested,
@@ -1363,6 +1370,7 @@ impl For {
                             inner: nested.dead,
                             clauses,
                             lifted: lifted.len(),
+                            bare,
                         }),
                         Vec::new(),
                     )
@@ -1586,6 +1594,7 @@ impl For {
             inner: Vec::new(),
             clauses: Vec::new(),
             lifted: 0,
+            bare: false,
         };
         if groups.len() > 1 {
             let leaf = groups
@@ -2777,11 +2786,16 @@ impl For {
                 child.rooted.clone(),
             ));
         };
-        if bare_item(outcome, &child.entry) {
+        if bare_item(outcome, &child.entry) || outcome.bare {
             let bare = child.entry.bare.as_deref().unwrap_or(name);
             let value = child.entry.raw.as_ref().unwrap_or(&child.entry.value);
             let text = super::message::isnt(bare, value, "an object");
-            return Some(Clause::item(name, outcome.cause, text, Vec::new()));
+            let said = if outcome.bare {
+                outcome.clauses.clone()
+            } else {
+                Vec::new()
+            };
+            return Some(Clause::item(name, Cause::NotAnObject, text, said));
         }
         let mut said: Vec<Clause> = outcome.clauses.clone();
         let mut text = String::new();
