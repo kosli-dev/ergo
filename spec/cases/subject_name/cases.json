@@ -13114,18 +13114,6 @@
                       "/xs/1/item/0",
                       "/xs/1/item/1"
                     ],
-                    "name": ".item[]",
-                    "outcome": "usable",
-                    "value": [
-                      1,
-                      2
-                    ]
-                  },
-                  {
-                    "locations": [
-                      "/xs/1/item/0",
-                      "/xs/1/item/1"
-                    ],
                     "name": "count of .item",
                     "value": 2
                   }

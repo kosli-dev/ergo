@@ -3290,6 +3290,352 @@
     ]
   },
   {
+    "description": "count of a path that meets null partway",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "release": {
+          "from": "releases",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": "count of items.m.n is 3"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails as null when an item's path meets null before its end, and names that step",
+        "rules": [
+          "sentence.derived.count",
+          "tally.walk",
+          "tally.count",
+          "tally.inputs",
+          "tally.fail",
+          "sentence.derived.fail",
+          "sentence.phrase.is",
+          "path.null",
+          "location.read"
+        ],
+        "input": {
+          "releases": [
+            {
+              "items": [
+                {
+                  "m": {
+                    "n": 1
+                  }
+                },
+                {
+                  "m": null
+                }
+              ],
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "null",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/releases/0/items/1/m"
+                        ],
+                        "name": "items[1].m.n",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/releases/0/items/1"
+                    ],
+                    "message": "m is null",
+                    "name": "item 2 of items",
+                    "value": {
+                      "m": null
+                    }
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/releases/0/items/0/m/n",
+                      "/releases/0/items/1/m"
+                    ],
+                    "name": "count of items.m.n",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "",
+                "name": "count of items.m.n is 3"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/items/0/m/n",
+                  "/releases/0/items/1/m"
+                ],
+                "name": "count of items.m.n",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/releases/0/items/0/m/n",
+                  "/releases/0/items/1/m"
+                ],
+                "name": "items[].m.n",
+                "outcome": "usable",
+                "value": [
+                  1,
+                  null
+                ]
+              }
+            ],
+            "message": "item 2 of items: m is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "sum of a path that meets null partway",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "release": {
+          "from": "releases",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": "sum of items.m.n is 3"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails as null when an item's path meets null before its end, and names that step",
+        "rules": [
+          "sentence.derived.sum",
+          "tally.walk",
+          "tally.sum",
+          "tally.inputs",
+          "tally.fail",
+          "sentence.derived.fail",
+          "sentence.phrase.is",
+          "path.null",
+          "location.read"
+        ],
+        "input": {
+          "releases": [
+            {
+              "items": [
+                {
+                  "m": {
+                    "n": 1
+                  }
+                },
+                {
+                  "m": null
+                }
+              ],
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "null",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/releases/0/items/1/m"
+                        ],
+                        "name": "items[1].m.n",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/releases/0/items/1"
+                    ],
+                    "message": "m is null",
+                    "name": "item 2 of items",
+                    "value": {
+                      "m": null
+                    }
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/releases/0/items/0/m/n",
+                      "/releases/0/items/1/m"
+                    ],
+                    "name": "sum of items.m.n",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "",
+                "name": "sum of items.m.n is 3"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/items/0/m/n",
+                  "/releases/0/items/1/m"
+                ],
+                "name": "sum of items.m.n",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/releases/0/items/0/m/n",
+                  "/releases/0/items/1/m"
+                ],
+                "name": "items[].m.n",
+                "outcome": "usable",
+                "value": [
+                  1,
+                  null
+                ]
+              }
+            ],
+            "message": "item 2 of items: m is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "count of a path that ends at null counts it",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "release": {
+          "from": "releases",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": "count of items.m.n is 1"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "passes when the last step of an item's path is null, because null is a value that counts",
+        "rules": [
+          "sentence.derived.count",
+          "tally.walk",
+          "tally.count",
+          "tally.inputs",
+          "path.null",
+          "sentence.phrase.is",
+          "location.read"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "items": [
+                {
+                  "m": {
+                    "n": null
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/items/0/m/n"
+                ],
+                "name": "count of items.m.n",
+                "value": 1
+              },
+              {
+                "locations": [
+                  "/releases/0/items/0/m/n"
+                ],
+                "name": "items[].m.n",
+                "value": [
+                  null
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
     "description": "sum over no items is 0",
     "policy": {
       "ergo_spec": "{{spec}}",

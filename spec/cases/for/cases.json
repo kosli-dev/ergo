@@ -40600,12 +40600,6 @@
                     "locations": [],
                     "name": "count of $params[0].v",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "$params[0].v",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",

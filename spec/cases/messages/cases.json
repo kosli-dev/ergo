@@ -8417,18 +8417,6 @@
                   },
                   {
                     "locations": [
-                      "/things/0/x/0/0/a",
-                      "/things/0/x/0/1"
-                    ],
-                    "name": "x[0][] named by zz",
-                    "outcome": "usable",
-                    "value": [
-                      1,
-                      null
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/things/0/zz"
                     ],
                     "name": "zz",
@@ -8540,16 +8528,6 @@
                     ],
                     "name": "count of x[0] named by zz",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/things/0/x/0/0"
-                    ],
-                    "name": "x[0][] named by zz",
-                    "outcome": "usable",
-                    "value": [
-                      null
-                    ]
                   },
                   {
                     "locations": [
@@ -8684,16 +8662,6 @@
                     ],
                     "name": "count of x[0][0] named by zz",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/things/0/x/0/0/0"
-                    ],
-                    "name": "x[0][0][] named by zz",
-                    "outcome": "usable",
-                    "value": [
-                      null
-                    ]
                   },
                   {
                     "locations": [
@@ -9143,16 +9111,6 @@
                     ],
                     "name": "count of x[0] named by zz",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/things/0/x/0/0"
-                    ],
-                    "name": "x[0][] named by zz",
-                    "outcome": "usable",
-                    "value": [
-                      null
-                    ]
                   },
                   {
                     "locations": [
@@ -16028,12 +15986,6 @@
                     "locations": [],
                     "name": "count of y[0].v",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "y[0].v",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -16123,12 +16075,6 @@
                     "locations": [],
                     "name": "count of $input.y[0].v",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "$input.y[0].v",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -29619,9 +29565,15 @@
                     ],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/arts/0/c"
+                        ],
                         "name": "art.cov.z",
-                        "outcome": "absent",
+                        "outcome": "null",
+                        "part": {
+                          "id": null,
+                          "name": "art.cov"
+                        },
                         "value": null
                       }
                     ],
@@ -29629,7 +29581,7 @@
                     "locations": [
                       "$policy:/requirements/r/checks/every/any_of/a"
                     ],
-                    "message": "art.cov.z is missing",
+                    "message": "art.cov is null",
                     "name": "every ys whose n is at least art.cov.z, if any, exists"
                   }
                 ],
@@ -29743,9 +29695,15 @@
                     ],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/arts/0/c"
+                        ],
                         "name": "art.cov.z",
-                        "outcome": "absent",
+                        "outcome": "null",
+                        "part": {
+                          "id": null,
+                          "name": "art.cov"
+                        },
                         "value": null
                       }
                     ],
@@ -29753,7 +29711,7 @@
                     "locations": [
                       "$policy:/requirements/r/checks/some/any_of/a"
                     ],
-                    "message": "art.cov.z is missing",
+                    "message": "art.cov is null",
                     "name": "some ys whose n is at least art.cov.z exists"
                   }
                 ],
@@ -29874,9 +29832,15 @@
                     ],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/arts/0"
+                        ],
                         "name": "art.cov.z",
                         "outcome": "absent",
+                        "part": {
+                          "id": null,
+                          "name": "art.cov"
+                        },
                         "value": null
                       }
                     ],
@@ -30000,9 +29964,15 @@
                     ],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/arts/0"
+                        ],
                         "name": "art.cov.z",
                         "outcome": "absent",
+                        "part": {
+                          "id": null,
+                          "name": "art.cov"
+                        },
                         "value": null
                       }
                     ],
@@ -30133,17 +30103,23 @@
                     ],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/arts/0/c/z"
+                        ],
                         "name": "art.cov.z",
-                        "outcome": "absent",
-                        "value": null
+                        "outcome": "unusable",
+                        "part": {
+                          "id": null,
+                          "name": "art.cov"
+                        },
+                        "value": "s"
                       }
                     ],
                     "kind": "assertion",
                     "locations": [
                       "$policy:/requirements/r/checks/every/any_of/a"
                     ],
-                    "message": "art.cov.z is missing",
+                    "message": "art.cov.z is \"s\", which isn't a number",
                     "name": "every ys whose n is at least art.cov.z, if any, exists"
                   }
                 ],
@@ -30194,7 +30170,7 @@
                   "/arts/0/c/z"
                 ],
                 "name": "art.cov.z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "part": {
                   "id": null,
                   "name": "art.cov"
@@ -30259,17 +30235,23 @@
                     ],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/arts/0/c/z"
+                        ],
                         "name": "art.cov.z",
-                        "outcome": "absent",
-                        "value": null
+                        "outcome": "unusable",
+                        "part": {
+                          "id": null,
+                          "name": "art.cov"
+                        },
+                        "value": "s"
                       }
                     ],
                     "kind": "assertion",
                     "locations": [
                       "$policy:/requirements/r/checks/some/any_of/a"
                     ],
-                    "message": "art.cov.z is missing",
+                    "message": "art.cov.z is \"s\", which isn't a number",
                     "name": "some ys whose n is at least art.cov.z exists"
                   }
                 ],
@@ -30320,7 +30302,7 @@
                   "/arts/0/c/z"
                 ],
                 "name": "art.cov.z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "part": {
                   "id": null,
                   "name": "art.cov"
@@ -35455,6 +35437,10 @@
                         ],
                         "name": "pl.z",
                         "outcome": "absent",
+                        "part": {
+                          "id": null,
+                          "name": "pl"
+                        },
                         "value": null
                       }
                     ],
@@ -36089,6 +36075,10 @@
                         ],
                         "name": "pl.z",
                         "outcome": "unusable",
+                        "part": {
+                          "id": null,
+                          "name": "pl"
+                        },
                         "value": "s"
                       }
                     ],
@@ -36161,7 +36151,7 @@
                   "/ts/0/p/z"
                 ],
                 "name": "pl.z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "part": {
                   "id": null,
                   "name": "pl"
@@ -36739,6 +36729,10 @@
                         ],
                         "name": "pl.z",
                         "outcome": "null",
+                        "part": {
+                          "id": null,
+                          "name": "pl"
+                        },
                         "value": null
                       }
                     ],
@@ -37332,6 +37326,10 @@
                         ],
                         "name": "pl.z",
                         "outcome": "absent",
+                        "part": {
+                          "id": null,
+                          "name": "pl"
+                        },
                         "value": null
                       }
                     ],

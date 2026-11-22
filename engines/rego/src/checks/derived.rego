@@ -451,6 +451,18 @@ _tally_mark(true, e) := {"not_an_object"} if {
 _tally_mark(true, e) := {"absent"} if {
 	e.v == _absent
 	is_object(e.iv)
+	not _tally_null_step(e)
+}
+
+_tally_mark(true, e) := {"null"} if {
+	e.v == _absent
+	is_object(e.iv)
+	_tally_null_step(e)
+}
+
+_tally_null_step(e) := min(steps) if {
+	steps := {j | some j in numbers.range(1, count(e.r)); _read_state(e.iv, array.slice(e.r, 0, j)) == "null"}
+	steps != set()
 }
 
 _tally_mark(true, e) := {_read_state(e.iv, e.r)} if e.v == _unusable_mark
