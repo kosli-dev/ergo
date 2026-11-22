@@ -3666,6 +3666,43 @@ fn an_item_that_isnt_an_object_isnt_named_for_a_later_lines_whose_that_reads_it_
 }
 
 #[test]
+fn a_pairs_part_says_its_sentences_in_the_order_they_are_written() {
+    for (assertions, es, said) in [
+        (
+            &["x.v is 1", "e.n is 1"][..],
+            json!([{"n": 1}, {"n": 2}]),
+            "item 1 of xs: item 2 of es: x.v is 2, and e.n is 2",
+        ),
+        (
+            &["e.n is 1", "x.v is 1"][..],
+            json!([{"n": 1}, {"n": 2}]),
+            "item 1 of xs: item 2 of es: e.n is 2, and x.v is 2",
+        ),
+        (
+            &["x.v is 1", "e.n is 1"][..],
+            json!([{"n": 3}, {"n": 2}]),
+            "item 1 of xs: item 1 of es: x.v is 2, and e.n is 3; item 1 of xs: item 2 of es: e.n is 2",
+        ),
+        (
+            &["e.m is 1", "x.v is 1", "e.n is 1"][..],
+            json!([{"n": 3, "m": 2}]),
+            "item 1 of xs: item 1 of es: e.m is 2, and x.v is 2, and e.n is 3",
+        ),
+    ] {
+        assert_eq!(
+            for_row(
+                "every xs as x, every es as e",
+                assertions,
+                json!({"xs": [{"v": 2}], "es": es}),
+                json!({}),
+            ),
+            ("value".to_string(), said.to_string()),
+            "{assertions:?}"
+        );
+    }
+}
+
+#[test]
 fn a_list_the_line_cant_walk_isnt_counted_as_an_item() {
     let zz = |n: usize| {
         (1..=n)
