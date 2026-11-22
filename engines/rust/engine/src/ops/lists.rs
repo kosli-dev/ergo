@@ -334,7 +334,9 @@ pub(super) fn text_fault(check: &super::Check, path: &Path, ctx: &Ctx) -> Option
 pub(crate) fn text_unfit(check: &super::Check, name: &str, ctx: &Ctx) -> bool {
     text_right(check)
         .and_then(|list| text_walk(check, list, ctx))
-        .is_some_and(|walk| walk.cause.is_some() && walk.name == name)
+        .is_some_and(|walk| {
+            walk.cause.is_some_and(|cause| cause != Cause::Value) && walk.name == name
+        })
 }
 
 pub(super) fn text_stand_in(check: &super::Check, ctx: &Ctx) -> Option<super::Check> {
