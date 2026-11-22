@@ -177,9 +177,30 @@ test_the_list_of_a_member_is_what_follows_its_key if {
 }
 
 test_a_text_beside_a_member_that_names_no_item_is_a_root_text if {
-	ergo._root_text("member b of xs", "$params.k is missing")
-	not ergo._root_text("member b of xs", "member b of xs is 1")
-	not ergo._root_text("member b of xs", "")
+	row := {"failed_items": [{"item": "member b of xs"}, {"item": "member c of xs"}, {"item": "member d of xs"}]}
+	clauses := [
+		ergo._m_clause("root", "$params.k", "absent", "$params.k is missing"),
+		ergo._m_clause("item", ["xs", "c"], "value", "member c of xs is 1"),
+		ergo._m_clause("root", "", "value", ""),
+	]
+	ergo._walk_root_texts(row, clauses) == ["$params.k is missing"]
+	ergo._walk_owned_texts(row, clauses) == ["", "member c of xs is 1", ""]
+}
+
+test_a_list_entry_of_a_walk_with_no_items_takes_its_name_and_cause_from_its_clause if {
+	row := {"ergo/subj": {"xs": "s", "ys": null}, "ergo/heads": [
+		ergo._m_clause("list", "xs", "absent", "xs is gone"),
+		ergo._m_clause("root", "$params.k", "unusable", "$params.k is 3, which isn't text"),
+	]}
+	[[e.kind, e.name, e.cause, e.message] | some e in ergo._walk_flaw_lists(row, "s", {"path": ["xs"]}, [])] == [["list", "xs", "absent", "xs is gone"]]
+	ergo._walk_flaw_lists(row, "s", {"path": ["xs"]}, [{"kind": "item"}]) == []
+}
+
+test_an_item_clause_is_the_items_own_text_whatever_its_words_say if {
+	row := {"failed_items": [{"item": "item 1 of xs"}, {"item": "xs"}]}
+	clauses := [ergo._m_clause("item", ["xs", 0], "absent", "cov.z is missing"), ergo._m_clause("list", "xs", "absent", "xs is missing")]
+	ergo._walk_root_texts(row, clauses) == []
+	ergo._walk_owned_texts(row, clauses) == ["cov.z is missing", "xs is missing"]
 }
 
 test_a_member_read_by_its_key_is_its_list_and_its_key if {

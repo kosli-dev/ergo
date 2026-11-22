@@ -2857,6 +2857,56 @@ fn a_walked_list_is_found_when_only_an_item_of_it_lacks_the_field() {
     );
 }
 
+fn list_read(sentence: &str, subject: Value, list: &str) -> crate::path::Outcome {
+    verdict_of(sentence, subject)
+        .inputs
+        .into_iter()
+        .find(|input| input.name == list)
+        .unwrap_or_else(|| panic!("{sentence} has no input {list}"))
+        .state
+}
+
+#[test]
+fn a_count_of_or_a_sum_of_a_value_that_is_not_a_list_or_an_object_reads_it_as_unusable() {
+    for value in [json!(3), json!("s"), json!(true)] {
+        for sentence in ["count of ms is 1", "sum of ms is 1"] {
+            assert_eq!(
+                list_read(sentence, json!({"ms": value}), "ms"),
+                crate::path::Outcome::Unusable,
+                "{sentence} on {value}"
+            );
+        }
+    }
+    assert_eq!(
+        list_read("count of y[0].v is 1", json!({"y": [{"v": 1}]}), "y[0].v"),
+        crate::path::Outcome::Unusable
+    );
+    assert_eq!(
+        list_read(
+            "count of x named by zz is 1",
+            json!({"x": {"k": 5}, "zz": "k"}),
+            "x named by zz"
+        ),
+        crate::path::Outcome::Unusable
+    );
+}
+
+#[test]
+fn a_count_of_or_a_sum_of_member_of_a_value_that_is_not_an_object_reads_it_as_unusable() {
+    for value in [json!(3), json!("s"), json!(true), json!([1])] {
+        for sentence in [
+            "count of member of costs is 1",
+            "sum of member of costs is at most 3",
+        ] {
+            assert_eq!(
+                list_read(sentence, json!({"costs": value}), "costs"),
+                crate::path::Outcome::Unusable,
+                "{sentence} on {value}"
+            );
+        }
+    }
+}
+
 #[test]
 fn half_a_microsecond_rounds_up_and_less_rounds_down_whatever_its_length() {
     for (from, to, wanted) in [
@@ -2930,5 +2980,47 @@ fn a_count_or_a_sum_still_says_a_missing_step_as_missing_beside_one_that_is_null
             ],
             "{sentence}"
         );
+    }
+}
+
+fn read_of(state: crate::path::Outcome, locations: &[&str]) -> Input {
+    Input {
+        name: "m".to_string(),
+        value: json!([]),
+        locations: locations.iter().map(|l| l.to_string()).collect(),
+        part: None,
+        state,
+        null_at: None,
+        worked: false,
+    }
+}
+
+#[test]
+fn two_reads_of_the_same_value_merge_into_one_input_with_the_worst_outcome() {
+    use crate::path::Outcome;
+    let usable = read_of(Outcome::Found, &[]);
+    let unusable = read_of(Outcome::Unusable, &[]);
+    let absent = read_of(Outcome::Absent, &[]);
+    let elsewhere = read_of(Outcome::Absent, &["/m"]);
+    for (entries, wanted) in [
+        (
+            vec![usable.clone(), unusable.clone()],
+            vec![unusable.clone()],
+        ),
+        (
+            vec![unusable.clone(), usable.clone()],
+            vec![unusable.clone()],
+        ),
+        (
+            vec![absent, unusable.clone(), usable.clone()],
+            vec![unusable.clone()],
+        ),
+        (vec![usable.clone(), usable.clone()], vec![usable]),
+        (
+            vec![unusable.clone(), elsewhere.clone()],
+            vec![unusable, elsewhere],
+        ),
+    ] {
+        assert_eq!(merged(entries.clone()), wanted, "{entries:?}");
     }
 }

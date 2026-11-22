@@ -6,7 +6,7 @@ _walk_row(check, subj) := object.union(r, {"other_roots": _walk_parts(check, sub
 	r := _key_item_row(check, subj)
 } else := object.union(r, {"cause": _worst_of(_key_item_flaws(check) | {r.cause}), "other_roots": _walk_parts(check, subj, {"ergo/key_texts": true}, r)}) if {
 	r := _key_list_fail_row(check, subj)
-} else := object.union(raw, {"cause": "unusable", "failed": a.failed, "root_msgs": _with_roots(ps, ms), "ergo/alone_items": [p.text | some p in ps; not p.text in {m.text | some m in ms}]}) if {
+} else := object.union(raw, {"cause": "unusable", "failed": a.failed, "root_msgs": _with_roots(ps, ms), "ergo/alone_items": [p | some p in ps; not p.text in {m.text | some m in ms}]}) if {
 	_walk_flawed(check)
 	not _unreadable_input
 	not _walk_keyed(check)
@@ -606,6 +606,8 @@ _item_locations(f) := [f.iat] if not "ats" in object.keys(f)
 else := [trim_suffix(a, trim_prefix(f.at, f.iat)) | some a in f.ats]
 
 _walk_inputs(check, w) := [{"name": _walk_name(check.path, w.walked), "value": [], "locations": [], "ergo/outcome": _walk_stop_state(_walk_stopped_at(w.trail).v)}] if w.walked == set()
+
+else := [{"name": _walk_name(check.path, w.walked), "value": [], "locations": [], "ergo/outcome": o}] if o := _stopped_list_outcome(w.items, w.fails)
 
 else := [{"name": _walk_name(check.path, w.walked), "value": [_walk_value(e.v, e, w) | some e in w.items], "locations": _walk_locations(w)}]
 

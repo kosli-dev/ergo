@@ -263,7 +263,7 @@ _walk_list_names(check) := {_input_name(array.slice(p, 0, i)) |
 	}
 }
 
-_walk_item_texts(parts, r) := [_clause_text(p) | some p in parts] if count(parts) == count(r.failed)
+_walk_item_texts(parts, r) := parts if count(parts) == count(r.failed)
 
 else := []
 

@@ -9,7 +9,7 @@ _keyed_rooted(o, check, subj) := _keyed_said(o, k, fault, subj) if {
 	fault := _keyed_root_fault(subj, k.clause.right)
 } else := o
 
-_keyed_said(o, k, fault, subj) := object.union(o, {"cause": _worst_of(causes), "message": _m_joined(array.concat([fault.text], said)), "ergo/own": [fault.text], "ergo/texts": [_keyed_said_text(said, f.item) | some f in object.get(o, "failed_items", [])]}) if {
+_keyed_said(o, k, fault, subj) := object.union(o, {"cause": _worst_of(causes), "message": _m_joined(array.concat([fault.text], said)), "ergo/own": [fault.text], "ergo/texts": [_m_clause("item", f.item, f.cause, _keyed_said_text(said, f.item)) | some f in object.get(o, "failed_items", [])]}) if {
 	w := _walk(_walk_start({"path": k.path}, subj), _walk_keys({"path": k.path}, subj), true)
 	_keyed_list_read(w)
 	items := [x | some e in w.items; x := _keyed_item(e, k)]

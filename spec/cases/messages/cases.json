@@ -9300,7 +9300,7 @@
               {
                 "locations": [],
                 "name": "x named by zz",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               },
               {
@@ -9384,7 +9384,7 @@
               {
                 "locations": [],
                 "name": "x named by zz",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               },
               {
@@ -16005,7 +16005,7 @@
               {
                 "locations": [],
                 "name": "y[0].v",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -16094,7 +16094,7 @@
               {
                 "locations": [],
                 "name": "$input.y[0].v",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               }
             ],
