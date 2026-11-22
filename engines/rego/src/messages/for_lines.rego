@@ -177,7 +177,7 @@ _for_own_read(c, iv, p) := [s, st] if {
 	s in _failed_read_states
 } else := [_side_state(iv, p), c]
 
-_m_whose_why(first, f) :=_for_why(first, wo[0], wo[1], wo[2], wo[3], f) if {
+_m_whose_why(first, f) := _for_why(first, wo[0], wo[1], wo[2], wo[3], f) if {
 	wo := f.whose_of
 	_for_root_fails(wo[0], wo[1], wo[2])
 } else := _for_why(first, wo[0], wo[1], wo[2], wo[3], f) if {
