@@ -891,6 +891,52 @@ else := _m_item_clause(f.said, _for_said_cause(said), said) if {
 	said != []
 }
 
+else := _m_item_clause(f.said, _for_said_cause(said), said) if {
+	_m_two_list(f)
+	said := _for_pairs_said(check, f, _for_item_bound(check, f))
+	said != []
+}
+
+_for_pairs_said(check, f, names) := array.concat([x | firsts == []; some p in riders; some x in p[1]], [x[3] | some x in sort(array.concat(pairs, dead))]) if {
+	w := _for_walk(check.items[1], object.get(names, "ergo/subject", null), names)
+	own := [[j, _for_pair_parts(check, f, names, w, e)] | some j, e in w.items]
+	firsts := [j | some [j, ps] in own; ps != []]
+	riders := _for_rider_parts(check, f, names)
+	pairs := [[j, 0, 0, _m_item_clause(_for_item_name(check, w.items[j].i), _for_said_cause(said), said)] |
+		some [j, ps] in own
+		said := [x | some p in sort(array.concat(ps, [r | j == firsts[0]; some r in riders])); some x in p[1]]
+		said != []
+	]
+	dead := [[_for_inner_at(check, w, x), 1, k, _m_clause("item", x.item, x.cause, t)] |
+		some k, x in object.get(f, "failed_items", [])
+		object.get(x, "free", false) != true
+		some t in _m_inner_fail(x)
+	]
+}
+
+_for_pair_parts(check, f, names, w, e) := [[i, cs] |
+	name := _for_item_name(check, e.i)
+	some i, c in check.checks
+	some l in f.failed_assertions
+	l.assertion == check.assertions[i]
+	some x in object.get(l, "items", [])
+	x.item == name
+	cs := _for_sentence_clauses(check, c, object.get(names, "ergo/subject", null), x.cause) with input as {"ergo/names": _bound(names, check.items[1].as, e.v, _walk_at(w, e))}
+	cs != []
+]
+
+_for_rider_parts(check, f, names) := [[i, cs] |
+	some i, c in check.checks
+	_for_reads_an_alias(check, c)
+	some l in f.failed_assertions
+	l.assertion == check.assertions[i]
+	not "items" in object.keys(l)
+	cs := _for_sentence_clauses(check, c, object.get(names, "ergo/subject", null), l.cause) with input as {"ergo/names": names}
+	cs != []
+]
+
+_for_inner_at(check, w, x) := min({j | some j, e in w.items; _for_item_name(check, e.i) == x.path} | {count(w.items)})
+
 _for_item_walked(check, f) := [e, w] if {
 	w := _for_walk(check.items[0], object.get(_for_names, "ergo/subject", null), _for_names)
 	some e in w.items
