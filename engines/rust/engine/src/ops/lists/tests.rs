@@ -1420,10 +1420,7 @@ fn a_walked_list_after_is_in_ignoring_case_with_an_item_that_isnt_text_is_a_root
         walked_root_fault(&check, list, &ctx)
     };
     assert_eq!(
-        root_fault(
-            "v is in $input.cs.name ignoring case",
-            json!([{"name": 3}])
-        ),
+        root_fault("v is in $input.cs.name ignoring case", json!([{"name": 3}])),
         Some((
             Cause::Unusable,
             "item 1 of $input.cs: name is 3, which isn't text".to_string()
