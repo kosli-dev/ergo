@@ -686,6 +686,8 @@ _rooted_main(check, subj, r) := object.union(r, {"cause": "unusable", "failed": 
 _rooted_cause_said(_, _, r, flaw) if r.cause in {"satisfied", "value", flaw}
 
 _rooted_cause_said(check, subj, r, flaw) if {
+	some c in array.concat(_walk_root_conds(check), [object.get(check, "check", {})])
+	c.ignoring
 	_worst_of({flaw, r.cause}) == flaw
 	r.fails != []
 	ms := _walk_root_msgs(check, subj)
