@@ -4300,3 +4300,22 @@ fn an_item_a_second_lines_whose_cant_decide_is_said_beside_what_else_fails() {
         );
     }
 }
+
+#[test]
+fn a_sort_key_from_params_that_arent_an_object_says_only_the_params_once() {
+    for (assertion, message) in [
+        ("x.v exists", "$params is 3, which isn't an object"),
+        ("w exists", "w is missing; $params is 3, which isn't an object"),
+    ] {
+        assert_eq!(
+            for_row(
+                "first of xs sorted by m named by $params.k as x",
+                &[assertion],
+                json!({"xs": [{"v": 1, "m": null}, {"v": 2, "m": null}]}),
+                json!(3),
+            ),
+            ("unusable".to_string(), message.to_string()),
+            "{assertion}"
+        );
+    }
+}
