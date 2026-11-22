@@ -504,6 +504,17 @@ test_a_row_on_the_tree_says_the_trees_message if {
 	not "ergo/for_raw" in object.keys(said)
 }
 
+test_a_row_whose_sentence_reads_a_list_outside_its_item_keeps_the_text_the_tree_cant_say_yet if {
+	check := ergo._s_written_check({"for": "every rows as r", "assert": ["r.v is in $input.os.name"]})
+	subj := {"rows": [{"v": "bob"}, {"v": "ann"}]}
+	doc := {"os": [{"name": "ann"}, {}]}
+	names := {"ergo/subject": subj, "$at": {"names": {}}}
+	r := ergo._for_freed(check, subj, ergo._for_row_raw(check, subj)) with input as {"ergo/names": names} with data.ergo_document as doc
+	raw := {"passed": false, "cause": r.cause, "message": "", "ergo/for_raw": {"check": check, "subj": subj, "r": r, "tree": true}}
+	said := ergo._for_said(raw) with input as {"ergo/names": names} with data.ergo_document as doc
+	said.message == "item 2 of $input.os: name is missing"
+}
+
 test_a_row_on_the_tree_takes_the_worst_cause_of_what_it_says if {
 	_tree_said("every xs as x", ["x.v is 1"], {"xs": [{}]}, {}, "value").cause == "absent"
 	_tree_said("every xs as x", ["x.v is 1"], {"xs": [{}]}, {}, "not_an_object").cause == "not_an_object"
