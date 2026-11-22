@@ -253,9 +253,6 @@ _m_for_empty(check, subj, cause) := cs if {
 	faults := _once([c | some item in check.items; some c in array.concat(_m_key_faults(subj, _m_for_item(item)), _m_whose_ref_faults(item))])
 	faults != []
 	cs := _once(array.concat(faults, [c | some item in check.items; _m_picked_none(subj, item); some c in _m_list_found(subj, item.path)]))
-} else := [_m_fallback(check)] if {
-	cause == "unusable"
-	_m_params_unread(check)
 } else := cs if {
 	cs := _once([c | some item in check.items; _m_narrows(subj, item); some c in _m_list_found(subj, item.path)])
 	cs != []
