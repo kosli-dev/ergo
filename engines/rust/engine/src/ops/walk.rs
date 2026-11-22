@@ -1617,6 +1617,40 @@ fn with_fields(inputs: &mut Vec<Input>, list: &str, path: &Path, ctx: &Ctx) {
     }
 }
 
+/// How reading a walked list with no items ended, or `None` when it has items
+/// or no read stopped. With no list along the path, it is `Unusable` when the
+/// path reads a value that can't be walked; otherwise it is the worst of the
+/// ways its reads stopped.
+pub fn stopped_state(walked: &Walked, path: &Path, ctx: &Ctx) -> Option<Outcome> {
+    if !walked.items.is_empty() || walked.failures.is_empty() {
+        return None;
+    }
+    if walked.walked.is_empty() {
+        let read = path::read(&member::split(path).0, ctx);
+        return (read.outcome == Outcome::Found && read.value.is_some())
+            .then_some(Outcome::Unusable);
+    }
+    let worst = Cause::worst(
+        walked
+            .failures
+            .iter()
+            .filter(|f| !crate::parts::is_item(&f.item))
+            .map(|f| f.cause)
+            .filter(|cause| {
+                matches!(
+                    cause,
+                    Cause::Absent | Cause::Null | Cause::Unusable | Cause::NotAnObject
+                )
+            }),
+    )?;
+    Some(match worst {
+        Cause::Absent => crate::path::Outcome::Absent,
+        Cause::Null => crate::path::Outcome::Null,
+        Cause::NotAnObject => crate::path::Outcome::NotAnObject,
+        _ => crate::path::Outcome::Unusable,
+    })
+}
+
 /// How reading a walked list ended, from the failure that names the list
 /// itself when it has no items.
 pub fn list_state(walked: &Walked) -> crate::path::Outcome {

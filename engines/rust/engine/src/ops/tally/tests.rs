@@ -2877,6 +2877,18 @@ fn a_count_of_or_a_sum_of_a_value_that_is_not_a_list_or_an_object_reads_it_as_un
             );
         }
     }
+    assert_eq!(
+        list_read("count of y[0].v is 1", json!({"y": [{"v": 1}]}), "y[0].v"),
+        crate::path::Outcome::Unusable
+    );
+    assert_eq!(
+        list_read(
+            "count of x named by zz is 1",
+            json!({"x": {"k": 5}, "zz": "k"}),
+            "x named by zz"
+        ),
+        crate::path::Outcome::Unusable
+    );
 }
 
 #[test]
