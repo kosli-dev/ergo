@@ -623,8 +623,10 @@ fn usable_patterns(patterns: &Value) -> bool {
 
 impl In {
     pub fn flawed(&self, ctx: &Ctx) -> bool {
-        self.ignoring.is_none()
-            && ref_read(&self.values, ctx).is_some_and(|v| !usable_values(&v, false))
+        ref_read(&self.values, ctx).is_some_and(|v| match self.ignoring {
+            None => !usable_values(&v, false),
+            Some(_) => !v.is_array(),
+        })
     }
 }
 
