@@ -564,7 +564,7 @@ _m_tally_keyed_root(subj, side) := [[concat("", ["root ", f.cause]), f.text] | s
 	b := _m_tally_keyed_base(subj, side)
 } else := []
 
-_m_tally_keyed_base(subj, side) := object.union({"faults": fs}, _m_tally_keyed_clause(side, fs)) if {
+_m_tally_keyed_base(subj, side) := object.union({"faults": fs, "paths": _m_keyed_fault_paths(subj, whose)}, _m_tally_keyed_clause(side, fs)) if {
 	not _unreadable_input
 	whose := object.get(side, "whose", null)
 	is_array(whose)
@@ -579,6 +579,14 @@ _m_tally_keyed_base(subj, side) := object.union({"faults": fs}, _m_tally_keyed_c
 		st == f.cause
 	])])
 	fs != []
+}
+
+_m_keyed_fault_paths(subj, whose) := {p |
+	some c in whose
+	object.get(c, "op", null) == "compare"
+	some p in [object.get(c, "left", null), object.get(c, "right", null)]
+	_keyed_root_path(p)
+	_keyed_root_fault(subj, p)
 }
 
 _whose_reads_keyed_root(whose) if {
@@ -675,31 +683,48 @@ else := x
 
 _m_tally_items(subj, side) := [x[2] | some x in _m_tally_items_at(subj, side)]
 
-_m_tally_items_at(subj, side) := [[_m_positions(e.i), [1, k], array.concat(x, [{"item": e}])] | some e in w.items; some k, x in array.concat(_m_whose_undecided(subj, alone, e, flaws, roots), [y | _tally_judge(side, e, flaws, w, long).read; some y in _m_tally_item(f, e, roots)]); not x[1] in {concat("", [_m_item_name(i, roots), ": ", t]) | some t in keyed; some i in {e.i, object.get(e, "c", e.i)}}] if {
+_m_tally_items_at(subj, side) := [[_m_positions(e.i), [1, k], array.concat(x, [{"item": e}])] | some e in w.items; some k, x in array.concat(_m_whose_undecided(subj, alone, e, flaws, roots, paths), [y | _tally_judge(side, e, flaws, w, long).read; some y in _m_tally_item(f, e, roots)])] if {
 	f := _basic_form(side)
 	w := _tally_walk(subj, side)
 	alone := _whose_alone(subj, side)
 	flaws := [_cond_flaw(c) | some c in alone.whose]
 	roots := _dotted_roots([side[f]])
 	long := _long_text(json.marshal([e.iv | some e in w.items]))
-	keyed := _m_keyed_root_texts(subj, side)
+	paths := _m_keyed_paths(subj, side)
 }
 
-_m_keyed_root_texts(subj, side) := {f.text | some f in b.faults} | {concat("", [_path_name(p), " is ", _m_state_word(f.cause)]) |
-	some c in side.whose
-	some p in [object.get(c, "left", null), object.get(c, "right", null)]
-	_keyed_root_path(p)
-	f := _keyed_root_fault(subj, p)
-	f.cause in _no_value_states
-} if {
+_m_keyed_paths(subj, side) := b.paths if {
 	b := _m_tally_keyed_base(subj, side)
 } else := set()
 
-_m_whose_undecided(subj, side, e, flaws, roots) := _once([[_m_focus_state(e, c, cause), _m_focus_text(subj, c, e, cause, roots)] |
+_m_whose_undecided(subj, side, e, flaws, roots, paths) := _once([x |
 	some i, c in side.whose
 	cause := _tally_focus_cause(c, e, flaws[i])
 	not cause in _tally_decided_causes
+	some x in _m_undecided_said(subj, c, e, cause, roots, paths)
 ])
+
+_m_undecided_said(subj, c, e, cause, roots, paths) := _m_keyed_said_item(c, e, o, roots) if {
+	o := _keyed_own(c, e, paths)
+	is_object(_keyed_focus_value(e))
+} else := [[_m_focus_state(e, c, cause), _m_focus_text(subj, c, e, cause, roots)]]
+
+_m_keyed_said_item(c, e, o, roots) := [[_m_focus_state(e, c, _worst_of({t[0] | some t in ts})), _m_leaf_in(_focus_of(e, c).i, concat(", and ", [t[1] | some t in ts]), roots)]] if {
+	ts := _m_keyed_own_parts(c, o, _keyed_focus_value(e))
+	ts != []
+} else := []
+
+_m_keyed_own_parts(c, o, item) := array.concat(_m_keyed_key_part(c, o, item), _m_keyed_operand_part(o, item)) if o.side == "left"
+
+else := array.concat(_m_keyed_operand_part(o, item), _m_keyed_key_part(c, o, item))
+
+_m_keyed_operand_part(o, item) := [[o.operand, _m_cond_message(o.stand, item, o.operand)]] if not o.operand in _tally_decided_causes
+
+else := []
+
+_m_keyed_key_part(c, o, item) := [_keyed_key(item, c[o.side][count(c[o.side]) - 1])] if o.key != "satisfied"
+
+else := []
 
 _m_focus_state(e, c, cause) := concat("", ["focus ", cause]) if {
 	e.r != []
@@ -729,7 +754,7 @@ _m_undecided_text(subj, c, e, cause, roots) := _m_isnt(_m_item_name(e.i, roots),
 	cause == "not_an_object"
 	off := _m_input_one_refs(c)
 	off != []
-} else := _m_leaf_in(e.i, _m_cond_message(subj, c, e.iv, cause), roots)
+} else := _m_leaf_in(e.i, _m_cond_message(c, e.iv, cause), roots)
 
 _m_own_clauses(c, item, cause) := _once([_m_state_clause(s) |
 	some s in _m_sources(item, c)
@@ -878,7 +903,7 @@ _m_shown_at(shown, _, "absent") := shown
 
 _m_shown_at(shown, i, "null") := array.slice(shown, 0, i)
 
-_m_cond_message(subj, c, item, cause) := concat("; ", array.concat(_m_unsaid_null_before_key(subj, item, c), [concat(", and ", cs)])) if {
+_m_cond_message(c, item, cause) := concat("; ", array.concat(_m_null_before_key(item, c), [concat(", and ", cs)])) if {
 	cause in _no_value_states
 	cs := _m_key_states(item, c, cause)
 	cs != []
@@ -1076,19 +1101,6 @@ _m_null_before_key(item, c) := _once([concat("", [_input_name(prefix), " is null
 	prefix := array.slice(p, 0, i)
 	_m_resolved_prefix(item, prefix) == null
 ])
-
-_m_unsaid_null_before_key(subj, item, c) := [t | some t in ns; not t in _m_keyed_root_said(subj, c)] if {
-	ns := _m_null_before_key(item, c)
-	ns != []
-} else := []
-
-_m_keyed_root_said(subj, c) := {f.text |
-	not _unreadable_input
-	object.get(c, "op", null) == "compare"
-	some p in [object.get(c, "left", null), object.get(c, "right", null)]
-	_keyed_root_path(p)
-	f := _keyed_root_fault(subj, p)
-}
 
 _m_rooted_path(p) if _part_start(p)
 
