@@ -585,9 +585,9 @@ _walk_worst(fails) := [c | some c in array.concat(_cause_precedence, ["value"]);
 _walk_failed("satisfied", _, _) := []
 
 _walk_failed(cause, fails, path) := [object.union({"path": _failed_name(f.path, _dotted_roots([path])), "item": _failed_name(f.item, _dotted_roots([path])), "cause": f.cause, "value": f.value, "locations": _fail_locations(f), "ergo/item": _fail_item(f)}, object.union(_plain_item_read(f, path), _fail_read_outcome(f))) |
-	some p in sort({f.path | some f in fails})
+	some p in sort({[f.item, f.path] | some f in fails})
 	some f in fails
-	f.path == p
+	[f.item, f.path] == p
 ] if cause != "satisfied"
 
 _plain_item_read(f, path) := {"ergo/read": _failed_read_name(f.path, _dotted_roots([path]))} if f.path == f.item
