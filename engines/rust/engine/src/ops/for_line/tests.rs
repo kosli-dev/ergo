@@ -4625,3 +4625,36 @@ fn an_alias_read_whole_that_can_be_read_isnt_said_beside_an_item_a_later_lines_w
         );
     }
 }
+
+#[test]
+fn an_alias_read_whole_keeps_its_problem_beside_an_item_a_later_lines_path_cant_walk() {
+    for for_line in [
+        "every xs as x, every x.ys as y",
+        "every xs as x, some x.ys as y",
+        "every xs as x, first of x.ys as y",
+        "every xs as x, every x.ys whose n is 1 as y",
+        "some xs as x, every x.ys as y",
+    ] {
+        for assertions in [
+            &["m named by x is 1"][..],
+            &["x.m named by x.k is 1"][..],
+            &["m named by x is 1", "y.n is 1"][..],
+            &["x is 1", "m named by x is 1"][..],
+        ] {
+            assert_eq!(
+                for_row(
+                    for_line,
+                    assertions,
+                    json!({"xs": [3], "m": {"a": 1}}),
+                    json!({}),
+                ),
+                (
+                    "not_an_object".to_string(),
+                    "item 1 of xs is 3, which isn't an object; item 1 of xs: x is 3, which isn't text"
+                        .to_string()
+                ),
+                "{for_line} {assertions:?}"
+            );
+        }
+    }
+}
