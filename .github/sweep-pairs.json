@@ -11384,5 +11384,132 @@
    ]
   },
   "want": "w is missing; z is 1, which isn't text"
+ },
+ {
+  "name": "for r5-6/a value a sentence that reads no alias said not said again under each item [message.join]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs as x",
+       "assert": [
+        "x.v is at least z",
+        "z is 1"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": 1
+      },
+      {
+       "v": 3
+      }
+     ],
+     "z": 5
+    }
+   ]
+  },
+  "want": "z is 5; item 1 of xs: x.v is 1; item 2 of xs: x.v is 3"
+ },
+ {
+  "name": "for r5-6/a list a sentence that reads no alias said not said again under each item [message.join]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every ks as k",
+       "assert": [
+        "every es.zz is 1",
+        "sum of es.m named by k is 1"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": null,
+     "ks": [
+      "a",
+      "v"
+     ]
+    }
+   ]
+  },
+  "want": "es is null"
+ },
+ {
+  "name": "for r5-6/two problems of one item of a list under the item both said [message.join]",
+  "params": {},
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": {
+       "for": "every xs as x",
+       "assert": [
+        "every x.ys exists",
+        "sum of x.ys.n is 3"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "v": 2,
+       "ys": [
+        {
+         "n": 1
+        },
+        null
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "want": "item 1 of xs: item 2 of x.ys is null, and item 2 of x.ys is null, which isn't an object"
  }
 ]
