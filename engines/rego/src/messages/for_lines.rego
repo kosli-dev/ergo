@@ -149,8 +149,9 @@ _for_cond_clause(c, e) := _m_item_clause(_m_item_name(e.i, set()), cause, [_m_cl
 	p != []
 	not _walk_outside(p)
 	name := _m_item_name(fe.i, set())
-} else := _m_item_clause(_m_item_name(e.i, set()), cause, said) if {
-	said := _once(_for_cond_own(c, _focus_of(e, c), object.get(_for_names, "ergo/subject", null)))
+} else := _m_item_clause(_m_item_name(fe.i, set()), cause, said) if {
+	fe := _focus_of(e, c)
+	said := _once(_for_cond_own(c, fe, object.get(_for_names, "ergo/subject", null)))
 	cause := _for_said_cause(said)
 	cause != "satisfied"
 }
@@ -350,15 +351,7 @@ _m_strip_line(l) := object.union(object.remove(l, _line_internal_keys), {"items"
 
 else := object.remove(l, _line_internal_keys)
 
-_for_message(check, subj, r) := _m_not_object(check, subj) if {
-	r.cause == "not_an_object"
-	r.failed == []
-}
-
-_for_message(check, subj, r) := _m_joined(_m_for_empty(object.union(check, {"items": object.get(r, "said_items", check.items)}), subj, r.cause)) if {
-	r.cause != "not_an_object"
-	r.failed == []
-}
+_for_message(check, subj, r) := _m_joined(_for_empty_texts(check, subj, r)) if r.failed == []
 
 _m_for_empty(check, subj, cause) := cs if {
 	ls := [t | some item in check.items; some t in _m_key_list_texts(subj, item.path, object.get(item, "if_any", false) == true)]
@@ -890,42 +883,50 @@ _for_said_by_root(x, roots) if {
 	x.text in roots
 }
 
-_for_item_clause(check, failed, k) := _m_clause("item", t, "ambiguous", t) if {
+_for_item_clause(check, failed, k) := _for_item_clause_at(check, failed, k, _for_items_walked(check))
+
+_for_item_clause_at(check, failed, k, walked) := _m_clause("item", t, "ambiguous", t) if {
 	failed[k].cause == "ambiguous"
 	not _m_nested_tie(failed[k])
 	not _m_earlier_tie(failed, k)
 	t := _m_tie(check, 0, failed)
+	_ = walked
 }
 
-_for_item_clause(check, failed, k) := _m_item_clause(f.said, "ambiguous", [_m_clause("item", t, "ambiguous", t)]) if {
+_for_item_clause_at(check, failed, k, walked) := _m_item_clause(f.said, "ambiguous", [_m_clause("item", t, "ambiguous", t)]) if {
 	f := failed[k]
 	f.cause == "ambiguous"
 	_m_nested_tie(f)
 	t := _m_tie(check, 1, f.failed_items)
+	_ = walked
 }
 
-_for_item_clause(check, failed, k) := c if {
+_for_item_clause_at(check, failed, k, walked) := c if {
 	failed[k].cause != "ambiguous"
-	c := _for_item_own(check, failed[k])
+	c := _for_item_own(check, failed[k], walked)
 }
 
-_for_item_own(check, f) := _for_whose_item_clause(check.items[0], e, _for_names, wh) if {
-	[e, _] := _for_item_walked(check, f)
+_for_item_own(check, f, walked) := _for_whose_item_clause(check.items[0], e, _for_names, wh) if {
+	e := walked.items[f.path]
 	wh := _for_whose(check.items[0], e, _for_names)
 	wh.undecided != []
+	object.get(check.items[0], "whose", []) != []
 }
 
-_for_item_own(check, f) := c if {
-	not _for_item_undecided(check, f)
-	c := _for_item_kept(check, f)
+_for_item_own(check, f, walked) := c if {
+	not _for_whose_undecided(check, f, walked)
+	c := _for_item_kept(check, f, walked)
 }
 
-_for_item_undecided(check, f) if {
-	[e, _] := _for_item_walked(check, f)
-	_for_whose(check.items[0], e, _for_names).undecided != []
+_for_whose_undecided(check, f, walked) if {
+	object.get(check.items[0], "whose", []) != []
+	_for_whose(check.items[0], walked.items[f.path], _for_names).undecided != []
 }
 
-_for_item_kept(check, f) := _m_clause("item", f.said, f.cause, concat("; ", _m_for_fail(_m_with_why(f)))) if _for_said_why(f)
+_for_item_kept(check, f, walked) := _m_clause("item", f.said, f.cause, concat("; ", _m_for_fail(_m_with_why(f)))) if {
+	_for_said_why(f)
+	_ = [check, walked]
+}
 
 else := _m_clause("item", f.said, "not_an_object", _m_isnt(object.get(f, "bare", f.said), object.get(f, "raw", f.value), "an object")) if {
 	f.cause == "not_an_object"
@@ -941,19 +942,19 @@ else := object.union(_m_item_clause(f.said, _worst_or_value({own[0]} | {x.cause 
 	count(check.items) == 1
 	own := _for_owned_text(f)
 	rest := [l | some l in array.slice(f.failed_assertions, 1, count(f.failed_assertions)); object.get(l, "own_msg", []) != f.failed_assertions[0].own_msg]
-	said := _for_item_sentences(check, object.union(f, {"failed_assertions": rest}), _for_item_bound(check, f))
+	said := _for_item_sentences(check, object.union(f, {"failed_assertions": rest}), _for_item_bound(check, f, walked))
 }
 
 else := _m_item_clause(f.said, _for_said_cause(said), said) if {
 	f.failed_assertions != []
 	count(check.items) == 1
-	said := _for_item_sentences(check, f, _for_item_bound(check, f))
+	said := _for_item_sentences(check, f, _for_item_bound(check, f, walked))
 	said != []
 }
 
 else := _m_item_clause(f.said, _for_said_cause(said), said) if {
 	count(check.items) == 2
-	said := _for_pairs_said(check, f, _for_item_bound(check, f))
+	said := _for_pairs_said(check, f, _for_item_bound(check, f, walked))
 	said != []
 }
 
@@ -1013,21 +1014,36 @@ _for_rider_parts(check, f, names) := [[i, cs] |
 
 _for_inner_at(check, w, x) := min({j | some j, e in w.items; _for_item_name(check, e.i) == x.path} | {count(w.items)})
 
-_for_item_walked(check, f) := [e, w] if {
+_for_items_walked(check) := {"w": w, "items": {_failed_name(e.i, d): e | some e in w.items}} if {
 	w := _for_walk(check.items[0], object.get(_for_names, "ergo/subject", null), _for_names)
-	some e in w.items
-	_failed_name(e.i, _for_dotted(check)) == f.path
+	d := _for_dotted(check)
 }
 
-_for_item_bound(check, f) := _bound(_for_names, check.items[0].as, e.v, _walk_at(w, e)) if [e, w] := _for_item_walked(check, f)
+_for_item_bound(check, f, walked) := _bound(_for_names, check.items[0].as, e.v, _walk_at(walked.w, e)) if e := walked.items[f.path]
 
-_for_item_sentences(check, f, names) := _for_in_list_order(_once([x |
-	some i, c in check.checks
-	_for_reads_an_alias(check, c)
-	some l in f.failed_assertions
-	l.assertion == check.assertions[i]
-	some x in _for_sentence_clauses(check, c, object.get(names, "ergo/subject", null), l.cause) with input as {"ergo/names": names}
-]))
+_for_item_sentences(check, f, names) := _for_in_list_order([x | some i, x in said; not _for_said_earlier(x, array.slice(said, 0, i))]) if {
+	said := _once([_for_whole_list(x) |
+		some i, c in check.checks
+		_for_reads_an_alias(check, c)
+		some l in f.failed_assertions
+		l.assertion == check.assertions[i]
+		some x in _for_sentence_clauses(check, c, object.get(names, "ergo/subject", null), l.cause) with input as {"ergo/names": names}
+	])
+}
+
+_for_whole_list(x) := object.union(x, {"kind": "list"}) if {
+	x.kind == "item"
+	x.said == []
+	is_string(x.name)
+	_walk_kind(x.name) == "list"
+} else := x
+
+_for_said_earlier(x, earlier) if {
+	x.kind != "item"
+	some e in earlier
+	e.kind != "item"
+	e.text == x.text
+}
 
 _for_in_list_order(said) := [_for_slot(said, sorted, i) | some i, _ in said] if {
 	items := [c | some c in said; c.kind == "item"]
@@ -1056,6 +1072,51 @@ _for_numbered(c) if {
 }
 
 _for_list_rank(lists, l) := [i | some i, x in lists; x == l][0]
+
+_for_row_clauses(check, subj, r) := array.concat(array.concat(p.free, p.items), p.lists) if p := _for_row_parts(check, subj, r)
+
+_for_row_parts(check, subj, r) := {"free": free, "items": items, "lists": array.concat(listed, line), "line": line} if {
+	free := _for_free_clauses(check, subj, r)
+	said := {t | some c in free; some t in _m_clause_lines(c)}
+	name := _input_name(check.items[0].path)
+	walked := _for_items_walked(check)
+	items := [x | some k, f in r.failed; f.path != name; x := _for_unrooted(_for_item_clause_at(check, r.failed, k, walked), said)]
+	listed := [object.union(_for_item_clause_at(check, r.failed, k, walked), {"kind": "list"}) | some k, f in r.failed; f.path == name]
+	line := [_m_clause("list", t, r.cause, t) | some t in _for_list_texts(check, subj, r)]
+}
+
+_for_free_clauses(check, subj, r) := [object.union(x, {"group": i - count(check.checks)}) |
+	some i, c in check.checks
+	not _for_reads_an_alias(check, c)
+	ls := array.concat([l | some f in r.failed; some l in object.get(f, "failed_assertions", []); l.assertion == check.assertions[i]], [l | some l in object.get(r, "free_lines", []); l.assertion == check.assertions[i]])
+	ls != []
+	some x in _for_sentence_clauses(check, c, subj, ls[0].cause)
+]
+
+_for_unrooted(c, said) := object.union(c, {"said": kept}) if {
+	kept := [x | some x in c.said; not _for_said_by_row(x, said)]
+	not _for_says_nothing(c.text, kept, said)
+}
+
+_for_says_nothing(text, [], said) if text in ({""} | said)
+
+_for_said_by_row(x, said) if {
+	x.said == []
+	x.text in said
+}
+
+_for_list_texts(check, subj, r) := [] if {
+	r.failed != []
+	_ = [check, subj]
+} else := _for_empty_texts(check, subj, r.unfreed) if "unfreed" in object.keys(r)
+
+else := [] if "free_lines" in object.keys(r)
+
+else := _for_empty_texts(check, subj, r)
+
+_for_empty_texts(check, subj, r) := [_m_not_object(check, subj)] if r.cause == "not_an_object"
+
+else := _m_for_empty(object.union(check, {"items": object.get(r, "said_items", check.items)}), subj, r.cause)
 
 _m_leaf_message(_, leaf, cause, _) := _m_root_alone(leaf, cause)
 
@@ -1357,7 +1418,21 @@ _m_applies(evals, req, false) := {"message": concat("; ", ms)} if {
 	ms != []
 } else := {"message": concat("", [_text(object.get(req, "subject", null)), " doesn't match"])}
 
-_for_said(raw) := object.union(object.remove(raw, ["ergo/for_raw"]), {"ergo/for_texts": _for_texts(s.check, s.subj, s.r, s.once, s.line)}) if s := raw["ergo/for_raw"]
+_for_said(raw) := object.union(object.remove(raw, ["ergo/for_raw"]), {
+	"message": _m_aliased(_m_clauses_text(_m_clauses_shown(tree))),
+	"cause": _worst_or_value({raw.cause} | {v.cause | walk(tree, [_, v]); is_object(v); "cause" in object.keys(v)}),
+	"ergo/for_texts": _for_texts(s.check, s.subj, s.r, _m_clause_texts(p.free), _m_clause_texts(p.line)),
+}) if {
+	s := raw["ergo/for_raw"]
+	s.tree == true
+	count(_m_for_said(s.check) | _m_for_tally_said(s.check)) == 0
+	p := _for_row_parts(s.check, s.subj, s.r)
+	tree := array.concat(array.concat(p.free, p.items), p.lists)
+} else := object.union(object.remove(raw, ["ergo/for_raw"]), {"message": said.message, "ergo/for_texts": _for_texts(s.check, s.subj, s.r, said.once, said.line)}) if {
+	s := raw["ergo/for_raw"]
+	s.tree == true
+	said := _for_row_text(s.check, s.subj, s.r)
+} else := object.union(object.remove(raw, ["ergo/for_raw"]), {"ergo/for_texts": _for_texts(s.check, s.subj, s.r, s.once, s.line)}) if s := raw["ergo/for_raw"]
 
 else := raw
 

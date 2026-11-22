@@ -84,6 +84,8 @@ jobs:
         run: .github/matrix/for_test.sh
       - name: Check the script that compares the pull request body with the report facts
         run: .github/body-facts_test.sh
+      - name: Check the script that reports how far the engines are from the spec
+        run: .github/sync-facts_test.sh
       - name: Check the script that counts the places that cut a message as text
         run: .github/message-cuts_test.sh
       - name: Check that engine code cuts no more messages as text than the base branch
@@ -295,6 +297,10 @@ jobs:
         env:
           BASE: origin/${{ github.base_ref }}
         run: .github/pr-facts.sh "$BASE" >> "$GITHUB_STEP_SUMMARY"
+      - name: Write how far the engines are from the spec in the job summary
+        env:
+          BASE: origin/${{ github.base_ref }}
+        run: .github/sync-facts.sh "$BASE" >> "$GITHUB_STEP_SUMMARY"
 
   pairs-facts:
     if: github.event_name == 'pull_request'

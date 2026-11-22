@@ -26,7 +26,7 @@ for name in pip python; do
 done
 export ERGO_CHECKS_VENV="$dir/venv"
 
-for name in build-ergo build-ergo_test dump-diff_test pr-facts_test pairs-facts_test property-check_test body-facts_test matrix-facts_test mutants-facts_test clean-worktrees_test red-check_test no-array-data no-array-data_test message-cuts message-cuts_test rules_test gitattributes_test docs-run docs-run_test docs-run-release_test no-inline-tests no-inline-tests_test rego-folders rego-folders_test rego-layers_test spec-placeholder spec-placeholder_test; do
+for name in build-ergo build-ergo_test dump-diff_test pr-facts_test pairs-facts_test property-check_test sync-facts_test body-facts_test matrix-facts_test mutants-facts_test clean-worktrees_test red-check_test no-array-data no-array-data_test message-cuts message-cuts_test rules_test gitattributes_test docs-run docs-run_test docs-run-release_test no-inline-tests no-inline-tests_test rego-folders rego-folders_test rego-layers_test spec-placeholder spec-placeholder_test; do
   printf '#!/bin/sh\n[ ! -e "%s/fail-%s" ]\n' "$dir" "$name" > "$repo/.github/$name.sh"
   chmod +x "$repo/.github/$name.sh"
 done
