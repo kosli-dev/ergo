@@ -2093,6 +2093,26 @@ fn row_on(sentence: &str, subject: Value, input: Value, params: Value) -> Run {
 }
 
 #[test]
+fn an_empty_walked_list_after_is_in_ignoring_case_fails_every_item_as_value_as_without_the_words() {
+    for sentence in [
+        "every xs.v is in $input.cs.name ignoring case",
+        "every xs.v is in $input.cs.name",
+    ] {
+        let out = row_on(
+            sentence,
+            json!({"xs": [{"v": "a"}, {"v": 3}, {}]}),
+            json!({"cs": []}),
+            json!({}),
+        );
+        assert_eq!(
+            (out.verdict.cause, out.message.as_deref()),
+            (Cause::Value, Some("$input.cs is []")),
+            "{sentence}"
+        );
+    }
+}
+
+#[test]
 fn a_walked_list_after_is_in_ignoring_case_it_cant_use_is_said_even_when_an_item_fails_on_its_own()
  {
     for (sentence, xs, cs, cause, message) in [

@@ -1305,6 +1305,28 @@ fn in_ignoring_case_takes_the_worst_cause_of_a_walked_list_with_a_null_and_an_it
 }
 
 #[test]
+fn in_ignoring_case_fails_as_value_on_an_empty_walked_list_whatever_the_field_holds() {
+    let Check::In(check) = lowered_check("x is in $input.cs.name ignoring case") else {
+        panic!("not in");
+    };
+    for subject in [
+        json!({}),
+        json!({"x": null}),
+        json!({"x": 3}),
+        json!({"x": "a"}),
+    ] {
+        assert_eq!(
+            on_input(subject.clone(), json!([]), json!({}), |ctx| run_in(
+                &check, ctx
+            ))
+            .cause,
+            Cause::Value,
+            "{subject}"
+        );
+    }
+}
+
+#[test]
 fn in_ignoring_case_says_a_list_from_the_params_that_isnt_a_list() {
     let Check::In(check) = lowered_check("x is in $params.n ignoring case") else {
         panic!("not in");
