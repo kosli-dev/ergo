@@ -1939,9 +1939,8 @@ impl For {
         let mut clauses = super::message::listed_root_clauses(&whose, &outer, true);
         clauses.extend(super::message::walked_root_clauses(&whose, &outer));
         for key in self.items.iter().flat_map(|item| sort_keys(&item.how)) {
-            if let Some((outcome, text, input)) = super::key_base::key_flaw(key, &outer) {
-                let cause = outcome.cause().unwrap_or(Cause::Unusable);
-                clauses.push(Clause::root(&input.name, cause, text));
+            if let Some((name, cause, text)) = sort_key_flaw(key, &outer) {
+                clauses.push(Clause::root(&name, cause, text));
             }
         }
         if let Some(first) = self.items.first()
@@ -2802,11 +2801,15 @@ impl For {
             _ => None,
         })?;
         let outer = outer_ctx(ctx);
-        if !keys
+        let flaws: Vec<(String, Cause, String)> = keys
             .into_iter()
-            .any(|key| super::key_base::key_flaw(key, &outer).is_some())
-        {
+            .filter_map(|key| sort_key_flaw(key, &outer))
+            .collect();
+        if flaws.is_empty() {
             return None;
+        }
+        if flaws.iter().any(|(name, _, _)| name == "$params") {
+            return Some(None);
         }
         if !item.is_object() {
             let text = super::message::isnt(dead.shown(), item, "an object");
@@ -3305,6 +3308,18 @@ fn unrooted(clause: Clause, roots: &[&str]) -> Option<Clause> {
     let bare = clause.kind == super::clause::Kind::Item && clause.text.is_empty();
     let empty = said.is_empty() && (rooted || bare);
     (!empty).then_some(Clause { said, ..clause })
+}
+
+fn sort_key_flaw(key: &Path, ctx: &Ctx) -> Option<(String, Cause, String)> {
+    if key.start == Start::Params
+        && let Some(params) = ctx.params.filter(|p| !p.is_object() && !p.is_null())
+    {
+        let text = super::message::params_break(key, params, ctx)
+            .unwrap_or_else(|| super::message::isnt("$params", params, "an object"));
+        return Some(("$params".to_string(), Cause::Unusable, text));
+    }
+    let (outcome, text, input) = super::key_base::key_flaw(key, ctx)?;
+    Some((input.name, outcome.cause().unwrap_or(Cause::Unusable), text))
 }
 
 fn sort_keys(how: &How) -> Vec<&Path> {
