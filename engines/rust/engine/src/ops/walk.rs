@@ -1638,20 +1638,56 @@ fn with_fields(inputs: &mut Vec<Input>, list: &str, path: &Path, ctx: &Ctx) {
     }
 }
 
-/// How reading a walked list ended, from the failure that names the list
-/// itself when it has no items.
-pub fn list_state(walked: &Walked) -> crate::path::Outcome {
-    walked
+/// `Unusable` when a walk with no list along its path gives no item because
+/// the path reads a value that can't be walked, and `None` otherwise.
+pub fn stopped_state(walked: &Walked, path: &Path, ctx: &Ctx) -> Option<Outcome> {
+    if !walked.items.is_empty()
+        || walked.failures.is_empty()
+        || walked.walked.iter().any(|at| *at != walked.steps)
+    {
+        return None;
+    }
+    let read = path::read(&member::split(path).0, ctx);
+    (read.outcome == Outcome::Found && read.value.is_some()).then_some(Outcome::Unusable)
+}
+
+fn worst_stop(walked: &Walked) -> Option<Outcome> {
+    if walked
         .failures
         .iter()
-        .find(|f| walked.items.is_empty() && !crate::parts::is_item(&f.item))
-        .map_or(crate::path::Outcome::Found, |f| match f.cause {
-            Cause::Absent => crate::path::Outcome::Absent,
-            Cause::Null => crate::path::Outcome::Null,
-            Cause::Unusable => crate::path::Outcome::Unusable,
-            Cause::NotAnObject => crate::path::Outcome::NotAnObject,
-            _ => crate::path::Outcome::Found,
-        })
+        .any(|f| f.cause == Cause::Value && !crate::parts::is_item(&f.item))
+    {
+        return None;
+    }
+    let worst = Cause::worst(
+        walked
+            .failures
+            .iter()
+            .filter(|f| !crate::parts::is_item(&f.item))
+            .map(|f| f.cause)
+            .filter(|cause| {
+                matches!(
+                    cause,
+                    Cause::Absent | Cause::Null | Cause::Unusable | Cause::NotAnObject
+                )
+            }),
+    )?;
+    Some(match worst {
+        Cause::Absent => Outcome::Absent,
+        Cause::Null => Outcome::Null,
+        Cause::NotAnObject => Outcome::NotAnObject,
+        _ => Outcome::Unusable,
+    })
+}
+
+/// How reading a walked list ended when it has no items: the worst of the
+/// ways the reads of the list itself stopped, whatever their order, or
+/// `Found` when one of its ends is empty.
+pub fn list_state(walked: &Walked) -> Outcome {
+    if !walked.items.is_empty() {
+        return Outcome::Found;
+    }
+    worst_stop(walked).unwrap_or(Outcome::Found)
 }
 
 fn read_row(walk: &Walk, ctx: &Ctx) -> Run {

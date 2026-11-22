@@ -1815,8 +1815,11 @@ pub(crate) fn merge_inputs(mut inputs: Vec<Input>) -> Vec<Input> {
             })
             .then_with(|| a.locations.cmp(&b.locations))
     });
-    inputs.dedup();
-    inputs
+    let mut merged = Vec::new();
+    for input in inputs {
+        ops::push_read(&mut merged, input);
+    }
+    merged
 }
 
 fn merged_inputs(inputs: Vec<Input>) -> Vec<Value> {

@@ -2360,3 +2360,29 @@ fn ids_of_any_other_value_are_ids() {
     );
     assert_eq!(row["passed"], json!(true));
 }
+
+#[test]
+fn reads_of_the_same_value_from_two_checks_merge_into_one_input_with_the_worst_outcome() {
+    use crate::ops::Input;
+    use crate::path::Outcome;
+    let read = |state| Input {
+        name: "m".to_string(),
+        value: json!([]),
+        locations: Vec::new(),
+        part: None,
+        state,
+        null_at: None,
+        worked: false,
+    };
+    for inputs in [
+        vec![read(Outcome::Found), read(Outcome::Unusable)],
+        vec![read(Outcome::Unusable), read(Outcome::Found)],
+        vec![
+            read(Outcome::Absent),
+            read(Outcome::Found),
+            read(Outcome::Unusable),
+        ],
+    ] {
+        assert_eq!(super::merge_inputs(inputs), [read(Outcome::Unusable)]);
+    }
+}

@@ -1175,7 +1175,7 @@ _subject_keyed_step(seg) if {
 
 _for_inner_pairs(check, _, _, _, _) := set() if count(check.items) == 1
 
-_for_inner_pairs(check, subj, names, item, w) := {_for_inner_stopped(check, [_for_list_name(check, check.items[1].path, walked), values, locations])} if {
+_for_inner_pairs(check, subj, names, item, w) := {_for_inner_stopped(check, _for_inner_read([_for_list_name(check, check.items[1].path, walked), values, locations], inner))} if {
 	count(check.items) == 2
 	_for_from_first(check)
 	dropped := _for_dropped(item, names, w)
@@ -1198,6 +1198,21 @@ _for_inner_pairs(check, subj, names, item, w) := {object.get(iw, "input", _for_i
 	w.items != []
 	dropped := _for_dropped(item, names, w)
 	inner := [_for_walk(check.items[1], subj, _bound(names, item.as, e.v, _walk_at(w, e))) | some i, e in w.items; not i in dropped]
+}
+
+_for_inner_read(t, inner) := array.concat(t, [_worst_of({s | some s in stops})]) if {
+	t[1] == []
+	stops := [s | some iw in inner; s := _for_inner_end_stop(iw)]
+	count(stops) == count(inner)
+	stops != []
+} else := t
+
+_for_inner_end_stop(iw) := _stopped_list_outcome(iw.items, fails) if {
+	object.get(iw, "members", false) == true
+	fails := array.concat(iw.fails, _walk_stop(iw))
+	every f in fails {
+		object.get(f, "msg", "") == "an object"
+	}
 }
 
 _for_inner_stopped(check, t) := [t[0], [], [], s] if {

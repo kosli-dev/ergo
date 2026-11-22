@@ -26,6 +26,32 @@ pub fn push_new<T: PartialEq>(list: &mut Vec<T>, item: T) {
     }
 }
 
+/// Adds `input` to the end of `list`, or, when `list` already holds a read
+/// with the same name, value, part and locations, keeps that one entry with
+/// the worse of the two outcomes.
+pub fn push_read(list: &mut Vec<Input>, input: Input) {
+    let same = list.iter_mut().find(|kept| {
+        kept.name == input.name
+            && kept.value == input.value
+            && kept.part == input.part
+            && kept.locations == input.locations
+            && kept.worked == input.worked
+    });
+    match same {
+        Some(kept) => {
+            let worse = match (input.state.cause(), kept.state.cause()) {
+                (Some(new), Some(old)) => new < old,
+                (Some(_), None) => true,
+                _ => false,
+            };
+            if worse {
+                *kept = input;
+            }
+        }
+        None => list.push(input),
+    }
+}
+
 #[derive(Debug, Clone, PartialEq)]
 pub struct Part {
     pub name: String,

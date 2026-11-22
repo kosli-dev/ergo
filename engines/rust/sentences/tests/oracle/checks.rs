@@ -17,6 +17,25 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    ("count of m is 1", "count of m is 1", &[], &[]),
+    (
+        "count of member of m is 1",
+        "count of member of m is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of member of m plus count of m is 1",
+        "count of member of m plus count of m is 1",
+        &[],
+        &[],
+    ),
+    (
+        "every rs.m, if any, is 1",
+        "every rs.m, if any, is 1",
+        &[],
+        &[],
+    ),
     (
         "every member of statuses is \"DONE\"",
         "every member of statuses is \"DONE\"",
