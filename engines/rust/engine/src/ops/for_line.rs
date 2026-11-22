@@ -2003,7 +2003,10 @@ impl For {
             let root = clause.name.as_str();
             if let Some((at, _)) = free.iter().find(|(_, names)| {
                 names.iter().any(|name| {
-                    name == root || name.strip_prefix(root).is_some_and(|rest| rest.starts_with('.'))
+                    name == root
+                        || name
+                            .strip_prefix(root)
+                            .is_some_and(|rest| rest.starts_with('.'))
                 })
             }) {
                 clause.group = clause.group.min(*at);

@@ -4305,7 +4305,10 @@ fn an_item_a_second_lines_whose_cant_decide_is_said_beside_what_else_fails() {
 fn a_sort_key_from_params_that_arent_an_object_says_only_the_params_once() {
     for (assertion, message) in [
         ("x.v exists", "$params is 3, which isn't an object"),
-        ("w exists", "w is missing; $params is 3, which isn't an object"),
+        (
+            "w exists",
+            "w is missing; $params is 3, which isn't an object",
+        ),
     ] {
         assert_eq!(
             for_row(
