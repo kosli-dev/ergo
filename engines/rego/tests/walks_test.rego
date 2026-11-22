@@ -2213,3 +2213,12 @@ test_an_item_that_fails_on_its_own_field_keeps_a_whose_key_that_isnt_text_in_eac
 	_key_rows(checks, {"es": [{"v": 1}, {"v": 2}]}, {"k": 3}) == {c: ["unusable", said] | some c in ["every", "some", "for"]}
 	_key_rows({"every": checks.every}, {"es": [{"v": 2}, {"zz": 2, "m": null}]}, {"k": null}) == {"every": ["absent", "item 1 of es: zz is missing; $params.k is null"]}
 }
+
+test_a_walk_among_several_assertions_says_a_missing_subject_field_once_on_its_assertion_with_no_item if {
+	things := {"things": [{"id": "t1", "xs": [{"k": 5}, {"k": 6}]}]}
+	rows := _walk_rows({"lines": {"assert": ["xs exists", "every xs.k is lo"]}, "one": "every xs.k is lo"}, things, {})
+	[[r[1], e.kind, e.message, [i.name | some i in e.inputs], e.failures] | some r in rows; some e in r[3]] == [
+		["lines", "assertion", "lo is missing", ["lo"], []],
+		["one", "assertion", "lo is missing", ["lo"], []],
+	]
+}

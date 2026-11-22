@@ -523,13 +523,21 @@ else := concat("; ", [c |
 
 _and_more(q) if regex.match(`^and [0-9]+ more$`, q)
 
+_tally_own_read(i, c, _, _) if {
+	contains(i.name, "[]")
+	some side in _m_tally_parts(c)
+	p := side[_basic_form(side)]
+	is_array(p)
+	_walked_path_read({"name": _m_aliased(i.name)}, _m_aliased(_input_name(p)))
+}
+
 _tally_own_read(i, c, _, items) if {
 	items != []
 	some side in _m_tally_parts(c)
 	not side.member
 	p := side[_basic_form(side)]
 	is_array(p)
-	_m_aliased(i.name) == concat("", [_m_aliased(_input_name(p)), "[]"])
+	_m_aliased(i.name) == _m_aliased(_input_name(p))
 }
 
 _tally_own_read(i, c, _, _) if {
@@ -714,13 +722,21 @@ _row_failures(row, at, where, _) := [_tallied_entry(
 	some k, fa in row.failed_assertions
 ] if _all_of_run(where.check)
 
+_scoped_walk_outcome(c, req, subj, op) := o if {
+	op != "for"
+	_scoped(req)
+	s := _scope_of(req, subj)
+	r := _keyed_rooted(_for_said(_check_outcome(c, subj, "")), c, subj) with input as s
+	o := object.union(r, {"inputs": _tagged(r.inputs, c, req, subj)}) with input as s
+} else := _keyed_rooted(_for_said(_check_outcome(c, subj, "")), c, subj)
+
 _tallied_entry(e, c, o, at, where, row) := object.union(e, {"inputs": x.inputs, "failures": x.failures, "message": x.message}) if {
 	_walks(c)
 	c.op != "for"
 	_ = o
-	raw := _check_outcome(c, row["ergo/subj"], "")
+	raw := _scoped_walk_outcome(c, row["ergo/req"], row["ergo/subj"], where.check.op)
 	raw.passed == false
-	wrow := object.union(_anchored(_keyed_rooted(_for_said(raw), c, row["ergo/subj"]), at), {"ergo/subj": row["ergo/subj"], "ergo/req": row["ergo/req"]})
+	wrow := object.union(_anchored(raw, at), {"ergo/subj": row["ergo/subj"], "ergo/req": row["ergo/req"]})
 	x := _walk_assertion_entry(wrow, at, object.union(where, {"check": object.union(c, {"expression": e.name}), "ats": {"": e.locations}}), _with_outcomes(wrow.inputs))
 } else := object.union(e, {"inputs": [i | some i in e.inputs; not i.name in names; not _item_input(i, lists); not _tally_own_read(i, c, names, items)], "failures": array.concat(ls, items), "message": _tally_rest_of(e.message, names, texts)}) if {
 	not _walks(c)
@@ -735,8 +751,8 @@ _tallied_entry(e, c, o, at, where, row) := object.union(e, {"inputs": x.inputs, 
 	count(names) + count(items) > 0
 } else := object.union(e, {"inputs": [i | some i in e.inputs; not _item_input(i, lists); not _tally_own_read(i, c, set(), [])]}) if {
 	not _walks(c)
+	count(_m_tally_parts(c)) > 0
 	lists := _tally_list_names(c)
-	count(lists) > 0
 }
 
 else := e
@@ -1306,9 +1322,30 @@ _said_outcomes(row) := row if row.passed == true
 else := _said_outcomes_of(_unled_dropped(row))
 
 _said_outcomes_of(row) := object.union(row, {
-	"inputs": _said_unusable(row.inputs, row.message),
-	"failures": [_said_entry(e) | some e in row.failures],
-})
+	"inputs": [_unfit_on_entry(i, unfit) | some i in _said_unusable(row.inputs, row.message)],
+	"failures": fs,
+}) if {
+	fs := [_said_entry(e) | some e in row.failures]
+	unfit := _entries_unfit(fs)
+}
+
+_entries_unfit(entries) := {[i.name, i.value, i.locations] |
+	some e in entries
+	some a in _entry_assertions(e)
+	some i in a.inputs
+	i.outcome == "unusable"
+}
+
+_entry_assertions(e) := [e] if e.kind == "assertion"
+
+else := [a | some a in e.failures; a.kind == "assertion"] if e.kind == "option"
+
+else := []
+
+_unfit_on_entry(i, unfit) := object.union(i, {"outcome": "unusable"}) if {
+	i.outcome == "usable"
+	[i.name, i.value, i.locations] in unfit
+} else := i
 
 _unled_dropped(row) := object.union(row, {
 	"message": concat("; ", [x | some x in ps; not endswith(x, ": ")]),

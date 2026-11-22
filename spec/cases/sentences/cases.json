@@ -62666,18 +62666,6 @@
                   },
                   {
                     "locations": [
-                      "/things/0/m/k/0",
-                      "/things/0/m/k/1"
-                    ],
-                    "name": "m named by p[]",
-                    "outcome": "usable",
-                    "value": [
-                      1,
-                      2
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/things/0/p"
                     ],
                     "name": "p",
@@ -62844,18 +62832,6 @@
                     ],
                     "name": "sum of m named by p",
                     "value": 3
-                  },
-                  {
-                    "locations": [
-                      "/things/0/m/k/0",
-                      "/things/0/m/k/1"
-                    ],
-                    "name": "m named by p[]",
-                    "outcome": "usable",
-                    "value": [
-                      1,
-                      2
-                    ]
                   },
                   {
                     "locations": [
@@ -64397,6 +64373,134 @@
             "requirement": "s",
             "subject": {
               "id": "t4",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a count of and a sum of a list read with named by a key from $params",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "count of o named by $params.k whose k is 1 is 3", "b": "sum of m named by $params.k is 9"}}}},
+    "params": {"k": "x"},
+    "cases": [
+      {
+        "description": "doesn't list the walked list in the assertion when it reads fine",
+        "rules": ["row.parts", "tally.inputs"],
+        "input": {"things": [{"id": "t1", "o": {"x": [{"k": 1}, {"k": 2}]}, "m": {"x": [1, 2]}}]},
+        "results": [
+          {
+            "cause": "value",
+            "check": "a",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/o/x/0",
+                      "/things/0/o/x/1"
+                    ],
+                    "name": "count of o named by $params.k whose k is 1",
+                    "value": 1
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/a"
+                ],
+                "message": "count of o named by $params.k whose k is 1 is 1",
+                "name": "count of o named by $params.k whose k is 1 is 3"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/o/x/0",
+                  "/things/0/o/x/1"
+                ],
+                "name": "count of o named by $params.k whose k is 1",
+                "value": 1
+              },
+              {
+                "locations": [
+                  "/things/0/o/x/0",
+                  "/things/0/o/x/1"
+                ],
+                "name": "o named by $params.k[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "k": 1
+                  },
+                  {
+                    "k": 2
+                  }
+                ]
+              }
+            ],
+            "message": "count of o named by $params.k whose k is 1 is 1",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "b",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/m/x/0",
+                      "/things/0/m/x/1"
+                    ],
+                    "name": "sum of m named by $params.k",
+                    "value": 3
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/b"
+                ],
+                "message": "sum of m named by $params.k is 3",
+                "name": "sum of m named by $params.k is 9"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/m/x/0",
+                  "/things/0/m/x/1"
+                ],
+                "name": "sum of m named by $params.k",
+                "value": 3
+              },
+              {
+                "locations": [
+                  "/things/0/m/x/0",
+                  "/things/0/m/x/1"
+                ],
+                "name": "m named by $params.k[]",
+                "outcome": "usable",
+                "value": [
+                  1,
+                  2
+                ]
+              }
+            ],
+            "message": "sum of m named by $params.k is 3",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
               "type": "thing"
             }
           }
@@ -66657,7 +66761,7 @@
               {
                 "locations": [],
                 "name": "m named by p",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               },
               {

@@ -2441,3 +2441,46 @@ fn a_root_compared_ignoring_case_stands_in_as_text_so_each_item_is_read_on_its_o
     assert!(alone.ignoring.is_some());
     assert!(without_roots(&lowered("v is $input.r")).is_none());
 }
+
+#[test]
+fn a_count_or_a_sum_fails_an_item_whose_path_meets_null_before_its_end_as_null_naming_that_step() {
+    for sentence in [
+        "count of items.m.n is 3",
+        "sum of items.m.n is 3",
+        "count of items.m.n.o is 3",
+    ] {
+        assert_eq!(
+            cause(sentence, json!({"items": [{"m": null}]})),
+            Cause::Null,
+            "{sentence}"
+        );
+        assert_eq!(
+            kinds_causes_and_texts(&tally_clauses(sentence, json!([{"m": null}]), json!({}))),
+            [item_said(Cause::Null, "item 1 of items: m is null")],
+            "{sentence}"
+        );
+    }
+}
+
+#[test]
+fn a_count_or_a_sum_still_says_a_missing_step_as_missing_beside_one_that_is_null() {
+    for sentence in ["count of items.m.n is 3", "sum of items.m.n is 3"] {
+        assert_eq!(
+            cause(sentence, json!({"items": [{}, {"m": null}]})),
+            Cause::Absent,
+            "{sentence}"
+        );
+        assert_eq!(
+            kinds_causes_and_texts(&tally_clauses(
+                sentence,
+                json!([{}, {"m": null}]),
+                json!({})
+            )),
+            [
+                item_said(Cause::Absent, "item 1 of items: m.n is missing"),
+                item_said(Cause::Null, "item 2 of items: m is null"),
+            ],
+            "{sentence}"
+        );
+    }
+}

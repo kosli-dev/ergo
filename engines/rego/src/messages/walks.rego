@@ -878,6 +878,13 @@ _m_tally_item(_, e, roots) := [["not_an_object", _m_isnt(_m_item_name(e.i, roots
 _m_tally_item(_, e, roots) := [["absent", concat("", [_m_item_name(e.c, roots), " is missing"])]] if {
 	e.v == _absent
 	is_object(e.iv)
+	not _tally_null_step(e)
+}
+
+_m_tally_item(_, e, roots) := [["null", concat("", [_m_item_name(array.slice(e.c, 0, (count(e.c) - count(e.r)) + j), roots), " is null"])]] if {
+	e.v == _absent
+	is_object(e.iv)
+	j := _tally_null_step(e)
 }
 
 _m_tally_item(_, e, roots) := [["unusable", _m_leaf_in(e.i, c, roots)] | some c in _m_parent_clause(e.iv, {"op": "present", "path": e.r}, _input_name(e.r))] if {
