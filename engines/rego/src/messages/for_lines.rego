@@ -1083,17 +1083,25 @@ _for_list_rank(lists, l) := [i | some i, x in lists; x == l][0]
 _for_row_clauses(check, subj, r) := array.concat(array.concat(array.concat(p.roots, p.free), p.items), p.lists) if p := _for_row_parts(check, subj, r)
 
 _for_row_parts(check, subj, r) := {"roots": roots, "free": free, "items": items, "lists": array.concat(listed, line), "line": line} if {
-	roots := [_for_root_item(c) | some c in _for_row_roots(check, subj, r); not _for_subject_root(c, subj, r)]
+	ssaid := _for_row_said(check, subj, r)
+	roots := [_for_root_item(c) | some c in _for_row_roots(check, subj, r, ssaid); not _for_subject_root(c, subj, r)]
 	rooted := {c.text | some c in roots}
-	sroots := {i: _for_sentence_roots(check, check.checks[i], subj) | some i in _for_failed_sentences(check, r)}
+	sroots := {i: {x[1] | some x in xs} | some i, xs in ssaid}
 	free := [x | some c in _for_free_clauses(check, subj, r, sroots); x := _for_free_unrooted(c, rooted)]
 	said := {t | some c in array.concat(roots, free); some t in _m_clause_lines(c)}
 	name := _input_name(check.items[0].path)
-	walked := object.union(_for_walked_items(check), {"roots": sroots})
 	after := (3 * count(check.checks)) + 2
-	items := [object.union(x, {"group": after}) | some k, f in r.failed; f.path != name; x := _for_unrooted(_for_item_clause_at(check, r.failed, k, walked), said)]
-	listed := [object.union(_for_item_clause_at(check, r.failed, k, walked), {"kind": "list", "group": after}) | some k, f in r.failed; f.path == name]
+	failed := _for_failed_clauses(check, r, sroots)
+	items := [object.union(x, {"group": after}) | some [k, c] in failed; r.failed[k].path != name; x := _for_unrooted(c, said)]
+	listed := [object.union(c, {"kind": "list", "group": after}) | some [k, c] in failed; r.failed[k].path == name]
 	line := [object.union(_m_clause("list", t, r.cause, t), {"group": after}) | some t in _for_list_texts(check, subj, r)]
+}
+
+_for_failed_clauses(check, r, roots) := [] if {
+	r.failed == []
+	_ = [check, roots]
+} else := [[k, _for_item_clause_at(check, r.failed, k, walked)] | some k, _ in r.failed] if {
+	walked := object.union(_for_walked_items(check), {"roots": roots})
 }
 
 _for_failed_sentences(check, r) := {i |
@@ -1115,14 +1123,24 @@ _for_free_clauses(check, subj, r, roots) := [object.union(x, {"group": i}) |
 	some x in _for_rooted_clauses(check, c, subj, ls[0].cause, roots[i])
 ]
 
-_for_row_roots(check, subj, r) := _for_root_clauses(check, subj) if {
+_for_row_said(check, subj, r) := {i: _walk_root_said(_for_one_sentence(check, c), subj) | some i, c in check.checks} if _for_row_rooted(r, subj)
+
+else := {i: _walk_root_said(_for_one_sentence(check, check.checks[i]), subj) | some i in _for_failed_sentences(check, r)}
+
+_for_row_roots(check, subj, r, said) := _for_roots_of(check, subj, [said[i] | some i, _ in check.checks]) if _for_row_rooted(r, subj)
+
+else := []
+
+_for_row_rooted(r, _) if {
 	some k in ["root_msgs", "other_roots"]
 	k in object.keys(r)
-} else := _for_root_clauses(check, subj) if {
+}
+
+_for_row_rooted(r, subj) if {
 	r.cause == "not_an_object"
 	r.failed == []
 	not is_object(subj)
-} else := []
+}
 
 _for_root_item(c) := object.union(c, {"kind": "item"}) if _walk_kind(c.text) == "item"
 
