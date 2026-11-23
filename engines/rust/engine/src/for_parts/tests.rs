@@ -367,6 +367,26 @@ fn what_a_sentence_says_of_an_item_whose_second_list_fails_stays_in_an_entry_bes
 }
 
 #[test]
+fn what_a_sentence_says_of_an_item_whose_shared_second_list_fails_stays_in_an_entry_beside_other_sentences()
+ {
+    let said = entries(
+        "every ws as w, every ys whose n is in $params.z as x",
+        json!(["z is 1", "w.v is at least $params.min"]),
+        json!({"z": 2, "ws": [{"v": 1}, {"v": "a"}, {}], "ys": [{"n": 1}]}),
+        json!({"min": 1}),
+    );
+    assert!(
+        said.iter()
+            .any(|entry| entry.contains("which isn't a number")),
+        "{said:#?}"
+    );
+    assert!(
+        said.iter().any(|entry| entry.contains("w.v is missing")),
+        "{said:#?}"
+    );
+}
+
+#[test]
 fn what_a_walk_says_of_an_item_whose_sorted_second_list_fails_stays_in_an_entry_beside_a_root_it_cant_read()
  {
     let said = entries(
