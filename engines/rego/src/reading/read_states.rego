@@ -548,10 +548,11 @@ _text_ref_state(r) := _text_walk_state(null, r) if {
 }
 
 _text_walk_state(x, p) := _worst_of(states) if {
-	w := _rwalk(x, p)
-	states := {w.state | w.failed} | {"unusable" | _text_items_state(w.value) == "unusable"}
+	states := _text_walk_states(x, p)
 	count(states) > 0
 }
+
+_text_walk_states(x, p) := {w.state | w.failed} | {"unusable" | _text_items_state(w.value) == "unusable"} if w := _rwalk(x, p)
 
 _list_text_state(r) := "unusable" if not is_array(r)
 

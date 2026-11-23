@@ -298,6 +298,19 @@ default _list_flaw(_, _) := set()
 
 _list_flaw(leaf, x) := {_lstate(leaf, x)} if {
 	_list_cmp(leaf)
+	not _text_walk_failed(leaf, x)
+	_lstate(leaf, x) != "value"
+}
+
+_list_flaw(leaf, x) := _text_walk_states(x, _rpath(leaf.right)) | _text_side_states(leaf.left, x) if {
+	_list_cmp(leaf)
+	_text_walk_failed(leaf, x)
+}
+
+_text_walk_failed(leaf, x) if {
+	leaf.ignoring
+	leaf.cmp in _membership_ops
+	_lfailed(leaf, x)
 	_lstate(leaf, x) != "value"
 }
 
