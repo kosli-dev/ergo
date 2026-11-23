@@ -61,10 +61,10 @@ Type 2 cases:
 ## ergo.rego: known_differences rows: 13
 
 - type 1 (verdict differs): 0
-- type 2 (a row's cause differs): 0
-- type 3 (anything else): 13
+- type 2 (a row's cause differs): 1
+- type 3 (anything else): 12
 - by family (type 1 / type 2 / type 3):
-  - derived: 0 / 0 / 8
+  - derived: 0 / 1 / 7
 
 Type 2 cases:
 
@@ -110,7 +110,7 @@ Nightly run: failure
 | Compared                           | Known, or cells that differ of all | Type 1 | Type 2 | Type 3 |
 | ---------------------------------- | ---------------------------------- | ------ | ------ | ------ |
 | Rust engine against the cases      | 579                                | 0      | 9      | 570    |
-| ergo.rego against the cases        | 13                                 | 0      | 0      | 13     |
+| ergo.rego against the cases        | 13                                 | 0      | 1      | 12     |
 | Engine against engine, grid        | 2919 of 5440                       | 2      | 204    | 2713   |
 | Engine against engine, fixed pairs | 210 of 307                         | 0      | 50     | 160    |
 
