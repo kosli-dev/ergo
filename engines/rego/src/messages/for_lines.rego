@@ -130,7 +130,7 @@ _for_whose_own(item, e) := clauses[0] if {
 	is_object(e.iv)
 	clauses := [x |
 		some c in item.whose
-		not _for_focus_cause(c, e) in _not_failing_causes
+		_for_focus_cause(c, e) != "satisfied"
 		x := _for_cond_clause(c, e)
 	]
 }
