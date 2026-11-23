@@ -107,7 +107,25 @@ _m_clause_texts(clauses) := [t | some c in clauses; some t in _m_clause_lines(c)
 
 _m_clauses_shown(clauses) := _m_clauses_cut(_m_clauses_order(clauses))
 
-_m_clauses_order(clauses) := array.concat(array.concat(_m_clauses_ahead(once), [c | some c in once; c.kind == "item"]), [c | some c in once; c.kind == "more"]) if once := _once(clauses)
+_m_clauses_order(clauses) := [c | some i, c in sorted; not _m_said_before(c, array.slice(sorted, 0, i))] if {
+	sorted := [x[5] | some x in sort([_m_clause_place(i, c) | some i, c in _once(clauses)])]
+}
+
+_m_clause_place(i, c) := [object.get(c, "group", 0), 0, object.get(_m_clause_ranks, c.cause, 6), c.name, c.text, c] if {
+	c.kind == "root"
+	_ = i
+}
+
+else := [object.get(c, "group", 0), object.get(_m_clause_kind_ranks, c.kind, 3), 0, "", i, c]
+
+_m_clause_kind_ranks := {"list": 1, "item": 2}
+
+_m_said_before(c, earlier) if {
+	c.kind in {"root", "list"}
+	some e in earlier
+	e.kind in {"root", "list"}
+	e.text == c.text
+}
 
 _m_walk_said(clauses, items) := {
 	"message": concat("; ", ts),
@@ -132,14 +150,16 @@ _m_walk_said(clauses, items) := {
 	said := {c.text | some c in items}
 }
 
-_m_clauses_cut(ordered) := ordered if count(_m_clause_counted_names(_m_clause_units([c | some c in ordered; c.kind == "item"]))) <= 3
+_m_clauses_cut(ordered) := ordered if count(_m_clause_counted_names(_m_clause_units_in(ordered))) <= 3
 
-_m_clauses_cut(ordered) := array.concat(array.concat([c | some c in ordered; c.kind != "item"], [u.clause | some u in pieces; _m_clause_kept(u, pieces, kept)]), [_m_clause_more(count(names) - 3)]) if {
-	pieces := _m_clause_units([c | some c in ordered; c.kind == "item"])
+_m_clauses_cut(ordered) := array.concat([x[1] | some x in sort(array.concat([[[i], c] | some i, c in ordered; c.kind != "item"], [[u.key, u.clause] | some u in pieces; _m_clause_kept(u, pieces, kept)]))], [_m_clause_more(count(names) - 3)]) if {
+	pieces := _m_clause_units_in(ordered)
 	names := _m_clause_counted_names(pieces)
 	count(names) > 3
 	kept := {n | some n in array.slice(names, 0, 3)}
 }
+
+_m_clause_units_in(ordered) := [x[1] | some x in sort([[u.key, u] | some t, c in ordered; c.kind == "item"; some u in _m_clause_item_units(t, c)])]
 
 _m_clause_counted_names(pieces) := _once([u.clause.name | some u in pieces; u.counted])
 
@@ -155,13 +175,6 @@ _m_clause_kept(u, pieces, kept) if {
 	p.counted
 	p.clause.name in kept
 	array.slice(p.key, 0, count(under)) == under
-}
-
-_m_clauses_ahead(once) := [c | some i, c in ahead; not c.text in {a.text | some a in array.slice(ahead, 0, i)}] if {
-	ahead := array.concat(
-		[x[4] | some x in sort([[object.get(c, "group", 0), object.get(_m_clause_ranks, c.cause, 6), c.name, c.text, c] | some c in once; c.kind == "root"])],
-		[c | some c in once; c.kind == "list"],
-	)
 }
 
 _m_clause_ranks := {"not_an_object": 1, "ambiguous": 2, "unusable": 3, "absent": 4, "null": 5}

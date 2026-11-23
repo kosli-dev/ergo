@@ -10756,7 +10756,7 @@
       },
       {
         "description": "a list that holds the alias in its items is printed as the input had it",
-        "rules": ["message.print"],
+        "rules": ["message.print", "message.join"],
         "input": {"things": [{"id": "t", "zs": [[{"k": ["$z ", "$z,"]}]]}]},
         "results": [
           {
@@ -10875,7 +10875,7 @@
                 ]
               }
             ],
-            "message": "item 1 of zs: item 1 of z: item 1 of k is \"$z \", which isn't a number, and item 2 of k is \"$z,\", which isn't a number",
+            "message": "item 1 of zs: item 1 of z: item 1 of k is \"$z \", which isn't a number; item 1 of zs: item 1 of z: item 2 of k is \"$z,\", which isn't a number",
             "passed": false,
             "requirement": "s",
             "subject": {

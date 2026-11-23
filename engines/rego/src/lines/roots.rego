@@ -90,9 +90,10 @@ _m_cond_root_texts(subj, c) := _once([x[1] | some x in _m_cond_root_said(subj, c
 
 _m_cond_root_said(subj, c) := _once([[st, m] |
 	ys := _walked_tallies(c)
+	reads := [[p, _root_state(subj, c, p, set())] | some p in sort(_root_reads(c))]
 	some st in _cause_precedence
 	some m in array.concat(
-		[m | some p in sort(_root_reads(c)); _root_state(subj, c, p, set()) == st; m := _m_for_root_text(subj, c, p, st)],
+		[m | some [p, s] in reads; s == st; m := _m_for_root_text(subj, c, p, st)],
 		_m_walked_tally_texts(subj, ys, st),
 	)
 ]) if object.get(c, "ergo/for", false) == true

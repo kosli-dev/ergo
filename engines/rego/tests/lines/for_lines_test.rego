@@ -104,6 +104,71 @@ _roots_said_today(line, sentences, subj, params) := {x[1] | some x in said} if {
 	said := ergo._walk_root_said(check, subj) with input as {"ergo/names": {"ergo/subject": subj}} with data.ergo_params as params
 }
 
+_on_tree(line, sentences, subj, params) if {
+	check := ergo._s_written_check({"for": line, "assert": sentences})
+	names := {"ergo/subject": subj, "$at": {"names": {}}}
+	r := ergo._for_freed(check, subj, ergo._for_row_raw(check, subj)) with input as {"ergo/names": names} with data.ergo_params as params
+	ergo._for_on_tree(check, subj, r) with input as {"ergo/names": names} with data.ergo_params as params
+}
+
+test_a_one_list_for_row_with_nothing_read_outside_it_that_fails_takes_its_message_from_the_tree if {
+	_on_tree("every xs as x", ["x.v is 1", "z is 1"], {"xs": [{"v": 2}], "z": 2}, {})
+	_on_tree("every xs as x", ["x.v is at least $params.min"], {"xs": [{"v": 0}]}, {"min": 1})
+	_on_tree("first of xs sorted by t as x", ["x.v is 1"], {"xs": [{"t": 1, "v": 2}]}, {})
+	_on_tree("every xs[0].ys as y", ["y.v is 1"], {"xs": [{"ys": [{"v": 2}]}]}, {})
+}
+
+test_a_for_row_keeps_its_message_off_the_tree_while_the_tree_cant_say_its_roots_keys_or_second_list if {
+	not _on_tree("every xs as x, every x.ys as y", ["y.v is 1"], {"xs": [{"ys": [{"v": 2}]}]}, {})
+	not _on_tree("every xs as x", ["x.v is at least $params.min"], {"xs": [{"v": 0}]}, {"min": "s"})
+	not _on_tree("every xs as x", ["x.v is at least $params.min"], {"xs": [{"v": 0}]}, {})
+	not _on_tree("every o named by $params.k as x", ["x is 1"], {"o": {"a": [2]}}, {"k": "a"})
+	not _on_tree("first of xs sorted by m named by $params.k as x", ["x.v is 1"], {"xs": [{"m": {"a": 1}, "v": 2}]}, {"k": "a"})
+	not _on_tree("every es whose zz is m named by $params.k as e", ["e.v is 1"], {"es": [{"zz": 1}]}, {"k": 3})
+	not _on_tree("every xs as x", ["every x.ys.n is 1", "every x.ys.m is 1"], {"xs": [{"ys": [{"n": 2, "m": 2}]}]}, {})
+	not _on_tree("every xs as x", ["every x.ys exists", "sum of x.ys.n is 3"], {"xs": [{"ys": [{"n": 1}, null]}]}, {})
+}
+
+test_a_for_row_on_the_tree_leaves_its_message_to_the_tree if {
+	check := ergo._s_written_check({"for": "every xs as x", "assert": "x.v is 1"})
+	subj := {"xs": [{"v": 2}]}
+	row := ergo._for_row(check, subj) with input as {"ergo/names": {"ergo/subject": subj, "$at": {"names": {}}}}
+	row.message == ""
+	row["ergo/for_raw"].tree == true
+	not "once" in object.keys(row["ergo/for_raw"])
+}
+
+test_a_for_row_whose_line_reads_its_item_whole_keeps_its_message_off_the_tree if {
+	not _on_tree(`every ws that starts with "b" as w`, ["w is not empty"], {"ws": ["b", 3]}, {})
+	not _on_tree("every xs that is at least c as x", ["x.n is 1"], {"c": 0, "xs": [1, {"c": 0, "n": 1}]}, {})
+	_on_tree("every xs whose n is at least c as x", ["x.n is 1"], {"c": 0, "xs": [1, {"c": 0, "n": 2}]}, {})
+}
+
+test_a_for_row_whose_named_by_key_is_its_alias_read_whole_keeps_its_message_off_the_tree if {
+	not _on_tree("every xs as m", ["m.k named by m.k is 1"], {"xs": [{"k": null}, {}, {"k": 1}]}, {})
+	not _on_tree("every xs as m", ["m is $params.l", "m.v named by m.v is 1"], {"xs": [null]}, {"l": 1})
+	not _on_tree("every xs as m", ["m.k is 2", "m.v named by m.k is 1"], {"xs": [{"k": null}]}, {})
+	_on_tree("every xs as m", ["m.v named by z is 1"], {"z": "a", "xs": [{"v": {"a": 2}}]}, {})
+}
+
+test_a_compiled_for_row_whose_item_leaves_whose_out_says_what_the_written_row_says_on_the_tree if {
+	written := ergo._s_written_check({"for": "every xs as x", "assert": ["x.v is 1", "z is 1"]})
+	compiled := object.union(written, {"items": [object.remove(written.items[0], ["whose"])]})
+	subj := {"xs": [{"v": 2}, {"v": 1}], "z": 3}
+	names := {"ergo/subject": subj, "$at": {"names": {}}}
+	said := [ergo._for_said(row) |
+		some check in [written, compiled]
+		row := ergo._for_row(check, subj) with input as {"ergo/names": names}
+		row["ergo/for_raw"].tree == true
+	] with input as {"ergo/names": names}
+	[s.message | some s in said] == ["z is 3; item 1 of xs: x.v is 2", "z is 3; item 1 of xs: x.v is 2"]
+}
+
+test_a_for_row_whose_item_walks_one_list_takes_its_message_from_the_tree if {
+	_on_tree("every xs as x", ["every x.ys.n is 1", "x.v is 1"], {"xs": [{"v": 2, "ys": [{"n": 2}]}]}, {})
+	_on_tree("every xs as x", ["count of x.ys is 1", "every es.n is 1"], {"xs": [{"ys": []}], "es": [{"n": 2}]}, {})
+}
+
 test_for_root_clauses_name_the_roots_the_row_names_today if {
 	rows := [
 		["every xs as x", ["x.v is at least $params.b", "x.w is at least $params.a"], {"xs": [{"v": 1, "w": 1}]}, {"a": "s"}],
