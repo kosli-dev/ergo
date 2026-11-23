@@ -206,7 +206,7 @@ test_a_walked_list_after_is_in_ignoring_case_in_a_one_line_every_is_a_root_read_
 	fine := {"p": [{"name": "a"}]}
 	ergo._text_leaf_flawed(every_part, fine) == [] with input as {"ergo/names": {"ergo/subject": fine}} with ergo._walk_roots_on as true
 	ref := {"op": "in", "path": ["x"], "values": {"ref": ["$$input[]", "cs", "name"]}, "ignoring": "case"}
-	every_ref := object.union(every_part, {"check": ref})
+	every_ref := object.union(object.remove(every_part, ["check"]), {"check": ref})
 	ergo._walk_root_flaw(every_ref, {}) == "unusable" with input as {"ergo/names": {"ergo/subject": {}}} with data.ergo_document as {"cs": [{"name": 3}]} with ergo._walk_roots_on as true
 	ergo._walk_root_msgs(every_ref, {}) == ["item 1 of $input.cs: name is 3, which isn't text"] with input as {"ergo/names": {"ergo/subject": {}}} with data.ergo_document as {"cs": [{"name": 3}]} with ergo._walk_roots_on as true
 }
