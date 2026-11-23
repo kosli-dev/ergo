@@ -3234,3 +3234,26 @@ fn two_reads_of_the_same_value_merge_into_one_input_with_the_worst_outcome() {
         assert_eq!(merged(entries.clone()), wanted, "{entries:?}");
     }
 }
+
+#[test]
+fn a_walked_list_after_is_in_ignoring_case_in_a_count_whose_is_said_before_a_list_that_is_missing() {
+    assert_eq!(
+        cause_and_row_in(
+            "count of xs whose v is in $input.cs.name ignoring case is 0",
+            json!({"things": [{}], "cs": [{"name": 3}]}),
+            json!({}),
+        ),
+        (
+            Cause::Unusable,
+            "item 1 of $input.cs: name is 3, which isn't text; xs is missing".to_string()
+        )
+    );
+    assert_eq!(
+        cause_and_row_in(
+            "count of xs whose v is in $input.cs.name ignoring case is 0",
+            json!({"things": [{}], "cs": [{"name": "a"}]}),
+            json!({}),
+        ),
+        (Cause::Absent, "xs is missing".to_string())
+    );
+}
