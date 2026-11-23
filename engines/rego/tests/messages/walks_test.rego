@@ -514,3 +514,10 @@ test_a_null_alias_before_a_key_from_the_item_is_named_as_the_part_before_the_key
 	ergo._m_null_before_key({"v": 1}, c) == ["$w is null"] with input as {"ergo/names": {"w": null}}
 	ergo._m_null_before_key({"v": 1, "key": "a"}, c) == [] with input as {"ergo/names": {"w": null}}
 }
+
+test_a_walked_list_after_is_in_ignoring_case_in_a_count_whose_is_said_as_a_root_beside_a_list_that_cant_be_walked if {
+	ref := {"op": "in", "path": ["v"], "values": {"ref": ["$$input[]", "cs", "name"]}, "ignoring": "case"}
+	stopped := {"fails": [{"cause": "absent"}], "walked": {1}, "trail": []}
+	ergo._m_tally_walked(ref, stopped) == [["unusable", "item 1 of $input.cs: name is 3, which isn't text"]] with input as {"ergo/names": {"ergo/subject": {}}} with data.ergo_document as {"cs": [{"name": 3}]}
+	ergo._m_tally_walked(object.remove(ref, ["ignoring"]), stopped) == [] with input as {"ergo/names": {"ergo/subject": {}}} with data.ergo_document as {"cs": [{}]}
+}
