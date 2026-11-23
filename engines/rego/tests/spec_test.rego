@@ -13,7 +13,9 @@ known_differences := {
 	"derived / an every or some whose whose reads a root from $params through a key the item holds fails on the root, said once, when each item reads fine / the root is null",
 	"for / a part that holds a list is walked by a whose in `count of m.ys whose v is in pl.z is 0` / the part holds an empty list and the list has an item",
 	"for / a part that holds a list is walked in the whose of a for line and in a whose under it / an empty part fails as value",
+	"for / a walk through a for line's alias leaves a root after the phrase to the assertion, and each item keeps its own cause and the items of its list / an item whose list holds five items without v",
 	"for / the roots of the line's own whose come before the roots of its sentences, whatever their causes / $params.min is missing and says first, though $params.a has the worse cause",
+	"messages / nothing hides a problem / the roots come first and then each item, and the row takes the worst cause",
 }
 
 _topic_cases(topic) := json.unmarshal(replace(json.marshal(data.spec.cases[topic]), "{{spec}}", ergo._spec))

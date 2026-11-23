@@ -503,6 +503,7 @@ pub struct Ran {
     pub rich: Vec<Value>,
     pub message: Option<String>,
     pub parts: Option<Vec<clause::Clause>>,
+    pub line_clauses: Option<Vec<clause::Clause>>,
 }
 
 thread_local! {
@@ -533,6 +534,7 @@ pub fn run_full(check: &Check, ctx: &Ctx) -> Ran {
                 rich: run.rich,
                 message: run.message,
                 parts: Some(run.parts),
+                line_clauses: None,
             }
         }
         Check::For(check) => {
@@ -543,6 +545,7 @@ pub fn run_full(check: &Check, ctx: &Ctx) -> Ran {
                 rich: Vec::new(),
                 message: run.message,
                 parts: None,
+                line_clauses: Some(run.clauses),
             }
         }
         other => Ran {
@@ -551,6 +554,7 @@ pub fn run_full(check: &Check, ctx: &Ctx) -> Ran {
             rich: Vec::new(),
             message: None,
             parts: None,
+            line_clauses: None,
         },
     }
 }

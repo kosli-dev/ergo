@@ -87,6 +87,7 @@ pub struct Run {
     pub failed_items: Vec<Value>,
     pub message: Option<String>,
     pub items: Vec<Clause>,
+    pub clauses: Vec<Clause>,
 }
 
 #[cfg(test)]
@@ -1116,6 +1117,7 @@ struct Sfail {
     cause: Cause,
     inputs: Vec<Value>,
     clauses: Vec<Clause>,
+    named: Vec<Clause>,
 }
 
 struct Child {
@@ -1575,6 +1577,7 @@ impl For {
                     cause: verdict.cause,
                     inputs,
                     clauses,
+                    named: Vec::new(),
                 });
             }
         }
@@ -1602,6 +1605,17 @@ impl For {
                 }
             }
             f.said = own;
+            f.named = f
+                .clauses
+                .iter()
+                .map(|clause| match clause.kind {
+                    super::clause::Kind::Root | super::clause::Kind::List if all_own => Clause {
+                        text: own_text(&clause.text, alias, f.one),
+                        ..clause.clone()
+                    },
+                    _ => clause.clone(),
+                })
+                .collect();
         }
         let assertions = sfails
             .iter()
@@ -1611,6 +1625,7 @@ impl For {
                     "cause": f.cause.name(),
                     "inputs": f.inputs,
                     "ergo/texts": f.said,
+                    "ergo/clauses": super::clause::to_value(&f.named),
                 })
             })
             .collect();
@@ -1694,6 +1709,7 @@ impl For {
                             "cause": f.cause.name(),
                             "inputs": f.inputs,
                             "ergo/texts": f.said,
+                            "ergo/clauses": super::clause::to_value(&f.named),
                             "ergo/said": child.entry.shown(),
                             "value": child.entry.value,
                             "locations": locations,
@@ -1711,6 +1727,7 @@ impl For {
                     "cause": cause.name(),
                     "inputs": found[0].1.inputs,
                     "ergo/texts": found[0].1.said,
+                    "ergo/clauses": super::clause::to_value(&found[0].1.named),
                 }));
             }
         }
@@ -1947,6 +1964,7 @@ impl For {
         if run.verdict.cause != Cause::Satisfied {
             self.key_inputs(&mut run, ctx);
             run.message = (!shown.is_empty()).then(|| super::clause::text(&shown));
+            run.clauses = clauses.clone();
         }
         #[cfg(test)]
         RAN.with(|ran| {
@@ -2018,18 +2036,58 @@ impl For {
             let group = self.sentence_group(at);
             clauses.extend(said.into_iter().map(|clause| clause.in_group(group)));
         }
-        let mut once: Vec<Clause> = Vec::new();
-        for clause in clauses {
-            let line = super::clause::text(std::slice::from_ref(&clause));
-            match once
-                .iter_mut()
-                .find(|seen| super::clause::text(std::slice::from_ref(seen)) == line)
-            {
-                Some(seen) => seen.group = seen.group.min(clause.group),
-                None => once.push(clause),
+        listed_roots(lines_once(clauses))
+    }
+
+    /// The roots the `whose` clauses of the line's own items read outside
+    /// the items and can't read, each said once.
+    pub fn whose_root_clauses(&self, ctx: &Ctx) -> Vec<Clause> {
+        let outer = outer_ctx(ctx);
+        let whose: Vec<&Check> = self
+            .items
+            .iter()
+            .flat_map(|item| item.whose.iter())
+            .collect();
+        let mut clauses = super::message::listed_root_clauses(&whose, &outer, true);
+        clauses.extend(super::message::walked_root_clauses(&whose, &outer));
+        listed_roots(lines_once(clauses))
+    }
+
+    /// The roots the sentence at `idx` reads outside the items and can't
+    /// read, each said once, whichever other sentence reads them too.
+    pub fn assertion_roots(&self, idx: usize, ctx: &Ctx) -> Vec<Clause> {
+        let Some(sentence) = self.sentences.get(idx) else {
+            return Vec::new();
+        };
+        listed_roots(lines_once(sentence_roots_listed(
+            &sentence.check,
+            &outer_ctx(ctx),
+        )))
+    }
+
+    /// What each root of the line says, and each item under a root that
+    /// walks a list, as a row would say it alone.
+    pub fn root_texts(&self, ctx: &Ctx) -> Vec<String> {
+        let outer = outer_ctx(ctx);
+        let whose: Vec<&Check> = self
+            .items
+            .iter()
+            .flat_map(|item| item.whose.iter())
+            .collect();
+        let mut clauses = self.root_clauses(ctx);
+        clauses.extend(super::message::listed_root_clauses(&whose, &outer, true));
+        for sentence in &self.sentences {
+            clauses.extend(sentence_roots_listed(&sentence.check, &outer));
+        }
+        fn said_lines(clauses: &[Clause], out: &mut Vec<String>) {
+            for clause in clauses {
+                push_new(out, super::clause::text(std::slice::from_ref(clause)));
+                said_lines(&clause.said, out);
             }
         }
-        listed_roots(once)
+        let mut out: Vec<String> = Vec::new();
+        said_lines(&clauses, &mut out);
+        out
     }
 
     #[cfg_attr(not(test), expect(dead_code))]
@@ -2305,6 +2363,7 @@ impl For {
                 failed_items: Vec::new(),
                 message: None,
                 items: Vec::new(),
+                clauses: Vec::new(),
             };
         }
         let mut collect = Collect {
@@ -2412,9 +2471,10 @@ impl For {
             items.extend(
                 super::message::for_empty(&listed, &outer, cause)
                     .into_iter()
-                    .filter(|text| !roots.contains(text))
-                    .map(|text| {
-                        Clause::list(&text.clone(), cause, text).in_group(self.sentences.len())
+                    .filter(|(_, text)| !roots.contains(text))
+                    .map(|(name, text)| {
+                        let name = if name.is_empty() { text.clone() } else { name };
+                        Clause::list(&name, cause, text).in_group(self.sentences.len())
                     }),
             );
         }
@@ -2428,6 +2488,7 @@ impl For {
             failed_items: failed,
             message: None,
             items: free.into_iter().chain(items).collect(),
+            clauses: Vec::new(),
         }
     }
 
@@ -3077,6 +3138,14 @@ impl For {
         super::key_base::key_flaw(key, &outer_ctx(ctx))
     }
 
+    /// What the line says about a key of a later list that can't be read.
+    pub fn later_key_texts(&self, ctx: &Ctx) -> Vec<String> {
+        (1..self.items.len())
+            .flat_map(|depth| self.later_keys(depth, ctx))
+            .map(|clause| clause.text)
+            .collect()
+    }
+
     fn later_keys(&self, depth: usize, ctx: &Ctx) -> Vec<Clause> {
         self.later_key(depth, ctx)
             .map(|(outcome, text, input)| {
@@ -3354,6 +3423,21 @@ fn root_lines(roots: &[Clause]) -> Vec<String> {
         push_new(&mut out, line);
     }
     out
+}
+
+fn lines_once(clauses: Vec<Clause>) -> Vec<Clause> {
+    let mut once: Vec<Clause> = Vec::new();
+    for clause in clauses {
+        let line = super::clause::text(std::slice::from_ref(&clause));
+        match once
+            .iter_mut()
+            .find(|seen| super::clause::text(std::slice::from_ref(seen)) == line)
+        {
+            Some(seen) => seen.group = seen.group.min(clause.group),
+            None => once.push(clause),
+        }
+    }
+    once
 }
 
 fn listed_roots(clauses: Vec<Clause>) -> Vec<Clause> {
