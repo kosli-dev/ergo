@@ -662,7 +662,17 @@ pub fn for_failures(
         .iter()
         .filter(|f| list(f, "failed_assertions").is_empty())
         .map(|f| text(f, "item"))
+        .chain(
+            row.iter()
+                .filter(|piece| piece.kind == Kind::Item)
+                .map(|piece| piece.name.clone()),
+        )
         .filter(|n| crate::parts::is_item(n) && crate::parts::list_base(n) == list_names[0])
+        .filter(|n| {
+            !failed
+                .iter()
+                .any(|f| text(f, "item") == *n && !list(f, "failed_assertions").is_empty())
+        })
         .collect();
     let walk_pieces: Vec<&str> = walked
         .iter()
