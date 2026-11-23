@@ -226,3 +226,115 @@ fn a_for_lines_whose_root_with_more_than_three_problems_is_said_once_capped_and_
         format!("list t.ms: {capped}")
     );
 }
+
+fn spec_groups() -> Vec<(String, Value)> {
+    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../../spec/cases");
+    let mut topics: Vec<_> = std::fs::read_dir(&root)
+        .unwrap()
+        .map(|entry| entry.unwrap().path())
+        .collect();
+    topics.sort();
+    let mut out = Vec::new();
+    for topic in topics {
+        let file = topic.join("cases.json");
+        let Ok(text) = std::fs::read_to_string(&file) else {
+            continue;
+        };
+        let name = topic.file_name().unwrap().to_string_lossy().to_string();
+        let groups: Value = serde_json::from_str(&text.replace("{{spec}}", SPEC)).unwrap();
+        for group in groups.as_array().unwrap() {
+            out.push((name.clone(), group.clone()));
+        }
+    }
+    out
+}
+
+fn fails(rows: &Value, row: &Value) -> bool {
+    rows.as_array().into_iter().flatten().any(|other| {
+        other["requirement"] == row["requirement"]
+            && other["check"] == row["check"]
+            && other["subject"] == row["subject"]
+            && other["passed"] == false
+    })
+}
+
+fn assertion_of(rows: &Value, row: &Value, sentence: &str) -> Option<Value> {
+    let same = rows.as_array()?.iter().find(|other| {
+        other["requirement"] == row["requirement"]
+            && other["check"] == row["check"]
+            && other["subject"] == row["subject"]
+    })?;
+    let mut entry = same["failures"]
+        .as_array()?
+        .iter()
+        .find(|entry| entry["kind"] == "assertion" && entry["name"] == sentence)?
+        .clone();
+    entry.as_object_mut()?.remove("locations");
+    Some(entry)
+}
+
+#[test]
+fn a_sentence_has_the_same_assertion_entry_as_alone_in_its_check() {
+    let mut differ: Vec<String> = Vec::new();
+    for (topic, group) in spec_groups() {
+        let params = group.get("params").cloned().unwrap_or(json!({}));
+        let policy = &group["policy"];
+        let Some(requirements) = policy["requirements"].as_object() else {
+            continue;
+        };
+        for (requirement, body) in requirements {
+            let Some(checks) = body["checks"].as_object() else {
+                continue;
+            };
+            for (check, written) in checks {
+                let Some(sentences) = written["assert"].as_array() else {
+                    continue;
+                };
+                if written.get("for").is_none() || sentences.len() < 2 {
+                    continue;
+                }
+                for case in group["cases"].as_array().unwrap() {
+                    let full = ergo_policy_engine::report(&case["input"], policy, &params);
+                    let rows = &full["results"];
+                    for (at, sentence) in sentences.iter().enumerate() {
+                        let Some(text) = sentence.as_str() else {
+                            continue;
+                        };
+                        if sentences.iter().filter(|s| *s == sentence).count() > 1 {
+                            continue;
+                        }
+                        let mut alone = policy.clone();
+                        alone["requirements"][requirement]["checks"][check]["assert"] = json!(text);
+                        let by_itself = ergo_policy_engine::report(&case["input"], &alone, &params);
+                        for row in rows.as_array().into_iter().flatten().filter(|row| {
+                            row["requirement"] == requirement.as_str()
+                                && row["check"] == check.as_str()
+                        }) {
+                            if !fails(&by_itself["results"], row) {
+                                continue;
+                            }
+                            let beside = assertion_of(rows, row, text);
+                            let own = assertion_of(&by_itself["results"], row, text);
+                            if beside != own {
+                                differ.push(format!(
+                                    "{topic} / {} / {} / {check} / sentence {}",
+                                    group["description"].as_str().unwrap_or_default(),
+                                    case["description"].as_str().unwrap_or_default(),
+                                    at + 1
+                                ));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    assert_eq!(differ, NO_ENTRY_YET_FOR_AN_ITEM_WHOSE_SECOND_LIST_FAILS);
+}
+
+const NO_ENTRY_YET_FOR_AN_ITEM_WHOSE_SECOND_LIST_FAILS: [&str; 4] = [
+    "for / a for line whose second list fails for an item, with sentences that don't read the second alias / runs the sentences that don't read y for each item and says them before the list / c / sentence 2",
+    "for / a for line whose second list has a named by key from $params that isn't text / says the key once on the row, after the sentence that doesn't read x / c / sentence 2",
+    "messages / a for line over two lists, with a walk under the first item before a sentence on the second / the parts follow the items, not the sentences / c / sentence 1",
+    "messages / a for line over two lists, with a sentence on the second item before a walk under the first / the parts follow the items, not the sentences / c / sentence 2",
+];
