@@ -2342,3 +2342,52 @@ fn an_every_or_some_fails_on_a_root_before_a_key_from_the_item_it_cant_read_even
         }
     }
 }
+
+#[test]
+fn a_list_after_is_in_ignoring_case_that_cant_be_used_is_said_before_a_walked_list_that_is_missing_or_null()
+ {
+    for (sentence, subject, params, cause, message) in [
+        (
+            "every xs.v is in ys ignoring case",
+            json!({"ys": ["a", 3]}),
+            json!({}),
+            Cause::Unusable,
+            "item 2 of ys is 3, which isn't text; xs is missing",
+        ),
+        (
+            "every xs.v is in $params.l ignoring case",
+            json!({}),
+            json!({"l": ["a", 3]}),
+            Cause::Unusable,
+            "item 2 of $params.l is 3, which isn't text; xs is missing",
+        ),
+        (
+            "some xs.v is in ys ignoring case",
+            json!({"xs": null, "ys": ["a", 3]}),
+            json!({}),
+            Cause::Unusable,
+            "item 2 of ys is 3, which isn't text; xs is null",
+        ),
+        (
+            "every xs.v is in ys ignoring case",
+            json!({"ys": ["a", null]}),
+            json!({}),
+            Cause::Absent,
+            "item 2 of ys is null; xs is missing",
+        ),
+    ] {
+        let out = row_of(sentence, subject, params);
+        assert_eq!(
+            (out.verdict.cause, out.message.as_deref()),
+            (cause, Some(message)),
+            "{sentence}"
+        );
+        assert!(
+            out.parts
+                .iter()
+                .all(|part| part.kind == crate::ops::clause::Kind::Root),
+            "{sentence}: {:?}",
+            out.parts
+        );
+    }
+}
