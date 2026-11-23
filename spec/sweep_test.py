@@ -183,5 +183,64 @@ class StaleBinaryTest(unittest.TestCase):
         self.assertEqual(seen, ["ergo --version"])
 
 
+def one_row(passed=True, cause="satisfied", message="m", check="c"):
+    return {"requirement": "r", "check": check, "subject": "t", "passed": passed, "cause": cause, "message": message}
+
+
+def whole(*rows, compliant=True, status="pass"):
+    return {"compliant": compliant, "requirements": {"r": {"status": status}}, "results": list(rows)}
+
+
+class KindTest(unittest.TestCase):
+    def test_equal_reports_are_no_difference(self):
+        self.assertEqual(sweep.kind(whole(one_row()), whole(one_row())), 0)
+
+    def test_a_row_that_passes_in_one_engine_and_fails_in_the_other_is_type_1(self):
+        self.assertEqual(sweep.kind(whole(one_row()), whole(one_row(passed=False))), 1)
+
+    def test_compliant_differing_is_type_1(self):
+        self.assertEqual(sweep.kind(whole(one_row(), compliant=True), whole(one_row(), compliant=False)), 1)
+
+    def test_a_requirement_status_differing_is_type_1(self):
+        self.assertEqual(sweep.kind(whole(one_row(), status="pass"), whole(one_row(), status="fail")), 1)
+
+    def test_a_row_in_one_engine_only_is_type_1(self):
+        self.assertEqual(sweep.kind(whole(one_row(), one_row(check="d")), whole(one_row())), 1)
+
+    def test_an_error_in_one_engine_only_is_type_1(self):
+        self.assertEqual(sweep.kind(whole(one_row()), {"error": "boom"}), 1)
+
+    def test_only_a_row_cause_differing_is_type_2(self):
+        self.assertEqual(sweep.kind(whole(one_row(False, "value")), whole(one_row(False, "missing"))), 2)
+
+    def test_only_a_message_differing_is_type_3(self):
+        self.assertEqual(sweep.kind(whole(one_row(False, "value", "a")), whole(one_row(False, "value", "b"))), 3)
+
+    def test_two_different_errors_are_type_3(self):
+        self.assertEqual(sweep.kind({"error": "a"}, {"error": "b"}), 3)
+
+    def test_a_verdict_difference_wins_over_a_cause_difference(self):
+        left = whole(one_row(False, "value"), one_row(check="d"))
+        right = whole(one_row(False, "missing"), one_row(passed=False, check="d"))
+        self.assertEqual(sweep.kind(left, right), 1)
+
+
+class SummaryTest(unittest.TestCase):
+    def test_the_summary_counts_each_type_and_names_the_cells_of_types_1_and_2(self):
+        found = {1: ["a | cell 1"], 2: ["b | cell 2", "c | cell 3"], 3: ["d"] * 4}
+        lines = sweep.type_lines(found)
+        self.assertIn("type 1 (verdict differs): 1", lines)
+        self.assertIn("type 2 (a row's cause differs): 2", lines)
+        self.assertIn("type 3 (anything else): 4", lines)
+        self.assertIn("- a | cell 1", lines)
+        self.assertIn("- c | cell 3", lines)
+        self.assertNotIn("- d", lines)
+
+    def test_requiring_no_type_1_fails_only_when_one_is_left(self):
+        self.assertEqual(sweep.type_exit({1: ["a"], 2: [], 3: []}, True), 1)
+        self.assertEqual(sweep.type_exit({1: [], 2: ["a"], 3: ["b"]}, True), 0)
+        self.assertEqual(sweep.type_exit({1: ["a"], 2: [], 3: []}, False), 0)
+
+
 if __name__ == "__main__":
     unittest.main()
