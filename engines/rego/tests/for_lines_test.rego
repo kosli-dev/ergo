@@ -556,6 +556,15 @@ test_a_for_line_whose_says_an_empty_list_on_the_right_then_the_list_or_each_item
 	_for_said_beside_empty("every xs whose v is in $params.cs.name, if any, as m", [{"v": "a"}, {}]) == [["absent", "$params.cs is []; item 2 of xs: v is missing"]]
 }
 
+_for_entry_causes(line, asserts, xs, params) := [[[e.kind, e.name, e.cause] | some e in r.failures] | some r in ergo.report({"things": [{"id": 1, "xs": xs}]}, _sentence_policy({"c": {"for": line, "assert": asserts}}), params).results; r.check == "c"]
+
+test_each_entry_of_a_for_row_whose_root_cant_be_read_keeps_its_own_cause_when_the_row_fails_worse if {
+	_for_entry_causes("every xs whose v is in $params.cs.name as m", "m.v exists", [null], {"cs": []}) == [[["list", "xs", "value"], ["item", "item 1 of xs", "not_an_object"]]]
+	_for_entry_causes("every xs whose v is in $params.cs.name, if any, as m", "m.w exists", [{}], {"cs": null}) == [[["list", "xs", "null"], ["item", "item 1 of xs", "absent"]]]
+	_for_entry_causes("every xs whose v is in $params.cs.name as m", "m.w exists", [null, 3], {"cs": "s"}) == [[["list", "xs", "unusable"], ["item", "item 1 of xs", "not_an_object"], ["item", "item 2 of xs", "not_an_object"]]]
+	[[e | some e in es; e[0] != "item"] | some es in _for_entry_causes("every xs whose v is at least $params.min as m", "m.w is at least $params.a", [{"v": 0}, {}, {"v": "a"}], {"a": null})] == [[["assertion", "m.w is at least $params.a", "null"], ["list", "xs", "absent"]]]
+}
+
 test_a_for_lines_whose_leaves_an_empty_part_out_of_the_rows_inputs_as_a_null_part if {
 	policy := _item_policy({"has": {"pl": "c"}}, {"every": {"for": "every xs whose v is in pl.z as m", "assert": "m.v is 1"}})
 	every part in [[], null] {
