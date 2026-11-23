@@ -260,6 +260,7 @@ in / a ref on the right side that starts at an input that is a list / fails ever
 in / a ref on the right side that starts at an input that is a list / walks the items of the input
 in / a ref on the right side that walks a list of objects / compares with the list of what it reads from each item, and lists it in $refs and in the violation's inputs
 in / a ref on the right side that walks a list of objects / fails as unusable when the names are of more than one type
+in / an empty list on the right of a whose is said before the list it filters, after contains all of and none of, beside a plus and on a for line, as a null list is / fails with the empty list said once, then an item that is null
 in / an empty list on the right of a whose is said before the list it filters, after contains all of and none of, beside a plus and on a for line, as a null list is / fails with the empty list said once, then each item that can't be read under its item
 in / count of and sum of read the field named like a part and list it with the dot / lists the field with the dot and the part without it, and names the item of the part
 in / every phrase that takes a list, with a ref on the right side that starts at an input that is a list / compares with what each item of the input holds, with every phrase that takes a list

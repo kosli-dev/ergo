@@ -72131,7 +72131,8 @@
         "description": "an item without v, with a null part",
         "rules": [
           "for.roots",
-          "message.items"
+          "message.items",
+          "problems.all_said"
         ],
         "input": {
           "cs": [
@@ -72165,11 +72166,11 @@
         },
         "results": [
           {
-            "cause": "null",
+            "cause": "absent",
             "check": "first",
             "failures": [
               {
-                "cause": "null",
+                "cause": "absent",
                 "failures": [],
                 "inputs": [
                   {
