@@ -814,20 +814,21 @@ pub fn for_failures(
                         }
                     }
                 }
+                let mut own: Vec<String> = Vec::new();
                 if !roots.is_empty() {
-                    clause::text(&clause::shown(&roots))
-                } else {
-                    let mut own: Vec<String> = Vec::new();
-                    for piece in clauses(message) {
-                        let a_root = !odd_params
-                            && (root_texts.iter().any(|t| t == piece)
-                                || owns.iter().flatten().any(|t| t == piece));
-                        if owned[i].iter().any(|o| o == piece) && !a_root {
-                            ops::push_new(&mut own, piece.to_string());
-                        }
-                    }
-                    own.join("; ")
+                    own.push(clause::text(&clause::shown(&roots)));
                 }
+                let root_lines = clause::lines(&roots);
+                for piece in clauses(message) {
+                    let a_root = !odd_params
+                        && (root_texts.iter().any(|t| t == piece)
+                            || owns.iter().flatten().any(|t| t == piece)
+                            || root_lines.iter().any(|line| clauses(line).contains(&piece)));
+                    if owned[i].iter().any(|o| o == piece) && !a_root {
+                        ops::push_new(&mut own, piece.to_string());
+                    }
+                }
+                own.join("; ")
             }
         };
         let mut named: Vec<String> = Vec::new();
