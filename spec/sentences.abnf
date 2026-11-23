@@ -62,7 +62,8 @@ joined            = (value / field) 1*(WS "followed" WS "by" WS (value / right-p
 ; Phrases. compare-phrase is the subset a derived value can take.
 ; ignoring reads after every phrase but the text phrases. syntax.md writes it
 ; wrong after a phrase other than is, is not, is one of, is not one of, is in
-; and is not in.
+; and is not in, and after a list read from a path of more than one step,
+; for now.
 phrase            = (one-of-phrase / exists-phrase / empty-phrase / type-phrase
                   / matches-phrase / time-phrase) [WS ignoring]
                   / contains-phrase / contains-all-phrase
