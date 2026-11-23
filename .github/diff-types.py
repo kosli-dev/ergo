@@ -256,7 +256,7 @@ def run_rego(root, names, cases, folder):
             f.write("%d\t%s\n" % (number, name))
 
 
-def section(title, ids, sorted_ids, missing, summary):
+def section(title, ids, sorted_ids, missing, summary, pinned=None):
     out = ["## " + title, ""]
     for number, label in TYPES:
         out.append("- %s: %d" % (label, len(sorted_ids[number])))
@@ -269,6 +269,8 @@ def section(title, ids, sorted_ids, missing, summary):
         for family in sorted(families):
             counts = families[family]
             out.append("  - %s: %d / %d / %d" % (family, counts[1], counts[2], counts[3]))
+    if pinned is not None:
+        out.append("- violations are not compared; %d known failure%s them" % (pinned, " pins" if pinned == 1 else "s pin"))
     if missing:
         out.append("- no report to compare for %d case(s), counted as type 3" % len(missing))
     if not summary:
@@ -311,7 +313,8 @@ def main():
     reports = read_dump(dump, cases)
     sorted_ids, missing = sort_cases(known, cases, reports)
     type_1 = type_1 or bool(sorted_ids[1])
-    out += section("Rust engine: known failures: %d" % len(known), known, sorted_ids, missing, args.summary)
+    pinned = sum(1 for name in known if name in cases and "violations" in cases[name][2])
+    out += section("Rust engine: known failures: %d" % len(known), known, sorted_ids, missing, args.summary, pinned)
 
     names = known_differences(os.path.join(root, "engines", "rego", "tests", "spec_test.rego"))
     if names is None:
