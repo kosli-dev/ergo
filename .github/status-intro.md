@@ -1,4 +1,4 @@
-This is the status of the two engines against the spec and against each other. A workflow rewrites everything below the line every night, so edit nothing here by hand.
+This is the status of the two engines against the spec and against each other. A workflow rewrites this whole text every night, so edit nothing here by hand.
 
 `spec/OPEN.md` is the one list of the differences, with what differs, an example, its type and the step that fixes it. Each difference is sorted by what differs:
 

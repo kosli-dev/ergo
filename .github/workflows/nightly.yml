@@ -50,6 +50,7 @@ jobs:
       - name: Count the entries of spec/OPEN.md
         run: .github/sync-facts.sh HEAD > "$RUNNER_TEMP/status/facts.txt"
       - uses: actions/upload-artifact@v7
+        if: always()
         with:
           name: nightly-status
           path: ${{ runner.temp }}/status
