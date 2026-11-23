@@ -1856,7 +1856,17 @@ fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
             let items: Vec<Clause> = said.iter().map(|(_, item)| item.clone()).collect();
             let alone: Vec<Cause> = judged.iter().filter_map(|j| j.alone).collect();
             let reached = judged.iter().any(|j| j.reached);
-            leaf_roots(walk, &outer, &items, &alone, reached)
+            let mut leaf = leaf_roots(walk, &outer, &items, &alone, reached);
+            if walked.items.is_empty() && !walk.if_any {
+                once(
+                    &mut leaf,
+                    message::walked_root_clauses(&[&*walk.check], &outer)
+                        .into_iter()
+                        .filter(|root| root.last_of_cause)
+                        .collect(),
+                );
+            }
+            leaf
         };
         let up_front = !leaf.is_empty() || params_unreadable(&outer) && !roots.is_empty();
         if text_beside_list {

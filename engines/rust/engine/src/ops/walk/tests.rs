@@ -2425,7 +2425,8 @@ fn a_walked_list_after_is_in_ignoring_case_in_a_whose_fails_an_empty_list_with_t
 }
 
 #[test]
-fn a_walked_list_after_is_in_ignoring_case_that_cant_be_used_fails_a_one_line_every_on_an_empty_list() {
+fn a_walked_list_after_is_in_ignoring_case_that_cant_be_used_fails_a_one_line_every_on_an_empty_list()
+ {
     for (sentence, input, cause, message) in [
         (
             "every xs.v is in $input.cs.name ignoring case",
