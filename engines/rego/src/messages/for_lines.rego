@@ -1165,6 +1165,15 @@ _for_unrooted(c, said) := object.union(c, {"said": kept}) if {
 
 _for_says_nothing(text, [], said) if text in ({""} | said)
 
+_for_says_nothing(text, kept, said) if {
+	text in ({""} | said)
+	kept != []
+	every x in kept {
+		x.said == []
+	}
+	concat(", and ", [x.text | some x in kept]) in said
+}
+
 _for_said_by_row(x, said) if {
 	x.said == []
 	x.text in said
