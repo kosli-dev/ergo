@@ -104,6 +104,34 @@ _roots_said_today(line, sentences, subj, params) := {x[1] | some x in said} if {
 	said := ergo._walk_root_said(check, subj) with input as {"ergo/names": {"ergo/subject": subj}} with data.ergo_params as params
 }
 
+_said_parts_match(line, sentences, subj, params) if {
+	check := ergo._s_written_check({"for": line, "assert": sentences})
+	names := {"ergo/names": {"ergo/subject": subj, "$at": {"names": {}}}}
+	parts := ergo._for_said_parts(check, subj) with input as names with data.ergo_params as params
+	parts.all == ergo._walk_root_said(check, subj) with input as names with data.ergo_params as params
+	parts.said == [ergo._walk_root_said(ergo._for_one_sentence(check, c), subj) | some c in check.checks] with input as names with data.ergo_params as params
+	parts.all != []
+}
+
+test_a_for_line_reads_its_roots_once_for_the_line_and_for_each_sentence if {
+	_said_parts_match("every xs as x", ["x.v is $params.a", "x.v is $params.b"], {"xs": [{"v": 1}]}, {"a": null})
+	_said_parts_match("every xs whose v is at least $params.min as x", ["x.w is 1", "z is 1", "approved_by is a non-empty string"], {"xs": [{"v": 1, "w": 2}]}, {"min": "s"})
+	_said_parts_match("every xs as x", ["count of x.ys whose k is $params.k is 1", "every x.ys whose n is $params.n exists"], {"xs": [{"ys": [{"k": 1}]}]}, {})
+}
+
+test_a_for_row_hands_the_roots_it_read_to_its_message if {
+	check := ergo._s_written_check({"for": "every tests as t", "assert": ["t.ok is true", "approved_by is a non-empty string"]})
+	subj := {"tests": [{"ok": false}]}
+	names := {"ergo/names": {"ergo/subject": subj, "$at": {"names": {}}}}
+	r := ergo._for_freed(check, subj, ergo._for_row_raw(check, subj)) with input as names
+	r["ergo/root_said"] == [[], [["absent", "approved_by is missing"]]]
+	ergo._for_row_said(check, subj, object.union(r, {"ergo/root_said": [[["absent", "a is missing"]], []]})) == {0: [["absent", "a is missing"]], 1: []} with input as names
+	approved := {"tests": [{"ok": false}], "approved_by": "a"}
+	approved_names := {"ergo/names": {"ergo/subject": approved, "$at": {"names": {}}}}
+	plain := ergo._for_freed(check, approved, ergo._for_row_raw(check, approved)) with input as approved_names
+	ergo._for_row_said(check, approved, object.union(plain, {"ergo/root_said": [[["absent", "a is missing"]], []]})) == {0: [["absent", "a is missing"]]} with input as approved_names
+}
+
 _on_tree(line, sentences, subj, params) if {
 	check := ergo._s_written_check({"for": line, "assert": sentences})
 	names := {"ergo/subject": subj, "$at": {"names": {}}}

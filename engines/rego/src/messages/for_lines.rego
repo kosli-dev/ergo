@@ -1123,9 +1123,16 @@ _for_free_clauses(check, subj, r, roots) := [object.union(x, {"group": i}) |
 	some x in _for_rooted_clauses(check, c, subj, ls[0].cause, roots[i])
 ]
 
-_for_row_said(check, subj, r) := {i: _walk_root_said(_for_one_sentence(check, c), subj) | some i, c in check.checks} if _for_row_rooted(r, subj)
+_for_row_said(check, subj, r) := _for_said_of(check, subj, r, {i | some i, _ in check.checks}) if _for_row_rooted(r, subj)
 
-else := {i: _walk_root_said(_for_one_sentence(check, check.checks[i]), subj) | some i in _for_failed_sentences(check, r)}
+else := _for_said_of(check, subj, r, _for_failed_sentences(check, r))
+
+_for_said_of(check, subj, r, is) := {i: r["ergo/root_said"][i] | some i in is} if {
+	"ergo/root_said" in object.keys(r)
+	_ = [check, subj]
+}
+
+else := {i: _walk_root_said(_for_one_sentence(check, check.checks[i]), subj) | some i in is}
 
 _for_row_roots(check, subj, r, said) := _for_roots_of(check, subj, said) if _for_row_rooted(r, subj)
 

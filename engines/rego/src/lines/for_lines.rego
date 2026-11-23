@@ -262,6 +262,24 @@ _for_sentence_said(check, c, subj) := said if {
 	said := _walk_root_said(_for_one_sentence(check, c), subj) with input as {"ergo/names": _for_unbound(check, _for_names)}
 }
 
+_for_said_parts(check, subj) := {"all": line, "said": said} if {
+	top := _for_conds_said(subj, object.get(check, "whose", []))
+	own := _for_conds_said(subj, [c | some item in check.items; some c in object.get(item, "whose", [])])
+	ps := [_for_sentence_parts(subj, {"op": "for", "checks": [c]}) | some c in check.checks]
+	line := _once(array.concat(_said_by_text([x | some p in ps; some x in p.count]), array.concat(array.concat(array.concat(top, own), [x | some p in ps; some x in p.nested]), [x | some p in ps; some x in p.conds])))
+	said := [_once(array.concat(_said_by_text(p.count), array.concat(array.concat(top, p.nested), p.conds))) | some p in ps]
+}
+
+_for_sentence_parts(subj, one) := {
+	"count": [x | some c in _walk_count_conds(one); some x in array.concat(_m_root_said_all(subj, c), _m_cond_walked_said(c)); x[0] in _no_value_states; startswith(x[1], "$")],
+	"nested": _for_conds_said(subj, _for_nested_conds(one)),
+	"conds": [x | some c in _for_sentence_conds(one); some x in array.concat(_m_cond_root_said(subj, c), _m_walked_root_said(c))],
+}
+
+_for_conds_said(subj, cs) := [x | some c in cs; some x in array.concat(_m_cond_root_said(subj, c), _m_cond_walked_said(c))]
+
+_said_by_text(xs) := [[y[1], y[0]] | some y in sort([[x[1], x[0]] | some x in xs])]
+
 _for_unbound(check, names) := object.union(object.remove(names, aliases), {"$at": object.union(at, {"names": object.remove(object.get(at, "names", {}), aliases)})}) if {
 	aliases := [item.as | some item in check.items]
 	at := object.get(names, "$at", {})
