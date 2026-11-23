@@ -86,6 +86,8 @@ jobs:
         run: .github/body-facts_test.sh
       - name: Check the script that reports how far the engines are from the spec
         run: .github/sync-facts_test.sh
+      - name: Check the script that sorts the known failures by what differs
+        run: .github/diff-types_test.sh
       - name: Check the script that counts the places that cut a message as text
         run: .github/message-cuts_test.sh
       - name: Check that engine code cuts no more messages as text than the base branch
@@ -300,6 +302,7 @@ jobs:
       - name: Write how far the engines are from the spec in the job summary
         env:
           BASE: origin/${{ github.base_ref }}
+          SYNC_FACTS_TYPES: "1"
         run: .github/sync-facts.sh "$BASE" >> "$GITHUB_STEP_SUMMARY"
 
   pairs-facts:
