@@ -250,5 +250,32 @@ class SummaryTest(unittest.TestCase):
         self.assertEqual(sweep.type_exit({1: ["a"], 2: [], 3: []}, False), 0)
 
 
+class PartShapeTest(unittest.TestCase):
+    shape = {"name": "x", "has": {"pl": "p"}, "check": "every es.v, if any, is in pl.name", "keys": ["pl.name"]}
+
+    def built(self, k):
+        return sweep.build_cell(self.shape, "pl.name", k, "a", "two", "object", "plain")
+
+    def test_a_shape_with_has_gives_the_subject_its_parts(self):
+        policy, data, _ = self.built("a")
+        self.assertEqual(policy["subjects"]["thing"]["has"], {"pl": "p"})
+        self.assertEqual(data["things"][0]["p"], [{"name": "a"}])
+
+    def test_a_missing_key_makes_the_list_of_parts_empty(self):
+        self.assertEqual(self.built(sweep.ABSENT)[1]["things"][0]["p"], [])
+
+    def test_the_key_becomes_the_name_of_the_part(self):
+        self.assertEqual(self.built(None)[1]["things"][0]["p"], [{"name": None}])
+        self.assertEqual(self.built(3)[1]["things"][0]["p"], [{"name": 3}])
+
+    def test_an_empty_list_as_key_makes_a_part_without_a_name(self):
+        self.assertEqual(self.built([])[1]["things"][0]["p"], [{}])
+
+    def test_a_shape_without_has_gives_the_thing_no_parts(self):
+        shape = {"name": "y", "check": "id exists", "keys": ["$input.k"]}
+        _, data, _ = sweep.build_cell(shape, "$input.k", "a", "a", "two", "object", "plain")
+        self.assertNotIn("p", data["things"][0])
+
+
 if __name__ == "__main__":
     unittest.main()
