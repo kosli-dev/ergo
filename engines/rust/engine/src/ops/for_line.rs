@@ -3138,6 +3138,14 @@ impl For {
         super::key_base::key_flaw(key, &outer_ctx(ctx))
     }
 
+    /// What the line says about a key of a later list that can't be read.
+    pub fn later_key_texts(&self, ctx: &Ctx) -> Vec<String> {
+        (1..self.items.len())
+            .flat_map(|depth| self.later_keys(depth, ctx))
+            .map(|clause| clause.text)
+            .collect()
+    }
+
     fn later_keys(&self, depth: usize, ctx: &Ctx) -> Vec<Clause> {
         self.later_key(depth, ctx)
             .map(|(outcome, text, input)| {

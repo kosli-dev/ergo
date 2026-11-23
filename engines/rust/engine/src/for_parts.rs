@@ -623,6 +623,8 @@ pub fn for_failures(
     if let Some((text, _, _)) = &base {
         skipped.push(text);
     }
+    let later_keys = line.later_key_texts(ctx);
+    skipped.extend(later_keys.iter().map(String::as_str));
     let mut walked: Vec<(String, Vec<String>)> = Vec::new();
     let unread = odd_params || off_subject;
     if !odd_params {
@@ -678,7 +680,7 @@ pub fn for_failures(
             continue;
         }
         if clause.is_empty()
-            || key_said.contains(&clause)
+            || skipped.contains(&clause)
             || failed.iter().any(|f| {
                 let named = text(f, "item");
                 crate::parts::is_item(&named)
