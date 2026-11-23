@@ -316,3 +316,17 @@ fn a_root_of_the_lines_own_whose_sits_on_the_lists_entry_capped_and_on_no_assert
         ]
     );
 }
+
+#[test]
+fn a_key_of_a_second_list_that_cant_be_read_is_no_entry_of_the_first_list() {
+    let said = entries(
+        "every ws as w, every w.o named by $params.k as x",
+        json!(["x is 1", "z is 1"]),
+        json!({"ws": [{"o": {"a": 1}}], "z": 2}),
+        json!({}),
+    );
+    assert!(
+        !said.iter().any(|entry| entry.starts_with("list ws ")),
+        "{said:#?}"
+    );
+}
