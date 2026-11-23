@@ -319,3 +319,17 @@ test_ignoring_case_lowers_and_surrounding_spaces_trims_as_opa_does if {
 	ergo._prepared(concat("", ["\u200b", "a", "\ufeff"]), "surrounding spaces") == concat("", ["\u200b", "a", "\ufeff"])
 	ergo._prepared("  IN Progress ", "case and surrounding spaces") == "in progress"
 }
+
+test_a_walked_part_list_after_is_in_ignoring_case_that_misses_an_item_still_judges_the_field_and_each_item_as_text if {
+	part := [`${"alias":"pl","n":1,"of":null,"old":true}`, "p", "name"]
+	leaf := {"op": "compare", "cmp": "in", "left": ["v"], "right": part, "ignoring": "case"}
+	three := {"v": 3, "p": [{"name": "a"}, {}]}
+	ergo._list_flaw(leaf, three) == {"absent", "unusable"} with input as {"ergo/names": {"ergo/subject": three}}
+	broken := {"v": "a", "p": [{"name": 3}, {}]}
+	ergo._list_flaw(leaf, broken) == {"absent", "unusable"} with input as {"ergo/names": {"ergo/subject": broken}}
+	params := {"p": [{"name": "a"}, {}]}
+	ergo._list_flaw(object.union(leaf, {"left": ["$$params", "k"]}), params) == {"absent", "null"} with input as {"ergo/names": {"ergo/subject": params}} with data.ergo_params as {"k": null}
+	ergo._list_flaw(object.remove(leaf, ["ignoring"]), three) == {"absent"} with input as {"ergo/names": {"ergo/subject": three}}
+	ys := {"v": 3}
+	ergo._list_flaw(object.union(leaf, {"right": ["ys"]}), ys) == {"absent"} with input as {"ergo/names": {"ergo/subject": ys}}
+}
