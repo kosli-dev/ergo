@@ -540,6 +540,14 @@ _text_walked_ref(check, r) if {
 	_ref_walks(r)
 }
 
+_text_walked_ref(check, r) if {
+	check.ignoring
+	_list_cmp(check)
+	check.cmp in _membership_ops
+	_as_subject_part(_rpath(check.right)) == r
+	_part_start(r)
+}
+
 _text_ref_state(r) := _text_walk_state(null, r) if {
 	_ref_walks(r)
 } else := _list_text_state(_ref_read(r)) if {
