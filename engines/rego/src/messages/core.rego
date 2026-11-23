@@ -374,6 +374,15 @@ _m_side_said(s, cause, check) if {
 	s.state in _no_value_states
 }
 
+_m_side_said(s, cause, check) if {
+	object.get(check, "ergo/row", false) == true
+	check.ignoring
+	check.cmp in _membership_ops
+	_walked_side(check.right)
+	s.state != cause
+	s.state in _no_value_states
+}
+
 _m_null_name(subj, side, "null") := _input_name(array.slice(side, 0, j)) if {
 	j := min({i | some i, _ in side; i > _first_key_at(side); _resolved(subj, array.slice(side, 0, i)) == null})
 } else := _input_name(array.slice(side, 0, _first_key_at(side))) if {

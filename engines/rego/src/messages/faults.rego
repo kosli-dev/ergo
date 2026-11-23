@@ -324,12 +324,21 @@ _m_walk_ref_faults(subj, check) := [] if {
 	count(_m_tally_parts(check)) > 0
 } else := _m_walk_ref_faults_of(subj, check)
 
-_m_walk_ref_faults_of(subj, check) := array.concat(array.concat(array.concat(_m_ref_blocked(check), _m_unusable_ref_walks(check)), _m_unusable_side_walks(subj, check)), _m_text_ref_walks(check))
+_m_walk_ref_faults_of(subj, check) := array.concat(array.concat(array.concat(array.concat(_m_ref_blocked(check), _m_unusable_ref_walks(check)), _m_unusable_side_walks(subj, check)), _m_text_ref_walks(check)), _m_text_side_walks(subj, check))
 
 _m_text_ref_walks(check) := [_m_text_walk_text(null, r)] if {
 	r := check.values.ref
 	_text_walked_ref(check, r)
 	_text_ref_state(r)
+} else := []
+
+_m_text_side_walks(subj, check) := [_m_text_walk_text(subj, p)] if {
+	check.ignoring
+	_list_cmp(check)
+	check.cmp in _membership_ops
+	_rwalking(subj, check.right)
+	p := _rpath(check.right)
+	_text_walk_state(subj, p)
 } else := []
 
 _m_text_walk_text(x, r) := _m_joined(_m_fail_parts("unusable", fails, roots)) if {
@@ -440,6 +449,7 @@ _m_fault_9(subj, check) := fs if {
 
 _m_list_right(subj, check) := [[check.right, k]] if {
 	check.ignoring
+	not _rwalking(subj, check.right)
 	_lstate(check, subj) == "value"
 	not _lfailed(check, subj)
 	k := _text_list_kind(_lvalue(check, subj))
