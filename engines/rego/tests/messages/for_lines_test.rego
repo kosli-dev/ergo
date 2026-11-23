@@ -3,6 +3,21 @@ package ergo_test
 import data.ergo
 import rego.v1
 
+test_a_for_row_whose_root_cant_be_read_keeps_each_clause_cause_only_when_the_tree_makes_the_row_fail_worse if {
+	p := {"roots": [{"text": "pos is null", "cause": "null"}], "line": [{"text": "xs is []", "cause": "value"}], "own": {1: "absent"}}
+	moved := {"texts": {"pos is null": "null", "xs is []": "value"}, "items": {1: "absent"}}
+	ergo._for_own_causes({"r": {"root_msgs": ["pos is null"]}, "subj": {}}, p, "null", "absent") == moved
+	ergo._for_own_causes({"r": {"root_msgs": ["pos is null"]}, "subj": {}}, p, "absent", "absent") == {"texts": {}, "items": {}}
+	ergo._for_own_causes({"r": {}, "subj": {}}, p, "null", "absent") == {"texts": {}, "items": {}}
+}
+
+test_a_for_entry_takes_the_worst_cause_of_its_texts_only_when_each_text_has_one if {
+	ergo._for_texts_cause({"a": "null", "b": "absent"}, ["a", "b"]) == "absent"
+	ergo._for_texts_cause({"a": "null"}, ["a"]) == "null"
+	ergo._for_texts_cause({"a": "null"}, ["a", "c"]) == null
+	ergo._for_texts_cause({}, []) == null
+}
+
 test_message_a_list_holds_a_position_and_an_object_holds_a_key if {
 	ergo._m_holds([1], 0)
 	ergo._m_holds({"a": 1}, "a")
