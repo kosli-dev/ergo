@@ -2455,3 +2455,30 @@ fn a_walked_list_after_is_in_ignoring_case_that_cant_be_used_fails_a_one_line_ev
         );
     }
 }
+
+#[test]
+fn a_null_item_of_a_list_after_is_in_ignoring_case_is_said_beside_an_item_that_fails_worse() {
+    for (sentence, subject, params, cause, message) in [
+        (
+            "some xs.v is in ys ignoring case",
+            json!({"xs": [{}], "ys": ["a", null]}),
+            json!({}),
+            Cause::Absent,
+            "item 2 of ys is null; item 1 of xs: v is missing",
+        ),
+        (
+            "every xs.v is in $params.l ignoring case",
+            json!({"xs": [{"v": "a"}, {}]}),
+            json!({"l": [null]}),
+            Cause::Absent,
+            "item 1 of $params.l is null; item 2 of xs: v is missing",
+        ),
+    ] {
+        let out = row_of(sentence, subject, params);
+        assert_eq!(
+            (out.verdict.cause, out.message.as_deref()),
+            (cause, Some(message)),
+            "{sentence}"
+        );
+    }
+}
