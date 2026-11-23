@@ -87,6 +87,7 @@ pub struct Run {
     pub failed_items: Vec<Value>,
     pub message: Option<String>,
     pub items: Vec<Clause>,
+    pub clauses: Vec<Clause>,
 }
 
 #[cfg(test)]
@@ -1963,6 +1964,7 @@ impl For {
         if run.verdict.cause != Cause::Satisfied {
             self.key_inputs(&mut run, ctx);
             run.message = (!shown.is_empty()).then(|| super::clause::text(&shown));
+            run.clauses = clauses.clone();
         }
         #[cfg(test)]
         RAN.with(|ran| {
@@ -2034,6 +2036,20 @@ impl For {
             let group = self.sentence_group(at);
             clauses.extend(said.into_iter().map(|clause| clause.in_group(group)));
         }
+        listed_roots(lines_once(clauses))
+    }
+
+    /// The roots the `whose` clauses of the line's own items read outside
+    /// the items and can't read, each said once.
+    pub fn whose_root_clauses(&self, ctx: &Ctx) -> Vec<Clause> {
+        let outer = outer_ctx(ctx);
+        let whose: Vec<&Check> = self
+            .items
+            .iter()
+            .flat_map(|item| item.whose.iter())
+            .collect();
+        let mut clauses = super::message::listed_root_clauses(&whose, &outer, true);
+        clauses.extend(super::message::walked_root_clauses(&whose, &outer));
         listed_roots(lines_once(clauses))
     }
 
@@ -2347,6 +2363,7 @@ impl For {
                 failed_items: Vec::new(),
                 message: None,
                 items: Vec::new(),
+                clauses: Vec::new(),
             };
         }
         let mut collect = Collect {
@@ -2454,9 +2471,10 @@ impl For {
             items.extend(
                 super::message::for_empty(&listed, &outer, cause)
                     .into_iter()
-                    .filter(|text| !roots.contains(text))
-                    .map(|text| {
-                        Clause::list(&text.clone(), cause, text).in_group(self.sentences.len())
+                    .filter(|(_, text)| !roots.contains(text))
+                    .map(|(name, text)| {
+                        let name = if name.is_empty() { text.clone() } else { name };
+                        Clause::list(&name, cause, text).in_group(self.sentences.len())
                     }),
             );
         }
@@ -2470,6 +2488,7 @@ impl For {
             failed_items: failed,
             message: None,
             items: free.into_iter().chain(items).collect(),
+            clauses: Vec::new(),
         }
     }
 
