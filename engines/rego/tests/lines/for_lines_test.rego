@@ -143,6 +143,12 @@ test_a_for_row_run_again_to_read_its_walked_roots_keeps_its_message_off_the_tree
 	_on_tree("every xs as x", ["x.v is 1"], {"xs": [{"v": 0}]}, {}) with ergo._walk_roots_on as true
 }
 
+test_a_for_row_whose_whose_key_from_params_cant_be_read_keeps_its_message_off_the_tree if {
+	not _on_tree("every es whose zz is m named by $params.k as e", ["e.v exists", "z is 1"], {"z": 2, "es": [{"zz": 2, "m": {"a": 1}, "v": 1}]}, {})
+	not _on_tree("every es whose zz is m named by $params.k as e", ["e.v exists", "z is 1"], {"z": 2, "es": [{"zz": 2, "m": {"a": 1}, "v": 1}]}, {"k": null})
+	_on_tree("every es whose zz is m named by $params.k as e", ["e.v is 2"], {"es": [{"zz": 2, "m": {"a": 2}, "v": 1}]}, {"k": "a"})
+}
+
 test_a_for_row_on_the_tree_leaves_its_message_to_the_tree if {
 	check := ergo._s_written_check({"for": "every xs as x", "assert": "x.v is 1"})
 	subj := {"xs": [{"v": 2}]}
