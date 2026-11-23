@@ -382,6 +382,21 @@ fn what_a_walk_says_of_an_item_whose_sorted_second_list_fails_stays_in_an_entry_
 }
 
 #[test]
+fn an_item_that_isnt_an_object_stays_in_the_list_entry_beside_a_sort_key_that_isnt_text() {
+    let said = entries(
+        "first of xs sorted by m named by $params.km as x",
+        json!(["x.v is 1", "z is 1"]),
+        json!({"z": 2, "xs": [{"v": 2, "m": 2}, [1], {"v": 2, "m": [1]}]}),
+        json!({"km": 3}),
+    );
+    assert!(
+        said.iter()
+            .any(|entry| entry.contains("item 2 of xs is [1], which isn't an object")),
+        "{said:#?}"
+    );
+}
+
+#[test]
 fn an_items_problem_that_only_the_row_says_beside_a_null_root_stays_in_an_entry() {
     let said = entries(
         "every ws as w, every ys whose n is in $params.z as x",
