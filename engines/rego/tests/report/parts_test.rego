@@ -229,6 +229,13 @@ test_a_list_after_is_in_ignoring_case_that_holds_an_item_that_isnt_text_is_an_un
 	ergo._with_outcome({"name": "ys", "value": null}) == {"name": "ys", "value": null} with data.ergo_text_lists as {"ys"}
 }
 
+test_a_walked_part_list_after_is_in_ignoring_case_is_named_with_its_walked_steps_and_is_an_unusable_input_when_an_item_isnt_text if {
+	ergo._with_outcome({"name": "pl[].name", "value": [3]}).outcome == "unusable" with data.ergo_text_lists as {"pl.name"}
+	ergo._with_outcome({"name": "pl[].name", "value": ["a", null]}).outcome == "unusable" with data.ergo_text_lists as {"pl.name"}
+	ergo._with_outcome({"name": "pl[].name", "value": ["a"]}).outcome == "usable" with data.ergo_text_lists as {"pl.name"}
+	ergo._with_outcome({"name": "pl[].name", "value": [3]}).outcome == "usable" with data.ergo_text_lists as {"pl.id"}
+}
+
 test_the_lists_a_check_compares_ignoring_case_are_named_as_its_inputs_name_them if {
 	field := {"op": "compare", "left": ["x"], "cmp": "in", "right": ["ys"], "ignoring": "case"}
 	ergo._text_list_names(field) == {"ys"}
