@@ -148,3 +148,12 @@ test_a_walked_part_list_after_is_in_ignoring_case_names_each_item_as_a_walk_does
 	row := object.union(object.union(leaf, {"left": ["$$params", "k"]}), {"ergo/row": true})
 	ergo._m_message_pieces(ergo._m_with_sides(ergo._m_walked(row, params)), params, "absent") == ["$params.k is null", "item 2 of pl: name is missing"] with input as {"ergo/names": {"ergo/subject": params}} with data.ergo_params as {"k": null}
 }
+
+test_a_walked_part_list_after_is_in_ignoring_case_is_said_after_the_field_so_its_part_is_one_of_the_lists_a_message_names_last if {
+	part := [`${"alias":"pl","n":1,"of":null,"old":true}`, "p", "name"]
+	leaf := {"op": "compare", "cmp": "in", "left": ["v"], "right": part, "ignoring": "case"}
+	"pl" in ergo._m_list_names(leaf)
+	"pl.name" in ergo._m_list_names(leaf)
+	ergo._m_list_names(object.union(leaf, {"right": ["ys"]})) == {"ys"}
+	ergo._m_list_names(object.remove(leaf, ["ignoring"])) == set()
+}
