@@ -736,9 +736,9 @@ pub fn for_failures(
             })
             || texts_once.len() != 1
         {
-            let first_item = first_items
-                .iter()
-                .any(|n| clause.starts_with(&format!("{n}: ")));
+            let first_item = first_items.iter().any(|n| {
+                clause.starts_with(&format!("{n}: ")) || clause.starts_with(&format!("{n} "))
+            });
             if unread || (texts_once.len() != 1 && first_item) {
                 ops::push_new(&mut leftover, clause.to_string());
             }
