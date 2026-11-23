@@ -15,7 +15,6 @@ concurrency:
 
 jobs:
   checks:
-    if: github.event.action != 'edited'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -145,7 +144,6 @@ jobs:
         run: opa eval --strict-builtin-errors -d engines/rego -d dist -d spec:spec -d examples:examples --ignore src --format raw 'count(data) > 0'
 
   tests-rego:
-    if: github.event.action != 'edited'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     strategy:
@@ -175,7 +173,6 @@ jobs:
           path: ${{ runner.temp }}/not-covered-${{ matrix.part }}.txt
 
   tests-rego-coverage:
-    if: github.event.action != 'edited'
     needs: tests-rego
     runs-on: ubuntu-latest
     timeout-minutes: 4
