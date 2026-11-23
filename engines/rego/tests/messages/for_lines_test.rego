@@ -568,6 +568,12 @@ test_a_root_of_a_for_row_that_names_an_item_counts_toward_the_items_shown if {
 	shown == "item 1 of t: item 1 of c is 1, which isn't an object; item 1 of t: item 2 of c is 1, which isn't an object; item 2 of t: item 1 of c is 1, which isn't an object; and 1 more"
 }
 
+test_a_sentences_roots_for_its_entries_come_from_what_the_tree_read_or_are_read_again if {
+	check := ergo._s_written_check({"for": "every xs as x", "assert": ["x.v is $params.a", "x.w is 1"]})
+	"$params.a is missing" in ergo._for_sentence_root_texts(check, {"xs": [{"v": 1}]}, 0, {})
+	ergo._for_sentence_root_texts(check, {"xs": [{"v": 1}]}, 0, {0: [["absent", "$params.b is missing"]]}) == ["$params.b is missing"]
+}
+
 test_a_for_rows_list_is_not_said_when_a_root_failed_beside_a_sentence_that_reads_no_alias if {
 	check := ergo._s_written_check({"for": "every xs as m", "assert": "count of xs whose v is in $input.z is 0"})
 	unfreed := {"cause": "value", "failed": [], "root_msgs": ["$input.z is []"]}
