@@ -255,7 +255,6 @@ fn leaves(item: &Clause) -> usize {
     usize::from(!item.text.is_empty()) + usize::from(own) + under
 }
 
-#[cfg_attr(not(test), expect(dead_code))]
 pub fn to_value(clauses: &[Clause]) -> Value {
     Value::Array(
         clauses
@@ -275,13 +274,13 @@ pub fn to_value(clauses: &[Clause]) -> Value {
                     "text": clause.text,
                     "said": to_value(&clause.said),
                     "group": clause.group,
+                    "said_first": clause.said_first,
                 })
             })
             .collect(),
     )
 }
 
-#[cfg_attr(not(test), expect(dead_code))]
 pub fn of_value(value: &Value) -> Option<Vec<Clause>> {
     let number = |clause: &Value, key: &str| usize::try_from(clause.get(key)?.as_u64()?).ok();
     let text = |clause: &Value, key: &str| clause.get(key)?.as_str().map(str::to_string);
@@ -304,7 +303,10 @@ pub fn of_value(value: &Value) -> Option<Vec<Clause>> {
                 said: of_value(clause.get("said")?)?,
                 group: number(clause, "group")?,
                 last_of_cause: false,
-                said_first: false,
+                said_first: clause
+                    .get("said_first")
+                    .and_then(Value::as_bool)
+                    .unwrap_or(false),
             })
         })
         .collect()

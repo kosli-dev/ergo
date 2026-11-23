@@ -2617,6 +2617,7 @@ fn walked_roots_run(check: &Check, ctx: &Ctx) -> (ops::Ran, Option<Said>) {
 struct RanItems {
     rich: Vec<Value>,
     pieces: Option<Vec<ops::clause::Clause>>,
+    line_clauses: Vec<ops::clause::Clause>,
     checks: Vec<Check>,
     verdicts: Vec<Verdict>,
     said: Vec<Option<Said>>,
@@ -3241,9 +3242,12 @@ fn with_failures(
                     .unwrap_or_default();
                 Some(crate::for_parts::for_failures(
                     line,
-                    row.cause,
-                    &row.inputs,
-                    &message,
+                    &crate::for_parts::LineRow {
+                        cause: row.cause,
+                        inputs: &row.inputs,
+                        message: &message,
+                        clauses: &ran.line_clauses,
+                    },
                     &failed,
                     &at(None, line.sentences.len()),
                     ctx,
@@ -3317,6 +3321,7 @@ fn check_row(
     let mut failed_items = None;
     let mut rich: Vec<Value> = Vec::new();
     let mut pieces: Option<Vec<ops::clause::Clause>> = None;
+    let mut line_clauses: Vec<ops::clause::Clause> = Vec::new();
     let mut said: Vec<Option<Said>> = Vec::new();
     let checks: Vec<Check> = plan
         .items
@@ -3333,6 +3338,7 @@ fn check_row(
             failed_items = ran.failed_items.map(Value::Array);
             rich = ran.rich;
             pieces = ran.parts;
+            line_clauses = ran.line_clauses.unwrap_or_default();
             let mut verdict = ran.verdict;
             if env.unreadable.is_empty() && !verdict.passed() {
                 let said = own
@@ -3405,6 +3411,7 @@ fn check_row(
         RanItems {
             rich,
             pieces,
+            line_clauses,
             checks,
             verdicts,
             said,

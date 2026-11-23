@@ -1607,6 +1607,10 @@ pub fn ref_fault_list(checks: &[&Check], ctx: &Ctx) -> Vec<String> {
 }
 
 pub fn first_list_text(path: &Path, ctx: &Ctx) -> Option<String> {
+    first_list_named(path, ctx).map(|(_, text)| text)
+}
+
+fn first_list_named(path: &Path, ctx: &Ctx) -> Option<(String, String)> {
     let from = usize::from(!matches!(path.start, Start::Part(_)));
     (from..=path.steps.len()).find_map(|at| {
         let prefix = Path {
@@ -1616,7 +1620,7 @@ pub fn first_list_text(path: &Path, ctx: &Ctx) -> Option<String> {
         let read = path::read(&prefix, ctx);
         read.value
             .filter(|value| value.is_array())
-            .map(|value| is(&name::name(&prefix), value))
+            .map(|value| (name::name(&prefix), is(&name::name(&prefix), value)))
     })
 }
 
@@ -1626,18 +1630,21 @@ pub struct ForItem<'a> {
     pub picks: bool,
 }
 
-pub fn for_empty(items: &[ForItem], ctx: &Ctx, cause: Cause) -> Vec<String> {
+/// What a `for` line that picks no item says, each with the name it reads,
+/// like `xs` for `xs is []`, or `""` when it says a key.
+pub fn for_empty(items: &[ForItem], ctx: &Ctx, cause: Cause) -> Vec<(String, String)> {
     let want = match cause {
         Cause::Absent => Some(Outcome::Absent),
         Cause::Null => Some(Outcome::Null),
         _ => None,
     };
-    let mut said: Vec<String> = Vec::new();
+    let mut said: Vec<(String, String)> = Vec::new();
     if let Some(want) = want {
-        said = once_of(
+        said = named_once(
             items
                 .iter()
                 .flat_map(|item| key_states_of(item.path, ctx, want))
+                .map(|text| (String::new(), text))
                 .collect(),
         );
         if said.is_empty() {
@@ -1653,10 +1660,13 @@ pub fn for_empty(items: &[ForItem], ctx: &Ctx, cause: Cause) -> Vec<String> {
                     inputs.extend(first_input(&reference, ctx));
                 }
                 for input in inputs.iter().filter(|input| input.state == want) {
-                    clauses.push(format!("{} is {}", input.stopped_at(), state_word(want)));
+                    clauses.push((
+                        input.stopped_at().to_string(),
+                        format!("{} is {}", input.stopped_at(), state_word(want)),
+                    ));
                 }
             }
-            said = once_of(clauses);
+            said = named_once(clauses);
         }
     } else if cause == Cause::Unusable {
         let mut clauses = Vec::new();
@@ -1665,7 +1675,12 @@ pub fn for_empty(items: &[ForItem], ctx: &Ctx, cause: Cause) -> Vec<String> {
             let checks: Vec<&Check> = item.whose.iter().collect();
             clauses.extend(ref_fault_list(&checks, ctx));
         }
-        said = once_of(clauses);
+        said = named_once(
+            clauses
+                .into_iter()
+                .map(|text| (String::new(), text))
+                .collect(),
+        );
     }
     if said.is_empty() {
         let narrows = |item: &&ForItem| {
@@ -1675,23 +1690,33 @@ pub fn for_empty(items: &[ForItem], ctx: &Ctx, cause: Cause) -> Vec<String> {
                     .value
                     .is_some_and(|value| value.as_array().is_some_and(Vec::is_empty))
         };
-        said = once_of(
+        said = named_once(
             items
                 .iter()
                 .filter(narrows)
-                .filter_map(|item| first_list_text(item.path, ctx))
+                .filter_map(|item| first_list_named(item.path, ctx))
                 .collect(),
         );
     }
     if said.is_empty() {
-        said = once_of(
+        said = named_once(
             items
                 .iter()
-                .filter_map(|item| first_list_text(item.path, ctx))
+                .filter_map(|item| first_list_named(item.path, ctx))
                 .collect(),
         );
     }
     said
+}
+
+fn named_once(all: Vec<(String, String)>) -> Vec<(String, String)> {
+    let mut out: Vec<(String, String)> = Vec::new();
+    for (name, text) in all {
+        if !out.iter().any(|(_, seen)| *seen == text) {
+            out.push((name, text));
+        }
+    }
+    out
 }
 
 pub fn reads_from_a_root(path: &Path) -> bool {

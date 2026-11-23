@@ -1901,6 +1901,30 @@ fn for_root_clauses(
     subject: Value,
     params: Value,
 ) -> Vec<crate::ops::clause::Clause> {
+    on_line(for_line, assertions, subject, params, |line, ctx| {
+        line.root_clauses(ctx)
+    })
+}
+
+fn for_assertion_roots(
+    for_line: &str,
+    assertions: &[&str],
+    subject: Value,
+    params: Value,
+    idx: usize,
+) -> String {
+    on_line(for_line, assertions, subject, params, |line, ctx| {
+        crate::ops::clause::text(&crate::ops::clause::shown(&line.assertion_roots(idx, ctx)))
+    })
+}
+
+fn on_line<T>(
+    for_line: &str,
+    assertions: &[&str],
+    subject: Value,
+    params: Value,
+    with: impl FnOnce(&super::For, &crate::path::Ctx) -> T,
+) -> T {
     let line = ergo_policy_sentences::parse_for(for_line).unwrap();
     let parsed: Vec<_> = assertions
         .iter()
@@ -1927,7 +1951,42 @@ fn for_root_clauses(
         params: Some(&params),
         aliases: std::collections::BTreeMap::new(),
     };
-    line.root_clauses(&ctx)
+    with(&line, &ctx)
+}
+
+#[test]
+fn each_sentence_that_reads_a_root_gives_it() {
+    let roots = |idx| {
+        for_assertion_roots(
+            "every xs as x",
+            &["x.v is at least $params.min", "x.w is at least $params.min"],
+            json!({"xs": [{"v": 1}, {}]}),
+            json!({"min": "s"}),
+            idx,
+        )
+    };
+    assert_eq!(roots(0), "$params.min is \"s\", which isn't a number");
+    assert_eq!(roots(1), "$params.min is \"s\", which isn't a number");
+}
+
+#[test]
+fn a_sentence_gives_only_the_roots_it_reads() {
+    let roots = |idx| {
+        for_assertion_roots(
+            "every xs as x",
+            &[
+                "x.v is at least $params.a",
+                "x.w is at least $params.b",
+                "x.u is 1",
+            ],
+            json!({"xs": [{}]}),
+            json!({"a": "s"}),
+            idx,
+        )
+    };
+    assert_eq!(roots(0), "$params.a is \"s\", which isn't a number");
+    assert_eq!(roots(1), "$params.b is missing");
+    assert_eq!(roots(2), "");
 }
 
 #[test]
@@ -2461,24 +2520,9 @@ const ROWS_THE_CLAUSES_DONT_SAY_YET: &[(&str, usize, &str)] = &[
         ROW_LEAVES_OUT_AN_ITEM,
     ),
     (
-        "messages / a for item with a whose that reads a part over items that aren't all objects / names the part first, once, then each item in turn",
-        1,
-        ENTRY_CAUSE,
-    ),
-    (
         "messages / a root that reads the alias of the first item of a for line, in the second item / fails before any item of the second list, naming each first item, on an empty list too",
         5,
         OTHER_SUBJECTS_CAUSE,
-    ),
-    (
-        "for / a walk through a for line's alias leaves a root after the phrase to the assertion, and each item keeps its own cause and the items of its list / an item whose list holds five items without v",
-        1,
-        ENTRY_CAUSE,
-    ),
-    (
-        "for / a walk through a for line's alias leaves a root after the phrase to the assertion, and each item keeps its own cause and the items of its list / an item whose list holds five items without v",
-        2,
-        ENTRY_CAUSE,
     ),
 ];
 
@@ -2589,6 +2633,44 @@ fn the_clauses_of_every_for_row_say_what_the_row_and_its_entries_say_today() {
         said.join("\n")
     );
     assert!(compared > 0);
+}
+
+fn record_clauses(record: &Value) -> Vec<String> {
+    crate::ops::clause::lines(
+        &crate::ops::clause::of_value(&record["ergo/clauses"]).unwrap_or_default(),
+    )
+}
+
+#[test]
+fn a_record_carries_each_sentences_clauses_whole() {
+    let run = for_run(
+        "every xs as x",
+        &["x.v is 1", "x.w is 1"],
+        json!({"xs": [{"v": "p; q"}]}),
+        json!({}),
+    );
+    let assertions = &run.failed_items[0]["failed_assertions"];
+    assert_eq!(
+        record_clauses(&assertions[0]),
+        ["x.v is \"p; q\", which isn't a number"]
+    );
+    assert_eq!(record_clauses(&assertions[1]), ["x.w is missing"]);
+}
+
+#[test]
+fn a_record_of_a_second_list_carries_each_sentences_clauses() {
+    let run = for_run(
+        "every ws as w, every w.ys as y",
+        &["y.v is 1", "w.n is 1"],
+        json!({"ws": [{"n": 2, "ys": [{"v": "p; q"}]}]}),
+        json!({}),
+    );
+    let assertions = &run.failed_items[0]["failed_assertions"];
+    assert_eq!(
+        record_clauses(&assertions[0]["items"][0]),
+        ["y.v is \"p; q\", which isn't a number"]
+    );
+    assert_eq!(record_clauses(&assertions[1]), ["w.n is 2"]);
 }
 
 fn for_items(
