@@ -6,6 +6,7 @@ trap '/bin/rm -rf "$dir"' EXIT
 repo=$dir/repo
 mkdir -p "$repo/.github" "$repo/engines/rust" "$repo/engines/rego/tests" "$repo/spec/cases/t" "$repo/spec/cases/u"
 cp "$script" "$repo/.github/sync-facts.sh"
+cp "$(dirname "$script")/diff-types.py" "$repo/.github/diff-types.py"
 cd "$repo"
 git init -q
 git config user.email test@example.com
@@ -132,5 +133,21 @@ if sh .github/sync-facts.sh a b 2> /dev/null; then
 fi
 if sh .github/sync-facts.sh nope 2> /dev/null; then
   echo "an unknown base should be an error" >&2
+  exit 1
+fi
+
+git checkout -q -f feature
+mkdir -p "$dir/dump/t" "$dir/dump/u"
+printf '1\tt / g / a\n3\tt / g / c\n' > "$dir/dump/t/index.txt"
+printf '2\tu / h / y\n3\tu / h / z\n' > "$dir/dump/u/index.txt"
+for f in t/1 t/3 u/2 u/3; do
+  echo '{}' > "$dir/dump/$f.json"
+done
+out=$(SYNC_FACTS_TYPES=1 SYNC_FACTS_DUMP="$dir/dump" sh .github/sync-facts.sh main)
+echo "$out" | grep -q -- '- type 1 (verdict differs): 0'
+echo "$out" | grep -q -- '- type 3 (anything else): 4'
+echo "$out" | grep -q -- '### Change against main'
+if sh .github/sync-facts.sh main | grep -q 'type 1'; then
+  echo "the types should appear only when SYNC_FACTS_TYPES is set" >&2
   exit 1
 fi

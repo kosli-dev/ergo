@@ -222,10 +222,10 @@ def run_rust(root, folder):
 QUERY = """{n: r |
     some n in input.names
     t := split(n, " / ")[0]
-    some group in data.ergo_test._topic_cases(t)
+    some group in data.spec_test._topic_cases(t)
     some c in group.cases
     concat(" / ", [t, group.description, c.description]) == n
-    r := data.ergo_test._report(group, c)
+    r := data.spec_test._report(group, c)
 }"""
 
 
