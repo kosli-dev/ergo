@@ -14,8 +14,6 @@ known_differences := {
 	"for / a part that holds a list is walked by a whose in `count of m.ys whose v is in pl.z is 0` / the part holds an empty list and the list has an item",
 	"for / a part that holds a list is walked in the whose of a for line and in a whose under it / an empty part fails as value",
 	"for / the roots of the line's own whose come before the roots of its sentences, whatever their causes / $params.min is missing and says first, though $params.a has the worse cause",
-	"in / an empty list on the right of a whose is said before the list it filters, after contains all of and none of, beside a plus and on a for line, as a null list is / fails with the empty list said once, then an item that is null",
-	"in / an empty list on the right of a whose is said before the list it filters, after contains all of and none of, beside a plus and on a for line, as a null list is / fails with the empty list said once, then each item that can't be read under its item",
 }
 
 _topic_cases(topic) := json.unmarshal(replace(json.marshal(data.spec.cases[topic]), "{{spec}}", ergo._spec))

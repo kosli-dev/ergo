@@ -1082,7 +1082,7 @@ _for_list_rank(lists, l) := [i | some i, x in lists; x == l][0]
 
 _for_row_clauses(check, subj, r) := array.concat(array.concat(array.concat(p.roots, p.free), p.items), p.lists) if p := _for_row_parts(check, subj, r)
 
-_for_row_parts(check, subj, r) := {"roots": roots, "free": free, "items": items, "lists": array.concat(listed, line), "line": line, "said": ssaid} if {
+_for_row_parts(check, subj, r) := {"roots": roots, "free": free, "items": items, "lists": array.concat(listed, line), "line": line, "said": ssaid, "own": {k: c.cause | some [k, c] in failed}} if {
 	ssaid := _for_row_said(check, subj, r)
 	roots := [_for_root_item(c) | some c in _for_row_roots(check, subj, r, ssaid); not _for_subject_root(c, subj, r)]
 	rooted := {c.text | some c in roots}
@@ -1502,14 +1502,16 @@ _m_applies(evals, req, false) := {"message": concat("; ", ms)} if {
 
 _for_said(raw) := object.union(object.remove(raw, ["ergo/for_raw"]), {
 	"message": _m_aliased(_m_clauses_text(_m_clauses_shown(tree))),
-	"cause": _worst_or_value({raw.cause} | {v.cause | walk(tree, [_, v]); is_object(v); "cause" in object.keys(v)}),
-	"ergo/for_texts": _for_said_texts(s.check, s.subj, s.r, _m_clause_texts(array.concat(p.roots, p.free)), _m_clause_texts(p.line), p.said, set()),
+	"cause": cause,
+	"ergo/for_texts": object.union(_for_said_texts(s.check, s.subj, s.r, _m_clause_texts(array.concat(p.roots, p.free)), _m_clause_texts(p.line), p.said, set(), own.texts), {"own": own.items}),
 }) if {
 	s := raw["ergo/for_raw"]
 	s.tree == true
 	count(_m_for_said(s.check) | _m_for_tally_said(s.check)) == 0
 	p := _for_row_parts(s.check, s.subj, s.r)
 	tree := array.concat(array.concat(array.concat(p.roots, p.free), p.items), p.lists)
+	cause := _worst_or_value({raw.cause} | {v.cause | walk(tree, [_, v]); is_object(v); "cause" in object.keys(v)})
+	own := _for_own_causes(s, p, raw.cause, cause)
 } else := object.union(object.remove(raw, ["ergo/for_raw"]), {"message": said.message, "ergo/for_texts": _for_texts(s.check, s.subj, s.r, said.once, said.line)}) if {
 	s := raw["ergo/for_raw"]
 	s.tree == true
@@ -1518,12 +1520,13 @@ _for_said(raw) := object.union(object.remove(raw, ["ergo/for_raw"]), {
 
 else := raw
 
-_for_texts(check, subj, r, once, line) := _for_said_texts(check, subj, r, once, line, {}, _m_for_said(check) | _m_for_tally_said(check))
+_for_texts(check, subj, r, once, line) := _for_said_texts(check, subj, r, once, line, {}, _m_for_said(check) | _m_for_tally_said(check), {})
 
-_for_said_texts(check, subj, r, once, line, ssaid, said) := {
+_for_said_texts(check, subj, r, once, line, ssaid, said, causes) := {
 	"items": items,
-	"said": [concat("; ", array.concat(_for_flaw_said(check, i, flaw), _for_grouped(check, _uncovered(array.concat([m | some m in roots; i in owners[m]], object.get(frees, a, [])))))) | some i, a in check.assertions],
-	"walk": array.concat(array.concat([["list", _for_list_label(check, m), m] | flaw == []; some m in line], [["list", _for_list_label(check, ""), concat("; ", _for_grouped(check, unowned))] | unowned != []]), seconds),
+	"said": [concat("; ", array.concat(_for_flaw_said(check, i, flaw), _for_grouped(check, owned[i]))) | some i, _ in check.assertions],
+	"said_causes": [_for_texts_cause(causes, array.concat(_for_flaw_said(check, i, flaw), owned[i])) | some i, _ in check.assertions],
+	"walk": array.concat(array.concat([["list", _for_list_label(check, m), m, _for_texts_cause(causes, [m])] | flaw == []; some m in line], [["list", _for_list_label(check, ""), concat("; ", _for_grouped(check, unowned)), _for_texts_cause(causes, unowned)] | unowned != []]), seconds),
 	"free": [object.remove(l, ["msg", "own_msg"]) | some l in object.get(r, "free_lines", [])],
 	"flawed": flaw != [],
 } if {
@@ -1538,8 +1541,22 @@ _for_said_texts(check, subj, r, once, line, ssaid, said) := {
 	frees0 := _for_free_said(r, [], once, free_as)
 	owners := {m: _for_root_owner(check, subj, m, frees0, ssaid) | some m in roots}
 	unowned := _uncovered([m | some m in roots; -1 in owners[m]])
-	seconds := [["item", _m_lead_of(m), _m_after_lead(_m_lead_of(m), m)] | once != []; some m in rs; m in second]
+	owned := [_uncovered(array.concat([m | some m in roots; i in owners[m]], object.get(frees, a, []))) | some i, a in check.assertions]
+	seconds := [["item", _m_lead_of(m), _m_after_lead(_m_lead_of(m), m), null] | once != []; some m in rs; m in second]
 }
+
+_for_texts_cause(causes, ts) := _worst_or_value({causes[t] | some t in ts}) if {
+	ts != []
+	every t in ts {
+		_ = causes[t]
+	}
+} else := null
+
+_for_own_causes(s, p, was, now) := {"texts": {c.text: _worst_or_value({d.cause | some d in cs; d.text == c.text}) | some c in cs}, "items": p.own} if {
+	now != was
+	_for_row_rooted(s.r, s.subj)
+	cs := array.concat(p.roots, p.line)
+} else := {"texts": {}, "items": {}}
 
 _for_flaw_line(check, line) := line if {
 	line != []
