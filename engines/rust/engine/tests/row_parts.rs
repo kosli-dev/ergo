@@ -188,8 +188,7 @@ fn tree_of(rows: &[Value], check: &str) -> Vec<String> {
 }
 
 #[test]
-fn a_for_lines_whose_root_with_more_than_three_problems_keeps_the_entries_it_has_until_entries_come_from_clauses()
- {
+fn a_for_lines_whose_root_with_more_than_three_problems_is_said_once_capped_and_no_item_says_it() {
     let pos = rows_of(
         json!({
             "subjects": {"c": {"from": "every cs", "has": {"pos": "os"}}},
@@ -202,7 +201,7 @@ fn a_for_lines_whose_root_with_more_than_three_problems_keeps_the_entries_it_has
     assert_eq!(
         tree_of(&pos, "whose"),
         [
-            "assertion r.v is \"bob\": item 2 of pos: name is missing; item 3 of pos: name is missing; item 4 of pos: name is missing",
+            "list rows: item 2 of pos: name is missing; item 3 of pos: name is missing; item 4 of pos: name is missing; and 2 more",
             "item item 2 of rows: v is missing",
             "item item 3 of rows: v is missing"
         ]
@@ -220,18 +219,10 @@ fn a_for_lines_whose_root_with_more_than_three_problems_keeps_the_entries_it_has
             {"c": [1, 2], "rows": [{"n": 2}, {"n": 3}], "ms": [{"ws": [{"n": 2}, {"n": 3}]}]}
         ]]}),
     );
-    let three = "item 1 of t: item 1 of c is 1, which isn't an object; item 1 of t: item 2 of c is 2, which isn't an object; item 2 of t: item 1 of c is 1, which isn't an object";
-    assert_eq!(tree_of(&counted, "own"), [format!("list t.rows: {three}")]);
-    let capped = format!("{three}; and 1 more");
+    let capped = "item 1 of t: item 1 of c is 1, which isn't an object; item 1 of t: item 2 of c is 2, which isn't an object; item 2 of t: item 1 of c is 1, which isn't an object; and 1 more";
+    assert_eq!(tree_of(&counted, "own"), [format!("list t.rows: {capped}")]);
     assert_eq!(
-        tree_of(&counted, "second"),
-        [
-            "item item 1 of t[0].ms: ".to_string(),
-            format!("  item item 1 of m.ws: {capped}"),
-            format!("  item item 2 of m.ws: {capped}"),
-            "item item 1 of t[1].ms: ".to_string(),
-            format!("  item item 1 of m.ws: {capped}"),
-            format!("  item item 2 of m.ws: {capped}"),
-        ]
+        tree_of(&counted, "second")[0],
+        format!("list t.ms: {capped}")
     );
 }
