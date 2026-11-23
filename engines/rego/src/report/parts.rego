@@ -418,12 +418,16 @@ else := object.union(i, {"outcome": "unusable"}) if {
 	i.value != null
 	i.name in data.ergo_unfit
 } else := object.union(i, {"outcome": "unusable"}) if {
-	i.name in data.ergo_text_lists
+	_text_list_input(i.name)
 	is_array(i.value)
 	_text_items_state(i.value)
 } else := object.union(i, {"outcome": "usable"}) if i.value != null
 
 else := i
+
+_text_list_input(name) if name in data.ergo_text_lists
+
+_text_list_input(name) if replace(name, "[]", "") in data.ergo_text_lists
 
 _entry(kind, name, cause, inputs, failures, message) := {
 	"kind": kind,

@@ -234,6 +234,7 @@ test_a_walked_part_list_after_is_in_ignoring_case_is_named_with_its_walked_steps
 	ergo._with_outcome({"name": "pl[].name", "value": ["a", null]}).outcome == "unusable" with data.ergo_text_lists as {"pl.name"}
 	ergo._with_outcome({"name": "pl[].name", "value": ["a"]}).outcome == "usable" with data.ergo_text_lists as {"pl.name"}
 	ergo._with_outcome({"name": "pl[].name", "value": [3]}).outcome == "usable" with data.ergo_text_lists as {"pl.id"}
+	ergo._with_outcome({"name": "$input.cs[].name", "value": [3]}).outcome == "unusable" with data.ergo_text_lists as {"$input.cs[].name"}
 }
 
 test_the_lists_a_check_compares_ignoring_case_are_named_as_its_inputs_name_them if {
