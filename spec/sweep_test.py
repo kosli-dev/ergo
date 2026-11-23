@@ -219,6 +219,14 @@ class KindTest(unittest.TestCase):
     def test_two_different_errors_are_type_3(self):
         self.assertEqual(sweep.kind({"error": "a"}, {"error": "b"}), 3)
 
+    def test_a_duplicate_row_in_one_engine_only_is_type_1(self):
+        self.assertEqual(sweep.kind(whole(one_row(), one_row()), whole(one_row())), 1)
+
+    def test_rows_with_one_key_and_swapped_verdicts_are_type_1(self):
+        left = whole(one_row(True), one_row(False, "value"))
+        right = whole(one_row(False, "value"), one_row(False, "value"))
+        self.assertEqual(sweep.kind(left, right), 1)
+
     def test_a_verdict_difference_wins_over_a_cause_difference(self):
         left = whole(one_row(False, "value"), one_row(check="d"))
         right = whole(one_row(False, "missing"), one_row(passed=False, check="d"))
