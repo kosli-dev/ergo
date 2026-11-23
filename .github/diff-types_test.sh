@@ -30,7 +30,7 @@ satisfied = row("c", True, "satisfied")
 failed = row("c", False, "not equal")
 scenarios = [
     ("passed differs", {"results": [satisfied]}, {"results": [failed], "compliant": False}),
-    ("row missing", {"results": [satisfied]}, {"results": []}),
+    ("row missing", {"results": [satisfied], "violations": []}, {"results": []}),
     ("row extra", {"results": [satisfied]}, {"results": [satisfied, row("d", True, "satisfied")]}),
     ("compliant differs", {"results": [satisfied], "compliant": True}, {"results": [satisfied], "compliant": False}),
     (
@@ -93,6 +93,7 @@ grep -q "^- t / g / passed differs" "$out" || fail "type 1 list should name the 
 grep -q "^- t / g / cause differs" "$out" || fail "type 2 list should name the case"
 grep -q "^- t / g / nested cause" "$out" && fail "a nested cause is type 3 and must not be listed"
 grep -q "t: 5 / 1 / 4" "$out" || fail "the family line should count per type"
+grep -q "^- violations are not compared; 1 known failure pins them" "$out" || fail "the violations line should count the cases that pin them"
 grep -q "known_differences.*: 0" "$out" || fail "an empty known_differences should say 0"
 
 python3 "$script" --root "$root" --dump "$dump" --summary > "$out" || fail "summary should exit 0"
