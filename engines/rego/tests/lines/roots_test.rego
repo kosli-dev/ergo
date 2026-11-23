@@ -167,6 +167,17 @@ test_a_walked_root_is_judged_for_the_words_at_its_own_condition_so_each_row_walk
 	ergo._walked_root_states_at(ref, p) == {"absent"} with data.ergo_document as {"cs": [{"name": null}, {}]} with input as {}
 }
 
+test_a_walked_part_list_after_is_in_ignoring_case_is_a_root_no_item_can_pass_when_an_item_isnt_text if {
+	part := [`${"alias":"pl","n":1,"of":null,"old":true}`, "p", "name"]
+	field := {"op": "compare", "cmp": "in", "left": ["x"], "right": part, "ignoring": "case"}
+	ergo._walked_root_states_at(field, part) == {"unusable"} with input as {"ergo/names": {"ergo/subject": {"p": [{"name": 3}]}}}
+	ergo._walked_root_states_at(field, part) == {"absent", "unusable"} with input as {"ergo/names": {"ergo/subject": {"p": [{"name": 3}, {}]}}}
+	ergo._walked_root_states_at(field, part) == set() with input as {"ergo/names": {"ergo/subject": {"p": [{"name": "a"}]}}}
+	ergo._walked_root_states_at(object.remove(field, ["ignoring"]), part) == set() with input as {"ergo/names": {"ergo/subject": {"p": [{"name": 3}]}}}
+	ergo._m_walked_root_text(field, "unusable") == "item 1 of pl: name is 3, which isn't text; item 2 of pl: name is missing" with input as {"ergo/names": {"ergo/subject": {"p": [{"name": 3}, {}]}}}
+	not ergo._m_walked_root_text(field, "absent") with input as {"ergo/names": {"ergo/subject": {"p": [{"name": 3}, {}]}}}
+}
+
 test_a_row_whose_items_fail_worse_than_its_roots_keeps_its_items if {
 	c := {"op": "in", "path": ["$$params", "k"], "values": {"ref": ["$$params[]", "l"]}, "ignoring": "case"}
 	check := {"op": "every", "path": ["xs"], "whose": [c], "check": {"op": "present", "path": ["x"]}, "if_any": true}
