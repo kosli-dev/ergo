@@ -75,17 +75,21 @@ test_the_compare_time_cases_pass if {
 	_compiled_differences("compare_time") == set()
 }
 
-test_the_ignoring_cases_pass_part_1_of_3 if _case_part_passes("ignoring", 0, 3)
+test_the_ignoring_cases_pass_part_1_of_4 if _case_part_passes("ignoring", 0, 4)
 
-test_the_ignoring_cases_pass_part_2_of_3 if _case_part_passes("ignoring", 1, 3)
+test_the_ignoring_cases_pass_part_2_of_4 if _case_part_passes("ignoring", 1, 4)
 
-test_the_ignoring_cases_pass_part_3_of_3 if _case_part_passes("ignoring", 2, 3)
+test_the_ignoring_cases_pass_part_3_of_4 if _case_part_passes("ignoring", 2, 4)
 
-test_the_ignoring_cases_pass_compiled_part_1_of_3 if _differences_compiled("ignoring", _case_part("ignoring", 0, 3)) == set()
+test_the_ignoring_cases_pass_part_4_of_4 if _case_part_passes("ignoring", 3, 4)
 
-test_the_ignoring_cases_pass_compiled_part_2_of_3 if _differences_compiled("ignoring", _case_part("ignoring", 1, 3)) == set()
+test_the_ignoring_cases_pass_compiled_part_1_of_4 if _differences_compiled("ignoring", _case_part("ignoring", 0, 4)) == set()
 
-test_the_ignoring_cases_pass_compiled_part_3_of_3 if _differences_compiled("ignoring", _case_part("ignoring", 2, 3)) == set()
+test_the_ignoring_cases_pass_compiled_part_2_of_4 if _differences_compiled("ignoring", _case_part("ignoring", 1, 4)) == set()
+
+test_the_ignoring_cases_pass_compiled_part_3_of_4 if _differences_compiled("ignoring", _case_part("ignoring", 2, 4)) == set()
+
+test_the_ignoring_cases_pass_compiled_part_4_of_4 if _differences_compiled("ignoring", _case_part("ignoring", 3, 4)) == set()
 
 test_the_contains_cases_pass if {
 	_topic_failures("contains") == _known_in("contains")

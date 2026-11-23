@@ -15258,5 +15258,1323 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a part list after is in ignoring case that holds an item that isn't text is a root no item can pass, on an empty list too",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id",
+          "has": {
+            "pl": "p"
+          }
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "e": "every xs.v, if any, is in pl.name ignoring case",
+            "w": "every xs whose v is in pl.name ignoring case, if any, exists",
+            "c": "count of xs whose v is in pl.name ignoring case is 0",
+            "x": "every xs whose v is in pl.name ignoring case exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails as unusable and names the item of the part as a walk does, before the empty list",
+        "rules": ["text.not_text", "walk.right.fail", "problems.all_said"],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "xs": [],
+              "p": [
+                {
+                  "name": 3
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "count of xs whose v is in pl.name ignoring case",
+                    "value": null
+                  },
+                  {
+                    "locations": ["/things/0/p/0/name"],
+                    "name": "pl[].name",
+                    "outcome": "unusable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": [3]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": ["$policy:/requirements/s/checks/c"],
+                "message": "item 1 of pl: name is 3, which isn't text",
+                "name": "count of xs whose v is in pl.name ignoring case is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count of xs whose v is in pl.name ignoring case",
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": []
+              },
+              {
+                "locations": ["/things/0/p/0/name"],
+                "name": "pl[].name",
+                "outcome": "unusable",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": [3]
+              }
+            ],
+            "message": "item 1 of pl: name is 3, which isn't text",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "e",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": ["/things/0/p/0/name"],
+                    "name": "pl[].name",
+                    "outcome": "unusable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": [3]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": ["$policy:/requirements/s/checks/e"],
+                "message": "item 1 of pl: name is 3, which isn't text",
+                "name": "every xs.v, if any, is in pl.name ignoring case"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": ["/things/0/p/0/name"],
+                "name": "pl[].name",
+                "outcome": "unusable",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": [3]
+              },
+              {
+                "locations": [],
+                "name": "xs[].v",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "item 1 of pl: name is 3, which isn't text",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "w",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": ["/things/0/p/0/name"],
+                    "name": "pl[].name",
+                    "outcome": "unusable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": [3]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": ["$policy:/requirements/s/checks/w"],
+                "message": "item 1 of pl: name is 3, which isn't text",
+                "name": "every xs whose v is in pl.name ignoring case, if any, exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": ["/things/0/p/0/name"],
+                "name": "pl[].name",
+                "outcome": "unusable",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": [3]
+              },
+              {
+                "locations": [],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "item 1 of pl: name is 3, which isn't text",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "x",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": ["/things/0/xs"],
+                        "name": "xs",
+                        "outcome": "usable",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "xs is []",
+                    "name": "xs"
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": ["/things/0/p/0/name"],
+                    "name": "pl[].name",
+                    "outcome": "unusable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": [3]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": ["$policy:/requirements/s/checks/x"],
+                "message": "item 1 of pl: name is 3, which isn't text",
+                "name": "every xs whose v is in pl.name ignoring case exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": ["/things/0/p/0/name"],
+                "name": "pl[].name",
+                "outcome": "unusable",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": [3]
+              },
+              {
+                "locations": [],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "item 1 of pl: name is 3, which isn't text; xs is []",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a part list after is in ignoring case, in a plain check, names its items as a walk does after what the field can't give",
+    "params": {
+      "k": null
+    },
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id",
+          "has": {
+            "pl": "p"
+          }
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "v": "v is in pl.name ignoring case",
+            "k": "$params.k is in pl.name ignoring case"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "a field that isn't text beside an item of the part without the name",
+        "rules": ["text.not_text", "walk.right.fail", "problems.all_said"],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "v": 3,
+              "p": [
+                {
+                  "name": "a"
+                },
+                {}
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "k",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": ["$params:/k"],
+                    "name": "$params.k",
+                    "outcome": "null",
+                    "value": null
+                  },
+                  {
+                    "locations": ["/things/0/p/0/name", "/things/0/p/1"],
+                    "name": "pl[].name",
+                    "outcome": "unusable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": ["a", null]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": ["$policy:/requirements/s/checks/k"],
+                "message": "$params.k is null, and item 2 of pl: name is missing",
+                "name": "$params.k is in pl.name ignoring case"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": ["$params:/k"],
+                "name": "$params.k",
+                "outcome": "null",
+                "value": null
+              },
+              {
+                "locations": ["/things/0/p/0/name", "/things/0/p/1"],
+                "name": "pl[].name",
+                "outcome": "unusable",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": ["a", null]
+              }
+            ],
+            "message": "$params.k is null, and item 2 of pl: name is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "v",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": ["/things/0/v"],
+                    "name": "v",
+                    "outcome": "unusable",
+                    "value": 3
+                  },
+                  {
+                    "locations": ["/things/0/p/0/name", "/things/0/p/1"],
+                    "name": "pl[].name",
+                    "outcome": "unusable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": ["a", null]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": ["$policy:/requirements/s/checks/v"],
+                "message": "v is 3, which isn't text, and item 2 of pl: name is missing",
+                "name": "v is in pl.name ignoring case"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": ["/things/0/v"],
+                "name": "v",
+                "outcome": "unusable",
+                "value": 3
+              },
+              {
+                "locations": ["/things/0/p/0/name", "/things/0/p/1"],
+                "name": "pl[].name",
+                "outcome": "unusable",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": ["a", null]
+              }
+            ],
+            "message": "v is 3, which isn't text, and item 2 of pl: name is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "an item of the part whose name isn't text",
+        "rules": ["text.not_text", "walk.right.fail"],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "v": "a",
+              "p": [
+                {
+                  "name": "b"
+                },
+                {
+                  "name": 3
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "k",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": ["$params:/k"],
+                    "name": "$params.k",
+                    "outcome": "null",
+                    "value": null
+                  },
+                  {
+                    "locations": ["/things/0/p/0/name", "/things/0/p/1/name"],
+                    "name": "pl[].name",
+                    "outcome": "unusable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": ["b", 3]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": ["$policy:/requirements/s/checks/k"],
+                "message": "$params.k is null, and item 2 of pl: name is 3, which isn't text",
+                "name": "$params.k is in pl.name ignoring case"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": ["$params:/k"],
+                "name": "$params.k",
+                "outcome": "null",
+                "value": null
+              },
+              {
+                "locations": ["/things/0/p/0/name", "/things/0/p/1/name"],
+                "name": "pl[].name",
+                "outcome": "unusable",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": ["b", 3]
+              }
+            ],
+            "message": "$params.k is null, and item 2 of pl: name is 3, which isn't text",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "v",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": ["/things/0/v"],
+                    "name": "v",
+                    "outcome": "usable",
+                    "value": "a"
+                  },
+                  {
+                    "locations": ["/things/0/p/0/name", "/things/0/p/1/name"],
+                    "name": "pl[].name",
+                    "outcome": "unusable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": ["b", 3]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": ["$policy:/requirements/s/checks/v"],
+                "message": "item 2 of pl: name is 3, which isn't text",
+                "name": "v is in pl.name ignoring case"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": ["/things/0/v"],
+                "name": "v",
+                "outcome": "usable",
+                "value": "a"
+              },
+              {
+                "locations": ["/things/0/p/0/name", "/things/0/p/1/name"],
+                "name": "pl[].name",
+                "outcome": "unusable",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": ["b", 3]
+              }
+            ],
+            "message": "item 2 of pl: name is 3, which isn't text",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "a field and an item of the part that both aren't text",
+        "rules": ["text.not_text", "problems.all_said"],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "v": 3,
+              "p": [
+                {
+                  "name": "a"
+                },
+                {
+                  "name": 5
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "k",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": ["$params:/k"],
+                    "name": "$params.k",
+                    "outcome": "null",
+                    "value": null
+                  },
+                  {
+                    "locations": ["/things/0/p/0/name", "/things/0/p/1/name"],
+                    "name": "pl[].name",
+                    "outcome": "unusable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": ["a", 5]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": ["$policy:/requirements/s/checks/k"],
+                "message": "$params.k is null, and item 2 of pl: name is 5, which isn't text",
+                "name": "$params.k is in pl.name ignoring case"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": ["$params:/k"],
+                "name": "$params.k",
+                "outcome": "null",
+                "value": null
+              },
+              {
+                "locations": ["/things/0/p/0/name", "/things/0/p/1/name"],
+                "name": "pl[].name",
+                "outcome": "unusable",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": ["a", 5]
+              }
+            ],
+            "message": "$params.k is null, and item 2 of pl: name is 5, which isn't text",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "v",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": ["/things/0/v"],
+                    "name": "v",
+                    "outcome": "unusable",
+                    "value": 3
+                  },
+                  {
+                    "locations": ["/things/0/p/0/name", "/things/0/p/1/name"],
+                    "name": "pl[].name",
+                    "outcome": "unusable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": ["a", 5]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": ["$policy:/requirements/s/checks/v"],
+                "message": "v is 3, which isn't text, and item 2 of pl: name is 5, which isn't text",
+                "name": "v is in pl.name ignoring case"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": ["/things/0/v"],
+                "name": "v",
+                "outcome": "unusable",
+                "value": 3
+              },
+              {
+                "locations": ["/things/0/p/0/name", "/things/0/p/1/name"],
+                "name": "pl[].name",
+                "outcome": "unusable",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": ["a", 5]
+              }
+            ],
+            "message": "v is 3, which isn't text, and item 2 of pl: name is 5, which isn't text",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a part list after is in ignoring case in a one-line every names an item that isn't text as a walk does",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id",
+          "has": {
+            "pl": "p"
+          }
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "e": "every xs.v is in pl.name ignoring case"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "names the item of the part, not the list of names",
+        "rules": ["text.not_text", "walk.right.fail"],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "xs": [
+                {
+                  "v": "a"
+                }
+              ],
+              "p": [
+                {
+                  "name": "a"
+                },
+                {
+                  "name": 3
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "e",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": ["/things/0/xs/0/v"],
+                        "name": "xs[0].v",
+                        "outcome": "unusable",
+                        "value": "a"
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": ["/things/0/xs/0"],
+                    "message": "item 2 of pl: name is 3, which isn't text",
+                    "name": "item 1 of xs",
+                    "value": {
+                      "v": "a"
+                    }
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": ["/things/0/p/0/name", "/things/0/p/1/name"],
+                    "name": "pl[].name",
+                    "outcome": "unusable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": ["a", 3]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": ["$policy:/requirements/s/checks/e"],
+                "message": "",
+                "name": "every xs.v is in pl.name ignoring case"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": ["/things/0/p/0/name", "/things/0/p/1/name"],
+                "name": "pl[].name",
+                "outcome": "unusable",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": ["a", 3]
+              },
+              {
+                "locations": ["/things/0/xs/0/v"],
+                "name": "xs[].v",
+                "outcome": "usable",
+                "value": ["a"]
+              }
+            ],
+            "message": "item 2 of pl: name is 3, which isn't text",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a walked list from the input after is in ignoring case that can't be used, in a whose, beside a list that is empty or missing",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "w": "every xs whose v is in $input.cs.name ignoring case exists",
+            "c": "count of xs whose v is in $input.cs.name ignoring case is 0"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "an empty list fails as unusable, the root first",
+        "rules": ["text.not_text", "walk.flaws", "problems.all_said"],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "xs": []
+            }
+          ],
+          "cs": [
+            {
+              "name": 3
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "count of xs whose v is in $input.cs.name ignoring case",
+                    "value": null
+                  },
+                  {
+                    "locations": ["/cs/0/name"],
+                    "name": "$input.cs[].name",
+                    "outcome": "unusable",
+                    "value": [3]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": ["$policy:/requirements/s/checks/c"],
+                "message": "item 1 of $input.cs: name is 3, which isn't text",
+                "name": "count of xs whose v is in $input.cs.name ignoring case is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count of xs whose v is in $input.cs.name ignoring case",
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": []
+              },
+              {
+                "locations": ["/cs/0/name"],
+                "name": "$input.cs[].name",
+                "outcome": "unusable",
+                "value": [3]
+              }
+            ],
+            "message": "item 1 of $input.cs: name is 3, which isn't text",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "w",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": ["/things/0/xs"],
+                        "name": "xs",
+                        "outcome": "usable",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "xs is []",
+                    "name": "xs"
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": ["/cs/0/name"],
+                    "name": "$input.cs[].name",
+                    "outcome": "unusable",
+                    "value": [3]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": ["$policy:/requirements/s/checks/w"],
+                "message": "item 1 of $input.cs: name is 3, which isn't text",
+                "name": "every xs whose v is in $input.cs.name ignoring case exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": ["/cs/0/name"],
+                "name": "$input.cs[].name",
+                "outcome": "unusable",
+                "value": [3]
+              },
+              {
+                "locations": [],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "item 1 of $input.cs: name is 3, which isn't text; xs is []",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "a missing list fails as unusable, the root first",
+        "rules": ["text.not_text", "walk.flaws", "problems.all_said"],
+        "input": {
+          "things": [
+            {
+              "id": "t1"
+            }
+          ],
+          "cs": [
+            {
+              "name": 3
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": ["/things/0"],
+                        "name": "xs",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "xs is missing",
+                    "name": "xs"
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "count of xs whose v is in $input.cs.name ignoring case",
+                    "value": null
+                  },
+                  {
+                    "locations": ["/cs/0/name"],
+                    "name": "$input.cs[].name",
+                    "outcome": "unusable",
+                    "value": [3]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": ["$policy:/requirements/s/checks/c"],
+                "message": "item 1 of $input.cs: name is 3, which isn't text",
+                "name": "count of xs whose v is in $input.cs.name ignoring case is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count of xs whose v is in $input.cs.name ignoring case",
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "xs",
+                "outcome": "absent",
+                "value": []
+              },
+              {
+                "locations": ["/cs/0/name"],
+                "name": "$input.cs[].name",
+                "outcome": "unusable",
+                "value": [3]
+              }
+            ],
+            "message": "item 1 of $input.cs: name is 3, which isn't text; xs is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "w",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": ["/things/0"],
+                        "name": "xs",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "xs is missing",
+                    "name": "xs"
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": ["/cs/0/name"],
+                    "name": "$input.cs[].name",
+                    "outcome": "unusable",
+                    "value": [3]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": ["$policy:/requirements/s/checks/w"],
+                "message": "item 1 of $input.cs: name is 3, which isn't text",
+                "name": "every xs whose v is in $input.cs.name ignoring case exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": ["/cs/0/name"],
+                "name": "$input.cs[].name",
+                "outcome": "unusable",
+                "value": [3]
+              },
+              {
+                "locations": [],
+                "name": "xs",
+                "outcome": "absent",
+                "value": []
+              }
+            ],
+            "message": "item 1 of $input.cs: name is 3, which isn't text; xs is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a walked list from the input after is in ignoring case that can't be used, in a one-line every on an empty list",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "e": "every xs.v is in $input.cs.name ignoring case"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails as unusable and says the root",
+        "rules": ["text.not_text", "walk.flaws"],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "xs": []
+            }
+          ],
+          "cs": [
+            {
+              "name": 3
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "e",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": ["/cs/0/name"],
+                    "name": "$input.cs[].name",
+                    "outcome": "unusable",
+                    "value": [3]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": ["$policy:/requirements/s/checks/e"],
+                "message": "item 1 of $input.cs: name is 3, which isn't text",
+                "name": "every xs.v is in $input.cs.name ignoring case"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": ["/cs/0/name"],
+                "name": "$input.cs[].name",
+                "outcome": "unusable",
+                "value": [3]
+              },
+              {
+                "locations": [],
+                "name": "xs[].v",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "item 1 of $input.cs: name is 3, which isn't text",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a null item of a list after is in ignoring case beside an item that fails worse",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "s": "some xs.v is in ys ignoring case"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is said first, and the item after it with its own cause",
+        "rules": ["text.not_text", "problems.all_said"],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "xs": [
+                {}
+              ],
+              "ys": ["a", null]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "s",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": ["/things/0/xs/0"],
+                        "name": "xs[0].v",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": ["/things/0/xs/0"],
+                    "message": "v is missing",
+                    "name": "item 1 of xs",
+                    "value": {}
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": ["/things/0/ys"],
+                    "name": "ys",
+                    "outcome": "unusable",
+                    "value": ["a", null]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": ["$policy:/requirements/s/checks/s"],
+                "message": "item 2 of ys is null",
+                "name": "some xs.v is in ys ignoring case"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": ["/things/0/xs/0"],
+                "name": "xs[].v",
+                "outcome": "usable",
+                "value": [null]
+              },
+              {
+                "locations": ["/things/0/ys"],
+                "name": "ys",
+                "outcome": "unusable",
+                "value": ["a", null]
+              }
+            ],
+            "message": "item 2 of ys is null; item 1 of xs: v is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]

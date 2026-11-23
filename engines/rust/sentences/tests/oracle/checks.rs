@@ -11052,6 +11052,36 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
+        "$params.k is in pl.name ignoring case",
+        "$params.k is in pl.name ignoring case",
+        &[],
+        &[],
+    ),
+    (
+        "every xs whose v is in pl.name ignoring case exists",
+        "every xs whose v is in pl.name ignoring case exists",
+        &[],
+        &[],
+    ),
+    (
+        "every xs whose v is in pl.name ignoring case, if any, exists",
+        "every xs whose v is in pl.name ignoring case, if any, exists",
+        &[],
+        &[],
+    ),
+    (
+        "every xs.v, if any, is in pl.name ignoring case",
+        "every xs.v, if any, is in pl.name ignoring case",
+        &[],
+        &[],
+    ),
+    (
+        "v is in pl.name ignoring case",
+        "v is in pl.name ignoring case",
+        &[],
+        &[],
+    ),
+    (
         "every xs.v is not in $input.cs.name ignoring case",
         "every xs.v is not in $input.cs.name ignoring case",
         &[],
