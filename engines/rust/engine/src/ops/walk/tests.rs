@@ -2391,3 +2391,35 @@ fn a_list_after_is_in_ignoring_case_that_cant_be_used_is_said_before_a_walked_li
         );
     }
 }
+
+#[test]
+fn a_walked_list_after_is_in_ignoring_case_in_a_whose_fails_an_empty_list_with_the_worst_cause_of_its_items()
+ {
+    for (sentence, input, cause, message) in [
+        (
+            "every xs whose v is in $input.cs.name ignoring case exists",
+            json!({"cs": [{"name": 3}]}),
+            Cause::Unusable,
+            "item 1 of $input.cs: name is 3, which isn't text; xs is []",
+        ),
+        (
+            "every xs whose v is in $input.cs.name ignoring case exists",
+            json!({"cs": [{"name": "a"}]}),
+            Cause::Value,
+            "xs is []",
+        ),
+    ] {
+        let Check::Walk(walk_check) = lowered(sentence) else {
+            panic!("{sentence} is not every or some");
+        };
+        let subject = json!({"xs": []});
+        let params = json!({});
+        let context = ctx(&subject, &input, Some(&params));
+        let out = run(&walk_check, &context);
+        assert_eq!(
+            (out.verdict.cause, out.message.as_deref()),
+            (cause, Some(message)),
+            "{sentence}"
+        );
+    }
+}
