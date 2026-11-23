@@ -658,6 +658,12 @@ pub fn for_failures(
         }
     }
     let mut leftover: Vec<String> = Vec::new();
+    let first_items: Vec<String> = failed
+        .iter()
+        .filter(|f| list(f, "failed_assertions").is_empty())
+        .map(|f| text(f, "item"))
+        .filter(|n| crate::parts::is_item(n) && crate::parts::list_base(n) == list_names[0])
+        .collect();
     let walk_pieces: Vec<&str> = walked
         .iter()
         .flat_map(|(_, texts)| texts.iter().flat_map(|t| clauses(t)))
@@ -730,7 +736,10 @@ pub fn for_failures(
             })
             || texts_once.len() != 1
         {
-            if unread {
+            let first_item = first_items
+                .iter()
+                .any(|n| clause.starts_with(&format!("{n}: ")));
+            if unread || (texts_once.len() != 1 && first_item) {
                 ops::push_new(&mut leftover, clause.to_string());
             }
         } else {
