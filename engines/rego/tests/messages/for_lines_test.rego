@@ -574,6 +574,10 @@ test_a_sentences_roots_for_its_entries_come_from_what_the_tree_read_or_are_read_
 	ergo._for_sentence_root_texts(check, {"xs": [{"v": 1}]}, 0, {0: [["absent", "$params.b is missing"]]}) == ["$params.b is missing"]
 }
 
+test_an_item_that_says_only_the_roots_its_sentence_joins_is_left_out if {
+	_row_tree_text("every rows as row", ["row.v is zz.x named by p"], {"zz": "str", "rows": [{"v": 1}], "p": 3}, {}) == `p is 3, which isn't text, and zz is "str", which isn't an object`
+}
+
 test_a_for_rows_list_is_not_said_when_a_root_failed_beside_a_sentence_that_reads_no_alias if {
 	check := ergo._s_written_check({"for": "every xs as m", "assert": "count of xs whose v is in $input.z is 0"})
 	unfreed := {"cause": "value", "failed": [], "root_msgs": ["$input.z is []"]}
