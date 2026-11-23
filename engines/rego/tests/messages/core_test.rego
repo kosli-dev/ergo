@@ -134,3 +134,17 @@ test_a_list_after_is_in_ignoring_case_names_three_items_it_cant_use_and_counts_t
 	ergo._message(field, {"x": "a", "ys": [null, null, null, 3]}, "unusable") == "item 1 of ys is null; item 2 of ys is null; item 3 of ys is null; and 1 more"
 	ergo._message(field, {"x": "a", "ys": [null, 2, null]}, "unusable") == "item 1 of ys is null; item 2 of ys is 2, which isn't text; item 3 of ys is null"
 }
+
+test_a_walked_part_list_after_is_in_ignoring_case_names_each_item_as_a_walk_does_after_what_the_field_cant_give if {
+	part := [`${"alias":"pl","n":1,"of":null,"old":true}`, "p", "name"]
+	leaf := {"op": "compare", "cmp": "in", "left": ["v"], "right": part, "ignoring": "case"}
+	three := {"v": 3, "p": [{"name": "a"}, {}]}
+	ergo._m_message_pieces(ergo._m_with_sides(ergo._m_walked(leaf, three)), three, "unusable") == ["v is 3, which isn't text", "item 2 of pl: name is missing"] with input as {"ergo/names": {"ergo/subject": three}}
+	broken := {"v": "a", "p": [{"name": 3}, {}]}
+	ergo._m_message_pieces(ergo._m_with_sides(ergo._m_walked(leaf, broken)), broken, "unusable") == ["item 1 of pl: name is 3, which isn't text; item 2 of pl: name is missing"] with input as {"ergo/names": {"ergo/subject": broken}}
+	five := {"v": 3, "p": [{"name": "a"}, {"name": 5}]}
+	ergo._m_message_pieces(ergo._m_with_sides(ergo._m_walked(leaf, five)), five, "unusable") == ["v is 3, which isn't text", "item 2 of pl: name is 5, which isn't text"] with input as {"ergo/names": {"ergo/subject": five}}
+	params := {"p": [{"name": "a"}, {}]}
+	row := object.union(object.union(leaf, {"left": ["$$params", "k"]}), {"ergo/row": true})
+	ergo._m_message_pieces(ergo._m_with_sides(ergo._m_walked(row, params)), params, "absent") == ["$params.k is null", "item 2 of pl: name is missing"] with input as {"ergo/names": {"ergo/subject": params}} with data.ergo_params as {"k": null}
+}
