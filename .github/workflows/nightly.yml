@@ -1,0 +1,85 @@
+name: nightly
+
+on:
+  schedule:
+    - cron: "23 2 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nightly
+  cancel-in-progress: false
+
+jobs:
+  sweep:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v7
+      - uses: open-policy-agent/setup-opa@v2
+        with:
+          version: 1.22.0
+      - uses: ./.github/actions/rust-cache
+        with:
+          name: nightly
+      - name: Install the Rust version in rust-toolchain.toml
+        working-directory: engines/rust
+        run: rustup toolchain install
+      - name: Build the ergo command
+        working-directory: engines/rust
+        run: cargo build --locked -p ergo-policy-cli
+      - name: Build ergo.rego
+        run: .github/build-ergo.sh
+      - name: Run the whole grid of the sweep and fail on a verdict that differs
+        id: grid
+        continue-on-error: true
+        run: |
+          mkdir -p "$RUNNER_TEMP/status"
+          PATH="$PWD/engines/rust/target/debug:$PATH" python3 spec/sweep.py --limit 100000 --require-no-type-1 > "$RUNNER_TEMP/status/grid.txt" 2>&1
+      - name: Run the pairs of the sweep and fail on a verdict that differs
+        id: pairs
+        continue-on-error: true
+        run: PATH="$PWD/engines/rust/target/debug:$PATH" python3 spec/sweep.py --pairs .github/sweep-pairs.json --require-no-type-1 > "$RUNNER_TEMP/status/pairs.txt" 2>&1
+      - name: Sort the known failures of both engines and fail on a verdict that differs
+        id: types
+        continue-on-error: true
+        run: python3 .github/diff-types.py --rego --summary --require-no-type-1 > "$RUNNER_TEMP/status/types.txt"
+      - name: Count the entries of spec/OPEN.md
+        run: .github/sync-facts.sh HEAD > "$RUNNER_TEMP/status/facts.txt"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: nightly-status
+          path: ${{ runner.temp }}/status
+      - name: Fail when any of the three runs found a verdict that differs
+        if: steps.grid.outcome != 'success' || steps.pairs.outcome != 'success' || steps.types.outcome != 'success'
+        run: |
+          echo "grid: ${{ steps.grid.outcome }}, pairs: ${{ steps.pairs.outcome }}, types: ${{ steps.types.outcome }}"
+          exit 1
+
+  status:
+    needs: sweep
+    if: always() && github.ref == 'refs/heads/main' && needs.sweep.result != 'skipped'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          name: nightly-status
+          path: status
+        continue-on-error: true
+      - name: Write the status block under the introduction in the body of issue 573
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RESULT: ${{ needs.sweep.result }}
+        run: |
+          mkdir -p status
+          touch status/grid.txt status/pairs.txt status/types.txt status/facts.txt
+          { cat .github/status-intro.md; echo; .github/status-block.sh "$RESULT" status/grid.txt status/pairs.txt status/types.txt status/facts.txt; } > status/body.md
+          gh issue edit 573 --body-file status/body.md
