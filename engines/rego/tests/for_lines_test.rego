@@ -88,7 +88,7 @@ test_an_empty_list_a_one_item_for_line_tolerates_still_runs_the_sentences_that_d
 	}
 	_said_rows({"for": "every xs whose k is 1, if any, as m", "assert": ["m.v is 1", "z is 1"]}, [{"id": 1, "xs": [{"k": 2}], "z": 3}]) == [[1, "value", "z is 3", [_assertion("z is 1", "value", ["$policy:/requirements/s/checks/c/assert/1"], [_seen("z", 3, ["/things/0/z"], "usable")], "z is 3", [])]]]
 	[row[1] | some row in _for_rows({"for": "every xs, if any, as m", "assert": "m.v is 1"}, [things[0]], {})] == ["satisfied"]
-	_said_rows({"for": "every xs, if any, as m", "assert": ["w exists", "y is at least 1", "z is 1"]}, [{"id": 1, "xs": [], "z": 3, "y": "s"}]) == [[1, "unusable", "y is \"s\", which isn't a number; w is missing; z is 3", [_assertion("w exists", "value", ["$policy:/requirements/s/checks/c/assert/0"], [_seen("w", null, ["/things/0"], "absent")], "w is missing", []), _assertion("y is at least 1", "unusable", ["$policy:/requirements/s/checks/c/assert/1"], [_seen("y", "s", ["/things/0/y"], "unusable")], "y is \"s\", which isn't a number", []), _assertion("z is 1", "value", ["$policy:/requirements/s/checks/c/assert/2"], [_seen("z", 3, ["/things/0/z"], "usable")], "z is 3", [])]]]
+	_said_rows({"for": "every xs, if any, as m", "assert": ["w exists", "y is at least 1", "z is 1"]}, [{"id": 1, "xs": [], "z": 3, "y": "s"}]) == [[1, "unusable", "w is missing; y is \"s\", which isn't a number; z is 3", [_assertion("w exists", "value", ["$policy:/requirements/s/checks/c/assert/0"], [_seen("w", null, ["/things/0"], "absent")], "w is missing", []), _assertion("y is at least 1", "unusable", ["$policy:/requirements/s/checks/c/assert/1"], [_seen("y", "s", ["/things/0/y"], "unusable")], "y is \"s\", which isn't a number", []), _assertion("z is 1", "value", ["$policy:/requirements/s/checks/c/assert/2"], [_seen("z", 3, ["/things/0/z"], "usable")], "z is 3", [])]]]
 }
 
 test_a_for_line_can_walk_a_param if {
@@ -519,7 +519,7 @@ _null_key_whose_row(check) := [[r.cause, r.message] |
 
 test_a_whose_key_from_the_input_that_is_null_is_named_once_and_the_worse_cause_of_an_item_wins if {
 	_null_key_whose_row({"for": "every rs whose v is m named by $input.k as r", "assert": "r.v is 1"}) == [["absent", "$input.k is null; item 1 of rs: m is missing; item 2 of rs: m is missing"]]
-	_null_key_whose_row({"for": "every rs whose zz is m named by $input.k as r", "assert": "r.v is 1"}) == [["absent", "$input.k is null; item 1 of rs: zz is missing; item 2 of rs: zz is missing"]]
+	_null_key_whose_row({"for": "every rs whose zz is m named by $input.k as r", "assert": "r.v is 1"}) == [["absent", "$input.k is null; item 1 of rs: zz is missing, and m is missing; item 2 of rs: zz is missing, and m is missing"]]
 }
 
 test_a_second_list_item_that_fails_on_its_own_field_keeps_a_whose_key_that_isnt_text_in_each_item if {
@@ -549,11 +549,11 @@ _for_said_beside_empty(line, xs) := [[r.cause, r.message] | some r in ergo.repor
 test_a_for_line_whose_says_an_empty_list_on_the_right_then_the_list_or_each_item_as_a_null_list_does if {
 	every line in ["every xs whose v is in $params.cs.name as m", "some xs whose v is in $params.cs.name as m"] {
 		_for_said_beside_empty(line, []) == [["value", "$params.cs is []; xs is []"]]
-		_for_said_beside_empty(line, [{"v": "a"}, {}]) == [["value", "$params.cs is []; item 2 of xs: v is missing"]]
-		_for_said_beside_empty(line, [null]) == [["value", "$params.cs is []; item 1 of xs is null, which isn't an object"]]
+		_for_said_beside_empty(line, [{"v": "a"}, {}]) == [["absent", "$params.cs is []; item 2 of xs: v is missing"]]
+		_for_said_beside_empty(line, [null]) == [["not_an_object", "$params.cs is []; item 1 of xs is null, which isn't an object"]]
 	}
 	_for_said_beside_empty("every xs whose v is in $params.cs.name, if any, as m", []) == [["value", "$params.cs is []"]]
-	_for_said_beside_empty("every xs whose v is in $params.cs.name, if any, as m", [{"v": "a"}, {}]) == [["value", "$params.cs is []; item 2 of xs: v is missing"]]
+	_for_said_beside_empty("every xs whose v is in $params.cs.name, if any, as m", [{"v": "a"}, {}]) == [["absent", "$params.cs is []; item 2 of xs: v is missing"]]
 }
 
 test_a_for_lines_whose_leaves_an_empty_part_out_of_the_rows_inputs_as_a_null_part if {
