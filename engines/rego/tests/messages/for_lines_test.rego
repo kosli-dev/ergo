@@ -550,6 +550,15 @@ test_an_empty_list_a_line_tolerates_is_not_said_beside_a_root_that_fails if {
 	_row_tree_text("every xs as x", ["x.v is at least $params.min"], {"xs": []}, {"min": "s"}) == `$params.min is "s", which isn't a number; xs is []`
 }
 
+test_a_for_row_on_a_subject_that_isnt_an_object_says_that_once_after_its_other_roots if {
+	check := ergo._s_written_check({"for": "every owner as o", "assert": ["o is $params.z", "o is z"]})
+	subj := [{"owner": "a"}]
+	names := {"ergo/subject": subj, "$at": {"names": {}}}
+	p := ergo._for_row_parts(check, subj, {"cause": "not_an_object", "inputs": [], "failed": []}) with input as {"ergo/names": names}
+	[c.text | some c in p.roots] == ["$params.z is missing"]
+	[c.text | some c in p.lists] == [`the subject is [{"owner": "a"}], which isn't an object`]
+}
+
 test_a_for_rows_list_is_not_said_when_a_root_failed_beside_a_sentence_that_reads_no_alias if {
 	check := ergo._s_written_check({"for": "every xs as m", "assert": "count of xs whose v is in $input.z is 0"})
 	unfreed := {"cause": "value", "failed": [], "root_msgs": ["$input.z is []"]}
