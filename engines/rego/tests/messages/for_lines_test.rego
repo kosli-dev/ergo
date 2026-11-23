@@ -559,6 +559,15 @@ test_a_for_row_on_a_subject_that_isnt_an_object_says_that_once_after_its_other_r
 	[c.text | some c in p.lists] == [`the subject is [{"owner": "a"}], which isn't an object`]
 }
 
+test_a_root_of_a_for_row_that_names_an_item_counts_toward_the_items_shown if {
+	named := ergo._m_root_in("item 1 of t: item 1 of c", "not_an_object", "item 1 of t: item 1 of c is 1, which isn't an object", 0)
+	ergo._for_root_item(named) == object.union(named, {"kind": "item"})
+	plain := ergo._m_root_in("$params.z", "absent", "$params.z is missing", 0)
+	ergo._for_root_item(plain) == plain
+	shown := ergo._m_clauses_text(ergo._m_clauses_shown([ergo._for_root_item(ergo._m_root_in(n, "not_an_object", concat("", [n, " is 1, which isn't an object"]), 0)) | some n in ["item 1 of t: item 1 of c", "item 1 of t: item 2 of c", "item 2 of t: item 1 of c", "item 2 of t: item 2 of c"]]))
+	shown == "item 1 of t: item 1 of c is 1, which isn't an object; item 1 of t: item 2 of c is 1, which isn't an object; item 2 of t: item 1 of c is 1, which isn't an object; and 1 more"
+}
+
 test_a_for_rows_list_is_not_said_when_a_root_failed_beside_a_sentence_that_reads_no_alias if {
 	check := ergo._s_written_check({"for": "every xs as m", "assert": "count of xs whose v is in $input.z is 0"})
 	unfreed := {"cause": "value", "failed": [], "root_msgs": ["$input.z is []"]}
