@@ -326,16 +326,16 @@ _m_walk_ref_faults(subj, check) := [] if {
 
 _m_walk_ref_faults_of(subj, check) := array.concat(array.concat(array.concat(_m_ref_blocked(check), _m_unusable_ref_walks(check)), _m_unusable_side_walks(subj, check)), _m_text_ref_walks(check))
 
-_m_text_ref_walks(check) := [_m_text_walk_text(r)] if {
+_m_text_ref_walks(check) := [_m_text_walk_text(null, r)] if {
 	r := check.values.ref
 	_text_walked_ref(check, r)
 	_text_ref_state(r)
 } else := []
 
-_m_text_walk_text(r) := _m_joined(_m_fail_parts("unusable", fails, roots)) if {
+_m_text_walk_text(x, r) := _m_joined(_m_fail_parts("unusable", fails, roots)) if {
 	roots := _dotted_roots([r])
-	w := _rwalk_run(null, r)
-	fails := array.concat(array.concat([_rwalk_broken(null, r, f) | some f in w.fails], [f | some e in w.items; some f in _m_text_item_fails(e, roots)]), _walk_stop(w))
+	w := _rwalk_run(x, r)
+	fails := array.concat(array.concat([_rwalk_broken(x, r, f) | some f in w.fails], [f | some e in w.items; some f in _m_text_item_fails(e, roots)]), _walk_stop(w))
 }
 
 _m_text_item_fails(e, roots) := [{"path": e.c, "item": e.i, "cause": "unusable", "value": e.v, "msg": _m_isnt(_m_item_name(e.c, roots), e.v, "text")}] if {

@@ -854,11 +854,14 @@ _m_walked_roots(c) := [p |
 	_walking_root(c, p)
 ]
 
-_m_walked_root_fault(c, shown, x, cause) := _m_text_walk_text(shown) if {
+_m_walked_root_fault(c, shown, x, cause) := _m_text_walk_text(null, shown) if {
 	_text_walked_ref(c, shown)
 	_text_ref_state(shown) == cause
+} else := _m_text_walk_text(x, shown) if {
+	_text_walked_side(c, shown)
+	_text_walk_state(x, shown) == cause
 } else := _rwalk_text(x, shown) if {
-	not _text_walk_flawed(c, shown)
+	not _text_walk_flawed(c, shown, x)
 	w := _rwalk(x, shown)
 	w.failed
 	w.state == cause
@@ -869,9 +872,20 @@ _m_walked_root_fault(c, shown, x, cause) := _m_text_walk_text(shown) if {
 	k := _m_leaf_needs(c, w.value)
 }
 
-_text_walk_flawed(c, shown) if {
+_text_walk_flawed(c, shown, _) if {
 	_text_walked_ref(c, shown)
 	_text_ref_state(shown)
+}
+
+_text_walk_flawed(c, shown, x) if {
+	_text_walked_side(c, shown)
+	_text_walk_state(x, shown)
+}
+
+_text_walked_side(c, shown) if {
+	p := _rpath(c.right)
+	_text_list_root(c, p)
+	_walked_root_shown(p) == shown
 }
 
 _m_off_right(subj, c) := [_m_isnt(_root_label(p), _root_value(subj, p), k) |

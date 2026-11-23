@@ -540,14 +540,17 @@ _text_walked_ref(check, r) if {
 	_ref_walks(r)
 }
 
-_text_ref_state(r) := _worst_of(states) if {
+_text_ref_state(r) := _text_walk_state(null, r) if {
 	_ref_walks(r)
-	w := _ref_walk(r)
-	states := {w.state | w.failed} | {"unusable" | some v in w.value; v != null; not is_string(v)}
-	count(states) > 0
 } else := _list_text_state(_ref_read(r)) if {
 	not _ref_walks(r)
 	_ref_state(r) == "value"
+}
+
+_text_walk_state(x, p) := _worst_of(states) if {
+	w := _rwalk(x, p)
+	states := {w.state | w.failed} | {"unusable" | _text_items_state(w.value) == "unusable"}
+	count(states) > 0
 }
 
 _list_text_state(r) := "unusable" if not is_array(r)

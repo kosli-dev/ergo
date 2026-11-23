@@ -42,9 +42,13 @@ _walked_root_states(c) := {st |
 	some st in _walked_root_states_at(x, p)
 }
 
-_walked_root_states_at(x, p) := {st | st := _walked_root_state(x, _rwalk_run(object.get(input, ["ergo/names", "ergo/subject"], null), _dotted_root_part(p)))} | {st |
+_walked_root_states_at(x, p) := ({st | st := _walked_root_state(x, _rwalk_run(object.get(input, ["ergo/names", "ergo/subject"], null), _dotted_root_part(p)))} | {st |
 	_text_walked_ref(x, p)
 	st := _text_ref_state(p)
+	st in _failed_read_states
+}) | {st |
+	_text_list_root(x, p)
+	st := _text_walk_state(object.get(input, ["ergo/names", "ergo/subject"], null), _dotted_root_part(p))
 	st in _failed_read_states
 }
 
