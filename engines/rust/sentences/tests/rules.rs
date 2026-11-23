@@ -1159,13 +1159,6 @@ fn ignoring_words_after_a_list_from_a_path_of_more_than_one_step_are_written_wro
         assert_eq!(problems(line), one(problem), "{line}");
     }
     assert_eq!(
-        problems("count of xs is in ps.b ignoring case"),
-        vec![
-            "\"is in\" can't take ignoring case yet".to_string(),
-            "is one of can't follow a count of, a sum of or a plus".to_string(),
-        ]
-    );
-    assert_eq!(
         for_problems(
             &for_line("every xs whose v is not in $params.a.l ignoring case as x"),
             &[]

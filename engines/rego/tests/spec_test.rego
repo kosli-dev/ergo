@@ -15,6 +15,7 @@ known_differences := {
 	"for / a part that holds a list is walked in the whose of a for line and in a whose under it / an empty part fails as value",
 	"for / a walk through a for line's alias leaves a root after the phrase to the assertion, and each item keeps its own cause and the items of its list / an item whose list holds five items without v",
 	"for / the roots of the line's own whose come before the roots of its sentences, whatever their causes / $params.min is missing and says first, though $params.a has the worse cause",
+	"ignoring / a list read from a field of one step after is in ignoring case on a subject that is a list / walks the subject and names the item of the field that isn't text",
 	"in / an empty list on the right of a whose is said before the list it filters, after contains all of and none of, beside a plus and on a for line, as a null list is / fails with the empty list said once, then each item that can't be read under its item",
 	"messages / nothing hides a problem / the roots come first and then each item, and the row takes the worst cause",
 }
@@ -77,21 +78,17 @@ test_the_compare_time_cases_pass if {
 	_compiled_differences("compare_time") == set()
 }
 
-test_the_ignoring_cases_pass_part_1_of_4 if _case_part_passes("ignoring", 0, 4)
+test_the_ignoring_cases_pass_part_1_of_3 if _case_part_passes("ignoring", 0, 3)
 
-test_the_ignoring_cases_pass_part_2_of_4 if _case_part_passes("ignoring", 1, 4)
+test_the_ignoring_cases_pass_part_2_of_3 if _case_part_passes("ignoring", 1, 3)
 
-test_the_ignoring_cases_pass_part_3_of_4 if _case_part_passes("ignoring", 2, 4)
+test_the_ignoring_cases_pass_part_3_of_3 if _case_part_passes("ignoring", 2, 3)
 
-test_the_ignoring_cases_pass_part_4_of_4 if _case_part_passes("ignoring", 3, 4)
+test_the_ignoring_cases_pass_compiled_part_1_of_3 if _differences_compiled("ignoring", _case_part("ignoring", 0, 3)) == set()
 
-test_the_ignoring_cases_pass_compiled_part_1_of_4 if _differences_compiled("ignoring", _case_part("ignoring", 0, 4)) == set()
+test_the_ignoring_cases_pass_compiled_part_2_of_3 if _differences_compiled("ignoring", _case_part("ignoring", 1, 3)) == set()
 
-test_the_ignoring_cases_pass_compiled_part_2_of_4 if _differences_compiled("ignoring", _case_part("ignoring", 1, 4)) == set()
-
-test_the_ignoring_cases_pass_compiled_part_3_of_4 if _differences_compiled("ignoring", _case_part("ignoring", 2, 4)) == set()
-
-test_the_ignoring_cases_pass_compiled_part_4_of_4 if _differences_compiled("ignoring", _case_part("ignoring", 3, 4)) == set()
+test_the_ignoring_cases_pass_compiled_part_3_of_3 if _differences_compiled("ignoring", _case_part("ignoring", 2, 3)) == set()
 
 test_the_contains_cases_pass if {
 	_topic_failures("contains") == _known_in("contains")

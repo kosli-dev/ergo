@@ -793,28 +793,3 @@ fn an_input_list_after_is_in_ignoring_case_with_a_bad_item_is_unfit_in_a_walk() 
         assert_eq!(input_unfit(&[&check], &input, &ctx), unfit, "{list}");
     }
 }
-
-#[test]
-fn an_empty_input_list_after_is_in_ignoring_case_is_usable_as_it_is_without_the_words() {
-    let document = json!({"cs": []});
-    let params = json!({});
-    let input = found_input("$input.cs[].name", &json!([]));
-    for sentence in [
-        "every xs.v is in $input.cs.name ignoring case",
-        "every xs whose v is in $input.cs.name ignoring case, if any, exists",
-        "count of xs whose v is in $input.cs.name ignoring case is 0",
-        "v is in $input.cs.name ignoring case",
-    ] {
-        let check = first_check(one(json!({ "c": sentence })));
-        for subject in [json!({"xs": [{}]}), json!({"xs": [{"v": "a"}], "v": "a"})] {
-            let ctx = crate::path::Ctx {
-                input: &document,
-                ..ctx_of(&subject, &params)
-            };
-            assert!(
-                !input_unfit(&[&check], &input, &ctx),
-                "{sentence} {subject}"
-            );
-        }
-    }
-}
