@@ -541,7 +541,7 @@ _m_message_pieces(check, subj, "not_an_object") := clauses if {
 
 _m_list_names(check) := _m_tally_list_names(check) | _m_text_list_names(check)
 
-_m_text_list_names(check) := {_input_name(check.right)} if {
+_m_text_list_names(check) := {_input_name(check.right)} | {_input_name(_as_subject_part(array.slice(check.right, 0, i))) | _part_start(check.right); some i in numbers.range(2, count(check.right)); i < count(check.right)} if {
 	check.ignoring
 	_list_cmp(check)
 	is_array(check.right)
