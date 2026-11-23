@@ -119,3 +119,13 @@ test_a_list_walked_from_the_input_after_is_in_ignoring_case_that_cant_be_read_ta
 	ergo._worst_read({"x": "a"}, ref) == "null" with data.ergo_document as {"cs": [{"name": "a"}, {"name": null}]}
 	ergo._worst_read({}, object.remove(ref, ["ignoring"])) == "null" with data.ergo_document as {"cs": [{"name": "a"}, {"name": null}]}
 }
+
+test_a_walked_part_list_after_is_in_ignoring_case_is_judged_per_item_like_a_walked_list_from_the_input if {
+	part := [`${"alias":"pl","n":1,"of":null,"old":true}`, "p", "name"]
+	leaf := {"op": "compare", "cmp": "in", "left": ["v"], "right": part, "ignoring": "case"}
+	ergo._text_walked_ref(leaf, ergo._as_subject_part(part))
+	ergo._text_walked_ref(object.union(leaf, {"right": {"walked": part}}), ergo._as_subject_part(part))
+	not ergo._text_walked_ref(object.remove(leaf, ["ignoring"]), ergo._as_subject_part(part))
+	not ergo._text_walked_ref(object.union(leaf, {"cmp": "includes"}), ergo._as_subject_part(part))
+	not ergo._text_walked_ref(leaf, ["v"])
+}
