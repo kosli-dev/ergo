@@ -6,7 +6,7 @@ _s_sentence_problems(parsed, pat) := (_s_base_problems(parsed) | _s_join_problem
 
 else := _s_base_problems(parsed) | _s_join_problems(parsed)
 
-_s_ignoring_problems(parsed) := ({concat("", [`"ignoring surrounding spaces and case" is written "ignoring case and surrounding spaces"`]) |
+_s_ignoring_problems(parsed) := (({concat("", [`"ignoring surrounding spaces and case" is written "ignoring case and surrounding spaces"`]) |
 	some node in _s_nodes(parsed)
 	is_object(node)
 	object.get(node, "ignoring", "") == "surrounding spaces and case"
@@ -14,12 +14,17 @@ _s_ignoring_problems(parsed) := ({concat("", [`"ignoring surrounding spaces and 
 	some node in _s_nodes(parsed)
 	_s_ignoring_node(node)
 	not _s_takes_ignoring(node)
+}) | {concat("", [`"`, _s_ignoring_list_op[node.op], `" can't take ignoring `, node.ignoring, ` yet`]) |
+	some node in _s_nodes(parsed)
+	_s_ignoring_node(node)
+	_s_ignoring_long_list_path(node)
 }) | {_s_ignoring_flaw(holder, node) |
 	some holder in _s_nodes(parsed)
 	is_object(holder)
 	node := object.get(holder, "phrase", null)
 	_s_ignoring_node(node)
 	_s_takes_ignoring(node)
+	not _s_ignoring_long_list_path(node)
 }
 
 _s_ignoring_node(node) if {
@@ -34,6 +39,13 @@ _s_takes_ignoring(node) if {
 }
 
 _s_takes_ignoring(node) if node.op in {"is one of", "is not one of"}
+
+_s_ignoring_list_op := {"is one of": "is in", "is not one of": "is not in"}
+
+_s_ignoring_long_list_path(node) if {
+	node.op in object.keys(_s_ignoring_list_op)
+	count(node.path.steps) + count([1 | "position" in object.keys(node.path)]) > 1
+}
 
 _s_ignoring_op(node) := "within" if "within" in object.keys(node)
 

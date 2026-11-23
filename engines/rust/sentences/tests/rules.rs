@@ -1107,13 +1107,22 @@ fn ignoring_words_after_a_list_read_from_a_path_are_read() {
 #[test]
 fn ignoring_words_after_a_list_from_a_path_of_more_than_one_step_are_written_wrong_for_now() {
     for (line, problem) in [
-        ("x is in pl.name ignoring case", "\"is in\" can't take ignoring case yet"),
+        (
+            "x is in pl.name ignoring case",
+            "\"is in\" can't take ignoring case yet",
+        ),
         (
             "x is in xs[0] ignoring surrounding spaces",
             "\"is in\" can't take ignoring surrounding spaces yet",
         ),
-        ("x is in item 2 of xs ignoring case", "\"is in\" can't take ignoring case yet"),
-        ("x is in first of xs ignoring case", "\"is in\" can't take ignoring case yet"),
+        (
+            "x is in item 2 of xs ignoring case",
+            "\"is in\" can't take ignoring case yet",
+        ),
+        (
+            "x is in first of xs ignoring case",
+            "\"is in\" can't take ignoring case yet",
+        ),
         (
             "x is in $input.cs named by k ignoring case",
             "\"is in\" can't take ignoring case yet",
@@ -1149,6 +1158,13 @@ fn ignoring_words_after_a_list_from_a_path_of_more_than_one_step_are_written_wro
     ] {
         assert_eq!(problems(line), one(problem), "{line}");
     }
+    assert_eq!(
+        problems("count of xs is in ps.b ignoring case"),
+        vec![
+            "\"is in\" can't take ignoring case yet".to_string(),
+            "is one of can't follow a count of, a sum of or a plus".to_string(),
+        ]
+    );
     assert_eq!(
         for_problems(
             &for_line("every xs whose v is not in $params.a.l ignoring case as x"),

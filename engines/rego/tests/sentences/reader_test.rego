@@ -217,6 +217,7 @@ test_ignoring_words_after_a_list_from_a_path_of_more_than_one_step_are_written_w
 	] {
 		_read(pair[0]) == {"problems": [pair[1]]}
 	}
+	_read(`count of xs is in ps.b ignoring case`) == {"problems": [`"is in" can't take ignoring case yet`, "is one of can't follow a count of, a sum of or a plus"]}
 	ergo._for_line(`every xs whose v is not in $params.a.l ignoring case as x`) == {"problems": [`"is not in" can't take ignoring case yet`]}
 	_read(`x is in ps.b ignoring surrounding spaces and case`) == {"problems": [
 		`"ignoring surrounding spaces and case" is written "ignoring case and surrounding spaces"`,
