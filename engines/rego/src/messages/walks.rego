@@ -654,7 +654,17 @@ _m_tally_keyed(side) if {
 
 _m_tally_walked(c, w) := _m_cond_walked_said(c) if array.concat(w.fails, _walk_stop(w)) == []
 
-else := [x | some x in _m_cond_walked_said(c); x[0] == "value"]
+else := array.concat([x | some x in _m_cond_walked_said(c); x[0] == "value"], _m_text_walked_said(c))
+
+_m_text_walked_said(c) := [[cause, t] |
+	walk(c, [_, x])
+	is_object(x)
+	x.ignoring
+	some p in _m_walked_roots(x)
+	_text_walked_root(x, p)
+	some cause in _value_fault_cause_list
+	t := _m_walked_root_text(x, cause)
+]
 
 _m_positions(path) := [_m_position(x) | some x in path; _item_step(x)]
 
