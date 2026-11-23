@@ -611,19 +611,24 @@ _rooted_main(check, subj, r) := object.union(r, {"cause": "unusable", "failed": 
 	r.cause in _not_failing_causes
 	_walk_key_texts(check, r) != []
 	_key_beats_roots(check, subj)
-} else := object.union(r, object.union({"cause": flaw, "failed": _rooted_failed(r)}, {"root_msgs": ms | ms := _walk_root_clauses(check, subj); ms != []})) if {
+} else := object.union(r, object.union(object.union({"cause": flaw, "failed": _rooted_failed(r)}, {"root_msgs": ms | ms := _m_said_clauses(_m_said_sorted(said.all)); ms != []}), said.kept)) if {
 	flaw := _walk_root_flaw(check, subj)
 	flaw != ""
 	r.cause in {"satisfied", "value", flaw}
+	said := _root_said_kept(check, subj)
 } else := object.union(r, object.union({"cause": flaw, "failed": []}, {"root_msgs": ms | ms := _leaf_root_clauses(check, flaw); ms != []})) if {
 	r.cause in _not_failing_causes
 	flaw := _leaf_root_flaw(check, subj)
 	flaw != ""
-} else := object.union(r, {"other_roots": ms}) if {
+} else := object.union(r, object.union({"other_roots": ms | ms := _m_said_clauses(_m_said_sorted(said.all)); ms != []}, said.kept)) if {
 	not r.cause in _not_failing_causes
-	ms := _walk_root_clauses(check, subj)
-	ms != []
+	said := _root_said_kept(check, subj)
 } else := r
+
+_root_said_kept(check, subj) := {"all": parts.all, "kept": {"ergo/root_said": parts.said}} if {
+	check.op == "for"
+	parts := _for_said_parts(check, subj)
+} else := {"all": _walk_root_said(check, subj), "kept": {}}
 
 _parts_ahead(parts, r) := _with_roots(parts, r.other_roots) if "other_roots" in object.keys(r)
 

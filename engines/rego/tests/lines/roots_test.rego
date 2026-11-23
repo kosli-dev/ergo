@@ -85,3 +85,13 @@ test_a_root_a_whose_cant_read_has_no_stand_in_after_a_key_or_a_phrase_b9_leaves_
 	includes := {"op": "includes", "path": ["tags"], "value": {"ref": ["$$params", "t"]}}
 	ergo._root_stand_in(includes) == includes
 }
+
+test_a_line_that_isnt_a_for_line_keeps_no_roots_for_its_sentences if {
+	check := {"op": "every", "path": ["xs"], "whose": [{"op": "compare", "left": ["v"], "cmp": "gte", "right": ["$$params", "min"]}], "check": {"op": "compare", "left": ["v"], "cmp": "eq", "right": 1}}
+	subj := {"xs": [{"v": 1}]}
+	names := {"ergo/names": {"ergo/subject": subj, "$at": {"names": {}}}}
+	said := ergo._root_said_kept(check, subj) with input as names with data.ergo_params as {}
+	said.kept == {}
+	said.all == ergo._walk_root_said(check, subj) with input as names with data.ergo_params as {}
+	said.all != []
+}
