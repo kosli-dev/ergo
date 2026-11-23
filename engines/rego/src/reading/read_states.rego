@@ -542,10 +542,13 @@ _text_walked_ref(check, r) if {
 
 _text_walked_ref(check, r) if {
 	check.ignoring
-	_list_cmp(check)
+	check.op == "compare"
 	check.cmp in _membership_ops
-	_as_subject_part(_rpath(check.right)) == r
+	p := _rpath(check.right)
+	_part_start(p)
 	_part_start(r)
+	object.remove(_part_of(p), ["old"]) == object.remove(_part_of(r), ["old"])
+	array.slice(p, 1, count(p)) == array.slice(r, 1, count(r))
 }
 
 _text_ref_state(r) := _text_walk_state(null, r) if {

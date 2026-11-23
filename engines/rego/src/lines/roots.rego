@@ -347,8 +347,7 @@ _text_leaf_broken(subj, c) if {
 
 _text_leaf_broken(_, c) if {
 	_walk_roots_on
-	some p in _m_walked_roots(c)
-	_text_walked_root(c, p)
+	some p in _text_walked_paths(c)
 	_walked_root_states_at(c, p) & _failed_read_states != set()
 }
 
@@ -369,6 +368,14 @@ _text_list_root(c, p) if {
 _text_walked_root(x, p) if _text_walked_ref(x, p)
 
 _text_walked_root(x, p) if _text_list_root(x, p)
+
+_text_walked_paths(c) := {p |
+	c.ignoring
+	some p in array.concat([c.values.ref | _is_ref(object.get(c, "values", null))], [_rpath(c.right) | c.op == "compare"; c.cmp in _membership_ops; _rpath(c.right)])
+	_walk_outside(p)
+	_walking_root(c, p)
+	_text_walked_root(c, p)
+}
 
 _side_root(c, p) if c.right == p
 
@@ -444,8 +451,7 @@ _text_leaf_conds(check) := [c] if {
 	c := object.get(check, "check", null)
 	is_object(c)
 	c.ignoring
-	some p in _m_walked_roots(c)
-	_text_walked_root(c, p)
+	_text_walked_paths(c) != set()
 } else := []
 
 _walk_whose_conds(check) := array.concat(array.concat(object.get(check, "whose", []), [c | check.op == "for"; some item in check.items; some c in object.get(item, "whose", [])]), _for_nested_conds(check))

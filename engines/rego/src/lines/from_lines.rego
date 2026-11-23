@@ -941,8 +941,7 @@ _text_walk_rooted(c) if {
 	walk(c, [_, x])
 	is_object(x)
 	x.ignoring
-	some p in _m_walked_roots(x)
-	_text_walked_root(x, p)
+	_text_walked_paths(x) != set()
 }
 
 _may_hide_a_root(raw, _) if {
