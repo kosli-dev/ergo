@@ -330,3 +330,18 @@ fn a_key_of_a_second_list_that_cant_be_read_is_no_entry_of_the_first_list() {
         "{said:#?}"
     );
 }
+
+#[test]
+fn what_a_sentence_says_of_an_item_whose_second_list_fails_stays_in_an_entry_until_the_item_has_its_own()
+ {
+    let said = entries(
+        "every xs as x, every x.ys as y",
+        json!(["x.w is 1", "y.n is 1"]),
+        json!({"xs": [{"ys": [{"n": 1}], "w": 1}, {"w": 2}]}),
+        json!({}),
+    );
+    assert!(
+        said.iter().any(|entry| entry.contains("x.w is 2")),
+        "{said:#?}"
+    );
+}
