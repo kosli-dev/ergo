@@ -1987,6 +1987,7 @@ fn leaf_roots(
         .into_iter()
         .filter(|root| {
             alone.contains(&root.cause)
+                || root.last_of_cause
                 || reached && items.iter().all(|item| root.cause <= item.cause)
                 || items.iter().all(|item| item.cause == Cause::Value)
         })
