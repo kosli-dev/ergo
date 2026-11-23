@@ -315,7 +315,6 @@ messages / a for alias after is in that isn't a list, missing or null, on an emp
 messages / a for alias after is in that isn't a list, missing or null, on an empty list / says the alias's field is null, then the list, in the item
 messages / a for item with a whose that reads a part over items that aren't all objects / names the part first, once, then each item in turn
 messages / a for item with a whose that reads a part over items that aren't all objects / names the part first, once, then the inner items
-messages / a for line over a list of lists whose values spell the alias / a list that holds the alias in its items is printed as the input had it
 messages / a for line over two lists, with a sentence on the second item before a walk under the first / the parts follow the items, not the sentences
 messages / a for line over two lists, with a sentence that walks a list of the subject / names each item of the subject's list once, with no item of the for line in front, because the sentence doesn't read the for line's items
 messages / a for line over two lists, with a walk under the first item before a sentence on the second / the parts follow the items, not the sentences
