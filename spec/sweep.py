@@ -50,6 +50,14 @@ def items_for(name, k):
     }.get(name, ABSENT)
 
 
+def parts_for(k):
+    if k == ABSENT:
+        return []
+    if k == []:
+        return [{}]
+    return [{"name": k}]
+
+
 def expand_all(value, expand):
     if isinstance(value, str):
         return expand(value)
@@ -67,6 +75,8 @@ def build_cell(shape, key, k, j, es, input_shape, params_shape):
 
     from_line = shape.get("from")
     subject = {"from": expand(from_line) if from_line else things, "identified_by": "id"}
+    if shape.get("has"):
+        subject["has"] = shape["has"]
     check = shape.get("check", "id exists")
     check = expand_all(check, expand)
     policy = {
@@ -77,6 +87,8 @@ def build_cell(shape, key, k, j, es, input_shape, params_shape):
     thing = {"id": "t", "m": {"a": 2}}
     if k != ABSENT:
         thing["k"] = k
+    if shape.get("has"):
+        thing["p"] = parts_for(k)
     items = items_for(es, k)
     if items != ABSENT:
         thing["es"] = items
