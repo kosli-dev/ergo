@@ -269,6 +269,14 @@ def rows(report):
     return found
 
 
+def row_lists(report):
+    found = {}
+    for row in report.get("results", []):
+        key = (row.get("requirement"), row.get("check"), json.dumps(row.get("subject"), sort_keys=True))
+        found.setdefault(key, []).append(row)
+    return found
+
+
 def statuses(report):
     return {name: (entry or {}).get("status") for name, entry in (report.get("requirements") or {}).items()}
 
@@ -280,10 +288,10 @@ def kind(rego, rust):
         return 1 if ("error" in rego) != ("error" in rust) else 3
     if rego.get("compliant") != rust.get("compliant") or statuses(rego) != statuses(rust):
         return 1
-    a, b = rows(rego), rows(rust)
-    if set(a) != set(b) or any(a[key].get("passed") != b[key].get("passed") for key in a):
+    a, b = row_lists(rego), row_lists(rust)
+    if set(a) != set(b) or any(sorted(x.get("passed") is True for x in a[key]) != sorted(x.get("passed") is True for x in b[key]) for key in a):
         return 1
-    if any(a[key].get("cause") != b[key].get("cause") for key in a):
+    if any(sorted(json.dumps(x.get("cause")) for x in a[key]) != sorted(json.dumps(x.get("cause")) for x in b[key]) for key in a):
         return 2
     return 3
 
