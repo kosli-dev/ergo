@@ -1892,7 +1892,18 @@ fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
         and_walked_roots(walk, &outer, &mut parts);
         match Cause::worst(parts.iter().map(|part| part.cause)) {
             Some(worst) if said_nothing || items_said => (worst, parts),
-            Some(_) => (cause, parts),
+            Some(_) => (
+                Cause::worst(
+                    std::iter::once(cause).chain(
+                        parts
+                            .iter()
+                            .filter(|part| part.kind == Kind::Root && part.last_of_cause)
+                            .map(|part| part.cause),
+                    ),
+                )
+                .unwrap_or(cause),
+                parts,
+            ),
             None => {
                 let list = first_list(&walk.path, &outer);
                 (settled, vec![Clause::list(&walked.name, settled, list)])
