@@ -193,3 +193,20 @@ test_a_row_without_the_words_whose_items_fail_on_a_null_item_of_the_list_keeps_i
 	words := object.union(check, {"whose": [object.union(c, {"ignoring": "case"})]})
 	ergo._rooted_cause_said(words, {"xs": [{}]}, r, "absent") with data.ergo_document as {"cs": [{"name": null}]} with data.ergo_params as {} with input as {}
 }
+
+test_a_walked_list_after_is_in_ignoring_case_in_a_one_line_every_is_a_root_read_before_any_item_when_the_walked_roots_are_read if {
+	part := [`${"alias":"pl","n":1,"of":null,"old":true}`, "p", "name"]
+	field := {"op": "compare", "cmp": "in", "left": ["x"], "right": part, "ignoring": "case"}
+	every_part := {"op": "every", "path": ["xs", "x"], "check": field, "whose": [], "if_any": false}
+	three := {"p": [{"name": 3}]}
+	ergo._text_leaf_flawed(every_part, three) == [field] with input as {"ergo/names": {"ergo/subject": three}} with ergo._walk_roots_on as true
+	ergo._walk_root_flaw(every_part, three) == "unusable" with input as {"ergo/names": {"ergo/subject": three}} with ergo._walk_roots_on as true
+	ergo._walk_root_msgs(every_part, three) == ["item 1 of pl: name is 3, which isn't text"] with input as {"ergo/names": {"ergo/subject": three}} with ergo._walk_roots_on as true
+	ergo._text_leaf_flawed(every_part, three) == [] with input as {"ergo/names": {"ergo/subject": three}}
+	fine := {"p": [{"name": "a"}]}
+	ergo._text_leaf_flawed(every_part, fine) == [] with input as {"ergo/names": {"ergo/subject": fine}} with ergo._walk_roots_on as true
+	ref := {"op": "in", "path": ["x"], "values": {"ref": ["$$input[]", "cs", "name"]}, "ignoring": "case"}
+	every_ref := object.union(every_part, {"check": ref})
+	ergo._walk_root_flaw(every_ref, {}) == "unusable" with input as {"ergo/names": {"ergo/subject": {}}} with data.ergo_document as {"cs": [{"name": 3}]} with ergo._walk_roots_on as true
+	ergo._walk_root_msgs(every_ref, {}) == ["item 1 of $input.cs: name is 3, which isn't text"] with input as {"ergo/names": {"ergo/subject": {}}} with data.ergo_document as {"cs": [{"name": 3}]} with ergo._walk_roots_on as true
+}
