@@ -845,26 +845,26 @@ else := ""
 
 _m_line(c, subj, cause) := _m_sentence(c, subj, cause)
 
-_for_sentence_clauses(_, _, _, "satisfied") := []
+_for_sentence_clauses(check, c, subj, cause) := _for_rooted_clauses(check, c, subj, cause, _for_sentence_roots(check, c, subj))
 
-_for_sentence_clauses(_, c, _, cause) := [] if {
+_for_rooted_clauses(_, _, _, "satisfied", _) := []
+
+_for_rooted_clauses(_, c, _, cause, _) := [] if {
 	cause != "satisfied"
 	_m_params_unread(c)
 }
 
-_for_sentence_clauses(check, c, subj, cause) := [x | some x in _m_walk_clauses(c, subj, cause, _walk_row(c, subj)); not _for_said_by_root(x, roots)] if {
+_for_rooted_clauses(_, c, subj, cause, roots) := [x | some x in _m_walk_clauses(c, subj, cause, _walk_row(c, subj)); not _for_said_by_root(x, roots)] if {
 	cause != "satisfied"
 	not _m_params_unread(c)
 	_walks(c)
-	roots := _for_sentence_roots(check, c, subj)
 }
 
-_for_sentence_clauses(check, c, subj, cause) := _once([x | some g in said; some x in _for_group_clauses(g, roots, cause, whole)]) if {
+_for_rooted_clauses(check, c, subj, cause, roots) := _once([x | some g in said; some x in _for_group_clauses(g, roots, cause, whole)]) if {
 	cause != "satisfied"
 	not _m_params_unread(c)
 	not _walks(c)
 	said := _message_said(c, subj, cause)
-	roots := _for_sentence_roots(check, c, subj)
 	whole := _for_says_whole(check, c)
 }
 
@@ -947,13 +947,13 @@ else := object.union(_m_item_clause(f.said, _worst_or_value({own[0]} | {x.cause 
 	count(check.items) == 1
 	own := _for_owned_text(f)
 	rest := [l | some l in array.slice(f.failed_assertions, 1, count(f.failed_assertions)); object.get(l, "own_msg", []) != f.failed_assertions[0].own_msg]
-	said := _for_item_sentences(check, object.union(f, {"failed_assertions": rest}), _for_item_bound(check, f, walked))
+	said := _for_item_sentences(check, object.union(f, {"failed_assertions": rest}), _for_item_bound(check, f, walked), walked.roots)
 }
 
 else := _m_item_clause(f.said, _for_said_cause(said), said) if {
 	f.failed_assertions != []
 	count(check.items) == 1
-	said := _for_item_sentences(check, f, _for_item_bound(check, f, walked))
+	said := _for_item_sentences(check, f, _for_item_bound(check, f, walked), walked.roots)
 	said != []
 }
 
@@ -1019,20 +1019,22 @@ _for_rider_parts(check, f, names) := [[i, cs] |
 
 _for_inner_at(check, w, x) := min({j | some j, e in w.items; _for_item_name(check, e.i) == x.path} | {count(w.items)})
 
-_for_items_walked(check) := {"w": w, "items": {_failed_name(e.i, d): e | some e in w.items}} if {
+_for_items_walked(check) := object.union(_for_walked_items(check), {"roots": [_for_sentence_roots(check, c, object.get(_for_names, "ergo/subject", null)) | some c in check.checks]})
+
+_for_walked_items(check) := {"w": w, "items": {_failed_name(e.i, d): e | some e in w.items}} if {
 	w := _for_walk(check.items[0], object.get(_for_names, "ergo/subject", null), _for_names)
 	d := _for_dotted(check)
 }
 
 _for_item_bound(check, f, walked) := _bound(_for_names, check.items[0].as, e.v, _walk_at(walked.w, e)) if e := walked.items[f.path]
 
-_for_item_sentences(check, f, names) := _for_in_list_order([x | some i, x in said; not _for_said_earlier(x, array.slice(said, 0, i))]) if {
+_for_item_sentences(check, f, names, roots) := _for_in_list_order([x | some i, x in said; not _for_said_earlier(x, array.slice(said, 0, i))]) if {
 	said := _once([_for_whole_list(x) |
 		some i, c in check.checks
 		_for_reads_an_alias(check, c)
 		some l in f.failed_assertions
 		l.assertion == check.assertions[i]
-		some x in _for_sentence_clauses(check, c, object.get(names, "ergo/subject", null), l.cause) with input as {"ergo/names": names}
+		some x in _for_rooted_clauses(check, c, object.get(names, "ergo/subject", null), l.cause, roots[i]) with input as {"ergo/names": names}
 	])
 }
 
@@ -1081,25 +1083,46 @@ _for_list_rank(lists, l) := [i | some i, x in lists; x == l][0]
 _for_row_clauses(check, subj, r) := array.concat(array.concat(array.concat(p.roots, p.free), p.items), p.lists) if p := _for_row_parts(check, subj, r)
 
 _for_row_parts(check, subj, r) := {"roots": roots, "free": free, "items": items, "lists": array.concat(listed, line), "line": line} if {
-	roots := [_for_root_item(c) | some c in _for_root_clauses(check, subj); not _for_subject_root(c, subj, r)]
+	roots := [_for_root_item(c) | some c in _for_row_roots(check, subj, r); not _for_subject_root(c, subj, r)]
 	rooted := {c.text | some c in roots}
-	free := [x | some c in _for_free_clauses(check, subj, r); x := _for_free_unrooted(c, rooted)]
+	sroots := {i: _for_sentence_roots(check, check.checks[i], subj) | some i in _for_failed_sentences(check, r)}
+	free := [x | some c in _for_free_clauses(check, subj, r, sroots); x := _for_free_unrooted(c, rooted)]
 	said := {t | some c in array.concat(roots, free); some t in _m_clause_lines(c)}
 	name := _input_name(check.items[0].path)
-	walked := _for_items_walked(check)
+	walked := object.union(_for_walked_items(check), {"roots": sroots})
 	after := (3 * count(check.checks)) + 2
 	items := [object.union(x, {"group": after}) | some k, f in r.failed; f.path != name; x := _for_unrooted(_for_item_clause_at(check, r.failed, k, walked), said)]
 	listed := [object.union(_for_item_clause_at(check, r.failed, k, walked), {"kind": "list", "group": after}) | some k, f in r.failed; f.path == name]
 	line := [object.union(_m_clause("list", t, r.cause, t), {"group": after}) | some t in _for_list_texts(check, subj, r)]
 }
 
-_for_free_clauses(check, subj, r) := [object.union(x, {"group": i}) |
+_for_failed_sentences(check, r) := {i |
+	some f in r.failed
+	some l in object.get(f, "failed_assertions", [])
+	some i, a in check.assertions
+	l.assertion == a
+} | {i |
+	some l in object.get(r, "free_lines", [])
+	some i, a in check.assertions
+	l.assertion == a
+}
+
+_for_free_clauses(check, subj, r, roots) := [object.union(x, {"group": i}) |
 	some i, c in check.checks
 	not _for_reads_an_alias(check, c)
 	ls := array.concat([l | some f in r.failed; some l in object.get(f, "failed_assertions", []); l.assertion == check.assertions[i]], [l | some l in object.get(r, "free_lines", []); l.assertion == check.assertions[i]])
 	ls != []
-	some x in _for_sentence_clauses(check, c, subj, ls[0].cause)
+	some x in _for_rooted_clauses(check, c, subj, ls[0].cause, roots[i])
 ]
+
+_for_row_roots(check, subj, r) := _for_root_clauses(check, subj) if {
+	some k in ["root_msgs", "other_roots"]
+	k in object.keys(r)
+} else := _for_root_clauses(check, subj) if {
+	r.cause == "not_an_object"
+	r.failed == []
+	not is_object(subj)
+} else := []
 
 _for_root_item(c) := object.union(c, {"kind": "item"}) if _walk_kind(c.text) == "item"
 
