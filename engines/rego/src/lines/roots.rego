@@ -359,6 +359,10 @@ _text_list_root(c, p) if {
 	_rpath(c.right) == p
 }
 
+_text_walked_root(x, p) if _text_walked_ref(x, p)
+
+_text_walked_root(x, p) if _text_list_root(x, p)
+
 _side_root(c, p) if c.right == p
 
 _side_root(c, p) if c.right == {"ref": p}
