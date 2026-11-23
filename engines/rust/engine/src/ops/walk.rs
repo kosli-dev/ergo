@@ -1839,7 +1839,18 @@ fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
     } else {
         let mut roots = whose_roots(walk, &outer, settled != Cause::Satisfied);
         let flawed = walk.check.flawed(&outer) && roots.is_empty();
-        let leaf = if flawed || !roots.is_empty() {
+        let text_beside_list = said
+            .iter()
+            .any(|(_, item)| item.kind == Kind::List && item.cause.is_failure())
+            && super::lists::text_list_flawed(&walk.check, &outer);
+        let leaf = if text_beside_list {
+            let mut leaf = message::root_clauses(&[&*walk.check], &outer);
+            once(
+                &mut leaf,
+                message::walked_root_clauses(&[&*walk.check], &outer),
+            );
+            leaf
+        } else if flawed || !roots.is_empty() {
             message::root_clauses(&[&*walk.check], &outer)
         } else {
             let items: Vec<Clause> = said.iter().map(|(_, item)| item.clone()).collect();
@@ -1848,7 +1859,14 @@ fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
             leaf_roots(walk, &outer, &items, &alone, reached)
         };
         let up_front = !leaf.is_empty() || params_unreadable(&outer) && !roots.is_empty();
-        if flawed {
+        if text_beside_list {
+            list = said
+                .iter()
+                .filter(|(_, item)| item.kind == Kind::List)
+                .map(|(_, item)| Clause::said(item.cause, item.text.clone()).in_group(1))
+                .collect();
+            said.clear();
+        } else if flawed {
             said.clear();
             if !through_a_list(&walk.path, &outer) {
                 list = message::blocked_of(&walk.path, &outer)
