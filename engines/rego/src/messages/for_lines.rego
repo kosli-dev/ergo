@@ -1081,7 +1081,7 @@ _for_list_rank(lists, l) := [i | some i, x in lists; x == l][0]
 _for_row_clauses(check, subj, r) := array.concat(array.concat(array.concat(p.roots, p.free), p.items), p.lists) if p := _for_row_parts(check, subj, r)
 
 _for_row_parts(check, subj, r) := {"roots": roots, "free": free, "items": items, "lists": array.concat(listed, line), "line": line} if {
-	roots := _for_root_clauses(check, subj)
+	roots := [c | some c in _for_root_clauses(check, subj); not _for_subject_root(c, subj, r)]
 	rooted := {c.text | some c in roots}
 	free := [x | some c in _for_free_clauses(check, subj, r); x := _for_free_unrooted(c, rooted)]
 	said := {t | some c in array.concat(roots, free); some t in _m_clause_lines(c)}
@@ -1100,6 +1100,13 @@ _for_free_clauses(check, subj, r) := [object.union(x, {"group": i}) |
 	ls != []
 	some x in _for_sentence_clauses(check, c, subj, ls[0].cause)
 ]
+
+_for_subject_root(c, subj, r) if {
+	r.cause == "not_an_object"
+	r.failed == []
+	not is_object(subj)
+	c.name == "the subject"
+}
 
 _for_free_unrooted(c, rooted) := c if {
 	c.kind != "item"
