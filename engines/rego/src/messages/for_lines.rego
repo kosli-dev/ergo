@@ -1082,7 +1082,7 @@ _for_list_rank(lists, l) := [i | some i, x in lists; x == l][0]
 
 _for_row_clauses(check, subj, r) := array.concat(array.concat(array.concat(p.roots, p.free), p.items), p.lists) if p := _for_row_parts(check, subj, r)
 
-_for_row_parts(check, subj, r) := {"roots": roots, "free": free, "items": items, "lists": array.concat(listed, line), "line": line} if {
+_for_row_parts(check, subj, r) := {"roots": roots, "free": free, "items": items, "lists": array.concat(listed, line), "line": line, "said": ssaid} if {
 	ssaid := _for_row_said(check, subj, r)
 	roots := [_for_root_item(c) | some c in _for_row_roots(check, subj, r, ssaid); not _for_subject_root(c, subj, r)]
 	rooted := {c.text | some c in roots}
@@ -1127,7 +1127,7 @@ _for_row_said(check, subj, r) := {i: _walk_root_said(_for_one_sentence(check, c)
 
 else := {i: _walk_root_said(_for_one_sentence(check, check.checks[i]), subj) | some i in _for_failed_sentences(check, r)}
 
-_for_row_roots(check, subj, r, said) := _for_roots_of(check, subj, [said[i] | some i, _ in check.checks]) if _for_row_rooted(r, subj)
+_for_row_roots(check, subj, r, said) := _for_roots_of(check, subj, said) if _for_row_rooted(r, subj)
 
 else := []
 
@@ -1487,7 +1487,7 @@ _m_applies(evals, req, false) := {"message": concat("; ", ms)} if {
 _for_said(raw) := object.union(object.remove(raw, ["ergo/for_raw"]), {
 	"message": _m_aliased(_m_clauses_text(_m_clauses_shown(tree))),
 	"cause": _worst_or_value({raw.cause} | {v.cause | walk(tree, [_, v]); is_object(v); "cause" in object.keys(v)}),
-	"ergo/for_texts": _for_texts(s.check, s.subj, s.r, _m_clause_texts(array.concat(p.roots, p.free)), _m_clause_texts(p.line)),
+	"ergo/for_texts": _for_said_texts(s.check, s.subj, s.r, _m_clause_texts(array.concat(p.roots, p.free)), _m_clause_texts(p.line), p.said),
 }) if {
 	s := raw["ergo/for_raw"]
 	s.tree == true
@@ -1502,7 +1502,9 @@ _for_said(raw) := object.union(object.remove(raw, ["ergo/for_raw"]), {
 
 else := raw
 
-_for_texts(check, subj, r, once, line) := {
+_for_texts(check, subj, r, once, line) := _for_said_texts(check, subj, r, once, line, {})
+
+_for_said_texts(check, subj, r, once, line, ssaid) := {
 	"items": items,
 	"said": [concat("; ", array.concat(_for_flaw_said(check, i, flaw), _for_grouped(check, _uncovered(array.concat([m | some m in roots; i in owners[m]], object.get(frees, a, [])))))) | some i, a in check.assertions],
 	"walk": array.concat(array.concat([["list", _for_list_label(check, m), m] | flaw == []; some m in line], [["list", _for_list_label(check, ""), concat("; ", _for_grouped(check, unowned))] | unowned != []]), seconds),
@@ -1518,7 +1520,8 @@ _for_texts(check, subj, r, once, line) := {
 	items := [_for_item_texts(check, r.failed, k, skip, said, once, free_as) | some k, _ in r.failed]
 	roots := _once(array.concat([m | once != []; some m in rs; not m in second], [t | some x in items; some t in x.roots]))
 	frees := _for_free_said(r, rs, once, free_as)
-	owners := {m: _for_root_owner(check, subj, m, _for_free_said(r, [], once, free_as)) | some m in roots}
+	frees0 := _for_free_said(r, [], once, free_as)
+	owners := {m: _for_root_owner(check, subj, m, frees0, ssaid) | some m in roots}
 	unowned := _uncovered([m | some m in roots; -1 in owners[m]])
 	seconds := [["item", _m_lead_of(m), _m_after_lead(_m_lead_of(m), m)] | once != []; some m in rs; m in second]
 }
@@ -1568,19 +1571,24 @@ _for_list_label(check, m) := name if {
 	startswith(m, concat("", [name, " "]))
 } else := _input_name(check.items[0].path)
 
-_for_root_owner(check, subj, m, frees) := free | {i | some i, _ in check.assertions; not i in free; _for_root_of(check, subj, i, m)} if {
+_for_root_owner(check, subj, m, frees, ssaid) := free | {i | some i, _ in check.assertions; not i in free; _for_root_of(check, subj, i, m, ssaid)} if {
 	free := {i | some i, a in check.assertions; _for_free_root(m, frees[a])}
 	count(free) > 0
 } else := {-1} if {
 	some it in check.items
 	count(object.get(it, "whose", [])) > 0
-	_for_root_of(object.union(check, {"checks": [], "assertions": []}), subj, -1, m)
+	_for_root_of(object.union(check, {"checks": [], "assertions": []}), subj, -1, m, {})
 } else := {0} if count(check.checks) == 1
 
 else := owners if {
-	owners := {i | some i, _ in check.checks; _for_root_of(check, subj, i, m)}
+	owners := {i | some i, _ in check.checks; _for_root_of(check, subj, i, m, ssaid)}
 	count(owners) > 0
 } else := {-1}
+
+_for_sentence_root_texts(check, subj, i, ssaid) := [x[1] | some x in xs] if {
+	xs := ssaid[i]
+	_ = [check, subj]
+} else := _walk_root_msgs(object.union(check, {"items": [object.remove(it, ["whose"]) | some it in check.items], "checks": [check.checks[i]], "assertions": [check.assertions[i]]}), subj)
 
 _for_free_root(m, ts) if {
 	every p in split(m, "; ") {
@@ -1588,17 +1596,16 @@ _for_free_root(m, ts) if {
 	}
 }
 
-_for_root_of(check, subj, -1, m) if {
+_for_root_of(check, subj, -1, m, _) if {
 	every p in split(m, "; ") {
 		p in {x | some t in _walk_root_msgs(check, subj); some x in array.concat([t], split(t, "; "))}
 	}
 }
 
-_for_root_of(check, subj, i, m) if {
+_for_root_of(check, subj, i, m, ssaid) if {
 	i >= 0
 	c := check.checks[i]
-	one := object.union(check, {"items": [object.remove(it, ["whose"]) | some it in check.items], "checks": [c], "assertions": [check.assertions[i]]})
-	texts := {p | some t in array.concat(_walk_root_msgs(one, subj), [x | some x in (_m_for_said(c) | _m_for_tally_said(c))]); some p in array.concat([t], split(t, "; "))}
+	texts := {p | some t in array.concat(_for_sentence_root_texts(check, subj, i, ssaid), [x | some x in (_m_for_said(c) | _m_for_tally_said(c))]); some p in array.concat([t], split(t, "; "))}
 	every p in split(m, "; ") {
 		p in texts
 	}
