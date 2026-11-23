@@ -46,7 +46,7 @@ jobs:
       - name: Sort the known failures of both engines and fail on a verdict that differs
         id: types
         continue-on-error: true
-        run: python3 .github/diff-types.py --rego --summary --require-no-type-1 > "$RUNNER_TEMP/status/types.txt"
+        run: python3 .github/diff-types.py --rego --require-no-type-1 > "$RUNNER_TEMP/status/types.txt"
       - name: Count the entries of spec/OPEN.md
         run: .github/sync-facts.sh HEAD > "$RUNNER_TEMP/status/facts.txt"
       - uses: actions/upload-artifact@v7
@@ -82,5 +82,7 @@ jobs:
         run: |
           mkdir -p status
           touch status/grid.txt status/pairs.txt status/types.txt status/facts.txt
-          { cat .github/status-intro.md; echo; .github/status-block.sh "$RESULT" status/grid.txt status/pairs.txt status/types.txt status/facts.txt; } > status/body.md
+          .github/status-block.sh "$RESULT" status/grid.txt status/pairs.txt status/types.txt status/facts.txt > status/block.md
+          { cat .github/status-intro.md; echo; cat status/block.md; } > status/body.md
+          cat status/block.md >> "$GITHUB_STEP_SUMMARY"
           gh issue edit 573 --body-file status/body.md
