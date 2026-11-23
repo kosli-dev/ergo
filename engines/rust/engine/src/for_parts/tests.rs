@@ -345,3 +345,53 @@ fn what_a_sentence_says_of_an_item_whose_second_list_fails_stays_in_an_entry_unt
         "{said:#?}"
     );
 }
+
+#[test]
+fn what_a_sentence_says_of_an_item_whose_second_list_fails_stays_in_an_entry_beside_a_root_it_cant_read()
+ {
+    let said = entries(
+        "every ws as w, every ys whose n is in $params.z as x",
+        json!("w.v is at least $params.min"),
+        json!({"ws": [{"v": 1}, {"v": "a"}, {}], "ys": [{"n": 1}]}),
+        json!({"min": null}),
+    );
+    assert!(
+        said.iter()
+            .any(|entry| entry.contains("which isn't a number")),
+        "{said:#?}"
+    );
+    assert!(
+        said.iter().any(|entry| entry.contains("w.v is missing")),
+        "{said:#?}"
+    );
+}
+
+#[test]
+fn what_a_walk_says_of_an_item_whose_sorted_second_list_fails_stays_in_an_entry_beside_a_root_it_cant_read()
+ {
+    let said = entries(
+        "every ws as w, first of ys whose n is in $params.z sorted by n as x",
+        json!("every w.ys.v is at least $params.min"),
+        json!({"ws": [{"ys": [{"v": 1}]}, {"ys": null}], "ys": [{"n": 1}]}),
+        json!({"min": null}),
+    );
+    assert!(
+        said.iter().any(|entry| entry.contains("w.ys is null")),
+        "{said:#?}"
+    );
+}
+
+#[test]
+fn an_items_problem_that_only_the_row_says_beside_a_null_root_stays_in_an_entry() {
+    let said = entries(
+        "every ws as w, every ys whose n is in $params.z as x",
+        json!("w.v is at least $params.min"),
+        json!({"ws": [{"v": 1}, {"v": "a"}, {}], "ys": [{"n": 1}]}),
+        json!({"min": null, "z": [1]}),
+    );
+    assert!(
+        said.iter()
+            .any(|entry| entry.contains("which isn't a number")),
+        "{said:#?}"
+    );
+}
