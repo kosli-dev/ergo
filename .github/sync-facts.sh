@@ -11,7 +11,7 @@ if ! git -C "$root" rev-parse --verify --quiet "$base^{commit}" > /dev/null; the
   echo "sync-facts.sh: $base is not a commit" >&2
   exit 2
 fi
-python3 -I - "$root" "$base" << 'PY'
+exec python3 -I - "$root" "$base" << 'PY'
 import json
 import subprocess
 import sys
@@ -164,14 +164,3 @@ lines = ["## How far the engines are from the spec", ""]
 lines += block("Branch", new) + block(base, old) + change(old, new)
 print("\n".join(lines).rstrip("\n"))
 PY
-if [ -n "${SYNC_FACTS_TYPES:-}" ]; then
-  echo
-  set -- --summary --root "$root"
-  if [ -n "${SYNC_FACTS_DUMP:-}" ]; then
-    set -- "$@" --dump "$SYNC_FACTS_DUMP"
-  fi
-  if command -v opa > /dev/null 2>&1 && [ -f "$root/dist/ergo.rego" ]; then
-    set -- "$@" --rego
-  fi
-  python3 -I "$here/diff-types.py" "$@"
-fi

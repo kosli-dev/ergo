@@ -302,7 +302,6 @@ jobs:
       - name: Write how far the engines are from the spec in the job summary
         env:
           BASE: origin/${{ github.base_ref }}
-          SYNC_FACTS_TYPES: "1"
         run: .github/sync-facts.sh "$BASE" >> "$GITHUB_STEP_SUMMARY"
 
   pairs-facts:
