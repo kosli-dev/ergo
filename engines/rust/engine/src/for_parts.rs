@@ -396,7 +396,7 @@ fn item_entry(
                         text(y, "item"),
                         Cause::worst(said.iter().map(|piece| piece.cause))
                             .unwrap_or_else(|| cause_of(y)),
-                        list(y, "inputs"),
+                        alias_inputs(y, aliases),
                         Vec::new(),
                         message,
                         y,
@@ -1027,7 +1027,11 @@ pub fn for_failures(
                     continue;
                 }
                 causes.push(cause_of(&l));
-                for x in list(&l, "inputs") {
+                let pairs = list(&l, "items");
+                for x in list(&l, "inputs")
+                    .into_iter()
+                    .chain(pairs.iter().flat_map(|y| list(y, "inputs")))
+                {
                     if !alias_named(&text(&x, "name"), &aliases) {
                         ops::push_new(&mut inputs, x);
                     }
