@@ -47681,5 +47681,165 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a from line whose whose walks a list from outside the item on the right fails $applies as the same check does, on an empty list",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "t": {
+          "from": "ts whose every xs.v, if any, is in $input.cs.name",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "t",
+          "checks": {
+            "c": "id exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "an input list that is empty fails $applies as value, as the check does",
+        "rules": [
+          "problems.same_path",
+          "walk.right"
+        ],
+        "input": {
+          "ts": [
+            {
+              "id": "t1",
+              "xs": []
+            }
+          ],
+          "cs": []
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$applies",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "$input.cs[].name",
+                    "outcome": "usable",
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/subjects/t/from"
+                ],
+                "message": "$input.cs is []",
+                "name": "every xs.v, if any, is in $input.cs.name"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "$input.cs[].name",
+                "outcome": "usable",
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "xs[].v",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "$input.cs is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t1",
+              "type": "t"
+            }
+          }
+        ]
+      },
+      {
+        "description": "an item of an input list with no name fails $applies as absent, as the check does",
+        "rules": [
+          "problems.same_path",
+          "walk.right"
+        ],
+        "input": {
+          "ts": [
+            {
+              "id": "t1",
+              "xs": []
+            }
+          ],
+          "cs": [
+            {
+              "id": "c1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "$applies",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0"
+                    ],
+                    "name": "$input.cs[].name",
+                    "outcome": "usable",
+                    "value": [
+                      null
+                    ]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/subjects/t/from"
+                ],
+                "message": "item 1 of $input.cs: name is missing",
+                "name": "every xs.v, if any, is in $input.cs.name"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0"
+                ],
+                "name": "$input.cs[].name",
+                "outcome": "usable",
+                "value": [
+                  null
+                ]
+              },
+              {
+                "locations": [],
+                "name": "xs[].v",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "item 1 of $input.cs: name is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t1",
+              "type": "t"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]

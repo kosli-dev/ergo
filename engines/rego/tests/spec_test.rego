@@ -17,6 +17,8 @@ known_differences := {
 	"for / a walk through a for line's alias leaves a root after the phrase to the assertion, and each item keeps its own cause and the items of its list / an item whose list holds five items without v",
 	"for / the roots of the line's own whose come before the roots of its sentences, whatever their causes / $params.min is missing and says first, though $params.a has the worse cause",
 	"messages / nothing hides a problem / the roots come first and then each item, and the row takes the worst cause",
+	"walks / a from line whose whose walks a list from outside the item on the right fails $applies as the same check does, on an empty list / an input list that is empty fails $applies as value, as the check does",
+	"walks / a from line whose whose walks a list from outside the item on the right fails $applies as the same check does, on an empty list / an item of an input list with no name fails $applies as absent, as the check does",
 }
 
 _topic_cases(topic) := json.unmarshal(replace(json.marshal(data.spec.cases[topic]), "{{spec}}", ergo._spec))

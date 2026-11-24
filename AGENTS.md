@@ -162,9 +162,11 @@ Sort every difference between the Rego engine and the Rust engine by what differ
 - A **type 2** difference changes only a row's cause. Fix it as soon as you can, in the same change when it's small.
 - A **type 3** difference changes only the wording or where a piece sits. Fix it when that's cheap, and otherwise defer it.
 
+A type 1 difference found, whether the engines agree on it or not, also gets a spec case with the right verdict, written by hand from the rule, in the same change that records it in `spec/OPEN.md`. The case fails in each engine that gets it wrong, and is listed as a known failure there (`engines/rust/known-failures.txt`, `known_differences` in `engines/rego/tests/spec_test.rego`), so the nightly shows it.
+
 A deferred difference is one entry in `spec/OPEN.md`, with what differs, an example, its type and the step that fixes it. `spec/OPEN.md` is the one list. Don't open an issue for a difference. Issue #573 is a status page that a nightly workflow rewrites, so don't edit it by hand.
 
-A review looks for type 1 first. A type 3 finding goes on the list and doesn't block the change.
+A review looks for type 1 first. A type 1 found, whether both engines agree or not, gets a spec case with the right verdict, so it fails. A type 3 finding goes on the list and doesn't block the change.
 
 ## Tests
 
