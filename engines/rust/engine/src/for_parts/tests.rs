@@ -454,3 +454,19 @@ fn the_assertion_under_two_for_lines_holds_a_part_it_cant_read() {
         ["assertion e.v is in pl [absent] \"pl is missing\" (\"pl\" \"absent\")"]
     );
 }
+
+#[test]
+fn an_item_named_whole_under_a_sentence_is_said_by_its_item_and_not_by_the_assertion() {
+    assert_eq!(
+        entries(
+            "every distinct commits.author as who",
+            json!("who is \"ann\""),
+            json!({"commits": [{"author": "ann"}, {"author": "bob"}, {"author": "bob"}]}),
+            json!({}),
+        ),
+        [
+            "assertion who is \"ann\" [value] \"\" ()",
+            "  item item 2 of commits [value] \"item 2 of commits is \\\"bob\\\"\" (\"who\" \"usable\")",
+        ]
+    );
+}
