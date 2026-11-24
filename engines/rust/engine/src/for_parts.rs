@@ -191,6 +191,16 @@ fn root_reads(check: &Check, roots: &[Clause], ctx: &Ctx) -> Vec<Value> {
     out
 }
 
+fn text_root(check: &Check, input: &Value, ctx: &Ctx) -> bool {
+    for_line::all_paths(check)
+        .into_iter()
+        .chain(ops::walk::listed_refs(check))
+        .any(|path| {
+            crate::name::name(path) == text(input, "name")
+                && ops::lists::text_fault(check, path, ctx).is_some()
+        })
+}
+
 fn said_clauses(record: &Value) -> Vec<Clause> {
     record
         .get("ergo/clauses")
@@ -823,13 +833,15 @@ pub fn for_failures(
                     line.assertion_roots(i, ctx)
                 };
 
-                if !causes.is_empty() || empty_first {
+                let all_read = !causes.is_empty() || empty_first;
+                if all_read {
                     causes.extend(roots.iter().map(|root| root.cause));
-                    for input in root_reads(&sentence.check, &roots, ctx) {
-                        let walked = |x: &Value| text(x, "name").replace("[]", "");
-                        if !inputs.iter().any(|x| walked(x) == walked(&input)) {
-                            inputs.push(input);
-                        }
+                }
+                for input in root_reads(&sentence.check, &roots, ctx) {
+                    let walked = |x: &Value| text(x, "name").replace("[]", "");
+                    let shown = all_read || text_root(&sentence.check, &input, ctx);
+                    if shown && !inputs.iter().any(|x| walked(x) == walked(&input)) {
+                        inputs.push(input);
                     }
                 }
                 let mut own: Vec<String> = Vec::new();
