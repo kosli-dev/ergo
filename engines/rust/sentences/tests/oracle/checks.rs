@@ -9452,6 +9452,20 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    ("r.v is in m.ys.name", "r.v is in m.ys.name", &[], &[]),
+    (
+        "r.v is not one of m.ys.name",
+        "r.v is not in m.ys.name",
+        &[],
+        &[],
+    ),
+    (
+        "r.tags contains all of m.ys.name",
+        "r.tags contains all of m.ys.name",
+        &[],
+        &[],
+    ),
+    ("w.v is in m.ys.name", "w.v is in m.ys.name", &[], &[]),
     (
         "every rows.v, if any, is not in $input.os.name",
         "every rows.v, if any, is not in $input.os.name",
@@ -15646,6 +15660,24 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "every ms as m, every rows, if any, as r",
         "every ms as m, every rows, if any, as r",
+        &[],
+        &[],
+    ),
+    (
+        "some ms as m, every rows, if any, as r",
+        "some ms as m, every rows, if any, as r",
+        &[],
+        &[],
+    ),
+    (
+        "every ms as m, every m.ws, if any, as w",
+        "every ms as m, every m.ws, if any, as w",
+        &[],
+        &[],
+    ),
+    (
+        "every ms as m, every vs whose v is 9, if any, as r",
+        "every ms as m, every vs whose v is 9, if any, as r",
         &[],
         &[],
     ),

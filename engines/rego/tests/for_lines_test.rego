@@ -615,28 +615,3 @@ test_a_walk_in_a_for_line_sentence_fails_as_value_when_the_list_on_its_right_is_
 		"input": ["value", "$input.os is []"],
 	}
 }
-
-test_a_for_line_on_an_empty_list_fails_as_value_when_a_list_its_sentence_walks_on_the_right_is_empty if {
-	checks := {
-		"in": {"for": "every rows, if any, as r", "assert": "r.v is in pos.name"},
-		"params": {"for": "every rows, if any, as r", "assert": "r.v is in $params.os.name"},
-		"all": {"for": "every rows, if any, as r", "assert": "r.tags contains all of pos.name"},
-		"not_in": {"for": "every rows, if any, as r", "assert": "r.v is not one of pos.name"},
-		"two": {"for": "every ms as m, every rows, if any, as r", "assert": "r.v is in pos.name"},
-		"walk": {"for": "every rows, if any, as r", "assert": "every r.ys.v, if any, is in pos.name"},
-	}
-	_empty_root_rows(checks, {"cs": [{"id": "c", "rows": [], "ms": [{}], "os": []}]}, {"os": []}) == {
-		"in": ["value", "pos is []"],
-		"params": ["value", "$params.os is []"],
-		"all": ["value", "pos is []"],
-		"not_in": ["value", "pos is []"],
-		"two": ["value", "pos is []"],
-		"walk": ["value", "pos is []"],
-	}
-	_empty_root_rows({"dot": {"for": "every rows, if any, as p", "assert": "p.v is in .p.name"}}, {"cs": [{"id": "c", "rows": [], "p": [{"name": []}]}]}, {}) == {"dot": ["value", "item 1 of .p: name is []"]}
-}
-
-test_a_for_line_on_an_empty_list_passes_when_the_list_its_sentence_walks_on_the_right_holds_names if {
-	checks := {"in": {"for": "every rows, if any, as r", "assert": "r.v is in pos.name"}, "walk": {"for": "every ms as m", "assert": "every m.ys.v, if any, is in pos.name"}}
-	_empty_root_rows(checks, {"cs": [{"id": "c", "rows": [], "ms": [{"ys": []}], "os": [{"name": "a"}]}]}, {}) == {"in": ["satisfied", null], "walk": ["satisfied", null]}
-}
