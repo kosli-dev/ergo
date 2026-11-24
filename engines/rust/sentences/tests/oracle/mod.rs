@@ -3,6 +3,10 @@
 pub mod checks;
 
 pub const FROM_OK: &[(&str, &str)] = &[
+    (
+        "ts whose every xs.v, if any, is in $input.cs.name",
+        "ts whose every xs.v, if any, is in $input.cs.name",
+    ),
     ("items.allowed", "items.allowed"),
     (
         "things whose t is in $params.l ignoring case",

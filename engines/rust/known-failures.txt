@@ -498,6 +498,8 @@ walks / a for line whose whose reads a named by key from $params that isn't text
 walks / a for line with a walk next to a parent / lists the for line's list and the parent's value, and never the alias's value
 walks / a from line whose every reads a root after the phrase of a type the phrase can't use says the root first, and each item that fails on its own has an entry / an item whose v is null and an item that reads only the root
 walks / a from line whose every reads a root after the phrase of a type the phrase can't use says the root first, and each item that fails on its own has an entry / five items without v
+walks / a from line whose whose walks a list from outside the item on the right fails $applies as the same check does, on an empty list / an input list that is empty fails $applies as value, as the check does
+walks / a from line whose whose walks a list from outside the item on the right fails $applies as the same check does, on an empty list / an item of an input list with no name fails $applies as absent, as the check does
 walks / a one-line every whose whose reads a named by key from $params that is missing / says the key once and then an item whose value before the key isn't an object, which makes the row worse
 walks / a one-line walk whose whose reads a named by key from $params that is missing says the key once and each item's own problem / an item without m and an item whose m is null
 walks / a one-line walk whose whose reads a named by key from $params that isn't text says the key once, with no item in front / two items without m
