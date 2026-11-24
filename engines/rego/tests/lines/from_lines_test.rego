@@ -63,3 +63,14 @@ test_a_failing_for_row_over_an_empty_list_is_read_again_with_a_part_after_is_in_
 	ergo._walk_read_again(raw, for_c) with input as {"ergo/names": {"ergo/subject": subj}}
 	not ergo._walk_read_again(raw, object.union(object.remove(for_c, ["checks"]), {"checks": [object.remove(assertion, ["ignoring"])]})) with input as {"ergo/names": {"ergo/subject": subj}}
 }
+
+test_a_failing_for_row_is_read_again_only_when_one_of_its_own_assertions_has_the_words_to_keep_the_wasm_memory_of_for_rows_near_main if {
+	right := [`${"alias":"pl","n":2,"of":null,"old":false}`, "items", "allowed"]
+	assertion := {"cmp": "in", "ignoring": "case", "left": ["$e", "v"], "op": "compare", "right": right}
+	for_c := {"op": "for", "checks": [assertion], "items": [{"as": "e", "if_any": false, "path": ["xs"], "q": "every", "whose": []}]}
+	subj := {"xs": [{"v": "a"}], "items": [{"allowed": ["a"]}, {"allowed": ["b", 3]}]}
+	ergo._walk_read_again({"passed": false, "inputs": [{"value": [{"v": "a"}]}]}, for_c) with input as {"ergo/names": {"ergo/subject": subj}}
+	nested := {"op": "compare", "cmp": "eq", "left": {"count_of": ["$e", "ys"], "whose": [object.union(assertion, {"left": ["v"]})]}, "right": {"literal": 1}}
+	if_any := {"op": "for", "checks": [nested], "items": [{"as": "e", "if_any": true, "path": ["xs"], "q": "every", "whose": []}]}
+	not ergo._walk_read_again({"passed": false, "inputs": []}, if_any) with input as {"ergo/names": {"ergo/subject": subj}}
+}
