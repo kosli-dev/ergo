@@ -703,3 +703,22 @@ fn a_list_entry_that_holds_two_roots_of_the_lines_own_whose_takes_their_worst_ca
         ]
     );
 }
+
+#[test]
+fn a_clause_the_row_counts_in_and_n_more_is_said_by_the_list_entry() {
+    assert_eq!(
+        entries(
+            "every ws as w, every w.ys, if any, as y",
+            json!(["w is 1", "y is 1"]),
+            json!({"ws": [2, 3, 4, null]}),
+            json!({}),
+        ),
+        [
+            "list ws [null] \"item 4 of ws: w is null\" (\"ws[]\" \"usable\")",
+            "item item 1 of ws [not_an_object] \"item 1 of ws is 2, which isn't an object\" ()",
+            "item item 2 of ws [not_an_object] \"item 2 of ws is 3, which isn't an object\" ()",
+            "item item 3 of ws [not_an_object] \"item 3 of ws is 4, which isn't an object\" ()",
+            "item item 4 of ws [not_an_object] \"item 4 of ws is null, which isn't an object\" ()",
+        ]
+    );
+}
