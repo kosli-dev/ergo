@@ -1109,7 +1109,6 @@ type SortRead<'a> = (Live<'a>, Result<Value, Cause>, Option<Location>, String);
 struct Sfail {
     own: bool,
     one: bool,
-    said: Vec<String>,
     text: String,
     parts: Vec<String>,
     reads_last: bool,
@@ -1578,7 +1577,6 @@ impl For {
                 sfails.push(Sfail {
                     own,
                     one: inputs.len() == 1 && !keyed_by_alias(&sentence.check, alias),
-                    said: Vec::new(),
                     text,
                     parts,
                     reads_last: sentence.reads_last,
@@ -1597,23 +1595,6 @@ impl For {
         let two = self.items.len() > 1 && sfails.iter().any(|f| f.reads_last);
         let mut texts: Vec<String> = Vec::new();
         for f in &mut sfails {
-            let lines: &[String] = if two {
-                std::slice::from_ref(&f.text)
-            } else {
-                &f.parts
-            };
-            let mut own: Vec<String> = Vec::new();
-            for line in lines {
-                let text = if all_own {
-                    own_text(line, alias, f.one)
-                } else {
-                    line.clone()
-                };
-                if !text.is_empty() {
-                    push_new(&mut own, text);
-                }
-            }
-            f.said = own;
             f.named = f
                 .clauses
                 .iter()
@@ -1633,7 +1614,6 @@ impl For {
                     "assertion": self.sentences[f.idx].text,
                     "cause": f.cause.name(),
                     "inputs": f.inputs,
-                    "ergo/texts": f.said,
                     "ergo/clauses": super::clause::to_value(&f.named),
                 })
             })
@@ -1717,8 +1697,7 @@ impl For {
                             "item": child.entry.name,
                             "cause": f.cause.name(),
                             "inputs": f.inputs,
-                            "ergo/texts": f.said,
-                            "ergo/clauses": super::clause::to_value(&f.named),
+                                    "ergo/clauses": super::clause::to_value(&f.named),
                             "ergo/said": child.entry.shown(),
                             "value": child.entry.value,
                             "locations": locations,
@@ -1735,7 +1714,6 @@ impl For {
                     "assertion": sentence.text,
                     "cause": cause.name(),
                     "inputs": found[0].1.inputs,
-                    "ergo/texts": found[0].1.said,
                     "ergo/clauses": super::clause::to_value(&found[0].1.named),
                 }));
             }

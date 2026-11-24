@@ -14,18 +14,6 @@ fn text(value: &Value, key: &str) -> String {
         .to_string()
 }
 
-fn texts(value: &Value) -> Vec<String> {
-    value
-        .get("ergo/texts")
-        .and_then(Value::as_array)
-        .map(|list| {
-            list.iter()
-                .filter_map(|t| t.as_str().map(str::to_string))
-                .collect()
-        })
-        .unwrap_or_default()
-}
-
 fn list(value: &Value, key: &str) -> Vec<Value> {
     value
         .get(key)
@@ -1128,11 +1116,6 @@ pub fn for_failures(
                                 .flat_map(|l| clause::lines(&own_said(l, &root_texts)))
                                 .collect();
                             joined.join(", and ") == rest
-                                || sentences.iter().any(|l| {
-                                    texts(l)
-                                        .iter()
-                                        .any(|t| clauses(t).into_iter().any(|p| p == rest))
-                                })
                         })
             })
             || failed.iter().any(|f| {
