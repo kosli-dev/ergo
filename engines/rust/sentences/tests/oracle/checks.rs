@@ -9435,6 +9435,24 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
+        "every r.ys.v, if any, is in pos.name",
+        "every r.ys.v, if any, is in pos.name",
+        &[],
+        &[],
+    ),
+    (
+        "r.tags contains all of pos.name",
+        "r.tags contains all of pos.name",
+        &[],
+        &[],
+    ),
+    (
+        "r.v is not one of pos.name",
+        "r.v is not in pos.name",
+        &[],
+        &[],
+    ),
+    (
         "every rows.v, if any, is not in $input.os.name",
         "every rows.v, if any, is not in $input.os.name",
         &[],
