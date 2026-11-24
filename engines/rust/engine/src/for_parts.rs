@@ -1070,8 +1070,17 @@ pub fn for_failures(
             .iter()
             .filter(|clause| dead && clause.kind == Kind::Item && clause.name == part.name)
         {
+            let mut kids_said: Vec<String> = Vec::new();
+            said_by(entry, &[], &mut kids_said);
             for inner in clause.said.iter().filter(|inner| inner.kind == Kind::Item) {
-                for line in clause::lines(std::slice::from_ref(inner)) {
+                let named = part
+                    .failures
+                    .iter()
+                    .any(|kid| kid.part().name == inner.name);
+                for line in clause::lines(std::slice::from_ref(inner))
+                    .into_iter()
+                    .filter(|line| !named || kids_said.contains(&format!("{}: {line}", part.name)))
+                {
                     for piece in clauses(&line) {
                         ops::push_new(&mut row_said, format!("{}: {piece}", part.name));
                     }
