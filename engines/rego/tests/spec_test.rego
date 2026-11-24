@@ -15,7 +15,6 @@ known_differences := {
 	"for / a part that holds a list is walked in the whose of a for line and in a whose under it / an empty part fails as value",
 	"for / a walk through a for line's alias leaves a root after the phrase to the assertion, and each item keeps its own cause and the items of its list / an item whose list holds five items without v",
 	"for / the roots of the line's own whose come before the roots of its sentences, whatever their causes / $params.min is missing and says first, though $params.a has the worse cause",
-	"ignoring / a list read from a field of one step after is in ignoring case on a subject that is a list / walks the subject and names the item of the field that isn't text",
 	"messages / nothing hides a problem / the roots come first and then each item, and the row takes the worst cause",
 }
 

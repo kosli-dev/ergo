@@ -536,3 +536,10 @@ test_an_option_or_a_filter_says_the_items_of_a_list_after_is_in_ignoring_case_af
 	ergo._m_line_sorted(c, {}, "absent") == ["t is missing"] with data.ergo_params as {"l": ["a"]}
 	ergo._m_line_sorted(object.remove(c, ["ignoring"]), {}, "absent") == ["t is missing"] with data.ergo_params as {"l": ["a", null]}
 }
+
+test_a_list_after_is_in_ignoring_case_read_from_each_item_of_a_subject_that_is_a_list_is_marked_unusable_when_an_item_isnt_text if {
+	c := {"op": "compare", "cmp": "in", "left": ["$$params", "v"], "right": [`${"alias":"thing","n":0,"of":null,"old":false}`, "states"], "ignoring": "case"}
+	subj := [{"states": ["A"]}, {"states": ["b", 3]}]
+	"thing[].states[]" in ergo._m_unusable_names_of(c, subj, "unusable") with input as {"ergo/names": {"ergo/subject": subj}} with data.ergo_params as {"v": "a"}
+	not "thing[].states[]" in ergo._m_unusable_names_of(object.remove(c, ["ignoring"]), subj, "unusable") with input as {"ergo/names": {"ergo/subject": subj}} with data.ergo_params as {"v": "a"}
+}
