@@ -1063,6 +1063,21 @@ pub fn for_failures(
         }) {
             ops::push_new(&mut row_said, clause.text.clone());
         }
+        let dead = failed
+            .iter()
+            .any(|f| text(f, "item") == part.name && list(f, "failed_assertions").is_empty());
+        for clause in row
+            .iter()
+            .filter(|clause| dead && clause.kind == Kind::Item && clause.name == part.name)
+        {
+            for inner in clause.said.iter().filter(|inner| inner.kind == Kind::Item) {
+                for line in clause::lines(std::slice::from_ref(inner)) {
+                    for piece in clauses(&line) {
+                        ops::push_new(&mut row_said, format!("{}: {piece}", part.name));
+                    }
+                }
+            }
+        }
     }
     for whole in clauses(message) {
         let rest = broke_rest(whole);
