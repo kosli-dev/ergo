@@ -127,6 +127,16 @@ _m_said_before(c, earlier) if {
 	e.text == c.text
 }
 
+_m_said_before(c, earlier) if {
+	c.kind == "item"
+	c.said == []
+	c.text != ""
+	some e in earlier
+	e.kind == "item"
+	e.said == []
+	e.text == c.text
+}
+
 _m_walk_said(clauses, items) := {
 	"message": concat("; ", ts),
 	"ergo/own": [t | some t in ts; not t in said],
