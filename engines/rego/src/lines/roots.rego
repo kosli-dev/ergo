@@ -365,6 +365,10 @@ _walk_root_flaw(check, subj) := _worst_of(states) if {
 } else := "value" if {
 	some c in _walk_whose_conds(check)
 	_root_read_flaw(subj, c) == "value"
+} else := "value" if {
+	_walk_roots_on
+	some c in _for_sentence_conds(check)
+	_root_read_flaw(subj, c) == "value"
 } else := ""
 
 _walk_root_conds(check) := array.concat(_walk_whose_conds(check), _for_sentence_conds(check))
@@ -536,11 +540,11 @@ _leaf_root_flaw(check, subj) := fl if {
 	_leaf_may_root(check.check)
 	some p in _root_reads(check.check)
 	_root_kind(subj, check.check, p)
-} else := _worst_of(states) if {
+} else := _worst_or_value(states) if {
 	_walk_roots_on
 	check.op in _walk_ops
 	is_object(object.get(check, "check", null))
-	states := _walked_root_states(check.check) & _failed_read_states
+	states := _walked_root_states(check.check)
 	count(states) > 0
 } else := ""
 

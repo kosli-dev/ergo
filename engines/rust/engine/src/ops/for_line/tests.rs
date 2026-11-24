@@ -4818,3 +4818,62 @@ fn a_for_lines_whose_says_an_empty_list_on_a_list_entry_as_a_null_list() {
         );
     }
 }
+
+fn alias_root_faults(subject: Value, walked_roots: bool) -> Vec<(crate::cause::Cause, String)> {
+    let line = ergo_policy_sentences::parse_for("every ms as m, every rows, if any, as r").unwrap();
+    let parsed = ergo_policy_sentences::parse_check("r.v is in m.ys.name")
+        .unwrap()
+        .assertions;
+    let checked = super::lower_for(
+        &line,
+        &parsed,
+        &["p".to_string()],
+        &crate::lower::Scope::new(),
+    )
+    .unwrap();
+    let crate::ops::Check::For(line) = checked else {
+        panic!("not a for line");
+    };
+    let input = json!({"things": [subject]});
+    let params = json!({});
+    let mut ctx = crate::path::Ctx {
+        label: None,
+        item_by_item: false,
+        subject: crate::path::Located {
+            value: &input["things"][0],
+            location: crate::path::Location::input_root().key("things").index(0),
+        },
+        input: &input,
+        params: Some(&params),
+        aliases: std::collections::BTreeMap::new(),
+    };
+    ctx.aliases.insert(
+        line.items[0].alias.clone(),
+        crate::path::Located {
+            value: &input["things"][0]["ms"][0],
+            location: crate::path::Location::input_root()
+                .key("things")
+                .index(0)
+                .key("ms")
+                .index(0),
+        },
+    );
+    let forms = super::root_forms(&line.sentences[0].check);
+    if walked_roots {
+        crate::ops::reading_walked_roots(|| super::sentence_root_faults(&forms, &ctx))
+    } else {
+        super::sentence_root_faults(&forms, &ctx)
+    }
+}
+
+#[test]
+fn an_empty_list_read_through_an_earlier_alias_is_a_root_fault_when_the_walked_roots_are_read() {
+    let empty = json!({"rows": [], "ms": [{"ys": []}]});
+    assert_eq!(
+        alias_root_faults(empty.clone(), true),
+        vec![(crate::cause::Cause::Value, "m.ys is []".to_string())]
+    );
+    assert_eq!(alias_root_faults(empty, false), vec![]);
+    let named = json!({"rows": [], "ms": [{"ys": [{"name": "a"}]}]});
+    assert_eq!(alias_root_faults(named, true), vec![]);
+}
