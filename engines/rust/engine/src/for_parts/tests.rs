@@ -624,3 +624,20 @@ fn an_item_of_a_nested_list_under_a_broken_second_list_is_said_by_its_item_and_n
         ]
     );
 }
+
+#[test]
+fn one_piece_of_what_a_sentence_says_of_an_item_is_said_by_the_items_entry_and_not_by_the_assertion()
+ {
+    assert_eq!(
+        entries(
+            "every ws as w",
+            json!("count of ys whose n is w.n is 1"),
+            json!({"ws": [{"n": null}], "ys": [{"n": null}]}),
+            json!({}),
+        ),
+        [
+            "assertion count of ys whose n equals w.n is 1 [null] \"\" (\"ys[]\" \"usable\")",
+            "  item item 1 of ws [null] \"w.n is null; item 1 of ys: n is null\" (\"count of ys whose n equals w.n\" null, \"w.n\" \"null\")",
+        ]
+    );
+}
