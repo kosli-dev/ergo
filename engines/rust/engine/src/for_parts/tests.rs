@@ -641,3 +641,65 @@ fn one_piece_of_what_a_sentence_says_of_an_item_is_said_by_the_items_entry_and_n
         ]
     );
 }
+
+fn whose_roots_entries(
+    for_line: &str,
+    assertion: &str,
+    input: Value,
+    params: Value,
+) -> Vec<String> {
+    let policy = json!({
+        "ergo_spec": crate::SPEC,
+        "subjects": {"thing": {"from": "things", "identified_by": "id"}},
+        "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": for_line, "assert": assertion}}}}
+    });
+    let report = crate::report(&input, &policy, &params);
+    let row = report["results"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|row| row["check"] == "c")
+        .unwrap()
+        .clone();
+    let mut said = vec![format!(
+        "row [{}] {:?}",
+        row["cause"].as_str().unwrap_or_default(),
+        row["message"].as_str().unwrap_or_default()
+    )];
+    tree(&row["failures"], 0, &mut said);
+    said
+}
+
+#[test]
+fn a_list_entry_that_holds_two_roots_of_the_lines_own_whose_takes_the_rows_cause() {
+    assert_eq!(
+        whose_roots_entries(
+            "every xs whose v is at least $params.min and whose w is in $params.l as x",
+            "x.w is at least $params.a",
+            json!({"things": [{"id": "t", "xs": [{"v": 1, "w": 1}]}]}),
+            json!({"l": null, "a": "s"}),
+        ),
+        [
+            "row [unusable] \"$params.min is missing; $params.l is null; $params.a is \\\"s\\\", which isn't a number\"",
+            "assertion x.w is at least $params.a [unusable] \"$params.a is \\\"s\\\", which isn't a number\" ()",
+            "list xs [unusable] \"$params.min is missing; $params.l is null\" (\"xs[]\" \"usable\")",
+        ]
+    );
+}
+
+#[test]
+fn a_list_entry_that_holds_two_roots_of_the_lines_own_whose_takes_their_worst_cause_when_the_params_arent_an_object()
+ {
+    assert_eq!(
+        whose_roots_entries(
+            "every xs whose v is at least $input.min and whose w is in $input.l as x",
+            "x.w is at least 1",
+            json!({"things": [{"id": "t", "xs": [{"v": 1, "w": 1}]}], "l": null}),
+            json!(3),
+        ),
+        [
+            "row [unusable] \"$input.min is missing; $input.l is null\"",
+            "list xs [absent] \"$input.min is missing; $input.l is null\" (\"xs[]\" \"usable\")",
+        ]
+    );
+}
