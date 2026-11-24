@@ -272,3 +272,10 @@ test_the_text_lists_of_a_check_name_a_list_from_a_part_and_one_from_the_params_t
 	ref := {"op": "in", "path": ["x"], "values": {"ref": ["$$params", "l"]}, "ignoring": "case"}
 	{"items.allowed", "$params.l"} - ergo._text_list_names({"op": "for", "checks": [part, ref]}) == set()
 }
+
+test_a_list_read_through_an_alias_after_is_in_ignoring_case_is_named_as_the_item_entry_names_it if {
+	alias := {"op": "compare", "cmp": "in", "left": ["$e", "v"], "right": ["$g"], "ignoring": "case"}
+	"g" in ergo._text_list_names(alias)
+	"g.ls" in ergo._text_list_names(object.union(alias, {"right": ["$g", "ls"]}))
+	ergo._with_outcome({"name": "g", "value": ["a", null]}).outcome == "unusable" with data.ergo_text_lists as ergo._text_list_names(alias)
+}
