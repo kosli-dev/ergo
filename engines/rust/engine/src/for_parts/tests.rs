@@ -492,3 +492,14 @@ fn an_item_with_its_own_entry_on_the_row_is_said_by_that_entry_and_not_by_the_as
     );
     assert_eq!(said[0], "assertion w.n is 2 [unusable] \"\" ()");
 }
+
+#[test]
+fn a_tie_in_the_second_list_is_said_by_the_first_items_entry_and_not_by_the_assertion() {
+    let said = entries(
+        "every items as x, last of x.subs sorted by t as y",
+        json!("y.w is 1"),
+        json!({"items": [{"subs": [{"t": 5, "w": 1}, {"t": 5, "w": 2}]}]}),
+        json!({}),
+    );
+    assert_eq!(said[0], "item item 1 of items [ambiguous] \"\" ()");
+}
