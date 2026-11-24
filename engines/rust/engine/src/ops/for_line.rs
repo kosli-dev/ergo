@@ -2053,6 +2053,70 @@ impl For {
         listed_roots(lines_once(clauses))
     }
 
+    /// What the sentence at `idx` says, for the item of the first list that
+    /// `ctx` binds, about a path it reads through that item's alias before
+    /// any item of a later list, when that path can't be read or used.
+    pub fn item_alias_roots(&self, idx: usize, ctx: &Ctx) -> Vec<Clause> {
+        let Some(sentence) = self.sentences.get(idx) else {
+            return Vec::new();
+        };
+        if self.items.len() < 2 {
+            return Vec::new();
+        }
+        let alias = &self.items[0].alias;
+        let whole = ctx
+            .aliases
+            .get(alias)
+            .is_some_and(|at| !at.value.is_object());
+        let mut up = ctx.clone();
+        up.aliases.remove(alias);
+        let before: Vec<String> = sentence_roots_said(&sentence.check, &outer_ctx(&up))
+            .into_iter()
+            .map(|root| root.text)
+            .collect();
+        let mut out: Vec<Clause> = Vec::new();
+        for root in sentence_roots_said(&sentence.check, &outer_ctx(ctx)) {
+            if !before.contains(&root.text) && !(whole && root.cause == Cause::NotAnObject) {
+                push_new(&mut out, Clause::said(root.cause, root.text));
+            }
+        }
+        out
+    }
+
+    /// What the sentence at `idx` says, when it reads the first item's alias
+    /// and no later one, for the item of the first list that `ctx` binds:
+    /// its cause, its clauses and the inputs it read, or `None` when it
+    /// passes for that item.
+    pub fn first_alias_run(
+        &self,
+        idx: usize,
+        ctx: &Ctx,
+    ) -> Option<(Cause, Vec<Clause>, Vec<Value>)> {
+        let sentence = self.sentences.get(idx)?;
+        if self.items.len() < 2
+            || sentence.reads_last
+            || !reads_alias(&sentence.check, &self.items[0].alias)
+        {
+            return None;
+        }
+        let ran = run_full(&sentence.check, ctx);
+        if ran.verdict.passed() {
+            return None;
+        }
+        let (cause, clauses) = self.said_clauses(sentence, &ran, ctx);
+        let inputs = reading_order(&sentence.check, &ran.verdict.inputs, &self.alias_names())
+            .iter()
+            .filter(|input| !self.keyed_alias_input(&sentence.check, input))
+            .map(|input| {
+                crate::parts::with_outcome(
+                    input,
+                    crate::checks::input_unfit(&[&sentence.check], input, ctx),
+                )
+            })
+            .collect();
+        Some((cause, clauses, inputs))
+    }
+
     /// The roots the sentence at `idx` reads outside the items and can't
     /// read, each said once, whichever other sentence reads them too.
     pub fn assertion_roots(&self, idx: usize, ctx: &Ctx) -> Vec<Clause> {
@@ -2191,6 +2255,13 @@ impl For {
                     .filter_map(|depth| self.later_key(depth, ctx))
                     .map(|(_, _, input)| input)
                     .filter(|input| run.items.iter().any(|clause| clause.name == input.name)),
+            )
+            .chain(
+                self.items
+                    .iter()
+                    .flat_map(|item| sort_keys(&item.how))
+                    .filter_map(|key| super::key_base::key_flaw(key, &outer_ctx(ctx)))
+                    .map(|(_, _, input)| input),
             )
             .collect::<Vec<Input>>();
         for input in keys {

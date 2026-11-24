@@ -332,12 +332,8 @@ fn a_sentence_has_the_same_assertion_entry_as_alone_in_its_check() {
     assert_eq!(differ, NO_ENTRY_YET_FOR_AN_ITEM_WHOSE_SECOND_LIST_FAILS);
 }
 
-const NO_ENTRY_YET_FOR_AN_ITEM_WHOSE_SECOND_LIST_FAILS: [&str; 7] = [
+const NO_ENTRY_YET_FOR_AN_ITEM_WHOSE_SECOND_LIST_FAILS: [&str; 3] = [
     "for / a list that a second for line's sentence walks on the right through the first line's alias fails it as value on an empty list when the list is empty / fails as value, with an empty second list, when the list the alias reads is empty / beside / sentence 2",
     "for / a list that a second for line's sentence walks on the right through the first line's alias fails it as value on an empty list when the list is empty / fails as value, with an empty second list, when each item of the list the alias reads holds an empty list / beside / sentence 2",
     "for / a list that a second for line's sentence walks on the right through the first line's alias fails it as value on an empty list when the list is empty / fails as value for the item of the first line whose list is empty, and some passes on the other item / beside / sentence 2",
-    "for / a for line whose second list fails for an item, with sentences that don't read the second alias / runs the sentences that don't read y for each item and says them before the list / c / sentence 2",
-    "for / a for line whose second list has a named by key from $params that isn't text / says the key once on the row, after the sentence that doesn't read x / c / sentence 2",
-    "messages / a for line over two lists, with a walk under the first item before a sentence on the second / the parts follow the items, not the sentences / c / sentence 1",
-    "messages / a for line over two lists, with a sentence on the second item before a walk under the first / the parts follow the items, not the sentences / c / sentence 2",
 ];

@@ -109928,7 +109928,9 @@
                       "failures": [],
                       "inputs": [
                         {
-                          "locations": [],
+                          "locations": [
+                            "/things/0/ws/1/o"
+                          ],
                           "name": "w.o",
                           "outcome": "unusable",
                           "value": "s"
@@ -109958,7 +109960,9 @@
                       "failures": [],
                       "inputs": [
                         {
-                          "locations": [],
+                          "locations": [
+                            "/things/0/ws/2"
+                          ],
                           "name": "w.o",
                           "outcome": "absent",
                           "value": null
