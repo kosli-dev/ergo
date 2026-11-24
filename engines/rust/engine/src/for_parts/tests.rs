@@ -430,3 +430,27 @@ fn an_items_problem_that_only_the_row_says_beside_a_null_root_stays_in_an_entry(
         "{said:#?}"
     );
 }
+
+#[test]
+fn the_assertion_under_two_for_lines_holds_a_part_it_cant_read() {
+    let policy = json!({
+        "ergo_spec": crate::SPEC,
+        "subjects": {"thing": {"from": "things", "identified_by": "id", "has": {"pl": "ls"}}},
+        "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": "every gs as g, every g.xs as e", "assert": "e.v is in pl"}}}}
+    });
+    let input = json!({"things": [{"id": 1, "gs": [{"xs": [{"v": "A"}]}]}]});
+    let report = crate::report(&input, &policy, &json!({}));
+    let row = report["results"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|row| row["check"] == "c")
+        .unwrap()
+        .clone();
+    let mut said = Vec::new();
+    tree(&row["failures"], 0, &mut said);
+    assert_eq!(
+        said,
+        ["assertion e.v is in pl [absent] \"pl is missing\" (\"pl\" \"absent\")"]
+    );
+}
