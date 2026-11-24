@@ -987,8 +987,7 @@ pub fn pieces(check: &Check, ctx: &Ctx, verdict: &Verdict) -> Vec<Piece> {
                     lists::walk_fault(check, ctx)
                         .filter(|(cause, _)| {
                             *cause == verdict.cause
-                                || ctx.label.is_some()
-                                    && matches!(cause, Cause::Absent | Cause::Null)
+                                || matches!(cause, Cause::Absent | Cause::Null)
                                     && lists::text_list_flawed(check, ctx)
                         })
                         .map(|(_, text)| text),
