@@ -169,10 +169,13 @@ fn root_reads(check: &Check, roots: &[Clause], ctx: &Ctx) -> Vec<Value> {
             .into_iter()
             .chain(ops::walk::listed_refs(check))
             .find(|path| {
-                matches!(
+                (matches!(
                     path.start,
                     Start::Params | Start::Input | Start::Subject | Start::Own
-                ) && crate::name::name(path) == root.name
+                ) || matches!(path.start, Start::Part(_))
+                    && path.steps.is_empty()
+                    && ops::lists::walked(path, ctx).is_none())
+                    && crate::name::name(path) == root.name
             })
         else {
             continue;
