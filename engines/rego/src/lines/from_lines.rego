@@ -918,7 +918,7 @@ _rooted_outcome(c, subj, flaw, check, req) := _walk_rooted_outcome(_check_outcom
 _walk_rooted_outcome(raw, c, subj, flaw, check, req) := o if {
 	_walk_read_again(raw, c)
 	o := _messaged(_check_outcome(c, subj, flaw), check, req, subj) with _walk_roots_on as true
-	_walk_kept_again(raw, o)
+	o.passed == false
 } else := _messaged(raw, check, req, subj)
 
 _walk_read_again(raw, c) if {
@@ -932,10 +932,6 @@ _walk_read_again(raw, c) if {
 	_may_hide_a_root(raw, c)
 	_text_walk_rooted(c)
 }
-
-_walk_kept_again(raw, _) if raw.passed == false
-
-_walk_kept_again(_, o) if o.passed == false
 
 _text_walk_rooted(c) if {
 	walk(c, [_, x])

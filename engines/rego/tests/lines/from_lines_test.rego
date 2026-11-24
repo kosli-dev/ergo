@@ -28,6 +28,20 @@ test_a_from_line_note_about_mixed_types_says_one_clause_per_item_so_each_item_en
 	ergo._fl_note_clauses(req, beside) == ["item 1 of things: xs is a list", "item 2 of things: xs is a number"]
 }
 
+test_a_failing_row_over_an_empty_list_is_read_again_with_a_list_after_is_in_ignoring_case_that_walks_a_subject_or_input_that_is_a_list if {
+	field := {"op": "compare", "cmp": "in", "left": ["x"], "right": [`${"alias":"thing","n":0,"of":null,"old":true}`, "states"], "ignoring": "case"}
+	every_field := {"op": "every", "path": [`${"alias":"thing","n":0,"of":null,"old":false}`, "xs", "v"], "check": field, "whose": [], "if_any": false, "label": "thing"}
+	raw := {"passed": false, "inputs": [{"value": []}]}
+	subj := [{"xs": [], "states": ["A"]}, {"xs": [], "states": ["b", 3]}]
+	ergo._walk_read_again(raw, every_field) with input as {"ergo/names": {"ergo/subject": subj}}
+	not ergo._walk_read_again(raw, object.union(object.remove(every_field, ["check"]), {"check": object.remove(field, ["ignoring"])})) with input as {"ergo/names": {"ergo/subject": subj}}
+	not ergo._walk_read_again(object.union(raw, {"inputs": [{"value": [1]}]}), every_field) with input as {"ergo/names": {"ergo/subject": subj}}
+	ref := {"op": "in", "path": ["x"], "values": {"ref": ["$$input[]", "ok"]}, "ignoring": "case"}
+	every_ref := {"op": "every", "path": ["xs", "v"], "check": ref, "whose": [], "if_any": false}
+	ergo._walk_read_again(raw, every_ref) with input as {"ergo/names": {"ergo/subject": subj[1]}} with data.ergo_document as [{"ok": ["b", 3]}]
+	not ergo._walk_read_again(raw, every_ref) with input as {"ergo/names": {"ergo/subject": subj[1]}} with data.ergo_document as {"ok": ["b", 3]}
+}
+
 test_a_failing_row_whose_check_compares_ignoring_case_with_a_walked_list_is_read_again_with_its_walked_roots if {
 	part := [`${"alias":"pl","n":1,"of":null,"old":true}`, "p", "name"]
 	whose := {"op": "every", "path": ["xs"], "check": {"op": "present", "path": ["x"]}, "whose": [{"op": "compare", "cmp": "in", "left": ["v"], "right": part, "ignoring": "case"}], "if_any": false}

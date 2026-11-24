@@ -367,8 +367,6 @@ _text_list_root(c, p) if {
 
 _text_walked_root(x, p) if _text_walked_ref(x, p)
 
-_text_walked_root(x, p) if _text_list_root(x, p)
-
 _text_walked_paths(c) := {p |
 	c.ignoring
 	some p in array.concat([c.values.ref | _is_ref(object.get(c, "values", null))], [_rpath(c.right) | c.op == "compare"; c.cmp in _membership_ops; _rpath(c.right)])
