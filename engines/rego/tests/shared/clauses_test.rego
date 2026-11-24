@@ -405,3 +405,11 @@ test_a_cut_item_keeps_its_own_clauses_apart_like_an_uncut_one if {
 		"and 1 more",
 	])
 }
+
+test_a_problem_outside_the_items_that_every_item_gives_with_the_same_text_is_said_once if {
+	text := "item 2 of thing: item 2 of ls is null"
+	clauses := [ergo._m_item_clause(["t", i, "xs", j], "null", []) | some i in [0, 1]; some j in [0, 1]]
+	said := [object.union(c, {"text": text}) | some c in clauses]
+	ergo._m_walk_said(said, []).message == text
+	ergo._m_walk_said(array.slice(said, 0, 2), []).message == text
+}
