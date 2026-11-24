@@ -608,3 +608,34 @@ fn clauses_that_cant_be_read_back_give_nothing() {
     }
     assert!(of_value(&whole).is_some());
 }
+
+#[test]
+fn two_clauses_of_one_item_from_two_sentences_keep_each_owner_and_read_the_same() {
+    let a = |owner: Owner| missing("a").owned_by(owner);
+    let b = missing("b").owned_by(Owner::Sentence(1));
+    assert_eq!(a(Owner::Sentence(0)), a(Owner::Sentence(1)));
+    let clauses = vec![item(
+        "item 1 of xs",
+        Cause::Absent,
+        vec![a(Owner::Sentence(0)), a(Owner::Sentence(1)), b],
+    )];
+    let owners = |clauses: &[Clause]| -> Vec<Vec<Owner>> {
+        clauses[0]
+            .said
+            .iter()
+            .map(|clause| clause.owners.clone())
+            .collect()
+    };
+    let kept = shown(&clauses);
+    assert_eq!(text(&kept), "item 1 of xs: a is missing, and b is missing");
+    assert_eq!(
+        owners(&kept),
+        [
+            vec![Owner::Sentence(0), Owner::Sentence(1)],
+            vec![Owner::Sentence(1)]
+        ]
+    );
+    let back = of_value(&to_value(&kept)).unwrap();
+    assert_eq!(text(&back), text(&kept));
+    assert_eq!(owners(&back), owners(&kept));
+}
