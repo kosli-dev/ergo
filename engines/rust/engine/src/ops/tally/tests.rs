@@ -3258,3 +3258,22 @@ fn a_walked_list_after_is_in_ignoring_case_in_a_count_whose_is_said_before_a_lis
         (Cause::Absent, "xs is missing".to_string())
     );
 }
+
+#[test]
+fn a_list_after_is_in_ignoring_case_that_walks_an_input_that_is_a_list_fails_a_count_over_an_empty_list()
+ {
+    let check = lowered("count of xs whose v is in $input.ok ignoring case is 1");
+    let input = json!([{"xs": [], "ok": ["a"]}, {"xs": [], "ok": ["B", 3]}]);
+    let ctx = Ctx {
+        label: None,
+        item_by_item: false,
+        subject: Located {
+            value: &input[0],
+            location: Location::input_root().index(0),
+        },
+        input: &input,
+        params: Some(&Value::Null),
+        aliases: BTreeMap::new(),
+    };
+    assert_eq!(crate::ops::run(&check, &ctx).cause, Cause::Unusable);
+}
