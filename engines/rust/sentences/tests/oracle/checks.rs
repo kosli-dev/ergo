@@ -1323,6 +1323,12 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
+        "approver.t is more than t",
+        "approver.t is more than t",
+        &[],
+        &[],
+    ),
+    (
         "approver.timestamp is after commit.timestamp",
         "approver.timestamp is after commit.timestamp",
         &[],
@@ -13994,6 +14000,12 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "every approvers as approver, every commits.files as file",
         "every approvers as approver, every commits.files as file",
+        &[],
+        &[],
+    ),
+    (
+        "every approvers as approver, every distinct commits.files.t as t",
+        "every approvers as approver, every distinct commits.files.t as t",
         &[],
         &[],
     ),

@@ -5218,3 +5218,22 @@ fn a_root_of_the_second_whose_joined_with_a_first_alias_sentence_is_said_by_an_e
         "{said:?}"
     );
 }
+
+#[test]
+fn a_clause_two_sentences_give_one_item_is_said_once_whoever_owns_it() {
+    let got = row(
+        "every xs as x",
+        json!(["x.v exists", "x.v is 1"]),
+        json!({"xs": [{}]}),
+    );
+    assert_eq!(got["message"], "item 1 of xs: x.v is missing");
+    assert_eq!(
+        entries(&got["failures"]),
+        [
+            "assertion x.v exists value: ",
+            "  item item 1 of xs value: x.v is missing",
+            "assertion x.v is 1 absent: ",
+            "  item item 1 of xs absent: x.v is missing",
+        ]
+    );
+}

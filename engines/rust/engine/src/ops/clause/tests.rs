@@ -10,6 +10,7 @@ fn read(kind: Kind, name: &str, cause: Cause, text: &str) -> Clause {
         group: 0,
         last_of_cause: false,
         said_first: false,
+        owners: Vec::new(),
     }
 }
 
@@ -607,4 +608,69 @@ fn clauses_that_cant_be_read_back_give_nothing() {
         assert_eq!(of_value(&value), None, "{value}");
     }
     assert!(of_value(&whole).is_some());
+}
+
+#[test]
+fn two_clauses_of_one_item_from_two_sentences_keep_each_owner_and_read_the_same() {
+    let a = |owner: Owner| missing("a").owned_by(owner);
+    let b = missing("b").owned_by(Owner::Sentence(1));
+    assert_eq!(a(Owner::Sentence(0)), a(Owner::Sentence(1)));
+    let clauses = vec![item(
+        "item 1 of xs",
+        Cause::Absent,
+        vec![a(Owner::Sentence(0)), a(Owner::Sentence(1)), b],
+    )];
+    let owners = |clauses: &[Clause]| -> Vec<Vec<Owner>> {
+        clauses[0]
+            .said
+            .iter()
+            .map(|clause| clause.owners.clone())
+            .collect()
+    };
+    let kept = shown(&clauses);
+    assert_eq!(text(&kept), "item 1 of xs: a is missing, and b is missing");
+    assert_eq!(
+        owners(&kept),
+        [
+            vec![Owner::Sentence(0), Owner::Sentence(1)],
+            vec![Owner::Sentence(1)]
+        ]
+    );
+    let back = of_value(&to_value(&kept)).unwrap();
+    assert_eq!(text(&back), text(&kept));
+    assert_eq!(owners(&back), owners(&kept));
+}
+
+#[test]
+fn an_items_clauses_about_the_same_item_under_it_share_one_piece() {
+    let said = vec![
+        unread(
+            "item 1 of w.ys",
+            Cause::Absent,
+            "item 1 of w.ys: v is missing",
+        ),
+        unread("item 1 of w.ys", Cause::Null, "item 1 of w.ys: k is null"),
+    ];
+    assert_eq!(
+        item_says("item 1 of ws", "w", &said),
+        "item 1 of w.ys: v is missing, and k is null"
+    );
+}
+
+#[test]
+fn an_items_clauses_about_different_items_under_it_are_said_apart() {
+    let said = vec![
+        missing("w.n"),
+        unread(
+            "item 1 of w.ys",
+            Cause::Absent,
+            "item 1 of w.ys: v is missing",
+        ),
+        null("w.m"),
+        unread("item 2 of w.ys", Cause::Null, "item 2 of w.ys: v is null"),
+    ];
+    assert_eq!(
+        item_says("item 1 of ws", "w", &said),
+        "w.n is missing, and w.m is null; item 1 of w.ys: v is missing; item 2 of w.ys: v is null"
+    );
 }

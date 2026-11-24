@@ -56,7 +56,6 @@ for / a $params list that a for line reads fails it when the line's whose leaves
 for / a $params list that a for line walks fails it on an empty list when an item of it can't be read / fails, with an empty rows, when an item of it has no name
 for / a $params list that a for line walks fails it on an empty list when an item of it is null / fails, with an empty rows
 for / a $params list that a for line walks fails it on an empty list when it holds names of more than one kind / fails, with an empty rows
-for / a count of a field in a position of the params / fails as unusable and names the item once
 for / a count of a key of the params, with params as a number / fails as unusable and names the params and what they are
 for / a count of a key of the params, with params as an empty list / fails as unusable and names the params and what they are
 for / a count of a key of the params, with params as false / fails as unusable and names the params and what they are

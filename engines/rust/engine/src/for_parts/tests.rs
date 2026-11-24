@@ -587,3 +587,57 @@ fn every_clause_of_a_row_whose_sort_key_is_named_by_params_that_arent_text_is_sa
         );
     }
 }
+
+#[test]
+fn a_some_line_over_a_second_list_says_each_items_missing_field_on_the_assertion_and_on_the_item() {
+    assert_eq!(
+        entries(
+            "some approvers as approver, every commits as commit",
+            json!("approver.state is \"APPROVED\""),
+            json!({"approvers": [{}, {}], "commits": [{}]}),
+            json!({}),
+        ),
+        [
+            "assertion approver.state is \"APPROVED\" [absent] \"item 1 of approvers: approver.state is missing; item 2 of approvers: approver.state is missing\" ()",
+            "  item item 1 of approvers [absent] \"approver.state is missing\" (\"approver.state\" \"absent\")",
+            "  item item 2 of approvers [absent] \"approver.state is missing\" (\"approver.state\" \"absent\")",
+        ]
+    );
+}
+
+#[test]
+fn an_item_of_a_nested_list_under_a_broken_second_list_is_said_by_its_item_and_not_by_the_assertion()
+ {
+    let said = entries(
+        "every approvers as approver, every commits.files as file",
+        json!("approver.t is more than file.t"),
+        json!({"approvers": [{"t": 5}, {"t": 0}], "commits": [{"files": [{"t": 1}]}, {}]}),
+        json!({}),
+    );
+    assert_eq!(
+        said[..4],
+        [
+            "assertion approver.t is more than file.t [value] \"\" ()",
+            "  item item 2 of approvers [value] \"\" ()",
+            "    item item 1 of commits [value] \"\" ()",
+            "      item item 1 of files [value] \"approver.t is 0, and file.t is 1\" (\"approver.t\" \"usable\", \"file.t\" \"usable\")",
+        ]
+    );
+}
+
+#[test]
+fn one_piece_of_what_a_sentence_says_of_an_item_is_said_by_the_items_entry_and_not_by_the_assertion()
+ {
+    assert_eq!(
+        entries(
+            "every ws as w",
+            json!("count of ys whose n is w.n is 1"),
+            json!({"ws": [{"n": null}], "ys": [{"n": null}]}),
+            json!({}),
+        ),
+        [
+            "assertion count of ys whose n equals w.n is 1 [null] \"\" (\"ys[]\" \"usable\")",
+            "  item item 1 of ws [null] \"w.n is null; item 1 of ys: n is null\" (\"count of ys whose n equals w.n\" null, \"w.n\" \"null\")",
+        ]
+    );
+}

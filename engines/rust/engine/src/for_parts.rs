@@ -1,5 +1,5 @@
 use crate::cause::Cause;
-use crate::ops::clause::{self, Clause, Kind};
+use crate::ops::clause::{self, Clause, Kind, Owner};
 use crate::ops::for_line::{self, For};
 use crate::ops::{self, Check};
 use crate::parts::{Failure, Part};
@@ -12,18 +12,6 @@ fn text(value: &Value, key: &str) -> String {
         .and_then(Value::as_str)
         .unwrap_or_default()
         .to_string()
-}
-
-fn texts(value: &Value) -> Vec<String> {
-    value
-        .get("ergo/texts")
-        .and_then(Value::as_array)
-        .map(|list| {
-            list.iter()
-                .filter_map(|t| t.as_str().map(str::to_string))
-                .collect()
-        })
-        .unwrap_or_default()
 }
 
 fn list(value: &Value, key: &str) -> Vec<Value> {
@@ -209,10 +197,6 @@ fn own_said(record: &Value, roots: &[String]) -> Vec<Clause> {
         .collect()
 }
 
-fn own_text(record: &Value, said: &[Clause]) -> String {
-    for_line::rendered(&said_name(record), &clause::lines(said))
-}
-
 fn bound<'a>(line: &For, f: &'a Value, ctx: &Ctx<'a>) -> Option<Ctx<'a>> {
     let value = f.get("value")?;
     let place = strings(f, "locations").first().cloned()?;
@@ -283,7 +267,7 @@ fn broke_entry(
             cause,
             with_root_outcomes(own_inputs, &lifted),
             Vec::new(),
-            own_text(f, &said),
+            clause::item_says(&said_name(f), line.last_alias(), &said),
             f,
         ),
         outer,
@@ -422,13 +406,15 @@ fn item_entry(
     roots: &[String],
     lifted: &[Clause],
     walked: Option<Failure>,
+    ctx: &Ctx,
 ) -> Option<Failure> {
+    let alias = aliases.last().copied().unwrap_or_default();
     if let Some(pairs) = l.get("items").and_then(Value::as_array) {
         let inner: Vec<Failure> = pairs
             .iter()
             .filter_map(|y| {
                 let said = own_said(y, roots);
-                let message = own_text(y, &said);
+                let message = clause::item_says(&said_name(y), alias, &said);
                 (!message.is_empty()).then(|| {
                     item(
                         text(y, "item"),
@@ -442,6 +428,7 @@ fn item_entry(
                 })
             })
             .collect();
+        let inner = crate::parts::nest_with(inner, ctx.input, ctx.params);
         let cause = Cause::worst(inner.iter().map(|y| y.part().cause))?;
         return Some(item(
             text(f, "item"),
@@ -459,13 +446,13 @@ fn item_entry(
         .cloned()
         .chain(own.iter().cloned())
         .collect();
-    let message = own_text(f, &said);
+    let message = clause::item_says(&said_name(f), alias, &said);
     let walked = walked.filter(|walked| {
         let mut lines: Vec<String> = Vec::new();
         for kid in &walked.part().failures {
             said_by(kid, &[], &mut lines);
         }
-        !message.is_empty() && said.iter().all(|piece| covered(piece, &lines, ""))
+        !message.is_empty() && said.iter().all(|piece| covered(piece, &lines, "", aliases))
     });
     if let Some(walked) = walked {
         let part = walked.part().clone();
@@ -492,13 +479,17 @@ fn item_entry(
     })
 }
 
-fn covered(piece: &Clause, lines: &[String], lead: &str) -> bool {
+fn covered(piece: &Clause, lines: &[String], lead: &str, aliases: &[&str]) -> bool {
     match piece.kind {
         Kind::More(_) => true,
         Kind::Item if !piece.said.is_empty() => {
             let lead = format!("{lead}{}: ", piece.name);
-            piece.said.iter().all(|inner| covered(inner, lines, &lead))
+            piece
+                .said
+                .iter()
+                .all(|inner| covered(inner, lines, &lead, aliases))
         }
+        Kind::Item if aliases.contains(&piece.name.as_str()) => false,
         _ => lines.contains(&format!("{lead}{}", piece.text)),
     }
 }
@@ -1035,7 +1026,7 @@ pub fn for_failures(
                         let walked = walked_under(line, &sentence.check, f, &l, &aliases, ctx);
                         let lifted = alias_roots(line, i, f, row, ctx);
                         if let Some(entry) =
-                            item_entry(f, &l, &aliases, &root_texts, &lifted, walked)
+                            item_entry(f, &l, &aliases, &root_texts, &lifted, walked, ctx)
                         {
                             causes.push(entry.part().cause);
                             items.push(entry);
@@ -1063,16 +1054,16 @@ pub fn for_failures(
         }) {
             ops::push_new(&mut row_said, clause.text.clone());
         }
-        let dead = failed
-            .iter()
-            .any(|f| text(f, "item") == part.name && list(f, "failed_assertions").is_empty());
-        for clause in row
-            .iter()
-            .filter(|clause| dead && clause.kind == Kind::Item && clause.name == part.name)
-        {
+        for clause in row.iter().filter(|clause| {
+            clause.kind == Kind::Item && clause.name == part.name && !sentence_said(clause)
+        }) {
             let mut kids_said: Vec<String> = Vec::new();
             said_by(entry, &[], &mut kids_said);
-            for inner in clause.said.iter().filter(|inner| inner.kind == Kind::Item) {
+            for inner in clause
+                .said
+                .iter()
+                .filter(|inner| inner.kind == Kind::Item && inner.owners.contains(&Owner::Item))
+            {
                 let named = part
                     .failures
                     .iter()
@@ -1127,9 +1118,9 @@ pub fn for_failures(
                                 .collect();
                             joined.join(", and ") == rest
                                 || sentences.iter().any(|l| {
-                                    texts(l)
+                                    clause::lines(&own_said(l, &root_texts))
                                         .iter()
-                                        .any(|t| clauses(t).into_iter().any(|p| p == rest))
+                                        .any(|t| clauses(t).contains(&rest))
                                 })
                         })
             })
@@ -1313,6 +1304,14 @@ pub fn for_failures(
     out.extend(lists);
     out.extend(rest.into_iter().filter_map(said_item));
     out
+}
+
+fn sentence_said(clause: &Clause) -> bool {
+    clause
+        .owners
+        .iter()
+        .any(|owner| matches!(owner, Owner::Sentence(_)))
+        || clause.said.iter().any(sentence_said)
 }
 
 fn said_item(entry: Failure) -> Option<Failure> {
