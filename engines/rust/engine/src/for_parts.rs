@@ -237,7 +237,7 @@ fn broke_entry(
     row: &[Clause],
     aliases: &[&str],
     ctx: &Ctx,
-) -> Option<Failure> {
+) -> Option<(Failure, Vec<Value>)> {
     let under = said_under(row, &text(f, "item"));
     let at = bound(line, f, ctx)?;
     let (_, said, inputs) = line.first_alias_run(idx, &at)?;
@@ -253,20 +253,37 @@ fn broke_entry(
         .chain(own.iter().cloned())
         .collect();
     let cause = Cause::worst(said.iter().map(|piece| piece.cause))?;
-    Some(item(
-        text(f, "item"),
-        cause,
-        with_root_outcomes(
-            inputs
-                .into_iter()
-                .filter(|x| alias_named(&text(x, "name"), aliases))
-                .collect(),
-            &lifted,
+    let (own_inputs, outer): (Vec<Value>, Vec<Value>) = inputs
+        .into_iter()
+        .partition(|x| alias_named(&text(x, "name"), aliases));
+    Some((
+        item(
+            text(f, "item"),
+            cause,
+            with_root_outcomes(own_inputs, &lifted),
+            Vec::new(),
+            own_text(f, &said),
+            f,
         ),
-        Vec::new(),
-        own_text(f, &said),
-        f,
+        outer,
     ))
+}
+
+fn said_cause(clauses: &[Clause], said: &str) -> Option<Cause> {
+    clauses.iter().find_map(|clause| {
+        if clause.kind != Kind::Item {
+            return (clause.text == said).then_some(clause.cause);
+        }
+        if clause.text == said {
+            return Some(clause.cause);
+        }
+        let rest = said.strip_prefix(&format!("{}: ", clause.name))?;
+        Cause::worst(
+            ops::message::split_outside_quotes(rest, ", and ")
+                .into_iter()
+                .filter_map(|piece| said_cause(&clause.said, piece)),
+        )
+    })
 }
 
 fn sort_key_said(f: &Value, row: &[Clause]) -> bool {
@@ -837,7 +854,7 @@ pub fn for_failures(
             }
         }
     }
-    let broke_runs: Vec<(usize, usize, Failure)> = (0..line.sentences.len())
+    let broke_runs: Vec<(usize, usize, (Failure, Vec<Value>))> = (0..line.sentences.len())
         .flat_map(|i| {
             failed
                 .iter()
@@ -850,19 +867,29 @@ pub fn for_failures(
         })
         .collect();
     let broke_rest = |clause: &str| -> Option<String> {
-        broke_runs.iter().find_map(|(_, _, entry)| {
+        broke_runs.iter().find_map(|(_, _, (entry, _))| {
             let name = &entry.part().name;
             let rest = clause.strip_prefix(&format!("{name}: "))?;
-            let pieces = ops::message::split_outside_quotes(rest, ", and ");
-            let left: Vec<&str> = pieces
+            let said: Vec<&str> = broke_runs
                 .iter()
-                .copied()
-                .filter(|piece| {
-                    !broke_runs.iter().any(|(_, _, other)| {
-                        other.part().name == *name && clauses(&other.part().message).contains(piece)
-                    })
-                })
+                .filter(|(_, _, (other, _))| other.part().name == *name)
+                .flat_map(|(_, _, (other, _))| clauses(&other.part().message))
                 .collect();
+            let pieces = ops::message::split_outside_quotes(rest, ", and ");
+            let mut left: Vec<&str> = Vec::new();
+            let mut at = 0;
+            while at < pieces.len() {
+                match (at + 1..=pieces.len())
+                    .rev()
+                    .find(|end| said.contains(&pieces[at..*end].join(", and ").as_str()))
+                {
+                    Some(end) => at = end,
+                    None => {
+                        left.push(pieces[at]);
+                        at += 1;
+                    }
+                }
+            }
             (left.len() < pieces.len()).then(|| match left.is_empty() {
                 true => String::new(),
                 false => format!("{name}: {}", left.join(", and ")),
@@ -912,6 +939,10 @@ pub fn for_failures(
         .collect();
     for whole in clauses(message) {
         let rest = broke_rest(whole);
+        if let Some(rest) = rest.as_ref().filter(|rest| !rest.is_empty()) {
+            ops::push_new(&mut leftover, rest.clone());
+            continue;
+        }
         let clause = rest.as_deref().unwrap_or(whole);
         if let Some(middle) = &first_reads
             && crate::parts::is_item(clause)
@@ -992,6 +1023,7 @@ pub fn for_failures(
             ops::push_new(&mut owned[0], clause.to_string());
         }
     }
+    let only_items = walked.is_empty();
     if !leftover.is_empty() {
         match walked.first_mut() {
             Some((_, texts)) => texts.extend(leftover),
@@ -1015,12 +1047,15 @@ pub fn for_failures(
         let mut inputs: Vec<Value> = Vec::new();
         let mut items: Vec<Failure> = Vec::new();
         for (at, f) in failed.iter().enumerate().filter(|(_, f)| !bare(f)) {
-            if let Some((_, _, entry)) = broke_runs
+            if let Some((_, _, (entry, outer))) = broke_runs
                 .iter()
                 .find(|(idx, found, _)| *idx == i && *found == at)
             {
                 causes.push(entry.part().cause);
                 items.push(entry.clone());
+                for x in outer {
+                    ops::push_new(&mut inputs, x.clone());
+                }
             }
             for l in list(f, "failed_assertions") {
                 if text(&l, "assertion") != sentence.text {
@@ -1186,7 +1221,14 @@ pub fn for_failures(
             at,
             Failure::List(Part {
                 name: label.clone(),
-                cause: row_cause,
+                cause: Cause::worst(
+                    texts
+                        .iter()
+                        .flat_map(|said| clauses(said))
+                        .filter_map(|said| said_cause(row, said)),
+                )
+                .filter(|_| only_items)
+                .unwrap_or(row_cause),
                 inputs: row_inputs
                     .iter()
                     .filter(|i| {
