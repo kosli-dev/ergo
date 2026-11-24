@@ -4895,4 +4895,14 @@ fn a_for_assertion_lists_a_list_after_is_in_ignoring_case_it_cant_use_as_unusabl
         row["failures"][0]["inputs"],
         json!([{"locations": ["$params:/l"], "name": "$params.l", "outcome": "unusable", "value": ["a", null]}])
     );
+    let missing = row_with(
+        "every xs as e",
+        json!("e.v is in $params.l ignoring case"),
+        json!({}),
+        json!({"l": ["a", null]}),
+    );
+    assert_eq!(
+        missing["failures"][0]["inputs"],
+        row["failures"][0]["inputs"]
+    );
 }
