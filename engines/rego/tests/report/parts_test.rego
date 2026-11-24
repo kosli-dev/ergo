@@ -3,6 +3,11 @@ package ergo_test
 import data.ergo
 import rego.v1
 
+test_a_for_entry_keeps_its_own_cause_when_it_has_one_and_the_rows_cause_otherwise if {
+	ergo._for_entry_cause("null", "absent") == "null"
+	ergo._for_entry_cause(null, "absent") == "absent"
+}
+
 test_an_input_outcome_of_missing_is_the_cause_absent if {
 	ergo._cause_of_outcome("missing") == "absent"
 	ergo._cause_of_outcome("null") == "null"

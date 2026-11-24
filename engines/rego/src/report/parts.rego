@@ -129,9 +129,13 @@ _leveled_kind(e) := "item" if _has_levels(e)
 else := e.kind
 
 _for_row_breaks(row, t, at, where) := array.concat(
-	[_entry(w[0], w[1], row.cause, [i | some i in _with_outcomes(row.inputs); _list_read_of(i.name, w[1])], [], w[2]) | some w in t.walk],
-	[e | some k, f in row.failed_items; rec := t.items[k]; "walk" in object.keys(rec); e := _for_walk_entry(f, _tie_texts(row, t, f, rec), at, where)],
+	[_entry(w[0], w[1], _for_entry_cause(w[3], row.cause), [i | some i in _with_outcomes(row.inputs); _list_read_of(i.name, w[1])], [], w[2]) | some w in t.walk],
+	[object.union(e, {"cause": _for_entry_cause(object.get(t, ["own", k], null), e.cause)}) | some k, f in row.failed_items; rec := t.items[k]; "walk" in object.keys(rec); e := _for_walk_entry(f, _tie_texts(row, t, f, rec), at, where)],
 )
+
+_for_entry_cause(own, _) := own if own != null
+
+_for_entry_cause(null, cause) := cause
 
 _list_read_of(name, list) if name == list
 
@@ -175,7 +179,7 @@ _for_assertion_base(row, at, where, t, i, a) := _policy_entry(
 	aliases := {item.as | some item in where.check.items}
 	lines := [[k, j, l] | some k, f in row.failed_items; "lines" in object.keys(t.items[k]); some j, l in f.failed_assertions; l.assertion == a]
 	items := _nested_items([_for_item_of(row, where, i, row.failed_items[k], l, t.items[k].lines[j], aliases, at) | some [k, j, l] in lines; _for_item_said(t.items[k].lines[j])])
-	causes := ({l.cause | some [_, _, l] in lines} | {l.cause | some l in t.free; l.assertion == a}) | {row.cause | lines == []; not a in {l.assertion | some l in t.free}}
+	causes := ({l.cause | some [_, _, l] in lines} | {l.cause | some l in t.free; l.assertion == a}) | {_for_entry_cause(object.get(t, ["said_causes", i], null), row.cause) | lines == []; not a in {l.assertion | some l in t.free}}
 	_for_assertion_said(t.said[i], items)
 }
 

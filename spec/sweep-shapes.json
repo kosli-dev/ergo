@@ -22,6 +22,8 @@
     {"name": "applies-two-conditions", "keys": ["$input.k", "$params.k"], "from": "{things} whose m named by {key} is 2 and whose some es.v is m named by {key2}"},
     {"name": "every-member-of-named-by", "keys": ["$input.k", "$params.k"], "from": "every member of {things} named by {key}"},
     {"name": "every-member-of-that-key", "keys": ["$input.k", "$params.k"], "check": "every member of m that is m named by {key}, if any, exists"},
-    {"name": "for-member-of-key", "keys": ["$input.k", "$params.k"], "check": {"for": "every es as e, every member of e as f", "assert": "f is m named by {key}"}}
+    {"name": "for-member-of-key", "keys": ["$input.k", "$params.k"], "check": {"for": "every es as e, every member of e as f", "assert": "f is m named by {key}"}},
+    {"name": "part-every-if-any", "keys": ["pl.name"], "has": {"pl": "p"}, "check": "every es.v, if any, is in pl.name"},
+    {"name": "part-count-whose", "keys": ["pl.name"], "has": {"pl": "p"}, "check": "count of es whose v is in pl.name is 0"}
   ]
 }

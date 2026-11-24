@@ -50,6 +50,14 @@ def items_for(name, k):
     }.get(name, ABSENT)
 
 
+def parts_for(k):
+    if k == ABSENT:
+        return []
+    if k == []:
+        return [{}]
+    return [{"name": k}]
+
+
 def expand_all(value, expand):
     if isinstance(value, str):
         return expand(value)
@@ -67,6 +75,8 @@ def build_cell(shape, key, k, j, es, input_shape, params_shape):
 
     from_line = shape.get("from")
     subject = {"from": expand(from_line) if from_line else things, "identified_by": "id"}
+    if shape.get("has"):
+        subject["has"] = shape["has"]
     check = shape.get("check", "id exists")
     check = expand_all(check, expand)
     policy = {
@@ -77,6 +87,8 @@ def build_cell(shape, key, k, j, es, input_shape, params_shape):
     thing = {"id": "t", "m": {"a": 2}}
     if k != ABSENT:
         thing["k"] = k
+    if shape.get("has"):
+        thing["p"] = parts_for(k)
     items = items_for(es, k)
     if items != ABSENT:
         thing["es"] = items
@@ -269,6 +281,49 @@ def rows(report):
     return found
 
 
+def row_lists(report):
+    found = {}
+    for row in report.get("results", []):
+        key = (row.get("requirement"), row.get("check"), json.dumps(row.get("subject"), sort_keys=True))
+        found.setdefault(key, []).append(row)
+    return found
+
+
+def statuses(report):
+    return {name: (entry or {}).get("status") for name, entry in (report.get("requirements") or {}).items()}
+
+
+def kind(rego, rust):
+    if rego == rust:
+        return 0
+    if "error" in rego or "error" in rust:
+        return 1 if ("error" in rego) != ("error" in rust) else 3
+    if rego.get("compliant") != rust.get("compliant") or statuses(rego) != statuses(rust):
+        return 1
+    a, b = row_lists(rego), row_lists(rust)
+    if set(a) != set(b) or any(sorted(x.get("passed") is True for x in a[key]) != sorted(x.get("passed") is True for x in b[key]) for key in a):
+        return 1
+    if any(sorted(json.dumps(x.get("cause")) for x in a[key]) != sorted(json.dumps(x.get("cause")) for x in b[key]) for key in a):
+        return 2
+    return 3
+
+
+def type_lines(found):
+    lines = [
+        f"type 1 (verdict differs): {len(found[1])}",
+        f"type 2 (a row's cause differs): {len(found[2])}",
+        f"type 3 (anything else): {len(found[3])}",
+    ]
+    for number in (1, 2):
+        if found[number]:
+            lines += ["", f"Type {number} cells:", ""] + [f"- {name}" for name in found[number]]
+    return lines
+
+
+def type_exit(found, require):
+    return 1 if require and found[1] else 0
+
+
 def short(value):
     text = json.dumps(value, sort_keys=True)
     return text if len(text) <= 160 else text[:157] + "..."
@@ -337,6 +392,7 @@ def write_cells(built):
 
 
 def run_pairs(args):
+    found_kinds = {1: [], 2: [], 3: []}
     pairs = load_pairs(args.pairs)
     for i, pair in enumerate(pairs):
         pair["id"] = str(i)
@@ -351,6 +407,8 @@ def run_pairs(args):
         for i, pair in enumerate(pairs):
             found = differences(rego[i], rust[i])
             differ += bool(found)
+            if kind(rego[i], rust[i]):
+                found_kinds[kind(rego[i], rust[i])].append(pair["name"])
             wanted = ""
             if pair["want"] is not None:
                 wanted = f" | rego {'says' if says(rego[i], pair['want']) else 'does not say'} it, rust {'says' if says(rust[i], pair['want']) else 'does not say'} it"
@@ -364,8 +422,10 @@ def run_pairs(args):
                     print(f"      rego: {short((left or {}).get(field) if fields != ['entry'] else left)}")
                     print(f"      rust: {short((right or {}).get(field) if fields != ['entry'] else right)}")
         print(f"{differ} of {len(pairs)} pairs differ")
+        print("\n".join(type_lines(found_kinds)))
     finally:
         shutil.rmtree(WORK, ignore_errors=True)
+    return type_exit(found_kinds, args.require_no_type_1)
 
 
 def main():
@@ -376,11 +436,11 @@ def main():
     parser.add_argument("--opa", default="opa", help="command that runs OPA (default: opa)")
     parser.add_argument("--rust", default="sh -s", help="command that reads a shell script on stdin and runs it from the root of the repo with the ergo command on PATH (default: sh -s)")
     parser.add_argument("--list", action="store_true", help="print the shape names and stop")
+    parser.add_argument("--require-no-type-1", action="store_true", help="exit with 1 when a cell or pair has a verdict that differs between the engines")
     args = parser.parse_args()
 
     if args.pairs:
-        run_pairs(args)
-        return
+        sys.exit(run_pairs(args))
 
     with open(os.path.join(ROOT, "spec", "sweep-shapes.json")) as handle:
         shapes = json.load(handle)["shapes"]
@@ -419,6 +479,7 @@ def main():
     version, rust = run_rust(args.rust, ids)
     print(f"rust engine: {version}")
 
+    found_kinds = {1: [], 2: [], 3: []}
     per_shape = {}
     total = 0
     wrong = [0, 0]
@@ -437,6 +498,8 @@ def main():
             continue
         tally[0] += 1
         total += 1
+        if kind(rego[i], rust[i]):
+            found_kinds[kind(rego[i], rust[i])].append(f"{cell['group']} | {cell['values']} | cell {cell['id']}")
         print(f"{cell['group']} | {cell['values']} | cell {cell['id']}")
         for where, fields, left, right in found:
             print(f"  {where} differs in {', '.join(fields)}")
@@ -453,6 +516,8 @@ def main():
         print(f"{shape}: {differ} of {ran} differ, written wrong: rego {wrong_rego}, rust {wrong_rust}")
     print(f"written wrong: rego {wrong[0]}, rust {wrong[1]}")
     print(f"{total} of {len(chosen)} cells differ")
+    print("\n".join(type_lines(found_kinds)))
+    sys.exit(type_exit(found_kinds, args.require_no_type_1))
 
 
 if __name__ == "__main__":

@@ -210,3 +210,13 @@ test_a_walked_list_after_is_in_ignoring_case_in_a_one_line_every_is_a_root_read_
 	ergo._walk_root_flaw(every_ref, {}) == "unusable" with input as {"ergo/names": {"ergo/subject": {}}} with data.ergo_document as {"cs": [{"name": 3}]} with ergo._walk_roots_on as true
 	ergo._walk_root_msgs(every_ref, {}) == ["item 1 of $input.cs: name is 3, which isn't text"] with input as {"ergo/names": {"ergo/subject": {}}} with data.ergo_document as {"cs": [{"name": 3}]} with ergo._walk_roots_on as true
 }
+
+test_a_line_that_isnt_a_for_line_keeps_no_roots_for_its_sentences if {
+	check := {"op": "every", "path": ["xs"], "whose": [{"op": "compare", "left": ["v"], "cmp": "gte", "right": ["$$params", "min"]}], "check": {"op": "compare", "left": ["v"], "cmp": "eq", "right": 1}}
+	subj := {"xs": [{"v": 1}]}
+	names := {"ergo/names": {"ergo/subject": subj, "$at": {"names": {}}}}
+	said := ergo._root_said_kept(check, subj) with input as names with data.ergo_params as {}
+	said.kept == {}
+	said.all == ergo._walk_root_said(check, subj) with input as names with data.ergo_params as {}
+	said.all != []
+}

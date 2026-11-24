@@ -3,6 +3,21 @@ package ergo_test
 import data.ergo
 import rego.v1
 
+test_a_for_row_whose_root_cant_be_read_keeps_each_clause_cause_only_when_the_tree_makes_the_row_fail_worse if {
+	p := {"roots": [{"text": "pos is null", "cause": "null"}], "line": [{"text": "xs is []", "cause": "value"}], "own": {1: "absent"}}
+	moved := {"texts": {"pos is null": "null", "xs is []": "value"}, "items": {1: "absent"}}
+	ergo._for_own_causes({"r": {"root_msgs": ["pos is null"]}, "subj": {}}, p, "null", "absent") == moved
+	ergo._for_own_causes({"r": {"root_msgs": ["pos is null"]}, "subj": {}}, p, "absent", "absent") == {"texts": {}, "items": {}}
+	ergo._for_own_causes({"r": {}, "subj": {}}, p, "null", "absent") == {"texts": {}, "items": {}}
+}
+
+test_a_for_entry_takes_the_worst_cause_of_its_texts_only_when_each_text_has_one if {
+	ergo._for_texts_cause({"a": "null", "b": "absent"}, ["a", "b"]) == "absent"
+	ergo._for_texts_cause({"a": "null"}, ["a"]) == "null"
+	ergo._for_texts_cause({"a": "null"}, ["a", "c"]) == null
+	ergo._for_texts_cause({}, []) == null
+}
+
 test_message_a_list_holds_a_position_and_an_object_holds_a_key if {
 	ergo._m_holds([1], 0)
 	ergo._m_holds({"a": 1}, "a")
@@ -256,6 +271,16 @@ test_a_whose_item_says_only_its_own_read_beside_a_root if {
 test_a_whose_item_says_the_first_condition_that_says_something if {
 	_whose_item_texts("every xs whose v is at least $params.min and whose w is 1 as x", {"xs": [{"v": 1}]}, {"min": "s"}) == [["item 1 of xs: w is missing"]]
 	_whose_item_texts("every xs whose v is at least $params.min and whose w is at least $params.min as x", {"xs": [{"v": 1}]}, {"min": "s"}) == [["item 1 of xs: w is missing"]]
+}
+
+test_a_whose_item_beside_a_list_it_cant_read_from_a_part_is_checked_against_an_empty_list if {
+	c := {"cmp": "in", "left": ["k"], "op": "compare", "right": ["${\"alias\":\"pl\",\"n\":1,\"of\":null,\"old\":true}", "c", "z"]}
+	ergo._for_own_check(c, {"c": {"z": "s"}, "xs": [{"k": "a"}]}) == {"cmp": "in", "left": ["k"], "op": "compare", "right": {"literal": []}}
+	ergo._for_own_check(object.union(c, {"cmp": "not_in"}), {"c": {"z": "s"}, "xs": [{"k": "a"}]}) == {"cmp": "not_in", "left": ["k"], "op": "compare", "right": {"literal": []}}
+}
+
+test_a_whose_item_beside_an_empty_list_root_says_its_own_read if {
+	_whose_item_texts("every xs whose v is in $input.cs.name as x", {"xs": [{"v": "a"}, {}]}, {}) == [["item 2 of xs: v is missing"]] with data.ergo_document as {"cs": []}
 }
 
 test_a_whose_item_beside_a_root_says_a_value_of_the_wrong_kind_and_a_null if {
@@ -542,9 +567,71 @@ test_an_empty_list_a_line_tolerates_is_not_said_beside_a_sentence_that_reads_no_
 	_row_tree_text("every xs, if any, as m", ["z is 1"], {"xs": [], "z": 3}, {}) == "z is 3"
 }
 
+test_an_empty_list_a_line_tolerates_is_not_said_beside_a_root_that_fails if {
+	_row_tree_text("every xs, if any, as x", ["x.v is at least $params.min"], {"xs": []}, {"min": "s"}) == `$params.min is "s", which isn't a number`
+	_row_tree_text("every xs as x", ["x.v is at least $params.min"], {"xs": []}, {"min": "s"}) == `$params.min is "s", which isn't a number; xs is []`
+}
+
+test_a_for_row_on_a_subject_that_isnt_an_object_says_that_once_after_its_other_roots if {
+	check := ergo._s_written_check({"for": "every owner as o", "assert": ["o is $params.z", "o is z"]})
+	subj := [{"owner": "a"}]
+	names := {"ergo/subject": subj, "$at": {"names": {}}}
+	p := ergo._for_row_parts(check, subj, {"cause": "not_an_object", "inputs": [], "failed": []}) with input as {"ergo/names": names}
+	[c.text | some c in p.roots] == ["$params.z is missing"]
+	[c.text | some c in p.lists] == [`the subject is [{"owner": "a"}], which isn't an object`]
+}
+
+test_a_root_of_a_for_row_that_names_an_item_counts_toward_the_items_shown if {
+	named := ergo._m_root_in("item 1 of t: item 1 of c", "not_an_object", "item 1 of t: item 1 of c is 1, which isn't an object", 0)
+	ergo._for_root_item(named) == object.union(named, {"kind": "item"})
+	plain := ergo._m_root_in("$params.z", "absent", "$params.z is missing", 0)
+	ergo._for_root_item(plain) == plain
+	shown := ergo._m_clauses_text(ergo._m_clauses_shown([ergo._for_root_item(ergo._m_root_in(n, "not_an_object", concat("", [n, " is 1, which isn't an object"]), 0)) | some n in ["item 1 of t: item 1 of c", "item 1 of t: item 2 of c", "item 2 of t: item 1 of c", "item 2 of t: item 2 of c"]]))
+	shown == "item 1 of t: item 1 of c is 1, which isn't an object; item 1 of t: item 2 of c is 1, which isn't an object; item 2 of t: item 1 of c is 1, which isn't an object; and 1 more"
+}
+
+test_a_sentences_roots_for_its_entries_come_from_what_the_tree_read_or_are_read_again if {
+	check := ergo._s_written_check({"for": "every xs as x", "assert": ["x.v is $params.a", "x.w is 1"]})
+	"$params.a is missing" in ergo._for_sentence_root_texts(check, {"xs": [{"v": 1}]}, 0, {})
+	ergo._for_sentence_root_texts(check, {"xs": [{"v": 1}]}, 0, {0: [["absent", "$params.b is missing"]]}) == ["$params.b is missing"]
+}
+
+test_an_item_that_says_only_the_roots_its_sentence_joins_is_left_out if {
+	_row_tree_text("every rows as row", ["row.v is zz.x named by p"], {"zz": "str", "rows": [{"v": 1}], "p": 3}, {}) == `p is 3, which isn't text, and zz is "str", which isn't an object`
+}
+
+test_a_for_rows_list_is_not_said_when_a_root_failed_beside_a_sentence_that_reads_no_alias if {
+	check := ergo._s_written_check({"for": "every xs as m", "assert": "count of xs whose v is in $input.z is 0"})
+	unfreed := {"cause": "value", "failed": [], "root_msgs": ["$input.z is []"]}
+	ergo._for_list_texts(check, {"xs": [{"v": 1}]}, object.union(unfreed, {"free_lines": [], "unfreed": unfreed})) == []
+}
+
 test_the_list_a_line_picks_nothing_from_comes_after_a_sentence_that_reads_no_alias if {
 	_row_tree_text("every xs whose v is 1 as x", ["x.v is 1", "z is 1"], {"xs": [{"v": 3}], "z": 3}, {}) == `z is 3; xs is [{"v": 3}]`
 	_row_tree_text("first of xs sorted by v as x", ["x.v is 1", "z is 1"], {"xs": [], "z": 3}, {}) == "z is 3; xs is []"
+}
+
+test_a_for_rows_roots_keep_the_order_of_their_sentences if {
+	_row_tree_text("every xs as x", ["x.v is $params.a", "x.v is $params.b"], {"xs": [{"v": 1}]}, {"a": null}) == "$params.a is null; $params.b is missing"
+	_row_tree_text("every xs as x", ["x.v is $params.b", "x.v is $params.a"], {"xs": [{"v": 1}]}, {}) == "$params.b is missing; $params.a is missing"
+}
+
+test_the_roots_of_the_lines_own_whose_come_before_the_sentences_roots if {
+	_row_tree_text("every xs whose v is at least $params.min as x", ["x.w is at least $params.a"], {"xs": [{"v": 1, "w": 1}]}, {"a": "s"}) == `$params.min is missing; $params.a is "s", which isn't a number`
+}
+
+test_a_sentence_that_reads_no_alias_comes_first_with_its_roots if {
+	_row_tree_text("every xs, if any, as x", ["w exists", "y is at least 1", "z is 1"], {"xs": [], "y": "s", "z": 3}, {}) == `w is missing; y is "s", which isn't a number; z is 3`
+}
+
+test_a_root_is_said_with_the_sentence_that_cant_read_it if {
+	_row_tree_text("every xs as x", ["z is in $params.l", "w is 1", "x.m named by z is 1"], {"xs": [{"m": {"a": 1}}], "z": 1}, {"l": [1, 2]}) == "w is missing; z is 1, which isn't text"
+}
+
+test_a_for_rows_roots_come_before_its_items if {
+	_row_tree_text("every xs as x", ["x.v is at least $params.min", "x.w is 1"], {"xs": [{"v": 1, "w": 2}, {}]}, {"min": "s"}) == `$params.min is "s", which isn't a number; item 1 of xs: x.w is 2; item 2 of xs: x.v is missing, and x.w is missing`
+	_row_tree_text("every xs whose v is at least $params.min as x", ["x.w is 1"], {"xs": [{"v": 1, "w": 2}, {"w": 1}]}, {"min": "s"}) == `$params.min is "s", which isn't a number; item 2 of xs: v is missing`
+	_row_tree_text("every xs as x", ["x.v is at least $params.min", "z is 1"], {"xs": [{"v": 1}, {}], "z": 2}, {"min": null}) == "z is 2; $params.min is null; item 2 of xs: x.v is missing"
 }
 
 _tree_said(line, sentences, subj, params, cause) := said if {

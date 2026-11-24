@@ -1,0 +1,23 @@
+name: rust-cache
+description: Restore and save the Rust toolchain, the cargo registry and the build folders, keyed on Cargo.lock and rust-toolchain.toml
+
+inputs:
+  name:
+    description: The job, so that each job keeps its own build folders
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: |
+          ~/.rustup/toolchains
+          ~/.rustup/update-hashes
+          ~/.cargo/registry
+          ~/.cargo/git
+          ~/.cache/ergo-cargo-target
+          engines/rust/target
+        key: rust-${{ runner.os }}-${{ inputs.name }}-${{ hashFiles('engines/rust/Cargo.lock', 'engines/rust/rust-toolchain.toml') }}
+        restore-keys: |
+          rust-${{ runner.os }}-${{ inputs.name }}-

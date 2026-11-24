@@ -24212,7 +24212,7 @@
             }
           },
           {
-            "cause": "value",
+            "cause": "not_an_object",
             "check": "for_every",
             "failures": [
               {
@@ -24235,7 +24235,7 @@
                 "name": "xs"
               },
               {
-                "cause": "value",
+                "cause": "not_an_object",
                 "failures": [],
                 "inputs": [],
                 "kind": "item",
@@ -24274,7 +24274,7 @@
             }
           },
           {
-            "cause": "value",
+            "cause": "not_an_object",
             "check": "for_some",
             "failures": [
               {
@@ -24297,7 +24297,7 @@
                 "name": "xs"
               },
               {
-                "cause": "value",
+                "cause": "not_an_object",
                 "failures": [],
                 "inputs": [],
                 "kind": "item",

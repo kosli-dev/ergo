@@ -46,11 +46,10 @@ _for_row_of(check, subj, r) := r if {
 _for_on_tree(check, subj, r) if {
 	count(check.items) == 1
 	object.get(r, "natural", null) != "satisfied"
-	not "root_msgs" in object.keys(r)
-	not "other_roots" in object.keys(r)
 	not _walk_flawed(check)
-	_walk_root_flaw(check, subj) == ""
+	not _for_walked_root_fails(check, subj)
 	not _for_key_not_text(check)
+	not _for_key_unread(check)
 	not _for_key_is_alias(check)
 	count([c | some c in check.checks; _for_reads_an_alias(check, c); _for_reads_a_list(c)]) < 2
 	every c in object.get(check.items[0], "whose", []) {
@@ -61,6 +60,19 @@ _for_on_tree(check, subj, r) if {
 	every step in array.concat(check.items[0].path, object.get(object.get(check.items[0], "pick", {}), "by", [])) {
 		_for_plain_step(step)
 	}
+}
+
+_for_key_unread(check) if {
+	some item in check.items
+	some c in object.get(item, "whose", [])
+	some [p, _] in _key_base_reads(c)
+	some seg in p
+	_ref_step_flaw(seg) in {"absent", "null"}
+}
+
+_for_walked_root_fails(check, subj) if {
+	_walk_roots_on
+	_walk_root_flaw(check, subj) != ""
 }
 
 _for_key_is_alias(check) if {
@@ -229,10 +241,12 @@ _worse_root(check, subj, rr) := object.union(rr, {"cause": _worst_or_value({rr.c
 	flaw != ""
 } else := rr
 
-_for_root_clauses(check, subj) := [_m_root_in(c.name, c.cause, c.text, min({d.group | some d in cs; d.text == c.text})) | some i, c in cs; not c.text in {d.text | some d in array.slice(cs, 0, i)}] if {
+_for_root_clauses(check, subj) := _for_roots_of(check, subj, [_for_sentence_said(check, c, subj) | some c in check.checks])
+
+_for_roots_of(check, subj, said) := [_m_root_in(c.name, c.cause, c.text, min({d.group | some d in cs; d.text == c.text})) | some i, c in cs; not c.text in {d.text | some d in array.slice(cs, 0, i)}] if {
 	cs := array.concat(
 		[_m_root_in(_m_clause_name(x[1]), x[0], x[1], count(check.checks)) | some x in _walk_root_said(object.union(check, {"checks": [], "assertions": []}), subj)],
-		[_m_root_in(_m_clause_name(x[1]), x[0], x[1], _for_sentence_group(check, i)) | some i, c in check.checks; some x in _walk_root_said(_for_one_sentence(check, c), subj)],
+		[_m_root_in(_m_clause_name(x[1]), x[0], x[1], _for_sentence_group(check, i)) | some i, xs in said; some x in xs],
 	)
 }
 
@@ -242,9 +256,29 @@ else := i
 
 _for_one_sentence(check, c) := object.union(check, {"items": [object.remove(it, ["whose"]) | some it in check.items], "checks": [c]})
 
-_for_sentence_roots(check, c, subj) := roots if {
-	roots := {x[1] | some x in _walk_root_said(_for_one_sentence(check, c), subj)} with input as {"ergo/names": _for_unbound(check, _for_names)}
+_for_sentence_roots(check, c, subj) := {x[1] | some x in _for_sentence_said(check, c, subj)}
+
+_for_sentence_said(check, c, subj) := said if {
+	said := _walk_root_said(_for_one_sentence(check, c), subj) with input as {"ergo/names": _for_unbound(check, _for_names)}
 }
+
+_for_said_parts(check, subj) := {"all": line, "said": said} if {
+	top := _for_conds_said(subj, object.get(check, "whose", []))
+	own := _for_conds_said(subj, [c | some item in check.items; some c in object.get(item, "whose", [])])
+	ps := [_for_sentence_parts(subj, {"op": "for", "checks": [c]}) | some c in check.checks]
+	line := _once(array.concat(_said_by_text([x | some p in ps; some x in p.count]), array.concat(array.concat(array.concat(top, own), [x | some p in ps; some x in p.nested]), [x | some p in ps; some x in p.conds])))
+	said := [_once(array.concat(_said_by_text(p.count), array.concat(array.concat(top, p.nested), p.conds))) | some p in ps]
+}
+
+_for_sentence_parts(subj, one) := {
+	"count": [x | some c in _walk_count_conds(one); some x in array.concat(_m_root_said_all(subj, c), _m_cond_walked_said(c)); x[0] in _no_value_states; startswith(x[1], "$")],
+	"nested": _for_conds_said(subj, _for_nested_conds(one)),
+	"conds": [x | some c in _for_sentence_conds(one); some x in array.concat(_m_cond_root_said(subj, c), _m_walked_root_said(c))],
+}
+
+_for_conds_said(subj, cs) := [x | some c in cs; some x in array.concat(_m_cond_root_said(subj, c), _m_cond_walked_said(c))]
+
+_said_by_text(xs) := [[y[1], y[0]] | some y in sort([[x[1], x[0]] | some x in xs])]
 
 _for_unbound(check, names) := object.union(object.remove(names, aliases), {"$at": object.union(at, {"names": object.remove(object.get(at, "names", {}), aliases)})}) if {
 	aliases := [item.as | some item in check.items]

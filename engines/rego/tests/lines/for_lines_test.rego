@@ -104,6 +104,34 @@ _roots_said_today(line, sentences, subj, params) := {x[1] | some x in said} if {
 	said := ergo._walk_root_said(check, subj) with input as {"ergo/names": {"ergo/subject": subj}} with data.ergo_params as params
 }
 
+_said_parts_match(line, sentences, subj, params) if {
+	check := ergo._s_written_check({"for": line, "assert": sentences})
+	names := {"ergo/names": {"ergo/subject": subj, "$at": {"names": {}}}}
+	parts := ergo._for_said_parts(check, subj) with input as names with data.ergo_params as params
+	parts.all == ergo._walk_root_said(check, subj) with input as names with data.ergo_params as params
+	parts.said == [ergo._walk_root_said(ergo._for_one_sentence(check, c), subj) | some c in check.checks] with input as names with data.ergo_params as params
+	parts.all != []
+}
+
+test_a_for_line_reads_its_roots_once_for_the_line_and_for_each_sentence if {
+	_said_parts_match("every xs as x", ["x.v is $params.a", "x.v is $params.b"], {"xs": [{"v": 1}]}, {"a": null})
+	_said_parts_match("every xs whose v is at least $params.min as x", ["x.w is 1", "z is 1", "approved_by is a non-empty string"], {"xs": [{"v": 1, "w": 2}]}, {"min": "s"})
+	_said_parts_match("every xs as x", ["count of x.ys whose k is $params.k is 1", "every x.ys whose n is $params.n exists"], {"xs": [{"ys": [{"k": 1}]}]}, {})
+}
+
+test_a_for_row_hands_the_roots_it_read_to_its_message if {
+	check := ergo._s_written_check({"for": "every tests as t", "assert": ["t.ok is true", "approved_by is a non-empty string"]})
+	subj := {"tests": [{"ok": false}]}
+	names := {"ergo/names": {"ergo/subject": subj, "$at": {"names": {}}}}
+	r := ergo._for_freed(check, subj, ergo._for_row_raw(check, subj)) with input as names
+	r["ergo/root_said"] == [[], [["absent", "approved_by is missing"]]]
+	ergo._for_row_said(check, subj, object.union(r, {"ergo/root_said": [[["absent", "a is missing"]], []]})) == {0: [["absent", "a is missing"]], 1: []} with input as names
+	approved := {"tests": [{"ok": false}], "approved_by": "a"}
+	approved_names := {"ergo/names": {"ergo/subject": approved, "$at": {"names": {}}}}
+	plain := ergo._for_freed(check, approved, ergo._for_row_raw(check, approved)) with input as approved_names
+	ergo._for_row_said(check, approved, object.union(plain, {"ergo/root_said": [[["absent", "a is missing"]], []]})) == {0: [["absent", "a is missing"]]} with input as approved_names
+}
+
 _on_tree(line, sentences, subj, params) if {
 	check := ergo._s_written_check({"for": line, "assert": sentences})
 	names := {"ergo/subject": subj, "$at": {"names": {}}}
@@ -120,13 +148,33 @@ test_a_one_list_for_row_with_nothing_read_outside_it_that_fails_takes_its_messag
 
 test_a_for_row_keeps_its_message_off_the_tree_while_the_tree_cant_say_its_roots_keys_or_second_list if {
 	not _on_tree("every xs as x, every x.ys as y", ["y.v is 1"], {"xs": [{"ys": [{"v": 2}]}]}, {})
-	not _on_tree("every xs as x", ["x.v is at least $params.min"], {"xs": [{"v": 0}]}, {"min": "s"})
-	not _on_tree("every xs as x", ["x.v is at least $params.min"], {"xs": [{"v": 0}]}, {})
 	not _on_tree("every o named by $params.k as x", ["x is 1"], {"o": {"a": [2]}}, {"k": "a"})
 	not _on_tree("first of xs sorted by m named by $params.k as x", ["x.v is 1"], {"xs": [{"m": {"a": 1}, "v": 2}]}, {"k": "a"})
 	not _on_tree("every es whose zz is m named by $params.k as e", ["e.v is 1"], {"es": [{"zz": 1}]}, {"k": 3})
 	not _on_tree("every xs as x", ["every x.ys.n is 1", "every x.ys.m is 1"], {"xs": [{"ys": [{"n": 2, "m": 2}]}]}, {})
 	not _on_tree("every xs as x", ["every x.ys exists", "sum of x.ys.n is 3"], {"xs": [{"ys": [{"n": 1}, null]}]}, {})
+}
+
+test_a_one_list_for_row_with_a_root_that_fails_takes_its_message_from_the_tree if {
+	_on_tree("every xs as x", ["x.v is at least $params.min"], {"xs": [{"v": 0}]}, {"min": "s"})
+	_on_tree("every xs as x", ["x.v is at least $params.min"], {"xs": [{"v": 0}]}, {})
+	_on_tree("every xs whose v is at least $params.min as x", ["x.w is 1"], {"xs": [{"v": 1, "w": 2}, {"w": 1}]}, {"min": "s"})
+	_on_tree("every xs as x", ["x.v is $params.a", "x.v is $params.b"], {"xs": [{"v": 1}]}, {"a": null})
+}
+
+test_a_for_row_run_again_to_read_its_walked_roots_keeps_its_message_off_the_tree_when_a_root_fails if {
+	check := ergo._s_written_check({"for": "every xs as x", "assert": "x.v is at least $params.min"})
+	subj := {"xs": [{"v": 0}]}
+	names := {"ergo/subject": subj, "$at": {"names": {}}}
+	r := ergo._for_freed(check, subj, ergo._for_row_raw(check, subj)) with input as {"ergo/names": names} with ergo._walk_roots_on as true
+	not ergo._for_on_tree(check, subj, r) with input as {"ergo/names": names} with ergo._walk_roots_on as true
+	_on_tree("every xs as x", ["x.v is 1"], {"xs": [{"v": 0}]}, {}) with ergo._walk_roots_on as true
+}
+
+test_a_for_row_whose_whose_key_from_params_cant_be_read_keeps_its_message_off_the_tree if {
+	not _on_tree("every es whose zz is m named by $params.k as e", ["e.v exists", "z is 1"], {"z": 2, "es": [{"zz": 2, "m": {"a": 1}, "v": 1}]}, {})
+	not _on_tree("every es whose zz is m named by $params.k as e", ["e.v exists", "z is 1"], {"z": 2, "es": [{"zz": 2, "m": {"a": 1}, "v": 1}]}, {"k": null})
+	_on_tree("every es whose zz is m named by $params.k as e", ["e.v is 2"], {"es": [{"zz": 2, "m": {"a": 2}, "v": 1}]}, {"k": "a"})
 }
 
 test_a_for_row_on_the_tree_leaves_its_message_to_the_tree if {
