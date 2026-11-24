@@ -177,32 +177,6 @@ fn item_paths(check: &Check) -> Vec<&Path> {
         .collect()
 }
 
-/// The message an entry of a `for` line's `failures` gives for the item
-/// `name`, from the texts its sentence said for that item.
-pub fn rendered(name: &str, texts: &[String]) -> String {
-    match texts {
-        [] => String::new(),
-        [one] if !one.starts_with(MARK) => one.clone(),
-        _ => {
-            let mut once: Vec<String> = Vec::new();
-            for text in texts {
-                push_new(&mut once, text.clone());
-            }
-            group_by_lead(&once)
-                .iter()
-                .map(|group| {
-                    let said = under(name, &group_text(group));
-                    match said.strip_prefix(&format!("{name}: ")) {
-                        Some(rest) => rest.to_string(),
-                        None => said,
-                    }
-                })
-                .collect::<Vec<_>>()
-                .join("; ")
-        }
-    }
-}
-
 /// Whether `check` reads the `for` alias `alias`.
 pub fn reads_alias(check: &Check, alias: &str) -> bool {
     nested_checks(check).into_iter().any(|inner| {
@@ -1510,7 +1484,8 @@ impl For {
         self.items.iter().map(|i| i.alias.as_str()).collect()
     }
 
-    fn last_alias(&self) -> &str {
+    /// The alias of the line's last item.
+    pub fn last_alias(&self) -> &str {
         self.items
             .last()
             .map(|i| i.alias.as_str())
@@ -1599,10 +1574,11 @@ impl For {
                 .clauses
                 .iter()
                 .map(|clause| match clause.kind {
-                    super::clause::Kind::Root | super::clause::Kind::List if all_own => Clause {
-                        text: own_text(&clause.text, alias, f.one),
-                        ..clause.clone()
-                    },
+                    super::clause::Kind::Root | super::clause::Kind::List
+                        if all_own && f.one && clause.text.starts_with(&format!("{alias} is ")) =>
+                    {
+                        Clause::item(alias, clause.cause, clause.text.clone(), Vec::new())
+                    }
                     _ => clause.clone(),
                 })
                 .collect();

@@ -197,10 +197,6 @@ fn own_said(record: &Value, roots: &[String]) -> Vec<Clause> {
         .collect()
 }
 
-fn own_text(record: &Value, said: &[Clause]) -> String {
-    for_line::rendered(&said_name(record), &clause::lines(said))
-}
-
 fn bound<'a>(line: &For, f: &'a Value, ctx: &Ctx<'a>) -> Option<Ctx<'a>> {
     let value = f.get("value")?;
     let place = strings(f, "locations").first().cloned()?;
@@ -271,7 +267,7 @@ fn broke_entry(
             cause,
             with_root_outcomes(own_inputs, &lifted),
             Vec::new(),
-            own_text(f, &said),
+            clause::item_says(&said_name(f), line.last_alias(), &said),
             f,
         ),
         outer,
@@ -412,12 +408,13 @@ fn item_entry(
     walked: Option<Failure>,
     input: &Value,
 ) -> Option<Failure> {
+    let alias = aliases.last().copied().unwrap_or_default();
     if let Some(pairs) = l.get("items").and_then(Value::as_array) {
         let inner: Vec<Failure> = pairs
             .iter()
             .filter_map(|y| {
                 let said = own_said(y, roots);
-                let message = own_text(y, &said);
+                let message = clause::item_says(&said_name(y), alias, &said);
                 (!message.is_empty()).then(|| {
                     item(
                         text(y, "item"),
@@ -449,13 +446,13 @@ fn item_entry(
         .cloned()
         .chain(own.iter().cloned())
         .collect();
-    let message = own_text(f, &said);
+    let message = clause::item_says(&said_name(f), alias, &said);
     let walked = walked.filter(|walked| {
         let mut lines: Vec<String> = Vec::new();
         for kid in &walked.part().failures {
             said_by(kid, &[], &mut lines);
         }
-        !message.is_empty() && said.iter().all(|piece| covered(piece, &lines, ""))
+        !message.is_empty() && said.iter().all(|piece| covered(piece, &lines, "", aliases))
     });
     if let Some(walked) = walked {
         let part = walked.part().clone();
@@ -482,13 +479,17 @@ fn item_entry(
     })
 }
 
-fn covered(piece: &Clause, lines: &[String], lead: &str) -> bool {
+fn covered(piece: &Clause, lines: &[String], lead: &str, aliases: &[&str]) -> bool {
     match piece.kind {
         Kind::More(_) => true,
         Kind::Item if !piece.said.is_empty() => {
             let lead = format!("{lead}{}: ", piece.name);
-            piece.said.iter().all(|inner| covered(inner, lines, &lead))
+            piece
+                .said
+                .iter()
+                .all(|inner| covered(inner, lines, &lead, aliases))
         }
+        Kind::Item if aliases.contains(&piece.name.as_str()) => false,
         _ => lines.contains(&format!("{lead}{}", piece.text)),
     }
 }

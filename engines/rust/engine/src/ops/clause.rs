@@ -212,6 +212,85 @@ pub fn lines(clauses: &[Clause]) -> Vec<String> {
         .collect()
 }
 
+/// What the entry of the item `name` says, from the clauses `said` of it.
+/// Clauses about the same item under it share one piece, joined with
+/// `, and `, and a clause about `alias` alone that leads its piece reads as
+/// the item itself, like `item 1 of xs is 2` for `x is 2`.
+pub fn item_says(name: &str, alias: &str, said: &[Clause]) -> String {
+    let whole = |clause: &Clause| {
+        clause.kind == Kind::Item
+            && clause.said.is_empty()
+            && clause.name == alias
+            && clause.text.starts_with(&format!("{alias} "))
+    };
+    let mut lines: Vec<(String, bool)> = Vec::new();
+    for clause in said {
+        let line = (text(std::slice::from_ref(clause)), whole(clause));
+        if !lines.contains(&line) {
+            lines.push(line);
+        }
+    }
+    if let [(one, false)] = lines.as_slice() {
+        return one.clone();
+    }
+    let mut leads: Vec<String> = Vec::new();
+    for (line, _) in &lines {
+        let lead = lead_of(line);
+        if !leads.contains(&lead) {
+            leads.push(lead);
+        }
+    }
+    leads
+        .iter()
+        .map(|lead| {
+            let group: Vec<&(String, bool)> = lines
+                .iter()
+                .filter(|(line, _)| lead_of(line) == *lead)
+                .collect();
+            let rest: Vec<&str> = group[1..]
+                .iter()
+                .map(|(line, _)| match lead.is_empty() {
+                    true => line.as_str(),
+                    false => line.strip_prefix(&format!("{lead}: ")).unwrap_or(line),
+                })
+                .collect();
+            let (first, first_whole) = group[0];
+            let mut said = match first.strip_prefix(alias) {
+                Some(after) if *first_whole => format!("{name}{after}"),
+                _ => first.clone(),
+            };
+            for text in rest {
+                said.push_str(", and ");
+                said.push_str(text);
+            }
+            said
+        })
+        .collect::<Vec<_>>()
+        .join("; ")
+}
+
+fn lead_of(text: &str) -> String {
+    if !crate::parts::is_item(text) {
+        return String::new();
+    }
+    let outside_quotes = |text: &str| {
+        text.replace("\\\\", "")
+            .replace("\\\"", "")
+            .matches('"')
+            .count()
+            .is_multiple_of(2)
+    };
+    let cuts = text
+        .match_indices(": ")
+        .chain(text.match_indices(" is "))
+        .map(|(at, _)| at)
+        .filter(|at| *at > 0 && outside_quotes(&text[..*at]));
+    match cuts.min() {
+        Some(at) if text[..at].contains(" of ") => text[..at].to_string(),
+        _ => String::new(),
+    }
+}
+
 fn pieces(item: &Clause) -> Vec<String> {
     let mut out: Vec<String> = Vec::new();
     if !item.text.is_empty() && !item.said_first {
