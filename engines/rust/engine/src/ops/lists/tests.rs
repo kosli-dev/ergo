@@ -1105,6 +1105,33 @@ fn a_list_read_from_a_list_input_after_a_phrase_that_walks_it_says_no_key_fault(
     );
 }
 
+#[test]
+fn a_walked_list_after_is_in_ignoring_case_is_unfit_only_when_it_holds_an_item_that_isnt_text() {
+    let item = json!({"x": "a"});
+    for (input, unfit) in [
+        (json!([{"ls": ["a"]}, {}]), false),
+        (json!([{"ls": ["a"]}, {"ls": null}]), false),
+        (json!([{"ls": ["a"]}, {"ls": []}]), false),
+        (json!([{"ls": ["a"]}, {"ls": ["b", null]}]), true),
+        (json!([{"ls": ["a"]}, {"ls": [3]}]), true),
+        (json!([{"ls": ["a"]}, {"ls": ["b"]}]), false),
+    ] {
+        let ctx = Ctx {
+            label: None,
+            item_by_item: true,
+            subject: Located {
+                value: &item,
+                location: Location::input_root(),
+            },
+            input: &input,
+            params: None,
+            aliases: BTreeMap::new(),
+        };
+        let check = assertion("x is in $input.ls ignoring case");
+        assert_eq!(text_unfit(&check, "$input[].ls[]", &ctx), unfit, "{input}");
+    }
+}
+
 const BOTH: super::super::compare::Ignoring = super::super::compare::Ignoring {
     case: true,
     spaces: true,
