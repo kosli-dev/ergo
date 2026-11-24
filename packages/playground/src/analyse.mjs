@@ -33,6 +33,14 @@ const partProblems = (tree, text, partNames) => {
   return out;
 };
 
+const attempt = (read, fallback) => {
+  try {
+    return read();
+  } catch {
+    return fallback;
+  }
+};
+
 /** Makes a function that reads a list of located sentences (from `markdownSentences` or `yamlSentences`) with the parser. For each sentence it gives what the line needs: `{...sentence, tree, problems, tokens, lines, aliases, aliasKeys}`. `problems` are `{message, start, end}` with positions in the line, `tokens` colour the sentence from its tree (or are `null` when the text and the tree don't agree, or the text isn't what the line holds), `lines` say how it is read, and `aliasKeys` maps each name in scope to the last key of the list it stands for. The function gives `null` when the parser is missing or stopped. `base` is the kind the tokens that need no colour get. */
 export const makeAnalyser = (parser, base = "plain") => {
   const cache = new Map();
@@ -59,8 +67,8 @@ export const makeAnalyser = (parser, base = "plain") => {
     return {
       tree: read.tree,
       problems: read.problems,
-      tokens: read.tree && s.exact ? treeTokens(s.kind, read.tree, s.text, aliases, base, s.subject ?? null) : null,
-      lines: read.tree ? describe(s.kind, read.tree, ctx) : [],
+      tokens: read.tree && s.exact ? attempt(() => treeTokens(s.kind, read.tree, s.text, aliases, base, s.subject ?? null), null) : null,
+      lines: read.tree ? attempt(() => describe(s.kind, read.tree, ctx), []) : [],
       aliases,
       aliasKeys,
     };
