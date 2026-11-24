@@ -538,7 +538,20 @@ fn an_item_with_its_own_entry_on_the_row_is_said_by_that_entry_and_not_by_the_as
         json!({"ws": [{"n": 1}, [1], {"n": "a"}]}),
         json!({}),
     );
-    assert_eq!(said[0], "assertion w.n is 2 [unusable] \"\" ()");
+    assert_eq!(
+        said,
+        [
+            "assertion w.n is 2 [unusable] \"\" ()",
+            "  item item 1 of ws [value] \"w.n is 1\" (\"w.n\" \"usable\")",
+            "  item item 3 of ws [unusable] \"w.n is \\\"a\\\", which isn't a number\" (\"w.n\" \"unusable\")",
+            "item item 1 of ws [absent] \"\" ()",
+            "  list w.ys [absent] \"w.ys is missing\" (\"w.ys\" \"absent\")",
+            "item item 2 of ws [not_an_object] \"\" ()",
+            "  item item 1 of w [not_an_object] \"item 1 of w is 1, which isn't an object\" ()",
+            "item item 3 of ws [absent] \"\" ()",
+            "  list w.ys [absent] \"w.ys is missing\" (\"w.ys\" \"absent\")",
+        ]
+    );
 }
 
 #[test]
@@ -549,7 +562,14 @@ fn a_tie_in_the_second_list_is_said_by_the_first_items_entry_and_not_by_the_asse
         json!({"items": [{"subs": [{"t": 5, "w": 1}, {"t": 5, "w": 2}]}]}),
         json!({}),
     );
-    assert_eq!(said[0], "item item 1 of items [ambiguous] \"\" ()");
+    assert_eq!(
+        said,
+        [
+            "item item 1 of items [ambiguous] \"\" ()",
+            "  item item 1 of x.subs [ambiguous] \"item 1 of x.subs is 5\" ()",
+            "  item item 2 of x.subs [ambiguous] \"item 2 of x.subs is 5\" ()",
+        ]
+    );
 }
 
 #[test]
