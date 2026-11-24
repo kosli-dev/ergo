@@ -59,6 +59,54 @@ fn entries(for_line: &str, assertions: Value, subject: Value, params: Value) -> 
     out
 }
 
+fn unsaid(for_line: &str, assertions: Value, subject: Value, params: Value) -> Vec<String> {
+    let policy = json!({
+        "ergo_spec": crate::SPEC,
+        "subjects": {"thing": {"from": "things", "identified_by": "id"}},
+        "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": for_line, "assert": assertions}}}}
+    });
+    let mut subject = subject;
+    subject["id"] = json!(1);
+    let report = crate::report(&json!({"things": [subject]}), &policy, &params);
+    let row = report["results"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|row| row["check"] == "c")
+        .unwrap()
+        .clone();
+    let mut lines = Vec::new();
+    lines_of(&row["failures"], "", &mut lines);
+    let said = |clause: &str| {
+        lines
+            .iter()
+            .any(|line| line == clause || line.ends_with(&format!(": {clause}")))
+    };
+    clauses(row["message"].as_str().unwrap())
+        .into_iter()
+        .filter(|clause| !clause.starts_with("and ") && !said(clause))
+        .map(str::to_string)
+        .collect()
+}
+
+fn lines_of(failures: &Value, lead: &str, out: &mut Vec<String>) {
+    for entry in failures.as_array().into_iter().flatten() {
+        let name = entry["name"].as_str().unwrap_or_default();
+        let message = entry["message"].as_str().unwrap_or_default();
+        let here = match entry["kind"].as_str() {
+            Some("item") => format!("{lead}{name}: "),
+            _ => lead.to_string(),
+        };
+        if !message.is_empty() {
+            match entry["kind"].as_str() {
+                Some("item") if message.starts_with(name) => out.push(format!("{lead}{message}")),
+                _ => out.push(format!("{here}{message}")),
+            }
+        }
+        lines_of(&entry["failures"], &here, out);
+    }
+}
+
 fn tree(failures: &Value, depth: usize, out: &mut Vec<String>) {
     for entry in failures.as_array().into_iter().flatten() {
         let inputs: Vec<String> = entry["inputs"]
@@ -502,4 +550,20 @@ fn a_tie_in_the_second_list_is_said_by_the_first_items_entry_and_not_by_the_asse
         json!({}),
     );
     assert_eq!(said[0], "item item 1 of items [ambiguous] \"\" ()");
+}
+
+#[test]
+fn every_clause_of_a_row_whose_sort_key_is_named_by_params_that_arent_text_is_said_by_an_entry() {
+    for assertion in ["x.n is 1", "y.w is 1"] {
+        assert_eq!(
+            unsaid(
+                "every items as x, last of x.subs sorted by t named by $params.km as y",
+                json!(assertion),
+                json!({"items": [{"subs": [{"t": {"a": 1}}, {"t": 2}]}, 3, {"n": 1}]}),
+                json!({"km": 3}),
+            ),
+            Vec::<String>::new(),
+            "{assertion}"
+        );
+    }
 }
