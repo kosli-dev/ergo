@@ -111970,5 +111970,314 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a second for list sorted by a field named by a key from $params",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "for": "every items as x, last of x.subs sorted by t named by $params.km as y",
+              "assert": "y.w is 2"
+            }
+          }
+        }
+      }
+    },
+    "params": {
+      "km": "a"
+    },
+    "cases": [
+      {
+        "description": "picks the item that field puts last, and passes",
+        "rules": [
+          "sentence.for.pick",
+          "for.pick"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "items": [
+                {
+                  "subs": [
+                    {
+                      "t": {
+                        "a": 2,
+                        "b": 1
+                      },
+                      "w": 2
+                    },
+                    {
+                      "t": {
+                        "a": 1,
+                        "b": 2
+                      },
+                      "w": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/items/0"
+                ],
+                "name": "items[]",
+                "value": [
+                  {
+                    "subs": [
+                      {
+                        "t": {
+                          "a": 2,
+                          "b": 1
+                        },
+                        "w": 2
+                      },
+                      {
+                        "t": {
+                          "a": 1,
+                          "b": 2
+                        },
+                        "w": 1
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/items/0/subs/0"
+                ],
+                "name": "x.subs[]",
+                "value": [
+                  {
+                    "t": {
+                      "a": 2,
+                      "b": 1
+                    },
+                    "w": 2
+                  }
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a second for list sorted by another field named by a key from $params",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "for": "every items as x, last of x.subs sorted by t named by $params.km as y",
+              "assert": "y.w is 2"
+            }
+          }
+        }
+      }
+    },
+    "params": {
+      "km": "b"
+    },
+    "cases": [
+      {
+        "description": "picks the item that field puts last, and fails on it",
+        "rules": [
+          "sentence.for.pick",
+          "for.pick",
+          "for.failed_items"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "items": [
+                {
+                  "subs": [
+                    {
+                      "t": {
+                        "a": 2,
+                        "b": 1
+                      },
+                      "w": 2
+                    },
+                    {
+                      "t": {
+                        "a": 1,
+                        "b": 2
+                      },
+                      "w": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [
+                  {
+                    "cause": "value",
+                    "failures": [
+                      {
+                        "cause": "value",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/items/0/subs/1/w"
+                            ],
+                            "name": "y.w",
+                            "outcome": "usable",
+                            "value": 1
+                          }
+                        ],
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/items/0/subs/1"
+                        ],
+                        "message": "y.w is 1",
+                        "name": "item 2 of x.subs",
+                        "value": {
+                          "t": {
+                            "a": 1,
+                            "b": 2
+                          },
+                          "w": 1
+                        }
+                      }
+                    ],
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/items/0"
+                    ],
+                    "message": "",
+                    "name": "item 1 of items",
+                    "value": {
+                      "subs": [
+                        {
+                          "t": {
+                            "a": 2,
+                            "b": 1
+                          },
+                          "w": 2
+                        },
+                        {
+                          "t": {
+                            "a": 1,
+                            "b": 2
+                          },
+                          "w": 1
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c/assert"
+                ],
+                "message": "",
+                "name": "y.w is 2"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/items/0"
+                ],
+                "name": "items[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "subs": [
+                      {
+                        "t": {
+                          "a": 2,
+                          "b": 1
+                        },
+                        "w": 2
+                      },
+                      {
+                        "t": {
+                          "a": 1,
+                          "b": 2
+                        },
+                        "w": 1
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/items/0/subs/1"
+                ],
+                "name": "x.subs[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "t": {
+                      "a": 1,
+                      "b": 2
+                    },
+                    "w": 1
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of items: item 2 of x.subs: y.w is 1",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]
