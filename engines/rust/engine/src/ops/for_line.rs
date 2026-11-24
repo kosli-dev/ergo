@@ -4278,10 +4278,11 @@ fn sentence_root_faults(forms: &[(Check, bool)], ctx: &Ctx) -> Vec<(Cause, Strin
                 continue;
             }
             if !(part && read.outcome.cause().is_some())
-                && let Some(text) = super::message::root_kind_fault(check, root, ctx)
-                    .or_else(|| equals_kind_fault(check, root, &read))
+                && let Some(flaw) = super::message::root_kind_flaw(check, root, ctx).or_else(|| {
+                    equals_kind_fault(check, root, &read).map(|text| (Cause::Unusable, text))
+                })
             {
-                found.push((Cause::Unusable, text));
+                found.push(flaw);
                 continue;
             }
             if keys.contains(&root)

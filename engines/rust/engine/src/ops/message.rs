@@ -1818,7 +1818,7 @@ pub(super) fn root_kind_fault(check: &Check, root: &Path, ctx: &Ctx) -> Option<S
     root_kind_flaw(check, root, ctx).map(|(_, text)| text)
 }
 
-fn root_kind_flaw(check: &Check, root: &Path, ctx: &Ctx) -> Option<(Cause, String)> {
+pub(super) fn root_kind_flaw(check: &Check, root: &Path, ctx: &Ctx) -> Option<(Cause, String)> {
     if let Some(flaw) = lists::text_fault(check, root, ctx) {
         return Some(flaw);
     }
