@@ -5064,3 +5064,69 @@ fn a_root_a_sentence_reads_sits_on_its_assertion_and_not_on_an_item_of_the_secon
     assert_eq!(inputs(assertion), ["$params.min"]);
     assert_eq!(inputs(&assertion["failures"][0]["failures"][0]), ["x.v"]);
 }
+
+#[test]
+fn a_first_alias_sentence_that_says_its_right_side_is_said_once_and_its_assertion_lists_the_root() {
+    let row = row_with(
+        "every ws as w, every w.ys as y",
+        json!(["w.v is in $params.z", "y.n is 1"]),
+        json!({"ws": [{"v": 3, "ys": []}]}),
+        json!({"z": [1, 2]}),
+    );
+    assert_eq!(
+        row["message"],
+        "item 1 of ws: w.v is 3, and $params.z is [1, 2]; item 1 of ws: w.ys is []"
+    );
+    assert_eq!(
+        entries(&row["failures"]),
+        [
+            "assertion w.v is in $params.z value: ",
+            "  item item 1 of ws value: w.v is 3, and $params.z is [1, 2]",
+            "item item 1 of ws value: ",
+            "  list w.ys value: w.ys is []"
+        ]
+    );
+    let names: Vec<&str> = row["failures"][0]["inputs"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|input| input["name"].as_str().unwrap())
+        .collect();
+    assert_eq!(names, ["$params.z"]);
+}
+
+#[test]
+fn a_list_entry_of_the_first_list_takes_the_cause_of_what_it_says() {
+    let row = row_with(
+        "every ws as w, every w.ys whose n is w.n as y",
+        json!(["y.n is 1", "w.v is at least $params.min"]),
+        json!({"ws": [{"n": 1, "v": 1, "ys": [{"n": 1}]}, {"v": "a"}]}),
+        json!({"min": null}),
+    );
+    assert!(
+        entries(&row["failures"])
+            .contains(&"list ws absent: item 2 of ws: w.n is missing".to_string()),
+        "{:?}",
+        entries(&row["failures"])
+    );
+}
+
+#[test]
+fn a_root_of_the_second_whose_joined_with_a_first_alias_sentence_is_said_by_an_entry() {
+    let row = row_with(
+        "some ws as w, every ys whose n is w.n as y",
+        json!(["y.n is w.n", "w.v is in $params.z"]),
+        json!({"ws": [{"v": "a", "n": null}], "ys": [{}]}),
+        json!({"z": [1, 2]}),
+    );
+    assert_eq!(
+        row["message"],
+        "item 1 of ws: w.n is null, and w.v is \"a\", which isn't a number; item 1 of ws: item 1 of ys: n is missing"
+    );
+    let said = entries(&row["failures"]);
+    assert!(
+        said.iter()
+            .any(|entry| entry.ends_with("item 1 of ws: w.n is null")),
+        "{said:?}"
+    );
+}
