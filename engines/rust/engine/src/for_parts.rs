@@ -1,5 +1,5 @@
 use crate::cause::Cause;
-use crate::ops::clause::{self, Clause, Kind};
+use crate::ops::clause::{self, Clause, Kind, Owner};
 use crate::ops::for_line::{self, For};
 use crate::ops::{self, Check};
 use crate::parts::{Failure, Part};
@@ -1065,16 +1065,16 @@ pub fn for_failures(
         }) {
             ops::push_new(&mut row_said, clause.text.clone());
         }
-        let dead = failed
-            .iter()
-            .any(|f| text(f, "item") == part.name && list(f, "failed_assertions").is_empty());
-        for clause in row
-            .iter()
-            .filter(|clause| dead && clause.kind == Kind::Item && clause.name == part.name)
-        {
+        for clause in row.iter().filter(|clause| {
+            clause.kind == Kind::Item && clause.name == part.name && !sentence_said(clause)
+        }) {
             let mut kids_said: Vec<String> = Vec::new();
             said_by(entry, &[], &mut kids_said);
-            for inner in clause.said.iter().filter(|inner| inner.kind == Kind::Item) {
+            for inner in clause
+                .said
+                .iter()
+                .filter(|inner| inner.kind == Kind::Item && inner.owners.contains(&Owner::Item))
+            {
                 let named = part
                     .failures
                     .iter()
@@ -1315,6 +1315,14 @@ pub fn for_failures(
     out.extend(lists);
     out.extend(rest.into_iter().filter_map(said_item));
     out
+}
+
+fn sentence_said(clause: &Clause) -> bool {
+    clause
+        .owners
+        .iter()
+        .any(|owner| matches!(owner, Owner::Sentence(_)))
+        || clause.said.iter().any(sentence_said)
 }
 
 fn said_item(entry: Failure) -> Option<Failure> {
