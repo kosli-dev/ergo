@@ -2435,8 +2435,6 @@ fn for_line_cases() -> Vec<(String, Value, Value, Value)> {
     out
 }
 
-const ENTRY_CAUSE: &str = "the tree gives an item the cause the case gives its entry and Rust's entry doesn't, until R5-7 builds the entries from the clauses";
-
 const OTHER_SUBJECTS_CAUSE: &str = "the tree gives item 1 of ys its own cause, absent, as for.try says, in a subject where neither engine gives it an entry, and this test compares it with the entries of the same name in the case's other subjects, which are unusable and null";
 
 const SAID_NOWHERE: &str = "the row fails from something it says nowhere, a subject that isn't an object or an item of the first list that picks nothing, as for.pick says, so no clause of the tree carries that cause, and the row takes that cause from the line";
@@ -2453,24 +2451,9 @@ const ROWS_THE_CLAUSES_DONT_SAY_YET: &[(&str, usize, &str)] = &[
         SAID_NOWHERE,
     ),
     (
-        "for / a for line sorted by a key from $params that is missing says the key once and gives an item an entry only for its own problem / an item whose m is a list and an item without m",
-        1,
-        ENTRY_CAUSE,
-    ),
-    (
         "for / a for line walks a subject that is a list / an empty list fails as value, and a null subject as not_an_object",
         2,
         SAID_NOWHERE,
-    ),
-    (
-        "for / a for line whose second list has a named by key from $params that is missing / says the key once and then each item's list that fails whatever the key",
-        1,
-        ENTRY_CAUSE,
-    ),
-    (
-        "for / a for line whose second list has a named by key from $params that isn't text / says the key once on the row, after the sentence that doesn't read x",
-        1,
-        ENTRY_CAUSE,
     ),
     (
         "for / a for line walks a subject that is a list / an empty list fails as value, and a null subject as not_an_object",
@@ -4913,4 +4896,112 @@ fn an_item_of_a_second_list_its_whose_cant_read_sits_on_the_row_after_the_senten
             "  item item 2 of approvers absent: commit is missing"
         ]
     );
+}
+
+#[test]
+fn a_sentence_that_reads_only_the_first_alias_has_an_entry_for_an_item_whose_second_list_fails() {
+    let row = row(
+        "every ws as w, every w.ys as y",
+        json!(["y is 1", "w.n is 1", "z is 3"]),
+        json!({"z": 2, "ws": [{"n": 2, "ys": [1]}, {"n": 2, "ys": null}, {"n": 1}]}),
+    );
+    assert_eq!(
+        row["message"],
+        "z is 2; item 1 of ws: w.n is 2; item 2 of ws: w.n is 2; item 2 of ws: w.ys is null; item 3 of ws: w.ys is missing"
+    );
+    assert_eq!(
+        entries(&row["failures"]),
+        [
+            "assertion w.n is 1 value: ",
+            "  item item 1 of ws value: w.n is 2",
+            "  item item 2 of ws value: w.n is 2",
+            "assertion z is 3 value: z is 2",
+            "item item 2 of ws null: ",
+            "  list w.ys null: w.ys is null",
+            "item item 3 of ws absent: ",
+            "  list w.ys absent: w.ys is missing"
+        ]
+    );
+}
+
+#[test]
+fn a_second_list_whose_key_cant_be_read_has_an_entry_only_where_it_fails_whatever_the_key() {
+    let row = row_with(
+        "every ws as w, every w.o named by $params.k as x",
+        json!("x is 1"),
+        json!({"ws": [{"o": {"a": [1]}}, {"o": "s"}, {}]}),
+        json!({}),
+    );
+    assert_eq!(
+        row["message"],
+        "$params.k is missing; item 2 of ws: w.o is \"s\", which isn't a list or an object; item 3 of ws: w.o is missing"
+    );
+    assert_eq!(
+        entries(&row["failures"]),
+        [
+            "item item 2 of ws unusable: ",
+            "  list w.o unusable: w.o is \"s\", which isn't a list or an object",
+            "item item 3 of ws absent: ",
+            "  list w.o absent: w.o is missing"
+        ]
+    );
+    assert_eq!(
+        row["failures"][0]["failures"][0]["inputs"],
+        json!([{"name": "w.o", "value": "s", "outcome": "unusable", "locations": ["/things/0/ws/1/o"]}])
+    );
+    assert_eq!(
+        row["failures"][1]["failures"][0]["inputs"],
+        json!([{"name": "w.o", "value": null, "outcome": "absent", "locations": ["/things/0/ws/2"]}])
+    );
+    let fine = row_with(
+        "every ws as w, every w.o named by $params.k as x",
+        json!(["x is 1", "w.n is 1"]),
+        json!({"ws": [{"o": {"a": [1]}, "n": 2}, {"o": {"a": [1]}, "n": 1}]}),
+        json!({"k": 3}),
+    );
+    assert_eq!(
+        entries(&fine["failures"]),
+        ["assertion w.n is 1 value: ", "  item item 1 of ws value: w.n is 2"]
+    );
+}
+
+#[test]
+fn a_sort_key_that_cant_be_read_is_a_row_input_and_an_item_has_an_entry_only_for_its_own_problem() {
+    let row = row_with(
+        "first of rows sorted by m named by $params.km as r",
+        json!("r.v is 1"),
+        json!({"rows": [{"m": [5, 1]}, {"m": {"a": 1}}, {"v": 1}]}),
+        json!({}),
+    );
+    assert_eq!(
+        row["message"],
+        "$params.km is missing; item 1 of rows: m is [5, 1], which isn't an object; item 3 of rows: m is missing"
+    );
+    assert_eq!(
+        entries(&row["failures"]),
+        [
+            "item item 1 of rows unusable: m is [5, 1], which isn't an object",
+            "item item 3 of rows absent: m is missing"
+        ]
+    );
+    assert_eq!(row["failures"][1]["inputs"][0]["name"], "rows[2].m");
+    for rows in [json!([{"m": [5, 1]}]), json!([]), json!({})] {
+        let row = row_with(
+            "first of rows sorted by m named by $params.km as r",
+            json!("r.v is 1"),
+            json!({ "rows": rows }),
+            json!({}),
+        );
+        let keys: Vec<&Value> = row["inputs"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter(|input| input["name"] == "$params.km")
+            .collect();
+        assert_eq!(
+            keys,
+            [&json!({"name": "$params.km", "value": null, "outcome": "absent", "locations": ["$params:"]})],
+            "{rows}"
+        );
+    }
 }
