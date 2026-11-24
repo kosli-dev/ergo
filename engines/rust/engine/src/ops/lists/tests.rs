@@ -1069,6 +1069,42 @@ fn a_key_read_from_a_list_input_says_the_input_isnt_an_object_whatever_the_sente
     }
 }
 
+#[test]
+fn a_list_read_from_a_list_input_after_a_phrase_that_walks_it_says_no_key_fault() {
+    let item = json!({"k": "a", "rs": [{"v": "a"}]});
+    let input = json!([item.clone()]);
+    let ctx = Ctx {
+        label: None,
+        item_by_item: true,
+        subject: Located {
+            value: &item,
+            location: Location::input_root(),
+        },
+        input: &input,
+        params: None,
+        aliases: BTreeMap::new(),
+    };
+    for sentence in [
+        "k is in $input.ls",
+        "k is not in $input.ls",
+        "k is one of $input.ls",
+        "k is in $input.ls ignoring case",
+        "e.v is in $input.ls",
+        "every rs.v is in $input.ls",
+        "k matches $input.ls",
+        "k contains all of $input.ls",
+    ] {
+        assert!(
+            input_key_fault(&assertion(sentence), &ctx).is_empty(),
+            "{sentence}"
+        );
+    }
+    assert_eq!(
+        input_key_fault(&assertion("k contains $input.ls"), &ctx).len(),
+        1
+    );
+}
+
 const BOTH: super::super::compare::Ignoring = super::super::compare::Ignoring {
     case: true,
     spaces: true,
