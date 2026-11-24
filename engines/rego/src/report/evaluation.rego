@@ -468,6 +468,24 @@ _ref_node_unfit(x, r, _) if {
 	_node_param_broken(x)
 }
 
+_ref_node_unfit(x, r, v) if {
+	x.ignoring
+	x.op in _membership_ops
+	x.values == {"ref": r}
+	_text_list_unfit(r, v)
+}
+
+_text_list_unfit(r, v) if {
+	not _ref_walks(r)
+	is_array(v)
+	_text_items_state(v)
+}
+
+_text_list_unfit(r, _) if {
+	_ref_walks(r)
+	_text_items_state(_ref_walk(r).value)
+}
+
 _ref_side_kind(x) := "text" if x.ignoring
 
 else := "a number" if "within" in object.keys(x)
