@@ -337,3 +337,51 @@ const NO_ENTRY_YET_FOR_AN_ITEM_WHOSE_SECOND_LIST_FAILS: [&str; 3] = [
     "for / a list that a second for line's sentence walks on the right through the first line's alias fails it as value on an empty list when the list is empty / fails as value, with an empty second list, when each item of the list the alias reads holds an empty list / beside / sentence 2",
     "for / a list that a second for line's sentence walks on the right through the first line's alias fails it as value on an empty list when the list is empty / fails as value for the item of the first line whose list is empty, and some passes on the other item / beside / sentence 2",
 ];
+
+fn ergo_keys(value: &Value, at: &str, out: &mut Vec<String>) {
+    match value {
+        Value::Object(map) => {
+            for (key, inner) in map {
+                if key.starts_with("ergo/") {
+                    out.push(format!("{at}/{key}"));
+                }
+                ergo_keys(inner, &format!("{at}/{key}"), out);
+            }
+        }
+        Value::Array(list) => {
+            for (n, inner) in list.iter().enumerate() {
+                ergo_keys(inner, &format!("{at}/{n}"), out);
+            }
+        }
+        _ => {}
+    }
+}
+
+#[test]
+fn no_report_holds_an_ergo_key() {
+    let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../../spec/cases");
+    let mut topics: Vec<std::path::PathBuf> = std::fs::read_dir(&dir)
+        .unwrap()
+        .map(|entry| entry.unwrap().path())
+        .filter(|path| path.is_dir())
+        .collect();
+    topics.sort();
+    let mut reports = 0;
+    let mut found: Vec<String> = Vec::new();
+    for topic in topics {
+        let text = std::fs::read_to_string(topic.join("cases.json"))
+            .unwrap()
+            .replace("{{spec}}", SPEC);
+        let groups: Value = serde_json::from_str(&text).unwrap();
+        for group in groups.as_array().unwrap() {
+            let params = group.get("params").cloned().unwrap_or_else(|| json!({}));
+            for case in group["cases"].as_array().unwrap() {
+                let report = ergo_policy_engine::report(&case["input"], &group["policy"], &params);
+                reports += 1;
+                ergo_keys(&report, &topic.display().to_string(), &mut found);
+            }
+        }
+    }
+    assert!(reports > 1000, "{reports}");
+    assert_eq!(found, Vec::<String>::new());
+}

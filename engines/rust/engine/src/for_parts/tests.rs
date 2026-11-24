@@ -587,3 +587,20 @@ fn every_clause_of_a_row_whose_sort_key_is_named_by_params_that_arent_text_is_sa
         );
     }
 }
+
+#[test]
+fn a_some_line_over_a_second_list_says_each_items_missing_field_on_the_assertion_and_on_the_item() {
+    assert_eq!(
+        entries(
+            "some approvers as approver, every commits as commit",
+            json!("approver.state is \"APPROVED\""),
+            json!({"approvers": [{}, {}], "commits": [{}]}),
+            json!({}),
+        ),
+        [
+            "assertion approver.state is \"APPROVED\" [absent] \"item 1 of approvers: approver.state is missing; item 2 of approvers: approver.state is missing\" ()",
+            "  item item 1 of approvers [absent] \"approver.state is missing\" (\"approver.state\" \"absent\")",
+            "  item item 2 of approvers [absent] \"approver.state is missing\" (\"approver.state\" \"absent\")",
+        ]
+    );
+}
