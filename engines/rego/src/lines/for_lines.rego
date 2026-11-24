@@ -199,19 +199,19 @@ _for_some_passed(check, rr, xs) if {
 	not i in unread
 }
 
-_for_second_rooted(rr, xs) := object.union(rr, {"cause": _worst_of({rr.cause} | {x.fl | some x in xs}), "root_msgs": array.concat(rr.root_msgs, [m | some x in xs; some m in x.ms])}) if {
+_for_second_rooted(rr, xs) := object.union(rr, {"cause": _worst_or_value({rr.cause} | {x.fl | some x in xs}), "root_msgs": array.concat(rr.root_msgs, [m | some x in xs; some m in x.ms])}) if {
 	"root_msgs" in object.keys(rr)
-} else := object.union(rr, {"cause": _worst_of({rr.cause} | {x.fl | some x in xs}), "other_roots": array.concat(rr.other_roots, [m | some x in xs; some m in x.ms])}) if {
+} else := object.union(rr, {"cause": _worst_or_value({rr.cause} | {x.fl | some x in xs}), "other_roots": array.concat(rr.other_roots, [m | some x in xs; some m in x.ms])}) if {
 	"other_roots" in object.keys(rr)
-} else := object.union(rr, {"cause": _worst_of({x.fl | some x in xs}), "failed": [], "root_msgs": [m | some x in xs; some m in x.ms]}) if {
+} else := object.union(rr, {"cause": _worst_or_value({x.fl | some x in xs}), "failed": [], "root_msgs": [m | some x in xs; some m in x.ms]}) if {
 	rr.cause == "satisfied"
-} else := object.union(rr, {"cause": _worst_of({rr.cause} | {x.fl | some x in xs}), "other_roots": [m | some x in xs; some m in x.ms]}) if {
+} else := object.union(rr, {"cause": _worst_or_value({rr.cause} | {x.fl | some x in xs}), "other_roots": [m | some x in xs; some m in x.ms]}) if {
 	_for_list_failures(rr)
-} else := object.union(rr, {"cause": _worst_of({x.fl | some x in xs}), "failed": [], "root_msgs": [m | some x in xs; some m in x.ms]}) if {
+} else := object.union(rr, {"cause": _worst_or_value({x.fl | some x in xs}), "failed": [], "root_msgs": [m | some x in xs; some m in x.ms]}) if {
 	rr.cause == "value"
 } else := object.union(rr, {"root_msgs": [m | some x in xs; some m in x.ms]}) if {
-	rr.cause == _worst_of({x.fl | some x in xs})
-} else := object.union(rr, {"cause": _worst_of({rr.cause} | {x.fl | some x in xs}), "other_roots": [m | some x in xs; some m in x.ms]})
+	rr.cause == _worst_or_value({x.fl | some x in xs})
+} else := object.union(rr, {"cause": _worst_or_value({rr.cause} | {x.fl | some x in xs}), "other_roots": [m | some x in xs; some m in x.ms]})
 
 _for_list_failures(r) if {
 	r.cause != "satisfied"
@@ -299,10 +299,15 @@ _for_second_roots(check, subj) := [{"i": e.i, "fl": fl, "ms": ms, "raw": [_m_ali
 	some c in conds
 	fl := _root_read_flaw(subj, c) with input as {"ergo/names": names}
 	not fl in _tolerated_root_flaws
+	_second_root_counts(fl)
 	said := array.concat(_m_cond_root_texts(subj, c), _m_walked_root_texts(c)) with input as {"ergo/names": names}
 	ms := [_m_under(_m_for_item_name(check, e.i), _m_aliased(m)) | some m in said; not m in outer]
 	ms != []
 ]
+
+_second_root_counts(fl) if fl != "value"
+
+_second_root_counts("value") if _walk_roots_on
 
 _for_row_message(check, subj, r) := {"message": _m_joined(array.concat(_m_tally_grouped(check, once), parts)), "once": once, "line": [t | r.failed == []; some t in parts]} if {
 	rs := object.get(r, "root_msgs", object.get(r, "other_roots", []))
