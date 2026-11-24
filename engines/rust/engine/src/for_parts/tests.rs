@@ -486,3 +486,14 @@ fn a_tie_on_the_sort_key_is_said_by_the_tied_item_and_not_by_the_assertion() {
         ]
     );
 }
+
+#[test]
+fn an_item_with_its_own_entry_on_the_row_is_said_by_that_entry_and_not_by_the_assertion() {
+    let said = entries(
+        "every ws as w, every w.ys, if any, as y",
+        json!("w.n is 2"),
+        json!({"ws": [{"n": 1}, [1], {"n": "a"}]}),
+        json!({}),
+    );
+    assert_eq!(said[0], "assertion w.n is 2 [unusable] \"\" ()");
+}
