@@ -16,5 +16,5 @@ path = "src/main.rs"
 
 [dependencies]
 ergo-policy-engine = { path = "../engine", version = "0.5.0-dev" }
-saphyr-parser = "0.3"
+saphyr-parser = "0.4"
 serde_json = { version = "1", features = ["arbitrary_precision"] }
