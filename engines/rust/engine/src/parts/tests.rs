@@ -702,3 +702,67 @@ fn a_list_entry_keeps_its_own_name_in_its_message_when_the_text_says_it() {
     let leaf = &out[0].part().failures[0].part().failures;
     assert_eq!(leaf[0].part().message, "w: is missing");
 }
+
+fn value_of(entry: &Failure) -> Value {
+    match entry {
+        Failure::Item { value, .. } => value.clone(),
+        _ => Value::Null,
+    }
+}
+
+#[test]
+fn an_item_whose_place_goes_past_it_sits_under_the_item_it_is_in() {
+    let input = json!({"commits": [{"files": [{"t": 1}, {"t": 9}]}]});
+    for (name, place) in [
+        ("item 1 of commits[0].files", "/commits/0/files/0/t"),
+        ("item 2 of commits[0].files", "/commits/0/files/1/t"),
+    ] {
+        let out = nest(vec![failed_item(name, place, "t is 1")], &input);
+        assert_eq!(
+            names_and_places(&out),
+            [pair("item 1 of commits", "/commits/0")],
+            "{name}"
+        );
+        assert_eq!(value_of(&out[0]), input["commits"][0], "{name}");
+    }
+}
+
+fn entries_named(failures: &Value, name: &str, out: &mut Vec<Value>) {
+    for entry in failures.as_array().into_iter().flatten() {
+        if entry["name"] == name {
+            out.push(entry.clone());
+        }
+        entries_named(&entry["failures"], name, out);
+    }
+}
+
+#[test]
+fn an_item_of_a_list_in_the_params_holds_its_value_from_the_params() {
+    let params = json!({"commits": [{"files": [{"t": 1}]}]});
+    for check in [
+        json!({"assert": "every $params.commits.files.t is at least 5"}),
+        json!({"for": "every approvers as approver, every $params.commits.files as f", "assert": "approver.t is more than f.t"}),
+    ] {
+        let policy = json!({
+            "ergo_spec": crate::SPEC,
+            "subjects": {"thing": {"from": "things", "identified_by": "id"}},
+            "requirements": {"r": {"subject": "thing", "checks": {"c": check}}}
+        });
+        let input = json!({"things": [{"id": 1, "approvers": [{"t": 0}]}]});
+        let report = crate::report(&input, &policy, &params);
+        let row = report["results"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|row| row["check"] == "c")
+            .unwrap()
+            .clone();
+        let mut found = Vec::new();
+        entries_named(&row["failures"], "item 1 of $params.commits", &mut found);
+        assert!(!found.is_empty(), "{check}");
+        for entry in found {
+            assert_eq!(entry["value"], params["commits"][0], "{check}");
+            assert_eq!(entry["locations"], json!(["$params:/commits/0"]), "{check}");
+        }
+    }
+}
