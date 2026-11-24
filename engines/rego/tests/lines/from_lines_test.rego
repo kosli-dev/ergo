@@ -53,3 +53,13 @@ test_a_failing_row_whose_check_compares_ignoring_case_with_a_walked_list_is_read
 	params := {"op": "in", "path": ["v"], "values": {"ref": ["$$params[]", "l"]}, "ignoring": "case"}
 	not ergo._text_walk_rooted(object.union(whose, {"whose": [params]})) with input as {"ergo/names": {"ergo/subject": {"xs": []}}} with data.ergo_params as {"l": [3]}
 }
+
+test_a_failing_for_row_over_an_empty_list_is_read_again_with_a_part_after_is_in_ignoring_case_that_walks_a_list if {
+	right := [`${"alias":"pl","n":2,"of":null,"old":false}`, "items", "allowed"]
+	assertion := {"cmp": "in", "ignoring": "case", "left": ["$e", "v"], "op": "compare", "right": right}
+	for_c := {"op": "for", "checks": [assertion], "items": [{"as": "e", "if_any": false, "path": ["xs"], "q": "every", "whose": []}]}
+	raw := {"passed": false, "inputs": [{"value": []}]}
+	subj := {"xs": [], "items": [{"allowed": ["a"]}, {"allowed": ["b", 3]}]}
+	ergo._walk_read_again(raw, for_c) with input as {"ergo/names": {"ergo/subject": subj}}
+	not ergo._walk_read_again(raw, object.union(object.remove(for_c, ["checks"]), {"checks": [object.remove(assertion, ["ignoring"])]})) with input as {"ergo/names": {"ergo/subject": subj}}
+}
