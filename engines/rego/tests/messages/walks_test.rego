@@ -521,3 +521,10 @@ test_a_walked_list_after_is_in_ignoring_case_in_a_count_whose_is_said_as_a_root_
 	ergo._m_tally_walked(ref, stopped) == [["unusable", "item 1 of $input.cs: name is 3, which isn't text"]] with input as {"ergo/names": {"ergo/subject": {}}} with data.ergo_document as {"cs": [{"name": 3}]}
 	ergo._m_tally_walked(object.remove(ref, ["ignoring"]), stopped) == [] with input as {"ergo/names": {"ergo/subject": {}}} with data.ergo_document as {"cs": [{}]}
 }
+
+test_a_list_after_is_in_ignoring_case_read_from_each_item_of_a_subject_that_is_a_list_names_its_null_items_in_list_order if {
+	c := {"op": "compare", "cmp": "in", "left": ["$$params", "v"], "right": [`${"alias":"thing","n":0,"of":null,"old":true}`, "states"], "ignoring": "case"}
+	ergo._m_walked_root_text(c, "null") == "item 2 of thing: item 2 of states is null" with input as {"ergo/names": {"ergo/subject": [{"states": ["A"]}, {"states": ["b", null]}]}}
+	ergo._m_walked_root_text(c, "null") == "item 1 of thing: item 1 of states is null; item 2 of thing: item 1 of states is null" with input as {"ergo/names": {"ergo/subject": [{"states": [null]}, {"states": [null]}]}}
+	ergo._m_walked_root_text(c, "unusable") == "item 1 of thing: item 1 of states is null; item 1 of thing: item 2 of states is 4, which isn't text" with input as {"ergo/names": {"ergo/subject": [{"states": [null, 4]}]}}
+}
