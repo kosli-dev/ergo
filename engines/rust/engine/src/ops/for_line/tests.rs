@@ -2441,8 +2441,6 @@ const OTHER_SUBJECTS_CAUSE: &str = "the tree gives item 1 of ys its own cause, a
 
 const SAID_NOWHERE: &str = "the row fails from something it says nowhere, a subject that isn't an object or an item of the first list that picks nothing, as for.pick says, so no clause of the tree carries that cause, and the row takes that cause from the line";
 
-const ROW_LEAVES_OUT_AN_ITEM: &str = "the row and the tree leave out the item of the second list that the whose can't read, which the case says and which gives the row its cause, and the case is in known-failures.txt until the Rust engine says that item";
-
 const ROWS_THE_CLAUSES_DONT_SAY_YET: &[(&str, usize, &str)] = &[
     (
         "for / a for line on a subject that isn't an object / fails as not_an_object when the first path starts at the subject",
@@ -2508,16 +2506,6 @@ const ROWS_THE_CLAUSES_DONT_SAY_YET: &[(&str, usize, &str)] = &[
         "for / a second for item picking after the first alias lists nothing when it picks nothing / a first item that fails its check is listed and one that matches nothing is not",
         1,
         SAID_NOWHERE,
-    ),
-    (
-        "for / an item of a second list that the whose can't read is said beside an item that fails the sentence / one deploy and one approver fail the sentence, and one of each has no key",
-        1,
-        ROW_LEAVES_OUT_AN_ITEM,
-    ),
-    (
-        "for / an item of a second list that the whose can't read is said beside an item that fails the sentence / one deploy and one approver fail the sentence, and one of each has no key",
-        2,
-        ROW_LEAVES_OUT_AN_ITEM,
     ),
     (
         "messages / a root that reads the alias of the first item of a for line, in the second item / fails before any item of the second list, naming each first item, on an empty list too",
@@ -4897,6 +4885,32 @@ fn an_items_own_problem_beside_a_root_its_sentence_cant_read_is_an_item_entry_un
             "assertion w.v is at least $params.min unusable: $params.min is null",
             "  item item 2 of ws unusable: w.v is \"a\", which isn't a number",
             "  item item 3 of ws absent: w.v is missing"
+        ]
+    );
+}
+
+#[test]
+fn an_item_of_a_second_list_its_whose_cant_read_sits_on_the_row_after_the_sentences() {
+    let row = row(
+        "every commits as c, every approvers whose commit is c.id as ap",
+        json!("ap.ok is true"),
+        json!({
+            "commits": [{"id": "c1"}],
+            "approvers": [{"commit": "c1", "ok": false}, {"ok": true}]
+        }),
+    );
+    assert_eq!(
+        row["message"],
+        "item 1 of commits: item 1 of approvers: ap.ok is false; item 1 of commits: item 2 of approvers: commit is missing"
+    );
+    assert_eq!(
+        entries(&row["failures"]),
+        [
+            "assertion ap.ok is true value: ",
+            "  item item 1 of commits value: ",
+            "    item item 1 of approvers value: ap.ok is false",
+            "item item 1 of commits absent: ",
+            "  item item 2 of approvers absent: commit is missing"
         ]
     );
 }
