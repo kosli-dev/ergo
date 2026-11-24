@@ -722,3 +722,17 @@ fn a_clause_the_row_counts_in_and_n_more_is_said_by_the_list_entry() {
         ]
     );
 }
+
+#[test]
+fn an_assertion_says_each_piece_of_an_items_clause_that_holds_a_root_with_more_than_three_problems()
+{
+    assert_eq!(
+        entries(
+            "every ws as w, every ys as y",
+            json!("w.v is in pos.name"),
+            json!({"ws": [{"n": 2}], "ys": [{"n": 1}], "pos": [{"name": 1}, {"x": 1}, {"x": 2}, {"x": 3}, {"x": 4}]}),
+            json!({}),
+        )[0],
+        "assertion w.v is in pos.name [absent] \"item 1 of ws: w.v is missing, and item 2 of pos: name is missing; item 3 of pos: name is missing; item 4 of pos: name is missing\" (\"pos[].name\" \"usable\")"
+    );
+}
