@@ -118,3 +118,12 @@ test_a_list_after_is_in_ignoring_case_that_holds_an_item_that_isnt_text_has_the_
 	ergo._ref_use(walked, w) == "unusable" with data.ergo_document as [{"ok": ["a"]}, {"ok": ["b", 3]}]
 	ergo._ref_use(walked, w) == "usable" with data.ergo_document as [{"ok": ["a"]}, {"ok": ["b"]}]
 }
+
+test_a_walked_list_after_is_in_ignoring_case_that_holds_a_null_item_has_the_outcome_unusable_in_refs if {
+	w := ["$$input[]", "ok"]
+	walked := {"op": "in", "path": ["x"], "values": {"ref": w}, "ignoring": "case"}
+	ergo._ref_use(walked, w) == "unusable" with data.ergo_document as [{"ok": ["a"]}, {"ok": ["b", null]}]
+	ergo._ref_use(walked, w) == "absent" with data.ergo_document as [{"ok": ["a"]}, {}]
+	ergo._ref_use(walked, w) == "null" with data.ergo_document as [{"ok": ["a"]}, {"ok": null}]
+	ergo._ref_use(object.remove(walked, ["ignoring"]), w) == "null" with data.ergo_document as [{"ok": ["a"]}, {"ok": ["b", null]}]
+}
