@@ -100,3 +100,21 @@ test_a_side_of_is_ignoring_case_read_from_a_ref_needs_text_whatever_the_comparis
 	ergo._ref_side_kind({"op": "compare", "cmp": "eq", "left": ["x"], "right": {"ref": ["$$params", "v"]}, "ignoring": "case"}) == "text"
 	ergo._ref_side_kind({"op": "compare", "cmp": "ne", "left": ["x"], "right": {"ref": ["$$params", "v"]}, "ignoring": "surrounding spaces"}) == "text"
 }
+
+test_a_list_after_is_in_ignoring_case_that_holds_an_item_that_isnt_text_has_the_outcome_unusable_in_refs if {
+	r := ["$$params[]", "l"]
+	c := {"op": "in", "path": ["x"], "values": {"ref": r}, "ignoring": "case"}
+	ergo._ref_use(c, r) == "unusable" with data.ergo_params as {"l": ["a", 3]}
+	ergo._ref_use(c, r) == "unusable" with data.ergo_params as {"l": ["a", null]}
+	ergo._ref_use(c, r) == "unusable" with data.ergo_params as {"l": [null]}
+	ergo._ref_use(c, r) == "usable" with data.ergo_params as {"l": ["a"]}
+	ergo._ref_use(c, r) == "usable" with data.ergo_params as {"l": []}
+	ergo._ref_use(object.union(c, {"op": "not_in"}), r) == "unusable" with data.ergo_params as {"l": [1, 2]}
+	ergo._ref_use(object.remove(c, ["ignoring"]), r) == "usable" with data.ergo_params as {"l": ["a", null]}
+	every_c := {"op": "every", "path": ["xs", "v"], "check": c, "whose": [], "if_any": false}
+	ergo._ref_use(every_c, r) == "unusable" with data.ergo_params as {"l": ["a", null]}
+	w := ["$$input[]", "ok"]
+	walked := {"op": "in", "path": ["x"], "values": {"ref": w}, "ignoring": "case"}
+	ergo._ref_use(walked, w) == "unusable" with data.ergo_document as [{"ok": ["a"]}, {"ok": ["b", 3]}]
+	ergo._ref_use(walked, w) == "usable" with data.ergo_document as [{"ok": ["a"]}, {"ok": ["b"]}]
+}
