@@ -640,3 +640,37 @@ fn two_clauses_of_one_item_from_two_sentences_keep_each_owner_and_read_the_same(
     assert_eq!(text(&back), text(&kept));
     assert_eq!(owners(&back), owners(&kept));
 }
+
+#[test]
+fn an_items_clauses_about_the_same_item_under_it_share_one_piece() {
+    let said = vec![
+        unread(
+            "item 1 of w.ys",
+            Cause::Absent,
+            "item 1 of w.ys: v is missing",
+        ),
+        unread("item 1 of w.ys", Cause::Null, "item 1 of w.ys: k is null"),
+    ];
+    assert_eq!(
+        item_says("item 1 of ws", "w", &said),
+        "item 1 of w.ys: v is missing, and k is null"
+    );
+}
+
+#[test]
+fn an_items_clauses_about_different_items_under_it_are_said_apart() {
+    let said = vec![
+        missing("w.n"),
+        unread(
+            "item 1 of w.ys",
+            Cause::Absent,
+            "item 1 of w.ys: v is missing",
+        ),
+        null("w.m"),
+        unread("item 2 of w.ys", Cause::Null, "item 2 of w.ys: v is null"),
+    ];
+    assert_eq!(
+        item_says("item 1 of ws", "w", &said),
+        "w.n is missing, and w.m is null; item 1 of w.ys: v is missing; item 2 of w.ys: v is null"
+    );
+}
