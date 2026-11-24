@@ -220,3 +220,28 @@ test_a_line_that_isnt_a_for_line_keeps_no_roots_for_its_sentences if {
 	said.all == ergo._walk_root_said(check, subj) with input as names with data.ergo_params as {}
 	said.all != []
 }
+
+test_an_empty_list_on_the_right_of_a_one_line_walk_is_a_root_flaw_only_when_the_walked_roots_are_read_again if {
+	check := ergo._s_written_check("every xs.v, if any, is in $input.cs.name")
+	subj := {"xs": []}
+	names := {"ergo/names": {"ergo/subject": subj, "$at": {"names": {}}}}
+	ergo._leaf_root_flaw(check, subj) == "" with input as names with data.ergo_document as {"cs": []}
+	ergo._leaf_root_flaw(check, subj) == "value" with input as names with ergo._walk_roots_on as true with data.ergo_document as {"cs": []}
+	ergo._leaf_root_flaw(check, subj) == "value" with input as names with ergo._walk_roots_on as true with data.ergo_document as {"cs": [{"name": []}]}
+	ergo._leaf_root_flaw(check, subj) == "" with input as names with ergo._walk_roots_on as true with data.ergo_document as {"cs": [{"name": "a"}]}
+}
+
+test_an_empty_list_a_for_line_sentence_walks_on_the_right_is_a_root_flaw_only_when_the_walked_roots_are_read_again if {
+	every sentence in ["r.v is in q.name", "r.v is not one of q.name", "r.tags contains all of q.name"] {
+		check := ergo._s_written_check({"for": "every rows, if any, as r", "assert": sentence})
+		every q in [[], [{"name": []}]] {
+			subj := {"rows": [], "q": q}
+			names := {"ergo/names": {"ergo/subject": subj, "$at": {"names": {}}}}
+			ergo._walk_root_flaw(check, subj) == "" with input as names
+			ergo._walk_root_flaw(check, subj) == "value" with input as names with ergo._walk_roots_on as true
+		}
+	}
+	read := {"rows": [], "q": [{"name": "a"}]}
+	check := ergo._s_written_check({"for": "every rows, if any, as r", "assert": "r.v is in q.name"})
+	ergo._walk_root_flaw(check, read) == "" with input as {"ergo/names": {"ergo/subject": read, "$at": {"names": {}}}} with ergo._walk_roots_on as true
+}

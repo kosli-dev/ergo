@@ -4275,7 +4275,6 @@ fn sentence_root_faults(forms: &[(Check, bool)], ctx: &Ctx) -> Vec<(Cause, Strin
                 if super::walked_roots_on()
                     && bound_alias(root, ctx)
                     && let Some(fault) = super::lists::walked_root_fault(check, root, ctx)
-                    && fault.0 != Cause::Value
                 {
                     found.push(fault);
                 }

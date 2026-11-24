@@ -98879,6 +98879,2519 @@
     }
   },
   {
+    "description": "a list that a for line's sentence walks on the right fails it as value on an empty list when the list is empty or holds only empty lists",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "c": {
+          "from": "cs",
+          "identified_by": "id",
+          "has": {
+            "pos": "os"
+          }
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "c",
+          "checks": {
+            "in": {
+              "for": "every rows, if any, as r",
+              "assert": "r.v is in pos.name"
+            },
+            "not_in": {
+              "for": "every rows, if any, as r",
+              "assert": "r.v is not one of pos.name"
+            },
+            "all": {
+              "for": "every rows, if any, as r",
+              "assert": "r.tags contains all of pos.name"
+            },
+            "whose": {
+              "for": "every rows whose k is 1, if any, as r",
+              "assert": "r.v is in pos.name"
+            },
+            "two": {
+              "for": "every ms as m, every rows, if any, as r",
+              "assert": "r.v is in pos.name"
+            },
+            "walk": {
+              "for": "every rows, if any, as r",
+              "assert": "every r.ys.v, if any, is in pos.name"
+            },
+            "dot": {
+              "for": "every rows, if any, as p",
+              "assert": "p.v is in .p.name"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails as value, with an empty rows, when the list is empty",
+        "rules": [
+          "walk.right.fail",
+          "for.roots",
+          "for.if_any"
+        ],
+        "input": {
+          "cs": [
+            {
+              "id": "c1",
+              "rows": [],
+              "ms": [
+                {
+                  "k": 1
+                }
+              ],
+              "os": [],
+              "p": []
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "all",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/all/assert"
+                ],
+                "message": "pos is []",
+                "name": "r.tags contains all of pos.name"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "pos[].name",
+                "outcome": "usable",
+                "part": {
+                  "id": null,
+                  "name": "pos"
+                },
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "pos is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "dot",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/dot/assert"
+                ],
+                "message": ".p is []",
+                "name": "p.v is in .p.name"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": ".p[].name",
+                "outcome": "usable",
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": ".p is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "in",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/in/assert"
+                ],
+                "message": "pos is []",
+                "name": "r.v is in pos.name"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "pos[].name",
+                "outcome": "usable",
+                "part": {
+                  "id": null,
+                  "name": "pos"
+                },
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "pos is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "not_in",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/not_in/assert"
+                ],
+                "message": "pos is []",
+                "name": "r.v is not in pos.name"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "pos[].name",
+                "outcome": "usable",
+                "part": {
+                  "id": null,
+                  "name": "pos"
+                },
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "pos is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "two",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/two/assert"
+                ],
+                "message": "pos is []",
+                "name": "r.v is in pos.name"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/ms/0"
+                ],
+                "name": "ms[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "k": 1
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "pos[].name",
+                "outcome": "usable",
+                "part": {
+                  "id": null,
+                  "name": "pos"
+                },
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "pos is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "walk",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/walk/assert"
+                ],
+                "message": "pos is []",
+                "name": "every r.ys.v, if any, is in pos.name"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "pos[].name",
+                "outcome": "usable",
+                "part": {
+                  "id": null,
+                  "name": "pos"
+                },
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "pos is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "whose",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/whose/assert"
+                ],
+                "message": "pos is []",
+                "name": "r.v is in pos.name"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "pos[].name",
+                "outcome": "usable",
+                "part": {
+                  "id": null,
+                  "name": "pos"
+                },
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "pos is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as value, with an empty rows, when each item holds an empty list",
+        "rules": [
+          "walk.right.fail",
+          "for.roots",
+          "for.if_any"
+        ],
+        "input": {
+          "cs": [
+            {
+              "id": "c1",
+              "rows": [],
+              "ms": [
+                {
+                  "k": 1
+                }
+              ],
+              "os": [
+                {
+                  "name": []
+                }
+              ],
+              "p": [
+                {
+                  "name": []
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "all",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/all/assert"
+                ],
+                "message": "item 1 of pos: name is []",
+                "name": "r.tags contains all of pos.name"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "pos[].name[]",
+                "outcome": "usable",
+                "part": {
+                  "id": null,
+                  "name": "pos"
+                },
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "item 1 of pos: name is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "dot",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/dot/assert"
+                ],
+                "message": "item 1 of .p: name is []",
+                "name": "p.v is in .p.name"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": ".p[].name[]",
+                "outcome": "usable",
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "item 1 of .p: name is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "in",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/in/assert"
+                ],
+                "message": "item 1 of pos: name is []",
+                "name": "r.v is in pos.name"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "pos[].name[]",
+                "outcome": "usable",
+                "part": {
+                  "id": null,
+                  "name": "pos"
+                },
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "item 1 of pos: name is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "not_in",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/not_in/assert"
+                ],
+                "message": "item 1 of pos: name is []",
+                "name": "r.v is not in pos.name"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "pos[].name[]",
+                "outcome": "usable",
+                "part": {
+                  "id": null,
+                  "name": "pos"
+                },
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "item 1 of pos: name is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "two",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/two/assert"
+                ],
+                "message": "item 1 of pos: name is []",
+                "name": "r.v is in pos.name"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/ms/0"
+                ],
+                "name": "ms[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "k": 1
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "pos[].name[]",
+                "outcome": "usable",
+                "part": {
+                  "id": null,
+                  "name": "pos"
+                },
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "item 1 of pos: name is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "walk",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/walk/assert"
+                ],
+                "message": "item 1 of pos: name is []",
+                "name": "every r.ys.v, if any, is in pos.name"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "pos[].name[]",
+                "outcome": "usable",
+                "part": {
+                  "id": null,
+                  "name": "pos"
+                },
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "item 1 of pos: name is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "whose",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/whose/assert"
+                ],
+                "message": "item 1 of pos: name is []",
+                "name": "r.v is in pos.name"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "pos[].name[]",
+                "outcome": "usable",
+                "part": {
+                  "id": null,
+                  "name": "pos"
+                },
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "item 1 of pos: name is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          }
+        ]
+      },
+      {
+        "description": "passes, with an empty rows, when it holds names",
+        "rules": [
+          "walk.right.fail",
+          "for.roots",
+          "for.if_any"
+        ],
+        "input": {
+          "cs": [
+            {
+              "id": "c1",
+              "rows": [],
+              "ms": [
+                {
+                  "k": 1
+                }
+              ],
+              "os": [
+                {
+                  "name": "a"
+                }
+              ],
+              "p": [
+                {
+                  "name": "a"
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "all",
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/os/0/name"
+                ],
+                "name": "pos[].name",
+                "part": {
+                  "id": null,
+                  "name": "pos"
+                },
+                "value": [
+                  "a"
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "dot",
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/p/0/name"
+                ],
+                "name": ".p[].name",
+                "value": [
+                  "a"
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "in",
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/os/0/name"
+                ],
+                "name": "pos[].name",
+                "part": {
+                  "id": null,
+                  "name": "pos"
+                },
+                "value": [
+                  "a"
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "not_in",
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/os/0/name"
+                ],
+                "name": "pos[].name",
+                "part": {
+                  "id": null,
+                  "name": "pos"
+                },
+                "value": [
+                  "a"
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "two",
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/ms/0"
+                ],
+                "name": "ms[]",
+                "value": [
+                  {
+                    "k": 1
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/cs/0/os/0/name"
+                ],
+                "name": "pos[].name",
+                "part": {
+                  "id": null,
+                  "name": "pos"
+                },
+                "value": [
+                  "a"
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "walk",
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/os/0/name"
+                ],
+                "name": "pos[].name",
+                "part": {
+                  "id": null,
+                  "name": "pos"
+                },
+                "value": [
+                  "a"
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "whose",
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/os/0/name"
+                ],
+                "name": "pos[].name",
+                "part": {
+                  "id": null,
+                  "name": "pos"
+                },
+                "value": [
+                  "a"
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a list that a second for line's sentence walks on the right through the first line's alias fails it as value on an empty list when the list is empty",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "c": {
+          "from": "cs",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "c",
+          "checks": {
+            "every": {
+              "for": "every ms as m, every rows, if any, as r",
+              "assert": "r.v is in m.ys.name"
+            },
+            "some": {
+              "for": "some ms as m, every rows, if any, as r",
+              "assert": "r.v is in m.ys.name"
+            },
+            "alias": {
+              "for": "every ms as m, every m.ws, if any, as w",
+              "assert": "w.v is in m.ys.name"
+            },
+            "whose": {
+              "for": "every ms as m, every vs whose v is 9, if any, as r",
+              "assert": "r.v is in m.ys.name"
+            },
+            "not_in": {
+              "for": "every ms as m, every rows, if any, as r",
+              "assert": "r.v is not one of m.ys.name"
+            },
+            "all": {
+              "for": "every ms as m, every rows, if any, as r",
+              "assert": "r.tags contains all of m.ys.name"
+            },
+            "beside": {
+              "for": "every ms as m, every rows, if any, as r",
+              "assert": [
+                "m.v is 1",
+                "r.v is in m.ys.name"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails as value, with an empty second list, when the list the alias reads is empty",
+        "rules": [
+          "walk.right.fail",
+          "for.roots",
+          "for.if_any"
+        ],
+        "input": {
+          "cs": [
+            {
+              "id": "c1",
+              "rows": [],
+              "vs": [
+                {
+                  "v": 1
+                }
+              ],
+              "ms": [
+                {
+                  "v": 1,
+                  "ys": [],
+                  "ws": []
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "alias",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/alias/assert"
+                ],
+                "message": "item 1 of ms: m.ys is []",
+                "name": "w.v is in m.ys.name"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "m.ws[]",
+                "outcome": "usable",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/cs/0/ms/0"
+                ],
+                "name": "ms[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "v": 1,
+                    "ws": [],
+                    "ys": []
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of ms: m.ys is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "all",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/all/assert"
+                ],
+                "message": "item 1 of ms: m.ys is []",
+                "name": "r.tags contains all of m.ys.name"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/ms/0"
+                ],
+                "name": "ms[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "v": 1,
+                    "ws": [],
+                    "ys": []
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "item 1 of ms: m.ys is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "beside",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/ms/0"
+                    ],
+                    "name": "ms[]",
+                    "outcome": "usable",
+                    "value": [
+                      {
+                        "v": 1,
+                        "ws": [],
+                        "ys": []
+                      }
+                    ]
+                  }
+                ],
+                "kind": "list",
+                "message": "item 1 of ms: m.ys is []",
+                "name": "ms"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/ms/0"
+                ],
+                "name": "ms[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "v": 1,
+                    "ws": [],
+                    "ys": []
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "item 1 of ms: m.ys is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "every",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/every/assert"
+                ],
+                "message": "item 1 of ms: m.ys is []",
+                "name": "r.v is in m.ys.name"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/ms/0"
+                ],
+                "name": "ms[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "v": 1,
+                    "ws": [],
+                    "ys": []
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "item 1 of ms: m.ys is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "not_in",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/not_in/assert"
+                ],
+                "message": "item 1 of ms: m.ys is []",
+                "name": "r.v is not in m.ys.name"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/ms/0"
+                ],
+                "name": "ms[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "v": 1,
+                    "ws": [],
+                    "ys": []
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "item 1 of ms: m.ys is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "some",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/some/assert"
+                ],
+                "message": "item 1 of ms: m.ys is []",
+                "name": "r.v is in m.ys.name"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/ms/0"
+                ],
+                "name": "ms[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "v": 1,
+                    "ws": [],
+                    "ys": []
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "item 1 of ms: m.ys is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "whose",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/whose/assert"
+                ],
+                "message": "item 1 of ms: m.ys is []",
+                "name": "r.v is in m.ys.name"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/ms/0"
+                ],
+                "name": "ms[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "v": 1,
+                    "ws": [],
+                    "ys": []
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/cs/0/vs/0"
+                ],
+                "name": "vs[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "v": 1
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of ms: m.ys is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as value, with an empty second list, when each item of the list the alias reads holds an empty list",
+        "rules": [
+          "walk.right.fail",
+          "for.roots",
+          "for.if_any"
+        ],
+        "input": {
+          "cs": [
+            {
+              "id": "c1",
+              "rows": [],
+              "vs": [
+                {
+                  "v": 1
+                }
+              ],
+              "ms": [
+                {
+                  "v": 1,
+                  "ys": [
+                    {
+                      "name": []
+                    }
+                  ],
+                  "ws": []
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "alias",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/alias/assert"
+                ],
+                "message": "item 1 of ms: item 1 of m.ys: name is []",
+                "name": "w.v is in m.ys.name"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "m.ws[]",
+                "outcome": "usable",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/cs/0/ms/0"
+                ],
+                "name": "ms[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "v": 1,
+                    "ws": [],
+                    "ys": [
+                      {
+                        "name": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of ms: item 1 of m.ys: name is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "all",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/all/assert"
+                ],
+                "message": "item 1 of ms: item 1 of m.ys: name is []",
+                "name": "r.tags contains all of m.ys.name"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/ms/0"
+                ],
+                "name": "ms[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "v": 1,
+                    "ws": [],
+                    "ys": [
+                      {
+                        "name": []
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "item 1 of ms: item 1 of m.ys: name is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "beside",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/ms/0"
+                    ],
+                    "name": "ms[]",
+                    "outcome": "usable",
+                    "value": [
+                      {
+                        "v": 1,
+                        "ws": [],
+                        "ys": [
+                          {
+                            "name": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "kind": "list",
+                "message": "item 1 of ms: item 1 of m.ys: name is []",
+                "name": "ms"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/ms/0"
+                ],
+                "name": "ms[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "v": 1,
+                    "ws": [],
+                    "ys": [
+                      {
+                        "name": []
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "item 1 of ms: item 1 of m.ys: name is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "every",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/every/assert"
+                ],
+                "message": "item 1 of ms: item 1 of m.ys: name is []",
+                "name": "r.v is in m.ys.name"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/ms/0"
+                ],
+                "name": "ms[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "v": 1,
+                    "ws": [],
+                    "ys": [
+                      {
+                        "name": []
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "item 1 of ms: item 1 of m.ys: name is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "not_in",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/not_in/assert"
+                ],
+                "message": "item 1 of ms: item 1 of m.ys: name is []",
+                "name": "r.v is not in m.ys.name"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/ms/0"
+                ],
+                "name": "ms[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "v": 1,
+                    "ws": [],
+                    "ys": [
+                      {
+                        "name": []
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "item 1 of ms: item 1 of m.ys: name is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "some",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/some/assert"
+                ],
+                "message": "item 1 of ms: item 1 of m.ys: name is []",
+                "name": "r.v is in m.ys.name"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/ms/0"
+                ],
+                "name": "ms[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "v": 1,
+                    "ws": [],
+                    "ys": [
+                      {
+                        "name": []
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "item 1 of ms: item 1 of m.ys: name is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "whose",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/whose/assert"
+                ],
+                "message": "item 1 of ms: item 1 of m.ys: name is []",
+                "name": "r.v is in m.ys.name"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/ms/0"
+                ],
+                "name": "ms[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "v": 1,
+                    "ws": [],
+                    "ys": [
+                      {
+                        "name": []
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/cs/0/vs/0"
+                ],
+                "name": "vs[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "v": 1
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of ms: item 1 of m.ys: name is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as value for the item of the first line whose list is empty, and some passes on the other item",
+        "rules": [
+          "walk.right.fail",
+          "for.roots",
+          "for.if_any"
+        ],
+        "input": {
+          "cs": [
+            {
+              "id": "c1",
+              "rows": [],
+              "vs": [
+                {
+                  "v": 1
+                }
+              ],
+              "ms": [
+                {
+                  "v": 1,
+                  "ys": [
+                    {
+                      "name": "a"
+                    }
+                  ],
+                  "ws": []
+                },
+                {
+                  "v": 1,
+                  "ys": [],
+                  "ws": []
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "alias",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/alias/assert"
+                ],
+                "message": "item 2 of ms: m.ys is []",
+                "name": "w.v is in m.ys.name"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "m.ws[]",
+                "outcome": "usable",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/cs/0/ms/0",
+                  "/cs/0/ms/1"
+                ],
+                "name": "ms[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "v": 1,
+                    "ws": [],
+                    "ys": [
+                      {
+                        "name": "a"
+                      }
+                    ]
+                  },
+                  {
+                    "v": 1,
+                    "ws": [],
+                    "ys": []
+                  }
+                ]
+              }
+            ],
+            "message": "item 2 of ms: m.ys is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "all",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/all/assert"
+                ],
+                "message": "item 2 of ms: m.ys is []",
+                "name": "r.tags contains all of m.ys.name"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/ms/0",
+                  "/cs/0/ms/1"
+                ],
+                "name": "ms[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "v": 1,
+                    "ws": [],
+                    "ys": [
+                      {
+                        "name": "a"
+                      }
+                    ]
+                  },
+                  {
+                    "v": 1,
+                    "ws": [],
+                    "ys": []
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "item 2 of ms: m.ys is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "beside",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/ms/0",
+                      "/cs/0/ms/1"
+                    ],
+                    "name": "ms[]",
+                    "outcome": "usable",
+                    "value": [
+                      {
+                        "v": 1,
+                        "ws": [],
+                        "ys": [
+                          {
+                            "name": "a"
+                          }
+                        ]
+                      },
+                      {
+                        "v": 1,
+                        "ws": [],
+                        "ys": []
+                      }
+                    ]
+                  }
+                ],
+                "kind": "list",
+                "message": "item 2 of ms: m.ys is []",
+                "name": "ms"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/ms/0",
+                  "/cs/0/ms/1"
+                ],
+                "name": "ms[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "v": 1,
+                    "ws": [],
+                    "ys": [
+                      {
+                        "name": "a"
+                      }
+                    ]
+                  },
+                  {
+                    "v": 1,
+                    "ws": [],
+                    "ys": []
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "item 2 of ms: m.ys is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "every",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/every/assert"
+                ],
+                "message": "item 2 of ms: m.ys is []",
+                "name": "r.v is in m.ys.name"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/ms/0",
+                  "/cs/0/ms/1"
+                ],
+                "name": "ms[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "v": 1,
+                    "ws": [],
+                    "ys": [
+                      {
+                        "name": "a"
+                      }
+                    ]
+                  },
+                  {
+                    "v": 1,
+                    "ws": [],
+                    "ys": []
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "item 2 of ms: m.ys is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "not_in",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/not_in/assert"
+                ],
+                "message": "item 2 of ms: m.ys is []",
+                "name": "r.v is not in m.ys.name"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/ms/0",
+                  "/cs/0/ms/1"
+                ],
+                "name": "ms[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "v": 1,
+                    "ws": [],
+                    "ys": [
+                      {
+                        "name": "a"
+                      }
+                    ]
+                  },
+                  {
+                    "v": 1,
+                    "ws": [],
+                    "ys": []
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "item 2 of ms: m.ys is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "some",
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/ms/0",
+                  "/cs/0/ms/1"
+                ],
+                "name": "ms[]",
+                "value": [
+                  {
+                    "v": 1,
+                    "ws": [],
+                    "ys": [
+                      {
+                        "name": "a"
+                      }
+                    ]
+                  },
+                  {
+                    "v": 1,
+                    "ws": [],
+                    "ys": []
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "whose",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/whose/assert"
+                ],
+                "message": "item 2 of ms: m.ys is []",
+                "name": "r.v is in m.ys.name"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/ms/0",
+                  "/cs/0/ms/1"
+                ],
+                "name": "ms[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "v": 1,
+                    "ws": [],
+                    "ys": [
+                      {
+                        "name": "a"
+                      }
+                    ]
+                  },
+                  {
+                    "v": 1,
+                    "ws": [],
+                    "ys": []
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/cs/0/vs/0"
+                ],
+                "name": "vs[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "v": 1
+                  }
+                ]
+              }
+            ],
+            "message": "item 2 of ms: m.ys is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          }
+        ]
+      },
+      {
+        "description": "passes, with an empty second list, when the list the alias reads holds names",
+        "rules": [
+          "walk.right.fail",
+          "for.roots",
+          "for.if_any"
+        ],
+        "input": {
+          "cs": [
+            {
+              "id": "c1",
+              "rows": [],
+              "vs": [
+                {
+                  "v": 1
+                }
+              ],
+              "ms": [
+                {
+                  "v": 1,
+                  "ys": [
+                    {
+                      "name": "a"
+                    }
+                  ],
+                  "ws": []
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "alias",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "m.ws[]",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/cs/0/ms/0"
+                ],
+                "name": "ms[]",
+                "value": [
+                  {
+                    "v": 1,
+                    "ws": [],
+                    "ys": [
+                      {
+                        "name": "a"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "all",
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/ms/0"
+                ],
+                "name": "ms[]",
+                "value": [
+                  {
+                    "v": 1,
+                    "ws": [],
+                    "ys": [
+                      {
+                        "name": "a"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "beside",
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/ms/0"
+                ],
+                "name": "ms[]",
+                "value": [
+                  {
+                    "v": 1,
+                    "ws": [],
+                    "ys": [
+                      {
+                        "name": "a"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "every",
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/ms/0"
+                ],
+                "name": "ms[]",
+                "value": [
+                  {
+                    "v": 1,
+                    "ws": [],
+                    "ys": [
+                      {
+                        "name": "a"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "not_in",
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/ms/0"
+                ],
+                "name": "ms[]",
+                "value": [
+                  {
+                    "v": 1,
+                    "ws": [],
+                    "ys": [
+                      {
+                        "name": "a"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "some",
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/ms/0"
+                ],
+                "name": "ms[]",
+                "value": [
+                  {
+                    "v": 1,
+                    "ws": [],
+                    "ys": [
+                      {
+                        "name": "a"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "whose",
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/ms/0"
+                ],
+                "name": "ms[]",
+                "value": [
+                  {
+                    "v": 1,
+                    "ws": [],
+                    "ys": [
+                      {
+                        "name": "a"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/cs/0/vs/0"
+                ],
+                "name": "vs[]",
+                "value": [
+                  {
+                    "v": 1
+                  }
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
     "description": "an every on a for line that walks a $params list",
     "policy": {
       "ergo_spec": "{{spec}}",

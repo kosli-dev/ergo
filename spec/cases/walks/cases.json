@@ -15740,6 +15740,383 @@
     }
   },
   {
+    "description": "a list that a phrase walks fails a check on an empty list as value when it is empty or holds only empty lists, with if any too",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "c": {
+          "from": "cs",
+          "identified_by": "id",
+          "has": {
+            "pos": "os"
+          }
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "c",
+          "checks": {
+            "in": "every rows.v, if any, is in pos.name",
+            "not_in": "every rows.v, if any, is not one of pos.name",
+            "input": "every rows.v, if any, is in $input.os.name"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails as value, with an empty rows, when the list is empty",
+        "rules": [
+          "walk.right.fail",
+          "walk.right.inputs",
+          "walk.every"
+        ],
+        "input": {
+          "os": [],
+          "cs": [
+            {
+              "id": "c1",
+              "rows": [],
+              "os": []
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "in",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "pos[].name",
+                    "outcome": "usable",
+                    "part": {
+                      "id": null,
+                      "name": "pos"
+                    },
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/in"
+                ],
+                "message": "pos is []",
+                "name": "every rows.v, if any, is in pos.name"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "pos[].name",
+                "outcome": "usable",
+                "part": {
+                  "id": null,
+                  "name": "pos"
+                },
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "rows[].v",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "pos is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "input",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "$input.os[].name",
+                    "outcome": "usable",
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/input"
+                ],
+                "message": "$input.os is []",
+                "name": "every rows.v, if any, is in $input.os.name"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "$input.os[].name",
+                "outcome": "usable",
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "rows[].v",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "$input.os is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "not_in",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "pos[].name",
+                    "outcome": "usable",
+                    "part": {
+                      "id": null,
+                      "name": "pos"
+                    },
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/not_in"
+                ],
+                "message": "pos is []",
+                "name": "every rows.v, if any, is not in pos.name"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "pos[].name",
+                "outcome": "usable",
+                "part": {
+                  "id": null,
+                  "name": "pos"
+                },
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "rows[].v",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "pos is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as value, with an empty rows, when each item holds an empty list",
+        "rules": [
+          "walk.right.fail",
+          "walk.right.inputs",
+          "walk.every"
+        ],
+        "input": {
+          "os": [
+            {
+              "name": []
+            }
+          ],
+          "cs": [
+            {
+              "id": "c1",
+              "rows": [],
+              "os": [
+                {
+                  "name": []
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "in",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "pos[].name[]",
+                    "outcome": "usable",
+                    "part": {
+                      "id": null,
+                      "name": "pos"
+                    },
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/in"
+                ],
+                "message": "item 1 of pos: name is []",
+                "name": "every rows.v, if any, is in pos.name"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "pos[].name[]",
+                "outcome": "usable",
+                "part": {
+                  "id": null,
+                  "name": "pos"
+                },
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "rows[].v",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "item 1 of pos: name is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "input",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "$input.os[].name[]",
+                    "outcome": "usable",
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/input"
+                ],
+                "message": "item 1 of $input.os: name is []",
+                "name": "every rows.v, if any, is in $input.os.name"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "$input.os[].name[]",
+                "outcome": "usable",
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "rows[].v",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "item 1 of $input.os: name is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "not_in",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "pos[].name[]",
+                    "outcome": "usable",
+                    "part": {
+                      "id": null,
+                      "name": "pos"
+                    },
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/not_in"
+                ],
+                "message": "item 1 of pos: name is []",
+                "name": "every rows.v, if any, is not in pos.name"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "pos[].name[]",
+                "outcome": "usable",
+                "part": {
+                  "id": null,
+                  "name": "pos"
+                },
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "rows[].v",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "item 1 of pos: name is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
     "description": "a count of or a sum of that walks a $params or $input list of names of more than one kind fails on an empty list",
     "policy": {
       "ergo_spec": "{{spec}}",
