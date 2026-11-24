@@ -235,7 +235,7 @@ pub fn item_says(name: &str, alias: &str, said: &[Clause]) -> String {
     }
     let mut leads: Vec<String> = Vec::new();
     for (line, _) in &lines {
-        let lead = lead_of(line);
+        let lead = super::for_line::lead_of(line);
         if !leads.contains(&lead) {
             leads.push(lead);
         }
@@ -245,7 +245,7 @@ pub fn item_says(name: &str, alias: &str, said: &[Clause]) -> String {
         .map(|lead| {
             let group: Vec<&(String, bool)> = lines
                 .iter()
-                .filter(|(line, _)| lead_of(line) == *lead)
+                .filter(|(line, _)| super::for_line::lead_of(line) == *lead)
                 .collect();
             let rest: Vec<&str> = group[1..]
                 .iter()
@@ -267,28 +267,6 @@ pub fn item_says(name: &str, alias: &str, said: &[Clause]) -> String {
         })
         .collect::<Vec<_>>()
         .join("; ")
-}
-
-fn lead_of(text: &str) -> String {
-    if !crate::parts::is_item(text) {
-        return String::new();
-    }
-    let outside_quotes = |text: &str| {
-        text.replace("\\\\", "")
-            .replace("\\\"", "")
-            .matches('"')
-            .count()
-            .is_multiple_of(2)
-    };
-    let cuts = text
-        .match_indices(": ")
-        .chain(text.match_indices(" is "))
-        .map(|(at, _)| at)
-        .filter(|at| *at > 0 && outside_quotes(&text[..*at]));
-    match cuts.min() {
-        Some(at) if text[..at].contains(" of ") => text[..at].to_string(),
-        _ => String::new(),
-    }
 }
 
 fn pieces(item: &Clause) -> Vec<String> {

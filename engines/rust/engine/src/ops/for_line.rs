@@ -3820,7 +3820,7 @@ fn outside_quotes(text: &str) -> bool {
         .is_multiple_of(2)
 }
 
-fn lead_of(text: &str) -> String {
+pub(crate) fn lead_of(text: &str) -> String {
     if !crate::parts::is_item(text) {
         return String::new();
     }
