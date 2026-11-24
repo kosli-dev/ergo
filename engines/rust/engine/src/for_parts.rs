@@ -1067,7 +1067,12 @@ pub fn for_failures(
                     .collect();
                 let by_broke =
                     |inner: &Clause| broke.contains(&clause::text(std::slice::from_ref(inner)));
-                tree.extend(clause::said_pieces(&said, &by_broke));
+                for piece in clause::said_pieces(&said, &by_broke) {
+                    tree.extend(clauses(&piece.text).into_iter().map(|text| clause::Piece {
+                        text: text.to_string(),
+                        ..piece.clone()
+                    }));
+                }
             }
         }
     }
