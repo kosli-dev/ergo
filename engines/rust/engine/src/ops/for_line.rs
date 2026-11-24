@@ -4187,7 +4187,11 @@ fn sentence_root_clauses(forms: &[(Check, bool)], ctx: &Ctx) -> Vec<Clause> {
                 .map(|(cause, text)| {
                     let name = named
                         .iter()
-                        .find(|name| text.starts_with(name.as_str()))
+                        .find(|name| {
+                            text.starts_with(name.as_str())
+                                || text.starts_with("item ")
+                                    && text.contains(&format!(" of {name} "))
+                        })
                         .cloned()
                         .unwrap_or_else(|| text.clone());
                     Clause::root(&name, cause, text)

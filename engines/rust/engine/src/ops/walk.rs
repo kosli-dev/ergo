@@ -1065,7 +1065,7 @@ pub(super) fn right_needs(check: &Check, value: &Value) -> Option<&'static str> 
     }
 }
 
-pub(super) fn listed_refs(check: &Check) -> Vec<&Path> {
+pub(crate) fn listed_refs(check: &Check) -> Vec<&Path> {
     use super::lists::Wanted;
     match check {
         Check::In(check) => check.values.ref_paths(),

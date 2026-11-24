@@ -165,18 +165,26 @@ fn root_reads(check: &Check, roots: &[Clause], ctx: &Ctx) -> Vec<Value> {
             )
     };
     for root in roots.iter().filter(unread) {
-        let Some(path) = for_line::all_paths(check).into_iter().find(|path| {
-            matches!(
-                path.start,
-                Start::Params | Start::Input | Start::Subject | Start::Own
-            ) && crate::name::name(path) == root.name
-        }) else {
+        let Some(path) = for_line::all_paths(check)
+            .into_iter()
+            .chain(ops::walk::listed_refs(check))
+            .find(|path| {
+                matches!(
+                    path.start,
+                    Start::Params | Start::Input | Start::Subject | Start::Own
+                ) && crate::name::name(path) == root.name
+            })
+        else {
             continue;
         };
         if let Some(input) = ops::read_path(path, ctx).inputs.first() {
             ops::push_new(
                 &mut out,
-                crate::parts::with_outcome(input, root.cause == Cause::Unusable),
+                crate::parts::with_outcome(
+                    input,
+                    root.cause == Cause::Unusable
+                        || ops::lists::text_fault(check, path, ctx).is_some(),
+                ),
             );
         }
     }

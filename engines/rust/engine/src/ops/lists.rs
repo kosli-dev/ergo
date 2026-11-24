@@ -327,7 +327,7 @@ pub(super) fn flawed_text_list<'a>(check: &'a super::Check, ctx: &Ctx) -> Option
     flawed.then_some(list)
 }
 
-pub(super) fn text_fault(check: &super::Check, path: &Path, ctx: &Ctx) -> Option<(Cause, String)> {
+pub(crate) fn text_fault(check: &super::Check, path: &Path, ctx: &Ctx) -> Option<(Cause, String)> {
     text_walk(check, path, ctx).and_then(|walk| walk.cause.map(|cause| (cause, walk.text)))
 }
 
