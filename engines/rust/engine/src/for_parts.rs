@@ -728,6 +728,16 @@ pub fn for_failures(
                 .any(|f| text(f, "item") == *n && !list(f, "failed_assertions").is_empty())
         })
         .collect();
+    let walk_broke: Vec<String> = failed
+        .iter()
+        .filter(|f| !list(f, "failed_assertions").is_empty())
+        .flat_map(|f| {
+            list(f, "failed_items")
+                .iter()
+                .map(|x| format!("{}: {}", text(f, "item"), text(x, "ergo/text")))
+                .collect::<Vec<_>>()
+        })
+        .collect();
     let walk_pieces: Vec<&str> = walked
         .iter()
         .flat_map(|(_, texts)| texts.iter().flat_map(|t| clauses(t)))
@@ -784,6 +794,7 @@ pub fn for_failures(
             })
             || ops::message::cap_note(clause).is_some()
             || item_made.iter().any(|t| t == clause)
+            || walk_broke.iter().any(|t| t == clause)
             || free_said.iter().any(|t| t == clause)
         {
             continue;
@@ -930,6 +941,25 @@ pub fn for_failures(
     }
     let mut lists: Vec<Failure> = Vec::new();
     let mut rest: Vec<Failure> = Vec::new();
+    for f in failed
+        .iter()
+        .filter(|f| !list(f, "failed_assertions").is_empty() && !bare(f))
+    {
+        if let Some(Failure::Item {
+            mut part,
+            value,
+            locations,
+        }) = dead_entry(line, f, ctx).filter(|_| !list(f, "failed_items").is_empty())
+        {
+            part.cause = Cause::worst(part.failures.iter().map(|kid| kid.part().cause))
+                .unwrap_or(part.cause);
+            rest.push(Failure::Item {
+                part,
+                value,
+                locations,
+            });
+        }
+    }
     for f in failed
         .iter()
         .filter(|f| list(f, "failed_assertions").is_empty() || bare(f))
