@@ -3,6 +3,11 @@
 pub mod checks;
 
 pub const FROM_OK: &[(&str, &str)] = &[
+    ("items.allowed", "items.allowed"),
+    (
+        "things whose t is in $params.l ignoring case",
+        "things whose t is in $params.l ignoring case",
+    ),
     ("commits", "commits"),
     (
         "things whose count of member of m is 1 and whose sum of m.v is 1",
@@ -3319,6 +3324,7 @@ pub const FROM_PARTIAL: &[(&str, &[&str])] = &[
 ];
 
 pub const PATH_OK: &[(&str, &str)] = &[
+    ("items.allowed", "items.allowed"),
     ("by", "by"),
     ("x.n", "x.n"),
     ("idd", "idd"),

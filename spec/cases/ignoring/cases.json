@@ -8995,5 +8995,2436 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a list after is in ignoring case with a null item, on the assertion of a for line",
+    "params": {"l": ["a", null]},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"every": {"for": "every xs as e", "assert": "e.v is in $params.l ignoring case"}, "if_any": {"for": "every xs, if any, as e", "assert": "e.v is in $params.l ignoring case"}, "some": {"for": "some xs as e", "assert": "e.v is in $params.l ignoring case"}, "field": {"for": "every xs as e", "assert": "e.v is in allowed ignoring case"}}}}},
+    "cases": [
+      {
+        "description": "fails as null over an empty list, and says the item before the empty list",
+        "rules": ["text.not_text", "for.roots"],
+        "input": {"things": [{"id": "t1", "allowed": ["a", null], "xs": []}]},
+        "results": [
+          {
+            "cause": "null",
+            "check": "every",
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/l"
+                    ],
+                    "name": "$params.l",
+                    "outcome": "unusable",
+                    "value": [
+                      "a",
+                      null
+                    ]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/every/assert"
+                ],
+                "message": "item 2 of $params.l is null",
+                "name": "e.v is in $params.l ignoring case"
+              },
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/xs"
+                    ],
+                    "name": "xs",
+                    "outcome": "usable",
+                    "value": []
+                  }
+                ],
+                "kind": "list",
+                "message": "xs is []",
+                "name": "xs"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/l"
+                ],
+                "name": "$params.l",
+                "outcome": "unusable",
+                "value": [
+                  "a",
+                  null
+                ]
+              },
+              {
+                "locations": [],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "item 2 of $params.l is null; xs is []",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "field",
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/allowed"
+                    ],
+                    "name": "allowed",
+                    "outcome": "unusable",
+                    "value": [
+                      "a",
+                      null
+                    ]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/field/assert"
+                ],
+                "message": "item 2 of allowed is null",
+                "name": "e.v is in allowed ignoring case"
+              },
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/xs"
+                    ],
+                    "name": "xs",
+                    "outcome": "usable",
+                    "value": []
+                  }
+                ],
+                "kind": "list",
+                "message": "xs is []",
+                "name": "xs"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/allowed"
+                ],
+                "name": "allowed",
+                "outcome": "unusable",
+                "value": [
+                  "a",
+                  null
+                ]
+              },
+              {
+                "locations": [],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "item 2 of allowed is null; xs is []",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "if_any",
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/l"
+                    ],
+                    "name": "$params.l",
+                    "outcome": "unusable",
+                    "value": [
+                      "a",
+                      null
+                    ]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/if_any/assert"
+                ],
+                "message": "item 2 of $params.l is null",
+                "name": "e.v is in $params.l ignoring case"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/l"
+                ],
+                "name": "$params.l",
+                "outcome": "unusable",
+                "value": [
+                  "a",
+                  null
+                ]
+              },
+              {
+                "locations": [],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "item 2 of $params.l is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "some",
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/l"
+                    ],
+                    "name": "$params.l",
+                    "outcome": "unusable",
+                    "value": [
+                      "a",
+                      null
+                    ]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/some/assert"
+                ],
+                "message": "item 2 of $params.l is null",
+                "name": "e.v is in $params.l ignoring case"
+              },
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/xs"
+                    ],
+                    "name": "xs",
+                    "outcome": "usable",
+                    "value": []
+                  }
+                ],
+                "kind": "list",
+                "message": "xs is []",
+                "name": "xs"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/l"
+                ],
+                "name": "$params.l",
+                "outcome": "unusable",
+                "value": [
+                  "a",
+                  null
+                ]
+              },
+              {
+                "locations": [],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "item 2 of $params.l is null; xs is []",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ],
+        "refs": {
+          "s": {
+            "every": [
+              {
+                "locations": [
+                  "$params:/l"
+                ],
+                "name": "$params.l",
+                "outcome": "unusable",
+                "value": [
+                  "a",
+                  null
+                ]
+              }
+            ],
+            "field": [],
+            "if_any": [
+              {
+                "locations": [
+                  "$params:/l"
+                ],
+                "name": "$params.l",
+                "outcome": "unusable",
+                "value": [
+                  "a",
+                  null
+                ]
+              }
+            ],
+            "some": [
+              {
+                "locations": [
+                  "$params:/l"
+                ],
+                "name": "$params.l",
+                "outcome": "unusable",
+                "value": [
+                  "a",
+                  null
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "fails as null when every item matches",
+        "rules": ["text.not_text", "for.roots"],
+        "input": {"things": [{"id": "t1", "allowed": ["a", null], "xs": [{"v": "A"}]}]},
+        "results": [
+          {
+            "cause": "null",
+            "check": "every",
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/l"
+                    ],
+                    "name": "$params.l",
+                    "outcome": "unusable",
+                    "value": [
+                      "a",
+                      null
+                    ]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/every/assert"
+                ],
+                "message": "item 2 of $params.l is null",
+                "name": "e.v is in $params.l ignoring case"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/l"
+                ],
+                "name": "$params.l",
+                "outcome": "unusable",
+                "value": [
+                  "a",
+                  null
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "v": "A"
+                  }
+                ]
+              }
+            ],
+            "message": "item 2 of $params.l is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "field",
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/allowed"
+                    ],
+                    "name": "allowed",
+                    "outcome": "unusable",
+                    "value": [
+                      "a",
+                      null
+                    ]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/field/assert"
+                ],
+                "message": "item 2 of allowed is null",
+                "name": "e.v is in allowed ignoring case"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/allowed"
+                ],
+                "name": "allowed",
+                "outcome": "unusable",
+                "value": [
+                  "a",
+                  null
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "v": "A"
+                  }
+                ]
+              }
+            ],
+            "message": "item 2 of allowed is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "if_any",
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/l"
+                    ],
+                    "name": "$params.l",
+                    "outcome": "unusable",
+                    "value": [
+                      "a",
+                      null
+                    ]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/if_any/assert"
+                ],
+                "message": "item 2 of $params.l is null",
+                "name": "e.v is in $params.l ignoring case"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/l"
+                ],
+                "name": "$params.l",
+                "outcome": "unusable",
+                "value": [
+                  "a",
+                  null
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "v": "A"
+                  }
+                ]
+              }
+            ],
+            "message": "item 2 of $params.l is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "some",
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/l"
+                    ],
+                    "name": "$params.l",
+                    "outcome": "unusable",
+                    "value": [
+                      "a",
+                      null
+                    ]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/some/assert"
+                ],
+                "message": "item 2 of $params.l is null",
+                "name": "e.v is in $params.l ignoring case"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/l"
+                ],
+                "name": "$params.l",
+                "outcome": "unusable",
+                "value": [
+                  "a",
+                  null
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "v": "A"
+                  }
+                ]
+              }
+            ],
+            "message": "item 2 of $params.l is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as absent when the list the line walks is missing, and says the item first",
+        "rules": ["text.not_text", "for.roots", "problems.all_said"],
+        "input": {"things": [{"id": "t1", "allowed": ["a", null]}]},
+        "results": [
+          {
+            "cause": "absent",
+            "check": "every",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/l"
+                    ],
+                    "name": "$params.l",
+                    "outcome": "unusable",
+                    "value": [
+                      "a",
+                      null
+                    ]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/every/assert"
+                ],
+                "message": "item 2 of $params.l is null",
+                "name": "e.v is in $params.l ignoring case"
+              },
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0"
+                    ],
+                    "name": "xs",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "list",
+                "message": "xs is missing",
+                "name": "xs"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/l"
+                ],
+                "name": "$params.l",
+                "outcome": "unusable",
+                "value": [
+                  "a",
+                  null
+                ]
+              },
+              {
+                "locations": [],
+                "name": "xs",
+                "outcome": "absent",
+                "value": []
+              }
+            ],
+            "message": "item 2 of $params.l is null; xs is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "field",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/allowed"
+                    ],
+                    "name": "allowed",
+                    "outcome": "unusable",
+                    "value": [
+                      "a",
+                      null
+                    ]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/field/assert"
+                ],
+                "message": "item 2 of allowed is null",
+                "name": "e.v is in allowed ignoring case"
+              },
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0"
+                    ],
+                    "name": "xs",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "list",
+                "message": "xs is missing",
+                "name": "xs"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/allowed"
+                ],
+                "name": "allowed",
+                "outcome": "unusable",
+                "value": [
+                  "a",
+                  null
+                ]
+              },
+              {
+                "locations": [],
+                "name": "xs",
+                "outcome": "absent",
+                "value": []
+              }
+            ],
+            "message": "item 2 of allowed is null; xs is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "if_any",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/l"
+                    ],
+                    "name": "$params.l",
+                    "outcome": "unusable",
+                    "value": [
+                      "a",
+                      null
+                    ]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/if_any/assert"
+                ],
+                "message": "item 2 of $params.l is null",
+                "name": "e.v is in $params.l ignoring case"
+              },
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0"
+                    ],
+                    "name": "xs",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "list",
+                "message": "xs is missing",
+                "name": "xs"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/l"
+                ],
+                "name": "$params.l",
+                "outcome": "unusable",
+                "value": [
+                  "a",
+                  null
+                ]
+              },
+              {
+                "locations": [],
+                "name": "xs",
+                "outcome": "absent",
+                "value": []
+              }
+            ],
+            "message": "item 2 of $params.l is null; xs is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "some",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/l"
+                    ],
+                    "name": "$params.l",
+                    "outcome": "unusable",
+                    "value": [
+                      "a",
+                      null
+                    ]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/some/assert"
+                ],
+                "message": "item 2 of $params.l is null",
+                "name": "e.v is in $params.l ignoring case"
+              },
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0"
+                    ],
+                    "name": "xs",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "list",
+                "message": "xs is missing",
+                "name": "xs"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/l"
+                ],
+                "name": "$params.l",
+                "outcome": "unusable",
+                "value": [
+                  "a",
+                  null
+                ]
+              },
+              {
+                "locations": [],
+                "name": "xs",
+                "outcome": "absent",
+                "value": []
+              }
+            ],
+            "message": "item 2 of $params.l is null; xs is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a part that walks a list after is in ignoring case, on the assertion of a for line over an empty list",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id", "has": {"pl": "items.allowed"}}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"for": "every xs as e", "assert": "e.v is in pl ignoring case"}}}}},
+    "cases": [
+      {
+        "description": "fails as unusable and says the item of the part that isn't text",
+        "rules": ["text.not_text", "walk.right.fail", "for.roots"],
+        "input": {"things": [{"id": "t1", "xs": [], "items": [{"allowed": ["a"]}, {"allowed": ["b", 3]}]}]},
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c/assert"
+                ],
+                "message": "item 2 of items: item 2 of allowed is 3, which isn't text",
+                "name": "e.v is in pl ignoring case"
+              },
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/xs"
+                    ],
+                    "name": "xs",
+                    "outcome": "usable",
+                    "value": []
+                  }
+                ],
+                "kind": "list",
+                "message": "xs is []",
+                "name": "xs"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/items/0/allowed/0",
+                  "/things/0/items/1/allowed/0",
+                  "/things/0/items/1/allowed/1"
+                ],
+                "name": "items[].allowed[]",
+                "outcome": "unusable",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": [
+                  "a",
+                  "b",
+                  3
+                ]
+              },
+              {
+                "locations": [],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "item 2 of items: item 2 of allowed is 3, which isn't text; xs is []",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "an option of any_of with a list after is in ignoring case that holds null",
+    "params": {"l": ["a", null]},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"any_of": {"o1": "t is in $params.l ignoring case", "o2": "u exists"}}}}}},
+    "cases": [
+      {
+        "description": "says the item after the field that is missing",
+        "rules": ["text.not_text", "message.items", "any_of.cause"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {
+            "cause": "absent",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0"
+                        ],
+                        "name": "t",
+                        "outcome": "absent",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "$params:/l"
+                        ],
+                        "name": "$params.l",
+                        "outcome": "unusable",
+                        "value": [
+                          "a",
+                          null
+                        ]
+                      }
+                    ],
+                    "kind": "assertion",
+                    "locations": [
+                      "$policy:/requirements/s/checks/c/any_of/o1"
+                    ],
+                    "message": "t is missing, and item 2 of $params.l is null",
+                    "name": "t is in $params.l ignoring case"
+                  }
+                ],
+                "inputs": [],
+                "kind": "option",
+                "locations": [
+                  "$policy:/requirements/s/checks/c/any_of/o1"
+                ],
+                "message": "",
+                "name": "o1"
+              },
+              {
+                "cause": "value",
+                "failures": [
+                  {
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0"
+                        ],
+                        "name": "u",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "assertion",
+                    "locations": [
+                      "$policy:/requirements/s/checks/c/any_of/o2"
+                    ],
+                    "message": "u is missing",
+                    "name": "u exists"
+                  }
+                ],
+                "inputs": [],
+                "kind": "option",
+                "locations": [
+                  "$policy:/requirements/s/checks/c/any_of/o2"
+                ],
+                "message": "",
+                "name": "o2"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/l"
+                ],
+                "name": "$params.l",
+                "outcome": "unusable",
+                "value": [
+                  "a",
+                  null
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0"
+                ],
+                "name": "t",
+                "outcome": "absent",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/things/0"
+                ],
+                "name": "u",
+                "outcome": "absent",
+                "value": null
+              }
+            ],
+            "message": "o1: t is missing, and item 2 of $params.l is null; o2: u is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line whose filter compares with a list after is in ignoring case that holds null",
+    "params": {"l": ["a", null]},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things whose t is in $params.l ignoring case", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "t exists"}}}},
+    "cases": [
+      {
+        "description": "says the item after the field that is missing, or that isn't text, in the $applies row",
+        "rules": ["text.not_text", "message.items", "scope.failures"],
+        "input": {"things": [{"id": "t1"}, {"id": "t2", "t": 3}, {"id": "t3", "t": "A"}]},
+        "results": [
+          {
+            "cause": "absent",
+            "check": "$applies",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/l"
+                    ],
+                    "name": "$params.l",
+                    "outcome": "unusable",
+                    "value": [
+                      "a",
+                      null
+                    ]
+                  },
+                  {
+                    "locations": [
+                      "/things/0"
+                    ],
+                    "name": "t",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/subjects/thing/from"
+                ],
+                "message": "t is missing, and item 2 of $params.l is null",
+                "name": "t is in $params.l ignoring case"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/l"
+                ],
+                "name": "$params.l",
+                "outcome": "unusable",
+                "value": [
+                  "a",
+                  null
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0"
+                ],
+                "name": "t",
+                "outcome": "absent",
+                "value": null
+              }
+            ],
+            "message": "t is missing, and item 2 of $params.l is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "$applies",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/l"
+                    ],
+                    "name": "$params.l",
+                    "outcome": "unusable",
+                    "value": [
+                      "a",
+                      null
+                    ]
+                  },
+                  {
+                    "locations": [
+                      "/things/1/t"
+                    ],
+                    "name": "t",
+                    "outcome": "unusable",
+                    "value": 3
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/subjects/thing/from"
+                ],
+                "message": "t is 3, which isn't text, and item 2 of $params.l is null",
+                "name": "t is in $params.l ignoring case"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/l"
+                ],
+                "name": "$params.l",
+                "outcome": "unusable",
+                "value": [
+                  "a",
+                  null
+                ]
+              },
+              {
+                "locations": [
+                  "/things/1/t"
+                ],
+                "name": "t",
+                "outcome": "unusable",
+                "value": 3
+              }
+            ],
+            "message": "t is 3, which isn't text, and item 2 of $params.l is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t2",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "$applies",
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/l"
+                    ],
+                    "name": "$params.l",
+                    "outcome": "unusable",
+                    "value": [
+                      "a",
+                      null
+                    ]
+                  },
+                  {
+                    "locations": [
+                      "/things/2/t"
+                    ],
+                    "name": "t",
+                    "outcome": "usable",
+                    "value": "A"
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/subjects/thing/from"
+                ],
+                "message": "item 2 of $params.l is null",
+                "name": "t is in $params.l ignoring case"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/l"
+                ],
+                "name": "$params.l",
+                "outcome": "unusable",
+                "value": [
+                  "a",
+                  null
+                ]
+              },
+              {
+                "locations": [
+                  "/things/2/t"
+                ],
+                "name": "t",
+                "outcome": "usable",
+                "value": "A"
+              }
+            ],
+            "message": "item 2 of $params.l is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t3",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a null item of a list read from each item of a subject that is a list, after is in ignoring case",
+    "params": {"v": "a"},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "$params.v is in states ignoring case"}}}},
+    "cases": [
+      {
+        "description": "fails as null and names the null item",
+        "rules": ["text.not_text", "walk.start", "walk.right.fail"],
+        "input": {"things": [[{"states": ["A"]}, {"states": ["b", null]}]]},
+        "results": [
+          {
+            "cause": "null",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/v"
+                    ],
+                    "name": "$params.v",
+                    "outcome": "usable",
+                    "value": "a"
+                  },
+                  {
+                    "locations": [
+                      "/things/0/0/states/0",
+                      "/things/0/1/states/0",
+                      "/things/0/1/states/1"
+                    ],
+                    "name": "thing[].states[]",
+                    "outcome": "unusable",
+                    "value": [
+                      "A",
+                      "b",
+                      null
+                    ]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "item 2 of thing: item 2 of states is null",
+                "name": "$params.v is in states ignoring case"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/v"
+                ],
+                "name": "$params.v",
+                "outcome": "usable",
+                "value": "a"
+              },
+              {
+                "locations": [
+                  "/things/0/0/states/0",
+                  "/things/0/1/states/0",
+                  "/things/0/1/states/1"
+                ],
+                "name": "thing[].states[]",
+                "outcome": "unusable",
+                "value": [
+                  "A",
+                  "b",
+                  null
+                ]
+              }
+            ],
+            "message": "item 2 of thing: item 2 of states is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": [
+                {
+                  "states": [
+                    "A"
+                  ]
+                },
+                {
+                  "states": [
+                    "b",
+                    null
+                  ]
+                }
+              ],
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "names each null item, in list order",
+        "rules": ["text.not_text", "message.items"],
+        "input": {"things": [[{"states": [null]}, {"states": [null]}]]},
+        "results": [
+          {
+            "cause": "null",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/v"
+                    ],
+                    "name": "$params.v",
+                    "outcome": "usable",
+                    "value": "a"
+                  },
+                  {
+                    "locations": [
+                      "/things/0/0/states/0",
+                      "/things/0/1/states/0"
+                    ],
+                    "name": "thing[].states[]",
+                    "outcome": "unusable",
+                    "value": [
+                      null,
+                      null
+                    ]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "item 1 of thing: item 1 of states is null; item 2 of thing: item 1 of states is null",
+                "name": "$params.v is in states ignoring case"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/v"
+                ],
+                "name": "$params.v",
+                "outcome": "usable",
+                "value": "a"
+              },
+              {
+                "locations": [
+                  "/things/0/0/states/0",
+                  "/things/0/1/states/0"
+                ],
+                "name": "thing[].states[]",
+                "outcome": "unusable",
+                "value": [
+                  null,
+                  null
+                ]
+              }
+            ],
+            "message": "item 1 of thing: item 1 of states is null; item 2 of thing: item 1 of states is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": [
+                {
+                  "states": [
+                    null
+                  ]
+                },
+                {
+                  "states": [
+                    null
+                  ]
+                }
+              ],
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "names three items at most, null ones included, in list order",
+        "rules": ["text.not_text", "message.items", "problems.item_order"],
+        "input": {"things": [[{"states": [1, 2]}, {"states": [null, 4]}]]},
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/v"
+                    ],
+                    "name": "$params.v",
+                    "outcome": "usable",
+                    "value": "a"
+                  },
+                  {
+                    "locations": [
+                      "/things/0/0/states/0",
+                      "/things/0/0/states/1",
+                      "/things/0/1/states/0",
+                      "/things/0/1/states/1"
+                    ],
+                    "name": "thing[].states[]",
+                    "outcome": "unusable",
+                    "value": [
+                      1,
+                      2,
+                      null,
+                      4
+                    ]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "item 1 of thing: item 1 of states is 1, which isn't text; item 1 of thing: item 2 of states is 2, which isn't text; item 2 of thing: item 1 of states is null; and 1 more",
+                "name": "$params.v is in states ignoring case"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/v"
+                ],
+                "name": "$params.v",
+                "outcome": "usable",
+                "value": "a"
+              },
+              {
+                "locations": [
+                  "/things/0/0/states/0",
+                  "/things/0/0/states/1",
+                  "/things/0/1/states/0",
+                  "/things/0/1/states/1"
+                ],
+                "name": "thing[].states[]",
+                "outcome": "unusable",
+                "value": [
+                  1,
+                  2,
+                  null,
+                  4
+                ]
+              }
+            ],
+            "message": "item 1 of thing: item 1 of states is 1, which isn't text; item 1 of thing: item 2 of states is 2, which isn't text; item 2 of thing: item 1 of states is null; and 1 more",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": [
+                {
+                  "states": [
+                    1,
+                    2
+                  ]
+                },
+                {
+                  "states": [
+                    null,
+                    4
+                  ]
+                }
+              ],
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a root that isn't text before a list read from each item of a subject that is a list, after is in ignoring case",
+    "params": {"v": 3},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "$params.v is in states ignoring case"}}}},
+    "cases": [
+      {
+        "description": "says the root first and then the items in list order, whatever their causes",
+        "rules": ["text.not_text", "message.items", "problems.item_order"],
+        "input": {"things": [[{"states": ["A"]}, {"states": [null, 4]}]]},
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/v"
+                    ],
+                    "name": "$params.v",
+                    "outcome": "unusable",
+                    "value": 3
+                  },
+                  {
+                    "locations": [
+                      "/things/0/0/states/0",
+                      "/things/0/1/states/0",
+                      "/things/0/1/states/1"
+                    ],
+                    "name": "thing[].states[]",
+                    "outcome": "unusable",
+                    "value": [
+                      "A",
+                      null,
+                      4
+                    ]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "$params.v is 3, which isn't text, and item 2 of thing: item 1 of states is null; item 2 of thing: item 2 of states is 4, which isn't text",
+                "name": "$params.v is in states ignoring case"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/v"
+                ],
+                "name": "$params.v",
+                "outcome": "unusable",
+                "value": 3
+              },
+              {
+                "locations": [
+                  "/things/0/0/states/0",
+                  "/things/0/1/states/0",
+                  "/things/0/1/states/1"
+                ],
+                "name": "thing[].states[]",
+                "outcome": "unusable",
+                "value": [
+                  "A",
+                  null,
+                  4
+                ]
+              }
+            ],
+            "message": "$params.v is 3, which isn't text, and item 2 of thing: item 1 of states is null; item 2 of thing: item 2 of states is 4, which isn't text",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": [
+                {
+                  "states": [
+                    "A"
+                  ]
+                },
+                {
+                  "states": [
+                    null,
+                    4
+                  ]
+                }
+              ],
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "says the root first and then the null item",
+        "rules": ["text.not_text", "message.items"],
+        "input": {"things": [[{"states": ["a", null]}]]},
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/v"
+                    ],
+                    "name": "$params.v",
+                    "outcome": "unusable",
+                    "value": 3
+                  },
+                  {
+                    "locations": [
+                      "/things/0/0/states/0",
+                      "/things/0/0/states/1"
+                    ],
+                    "name": "thing[].states[]",
+                    "outcome": "unusable",
+                    "value": [
+                      "a",
+                      null
+                    ]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "$params.v is 3, which isn't text, and item 1 of thing: item 2 of states is null",
+                "name": "$params.v is in states ignoring case"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/v"
+                ],
+                "name": "$params.v",
+                "outcome": "unusable",
+                "value": 3
+              },
+              {
+                "locations": [
+                  "/things/0/0/states/0",
+                  "/things/0/0/states/1"
+                ],
+                "name": "thing[].states[]",
+                "outcome": "unusable",
+                "value": [
+                  "a",
+                  null
+                ]
+              }
+            ],
+            "message": "$params.v is 3, which isn't text, and item 1 of thing: item 2 of states is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": [
+                {
+                  "states": [
+                    "a",
+                    null
+                  ]
+                }
+              ],
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a list of one step after is in ignoring case that is missing, null or not a list",
+    "params": {},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is in ls ignoring case"}}}},
+    "cases": [
+      {
+        "description": "fails as absent when the list is missing",
+        "rules": ["text.not_text", "in.fail"],
+        "input": {"things": [{"id": "t1", "x": "A"}]},
+        "results": [
+          {
+            "cause": "absent",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/x"
+                    ],
+                    "name": "x",
+                    "outcome": "usable",
+                    "value": "A"
+                  },
+                  {
+                    "locations": [
+                      "/things/0"
+                    ],
+                    "name": "ls",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "ls is missing",
+                "name": "x is in ls ignoring case"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x",
+                "outcome": "usable",
+                "value": "A"
+              },
+              {
+                "locations": [
+                  "/things/0"
+                ],
+                "name": "ls",
+                "outcome": "absent",
+                "value": null
+              }
+            ],
+            "message": "ls is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as null when the list is null",
+        "rules": ["text.not_text", "in.fail"],
+        "input": {"things": [{"id": "t1", "x": "A", "ls": null}]},
+        "results": [
+          {
+            "cause": "null",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/x"
+                    ],
+                    "name": "x",
+                    "outcome": "usable",
+                    "value": "A"
+                  },
+                  {
+                    "locations": [
+                      "/things/0/ls"
+                    ],
+                    "name": "ls",
+                    "outcome": "null",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "ls is null",
+                "name": "x is in ls ignoring case"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x",
+                "outcome": "usable",
+                "value": "A"
+              },
+              {
+                "locations": [
+                  "/things/0/ls"
+                ],
+                "name": "ls",
+                "outcome": "null",
+                "value": null
+              }
+            ],
+            "message": "ls is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable when the list is text",
+        "rules": ["text.not_text", "in.fail"],
+        "input": {"things": [{"id": "t1", "x": "A", "ls": "a"}]},
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/x"
+                    ],
+                    "name": "x",
+                    "outcome": "usable",
+                    "value": "A"
+                  },
+                  {
+                    "locations": [
+                      "/things/0/ls"
+                    ],
+                    "name": "ls",
+                    "outcome": "unusable",
+                    "value": "a"
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "ls is \"a\", which isn't a list",
+                "name": "x is in ls ignoring case"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x",
+                "outcome": "usable",
+                "value": "A"
+              },
+              {
+                "locations": [
+                  "/things/0/ls"
+                ],
+                "name": "ls",
+                "outcome": "unusable",
+                "value": "a"
+              }
+            ],
+            "message": "ls is \"a\", which isn't a list",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "$refs of a list from the input after is in ignoring case",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is in $input.ls ignoring case"}}}},
+    "cases": [
+      {
+        "description": "gives the list the outcome unusable when an item is a number",
+        "rules": ["text.not_text", "value.refs", "row.parts"],
+        "input": {"things": [{"id": "t1", "x": "A"}], "ls": ["a", 3]},
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/x"
+                    ],
+                    "name": "x",
+                    "outcome": "usable",
+                    "value": "A"
+                  },
+                  {
+                    "locations": [
+                      "/ls"
+                    ],
+                    "name": "$input.ls",
+                    "outcome": "unusable",
+                    "value": [
+                      "a",
+                      3
+                    ]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "item 2 of $input.ls is 3, which isn't text",
+                "name": "x is in $input.ls ignoring case"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x",
+                "outcome": "usable",
+                "value": "A"
+              },
+              {
+                "locations": [
+                  "/ls"
+                ],
+                "name": "$input.ls",
+                "outcome": "unusable",
+                "value": [
+                  "a",
+                  3
+                ]
+              }
+            ],
+            "message": "item 2 of $input.ls is 3, which isn't text",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ],
+        "refs": {
+          "s": {
+            "c": [
+              {
+                "locations": [
+                  "/ls"
+                ],
+                "name": "$input.ls",
+                "outcome": "unusable",
+                "value": [
+                  "a",
+                  3
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "gives the list the outcome unusable when an item is null",
+        "rules": ["text.not_text", "value.refs", "row.parts"],
+        "input": {"things": [{"id": "t1", "x": "A"}], "ls": ["a", null]},
+        "results": [
+          {
+            "cause": "null",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/x"
+                    ],
+                    "name": "x",
+                    "outcome": "usable",
+                    "value": "A"
+                  },
+                  {
+                    "locations": [
+                      "/ls"
+                    ],
+                    "name": "$input.ls",
+                    "outcome": "unusable",
+                    "value": [
+                      "a",
+                      null
+                    ]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "item 2 of $input.ls is null",
+                "name": "x is in $input.ls ignoring case"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x",
+                "outcome": "usable",
+                "value": "A"
+              },
+              {
+                "locations": [
+                  "/ls"
+                ],
+                "name": "$input.ls",
+                "outcome": "unusable",
+                "value": [
+                  "a",
+                  null
+                ]
+              }
+            ],
+            "message": "item 2 of $input.ls is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ],
+        "refs": {
+          "s": {
+            "c": [
+              {
+                "locations": [
+                  "/ls"
+                ],
+                "name": "$input.ls",
+                "outcome": "unusable",
+                "value": [
+                  "a",
+                  null
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "gives the list the outcome unusable when no item is text",
+        "rules": ["text.not_text", "value.refs", "row.parts"],
+        "input": {"things": [{"id": "t1", "x": "A"}], "ls": [null]},
+        "results": [
+          {
+            "cause": "null",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/x"
+                    ],
+                    "name": "x",
+                    "outcome": "usable",
+                    "value": "A"
+                  },
+                  {
+                    "locations": [
+                      "/ls"
+                    ],
+                    "name": "$input.ls",
+                    "outcome": "unusable",
+                    "value": [
+                      null
+                    ]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "item 1 of $input.ls is null",
+                "name": "x is in $input.ls ignoring case"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x",
+                "outcome": "usable",
+                "value": "A"
+              },
+              {
+                "locations": [
+                  "/ls"
+                ],
+                "name": "$input.ls",
+                "outcome": "unusable",
+                "value": [
+                  null
+                ]
+              }
+            ],
+            "message": "item 1 of $input.ls is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ],
+        "refs": {
+          "s": {
+            "c": [
+              {
+                "locations": [
+                  "/ls"
+                ],
+                "name": "$input.ls",
+                "outcome": "unusable",
+                "value": [
+                  null
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "gives the list the outcome usable when every item is text",
+        "rules": ["text.ignoring", "value.refs"],
+        "input": {"things": [{"id": "t1", "x": "A"}], "ls": ["a"]},
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x",
+                "value": "A"
+              },
+              {
+                "locations": [
+                  "/ls"
+                ],
+                "name": "$input.ls",
+                "value": [
+                  "a"
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ],
+        "refs": {
+          "s": {
+            "c": [
+              {
+                "locations": [
+                  "/ls"
+                ],
+                "name": "$input.ls",
+                "outcome": "usable",
+                "value": [
+                  "a"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "a count over an empty list whose whose compares with a list from each item of an input that is a list, ignoring case",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "$input", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "count of xs whose v is in $input.ok ignoring case is 1"}}}},
+    "cases": [
+      {
+        "description": "fails with the worst cause of the items of the list and says only them",
+        "rules": ["text.not_text", "tally.walk", "walk.start"],
+        "input": [{"id": "t1", "xs": [], "ok": ["a"]}, {"id": "t2", "xs": [], "ok": ["B", 3]}],
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "count of xs whose v is in $input.ok ignoring case",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "/0/ok/0",
+                      "/1/ok/0",
+                      "/1/ok/1"
+                    ],
+                    "name": "$input[].ok[]",
+                    "outcome": "unusable",
+                    "value": [
+                      "a",
+                      "B",
+                      3
+                    ]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "item 2 of $input: item 2 of ok is 3, which isn't text",
+                "name": "count of xs whose v is in $input.ok ignoring case is 1"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count of xs whose v is in $input.ok ignoring case",
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/0/ok/0",
+                  "/1/ok/0",
+                  "/1/ok/1"
+                ],
+                "name": "$input[].ok[]",
+                "outcome": "unusable",
+                "value": [
+                  "a",
+                  "B",
+                  3
+                ]
+              }
+            ],
+            "message": "item 2 of $input: item 2 of ok is 3, which isn't text",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "count of xs whose v is in $input.ok ignoring case",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "/0/ok/0",
+                      "/1/ok/0",
+                      "/1/ok/1"
+                    ],
+                    "name": "$input[].ok[]",
+                    "outcome": "unusable",
+                    "value": [
+                      "a",
+                      "B",
+                      3
+                    ]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "item 2 of $input: item 2 of ok is 3, which isn't text",
+                "name": "count of xs whose v is in $input.ok ignoring case is 1"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count of xs whose v is in $input.ok ignoring case",
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/0/ok/0",
+                  "/1/ok/0",
+                  "/1/ok/1"
+                ],
+                "name": "$input[].ok[]",
+                "outcome": "unusable",
+                "value": [
+                  "a",
+                  "B",
+                  3
+                ]
+              }
+            ],
+            "message": "item 2 of $input: item 2 of ok is 3, which isn't text",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t2",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]

@@ -11028,6 +11028,48 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
+        "count of xs whose v is in $input.ok ignoring case is 1",
+        "count of xs whose v is in $input.ok ignoring case is 1",
+        &[],
+        &[],
+    ),
+    (
+        "e.v is in $params.l ignoring case",
+        "e.v is in $params.l ignoring case",
+        &[],
+        &[],
+    ),
+    (
+        "e.v is in allowed ignoring case",
+        "e.v is in allowed ignoring case",
+        &[],
+        &[],
+    ),
+    (
+        "e.v is in pl ignoring case",
+        "e.v is in pl ignoring case",
+        &[],
+        &[],
+    ),
+    (
+        "t is in $params.l ignoring case",
+        "t is in $params.l ignoring case",
+        &[],
+        &[],
+    ),
+    (
+        "x is in $input.ls ignoring case",
+        "x is in $input.ls ignoring case",
+        &[],
+        &[],
+    ),
+    (
+        "x is in ls ignoring case",
+        "x is in ls ignoring case",
+        &[],
+        &[],
+    ),
+    (
         "type is one of $input.allowed ignoring surrounding spaces",
         "type is in $input.allowed ignoring surrounding spaces",
         &[],
@@ -14264,6 +14306,9 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("every xs as pull", "every xs as pull", &[], &[]),
     ("every xs as x", "every xs as x", &[], &[]),
     ("some xs as x", "some xs as x", &[], &[]),
+    ("every xs as e", "every xs as e", &[], &[]),
+    ("every xs, if any, as e", "every xs, if any, as e", &[], &[]),
+    ("some xs as e", "some xs as e", &[], &[]),
     (
         "every xs as x, every ys.zs as y",
         "every xs as x, every ys.zs as y",
