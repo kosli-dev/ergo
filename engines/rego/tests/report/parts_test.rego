@@ -258,3 +258,11 @@ test_an_item_record_that_only_repeats_what_the_row_already_says_gives_no_entry i
 	ergo._tally_unrooted(["null", "item 1 of xs: $input.m is null", {}], "$input.m is null") == null
 	ergo._tally_unrooted(["absent", "item 1 of xs: $input.m is null; key is missing", {}], "$input.m is null") == ["absent", "item 1 of xs: key is missing", {}]
 }
+
+test_a_list_after_is_in_ignoring_case_that_walks_a_subject_that_is_a_list_or_a_part_is_unusable_when_an_item_isnt_text if {
+	walked := {"name": "thing[].states[]", "value": ["A", null], "locations": []}
+	ergo._with_outcome(walked).outcome == "unusable" with data.ergo_text_lists as {"states"} with data.ergo_unfit as set()
+	ergo._with_outcome(object.union(walked, {"value": ["A"]})).outcome == "usable" with data.ergo_text_lists as {"states"} with data.ergo_unfit as set()
+	part := {"op": "compare", "cmp": "in", "left": ["$e", "v"], "right": [`${"alias":"pl","n":2,"of":null,"old":false}`, "items", "allowed"], "ignoring": "case"}
+	"items.allowed" in ergo._text_list_names(part)
+}
