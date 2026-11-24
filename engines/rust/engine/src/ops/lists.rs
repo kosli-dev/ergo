@@ -1227,7 +1227,20 @@ pub fn input_one_fault(check: &super::Check, ctx: &Ctx) -> Vec<String> {
 /// Returns `$input is [...], which isn't an object` when the input is a list
 /// and the check reads `$input` with a key, like `m named by $input.k`.
 pub fn input_key_fault(check: &super::Check, ctx: &Ctx) -> Vec<String> {
-    input_key_fault_of(&check.refs(), ctx)
+    let inner = match check {
+        super::Check::Walk(walk) => &*walk.check,
+        check => check,
+    };
+    let walked: Vec<&Path> = right_paths(inner)
+        .into_iter()
+        .filter(|path| !one_rights(inner).contains(path))
+        .collect();
+    let refs: Vec<Path> = check
+        .refs()
+        .into_iter()
+        .filter(|reference| !walked.contains(&reference))
+        .collect();
+    input_key_fault_of(&refs, ctx)
 }
 
 /// Returns `$input is [...], which isn't an object` when the input is a list
