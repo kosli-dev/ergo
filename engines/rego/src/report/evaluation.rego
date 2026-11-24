@@ -418,7 +418,36 @@ _ref_entries_in(refs, check) := [{"name": t[0], "value": t[1], "locations": t[2]
 _ref_use(check, r) := "unusable" if {
 	_ref_state(r) == "value"
 	_ref_unfit(check, r, _ref_shown(r))
+} else := "unusable" if {
+	_ref_state(r) == "null"
+	_ref_walks(r)
+	_walk_read_whole(r)
+	walk(check, [p, x])
+	not _under_literal(check, p)
+	_text_listed(x, r)
 } else := _outcome_word(_ref_state(r))
+
+_text_listed(x, r) if {
+	x.ignoring
+	x.op in _membership_ops
+	x.values == {"ref": r}
+}
+
+_walk_read_whole(r) if {
+	w := _rwalk_run(null, r)
+	count(w.fails) == 0
+	count(_walk_stop(w)) == 0
+	every e in w.items {
+		not _rwalk_item_unread(e)
+	}
+}
+
+_rwalk_item_unread(e) if e.v in {_absent, _unusable_mark}
+
+_rwalk_item_unread(e) if {
+	e.v == null
+	is_object(e.iv)
+}
 
 _ref_unfit(check, r, _) if _wrong_step(check, r)
 
