@@ -298,6 +298,19 @@ default _list_flaw(_, _) := set()
 
 _list_flaw(leaf, x) := {_lstate(leaf, x)} if {
 	_list_cmp(leaf)
+	not _text_walk_failed(leaf, x)
+	_lstate(leaf, x) != "value"
+}
+
+_list_flaw(leaf, x) := _text_walk_states(x, _rpath(leaf.right)) | _text_side_states(leaf.left, x) if {
+	_list_cmp(leaf)
+	_text_walk_failed(leaf, x)
+}
+
+_text_walk_failed(leaf, x) if {
+	leaf.ignoring
+	leaf.cmp in _membership_ops
+	_lfailed(leaf, x)
 	_lstate(leaf, x) != "value"
 }
 
@@ -309,10 +322,37 @@ _list_flaw(leaf, x) := {"value"} if {
 
 _list_flaw(leaf, x) := {"unusable"} if {
 	_list_cmp(leaf)
+	not leaf.ignoring
 	_lstate(leaf, x) == "value"
 	not _lfailed(leaf, x)
 	not _list_right_usable(leaf.cmp, _lvalue(leaf, x))
 }
+
+_list_flaw(leaf, x) := {st} | _text_side_states(leaf.left, x) if {
+	_list_cmp(leaf)
+	leaf.ignoring
+	_lstate(leaf, x) == "value"
+	not _lfailed(leaf, x)
+	st := _list_text_state(_lvalue(leaf, x))
+}
+
+_list_flaw(leaf, x) := {st} | _text_side_states(leaf.path, x) if {
+	leaf.op in _membership_ops
+	leaf.ignoring
+	_is_ref(leaf.values)
+	st := _text_ref_state(leaf.values.ref)
+}
+
+_text_side_states(p, x) := {st | st := _read_state(x, p); st != "value"} | {"unusable" |
+	v := _found(x, p)
+	not is_string(v)
+}
+
+_text_items_kind := "text in every item"
+
+_text_list_kind(r) := "a list" if not is_array(r)
+
+else := _text_items_kind if _text_items_state(r) == "unusable"
 
 _list_flawed(leaf, x) if count(_list_flaw(leaf, x)) > 0
 

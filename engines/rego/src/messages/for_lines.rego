@@ -1217,6 +1217,7 @@ _m_root_alone(leaf, cause) := [m |
 
 _m_root_problem(leaf, shown, subj, cause) := _rwalk_text(subj, shown) if {
 	_list_phrase(leaf)
+	not _text_walked_ref(leaf, shown)
 	_rfailed(subj, shown)
 } else := _m_walked_root_fault(leaf, shown, subj, cause) if {
 	_list_phrase(leaf)

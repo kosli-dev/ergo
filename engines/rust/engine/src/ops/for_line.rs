@@ -4187,7 +4187,11 @@ fn sentence_root_clauses(forms: &[(Check, bool)], ctx: &Ctx) -> Vec<Clause> {
                 .map(|(cause, text)| {
                     let name = named
                         .iter()
-                        .find(|name| text.starts_with(name.as_str()))
+                        .find(|name| {
+                            text.starts_with(name.as_str())
+                                || text.starts_with("item ")
+                                    && text.contains(&format!(" of {name} "))
+                        })
                         .cloned()
                         .unwrap_or_else(|| text.clone());
                     Clause::root(&name, cause, text)
@@ -4277,10 +4281,11 @@ fn sentence_root_faults(forms: &[(Check, bool)], ctx: &Ctx) -> Vec<(Cause, Strin
                 continue;
             }
             if !(part && read.outcome.cause().is_some())
-                && let Some(text) = super::message::root_kind_fault(check, root, ctx)
-                    .or_else(|| equals_kind_fault(check, root, &read))
+                && let Some(flaw) = super::message::root_kind_flaw(check, root, ctx).or_else(|| {
+                    equals_kind_fault(check, root, &read).map(|text| (Cause::Unusable, text))
+                })
             {
-                found.push((Cause::Unusable, text));
+                found.push(flaw);
                 continue;
             }
             if keys.contains(&root)

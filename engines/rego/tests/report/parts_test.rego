@@ -226,7 +226,56 @@ test_the_object_a_count_of_member_of_reads_is_its_own_read_as_a_walked_list_is i
 	ergo._tally_own_read({"name": "costs"}, items, set(), [{"kind": "item"}])
 }
 
+test_a_list_after_is_in_ignoring_case_that_holds_an_item_that_isnt_text_is_an_unusable_input_even_when_the_row_fails_as_null if {
+	ergo._with_outcome({"name": "ys", "value": ["a", null]}) == {"name": "ys", "value": ["a", null], "outcome": "unusable"} with data.ergo_text_lists as {"ys"}
+	ergo._with_outcome({"name": "ys", "value": [3]}).outcome == "unusable" with data.ergo_text_lists as {"ys"}
+	ergo._with_outcome({"name": "ys", "value": ["a"]}).outcome == "usable" with data.ergo_text_lists as {"ys"}
+	ergo._with_outcome({"name": "zs", "value": [null]}).outcome == "usable" with data.ergo_text_lists as {"ys"}
+	ergo._with_outcome({"name": "ys", "value": null}) == {"name": "ys", "value": null} with data.ergo_text_lists as {"ys"}
+}
+
+test_a_walked_part_list_after_is_in_ignoring_case_is_named_with_its_walked_steps_and_is_an_unusable_input_when_an_item_isnt_text if {
+	ergo._with_outcome({"name": "pl[].name", "value": [3]}).outcome == "unusable" with data.ergo_text_lists as {"pl.name"}
+	ergo._with_outcome({"name": "pl[].name", "value": ["a", null]}).outcome == "unusable" with data.ergo_text_lists as {"pl.name"}
+	ergo._with_outcome({"name": "pl[].name", "value": ["a"]}).outcome == "usable" with data.ergo_text_lists as {"pl.name"}
+	ergo._with_outcome({"name": "pl[].name", "value": [3]}).outcome == "usable" with data.ergo_text_lists as {"pl.id"}
+	ergo._with_outcome({"name": "$input.cs[].name", "value": [3]}).outcome == "unusable" with data.ergo_text_lists as {"$input.cs[].name"}
+}
+
+test_the_lists_a_check_compares_ignoring_case_are_named_as_its_inputs_name_them if {
+	field := {"op": "compare", "left": ["x"], "cmp": "in", "right": ["ys"], "ignoring": "case"}
+	ergo._text_list_names(field) == {"ys"}
+	ergo._text_list_names(object.remove(field, ["ignoring"])) == set()
+	ref := {"op": "in", "path": ["x"], "values": {"ref": ["$$params[]", "l"]}, "ignoring": "case"}
+	ergo._text_list_names({"op": "every", "path": ["xs"], "check": {"op": "present", "path": ["x"]}, "whose": [ref]}) == {"$params.l"}
+	parent := {"op": "compare", "left": ["v"], "cmp": "in", "right": [`${"alias":"thing","n":0,"of":null,"old":true}`, "ys"], "ignoring": "case"}
+	ergo._text_list_names({"op": "compare", "cmp": "eq", "left": {"count_of": ["xs"], "whose": [parent]}, "right": {"literal": 0}}) == {"thing.ys"}
+	root := {"op": "compare", "left": ["x"], "cmp": "not_in", "right": [`${"alias":"","n":-1,"of":null,"old":true}`, "ys"], "ignoring": "case"}
+	ergo._text_list_names({"op": "every", "path": ["xs", "v"], "check": root}) == {"ys"}
+}
+
 test_an_item_record_that_only_repeats_what_the_row_already_says_gives_no_entry if {
 	ergo._tally_unrooted(["null", "item 1 of xs: $input.m is null", {}], "$input.m is null") == null
 	ergo._tally_unrooted(["absent", "item 1 of xs: $input.m is null; key is missing", {}], "$input.m is null") == ["absent", "item 1 of xs: key is missing", {}]
+}
+
+test_a_list_after_is_in_ignoring_case_that_walks_a_subject_that_is_a_list_or_a_part_is_unusable_when_an_item_isnt_text if {
+	walked := {"name": "thing[].states[]", "value": ["A", null], "locations": []}
+	ergo._with_outcome(walked).outcome == "unusable" with data.ergo_text_lists as {"states"} with data.ergo_unfit as set()
+	ergo._with_outcome(object.union(walked, {"value": ["A"]})).outcome == "usable" with data.ergo_text_lists as {"states"} with data.ergo_unfit as set()
+	part := {"op": "compare", "cmp": "in", "left": ["$e", "v"], "right": [`${"alias":"pl","n":2,"of":null,"old":false}`, "items", "allowed"], "ignoring": "case"}
+	"items.allowed" in ergo._text_list_names(part)
+}
+
+test_the_text_lists_of_a_check_name_a_list_from_a_part_and_one_from_the_params_together if {
+	part := {"op": "compare", "cmp": "in", "left": ["$e", "v"], "right": [`${"alias":"pl","n":2,"of":null,"old":false}`, "items", "allowed"], "ignoring": "case"}
+	ref := {"op": "in", "path": ["x"], "values": {"ref": ["$$params", "l"]}, "ignoring": "case"}
+	{"items.allowed", "$params.l"} - ergo._text_list_names({"op": "for", "checks": [part, ref]}) == set()
+}
+
+test_a_list_read_through_an_alias_after_is_in_ignoring_case_is_named_as_the_item_entry_names_it if {
+	alias := {"op": "compare", "cmp": "in", "left": ["$e", "v"], "right": ["$g"], "ignoring": "case"}
+	"g" in ergo._text_list_names(alias)
+	"g.ls" in ergo._text_list_names(object.union(alias, {"right": ["$g", "ls"]}))
+	ergo._with_outcome({"name": "g", "value": ["a", null]}).outcome == "unusable" with data.ergo_text_lists as ergo._text_list_names(alias)
 }

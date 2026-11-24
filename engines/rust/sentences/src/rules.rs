@@ -538,8 +538,9 @@ impl Walk {
         }
         if let Phrase::OneOf {
             not,
-            list: List::Path(_),
+            list: List::Path(path),
         } = phrase
+            && written_steps(path) > 1
         {
             let op = if *not { "is not in" } else { "is in" };
             self.out.insert(format!("\"{op}\" can't take {words} yet"));
@@ -1032,4 +1033,12 @@ fn for_self(line: &ForLine, aliases: &[&str]) -> BTreeSet<String> {
         out.extend(whose_self(whose, &names));
     }
     out
+}
+
+fn written_steps(path: &Path) -> usize {
+    let start = match path.start {
+        Start::Field { .. } | Start::Quoted(_) => 1,
+        Start::That | Start::Params | Start::Input | Start::Unknown(_) => 0,
+    };
+    start + path.steps.len() + usize::from(path.position.is_some())
 }

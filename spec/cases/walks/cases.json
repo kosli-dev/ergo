@@ -47237,5 +47237,449 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a for line whose sentence reads a list from each item of an input that is a list after is in",
+    "policy": {"subjects": {"thing": {"from": "$input", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"for": "every xs as e", "assert": "e.v is in $input.ls"}}}}, "ergo_spec": "{{spec}}"},
+    "cases": [
+      {
+        "description": "walks the input and passes when each value is in the lists of its items",
+        "rules": ["walk.start", "walk.right"],
+        "input": [{"id": "t1", "xs": [{"v": "a"}], "ls": ["a"]}, {"id": "t2", "xs": [{"v": "B"}], "ls": ["B"]}],
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/0/ls/0",
+                  "/1/ls/0"
+                ],
+                "name": "$input[].ls[]",
+                "value": [
+                  "a",
+                  "B"
+                ]
+              },
+              {
+                "locations": [
+                  "/0/xs/0"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "v": "a"
+                  }
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/0/ls/0",
+                  "/1/ls/0"
+                ],
+                "name": "$input[].ls[]",
+                "value": [
+                  "a",
+                  "B"
+                ]
+              },
+              {
+                "locations": [
+                  "/1/xs/0"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "v": "B"
+                  }
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t2",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as null on every subject, not as not_an_object, when an item of the list is null",
+        "rules": ["walk.start", "walk.right.fail"],
+        "input": [{"id": "t1", "xs": [{"v": "a"}], "ls": ["a"]}, {"id": "t2", "xs": [{"v": "B"}], "ls": ["B", null]}],
+        "results": [
+          {
+            "cause": "null",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/0/ls/0",
+                      "/1/ls/0",
+                      "/1/ls/1"
+                    ],
+                    "name": "$input[].ls[]",
+                    "outcome": "usable",
+                    "value": [
+                      "a",
+                      "B",
+                      null
+                    ]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c/assert"
+                ],
+                "message": "item 2 of $input: item 2 of ls is null",
+                "name": "e.v is in $input.ls"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/0/ls/0",
+                  "/1/ls/0",
+                  "/1/ls/1"
+                ],
+                "name": "$input[].ls[]",
+                "outcome": "usable",
+                "value": [
+                  "a",
+                  "B",
+                  null
+                ]
+              },
+              {
+                "locations": [
+                  "/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "v": "a"
+                  }
+                ]
+              }
+            ],
+            "message": "item 2 of $input: item 2 of ls is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/0/ls/0",
+                      "/1/ls/0",
+                      "/1/ls/1"
+                    ],
+                    "name": "$input[].ls[]",
+                    "outcome": "usable",
+                    "value": [
+                      "a",
+                      "B",
+                      null
+                    ]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c/assert"
+                ],
+                "message": "item 2 of $input: item 2 of ls is null",
+                "name": "e.v is in $input.ls"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/0/ls/0",
+                  "/1/ls/0",
+                  "/1/ls/1"
+                ],
+                "name": "$input[].ls[]",
+                "outcome": "usable",
+                "value": [
+                  "a",
+                  "B",
+                  null
+                ]
+              },
+              {
+                "locations": [
+                  "/1/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "v": "B"
+                  }
+                ]
+              }
+            ],
+            "message": "item 2 of $input: item 2 of ls is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t2",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line whose sentence reads a list from each item of an input that is a list after is in ignoring case",
+    "policy": {"subjects": {"thing": {"from": "$input", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"for": "every xs as e", "assert": "e.v is in $input.ls ignoring case"}}}}, "ergo_spec": "{{spec}}"},
+    "cases": [
+      {
+        "description": "walks the input and passes when each value is in the lists of its items",
+        "rules": ["walk.start", "walk.right", "text.ignoring"],
+        "input": [{"id": "t1", "xs": [{"v": "A"}], "ls": ["a"]}, {"id": "t2", "xs": [{"v": "b"}], "ls": ["B"]}],
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/0/ls/0",
+                  "/1/ls/0"
+                ],
+                "name": "$input[].ls[]",
+                "value": [
+                  "a",
+                  "B"
+                ]
+              },
+              {
+                "locations": [
+                  "/0/xs/0"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "v": "A"
+                  }
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/0/ls/0",
+                  "/1/ls/0"
+                ],
+                "name": "$input[].ls[]",
+                "value": [
+                  "a",
+                  "B"
+                ]
+              },
+              {
+                "locations": [
+                  "/1/xs/0"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "v": "b"
+                  }
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t2",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as null on every subject, not as not_an_object, when an item of the list is null",
+        "rules": ["walk.start", "walk.right.fail", "text.not_text"],
+        "input": [{"id": "t1", "xs": [{"v": "A"}], "ls": ["a"]}, {"id": "t2", "xs": [{"v": "b"}], "ls": ["B", null]}],
+        "results": [
+          {
+            "cause": "null",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/0/ls/0",
+                      "/1/ls/0",
+                      "/1/ls/1"
+                    ],
+                    "name": "$input[].ls[]",
+                    "outcome": "unusable",
+                    "value": [
+                      "a",
+                      "B",
+                      null
+                    ]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c/assert"
+                ],
+                "message": "item 2 of $input: item 2 of ls is null",
+                "name": "e.v is in $input.ls ignoring case"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/0/ls/0",
+                  "/1/ls/0",
+                  "/1/ls/1"
+                ],
+                "name": "$input[].ls[]",
+                "outcome": "unusable",
+                "value": [
+                  "a",
+                  "B",
+                  null
+                ]
+              },
+              {
+                "locations": [
+                  "/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "v": "A"
+                  }
+                ]
+              }
+            ],
+            "message": "item 2 of $input: item 2 of ls is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/0/ls/0",
+                      "/1/ls/0",
+                      "/1/ls/1"
+                    ],
+                    "name": "$input[].ls[]",
+                    "outcome": "unusable",
+                    "value": [
+                      "a",
+                      "B",
+                      null
+                    ]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c/assert"
+                ],
+                "message": "item 2 of $input: item 2 of ls is null",
+                "name": "e.v is in $input.ls ignoring case"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/0/ls/0",
+                  "/1/ls/0",
+                  "/1/ls/1"
+                ],
+                "name": "$input[].ls[]",
+                "outcome": "unusable",
+                "value": [
+                  "a",
+                  "B",
+                  null
+                ]
+              },
+              {
+                "locations": [
+                  "/1/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "v": "b"
+                  }
+                ]
+              }
+            ],
+            "message": "item 2 of $input: item 2 of ls is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t2",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]

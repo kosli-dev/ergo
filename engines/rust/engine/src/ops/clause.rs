@@ -17,6 +17,7 @@ pub struct Clause {
     pub text: String,
     pub said: Vec<Clause>,
     pub group: usize,
+    pub last_of_cause: bool,
     pub said_first: bool,
 }
 
@@ -29,6 +30,7 @@ impl Clause {
             text,
             said: Vec::new(),
             group: 0,
+            last_of_cause: false,
             said_first: false,
         }
     }
@@ -56,6 +58,13 @@ impl Clause {
         Clause { group, ..self }
     }
 
+    pub fn last_of_its_cause(self) -> Clause {
+        Clause {
+            last_of_cause: true,
+            ..self
+        }
+    }
+
     pub fn said_first(self) -> Clause {
         Clause {
             said_first: true,
@@ -76,7 +85,7 @@ pub fn shown(clauses: &[Clause]) -> Vec<Clause> {
     once.sort_by(|a, b| {
         (a.group, rank(a)).cmp(&(b.group, rank(b))).then_with(|| {
             if a.kind == Kind::Root && b.kind == Kind::Root {
-                (a.cause, &a.name).cmp(&(b.cause, &b.name))
+                (a.cause, a.last_of_cause, &a.name).cmp(&(b.cause, b.last_of_cause, &b.name))
             } else {
                 std::cmp::Ordering::Equal
             }
@@ -106,6 +115,7 @@ pub fn shown(clauses: &[Clause]) -> Vec<Clause> {
         text: String::new(),
         said: Vec::new(),
         group: 0,
+        last_of_cause: false,
         said_first: false,
     });
     out
@@ -292,6 +302,7 @@ pub fn of_value(value: &Value) -> Option<Vec<Clause>> {
                 text: text(clause, "text")?,
                 said: of_value(clause.get("said")?)?,
                 group: number(clause, "group")?,
+                last_of_cause: false,
                 said_first: clause
                     .get("said_first")
                     .and_then(Value::as_bool)

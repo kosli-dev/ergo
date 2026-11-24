@@ -1915,6 +1915,163 @@ fn the_item_entry_of_copies_lists_the_location_of_each_item_not_the_end_of_its_p
 }
 
 #[test]
+fn a_list_after_is_in_ignoring_case_with_an_item_that_isnt_text_is_said_once_before_the_items_on_an_empty_list_too()
+ {
+    for (sentence, subject, params, cause, message) in [
+        (
+            "every xs.v is in ys ignoring case",
+            json!({"xs": [{"v": "a"}, {"v": "b"}], "ys": ["A", 3]}),
+            json!({}),
+            Cause::Unusable,
+            "item 2 of ys is 3, which isn't text",
+        ),
+        (
+            "some xs.v is not in ys ignoring case",
+            json!({"xs": [{"v": "a"}, {"v": "b"}], "ys": [3]}),
+            json!({}),
+            Cause::Unusable,
+            "item 1 of ys is 3, which isn't text",
+        ),
+        (
+            "every xs.v, if any, is in ys ignoring case",
+            json!({"xs": [], "ys": [1, "a"]}),
+            json!({}),
+            Cause::Unusable,
+            "item 1 of ys is 1, which isn't text",
+        ),
+        (
+            "every xs.v, if any, is one of ys ignoring case",
+            json!({"xs": [], "ys": ["a", null]}),
+            json!({}),
+            Cause::Null,
+            "item 2 of ys is null",
+        ),
+        (
+            "every xs.v, if any, is in $params.l ignoring case",
+            json!({"xs": []}),
+            json!({"l": ["a", null]}),
+            Cause::Null,
+            "item 2 of $params.l is null",
+        ),
+        (
+            "every xs.v is in $params.l ignoring case",
+            json!({"xs": [{"v": "a"}, {"v": "b"}]}),
+            json!({"l": [null]}),
+            Cause::Null,
+            "item 1 of $params.l is null",
+        ),
+        (
+            "every xs.v, if any, is in $params.l ignoring case",
+            json!({"xs": []}),
+            json!({"l": ["a", 3]}),
+            Cause::Unusable,
+            "item 2 of $params.l is 3, which isn't text",
+        ),
+    ] {
+        let out = row_of(sentence, subject, params);
+        assert_eq!(
+            (out.verdict.cause, out.message.as_deref()),
+            (cause, Some(message)),
+            "{sentence}"
+        );
+    }
+}
+
+#[test]
+fn a_list_after_is_in_ignoring_case_that_cant_be_used_doesnt_hide_the_items_whose_own_value_isnt_text()
+ {
+    for (sentence, subject, params, cause, message) in [
+        (
+            "every xs.v is in $params.l ignoring case",
+            json!({"xs": [{"v": "a"}, {"v": 2}]}),
+            json!({"l": [null]}),
+            Cause::Unusable,
+            "item 1 of $params.l is null; item 2 of xs: v is 2, which isn't text",
+        ),
+        (
+            "every xs whose v is in $params.l ignoring case, if any, exists",
+            json!({"xs": [{"v": "a"}, {"v": 2}]}),
+            json!({"l": [null]}),
+            Cause::Unusable,
+            "item 1 of $params.l is null; item 2 of xs: v is 2, which isn't text",
+        ),
+        (
+            "some xs.v is not in $params.l ignoring case",
+            json!({"xs": [{"v": null}, {"v": "b"}]}),
+            json!({"l": ["a", 3]}),
+            Cause::Unusable,
+            "item 2 of $params.l is 3, which isn't text; item 1 of xs: v is null",
+        ),
+        (
+            "every xs.v is in ys ignoring case",
+            json!({"xs": [{"v": "a"}, {"v": 1}, {}], "ys": ["A", 3]}),
+            json!({}),
+            Cause::Unusable,
+            "item 2 of ys is 3, which isn't text; item 2 of xs: v is 1, which isn't text; item 3 of xs: v is missing",
+        ),
+        (
+            "every xs whose v is in $params.l ignoring case, if any, exists",
+            json!({"xs": [{"v": 1}, {"v": "b"}]}),
+            json!({"l": ["A", 3]}),
+            Cause::Unusable,
+            "item 2 of $params.l is 3, which isn't text; item 1 of xs: v is 1, which isn't text",
+        ),
+    ] {
+        let out = row_of(sentence, subject, params);
+        assert_eq!(
+            (out.verdict.cause, out.message.as_deref()),
+            (cause, Some(message)),
+            "{sentence}"
+        );
+    }
+}
+
+#[test]
+fn a_root_compared_with_a_list_after_is_in_ignoring_case_is_said_once_and_names_no_item() {
+    use crate::ops::clause::Kind;
+    for (params, cause, message) in [
+        (
+            json!({"l": ["a", null]}),
+            Cause::Absent,
+            "$params.k is missing; item 2 of $params.l is null",
+        ),
+        (
+            json!({"k": null, "l": ["a", null]}),
+            Cause::Null,
+            "$params.k is null; item 2 of $params.l is null",
+        ),
+        (
+            json!({"l": ["a", 3]}),
+            Cause::Unusable,
+            "item 2 of $params.l is 3, which isn't text; $params.k is missing",
+        ),
+        (
+            json!({"k": 3, "l": ["a"]}),
+            Cause::Unusable,
+            "$params.k is 3, which isn't text",
+        ),
+        (
+            json!({"k": 3, "l": ["a", null]}),
+            Cause::Unusable,
+            "$params.k is 3, which isn't text; item 2 of $params.l is null",
+        ),
+    ] {
+        let out = row_of(
+            "every xs whose $params.k is in $params.l ignoring case, if any, exists",
+            json!({"xs": [{"v": "a"}, {}]}),
+            params.clone(),
+        );
+        assert_eq!(
+            (out.verdict.cause, out.message.as_deref()),
+            (cause, Some(message)),
+            "{params}"
+        );
+        let kinds: Vec<Kind> = out.parts.iter().map(|part| part.kind).collect();
+        assert!(!kinds.contains(&Kind::Item), "{params} {kinds:?}");
+    }
+}
+
+#[test]
 fn a_one_line_walk_count_or_sum_says_a_counted_root_once_and_then_each_item_its_own_value() {
     let policy = serde_json::json!({
         "ergo_spec": crate::SPEC,
@@ -1945,6 +2102,120 @@ fn a_one_line_walk_count_or_sum_says_a_counted_root_once_and_then_each_item_its_
                 )
             ),
             "{check}"
+        );
+    }
+}
+
+fn row_on(sentence: &str, subject: Value, input: Value, params: Value) -> Run {
+    let Check::Walk(walk_check) = lowered(sentence) else {
+        panic!("{sentence} is not every or some");
+    };
+    let context = ctx(&subject, &input, Some(&params));
+    run(&walk_check, &context)
+}
+
+#[test]
+fn a_root_beside_a_walked_list_after_is_in_ignoring_case_in_a_whose_is_said_before_the_list_unless_the_list_fails_worse()
+ {
+    for (params, cs, cause, message) in [
+        (
+            json!({"k": 3}),
+            json!([{"name": 3}]),
+            Cause::Unusable,
+            "$params.k is 3, which isn't text; item 1 of $input.cs: name is 3, which isn't text",
+        ),
+        (
+            json!({}),
+            json!([{"name": "a"}, {}]),
+            Cause::Absent,
+            "$params.k is missing; item 2 of $input.cs: name is missing",
+        ),
+        (
+            json!({"k": null}),
+            json!([{"name": "a"}, {"name": null}]),
+            Cause::Null,
+            "$params.k is null; item 2 of $input.cs: name is null",
+        ),
+    ] {
+        for xs in [json!([]), json!([{"v": "a"}, {}]), json!([{"v": 3}])] {
+            let out = row_on(
+                "every xs whose $params.k is in $input.cs.name ignoring case, if any, exists",
+                json!({ "xs": xs }),
+                json!({ "cs": cs }),
+                params.clone(),
+            );
+            assert_eq!(
+                (out.verdict.cause, out.message.as_deref()),
+                (cause, Some(message)),
+                "{params} {cs} {xs}"
+            );
+        }
+    }
+}
+
+#[test]
+fn an_empty_walked_list_after_is_in_ignoring_case_fails_every_item_as_value_as_without_the_words() {
+    for sentence in [
+        "every xs.v is in $input.cs.name ignoring case",
+        "every xs.v is in $input.cs.name",
+    ] {
+        let out = row_on(
+            sentence,
+            json!({"xs": [{"v": "a"}, {"v": 3}, {}]}),
+            json!({"cs": []}),
+            json!({}),
+        );
+        assert_eq!(
+            (out.verdict.cause, out.message.as_deref()),
+            (Cause::Value, Some("$input.cs is []")),
+            "{sentence}"
+        );
+    }
+}
+
+#[test]
+fn a_walked_list_after_is_in_ignoring_case_it_cant_use_is_said_even_when_an_item_fails_on_its_own()
+{
+    for (sentence, xs, cs, cause, message) in [
+        (
+            "every xs.v is in $input.cs.name ignoring case",
+            json!([{"v": "a"}, {}]),
+            json!([{"name": "a"}, {"name": 3}]),
+            Cause::Unusable,
+            "item 2 of $input.cs: name is 3, which isn't text",
+        ),
+        (
+            "some xs.v is in $input.cs.name ignoring case",
+            json!([{"v": "a"}, {}]),
+            json!([{"name": "a"}, {"name": 3}]),
+            Cause::Unusable,
+            "item 2 of $input.cs: name is 3, which isn't text",
+        ),
+        (
+            "some xs.v is in $input.cs.name ignoring case",
+            json!([{"v": "a"}]),
+            json!([{"name": 3}]),
+            Cause::Unusable,
+            "item 1 of $input.cs: name is 3, which isn't text",
+        ),
+        (
+            "some xs.v is in $input.cs.name ignoring case",
+            json!([{"v": "a"}]),
+            json!([{"name": "a"}, {"name": null}]),
+            Cause::Null,
+            "item 2 of $input.cs: name is null",
+        ),
+    ] {
+        let out = row_on(
+            sentence,
+            json!({ "xs": xs }),
+            json!({ "cs": cs }),
+            json!({}),
+        );
+        assert_eq!(
+            (out.verdict.cause, out.message.as_deref()),
+            (cause, Some(message)),
+            "{sentence} {xs} {cs}"
         );
     }
 }
@@ -2069,5 +2340,145 @@ fn an_every_or_some_fails_on_a_root_before_a_key_from_the_item_it_cant_read_even
                 );
             }
         }
+    }
+}
+
+#[test]
+fn a_list_after_is_in_ignoring_case_that_cant_be_used_is_said_before_a_walked_list_that_is_missing_or_null()
+ {
+    for (sentence, subject, params, cause, message) in [
+        (
+            "every xs.v is in ys ignoring case",
+            json!({"ys": ["a", 3]}),
+            json!({}),
+            Cause::Unusable,
+            "item 2 of ys is 3, which isn't text; xs is missing",
+        ),
+        (
+            "every xs.v is in $params.l ignoring case",
+            json!({}),
+            json!({"l": ["a", 3]}),
+            Cause::Unusable,
+            "item 2 of $params.l is 3, which isn't text; xs is missing",
+        ),
+        (
+            "some xs.v is in ys ignoring case",
+            json!({"xs": null, "ys": ["a", 3]}),
+            json!({}),
+            Cause::Unusable,
+            "item 2 of ys is 3, which isn't text; xs is null",
+        ),
+        (
+            "every xs.v is in ys ignoring case",
+            json!({"ys": ["a", null]}),
+            json!({}),
+            Cause::Absent,
+            "item 2 of ys is null; xs is missing",
+        ),
+    ] {
+        let out = row_of(sentence, subject, params);
+        assert_eq!(
+            (out.verdict.cause, out.message.as_deref()),
+            (cause, Some(message)),
+            "{sentence}"
+        );
+        assert!(
+            out.parts
+                .iter()
+                .all(|part| part.kind == crate::ops::clause::Kind::Root),
+            "{sentence}: {:?}",
+            out.parts
+        );
+    }
+}
+
+#[test]
+fn a_walked_list_after_is_in_ignoring_case_in_a_whose_fails_an_empty_list_with_the_worst_cause_of_its_items()
+ {
+    for (sentence, input, cause, message) in [
+        (
+            "every xs whose v is in $input.cs.name ignoring case exists",
+            json!({"cs": [{"name": 3}]}),
+            Cause::Unusable,
+            "item 1 of $input.cs: name is 3, which isn't text; xs is []",
+        ),
+        (
+            "every xs whose v is in $input.cs.name ignoring case exists",
+            json!({"cs": [{"name": "a"}]}),
+            Cause::Value,
+            "xs is []",
+        ),
+    ] {
+        let Check::Walk(walk_check) = lowered(sentence) else {
+            panic!("{sentence} is not every or some");
+        };
+        let subject = json!({"xs": []});
+        let params = json!({});
+        let context = ctx(&subject, &input, Some(&params));
+        let out = run(&walk_check, &context);
+        assert_eq!(
+            (out.verdict.cause, out.message.as_deref()),
+            (cause, Some(message)),
+            "{sentence}"
+        );
+    }
+}
+
+#[test]
+fn a_walked_list_after_is_in_ignoring_case_that_cant_be_used_fails_a_one_line_every_on_an_empty_list()
+ {
+    for (sentence, input, cause, message) in [
+        (
+            "every xs.v is in $input.cs.name ignoring case",
+            json!({"cs": [{"name": 3}]}),
+            Cause::Unusable,
+            "item 1 of $input.cs: name is 3, which isn't text",
+        ),
+        (
+            "every xs.v is in $input.cs.name ignoring case",
+            json!({"cs": [{"name": "a"}]}),
+            Cause::Value,
+            "xs is []",
+        ),
+    ] {
+        let Check::Walk(walk_check) = lowered(sentence) else {
+            panic!("{sentence} is not every or some");
+        };
+        let subject = json!({"xs": []});
+        let params = json!({});
+        let context = ctx(&subject, &input, Some(&params));
+        let out = run(&walk_check, &context);
+        assert_eq!(
+            (out.verdict.cause, out.message.as_deref()),
+            (cause, Some(message)),
+            "{sentence}"
+        );
+    }
+}
+
+#[test]
+fn a_null_item_of_a_list_after_is_in_ignoring_case_is_said_beside_an_item_that_fails_worse() {
+    for (sentence, subject, params, cause, message) in [
+        (
+            "some xs.v is in ys ignoring case",
+            json!({"xs": [{}], "ys": ["a", null]}),
+            json!({}),
+            Cause::Absent,
+            "item 2 of ys is null; item 1 of xs: v is missing",
+        ),
+        (
+            "every xs.v is in $params.l ignoring case",
+            json!({"xs": [{"v": "a"}, {}]}),
+            json!({"l": [null]}),
+            Cause::Absent,
+            "item 1 of $params.l is null; item 2 of xs: v is missing",
+        ),
+    ] {
+        let out = row_of(sentence, subject, params);
+        assert_eq!(
+            (out.verdict.cause, out.message.as_deref()),
+            (cause, Some(message)),
+            "{sentence}"
+        );
     }
 }

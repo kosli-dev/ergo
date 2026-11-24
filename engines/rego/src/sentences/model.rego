@@ -648,7 +648,7 @@ _s_plain_model(a) := {"op": _s_contains_ops[a.phrase.op], "path": _s_model_path(
 	not _s_field_arg(a.phrase)
 }
 
-_s_plain_model(a) := {"op": "compare", "left": _s_model_path(a.path), "cmp": _s_list_cmps[a.phrase.op], "right": _s_model_path(_s_list_path(a.phrase))} if _s_field_arg(a.phrase)
+_s_plain_model(a) := object.union({"op": "compare", "left": _s_model_path(a.path), "cmp": _s_list_cmps[a.phrase.op], "right": _s_model_path(_s_list_path(a.phrase))}, object.filter(a.phrase, {"ignoring"})) if _s_field_arg(a.phrase)
 
 _s_field_arg(ph) if {
 	ph.op in _s_list_ops

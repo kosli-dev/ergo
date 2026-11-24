@@ -683,3 +683,113 @@ fn a_param_is_ignoring_case_compares_with_is_unfit_when_it_isnt_text() {
         );
     }
 }
+
+#[test]
+fn a_list_after_is_in_ignoring_case_with_an_item_that_isnt_text_is_unfit() {
+    let check = first_check(one(json!({"c": "x is in $params.q ignoring case"})));
+    let subject = json!({"x": "a"});
+    for (list, unfit) in [
+        (json!(["a", 3]), true),
+        (json!([null]), true),
+        (json!(["a"]), false),
+    ] {
+        let params = json!({ "q": list });
+        let ctx = ctx_of(&subject, &params);
+        assert_eq!(
+            ref_unfit(&[&check], &param("q"), &list, &ctx),
+            unfit,
+            "{list}"
+        );
+    }
+    let check = first_check(one(json!({"c": "x is in ys ignoring case"})));
+    for (list, unfit) in [
+        (json!(["a", 3]), true),
+        (json!([null]), true),
+        (json!(["a"]), false),
+    ] {
+        let subject = json!({"x": "a", "ys": list});
+        let params = json!({});
+        let ctx = ctx_of(&subject, &params);
+        let input = crate::ops::Input {
+            name: "ys".to_string(),
+            value: list.clone(),
+            locations: vec!["/ys".to_string()],
+            part: None,
+            state: crate::path::Outcome::Found,
+            null_at: None,
+            worked: false,
+        };
+        assert_eq!(input_unfit(&[&check], &input, &ctx), unfit, "{list}");
+    }
+}
+
+#[test]
+fn a_param_list_after_is_in_ignoring_case_with_a_bad_item_is_unfit_in_a_walk() {
+    for sentence in [
+        "every xs.v is in $params.q ignoring case",
+        "every xs whose v is in $params.q ignoring case, if any, exists",
+        "count of xs whose v is in $params.q ignoring case is 0",
+    ] {
+        let check = first_check(one(json!({ "c": sentence })));
+        let subject = json!({"xs": [{"v": "a"}]});
+        for (list, unfit) in [
+            (json!(["a", 3]), true),
+            (json!([null]), true),
+            (json!(["a"]), false),
+        ] {
+            let params = json!({ "q": list });
+            let ctx = ctx_of(&subject, &params);
+            assert_eq!(
+                ref_unfit(&[&check], &param("q"), &list, &ctx),
+                unfit,
+                "{sentence} {list}"
+            );
+        }
+    }
+}
+
+fn found_input(name: &str, value: &Value) -> crate::ops::Input {
+    crate::ops::Input {
+        name: name.to_string(),
+        value: value.clone(),
+        locations: Vec::new(),
+        part: None,
+        state: crate::path::Outcome::Found,
+        null_at: None,
+        worked: false,
+    }
+}
+
+#[test]
+fn an_input_list_after_is_in_ignoring_case_with_a_bad_item_is_unfit_in_a_walk() {
+    for sentence in [
+        "every xs.v is in $params.q ignoring case",
+        "every xs whose v is in $params.q ignoring case, if any, exists",
+        "count of xs whose v is in $params.q ignoring case is 0",
+    ] {
+        let check = first_check(one(json!({ "c": sentence })));
+        let subject = json!({"xs": [{"v": "a"}]});
+        for (list, unfit) in [
+            (json!(["a", 3]), true),
+            (json!([null]), true),
+            (json!(["a"]), false),
+        ] {
+            let params = json!({ "q": list });
+            let ctx = ctx_of(&subject, &params);
+            let input = found_input("$params.q", &list);
+            assert_eq!(
+                input_unfit(&[&check], &input, &ctx),
+                unfit,
+                "{sentence} {list}"
+            );
+        }
+    }
+    let check = first_check(one(json!({"c": "every xs.v is in ys ignoring case"})));
+    for (list, unfit) in [(json!(["a", 3]), true), (json!(["a"]), false)] {
+        let subject = json!({"xs": [{"v": "a"}], "ys": list});
+        let params = json!({});
+        let ctx = ctx_of(&subject, &params);
+        let input = found_input("ys", &list);
+        assert_eq!(input_unfit(&[&check], &input, &ctx), unfit, "{list}");
+    }
+}

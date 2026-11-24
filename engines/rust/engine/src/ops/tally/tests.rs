@@ -3234,3 +3234,91 @@ fn two_reads_of_the_same_value_merge_into_one_input_with_the_worst_outcome() {
         assert_eq!(merged(entries.clone()), wanted, "{entries:?}");
     }
 }
+
+#[test]
+fn a_walked_list_after_is_in_ignoring_case_in_a_count_whose_is_said_before_a_list_that_is_missing()
+{
+    assert_eq!(
+        cause_and_row_in(
+            "count of xs whose v is in $input.cs.name ignoring case is 0",
+            json!({"things": [{}], "cs": [{"name": 3}]}),
+            json!({}),
+        ),
+        (
+            Cause::Unusable,
+            "item 1 of $input.cs: name is 3, which isn't text; xs is missing".to_string()
+        )
+    );
+    assert_eq!(
+        cause_and_row_in(
+            "count of xs whose v is in $input.cs.name ignoring case is 0",
+            json!({"things": [{}], "cs": [{"name": "a"}]}),
+            json!({}),
+        ),
+        (Cause::Absent, "xs is missing".to_string())
+    );
+}
+
+#[test]
+fn a_list_after_is_in_ignoring_case_that_walks_an_input_that_is_a_list_fails_a_count_over_an_empty_list()
+ {
+    let check = lowered("count of xs whose v is in $input.ok ignoring case is 1");
+    let input = json!([{"xs": [], "ok": ["a"]}, {"xs": [], "ok": ["B", 3]}]);
+    let ctx = Ctx {
+        label: None,
+        item_by_item: false,
+        subject: Located {
+            value: &input[0],
+            location: Location::input_root().index(0),
+        },
+        input: &input,
+        params: Some(&Value::Null),
+        aliases: BTreeMap::new(),
+    };
+    assert_eq!(crate::ops::run(&check, &ctx).cause, Cause::Unusable);
+}
+
+#[test]
+fn a_count_over_an_empty_list_says_only_a_list_after_is_in_ignoring_case_that_walks_an_input_that_is_a_list()
+ {
+    let check = lowered("count of xs whose v is in $input.ok ignoring case is 1");
+    for (ok, cause, text) in [
+        (
+            json!(["B", 3]),
+            Cause::Unusable,
+            "item 2 of $input: item 2 of ok is 3, which isn't text",
+        ),
+        (
+            json!(["B", null]),
+            Cause::Null,
+            "item 2 of $input: item 2 of ok is null",
+        ),
+    ] {
+        let input = json!([{"xs": [], "ok": ["a"]}, {"xs": [], "ok": ok}]);
+        let ctx = Ctx {
+            label: None,
+            item_by_item: false,
+            subject: Located {
+                value: &input[0],
+                location: Location::input_root().index(0),
+            },
+            input: &input,
+            params: Some(&Value::Null),
+            aliases: BTreeMap::new(),
+        };
+        let verdict = crate::ops::run(&check, &ctx);
+        let Check::Tally(tally) = &check else {
+            panic!("not a count");
+        };
+        let said = super::row_said(
+            tally,
+            &ctx,
+            verdict.cause,
+            super::super::message::said(&check, &ctx, &verdict),
+        );
+        assert_eq!(
+            (verdict.cause, super::super::message::said_text(&said)),
+            (cause, text.to_string())
+        );
+    }
+}

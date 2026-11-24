@@ -1065,7 +1065,7 @@ pub(super) fn right_needs(check: &Check, value: &Value) -> Option<&'static str> 
     }
 }
 
-pub(super) fn listed_refs(check: &Check) -> Vec<&Path> {
+pub(crate) fn listed_refs(check: &Check) -> Vec<&Path> {
     use super::lists::Wanted;
     match check {
         Check::In(check) => check.values.ref_paths(),
@@ -1265,6 +1265,12 @@ fn roots_written_in(check: &Check, focus: &Ctx, blocked: impl Fn(&Path) -> bool)
         _ => None,
     };
     match check {
+        Check::In(within)
+            if blocked(&within.path)
+                && message::root_kind_fault(check, &within.path, focus).is_some() =>
+        {
+            None
+        }
         Check::In(within) => Some(Check::In(In {
             values: written(&within.values)?,
             ..within.clone()
@@ -1313,6 +1319,12 @@ fn stood_in(check: &Check, focus: &Ctx, blocked: impl Fn(&Path) -> bool) -> Opti
             .collect();
         kinds.len() > 1
     };
+    if let Check::In(within) = check
+        && !blocked(&within.path)
+        && let Some(stand_in) = super::lists::text_stand_in(check, focus)
+    {
+        return Some(stand_in);
+    }
     let side_blocked = |side: &Side| side.paths().into_iter().any(&blocked);
     let own_side = |left: &Side, right: &Side| match (side_blocked(left), side_blocked(right)) {
         (false, true) => Some(left.clone()),
@@ -1486,7 +1498,8 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
                         && leaf.cause.is_failure()
                         && failing().all(|(check, _, _)| reads_focus(check)));
             let alone = reached.then_some(leaf.cause).filter(|cause| {
-                leaf_roots.iter().any(|root| root.cause == *cause)
+                (super::lists::text_stand_in(&leaf_check, &at).is_some()
+                    || leaf_roots.iter().any(|root| root.cause == *cause))
                     && !leaf_walked.iter().any(|root| root.cause == *cause)
             });
             let failure = if let Some((_, true, said)) = own {
@@ -1548,6 +1561,31 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
                     },
                     said,
                 ))
+            } else if let Some((verdict, stand_in)) = alone
+                .and_then(|_| super::lists::text_stand_in(&leaf_check, &at))
+                .map(|stand_in| (run_check(&stand_in, &at), stand_in))
+                .filter(|(verdict, _)| verdict.cause.is_failure())
+            {
+                let failure = Failure {
+                    wants_object: false,
+                    msg: message::prefixed(
+                        &walked.item_name(&item.item_segs),
+                        &message::message(&stand_in, &at, &verdict),
+                    ),
+                    order: item.end_segs.clone(),
+                    said: walked.item_name_dotted(&item.end_segs),
+                    rank: rank_of(&walk.path.start, &item.end_segs),
+                    path: walked.name_of(&item.end_segs, item.unaliased),
+                    item: walked.name_of(&item.item_segs, item.unaliased),
+                    cause: verdict.cause,
+                    value: item.shown(),
+                    location: Some(item.end_location.clone()),
+                    copies: Vec::new(),
+                    seen: Some((item.item.value.clone(), item.item.location.clone())),
+                    outcome: None,
+                };
+                let said = failure_clause(&failure);
+                Some((failure, said))
             } else if !reached || alone.is_some() {
                 None
             } else {
@@ -1801,16 +1839,44 @@ fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
     } else {
         let mut roots = whose_roots(walk, &outer, settled != Cause::Satisfied);
         let flawed = walk.check.flawed(&outer) && roots.is_empty();
-        let leaf = if flawed || !roots.is_empty() {
+        let text_beside_list = said
+            .iter()
+            .any(|(_, item)| item.kind == Kind::List && item.cause.is_failure())
+            && super::lists::text_list_flawed(&walk.check, &outer);
+        let leaf = if text_beside_list {
+            let mut leaf = message::root_clauses(&[&*walk.check], &outer);
+            once(
+                &mut leaf,
+                message::walked_root_clauses(&[&*walk.check], &outer),
+            );
+            leaf
+        } else if flawed || !roots.is_empty() {
             message::root_clauses(&[&*walk.check], &outer)
         } else {
             let items: Vec<Clause> = said.iter().map(|(_, item)| item.clone()).collect();
             let alone: Vec<Cause> = judged.iter().filter_map(|j| j.alone).collect();
             let reached = judged.iter().any(|j| j.reached);
-            leaf_roots(walk, &outer, &items, &alone, reached)
+            let mut leaf = leaf_roots(walk, &outer, &items, &alone, reached);
+            if walked.items.is_empty() && !walk.if_any {
+                once(
+                    &mut leaf,
+                    message::walked_root_clauses(&[&*walk.check], &outer)
+                        .into_iter()
+                        .filter(|root| root.last_of_cause)
+                        .collect(),
+                );
+            }
+            leaf
         };
         let up_front = !leaf.is_empty() || params_unreadable(&outer) && !roots.is_empty();
-        if flawed {
+        if text_beside_list {
+            list = said
+                .iter()
+                .filter(|(_, item)| item.kind == Kind::List)
+                .map(|(_, item)| Clause::said(item.cause, item.text.clone()).in_group(1))
+                .collect();
+            said.clear();
+        } else if flawed {
             said.clear();
             if !through_a_list(&walk.path, &outer) {
                 list = message::blocked_of(&walk.path, &outer)
@@ -1836,7 +1902,18 @@ fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
         and_walked_roots(walk, &outer, &mut parts);
         match Cause::worst(parts.iter().map(|part| part.cause)) {
             Some(worst) if said_nothing || items_said => (worst, parts),
-            Some(_) => (cause, parts),
+            Some(_) => (
+                Cause::worst(
+                    std::iter::once(cause).chain(
+                        parts
+                            .iter()
+                            .filter(|part| part.kind == Kind::Root && part.last_of_cause)
+                            .map(|part| part.cause),
+                    ),
+                )
+                .unwrap_or(cause),
+                parts,
+            ),
             None => {
                 let list = first_list(&walk.path, &outer);
                 (settled, vec![Clause::list(&walked.name, settled, list)])
@@ -1910,6 +1987,7 @@ fn leaf_roots(
         .into_iter()
         .filter(|root| {
             alone.contains(&root.cause)
+                || root.last_of_cause
                 || reached && items.iter().all(|item| root.cause <= item.cause)
                 || items.iter().all(|item| item.cause == Cause::Value)
         })

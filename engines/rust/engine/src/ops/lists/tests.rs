@@ -749,6 +749,17 @@ fn a_ref_that_reads_the_wrong_kind_of_value_is_a_flaw_and_a_missing_one_is_not()
 }
 
 #[test]
+fn a_ref_after_is_in_ignoring_case_that_isnt_a_list_is_a_flaw_and_a_list_with_null_is_not() {
+    let in_list = lowered_check("x is in $params.l ignoring case");
+    assert!(flawed_with(&in_list, json!({"l": "a"})));
+    assert!(flawed_with(&in_list, json!({"l": {}})));
+    assert!(!flawed_with(&in_list, json!({"l": ["a", null]})));
+    assert!(!flawed_with(&in_list, json!({"l": ["a"]})));
+    assert!(!flawed_with(&in_list, json!({})));
+    assert!(!flawed_with(&in_list, json!({"l": null})));
+}
+
+#[test]
 fn a_written_list_or_a_field_on_the_right_is_never_a_flaw() {
     assert!(!flawed_with(
         &lowered_check("x is one of \"a\", \"b\""),
@@ -1058,6 +1069,69 @@ fn a_key_read_from_a_list_input_says_the_input_isnt_an_object_whatever_the_sente
     }
 }
 
+#[test]
+fn a_list_read_from_a_list_input_after_a_phrase_that_walks_it_says_no_key_fault() {
+    let item = json!({"k": "a", "rs": [{"v": "a"}]});
+    let input = json!([item.clone()]);
+    let ctx = Ctx {
+        label: None,
+        item_by_item: true,
+        subject: Located {
+            value: &item,
+            location: Location::input_root(),
+        },
+        input: &input,
+        params: None,
+        aliases: BTreeMap::new(),
+    };
+    for sentence in [
+        "k is in $input.ls",
+        "k is not in $input.ls",
+        "k is one of $input.ls",
+        "k is in $input.ls ignoring case",
+        "e.v is in $input.ls",
+        "every rs.v is in $input.ls",
+        "k matches $input.ls",
+        "k contains all of $input.ls",
+    ] {
+        assert!(
+            input_key_fault(&assertion(sentence), &ctx).is_empty(),
+            "{sentence}"
+        );
+    }
+    assert_eq!(
+        input_key_fault(&assertion("k contains $input.ls"), &ctx).len(),
+        1
+    );
+}
+
+#[test]
+fn a_walked_list_after_is_in_ignoring_case_is_unfit_only_when_it_holds_an_item_that_isnt_text() {
+    let item = json!({"x": "a"});
+    for (input, unfit) in [
+        (json!([{"ls": ["a"]}, {}]), false),
+        (json!([{"ls": ["a"]}, {"ls": null}]), false),
+        (json!([{"ls": ["a"]}, {"ls": []}]), false),
+        (json!([{"ls": ["a"]}, {"ls": ["b", null]}]), true),
+        (json!([{"ls": ["a"]}, {"ls": [3]}]), true),
+        (json!([{"ls": ["a"]}, {"ls": ["b"]}]), false),
+    ] {
+        let ctx = Ctx {
+            label: None,
+            item_by_item: true,
+            subject: Located {
+                value: &item,
+                location: Location::input_root(),
+            },
+            input: &input,
+            params: None,
+            aliases: BTreeMap::new(),
+        };
+        let check = assertion("x is in $input.ls ignoring case");
+        assert_eq!(text_unfit(&check, "$input[].ls[]", &ctx), unfit, "{input}");
+    }
+}
+
 const BOTH: super::super::compare::Ignoring = super::super::compare::Ignoring {
     case: true,
     spaces: true,
@@ -1132,14 +1206,80 @@ fn in_ignoring_case_fails_on_a_field_that_isnt_text() {
                 "{subject} {not}"
             );
         }
-        for list in [json!(["a", null]), json!(["a", 3])] {
+        for (list, cause) in [
+            (json!(["a", null]), Cause::Null),
+            (json!(["a", 3]), Cause::Unusable),
+        ] {
             assert_eq!(
                 in_ignoring(json!({"x": "a"}), None, written(list.clone()), not).cause,
-                Cause::Unusable,
+                cause,
                 "{list} {not}"
             );
         }
     }
+}
+
+#[test]
+fn in_ignoring_case_fails_on_a_list_from_the_input_with_an_item_that_isnt_text_whatever_the_field_holds_and_the_worst_cause_wins()
+ {
+    use Cause::{Absent, Null, Unusable};
+    let field = Right::Field(key_path(Start::Subject, &["ys"]));
+    let params = Right::Ref(key_path(Start::Params, &["l"]));
+    let held = [Some(json!("a")), Some(json!(3)), Some(json!(null)), None];
+    for not in [false, true] {
+        for (list, causes) in [
+            (json!(["A", 3]), [Unusable; 4]),
+            (json!([1, "a"]), [Unusable; 4]),
+            (json!([null]), [Null, Unusable, Null, Absent]),
+            (json!(["a", null]), [Null, Unusable, Null, Absent]),
+            (json!(["a", null, 3]), [Unusable; 4]),
+            (json!(["a", ["a"]]), [Unusable; 4]),
+            (json!(["a", {"a": 1}]), [Unusable; 4]),
+            (json!([true]), [Unusable; 4]),
+        ] {
+            for (x, cause) in held.iter().zip(causes) {
+                let mut subject = json!({ "ys": list });
+                let mut alone = json!({});
+                if let Some(x) = x {
+                    subject["x"] = x.clone();
+                    alone["x"] = x.clone();
+                }
+                assert_eq!(
+                    in_ignoring(subject, None, field.clone(), not).cause,
+                    cause,
+                    "{list} {x:?} {not}"
+                );
+                assert_eq!(
+                    in_ignoring(alone, Some(json!({ "l": list })), params.clone(), not).cause,
+                    cause,
+                    "{list} {x:?} {not}"
+                );
+            }
+        }
+    }
+}
+
+#[test]
+fn in_ignoring_case_compares_with_a_list_from_the_input_once_both_sides_are_prepared() {
+    let field = Right::Field(key_path(Start::Subject, &["ys"]));
+    let subject = json!({"x": " Bug ", "ys": ["incident", "BUG"]});
+    assert_eq!(
+        in_ignoring(subject.clone(), None, field.clone(), false).cause,
+        Cause::Satisfied
+    );
+    assert_eq!(
+        in_ignoring(subject, None, field.clone(), true).cause,
+        Cause::Value
+    );
+    let subject = json!({"x": "bug", "ys": []});
+    assert_eq!(
+        in_ignoring(subject.clone(), None, field.clone(), false).cause,
+        Cause::Value
+    );
+    assert_eq!(
+        in_ignoring(subject, None, field, true).cause,
+        Cause::Satisfied
+    );
 }
 
 #[test]
@@ -1171,4 +1311,226 @@ fn in_ignoring_case_names_the_field_that_isnt_text() {
     );
     assert_eq!(faults(json!({"x": "a"})), vec![]);
     assert_eq!(faults(json!({"x": null})), vec![]);
+}
+
+fn list_fault(sentence: &str, subject: Value, params: Value) -> Option<(Cause, String)> {
+    let check = lowered_check(sentence);
+    let input = json!({"things": [subject], "cs": [{"name": "A"}, {"name": 3}, {"name": null}]});
+    let ctx = Ctx {
+        label: None,
+        item_by_item: false,
+        subject: Located {
+            value: &input["things"][0],
+            location: Location::input_root().key("things").index(0),
+        },
+        input: &input,
+        params: Some(&params),
+        aliases: BTreeMap::new(),
+    };
+    walk_fault(&check, &ctx)
+}
+
+fn on_input(subject: Value, cs: Value, params: Value, run: impl Fn(&Ctx) -> Verdict) -> Verdict {
+    let input = json!({"things": [subject], "cs": cs});
+    let ctx = Ctx {
+        label: None,
+        item_by_item: false,
+        subject: Located {
+            value: &input["things"][0],
+            location: Location::input_root().key("things").index(0),
+        },
+        input: &input,
+        params: Some(&params),
+        aliases: BTreeMap::new(),
+    };
+    run(&ctx)
+}
+
+#[test]
+fn in_ignoring_case_takes_the_worst_cause_of_a_walked_list_with_a_null_and_an_item_that_isnt_text()
+{
+    let Check::In(check) = lowered_check("x is in $input.cs.name ignoring case") else {
+        panic!("not in");
+    };
+    let cs = json!([{"name": "A"}, {"name": 3}, {"name": null}]);
+    assert_eq!(
+        on_input(json!({"x": "a"}), cs.clone(), json!({}), |ctx| run_in(
+            &check, ctx
+        ))
+        .cause,
+        Cause::Unusable
+    );
+    let cs = json!([{"name": "A"}, {"name": null}]);
+    assert_eq!(
+        on_input(json!({"x": "a"}), cs, json!({}), |ctx| run_in(&check, ctx)).cause,
+        Cause::Null
+    );
+}
+
+#[test]
+fn in_ignoring_case_fails_as_value_on_an_empty_walked_list_whatever_the_field_holds() {
+    let Check::In(check) = lowered_check("x is in $input.cs.name ignoring case") else {
+        panic!("not in");
+    };
+    for subject in [
+        json!({}),
+        json!({"x": null}),
+        json!({"x": 3}),
+        json!({"x": "a"}),
+    ] {
+        assert_eq!(
+            on_input(subject.clone(), json!([]), json!({}), |ctx| run_in(
+                &check, ctx
+            ))
+            .cause,
+            Cause::Value,
+            "{subject}"
+        );
+    }
+}
+
+#[test]
+fn in_ignoring_case_says_a_list_from_the_params_that_isnt_a_list() {
+    let Check::In(check) = lowered_check("x is in $params.n ignoring case") else {
+        panic!("not in");
+    };
+    let faults = |params: Value| {
+        let input = json!({"things": [{"x": "a"}]});
+        let ctx = Ctx {
+            label: None,
+            item_by_item: false,
+            subject: Located {
+                value: &input["things"][0],
+                location: Location::input_root().key("things").index(0),
+            },
+            input: &input,
+            params: Some(&params),
+            aliases: BTreeMap::new(),
+        };
+        in_faults(&check, &ctx)
+    };
+    assert_eq!(
+        faults(json!({"n": "s"})),
+        vec![(
+            "$params.n".to_string(),
+            "$params.n is \"s\", which isn't a list".to_string()
+        )]
+    );
+    assert_eq!(faults(json!({"n": ["a", 3]})), vec![]);
+}
+
+#[test]
+fn a_list_after_is_in_ignoring_case_names_each_item_that_isnt_text_in_list_order() {
+    let said = |cause: Cause, text: &str| Some((cause, text.to_string()));
+    for (sentence, subject, params, want) in [
+        (
+            "x is in ys ignoring case",
+            json!({"x": "a", "ys": ["A", 3]}),
+            json!({}),
+            said(Cause::Unusable, "item 2 of ys is 3, which isn't text"),
+        ),
+        (
+            "x is not one of ys ignoring surrounding spaces",
+            json!({"ys": [null]}),
+            json!({}),
+            said(Cause::Null, "item 1 of ys is null"),
+        ),
+        (
+            "x is in ys ignoring case",
+            json!({"x": 3, "ys": ["a", null, {"a": 1}]}),
+            json!({}),
+            said(
+                Cause::Unusable,
+                "item 2 of ys is null; item 3 of ys is {\"a\": 1}, which isn't text",
+            ),
+        ),
+        (
+            "x is in $params.l ignoring case",
+            json!({"x": "a"}),
+            json!({"l": [1, "a"]}),
+            said(
+                Cause::Unusable,
+                "item 1 of $params.l is 1, which isn't text",
+            ),
+        ),
+        (
+            "x is in $input.cs.name ignoring case",
+            json!({"x": "a"}),
+            json!({}),
+            said(
+                Cause::Unusable,
+                "item 2 of $input.cs: name is 3, which isn't text; item 3 of $input.cs: name is null",
+            ),
+        ),
+        (
+            "x is in ys ignoring case",
+            json!({"x": "a", "ys": ["A", "b"]}),
+            json!({}),
+            None,
+        ),
+        (
+            "x is in ys",
+            json!({"x": "a", "ys": ["A", null]}),
+            json!({}),
+            None,
+        ),
+    ] {
+        assert_eq!(list_fault(sentence, subject, params), want, "{sentence}");
+    }
+}
+
+#[test]
+fn a_walked_list_after_is_in_ignoring_case_with_an_item_that_isnt_text_is_a_root_fault_whatever_the_field_holds()
+ {
+    let root_fault = |sentence: &str, cs: Value| {
+        let check = lowered_check(sentence);
+        let Check::In(In {
+            values: Right::Ref(list),
+            ..
+        }) = &check
+        else {
+            panic!("not in");
+        };
+        let input = json!({"things": [{}], "cs": cs});
+        let ctx = Ctx {
+            label: None,
+            item_by_item: false,
+            subject: Located {
+                value: &input["things"][0],
+                location: Location::input_root().key("things").index(0),
+            },
+            input: &input,
+            params: Some(&json!({})),
+            aliases: BTreeMap::new(),
+        };
+        walked_root_fault(&check, list, &ctx)
+    };
+    assert_eq!(
+        root_fault("v is in $input.cs.name ignoring case", json!([{"name": 3}])),
+        Some((
+            Cause::Unusable,
+            "item 1 of $input.cs: name is 3, which isn't text".to_string()
+        ))
+    );
+    assert_eq!(
+        root_fault(
+            "v is not in $input.cs.name ignoring case",
+            json!([{"name": "a"}, {"name": true}])
+        ),
+        Some((
+            Cause::Unusable,
+            "item 2 of $input.cs: name is true, which isn't text".to_string()
+        ))
+    );
+    assert_eq!(
+        root_fault("v is in $input.cs.name", json!([{"name": 3}])),
+        None
+    );
+    assert_eq!(
+        root_fault(
+            "v is in $input.cs.name ignoring case",
+            json!([{"name": "a"}])
+        ),
+        None
+    );
 }

@@ -141,7 +141,56 @@ _m_plural(v) := "objects" if is_object(v)
 
 _m_is(name, v) := concat("", [name, " is ", _m_print_at(v, name, null)])
 
-_m_isnt(name, v, kind) := concat("", [name, " is ", _m_print_at(v, name, null), ", which isn't ", kind])
+_m_isnt(name, v, kind) := _m_text_items(name, v) if kind == _text_items_kind
+
+else := concat("", [name, " is ", _m_print_at(v, name, null), ", which isn't ", kind])
+
+_m_text_items(name, v) := _m_joined([_m_text_item(concat("", ["item ", format_int(i + 1, 10), " of ", name]), x) |
+	some i, x in v
+	not is_string(x)
+])
+
+_m_text_item(name, null) := concat("", [name, " is null"])
+
+_m_text_item(name, x) := concat("", [name, " is ", _m_print_at(x, name, null), ", which isn't text"]) if x != null
+
+_m_text_list_said(subj, check, cause) := [_m_text_items(s.name, s.value)] if {
+	check.ignoring
+	s := _m_shown(subj, _m_text_list_side(check))
+	s.state == "value"
+	is_array(s.value)
+	_m_text_state_said(check, _text_items_state(s.value), cause)
+} else := []
+
+_m_text_state_said(_, st, cause) if st == cause
+
+_m_text_state_said(check, st, cause) if {
+	_m_says_all(check)
+	st != cause
+	st in _no_value_states
+}
+
+_m_says_all(check) if object.get(check, "ergo/row", false) == true
+
+_m_says_all(check) if object.get(check, "ergo/line", false) == true
+
+_m_text_side_said(subj, check) := [_m_state_clause(s)] if {
+	check.ignoring
+	_list_flawed(check, subj)
+	s := _m_shown(subj, _m_text_side(check))
+	s.state in _no_value_states
+} else := []
+
+_m_text_side(check) := check.left if check.op == "compare"
+
+else := check.path
+
+_m_text_list_side(check) := check.right if {
+	_list_cmp(check)
+	is_array(check.right)
+}
+
+_m_text_list_side(check) := check.values if _is_ref(check.values)
 
 _m_state_word("absent") := "missing"
 
@@ -319,6 +368,25 @@ _m_side_said(s, cause, check) if {
 	not _m_off_path(s.side)
 }
 
+_m_side_said(s, cause, check) if {
+	object.get(check, "ergo/row", false) == true
+	check.ignoring
+	check.op in _membership_ops
+	_is_ref(check.values)
+	_text_ref_state(check.values.ref)
+	s.state != cause
+	s.state in _no_value_states
+}
+
+_m_side_said(s, cause, check) if {
+	object.get(check, "ergo/row", false) == true
+	check.ignoring
+	check.cmp in _membership_ops
+	_walked_side(check.right)
+	s.state != cause
+	s.state in _no_value_states
+}
+
 _m_null_name(subj, side, "null") := _input_name(array.slice(side, 0, j)) if {
 	j := min({i | some i, _ in side; i > _first_key_at(side); _resolved(subj, array.slice(side, 0, i)) == null})
 } else := _input_name(array.slice(side, 0, _first_key_at(side))) if {
@@ -388,13 +456,13 @@ _m_message_pieces(check, subj, cause) := ps if {
 	ps := _m_pieces_once(array.concat(keys, _m_unkeyed_said(subj, check, cause)))
 } else := clauses if {
 	cause in _no_value_states
-	clauses := _m_pieces_once(array.concat([_m_state_clause(s) | some s in _m_sources(subj, check); _m_side_said(s, cause, check)], _m_tally_lists(subj, check, cause)))
+	clauses := _m_pieces_once(array.concat(array.concat([_m_state_clause(s) | some s in _m_sources(subj, check); _m_side_said(s, cause, check)], _m_tally_lists(subj, check, cause)), _m_text_list_said(subj, check, cause)))
 	count(clauses) > 0
 } else := [_m_fallback(check)] if cause in _no_value_states
 
-_m_unusable_before_faults(subj, check, kf) := array.concat(array.concat(kf, _m_blocked_early(subj, check)), _m_params_faults_early(subj, check))
+_m_unusable_before_faults(subj, check, kf) := array.concat(array.concat(array.concat(kf, _m_blocked_early(subj, check)), _m_params_faults_early(subj, check)), _m_text_side_said(subj, check))
 
-_m_unusable_after_faults(subj, check) := array.concat(array.concat(array.concat(_m_blocked_late(subj, check), _m_walk_ref_faults(subj, check)), _m_tally_lists(subj, check, "unusable")), _m_params_beside_input(check))
+_m_unusable_after_faults(subj, check) := array.concat(array.concat(array.concat(array.concat(_m_blocked_late(subj, check), _m_walk_ref_faults(subj, check)), _m_tally_lists(subj, check, "unusable")), _m_params_beside_input(check)), _m_text_list_said(subj, check, "null"))
 
 _m_params_beside_input(check) := array.concat([_m_isnt("$input", data.ergo_document, "an object")], sort({c | walk(check, [_, v]); some c in _m_params_break(v)})) if {
 	_reads_input_key(check)
@@ -475,7 +543,22 @@ _m_message_pieces(check, subj, "not_an_object") := clauses if {
 	count(clauses) > 0
 } else := [_m_fallback(check)] if is_object(subj)
 
-_m_list_names(check) := {_input_name(array.slice(p, 0, i)) |
+_m_list_names(check) := _m_tally_list_names(check) | _m_text_list_names(check)
+
+_m_text_list_names(check) := {_input_name(check.right)} | {_input_name(_as_subject_part(array.slice(check.right, 0, i))) | _part_start(check.right); some i in numbers.range(1, count(check.right)); i < count(check.right)} if {
+	check.ignoring
+	_list_cmp(check)
+	is_array(check.right)
+} else := {_ref_name(array.slice(check.values.ref, 0, i)) | some i in numbers.range(1, count(check.values.ref) - 1)} | {_ref_label(check.values.ref)} if {
+	check.ignoring
+	_is_ref(check.values)
+	_ref_walks(check.values.ref)
+} else := {_ref_label(check.values.ref)} if {
+	check.ignoring
+	_is_ref(check.values)
+} else := set()
+
+_m_tally_list_names(check) := {_input_name(array.slice(p, 0, i)) |
 	some side in _m_tally_parts(check)
 	p := side[_basic_form(side)]
 	is_array(p)

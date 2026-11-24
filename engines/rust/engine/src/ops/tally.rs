@@ -704,6 +704,12 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
                 .chain(&roots)
                 .map(|root| root.cause),
         );
+    } else {
+        causes.extend(
+            with_text_lists(Vec::new(), &whose, &outer)
+                .iter()
+                .map(|root| root.cause),
+        );
     }
     if counted.distinct {
         let mut seen = std::collections::BTreeSet::new();
@@ -1834,7 +1840,7 @@ pub fn counted_said(counted: &Counted, ctx: &Ctx) -> (Vec<Clause>, Vec<Value>) {
         out = if any_undecided {
             and_walked_roots(roots, &whose, &outer)
         } else {
-            roots
+            with_text_lists(roots, &whose, &outer)
         };
         for (said, _, record) in found {
             rich.extend(record);
@@ -1842,6 +1848,15 @@ pub fn counted_said(counted: &Counted, ctx: &Ctx) -> (Vec<Clause>, Vec<Value>) {
         }
     }
     (out, rich)
+}
+
+fn with_text_lists(mut roots: Vec<Clause>, whose: &[&Check], outer: &Ctx) -> Vec<Clause> {
+    for walked in super::message::walked_root_clauses(whose, outer) {
+        if walked.last_of_cause && !roots.iter().any(|root| root.text == walked.text) {
+            roots.push(walked);
+        }
+    }
+    roots
 }
 
 fn and_walked_roots(mut roots: Vec<Clause>, whose: &[&Check], outer: &Ctx) -> Vec<Clause> {

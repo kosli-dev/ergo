@@ -306,6 +306,7 @@ _at_most_max(check, l, subj) if {
 
 _compared(check, l, r, subj) if {
 	not "within" in object.keys(check)
+	not check.ignoring
 	check.cmp in _list_cmps
 	not "max" in object.keys(check)
 	_cmp(check.cmp, l, r, check, subj)
@@ -498,6 +499,15 @@ _unusable(leaf, x) if {
 	r := _rfound(x, leaf.right)
 	is_array(r)
 	not _fits_list(l, r)
+}
+
+_unusable(leaf, x) if {
+	leaf.ignoring
+	_list_cmp(leaf)
+	leaf.cmp in _membership_ops
+	l := _found(x, leaf.left)
+	l != null
+	not is_string(l)
 }
 
 _fits_list(v, vals) if {

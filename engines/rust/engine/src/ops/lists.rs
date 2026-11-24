@@ -195,7 +195,11 @@ fn broken_in(start: &Value, order: &[Seg]) -> Option<(Vec<Seg>, Value, &'static 
     None
 }
 
-fn item_fault(walked: &walk::Walked, item: &walk::WalkItem) -> Option<(Cause, Vec<Seg>, String)> {
+fn item_fault(
+    walked: &walk::Walked,
+    item: &walk::WalkItem,
+    text: bool,
+) -> Option<(Cause, Vec<Seg>, String)> {
     use super::message::{isnt, stated};
     match item.end {
         Some(Value::Null) => Some((
@@ -207,6 +211,11 @@ fn item_fault(walked: &walk::Walked, item: &walk::WalkItem) -> Option<(Cause, Ve
                 &Value::Null,
                 "",
             ),
+        )),
+        Some(value) if text && !value.is_string() => Some((
+            Cause::Unusable,
+            item.end_segs.clone(),
+            isnt(&walked.item_name(&item.end_segs), value, "text"),
         )),
         Some(_) => None,
         None => match item.miss {
@@ -254,10 +263,105 @@ pub(super) fn starts_at_a_list(path: &Path, ctx: &Ctx) -> bool {
 }
 
 pub fn walked(path: &Path, ctx: &Ctx) -> Option<Walked> {
-    walked_from(path, ctx, true)
+    walked_from(path, ctx, true, false)
 }
 
-fn walked_from(path: &Path, ctx: &Ctx, from_start: bool) -> Option<Walked> {
+fn text_right(check: &super::Check) -> Option<&Path> {
+    match check {
+        super::Check::In(In {
+            values: Right::Ref(path) | Right::Field(path),
+            ignoring: Some(_),
+            ..
+        }) => Some(path),
+        _ => None,
+    }
+}
+
+fn text_walk(check: &super::Check, path: &Path, ctx: &Ctx) -> Option<Walked> {
+    use super::message::{isnt, stated};
+    if text_right(check) != Some(path) {
+        return None;
+    }
+    if let Some(walk) = walked_from(path, ctx, true, true) {
+        return Some(walk);
+    }
+    let read = read_path(path, ctx);
+    let (Outcome::Found, Some(Value::Array(items)), Some(first)) =
+        (read.outcome, read.value.as_ref(), read.inputs.first())
+    else {
+        return None;
+    };
+    let faults: Vec<(Cause, String)> = items
+        .iter()
+        .enumerate()
+        .filter_map(|(at, item)| {
+            let name = format!("item {} of {}", at + 1, first.name);
+            match item {
+                Value::String(_) => None,
+                Value::Null => Some((Cause::Null, stated(&name, Cause::Null, item, ""))),
+                other => Some((Cause::Unusable, isnt(&name, other, "text"))),
+            }
+        })
+        .collect();
+    let cause = Cause::worst(faults.iter().map(|f| f.0))?;
+    Some(Walked {
+        name: first.name.clone(),
+        value: items.clone(),
+        locations: first.locations.clone(),
+        cause: Some(cause),
+        text: super::message::joined(faults.into_iter().map(|f| f.1).collect()),
+        part: first.part.clone(),
+    })
+}
+
+pub(super) fn text_list_flawed(check: &super::Check, ctx: &Ctx) -> bool {
+    flawed_text_list(check, ctx).is_some()
+}
+
+pub(super) fn flawed_text_list<'a>(check: &'a super::Check, ctx: &Ctx) -> Option<&'a Path> {
+    let list = text_right(check)?;
+    let flawed = text_fault(check, list, ctx).is_some() || {
+        let read = read_path(list, ctx);
+        read.outcome == Outcome::Found && read.value.as_ref().is_some_and(|v| !v.is_array())
+    };
+    flawed.then_some(list)
+}
+
+pub(crate) fn text_fault(check: &super::Check, path: &Path, ctx: &Ctx) -> Option<(Cause, String)> {
+    text_walk(check, path, ctx).and_then(|walk| walk.cause.map(|cause| (cause, walk.text)))
+}
+
+pub(crate) fn text_unfit(check: &super::Check, name: &str, ctx: &Ctx) -> bool {
+    text_right(check)
+        .and_then(|list| text_walk(check, list, ctx))
+        .is_some_and(|walk| {
+            walk.cause.is_some_and(|cause| cause != Cause::Value)
+                && walk.name == name
+                && walk.value.iter().any(|item| !item.is_string())
+        })
+}
+
+pub(super) fn text_stand_in(check: &super::Check, ctx: &Ctx) -> Option<super::Check> {
+    let super::Check::In(within) = check else {
+        return None;
+    };
+    let list = text_right(check)?;
+    text_fault(check, list, ctx)?;
+    let own = super::compare::Side::Path(within.path.clone());
+    Some(super::Check::Compare(super::compare::Compare {
+        left: own.clone(),
+        right: own,
+        cmp: super::compare::Cmp::Eq,
+        within: None,
+        ignoring: within.ignoring,
+    }))
+}
+
+fn fault_walk(check: &super::Check, path: &Path, ctx: &Ctx) -> Option<Walked> {
+    text_walk(check, path, ctx).or_else(|| walked(path, ctx))
+}
+
+fn walked_from(path: &Path, ctx: &Ctx, from_start: bool, text: bool) -> Option<Walked> {
     let simple = path
         .steps
         .iter()
@@ -301,7 +405,7 @@ fn walked_from(path: &Path, ctx: &Ctx, from_start: bool) -> Option<Walked> {
         walked
             .items
             .iter()
-            .filter_map(|item| item_fault(&walked, item)),
+            .filter_map(|item| item_fault(&walked, item, text)),
     );
     faults.sort_by(|a, b| a.1.cmp(&b.1));
     let cause = Cause::worst(faults.iter().map(|f| f.0));
@@ -382,6 +486,10 @@ pub(super) fn named_refs(check: &Check) -> Vec<&Path> {
 }
 
 fn read_right(right: &Right, ctx: &Ctx, walks: bool) -> RightRead {
+    read_right_as(right, ctx, walks, false)
+}
+
+fn read_right_as(right: &Right, ctx: &Ctx, walks: bool, text: bool) -> RightRead {
     match right {
         Right::Written(value) => RightRead {
             outcome: Outcome::Found,
@@ -389,27 +497,29 @@ fn read_right(right: &Right, ctx: &Ctx, walks: bool) -> RightRead {
             inputs: Vec::new(),
             forced: None,
         },
-        Right::Ref(path) | Right::Field(path) => match walked(path, ctx).filter(|_| walks) {
-            Some(walk) => {
-                let input = walk.input();
-                walked_read(walk, vec![input])
-            }
-            None => {
-                let read = read_path(path, ctx);
-                let outcome =
-                    if matches!(right, Right::Ref(_)) && !walks && input_one_path(path, ctx) {
-                        Outcome::NotAnObject
-                    } else {
-                        read.outcome
-                    };
-                RightRead {
-                    outcome,
-                    value: read.value,
-                    inputs: read.inputs,
-                    forced: None,
+        Right::Ref(path) | Right::Field(path) => {
+            match walked_from(path, ctx, true, text).filter(|_| walks) {
+                Some(walk) => {
+                    let input = walk.input();
+                    walked_read(walk, vec![input])
+                }
+                None => {
+                    let read = read_path(path, ctx);
+                    let outcome =
+                        if matches!(right, Right::Ref(_)) && !walks && input_one_path(path, ctx) {
+                            Outcome::NotAnObject
+                        } else {
+                            read.outcome
+                        };
+                    RightRead {
+                        outcome,
+                        value: read.value,
+                        inputs: read.inputs,
+                        forced: None,
+                    }
                 }
             }
-        },
+        }
         Right::Join(pieces) => {
             let reads: Vec<RightRead> = pieces.iter().map(|p| read_right(p, ctx, walks)).collect();
             let inputs = reads
@@ -465,15 +575,46 @@ fn judged<F>(path: &Path, right: &Right, ctx: &Ctx, walks: bool, decide: F) -> V
 where
     F: FnOnce(&Value, &Outcome, Option<&Value>) -> Cause,
 {
-    let read = read_right(right, ctx, walks);
+    judged_as(path, right, ctx, walks, false, decide)
+}
+
+fn judged_as<F>(
+    path: &Path,
+    right: &Right,
+    ctx: &Ctx,
+    walks: bool,
+    text: bool,
+    decide: F,
+) -> Verdict
+where
+    F: FnOnce(&Value, &Outcome, Option<&Value>) -> Cause,
+{
+    let read = read_right_as(right, ctx, walks, text);
     let left = read_path(path, ctx);
     let inputs = left.inputs.into_iter().chain(read.inputs).collect();
-    let cause = match (read.forced.or(read.outcome.cause()), &read.value) {
-        (Some(cause), _) => cause,
-        (None, Some(right_value)) => decide(right_value, &left.outcome, left.value.as_ref()),
-        (None, None) => Cause::Unusable,
+    let cause = match (read.forced, read.outcome.cause(), &read.value) {
+        (Some(forced), _, _) if text && forced != Cause::Value => Cause::worst(
+            [
+                Some(forced),
+                text_side_cause(&left.outcome, left.value.as_ref()),
+            ]
+            .into_iter()
+            .flatten(),
+        )
+        .unwrap_or(forced),
+        (Some(cause), _, _) | (None, Some(cause), _) => cause,
+        (None, None, Some(right_value)) => decide(right_value, &left.outcome, left.value.as_ref()),
+        (None, None, None) => Cause::Unusable,
     };
     Verdict { cause, inputs }
+}
+
+fn text_side_cause(outcome: &Outcome, found: Option<&Value>) -> Option<Cause> {
+    match left_cause(outcome, found) {
+        Ok(Value::String(_)) => None,
+        Ok(_) => Some(Cause::Unusable),
+        Err(cause) => Some(cause),
+    }
 }
 
 fn left_cause(outcome: &Outcome, found: Option<&Value>) -> Result<Value, Cause> {
@@ -516,7 +657,10 @@ fn usable_patterns(patterns: &Value) -> bool {
 
 impl In {
     pub fn flawed(&self, ctx: &Ctx) -> bool {
-        ref_read(&self.values, ctx).is_some_and(|v| !usable_values(&v, false))
+        ref_read(&self.values, ctx).is_some_and(|v| match self.ignoring {
+            None => !usable_values(&v, false),
+            Some(_) => !v.is_array(),
+        })
     }
 }
 
@@ -537,6 +681,14 @@ impl Matches {
     }
 }
 
+fn text_items_cause(values: &[Value]) -> Option<Cause> {
+    Cause::worst(values.iter().filter_map(|value| match value {
+        Value::String(_) => None,
+        Value::Null => Some(Cause::Null),
+        _ => Some(Cause::Unusable),
+    }))
+}
+
 fn in_text(
     check: &In,
     ignoring: super::compare::Ignoring,
@@ -544,14 +696,19 @@ fn in_text(
     outcome: &Outcome,
     found: Option<&Value>,
 ) -> Cause {
+    if let Some(cause) = text_items_cause(values) {
+        return Cause::worst(
+            [Some(cause), text_side_cause(outcome, found)]
+                .into_iter()
+                .flatten(),
+        )
+        .unwrap_or(cause);
+    }
     let text = match left_cause(outcome, found) {
         Ok(Value::String(text)) => text,
         Ok(_) => return Cause::Unusable,
         Err(cause) => return cause,
     };
-    if !values.iter().all(Value::is_string) {
-        return Cause::Unusable;
-    }
     let text = ignoring.prepare(&text);
     let hit = values
         .iter()
@@ -560,11 +717,12 @@ fn in_text(
 }
 
 pub fn run_in(check: &In, ctx: &Ctx) -> Verdict {
-    judged(
+    judged_as(
         &check.path,
         &check.values,
         ctx,
         true,
+        check.ignoring.is_some(),
         |values, outcome, found| {
             let Value::Array(values) = values else {
                 return Cause::Unusable;
@@ -1071,7 +1229,20 @@ pub fn input_one_fault(check: &super::Check, ctx: &Ctx) -> Vec<String> {
 /// Returns `$input is [...], which isn't an object` when the input is a list
 /// and the check reads `$input` with a key, like `m named by $input.k`.
 pub fn input_key_fault(check: &super::Check, ctx: &Ctx) -> Vec<String> {
-    input_key_fault_of(&check.refs(), ctx)
+    let inner = match check {
+        super::Check::Walk(walk) => &*walk.check,
+        check => check,
+    };
+    let walked: Vec<&Path> = right_paths(inner)
+        .into_iter()
+        .filter(|path| !one_rights(inner).contains(path))
+        .collect();
+    let refs: Vec<Path> = check
+        .refs()
+        .into_iter()
+        .filter(|reference| !walked.contains(&reference))
+        .collect();
+    input_key_fault_of(&refs, ctx)
 }
 
 /// Returns `$input is [...], which isn't an object` when the input is a list
@@ -1088,7 +1259,12 @@ pub fn walked_in(check: &super::Check, path: &Path, ctx: &Ctx) -> Option<Walked>
     if one_rights(check).contains(&path) {
         return None;
     }
-    walked_from(path, ctx, right_paths(check).contains(&path))
+    walked_from(
+        path,
+        ctx,
+        right_paths(check).contains(&path),
+        text_right(check) == Some(path),
+    )
 }
 
 pub(super) fn walked_root_fault(
@@ -1118,7 +1294,7 @@ pub(super) fn field_walk_fault(check: &super::Check, ctx: &Ctx) -> Option<(Cause
 pub fn walk_fault(check: &super::Check, ctx: &Ctx) -> Option<(Cause, String)> {
     rights_of(check).into_iter().find_map(|right| match right {
         Right::Ref(path) | Right::Field(path) => {
-            walked(path, ctx).and_then(|walk| walk.cause.map(|cause| (cause, walk.text)))
+            fault_walk(check, path, ctx).and_then(|walk| walk.cause.map(|cause| (cause, walk.text)))
         }
         _ => None,
     })
@@ -1133,11 +1309,15 @@ fn left_found(path: &Path, ctx: &Ctx) -> Option<(String, Value)> {
 }
 
 fn in_text_faults(check: &In, ctx: &Ctx) -> Vec<(String, String)> {
-    left_found(&check.path, ctx)
+    let mut out: Vec<(String, String)> = left_found(&check.path, ctx)
         .filter(|(_, found)| !found.is_string())
         .map(|(name, found)| super::message::fault(&name, &found, "text"))
         .into_iter()
-        .collect()
+        .collect();
+    out.extend(ref_fault(&check.values, ctx, Value::is_array, |_| {
+        "a list".to_string()
+    }));
+    out
 }
 
 pub fn in_faults(check: &In, ctx: &Ctx) -> Vec<(String, String)> {

@@ -447,6 +447,62 @@ test_a_named_failure_a_member_walk_wanted_as_an_object_says_it_isnt_one if {
 	ergo._m_named_fail({"path": "r.s", "cause": "unusable", "value": [1]}) == "r.s is [1], which isn't a list or an object"
 }
 
+test_a_row_keeps_the_items_of_a_list_after_is_in_ignoring_case_in_list_order if {
+	ref := {"op": "in", "path": ["x"], "values": {"ref": ["$$params[]", "l"]}, "ignoring": "case"}
+	ergo._m_row_text(ref, {"x": "a"}, "unusable") == "item 2 of $params.l is null; item 3 of $params.l is 3, which isn't text" with data.ergo_params as {"l": ["a", null, 3]}
+	field := {"op": "compare", "left": ["x"], "cmp": "in", "right": ["ys"], "ignoring": "case"}
+	ergo._m_row_text(field, {"x": "a", "ys": [null, 3]}, "unusable") == "item 1 of ys is null; item 2 of ys is 3, which isn't text"
+}
+
+test_a_root_list_after_is_in_ignoring_case_that_holds_null_names_each_null_item_and_not_the_list if {
+	ref := {"op": "in", "path": ["v"], "values": {"ref": ["$$params[]", "l"]}, "ignoring": "case"}
+	ergo._m_root_texts({}, ref, "null") == ["item 2 of $params.l is null"] with data.ergo_params as {"l": ["a", null]}
+	ergo._m_root_texts({}, ref, "null") == ["item 1 of $params.l is null"] with data.ergo_params as {"l": [null]}
+	ergo._m_root_texts({}, ref, "absent") == ["$params.l is missing"] with data.ergo_params as {}
+	field := {"op": "compare", "cmp": "in", "left": ["v"], "right": [`${"alias":"","n":-1,"of":null,"old":true}`, "ys"], "ignoring": "case"}
+	ergo._m_root_texts({"ys": ["a", null]}, field, "null") == ["item 2 of ys is null"]
+}
+
+test_a_row_keeps_the_items_of_a_list_walked_from_the_input_after_is_in_ignoring_case_in_list_order if {
+	ref := {"op": "in", "path": ["x"], "values": {"ref": ["$$input[]", "cs", "name"]}, "ignoring": "case"}
+	ergo._m_row_text(ref, {"x": "a"}, "unusable") == "item 1 of $input.cs: name is null; item 3 of $input.cs: name is true, which isn't text" with data.ergo_document as {"cs": [{"name": null}, {"name": "a"}, {"name": true}]}
+}
+
+test_a_root_beside_a_list_after_is_in_ignoring_case_says_its_own_state_and_not_the_lists if {
+	c := {"op": "compare", "cmp": "in", "left": ["$$params", "k"], "right": [`${"alias":"","n":-1,"of":null,"old":true}`, "ys"], "ignoring": "case"}
+	ergo._m_root_texts({"ys": ["a", null]}, c, "null") == ["item 2 of ys is null"] with data.ergo_params as {}
+	ergo._m_root_texts({"ys": ["a", null]}, c, "absent") == ["$params.k is missing"] with data.ergo_params as {}
+	ergo._m_root_texts({"ys": ["a", null]}, c, "null") == ["$params.k is null", "item 2 of ys is null"] with data.ergo_params as {"k": null}
+}
+
+test_a_walked_root_after_is_in_ignoring_case_names_each_item_that_isnt_text if {
+	c := {"op": "in", "path": ["v"], "values": {"ref": ["$$input[]", "cs", "name"]}, "ignoring": "case"}
+	ergo._m_walked_root_text(c, "unusable") == "item 1 of $input.cs: name is 3, which isn't text" with data.ergo_document as {"cs": [{"name": 3}]} with input as {}
+	ergo._m_walked_root_text(c, "unusable") == "item 1 of $input.cs: name is 3, which isn't text; item 2 of $input.cs: name is null" with data.ergo_document as {"cs": [{"name": 3}, {"name": null}]} with input as {}
+	not ergo._m_walked_root_text(c, "unusable") with data.ergo_document as {"cs": [{"name": "a"}]} with input as {}
+	not ergo._m_walked_root_text(object.remove(c, ["ignoring"]), "unusable") with data.ergo_document as {"cs": [{"name": 3}]} with input as {}
+}
+
+test_a_walked_root_after_is_in_ignoring_case_is_said_once_with_its_worst_cause if {
+	c := {"op": "in", "path": ["v"], "values": {"ref": ["$$input[]", "cs", "name"]}, "ignoring": "case"}
+	not ergo._m_walked_root_text(c, "null") with data.ergo_document as {"cs": [{"name": 3}, {"name": null}]} with input as {}
+	ergo._m_walked_root_text(c, "null") == "item 2 of $input.cs: name is null" with data.ergo_document as {"cs": [{"name": "a"}, {"name": null}]} with input as {}
+}
+
+test_a_list_after_is_in_ignoring_case_that_holds_null_is_said_with_the_roots_that_are_null_and_no_item_is_named_for_it if {
+	c := {"op": "compare", "cmp": "in", "left": ["$$params", "k"], "right": [`${"alias":"","n":-1,"of":null,"old":true}`, "ys"], "ignoring": "case"}
+	ergo._m_keyed_off({"ys": ["a", null]}, c, "null") == ["item 2 of ys is null"] with data.ergo_params as {}
+	ergo._m_keyed_off({"ys": ["a", null]}, c, "null") == ["$params.k is null", "item 2 of ys is null"] with data.ergo_params as {"k": null}
+	ergo._m_keyed_off({"ys": ["a", null]}, c, "absent") == ["$params.k is missing"] with data.ergo_params as {}
+	ergo._m_keyed_off({"ys": ["a", 3]}, c, "null") == [] with data.ergo_params as {}
+}
+
+test_an_empty_list_after_is_in_ignoring_case_is_said_as_a_walked_root_as_without_the_words if {
+	c := {"op": "in", "path": ["v"], "values": {"ref": ["$$input[]", "cs", "name"]}, "ignoring": "case"}
+	ergo._m_walked_root_text(object.remove(c, ["ignoring"]), "value") == "$input.cs is []" with data.ergo_document as {"cs": []} with input as {}
+	ergo._m_walked_root_text(c, "value") == "$input.cs is []" with data.ergo_document as {"cs": []} with input as {}
+}
+
 test_a_null_params_before_a_key_from_the_item_is_named_as_the_part_before_the_key if {
 	c := {"op": "compare", "cmp": "eq", "left": ["v"], "right": ["$$params", {"named_by_field": "key"}]}
 	ergo._m_null_before_key({"v": 1}, c) == ["$params is null"] with data.ergo_params as null
@@ -457,4 +513,34 @@ test_a_null_alias_before_a_key_from_the_item_is_named_as_the_part_before_the_key
 	c := {"op": "compare", "cmp": "eq", "left": ["v"], "right": ["$w", {"named_by_field": "key"}]}
 	ergo._m_null_before_key({"v": 1}, c) == ["$w is null"] with input as {"ergo/names": {"w": null}}
 	ergo._m_null_before_key({"v": 1, "key": "a"}, c) == [] with input as {"ergo/names": {"w": null}}
+}
+
+test_a_walked_list_after_is_in_ignoring_case_in_a_count_whose_is_said_as_a_root_beside_a_list_that_cant_be_walked if {
+	ref := {"op": "in", "path": ["v"], "values": {"ref": ["$$input[]", "cs", "name"]}, "ignoring": "case"}
+	stopped := {"fails": [{"cause": "absent"}], "walked": {1}, "trail": []}
+	ergo._m_tally_walked(ref, stopped) == [["unusable", "item 1 of $input.cs: name is 3, which isn't text"]] with input as {"ergo/names": {"ergo/subject": {}}} with data.ergo_document as {"cs": [{"name": 3}]}
+	ergo._m_tally_walked(object.remove(ref, ["ignoring"]), stopped) == [] with input as {"ergo/names": {"ergo/subject": {}}} with data.ergo_document as {"cs": [{}]}
+}
+
+test_a_list_after_is_in_ignoring_case_read_from_each_item_of_a_subject_that_is_a_list_names_its_null_items_in_list_order if {
+	c := {"op": "compare", "cmp": "in", "left": ["$$params", "v"], "right": [`${"alias":"thing","n":0,"of":null,"old":true}`, "states"], "ignoring": "case"}
+	ergo._m_walked_root_text(c, "null") == "item 2 of thing: item 2 of states is null" with input as {"ergo/names": {"ergo/subject": [{"states": ["A"]}, {"states": ["b", null]}]}}
+	ergo._m_walked_root_text(c, "null") == "item 1 of thing: item 1 of states is null; item 2 of thing: item 1 of states is null" with input as {"ergo/names": {"ergo/subject": [{"states": [null]}, {"states": [null]}]}}
+	ergo._m_walked_root_text(c, "unusable") == "item 1 of thing: item 1 of states is null; item 1 of thing: item 2 of states is 4, which isn't text" with input as {"ergo/names": {"ergo/subject": [{"states": [null, 4]}]}}
+}
+
+test_an_option_or_a_filter_says_the_items_of_a_list_after_is_in_ignoring_case_after_what_the_field_cant_give if {
+	c := {"op": "in", "path": ["t"], "values": {"ref": ["$$params[]", "l"]}, "ignoring": "case"}
+	ergo._m_line_sorted(c, {}, "absent") == ["t is missing, and item 2 of $params.l is null"] with data.ergo_params as {"l": ["a", null]}
+	ergo._m_line_sorted(c, {"t": 3}, "unusable") == ["t is 3, which isn't text, and item 2 of $params.l is null"] with data.ergo_params as {"l": ["a", null]}
+	ergo._m_line_sorted(c, {}, "absent") == ["t is missing"] with data.ergo_params as {"l": ["a"]}
+	ergo._m_line_sorted(object.remove(c, ["ignoring"]), {}, "absent") == ["t is missing"] with data.ergo_params as {"l": ["a", null]}
+}
+
+test_a_list_after_is_in_ignoring_case_read_from_each_item_of_a_subject_that_is_a_list_is_marked_unusable_when_an_item_isnt_text if {
+	c := {"op": "compare", "cmp": "in", "left": ["$$params", "v"], "right": [`${"alias":"thing","n":0,"of":null,"old":false}`, "states"], "ignoring": "case"}
+	subj := [{"states": ["A"]}, {"states": ["b", 3]}]
+	"thing[].states[]" in ergo._m_unusable_names_of(c, subj, "unusable") with input as {"ergo/names": {"ergo/subject": subj}} with data.ergo_params as {"v": "a"}
+	text := [{"states": ["A"]}, {"states": ["b"]}]
+	not "thing[].states[]" in ergo._m_unusable_names_of(c, text, "unusable") with input as {"ergo/names": {"ergo/subject": text}} with data.ergo_params as {"v": 3}
 }

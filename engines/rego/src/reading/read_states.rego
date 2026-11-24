@@ -306,6 +306,10 @@ _clear_path_states(subj, check) := set() if {
 } else := _list_flaw(check, subj) - {"value"} if {
 	_list_cmp(check)
 	_list_flawed(check, subj)
+} else := _list_flaw(check, subj) if {
+	check.op in _membership_ops
+	check.ignoring
+	_list_flawed(check, subj)
 } else := {s |
 	_two_sided(check)
 	some p in _read_paths(check)
@@ -524,7 +528,55 @@ _used_ref_state(check, r) := "not_an_object" if {
 	_input_key_ref(r)
 	r in _step_refs(check)
 	_plain_check(check)
+} else := "unusable" if {
+	_text_walked_ref(check, r)
+	_text_ref_state(r) == "unusable"
 } else := _ref_state(r)
+
+_text_walked_ref(check, r) if {
+	check.ignoring
+	check.op in _membership_ops
+	check.values == {"ref": r}
+	_ref_walks(r)
+}
+
+_text_walked_ref(check, r) if {
+	check.ignoring
+	check.op == "compare"
+	check.cmp in _membership_ops
+	p := _rpath(check.right)
+	_part_start(p)
+	_part_start(r)
+	object.remove(_part_of(p), ["old"]) == object.remove(_part_of(r), ["old"])
+	array.slice(p, 1, count(p)) == array.slice(r, 1, count(r))
+}
+
+_text_ref_state(r) := _text_walk_state(null, r) if {
+	_ref_walks(r)
+} else := _list_text_state(_ref_read(r)) if {
+	not _ref_walks(r)
+	_ref_state(r) == "value"
+}
+
+_text_walk_state(x, p) := _worst_of(states) if {
+	states := _text_walk_states(x, p)
+	count(states) > 0
+}
+
+_text_walk_states(x, p) := {w.state | w.failed} | {"unusable" | _text_items_state(w.value) == "unusable"} if w := _rwalk(x, p)
+
+_list_text_state(r) := "unusable" if not is_array(r)
+
+else := _text_items_state(r)
+
+_text_items_state(r) := "unusable" if {
+	some v in r
+	v != null
+	not is_string(v)
+} else := "null" if {
+	some v in r
+	v == null
+}
 
 _key_of_list_input_path(check, r) if {
 	is_array(data.ergo_document)

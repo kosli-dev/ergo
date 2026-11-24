@@ -3,6 +3,15 @@ package ergo_test
 import data.ergo
 import rego.v1
 
+test_a_row_whose_list_after_the_words_holds_text_and_a_number_says_the_list_and_the_root_and_not_that_the_sentence_is_false if {
+	c := {"ignoring": "case", "op": "in", "path": ["$$params", "k"], "values": {"ref": ["$$input[]", "cs", "name"]}}
+	check := {"check": {"op": "present", "path": ["x"]}, "expression": "every xs whose $params.k is in $input.cs.name ignoring case, if any, exists", "if_any": true, "op": "every", "path": ["xs"], "whose": [c]}
+	r := ergo._walk_row(check, {"xs": [{}]}) with data.ergo_document as {"cs": [{"name": "a"}, {"name": 3}]} with data.ergo_params as {} with input as {"ergo/names": {}}
+	[m.text | some m in r.other_roots] == ["item 2 of $input.cs: name is 3, which isn't text", "$params.k is missing"]
+	not "root_msgs" in object.keys(r)
+	[f.item | some f in r.failed] == ["item 1 of xs"]
+}
+
 test_a_walk_that_starts_at_a_name_with_no_location_still_walks_its_items if {
 	start := ergo._walk_start({"path": ["$x", "a"]}, {}) with input as {"ergo/names": {"x": {"a": [1]}}}
 	start.v == {"a": [1]}
@@ -77,6 +86,19 @@ test_a_tally_of_member_of_walks_each_member_of_the_object_as_an_item if {
 	w := ergo._tally_walk({"costs": {"b": 5, "a": 1}}, side)
 	[e.v | some e in w.items] == [1, 5]
 	[e.i | some e in w.items] == [["costs", {"member": "a"}], ["costs", {"member": "b"}]]
+}
+
+test_a_broken_text_list_after_is_in_ignoring_case_hides_an_empty_list_as_any_root_after_every_does if {
+	field := {"op": "compare", "cmp": "in", "left": ["x"], "right": [`${"alias":"","n":-1,"of":null,"old":true}`, "ys"], "ignoring": "case"}
+	every_field := {"op": "every", "path": ["xs", "x"], "check": field, "whose": [], "if_any": false}
+	row := ergo._walk_row(every_field, {"xs": [], "ys": [3]})
+	row.cause == "unusable"
+	row.failed == []
+	[m.text | some m in row.root_msgs] == ["item 1 of ys is 3, which isn't text"]
+	ref := {"op": "in", "path": ["x"], "values": {"ref": ["$$params[]", "l"]}, "ignoring": "case"}
+	mixed := ergo._walk_row({"op": "every", "path": ["xs", "x"], "check": ref, "whose": [], "if_any": false}, {"xs": []}) with data.ergo_params as {"l": ["A", 3]}
+	mixed.cause == "unusable"
+	[m.text | some m in mixed.root_msgs] == ["item 2 of $params.l is 3, which isn't text"]
 }
 
 _min_said(sentence, subj) := {"cause": r.cause, "message": ergo._m_walk_outcome(check, subj, r).message} if {

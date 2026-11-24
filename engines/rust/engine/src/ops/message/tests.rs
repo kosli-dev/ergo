@@ -302,6 +302,47 @@ fn root_clauses_keep_each_item_of_a_count_a_root_reads() {
 }
 
 #[test]
+fn root_clauses_say_a_root_before_is_in_ignoring_case_that_isnt_text() {
+    let subject = json!({"id": "t", "xs": [], "ys": ["a"]});
+    let input = json!({"cs": [{"name": "a"}]});
+    let params = json!({"k": 3, "l": ["a"]});
+    for sentence in [
+        "every xs whose $params.k is in $params.l ignoring case, if any, exists",
+        "every xs whose $params.k is in $input.cs.name ignoring case, if any, exists",
+        "every xs whose $params.k is not in $params.l ignoring case, if any, exists",
+    ] {
+        let said = root_clauses_of(sentence, &subject, &input, Some(&params));
+        assert_eq!(
+            said,
+            vec![(
+                "$params.k".to_string(),
+                "$params.k is 3, which isn't text".to_string()
+            )],
+            "{sentence}"
+        );
+    }
+    let text = json!({"k": "a", "l": ["a"]});
+    assert_eq!(
+        root_clauses_of(
+            "every xs whose $params.k is in $params.l ignoring case, if any, exists",
+            &subject,
+            &input,
+            Some(&text),
+        ),
+        vec![]
+    );
+    assert_eq!(
+        root_clauses_of(
+            "every xs whose $params.k is in $params.l, if any, exists",
+            &subject,
+            &input,
+            Some(&params),
+        ),
+        vec![]
+    );
+}
+
+#[test]
 fn walked_root_clauses_say_a_walked_root_that_holds_values_of_more_than_one_kind() {
     let super::Check::Walk(walk) = lowered("every items whose v is in $params.os.name exists")
     else {
@@ -575,6 +616,131 @@ fn is_ignoring_case_says_each_side_that_isnt_text() {
         compare_said(json!({"x": "  Blocked "}), Side::Value(json!("done"))),
         "x is \"  Blocked \""
     );
+}
+
+fn sentence_said(sentence: &str, subject: Value, params: Value) -> (crate::ops::Cause, String) {
+    sentence_said_on(
+        sentence,
+        subject,
+        json!([{"name": "a"}, {"name": null}]),
+        params,
+    )
+}
+
+fn sentence_said_on(
+    sentence: &str,
+    subject: Value,
+    cs: Value,
+    params: Value,
+) -> (crate::ops::Cause, String) {
+    use crate::path::{Located, Location};
+    let check = lowered(sentence);
+    let input = json!({"things": [subject], "cs": cs});
+    let ctx = crate::path::Ctx {
+        label: Some("thing".to_string()),
+        item_by_item: false,
+        subject: Located {
+            value: &input["things"][0],
+            location: Location::input_root().key("things").index(0),
+        },
+        input: &input,
+        params: Some(&params),
+        aliases: std::collections::BTreeMap::new(),
+    };
+    let verdict = crate::ops::run(&check, &ctx);
+    let said = super::message(&check, &ctx, &verdict);
+    (verdict.cause, said)
+}
+
+#[test]
+fn a_field_beside_a_list_after_is_in_ignoring_case_says_its_own_cause_and_the_worst_cause_wins() {
+    use crate::ops::Cause;
+    for (sentence, subject, params, cause, said) in [
+        (
+            "v is in ys ignoring case",
+            json!({"ys": ["a", null]}),
+            json!({}),
+            Cause::Absent,
+            "v is missing, and item 2 of ys is null",
+        ),
+        (
+            "v is in ys ignoring case",
+            json!({"v": 3, "ys": ["a", null]}),
+            json!({}),
+            Cause::Unusable,
+            "v is 3, which isn't text, and item 2 of ys is null",
+        ),
+        (
+            "v is in ys ignoring case",
+            json!({"ys": [3]}),
+            json!({}),
+            Cause::Unusable,
+            "v is missing, and item 1 of ys is 3, which isn't text",
+        ),
+        (
+            "v is not in ys ignoring case",
+            json!({"v": null, "ys": [3]}),
+            json!({}),
+            Cause::Unusable,
+            "v is null, and item 1 of ys is 3, which isn't text",
+        ),
+        (
+            "$params.k is in $params.l ignoring case",
+            json!({}),
+            json!({"l": ["a", null]}),
+            Cause::Absent,
+            "$params.k is missing, and item 2 of $params.l is null",
+        ),
+        (
+            "$params.k is in $params.l ignoring case",
+            json!({}),
+            json!({"k": 3, "l": ["a", null]}),
+            Cause::Unusable,
+            "$params.k is 3, which isn't text, and item 2 of $params.l is null",
+        ),
+        (
+            "v is in $input.cs.name ignoring case",
+            json!({}),
+            json!({}),
+            Cause::Absent,
+            "v is missing, and item 2 of $input.cs: name is null",
+        ),
+        (
+            "v is in $input.cs.name ignoring case",
+            json!({"v": 3}),
+            json!({}),
+            Cause::Unusable,
+            "v is 3, which isn't text, and item 2 of $input.cs: name is null",
+        ),
+    ] {
+        assert_eq!(
+            sentence_said(sentence, subject.clone(), params),
+            (cause, said.to_string()),
+            "{sentence} {subject}"
+        );
+    }
+}
+
+#[test]
+fn an_empty_walked_list_after_is_in_ignoring_case_fails_as_value_beside_the_field_as_without_the_words()
+ {
+    use crate::ops::Cause;
+    for (subject, said) in [
+        (json!({}), "v is missing, and $input.cs is []"),
+        (json!({"v": null}), "v is null, and $input.cs is []"),
+        (json!({"v": 3}), "v is 3, and $input.cs is []"),
+    ] {
+        for sentence in [
+            "v is in $input.cs.name ignoring case",
+            "v is in $input.cs.name",
+        ] {
+            assert_eq!(
+                sentence_said_on(sentence, subject.clone(), json!([]), json!({})),
+                (Cause::Value, said.to_string()),
+                "{sentence} {subject}"
+            );
+        }
+    }
 }
 
 #[test]

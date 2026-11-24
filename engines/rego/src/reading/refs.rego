@@ -171,6 +171,11 @@ _rwalk_item_fails(e, _) := [{"path": e.c, "item": e.i, "cause": state, "value": 
 	is_object(e.iv)
 }
 
+_rwalk_item_fails(e, _) := [{"path": e.c, "item": e.i, "cause": "null", "value": null, "msg": ""}] if {
+	e.v == null
+	not is_object(e.iv)
+}
+
 _rwalk_item_fails(e, roots) := [{"path": e.i, "item": e.i, "cause": "unusable", "value": e.iv, "msg": _m_isnt(_m_item_name(e.i, roots), e.iv, "an object")}] if {
 	e.v in {_absent, _unusable_mark}
 	not is_object(e.iv)

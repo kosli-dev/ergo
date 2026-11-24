@@ -65,6 +65,14 @@ _m_unusable_names(check, subj) := {s.name |
 	some f in _m_fault(subj, check)
 	s := _m_shown(subj, f[0])
 	s.state == "value"
+} | _m_text_walked_names(check, subj)
+
+_m_text_walked_names(check, subj) := {s.name |
+	check.ignoring
+	check.cmp in _membership_ops
+	_walked_side(check.right)
+	_text_walk_state(subj, _rpath(check.right))
+	s := _m_shown(subj, check.right)
 }
 
 _m_marked(inputs, names) := [_m_marked_input(i, names) | some i in inputs]
@@ -654,7 +662,17 @@ _m_tally_keyed(side) if {
 
 _m_tally_walked(c, w) := _m_cond_walked_said(c) if array.concat(w.fails, _walk_stop(w)) == []
 
-else := [x | some x in _m_cond_walked_said(c); x[0] == "value"]
+else := array.concat([x | some x in _m_cond_walked_said(c); x[0] == "value"], _m_text_walked_said(c))
+
+_m_text_walked_said(c) := [[cause, t] |
+	walk(c, [_, x])
+	is_object(x)
+	x.ignoring
+	some p in _m_walked_roots(x)
+	_text_walked_root(x, p)
+	some cause in _value_fault_cause_list
+	t := _m_walked_root_text(x, cause)
+]
 
 _m_positions(path) := [_m_position(x) | some x in path; _item_step(x)]
 
@@ -788,7 +806,7 @@ _m_root_texts(subj, c, cause) := [_m_isnt("$input", data.ergo_document, "an obje
 	is_array(data.ergo_document)
 } else := _m_keyed_off(subj, c, cause) if count(_m_keyed_off(subj, c, cause)) > 0
 
-else := [concat("", [_input_name(_as_subject_part(p)), " is ", _m_state_word(cause)]) | some p in sort(_root_reads(c))]
+else := [concat("", [_input_name(_as_subject_part(p)), " is ", _m_state_word(cause)]) | some p in sort(_root_reads(c)); _root_state(subj, c, p, _root_tally_lists(c)) == cause]
 
 _m_key_ref_failed(p) if {
 	some seg in p
@@ -854,7 +872,14 @@ _m_walked_roots(c) := [p |
 	_walking_root(c, p)
 ]
 
-_m_walked_root_fault(c, shown, x, cause) := _rwalk_text(x, shown) if {
+_m_walked_root_fault(c, shown, x, cause) := _m_text_walk_text(null, shown) if {
+	_text_walked_ref(c, shown)
+	_text_ref_state(shown) == cause
+} else := _m_text_walk_text(x, shown) if {
+	_text_walked_side(c, shown)
+	_text_walk_state(x, shown) == cause
+} else := _rwalk_text(x, shown) if {
+	not _text_walk_flawed(c, shown, x)
 	w := _rwalk(x, shown)
 	w.failed
 	w.state == cause
@@ -865,18 +890,41 @@ _m_walked_root_fault(c, shown, x, cause) := _rwalk_text(x, shown) if {
 	k := _m_leaf_needs(c, w.value)
 }
 
+_text_walk_flawed(c, shown, _) if {
+	_text_walked_ref(c, shown)
+	_text_ref_state(shown)
+}
+
+_text_walk_flawed(c, shown, x) if {
+	_text_walked_side(c, shown)
+	_text_walk_state(x, shown)
+}
+
+_text_walked_side(c, shown) if {
+	p := _rpath(c.right)
+	_text_list_root(c, p)
+	_walked_root_shown(p) == shown
+}
+
 _m_off_right(subj, c) := [_m_isnt(_root_label(p), _root_value(subj, p), k) |
 	some p in _root_reads(c)
 	k := _root_kind(subj, c, p)
 ]
 
-_m_off_item(subj, c, cause) := _once([concat("", [_input_name(shown_at), " is ", _m_state_word(cause)]) |
+_m_off_item(subj, c, cause) := _once([m |
 	some p in sort({x | walk(c, [_, x]); _m_off_path(x)})
 	not _m_key_ref_failed(p)
+	some m in _m_off_item_texts(subj, c, p, cause)
+]) if cause in _no_value_states
+
+_m_off_item_texts(subj, c, p, cause) := [_m_text_items(_root_label(p), v)] if {
+	_text_list_root(c, p)
+	v := _root_value(subj, p)
+	_text_items_state(v) == cause
+} else := [concat("", [_input_name(_m_shown_at(shown, i, cause)), " is ", _m_state_word(cause)])] if {
 	shown := _as_subject_part(p)
 	i := min({j | some j in numbers.range(1, count(shown)); _read_state(subj, array.slice(shown, 0, j)) == cause})
-	shown_at := _m_shown_at(shown, i, cause)
-]) if cause in _no_value_states
+} else := []
 
 _m_off_item(_, c, "not_an_object") := [_m_isnt("$input", data.ergo_document, "an object")] if {
 	some r in _step_refs(c)
@@ -980,7 +1028,7 @@ _m_tally_item("sum_of", e, roots) := [["unusable", _m_isnt(_m_item_name(e.c, roo
 
 _m_sentence(c, subj, cause) := [_message(c, subj, cause)] if not _walks(c)
 
-_m_line_sorted(c, subj, cause) := [_m_top_sorted(_message(c, subj, cause), _m_list_names(c))] if {
+_m_line_sorted(c, subj, cause) := [_m_top_sorted(_message(object.union(c, {"ergo/line": true}), subj, cause), _m_list_names(c))] if {
 	not _walks(c)
 	cause != "value"
 } else := _m_line(c, subj, cause)

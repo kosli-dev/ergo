@@ -855,6 +855,21 @@ pub fn null_key_parts(path: &Path, ctx: &Ctx) -> Vec<String> {
     vec![format!("{} is null", name::name(&prefix)), key]
 }
 
+fn text_side_unread(check: &Check, ctx: &Ctx, verdict: &Verdict) -> Vec<String> {
+    let Check::In(within) = check else {
+        return Vec::new();
+    };
+    if !lists::text_list_flawed(check, ctx) {
+        return Vec::new();
+    }
+    let side = name::name(&within.path);
+    sources(check, ctx, verdict)
+        .iter()
+        .filter(|i| i.name == side && matches!(i.state, Outcome::Absent | Outcome::Null))
+        .map(|i| format!("{} is {}", i.stopped_at(), state_word(i.state)))
+        .collect()
+}
+
 pub fn message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
     said_text(&said(check, ctx, verdict))
 }
@@ -961,7 +976,8 @@ pub fn pieces(check: &Check, ctx: &Ctx, verdict: &Verdict) -> Vec<Piece> {
                         .filter(|i| {
                             i.state == want
                                 || ctx.label.is_some()
-                                    && !roots.contains(&i.name)
+                                    && (!roots.contains(&i.name)
+                                        || lists::text_list_flawed(check, ctx))
                                     && matches!(i.state, Outcome::Absent | Outcome::Null)
                         })
                         .map(|i| format!("{} is {}", i.stopped_at(), state_word(i.state))),
@@ -969,7 +985,11 @@ pub fn pieces(check: &Check, ctx: &Ctx, verdict: &Verdict) -> Vec<Piece> {
                 .collect();
                 found.extend(said_all(
                     lists::walk_fault(check, ctx)
-                        .filter(|(cause, _)| *cause == verdict.cause)
+                        .filter(|(cause, _)| {
+                            *cause == verdict.cause
+                                || matches!(cause, Cause::Absent | Cause::Null)
+                                    && lists::text_list_flawed(check, ctx)
+                        })
                         .map(|(_, text)| text),
                 ));
                 if let Check::Tally(tally_check) = check {
@@ -992,6 +1012,7 @@ pub fn pieces(check: &Check, ctx: &Ctx, verdict: &Verdict) -> Vec<Piece> {
             let mut all: Vec<Piece> = said_all(key_faults(check, ctx)).collect();
             all.extend(said_all(blocked(check, ctx, false)));
             all.extend(said_all(params_position_fault(check, ctx)));
+            all.extend(said_all(text_side_unread(check, ctx, verdict)));
             match check {
                 Check::Tally(tally_check) => {
                     all.extend(tally_faults(tally_check, ctx).into_iter().map(|(_, p)| p));
@@ -1001,7 +1022,11 @@ pub fn pieces(check: &Check, ctx: &Ctx, verdict: &Verdict) -> Vec<Piece> {
             all.extend(said_all(blocked(check, ctx, true)));
             all.extend(said_all(
                 lists::walk_fault(check, ctx)
-                    .filter(|(cause, _)| *cause == Cause::Unusable)
+                    .filter(|(cause, _)| {
+                        *cause == Cause::Unusable
+                            || matches!(cause, Cause::Absent | Cause::Null)
+                                && lists::text_list_flawed(check, ctx)
+                    })
                     .map(|(_, text)| text),
             ));
             let input_key = lists::input_key_fault(check, ctx);
@@ -1789,6 +1814,17 @@ fn first_null_step(root: &Path, ctx: &Ctx) -> Option<(Cause, String)> {
 }
 
 pub(super) fn root_kind_fault(check: &Check, root: &Path, ctx: &Ctx) -> Option<String> {
+    root_kind_flaw(check, root, ctx).map(|(_, text)| text)
+}
+
+pub(super) fn root_kind_flaw(check: &Check, root: &Path, ctx: &Ctx) -> Option<(Cause, String)> {
+    if let Some(flaw) = lists::text_fault(check, root, ctx) {
+        return Some(flaw);
+    }
+    root_kind_text(check, root, ctx).map(|text| (Cause::Unusable, text))
+}
+
+fn root_kind_text(check: &Check, root: &Path, ctx: &Ctx) -> Option<String> {
     if lists::haystacks(check).contains(&root) {
         return lists::ref_faults(check, ctx).into_iter().next();
     }
@@ -1804,7 +1840,15 @@ pub(super) fn root_kind_fault(check: &Check, root: &Path, ctx: &Ctx) -> Option<S
             within: within.clone(),
             ignoring: None,
         });
-        return root_kind_fault(&compare, root, ctx);
+        return root_kind_text(&compare, root, ctx);
+    }
+    if let Check::In(within) = check
+        && within.ignoring.is_some()
+        && &within.path == root
+    {
+        let read = path::read(root, ctx);
+        let value = read.value.filter(|_| read.outcome == Outcome::Found)?;
+        return (!value.is_string()).then(|| isnt(&name::name(root), value, "text"));
     }
     let sides = match check {
         Check::Compare(c) => [&c.left, &c.right],
@@ -2086,9 +2130,9 @@ fn root_reads_with(
                     let text = isnt(&name::name(&root), value, "text");
                     let said = one(&root, Cause::Unusable, &text);
                     found.push((at, Cause::Unusable, text, true, said));
-                } else if !is_key && let Some(text) = root_kind_fault(check, &root, ctx) {
-                    let said = one(&root, Cause::Unusable, &text);
-                    found.push((at, Cause::Unusable, text, false, said));
+                } else if !is_key && let Some((cause, text)) = root_kind_flaw(check, &root, ctx) {
+                    let said = one(&root, cause, &text);
+                    found.push((at, cause, text, false, said));
                 }
             }
         }
@@ -2151,9 +2195,17 @@ pub fn walked_root_clauses_with(checks: &[&Check], ctx: &Ctx, empty: bool) -> Ve
                     reads_from_a_root(root) && lists::walked_in(check, root, ctx).is_some()
                 })
                 .filter_map(|root| {
+                    let text_list = lists::flawed_text_list(check, ctx) == Some(root);
                     lists::walked_root_fault(check, root, ctx)
                         .filter(|(cause, _)| empty || *cause != Cause::Value)
                         .map(|(cause, text)| Clause::root(&name::name(root), cause, text))
+                        .map(|clause| {
+                            if text_list {
+                                clause.last_of_its_cause()
+                            } else {
+                                clause
+                            }
+                        })
                 })
         })
         .collect()
@@ -2284,8 +2336,25 @@ fn roots_with(checks: &[&Check], ctx: &Ctx, item_keys: bool, keep_lists: bool) -
             said.push(clause);
         }
     }
+    let text_lists: Vec<String> = checks
+        .iter()
+        .filter_map(|check| lists::flawed_text_list(check, ctx))
+        .map(name::name)
+        .collect();
+    let mut said: Vec<Clause> = said
+        .into_iter()
+        .map(|clause| {
+            if clause.kind == clause::Kind::Root && text_lists.contains(&clause.name) {
+                clause.last_of_its_cause()
+            } else {
+                clause
+            }
+        })
+        .collect();
     said.sort_by(|a, b| match (a.kind, b.kind) {
-        (clause::Kind::Root, clause::Kind::Root) => (a.cause, &a.name).cmp(&(b.cause, &b.name)),
+        (clause::Kind::Root, clause::Kind::Root) => {
+            (a.cause, a.last_of_cause, &a.name).cmp(&(b.cause, b.last_of_cause, &b.name))
+        }
         (clause::Kind::Root, _) => std::cmp::Ordering::Less,
         (_, clause::Kind::Root) => std::cmp::Ordering::Greater,
         _ => std::cmp::Ordering::Equal,

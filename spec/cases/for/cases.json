@@ -111744,5 +111744,227 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a sentence under two for lines that reads a list from the params after is in, with a list that isn't a list",
+    "policy": {"subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"for": "every gs as g, every g.xs as e", "assert": "e.v is in $params.ls"}}}}, "ergo_spec": "{{spec}}"},
+    "params": {"ls": "s"},
+    "cases": [
+      {
+        "description": "lists the list it can't read in the assertion entry, as under one for line",
+        "rules": ["for.failure_inputs", "path.right_inputs", "row.parts"],
+        "input": {"things": [{"id": "t1", "gs": [{"xs": [{"v": "a"}]}]}]},
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/ls"
+                    ],
+                    "name": "$params.ls",
+                    "outcome": "unusable",
+                    "value": "s"
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c/assert"
+                ],
+                "message": "$params.ls is \"s\", which isn't a list",
+                "name": "e.v is in $params.ls"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/ls"
+                ],
+                "name": "$params.ls",
+                "outcome": "unusable",
+                "value": "s"
+              },
+              {
+                "locations": [
+                  "/things/0/gs/0/xs/0"
+                ],
+                "name": "g.xs[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "v": "a"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/gs/0"
+                ],
+                "name": "gs[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "xs": [
+                      {
+                        "v": "a"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "message": "$params.ls is \"s\", which isn't a list",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a sentence under two for lines that reads a list from the params after is in, with no list",
+    "policy": {"subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"for": "every gs as g, every g.xs as e", "assert": "e.v is in $params.ls"}}}}, "ergo_spec": "{{spec}}"},
+    "cases": [
+      {
+        "description": "lists the missing list in the assertion entry beside the items that fail on their own",
+        "rules": ["for.failure_inputs", "path.right_inputs", "problems.where_said"],
+        "input": {"things": [{"id": "t1", "gs": [{"xs": [{"v": "a"}, {}]}]}]},
+        "results": [
+          {
+            "cause": "absent",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [
+                      {
+                        "cause": "absent",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/gs/0/xs/1"
+                            ],
+                            "name": "e.v",
+                            "outcome": "absent",
+                            "value": null
+                          },
+                          {
+                            "locations": [
+                              "$params:"
+                            ],
+                            "name": "$params.ls",
+                            "outcome": "absent",
+                            "value": null
+                          }
+                        ],
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/gs/0/xs/1"
+                        ],
+                        "message": "e.v is missing",
+                        "name": "item 2 of g.xs",
+                        "value": {}
+                      }
+                    ],
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/gs/0"
+                    ],
+                    "message": "",
+                    "name": "item 1 of gs",
+                    "value": {
+                      "xs": [
+                        {
+                          "v": "a"
+                        },
+                        {}
+                      ]
+                    }
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.ls",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c/assert"
+                ],
+                "message": "$params.ls is missing",
+                "name": "e.v is in $params.ls"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.ls",
+                "outcome": "absent",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/things/0/gs/0/xs/0",
+                  "/things/0/gs/0/xs/1"
+                ],
+                "name": "g.xs[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "v": "a"
+                  },
+                  {}
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/gs/0"
+                ],
+                "name": "gs[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "xs": [
+                      {
+                        "v": "a"
+                      },
+                      {}
+                    ]
+                  }
+                ]
+              }
+            ],
+            "message": "$params.ls is missing; item 1 of gs: item 2 of g.xs: e.v is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]

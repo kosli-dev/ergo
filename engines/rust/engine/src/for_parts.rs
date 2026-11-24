@@ -165,22 +165,43 @@ fn root_reads(check: &Check, roots: &[Clause], ctx: &Ctx) -> Vec<Value> {
             )
     };
     for root in roots.iter().filter(unread) {
-        let Some(path) = for_line::all_paths(check).into_iter().find(|path| {
-            matches!(
-                path.start,
-                Start::Params | Start::Input | Start::Subject | Start::Own
-            ) && crate::name::name(path) == root.name
-        }) else {
+        let Some(path) = for_line::all_paths(check)
+            .into_iter()
+            .chain(ops::walk::listed_refs(check))
+            .find(|path| {
+                (matches!(
+                    path.start,
+                    Start::Params | Start::Input | Start::Subject | Start::Own
+                ) || matches!(path.start, Start::Part(_))
+                    && path.steps.is_empty()
+                    && ops::lists::walked(path, ctx).is_none())
+                    && crate::name::name(path) == root.name
+            })
+        else {
             continue;
         };
         if let Some(input) = ops::read_path(path, ctx).inputs.first() {
             ops::push_new(
                 &mut out,
-                crate::parts::with_outcome(input, root.cause == Cause::Unusable),
+                crate::parts::with_outcome(
+                    input,
+                    root.cause == Cause::Unusable
+                        || ops::lists::text_fault(check, path, ctx).is_some(),
+                ),
             );
         }
     }
     out
+}
+
+fn text_root(check: &Check, input: &Value, ctx: &Ctx) -> bool {
+    for_line::all_paths(check)
+        .into_iter()
+        .chain(ops::walk::listed_refs(check))
+        .any(|path| {
+            crate::name::name(path) == text(input, "name")
+                && ops::lists::text_fault(check, path, ctx).is_some()
+        })
 }
 
 fn said_clauses(record: &Value) -> Vec<Clause> {
@@ -815,13 +836,15 @@ pub fn for_failures(
                     line.assertion_roots(i, ctx)
                 };
 
-                if !causes.is_empty() || empty_first {
+                let all_read = !causes.is_empty() || empty_first;
+                if all_read {
                     causes.extend(roots.iter().map(|root| root.cause));
-                    for input in root_reads(&sentence.check, &roots, ctx) {
-                        let walked = |x: &Value| text(x, "name").replace("[]", "");
-                        if !inputs.iter().any(|x| walked(x) == walked(&input)) {
-                            inputs.push(input);
-                        }
+                }
+                for input in root_reads(&sentence.check, &roots, ctx) {
+                    let walked = |x: &Value| text(x, "name").replace("[]", "");
+                    let shown = all_read || text_root(&sentence.check, &input, ctx);
+                    if shown && !inputs.iter().any(|x| walked(x) == walked(&input)) {
+                        inputs.push(input);
                     }
                 }
                 let mut own: Vec<String> = Vec::new();

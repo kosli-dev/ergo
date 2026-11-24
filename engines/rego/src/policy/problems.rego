@@ -691,6 +691,7 @@ _node_param_broken(node) if {
 
 _node_param_broken(node) if {
 	node.op in _list_values_ops
+	not node.ignoring
 	vals := _wants(node.values)
 	_value_list(vals)
 	_mixed_types(vals)
