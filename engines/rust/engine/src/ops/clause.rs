@@ -114,7 +114,9 @@ impl Clause {
 
 const SHOWN_ITEMS: usize = 3;
 
-pub fn shown(clauses: &[Clause]) -> Vec<Clause> {
+/// The clauses a row says, each once and in the order the row says them,
+/// with no item left out.
+pub fn ordered(clauses: &[Clause]) -> Vec<Clause> {
     let mut once = said_once(clauses);
     let rank = |clause: &Clause| match clause.kind {
         Kind::Root => 0,
@@ -130,6 +132,11 @@ pub fn shown(clauses: &[Clause]) -> Vec<Clause> {
             }
         })
     });
+    once
+}
+
+pub fn shown(clauses: &[Clause]) -> Vec<Clause> {
+    let once = ordered(clauses);
     let leaves: usize = once
         .iter()
         .filter(|clause| clause.kind == Kind::Item)
@@ -270,32 +277,73 @@ pub fn item_says(name: &str, alias: &str, said: &[Clause]) -> String {
 }
 
 fn pieces(item: &Clause) -> Vec<String> {
-    let mut out: Vec<String> = Vec::new();
+    said_pieces(item, &|_: &Clause| false)
+        .into_iter()
+        .map(|piece| piece.text)
+        .collect()
+}
+
+/// One piece of what a row says of an item: its text, the worst cause of the
+/// clauses in it, and whether a clause of it was left out.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Piece {
+    pub text: String,
+    pub cause: Cause,
+    pub cut: bool,
+}
+
+/// The pieces the row says of `item`, as [`text`] gives them, without the
+/// clauses that `said` holds. A piece all of whose clauses `said` holds is
+/// left out.
+pub fn said_pieces(item: &Clause, said: &dyn Fn(&Clause) -> bool) -> Vec<Piece> {
+    let mut out: Vec<Piece> = Vec::new();
+    let own_text = || Piece {
+        text: item.text.clone(),
+        cause: item.cause,
+        cut: false,
+    };
     if !item.text.is_empty() && !item.said_first {
-        out.push(item.text.clone());
+        out.push(own_text());
     }
-    let mut own: Vec<&str> = Vec::new();
-    let flush = |own: &mut Vec<&str>, out: &mut Vec<String>| {
+    let mut own: Vec<&Clause> = Vec::new();
+    let mut dropped = false;
+    let flush = |own: &mut Vec<&Clause>, dropped: &mut bool, out: &mut Vec<Piece>| {
         if !own.is_empty() {
-            out.push(format!("{}: {}", item.name, own.join(", and ")));
-            own.clear();
+            out.push(Piece {
+                text: format!(
+                    "{}: {}",
+                    item.name,
+                    own.iter()
+                        .map(|clause| clause.text.as_str())
+                        .collect::<Vec<_>>()
+                        .join(", and ")
+                ),
+                cause: Cause::worst(own.iter().map(|clause| clause.cause)).unwrap_or(item.cause),
+                cut: *dropped,
+            });
         }
+        own.clear();
+        *dropped = false;
     };
     for clause in &item.said {
         if clause.kind == Kind::Item {
-            flush(&mut own, &mut out);
-            out.extend(
-                pieces(clause)
-                    .into_iter()
-                    .map(|piece| format!("{}: {piece}", item.name)),
-            );
+            flush(&mut own, &mut dropped, &mut out);
+            if said(clause) {
+                continue;
+            }
+            out.extend(said_pieces(clause, said).into_iter().map(|piece| Piece {
+                text: format!("{}: {}", item.name, piece.text),
+                ..piece
+            }));
+        } else if said(clause) {
+            dropped = true;
         } else {
-            own.push(&clause.text);
+            own.push(clause);
         }
     }
-    flush(&mut own, &mut out);
+    flush(&mut own, &mut dropped, &mut out);
     if !item.text.is_empty() && item.said_first {
-        out.push(item.text.clone());
+        out.push(own_text());
     }
     out
 }

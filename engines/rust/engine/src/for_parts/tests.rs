@@ -641,3 +641,98 @@ fn one_piece_of_what_a_sentence_says_of_an_item_is_said_by_the_items_entry_and_n
         ]
     );
 }
+
+fn whose_roots_entries(
+    for_line: &str,
+    assertion: &str,
+    input: Value,
+    params: Value,
+) -> Vec<String> {
+    let policy = json!({
+        "ergo_spec": crate::SPEC,
+        "subjects": {"thing": {"from": "things", "identified_by": "id"}},
+        "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": for_line, "assert": assertion}}}}
+    });
+    let report = crate::report(&input, &policy, &params);
+    let row = report["results"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|row| row["check"] == "c")
+        .unwrap()
+        .clone();
+    let mut said = vec![format!(
+        "row [{}] {:?}",
+        row["cause"].as_str().unwrap_or_default(),
+        row["message"].as_str().unwrap_or_default()
+    )];
+    tree(&row["failures"], 0, &mut said);
+    said
+}
+
+#[test]
+fn a_list_entry_of_two_whose_roots_has_the_rows_cause_as_on_main_when_the_params_are_an_object() {
+    assert_eq!(
+        whose_roots_entries(
+            "every xs whose v is at least $params.min and whose w is in $params.l as x",
+            "x.w is at least $params.a",
+            json!({"things": [{"id": "t", "xs": [{"v": 1, "w": 1}]}]}),
+            json!({"l": null, "a": "s"}),
+        ),
+        [
+            "row [unusable] \"$params.min is missing; $params.l is null; $params.a is \\\"s\\\", which isn't a number\"",
+            "assertion x.w is at least $params.a [unusable] \"$params.a is \\\"s\\\", which isn't a number\" ()",
+            "list xs [unusable] \"$params.min is missing; $params.l is null\" (\"xs[]\" \"usable\")",
+        ]
+    );
+}
+
+#[test]
+fn a_list_entry_of_two_whose_roots_has_their_worst_cause_as_on_main_when_the_params_arent_an_object()
+ {
+    assert_eq!(
+        whose_roots_entries(
+            "every xs whose v is at least $input.min and whose w is in $input.l as x",
+            "x.w is at least 1",
+            json!({"things": [{"id": "t", "xs": [{"v": 1, "w": 1}]}], "l": null}),
+            json!(3),
+        ),
+        [
+            "row [unusable] \"$input.min is missing; $input.l is null\"",
+            "list xs [absent] \"$input.min is missing; $input.l is null\" (\"xs[]\" \"usable\")",
+        ]
+    );
+}
+
+#[test]
+fn a_clause_the_row_counts_in_and_n_more_is_said_by_the_list_entry() {
+    assert_eq!(
+        entries(
+            "every ws as w, every w.ys, if any, as y",
+            json!(["w is 1", "y is 1"]),
+            json!({"ws": [2, 3, 4, null]}),
+            json!({}),
+        ),
+        [
+            "list ws [null] \"item 4 of ws: w is null\" (\"ws[]\" \"usable\")",
+            "item item 1 of ws [not_an_object] \"item 1 of ws is 2, which isn't an object\" ()",
+            "item item 2 of ws [not_an_object] \"item 2 of ws is 3, which isn't an object\" ()",
+            "item item 3 of ws [not_an_object] \"item 3 of ws is 4, which isn't an object\" ()",
+            "item item 4 of ws [not_an_object] \"item 4 of ws is null, which isn't an object\" ()",
+        ]
+    );
+}
+
+#[test]
+fn an_assertion_says_each_piece_of_an_items_clause_that_holds_a_root_with_more_than_three_problems()
+{
+    assert_eq!(
+        entries(
+            "every ws as w, every ys as y",
+            json!("w.v is in pos.name"),
+            json!({"ws": [{"n": 2}], "ys": [{"n": 1}], "pos": [{"name": 1}, {"x": 1}, {"x": 2}, {"x": 3}, {"x": 4}]}),
+            json!({}),
+        )[0],
+        "assertion w.v is in pos.name [absent] \"item 1 of ws: w.v is missing, and item 2 of pos: name is missing; item 3 of pos: name is missing; item 4 of pos: name is missing\" (\"pos[].name\" \"usable\")"
+    );
+}
