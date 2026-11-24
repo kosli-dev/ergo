@@ -1077,6 +1077,11 @@ pub fn for_failures(
         }) {
             ops::push_new(&mut row_said, clause.text.clone());
         }
+        for clause in row.iter().filter(|clause| {
+            clause.kind == Kind::Item && clause.name == part.name && !clause.text.is_empty()
+        }) {
+            ops::push_new(&mut row_said, clause.text.clone());
+        }
     }
     for whole in clauses(message) {
         let rest = broke_rest(whole);
