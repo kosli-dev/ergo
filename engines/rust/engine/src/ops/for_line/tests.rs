@@ -4882,3 +4882,17 @@ fn a_list_after_is_in_ignoring_case_on_an_assertion_fails_the_for_row_with_the_w
     );
     assert_eq!(missing["cause"], "absent");
 }
+
+#[test]
+fn a_for_assertion_lists_a_list_after_is_in_ignoring_case_it_cant_use_as_unusable() {
+    let row = row_with(
+        "every xs as e",
+        json!("e.v is in $params.l ignoring case"),
+        json!({"xs": []}),
+        json!({"l": ["a", null]}),
+    );
+    assert_eq!(
+        row["failures"][0]["inputs"],
+        json!([{"locations": ["$params:/l"], "name": "$params.l", "outcome": "unusable", "value": ["a", null]}])
+    );
+}
