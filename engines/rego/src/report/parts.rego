@@ -169,7 +169,7 @@ _for_assertion_base(row, at, where, t, i, a) := _policy_entry(
 			[x | some [_, _, l] in lines; some x in _with_outcomes(object.get(l, "inputs", [])); not _alias_named(x.name, aliases); not _sentence_walked_read(x, where.check.checks[i])],
 			[_with_row_part(x, row.inputs) | some l in t.free; l.assertion == a; some x in _with_outcomes(_anchored_inputs(l.inputs, at))],
 		),
-		[x | lines == []; not a in {l.assertion | some l in t.free}; some x in _with_outcomes(row.inputs); _for_sentence_read(x.name, where.check.checks[i]); not _alias_named(x.name, aliases)],
+		[x | not a in {l.assertion | some l in t.free}; some x in _with_outcomes(row.inputs); _for_root_failed(x, lines); _for_sentence_read(x.name, where.check.checks[i]); not _alias_named(x.name, aliases); not x.name in {y.name | some [_, _, l] in lines; some y in object.get(l, "inputs", [])}],
 	)),
 	items,
 	t.said[i],
@@ -181,6 +181,13 @@ _for_assertion_base(row, at, where, t, i, a) := _policy_entry(
 	items := _nested_items([_for_item_of(row, where, i, row.failed_items[k], l, t.items[k].lines[j], aliases, at) | some [k, j, l] in lines; _for_item_said(t.items[k].lines[j])])
 	causes := ({l.cause | some [_, _, l] in lines} | {l.cause | some l in t.free; l.assertion == a}) | {_for_entry_cause(object.get(t, ["said_causes", i], null), row.cause) | lines == []; not a in {l.assertion | some l in t.free}}
 	_for_assertion_said(t.said[i], items)
+}
+
+_for_root_failed(_, lines) if lines == []
+
+_for_root_failed(x, lines) if {
+	lines != []
+	object.get(x, "outcome", "usable") != "usable"
 }
 
 _for_assertion_said(said, _) if said != ""
