@@ -157,3 +157,11 @@ test_a_walked_part_list_after_is_in_ignoring_case_is_said_after_the_field_so_its
 	ergo._m_list_names(object.union(leaf, {"right": ["ys"]})) == {"ys"}
 	ergo._m_list_names(object.remove(leaf, ["ignoring"])) == set()
 }
+
+test_a_row_says_the_items_of_a_list_after_is_in_ignoring_case_read_from_each_item_of_a_subject_that_is_a_list_after_the_field_and_in_list_order if {
+	c := {"op": "compare", "cmp": "in", "left": ["$$params", "v"], "right": [`${"alias":"thing","n":0,"of":null,"old":false}`, "states"], "ignoring": "case"}
+	subj := [{"states": ["A"]}, {"states": [null, 4]}]
+	ergo._m_row_text(c, subj, "unusable") == "$params.v is 3, which isn't text, and item 2 of thing: item 1 of states is null; item 2 of thing: item 2 of states is 4, which isn't text" with input as {"ergo/names": {"ergo/subject": subj}} with data.ergo_params as {"v": 3}
+	ergo._m_row_text(c, subj, "unusable") == "item 2 of thing: item 1 of states is null; item 2 of thing: item 2 of states is 4, which isn't text" with input as {"ergo/names": {"ergo/subject": subj}} with data.ergo_params as {"v": "a"}
+	ergo._m_row_text(c, [{"states": ["a", 3]}], "unusable") == "$params.v is null, and item 1 of thing: item 2 of states is 3, which isn't text" with input as {"ergo/names": {"ergo/subject": [{"states": ["a", 3]}]}} with data.ergo_params as {"v": null}
+}
