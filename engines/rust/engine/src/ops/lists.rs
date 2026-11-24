@@ -335,7 +335,9 @@ pub(crate) fn text_unfit(check: &super::Check, name: &str, ctx: &Ctx) -> bool {
     text_right(check)
         .and_then(|list| text_walk(check, list, ctx))
         .is_some_and(|walk| {
-            walk.cause.is_some_and(|cause| cause != Cause::Value) && walk.name == name
+            walk.cause.is_some_and(|cause| cause != Cause::Value)
+                && walk.name == name
+                && walk.value.iter().any(|item| !item.is_string())
         })
 }
 
