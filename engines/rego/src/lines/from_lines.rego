@@ -928,7 +928,6 @@ _walk_read_again(raw, c) if {
 
 _walk_read_again(raw, c) if {
 	raw.passed == false
-	c.op != "for"
 	_may_hide_a_root(raw, c)
 	_text_walk_rooted(c)
 }
