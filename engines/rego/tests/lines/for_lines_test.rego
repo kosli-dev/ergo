@@ -240,3 +240,20 @@ test_for_root_clauses_say_a_root_two_sentences_read_once_in_the_first_of_their_g
 		ergo._m_root_in("$params.a", "null", "$params.a is null", 5),
 	]
 }
+
+test_an_empty_list_read_through_an_earlier_alias_fails_the_second_line_when_the_walked_roots_are_read_again if {
+	subj := {"rows": [], "vs": [{"v": 1}], "ms": [{"v": 1, "ys": [], "ws": []}]}
+	names := {"ergo/subject": subj, "$at": {"names": {}}}
+	lines := [
+		["every ms as m, every rows, if any, as r", "r.v is in m.ys.name"],
+		["some ms as m, every rows, if any, as r", "r.v is in m.ys.name"],
+		["every ms as m, every m.ws, if any, as w", "w.v is in m.ys.name"],
+		["every ms as m, every vs whose v is 9, if any, as r", "r.v is in m.ys.name"],
+		["every ms as m, every rows, if any, as r", "r.tags contains all of m.ys.name"],
+	]
+	every l in lines {
+		check := ergo._s_written_check({"for": l[0], "assert": l[1]})
+		ergo._for_row(check, subj).cause == "satisfied" with input as {"ergo/names": names}
+		ergo._for_row(check, subj).cause == "value" with input as {"ergo/names": names} with ergo._walk_roots_on as true
+	}
+}
