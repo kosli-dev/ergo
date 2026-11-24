@@ -1161,7 +1161,7 @@ _where(req_name, name, check) := object.union(w, {
 	"text_lists": _text_list_names(check),
 }) if w := {"check": check, "req": req_name, "name": name}
 
-_text_list_names(check) := {n |
+_text_list_names(check) := ({n |
 	walk(check, [_, x])
 	is_object(x)
 	x.ignoring
@@ -1171,6 +1171,12 @@ _text_list_names(check) := {n |
 	is_object(x)
 	x.ignoring
 	n := _text_part_list_name(x)
+}) | {trim_prefix(n, "$") |
+	walk(check, [_, x])
+	is_object(x)
+	x.ignoring
+	_alias_start(x.right)
+	n := _text_list_name(x)
 }
 
 _text_list_name(x) := _ref_label(x.values.ref) if {
