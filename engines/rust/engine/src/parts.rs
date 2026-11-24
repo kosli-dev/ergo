@@ -392,7 +392,9 @@ fn level_bits(path: &str) -> Option<(Vec<u64>, Vec<String>)> {
     Some((idx, fields))
 }
 
-fn levels_of(entry: Failure, input: &Value) -> Leveled {
+const PAST_THE_ITEM: usize = 3;
+
+fn levels_of(entry: Failure, input: &Value, params: Option<&Value>) -> Leveled {
     let name = entry.part().name.clone();
     let lead_of = match member_of(&name) {
         Some((key, list)) => Some((format!("member {key}"), list.to_string())),
@@ -443,8 +445,8 @@ fn levels_of(entry: Failure, input: &Value) -> Leveled {
     }
     let stopped_short = matches!(&entry, Failure::List(part) if part.cause == Cause::Absent);
     let count = |field: &str| field.split('.').filter(|f| !f.is_empty()).count();
-    let ends_with = |last: usize| {
-        let mut cut = cut;
+    let ends_with = |extra: usize, last: usize| {
+        let mut cut = cut.saturating_sub(extra);
         let mut ends = vec![0usize; m];
         for j in (0..m).rev() {
             cut = cut.saturating_sub(if j == m - 1 {
@@ -465,17 +467,37 @@ fn levels_of(entry: Failure, input: &Value) -> Leveled {
         })
     };
     let full = count(&fields[m]);
-    let ends = (0..=full)
-        .rev()
-        .map(ends_with)
-        .find(|ends| fits(ends))
-        .unwrap_or_else(|| ends_with(if stopped_short { 0 } else { full }));
+    let position = lead
+        .as_deref()
+        .and_then(|lead| lead.strip_prefix("item "))
+        .and_then(|number| number.parse::<u64>().ok())
+        .and_then(|number| number.checked_sub(1))
+        .map(|at| at.to_string());
+    let past = position.and_then(|at| {
+        (0..=PAST_THE_ITEM)
+            .filter(|extra| cut.checked_sub(*extra).and_then(|k| tokens.get(k)) == Some(&at))
+            .flat_map(|extra| (0..=full).rev().map(move |last| ends_with(extra, last)))
+            .find(|ends| fits(ends))
+    });
+    let ends = past
+        .or_else(|| {
+            (0..=full)
+                .rev()
+                .map(|last| ends_with(0, last))
+                .find(|ends| fits(ends))
+        })
+        .unwrap_or_else(|| ends_with(0, if stopped_short { 0 } else { full }));
     let levels: Vec<Level> = (0..m)
         .map(|j| {
             let pointer = tokens[..ends[j].min(tokens.len())].join("/");
             Level {
                 name: names[j].clone(),
-                value: input.pointer(&pointer).cloned().unwrap_or(Value::Null),
+                value: match pointer.strip_prefix("$params:") {
+                    Some(inside) => params.and_then(|params| params.pointer(inside)),
+                    None => input.pointer(&pointer),
+                }
+                .cloned()
+                .unwrap_or(Value::Null),
                 locations: vec![pointer],
             }
         })
@@ -590,7 +612,16 @@ fn merged_items(entries: Vec<Failure>) -> Vec<Failure> {
 /// Puts entries of a list walked several levels deep under the items they
 /// sit in, reading each outer item from `input`.
 pub fn nest(entries: Vec<Failure>, input: &Value) -> Vec<Failure> {
-    let leveled: Vec<Leveled> = entries.into_iter().map(|e| levels_of(e, input)).collect();
+    nest_with(entries, input, None)
+}
+
+/// Like [`nest`], reading an outer item whose place is in the params from
+/// `params`.
+pub fn nest_with(entries: Vec<Failure>, input: &Value, params: Option<&Value>) -> Vec<Failure> {
+    let leveled: Vec<Leveled> = entries
+        .into_iter()
+        .map(|e| levels_of(e, input, params))
+        .collect();
     if leveled.iter().all(|e| e.levels.is_empty()) {
         return leveled.into_iter().map(|e| e.entry).collect();
     }

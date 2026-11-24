@@ -1673,7 +1673,7 @@ impl For {
                             "item": child.entry.name,
                             "cause": f.cause.name(),
                             "inputs": f.inputs,
-                                    "ergo/clauses": super::clause::to_value(&f.named),
+                            "ergo/clauses": super::clause::to_value(&f.named),
                             "ergo/said": child.entry.shown(),
                             "value": child.entry.value,
                             "locations": locations,

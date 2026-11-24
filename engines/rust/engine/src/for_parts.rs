@@ -406,7 +406,7 @@ fn item_entry(
     roots: &[String],
     lifted: &[Clause],
     walked: Option<Failure>,
-    input: &Value,
+    ctx: &Ctx,
 ) -> Option<Failure> {
     let alias = aliases.last().copied().unwrap_or_default();
     if let Some(pairs) = l.get("items").and_then(Value::as_array) {
@@ -428,7 +428,7 @@ fn item_entry(
                 })
             })
             .collect();
-        let inner = crate::parts::nest(inner, input);
+        let inner = crate::parts::nest_with(inner, ctx.input, ctx.params);
         let cause = Cause::worst(inner.iter().map(|y| y.part().cause))?;
         return Some(item(
             text(f, "item"),
@@ -1026,7 +1026,7 @@ pub fn for_failures(
                         let walked = walked_under(line, &sentence.check, f, &l, &aliases, ctx);
                         let lifted = alias_roots(line, i, f, row, ctx);
                         if let Some(entry) =
-                            item_entry(f, &l, &aliases, &root_texts, &lifted, walked, ctx.input)
+                            item_entry(f, &l, &aliases, &root_texts, &lifted, walked, ctx)
                         {
                             causes.push(entry.part().cause);
                             items.push(entry);

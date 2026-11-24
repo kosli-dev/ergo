@@ -2821,7 +2821,7 @@ fn walk_part(
             for root in walked.roots {
                 push_line(&mut said, root);
             }
-            parts::nest(walked.entries, ctx.input)
+            parts::nest_with(walked.entries, ctx.input, ctx.params)
         }
     };
     let mut failures = walk_base(walk, ctx, &mut said);
@@ -2960,7 +2960,7 @@ fn tally_part(
         name: name.to_string(),
         cause,
         inputs: own,
-        failures: parts::nest(walked.entries, ctx.input),
+        failures: parts::nest_with(walked.entries, ctx.input, ctx.params),
         message: said_text(&own_said),
     }
 }
