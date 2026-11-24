@@ -223,3 +223,11 @@ test_a_failed_item_of_a_child_of_a_distinct_parent_lists_where_it_sits_under_eve
 		"outcome": "usable",
 	}]]
 }
+
+test_the_assertion_of_a_second_for_line_lists_a_list_after_is_in_it_cant_read_when_no_item_is_said if {
+	things := [{"id": "t1", "gs": [{"xs": [{"v": "a"}]}]}]
+	line := "every gs as g, every g.xs as e"
+	[[a.name, a.inputs] | some r in _parts_results({"things": things}, {"for": line, "assert": "e.v is in $params.ls"}, {"ls": "s"}); some a in r.failures] == [["e.v is in $params.ls", [{"name": "$params.ls", "value": "s", "locations": ["$params:/ls"], "outcome": "unusable"}]]]
+	[[a.name, a.inputs] | some r in _parts_results({"things": things}, {"for": line, "assert": "e.v is in $params.ls"}, {}); some a in r.failures] == [["e.v is in $params.ls", [{"name": "$params.ls", "value": null, "locations": ["$params:"], "outcome": "absent"}]]]
+	[[a.name, a.inputs] | some r in _parts_results({"things": things, "ls": null}, {"for": line, "assert": "e.v is in $input.ls"}, {}); some a in r.failures] == [["e.v is in $input.ls", [{"name": "$input.ls", "value": null, "locations": ["/ls"], "outcome": "null"}]]]
+}
