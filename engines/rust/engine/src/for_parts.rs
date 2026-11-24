@@ -1070,6 +1070,14 @@ pub fn for_failures(
     {
         said_by(entry, &[], &mut row_said);
     }
+    for entry in &rest {
+        let part = entry.part();
+        if let Some(clause) = row.iter().find(|clause| {
+            clause.kind == Kind::Item && !clause.text.is_empty() && clause.text == part.message
+        }) {
+            ops::push_new(&mut row_said, clause.text.clone());
+        }
+    }
     for whole in clauses(message) {
         let rest = broke_rest(whole);
         if let Some(rest) = rest.as_ref().filter(|rest| !rest.is_empty()) {
