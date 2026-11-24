@@ -127,3 +127,11 @@ test_a_walked_list_after_is_in_ignoring_case_that_holds_a_null_item_has_the_outc
 	ergo._ref_use(walked, w) == "null" with data.ergo_document as [{"ok": ["a"]}, {"ok": null}]
 	ergo._ref_use(object.remove(walked, ["ignoring"]), w) == "null" with data.ergo_document as [{"ok": ["a"]}, {"ok": ["b", null]}]
 }
+
+test_an_item_that_is_missing_or_unusable_is_unread_and_a_text_item_is_read if {
+	ergo._rwalk_item_unread({"v": ergo._absent})
+	ergo._rwalk_item_unread({"v": ergo._unusable_mark})
+	ergo._rwalk_item_unread({"v": null, "iv": {"a": 1}})
+	not ergo._rwalk_item_unread({"v": "a"})
+	not ergo._rwalk_item_unread({"v": null, "iv": 1})
+}
