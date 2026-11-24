@@ -47735,7 +47735,7 @@
                 ],
                 "kind": "assertion",
                 "locations": [
-                  "$policy:/subjects/t/from#1"
+                  "$policy:/subjects/t/from"
                 ],
                 "message": "$input.cs is []",
                 "name": "every xs.v, if any, is in $input.cs.name"
@@ -47806,7 +47806,7 @@
                 ],
                 "kind": "assertion",
                 "locations": [
-                  "$policy:/subjects/t/from#1"
+                  "$policy:/subjects/t/from"
                 ],
                 "message": "item 1 of $input.cs: name is missing",
                 "name": "every xs.v, if any, is in $input.cs.name"
