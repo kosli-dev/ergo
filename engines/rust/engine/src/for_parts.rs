@@ -114,19 +114,7 @@ fn walked_under(
     if !walks || line.items.len() != 1 || l.get("items").is_some() {
         return None;
     }
-    let value = f.get("value")?;
-    let place = strings(f, "locations").first().cloned()?;
-    let mut at = ctx.clone();
-    at.aliases.insert(
-        line.items[0].alias.clone(),
-        crate::path::Located {
-            value,
-            location: crate::path::Location {
-                root: ctx.subject.location.root,
-                pointer: place,
-            },
-        },
-    );
+    let at = bound(line, f, ctx)?;
     let cause = cause_of(l);
     let part = crate::subjects::sentence_part(
         sentence,
@@ -204,11 +192,71 @@ fn own_text(record: &Value, said: &[Clause]) -> String {
     for_line::rendered(&said_name(record), &clause::lines(said))
 }
 
+fn bound<'a>(line: &For, f: &'a Value, ctx: &Ctx<'a>) -> Option<Ctx<'a>> {
+    let value = f.get("value")?;
+    let place = strings(f, "locations").first().cloned()?;
+    let mut at = ctx.clone();
+    at.aliases.insert(
+        line.items[0].alias.clone(),
+        crate::path::Located {
+            value,
+            location: crate::path::Location {
+                root: ctx.subject.location.root,
+                pointer: place,
+            },
+        },
+    );
+    Some(at)
+}
+
+fn said_under(row: &[Clause], item: &str) -> Vec<String> {
+    row.iter()
+        .filter(|clause| clause.kind == Kind::Item && clause.name == item)
+        .flat_map(|clause| clause.said.iter().map(|said| said.text.clone()))
+        .collect()
+}
+
+fn alias_roots(line: &For, idx: usize, f: &Value, row: &[Clause], ctx: &Ctx) -> Vec<Clause> {
+    let said = said_under(row, &text(f, "item"));
+    if said.is_empty() {
+        return Vec::new();
+    }
+    let Some(at) = bound(line, f, ctx) else {
+        return Vec::new();
+    };
+    line.item_alias_roots(idx, &at)
+        .into_iter()
+        .filter(|root| said.contains(&root.text))
+        .collect()
+}
+
+fn with_root_outcomes(inputs: Vec<Value>, lifted: &[Clause]) -> Vec<Value> {
+    inputs
+        .into_iter()
+        .map(|mut input| {
+            let name = text(&input, "name");
+            if let Some(root) = lifted
+                .iter()
+                .find(|root| root.text.starts_with(&format!("{name} ")))
+                && matches!(
+                    root.cause,
+                    Cause::Absent | Cause::Null | Cause::Unusable | Cause::NotAnObject
+                )
+                && let Some(map) = input.as_object_mut()
+            {
+                map.insert("outcome".to_string(), json!(root.cause.name()));
+            }
+            input
+        })
+        .collect()
+}
+
 fn item_entry(
     f: &Value,
     l: &Value,
     aliases: &[&str],
     roots: &[String],
+    lifted: &[Clause],
     walked: Option<Failure>,
 ) -> Option<Failure> {
     if let Some(pairs) = l.get("items").and_then(Value::as_array) {
@@ -240,7 +288,13 @@ fn item_entry(
             f,
         ));
     }
-    let said = own_said(l, roots);
+    let own = own_said(l, roots);
+    let said: Vec<Clause> = lifted
+        .iter()
+        .filter(|root| !own.iter().any(|piece| piece.text == root.text))
+        .cloned()
+        .chain(own.iter().cloned())
+        .collect();
     let message = own_text(f, &said);
     let walked = walked.filter(|walked| {
         let mut lines: Vec<String> = Vec::new();
@@ -266,7 +320,7 @@ fn item_entry(
         item(
             text(f, "item"),
             cause,
-            alias_inputs(l, aliases),
+            with_root_outcomes(alias_inputs(l, aliases), lifted),
             Vec::new(),
             message,
             f,
@@ -791,7 +845,9 @@ pub fn for_failures(
                 }
                 if frees[i].is_none() {
                     let walked = walked_under(line, &sentence.check, f, &l, &aliases, ctx);
-                    if let Some(entry) = item_entry(f, &l, &aliases, &root_texts, walked) {
+                    let lifted = alias_roots(line, i, f, row, ctx);
+                    if let Some(entry) = item_entry(f, &l, &aliases, &root_texts, &lifted, walked) {
+                        causes.push(entry.part().cause);
                         items.push(entry);
                     }
                 }

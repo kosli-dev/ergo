@@ -2053,6 +2053,36 @@ impl For {
         listed_roots(lines_once(clauses))
     }
 
+    /// What the sentence at `idx` says, for the item of the first list that
+    /// `ctx` binds, about a path it reads through that item's alias before
+    /// any item of a later list, when that path can't be read or used.
+    pub fn item_alias_roots(&self, idx: usize, ctx: &Ctx) -> Vec<Clause> {
+        let Some(sentence) = self.sentences.get(idx) else {
+            return Vec::new();
+        };
+        if self.items.len() < 2 {
+            return Vec::new();
+        }
+        let alias = &self.items[0].alias;
+        let whole = ctx
+            .aliases
+            .get(alias)
+            .is_some_and(|at| !at.value.is_object());
+        let mut up = ctx.clone();
+        up.aliases.remove(alias);
+        let before: Vec<String> = sentence_roots_said(&sentence.check, &outer_ctx(&up))
+            .into_iter()
+            .map(|root| root.text)
+            .collect();
+        let mut out: Vec<Clause> = Vec::new();
+        for root in sentence_roots_said(&sentence.check, &outer_ctx(ctx)) {
+            if !before.contains(&root.text) && !(whole && root.cause == Cause::NotAnObject) {
+                push_new(&mut out, Clause::said(root.cause, root.text));
+            }
+        }
+        out
+    }
+
     /// The roots the sentence at `idx` reads outside the items and can't
     /// read, each said once, whichever other sentence reads them too.
     pub fn assertion_roots(&self, idx: usize, ctx: &Ctx) -> Vec<Clause> {
