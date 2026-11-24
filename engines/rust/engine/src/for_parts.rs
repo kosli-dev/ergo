@@ -700,22 +700,6 @@ fn item_read(f: &Value) -> Value {
     })
 }
 
-fn item_made(failed: &[Value], key_texts: &[String]) -> Vec<String> {
-    let mut made: Vec<String> = Vec::new();
-    for f in failed {
-        let mut after_key = false;
-        for piece in clauses(&text(f, "ergo/text")) {
-            if after_key || crate::parts::is_item(piece) || !crate::parts::is_item(&text(f, "item"))
-            {
-                ops::push_new(&mut made, piece.to_string());
-            }
-            after_key = crate::parts::is_item(piece)
-                && key_texts.iter().any(|k| piece.ends_with(k.as_str()));
-        }
-    }
-    made
-}
-
 /// A failed `for` row: its cause, its `inputs`, its message and the
 /// clauses the message was made from.
 pub struct LineRow<'a> {
@@ -1072,13 +1056,10 @@ pub fn for_failures(
     }
     for entry in &rest {
         let part = entry.part();
-        if let Some(clause) = row.iter().find(|clause| {
-            clause.kind == Kind::Item && !clause.text.is_empty() && clause.text == part.message
-        }) {
-            ops::push_new(&mut row_said, clause.text.clone());
-        }
         for clause in row.iter().filter(|clause| {
-            clause.kind == Kind::Item && clause.name == part.name && !clause.text.is_empty()
+            clause.kind == Kind::Item
+                && !clause.text.is_empty()
+                && (clause.name == part.name || clause.text == part.message)
         }) {
             ops::push_new(&mut row_said, clause.text.clone());
         }

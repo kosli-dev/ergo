@@ -79,8 +79,6 @@ for / a count or sum of a name read from outside the item on a for line says how
 for / a failed sentence on a for line lists its inputs in the order of its kind / a walk lists what starts at an alias first, both in name order, and a comparison or a count lists its left side and then its right side
 for / a failed sentence that counts items whose a parent's field matches lists the parent's value / lists the parent's value and its location beside the count
 for / a failed sentence that counts items whose a part matches lists the part's value / lists the part's value and its location, with the part, beside the count
-for / a first of on the second for item whose whose reads the first item's alias names the alias for each item, and no item of its list / fails as absent with w.z for each item of ws when it is missing
-for / a first of on the second for item whose whose reads the first item's alias names the alias for each item, and no item of its list / fails as unusable with w.z for each item of ws when it is of the wrong type
 for / a for alias read by a position, then a key, then a key from a field: w[0].a named by zz exists / fails as unusable when the item at the position is a number and the field is a number
 for / a for item that is a list, read by position and then by a key from a field: w[0] named by zz does not exist / with the key field a number
 for / a for item that is a list, read by position and then by a key from a field: w[0] named by zz is 1 / with the key field a number
@@ -331,7 +329,6 @@ messages / a root and the list it is read beside that both can't be read are bot
 messages / a root in a count of beside a list that is missing, when the params aren't an object / says the params, or the root, once, and then the list, and a check that doesn't read the params fails with the worst cause of what it says
 messages / a root name after is in inside a relative clause that isn't a list, on a list with items / names the root once, with no item, on a for line too
 messages / a root name after is in inside a relative clause that isn't a list, on an empty list / fails as unusable and names the root, because the list it looks in is read before any item, then the empty list
-messages / a root of a for line and a root that reads the alias in one message / names the root first, then the alias root of each first item
 messages / a root of a for line, said once / names the root once, with no item, whatever the list holds
 messages / a root of the wrong type for a phrase that reads a number, text or a time / fails as unusable before any item, with no item in front, on an empty list
 messages / a root of the wrong type for a phrase that reads a number, text or a time / names the root once on a list with items
@@ -340,7 +337,6 @@ messages / a root on the right of the phrase and a root in a whose, both missing
 messages / a root on the right of the phrase and a root in a whose, both null, beside a list that is null, are all said, then the list / both params and the list null
 messages / a root on the right of the phrase of the wrong type, beside a list that can't be read, is said first and then the list / a list that is missing
 messages / a root on the right of the phrase of the wrong type, beside a list that can't be read, is said first and then the list / a list that is text
-messages / a root that reads the alias of the first item of a for line, in the second item / fails before any item of the second list, naming each first item, on an empty list too
 messages / a subject read at the position of a list of the input / names the list when it is missing
 messages / a subject read at the position of a list of the input / says what the list is when it isn't a list or an object
 messages / a subject read at the position of a list of the input / says which item of the list is missing
@@ -413,7 +409,6 @@ sentences / a named by key on the right of every, after a part, a parent, an ali
 sentences / a named by key on the right of every, after a part, a parent, an alias, $params or $input / fails as unusable once when the subject's key isn't text
 sentences / a named by on the right of every that can't be read / names the key that is null, as the plain check does, when m is null too
 sentences / a root name on the right of some in a from line's condition, read up front / fails the candidate once, with no item named, even when its list is empty
-sentences / a second for item whose whose takes its key from the subject / names pr.k alone, and keeps the first item when the name depends on it
 sentences / a sum of whose that or whose reads a named by key against the focus / is written wrong naming the key, and a key from the subject or a count of is fine
 sentences / an any_of of sentences that read a part / reads the part by its alias in each option
 sentences / an any_of of sentences with a param that isn't a list / fails as unusable even when another option passes
