@@ -1020,7 +1020,7 @@ _m_tally_item("sum_of", e, roots) := [["unusable", _m_isnt(_m_item_name(e.c, roo
 
 _m_sentence(c, subj, cause) := [_message(c, subj, cause)] if not _walks(c)
 
-_m_line_sorted(c, subj, cause) := [_m_top_sorted(_message(c, subj, cause), _m_list_names(c))] if {
+_m_line_sorted(c, subj, cause) := [_m_top_sorted(_message(object.union(c, {"ergo/line": true}), subj, cause), _m_list_names(c))] if {
 	not _walks(c)
 	cause != "value"
 } else := _m_line(c, subj, cause)

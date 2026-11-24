@@ -165,10 +165,14 @@ _m_text_list_said(subj, check, cause) := [_m_text_items(s.name, s.value)] if {
 _m_text_state_said(_, st, cause) if st == cause
 
 _m_text_state_said(check, st, cause) if {
-	object.get(check, "ergo/row", false) == true
+	_m_says_all(check)
 	st != cause
 	st in _no_value_states
 }
+
+_m_says_all(check) if object.get(check, "ergo/row", false) == true
+
+_m_says_all(check) if object.get(check, "ergo/line", false) == true
 
 _m_text_side_said(subj, check) := [_m_state_clause(s)] if {
 	check.ignoring
