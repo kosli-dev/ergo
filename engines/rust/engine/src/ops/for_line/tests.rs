@@ -4818,3 +4818,67 @@ fn a_for_lines_whose_says_an_empty_list_on_a_list_entry_as_a_null_list() {
         );
     }
 }
+
+#[test]
+fn a_list_after_is_in_ignoring_case_on_an_assertion_fails_the_for_row_with_the_worst_cause_of_its_items()
+ {
+    let params = json!({"l": ["a", null]});
+    for (line, xs, cause, message) in [
+        (
+            "every xs as e",
+            json!([]),
+            "null",
+            "item 2 of $params.l is null; xs is []",
+        ),
+        (
+            "every xs as e",
+            json!([{"v": "A"}]),
+            "null",
+            "item 2 of $params.l is null",
+        ),
+        (
+            "some xs as e",
+            json!([{"v": "A"}]),
+            "null",
+            "item 2 of $params.l is null",
+        ),
+        (
+            "every xs, if any, as e",
+            json!([]),
+            "null",
+            "item 2 of $params.l is null",
+        ),
+    ] {
+        let one = row_with(
+            line,
+            json!("e.v is in $params.l ignoring case"),
+            json!({"xs": xs}),
+            params.clone(),
+        );
+        assert_eq!(
+            (line, &one["cause"], &one["message"]),
+            (line, &json!(cause), &json!(message))
+        );
+    }
+    let field = row_with(
+        "every xs as e",
+        json!("e.v is in allowed ignoring case"),
+        json!({"xs": [{"v": "A"}], "allowed": ["a", null]}),
+        json!({}),
+    );
+    assert_eq!(field["cause"], "null");
+    let number = row_with(
+        "every xs as e",
+        json!("e.v is in $params.l ignoring case"),
+        json!({"xs": []}),
+        json!({"l": ["a", null, 3]}),
+    );
+    assert_eq!(number["cause"], "unusable");
+    let missing = row_with(
+        "every xs as e",
+        json!("e.v is in $params.l ignoring case"),
+        json!({}),
+        params,
+    );
+    assert_eq!(missing["cause"], "absent");
+}
