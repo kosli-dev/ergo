@@ -27,6 +27,12 @@ else := _named_root_states(subj, c)
 
 _walk_roots_on := false
 
+_walk_empty_roots_on := false
+
+_walk_root_causes := _failed_read_states | {"value"} if _walk_empty_roots_on
+
+else := _failed_read_states
+
 _named_root_states(subj, c) := _plain_root_states(subj, c) | {st |
 	some y in _walked_tallies(c)
 	some st in _walked_tally_states(subj, y)
@@ -536,11 +542,11 @@ _leaf_root_flaw(check, subj) := fl if {
 	_leaf_may_root(check.check)
 	some p in _root_reads(check.check)
 	_root_kind(subj, check.check, p)
-} else := _worst_of(states) if {
+} else := _worst_or_value(states) if {
 	_walk_roots_on
 	check.op in _walk_ops
 	is_object(object.get(check, "check", null))
-	states := _walked_root_states(check.check) & _failed_read_states
+	states := _walked_root_states(check.check) & _walk_root_causes
 	count(states) > 0
 } else := ""
 

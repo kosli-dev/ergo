@@ -9423,6 +9423,18 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
+        "every rows.v, if any, is not one of pos.name",
+        "every rows.v, if any, is not in pos.name",
+        &[],
+        &[],
+    ),
+    (
+        "every rows.v, if any, is in $input.os.name",
+        "every rows.v, if any, is in $input.os.name",
+        &[],
+        &[],
+    ),
+    (
         "every rows.v, if any, is not in $input.os.name",
         "every rows.v, if any, is not in $input.os.name",
         &[],

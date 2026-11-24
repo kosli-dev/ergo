@@ -918,9 +918,16 @@ _rooted_outcome(c, subj, flaw, check, req) := _walk_rooted_outcome(_check_outcom
 _walk_rooted_outcome(raw, c, subj, flaw, check, req) := o if {
 	raw.passed == true
 	_may_hide_a_root(raw, c)
-	o := _messaged(_check_outcome(c, subj, flaw), check, req, subj) with _walk_roots_on as true
+	empty := _empty_roots_said(c)
+	o := _messaged(_check_outcome(c, subj, flaw), check, req, subj) with _walk_roots_on as true with _walk_empty_roots_on as empty
 	o.passed == false
 } else := _messaged(raw, check, req, subj)
+
+_empty_roots_said(c) := false if {
+	walk(c, [_, x])
+	is_object(x)
+	x.op == "for"
+} else := true
 
 _may_hide_a_root(raw, _) if {
 	some i in raw.inputs
