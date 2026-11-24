@@ -604,3 +604,23 @@ fn a_some_line_over_a_second_list_says_each_items_missing_field_on_the_assertion
         ]
     );
 }
+
+#[test]
+fn an_item_of_a_nested_list_under_a_broken_second_list_is_said_by_its_item_and_not_by_the_assertion()
+ {
+    let said = entries(
+        "every approvers as approver, every commits.files as file",
+        json!("approver.t is more than file.t"),
+        json!({"approvers": [{"t": 5}, {"t": 0}], "commits": [{"files": [{"t": 1}]}, {}]}),
+        json!({}),
+    );
+    assert_eq!(
+        said[..4],
+        [
+            "assertion approver.t is more than file.t [value] \"\" ()",
+            "  item item 2 of approvers [value] \"\" ()",
+            "    item item 1 of commits [value] \"\" ()",
+            "      item item 1 of files [value] \"approver.t is 0, and file.t is 1\" (\"approver.t\" \"usable\", \"file.t\" \"usable\")",
+        ]
+    );
+}
