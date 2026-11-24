@@ -528,3 +528,11 @@ test_a_list_after_is_in_ignoring_case_read_from_each_item_of_a_subject_that_is_a
 	ergo._m_walked_root_text(c, "null") == "item 1 of thing: item 1 of states is null; item 2 of thing: item 1 of states is null" with input as {"ergo/names": {"ergo/subject": [{"states": [null]}, {"states": [null]}]}}
 	ergo._m_walked_root_text(c, "unusable") == "item 1 of thing: item 1 of states is null; item 1 of thing: item 2 of states is 4, which isn't text" with input as {"ergo/names": {"ergo/subject": [{"states": [null, 4]}]}}
 }
+
+test_an_option_or_a_filter_says_the_items_of_a_list_after_is_in_ignoring_case_after_what_the_field_cant_give if {
+	c := {"op": "in", "path": ["t"], "values": {"ref": ["$$params[]", "l"]}, "ignoring": "case"}
+	ergo._m_line_sorted(c, {}, "absent") == ["t is missing, and item 2 of $params.l is null"] with data.ergo_params as {"l": ["a", null]}
+	ergo._m_line_sorted(c, {"t": 3}, "unusable") == ["t is 3, which isn't text, and item 2 of $params.l is null"] with data.ergo_params as {"l": ["a", null]}
+	ergo._m_line_sorted(c, {}, "absent") == ["t is missing"] with data.ergo_params as {"l": ["a"]}
+	ergo._m_line_sorted(object.remove(c, ["ignoring"]), {}, "absent") == ["t is missing"] with data.ergo_params as {"l": ["a", null]}
+}
