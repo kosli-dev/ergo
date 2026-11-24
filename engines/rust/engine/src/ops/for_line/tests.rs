@@ -4877,3 +4877,26 @@ fn an_empty_list_read_through_an_earlier_alias_is_a_root_fault_when_the_walked_r
     let named = json!({"rows": [], "ms": [{"ys": [{"name": "a"}]}]});
     assert_eq!(alias_root_faults(named, true), vec![]);
 }
+
+#[test]
+fn an_items_own_problem_beside_a_root_its_sentence_cant_read_is_an_item_entry_under_the_sentence() {
+    let row = row_with(
+        "every ws as w, every ys whose n is in $params.z as x",
+        json!(["z is 1", "w.v is at least $params.min"]),
+        json!({"z": 1, "ws": [{"v": 1}, {"v": "a"}, {}], "ys": [{"n": 1}]}),
+        json!({"min": null, "z": [1]}),
+    );
+    assert_eq!(
+        row["message"],
+        "$params.min is null; item 2 of ws: w.v is \"a\", which isn't a number; item 3 of ws: w.v is missing"
+    );
+    assert_eq!(row["cause"], "unusable");
+    assert_eq!(
+        entries(&row["failures"]),
+        [
+            "assertion w.v is at least $params.min unusable: $params.min is null",
+            "  item item 2 of ws unusable: w.v is \"a\", which isn't a number",
+            "  item item 3 of ws absent: w.v is missing"
+        ]
+    );
+}
