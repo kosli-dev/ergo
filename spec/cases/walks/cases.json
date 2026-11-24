@@ -47841,5 +47841,105 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a from line whose whose compares an item's list with a root read through a key the item holds reads the part the key picks",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "pr": {
+          "from": "every prs whose some xs.n equals $input.m named by k",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "pr",
+          "checks": {
+            "c": "id exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "m holds a part under the key k names, so the subject is in scope and the check passes",
+        "rules": [
+          "walk.right"
+        ],
+        "input": {
+          "m": {
+            "a": 1
+          },
+          "prs": [
+            {
+              "id": 1,
+              "k": "a",
+              "xs": [
+                {
+                  "n": 1
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$applies",
+            "inputs": [
+              {
+                "locations": [
+                  "/m/a"
+                ],
+                "name": "$input.m named by k",
+                "value": 1
+              },
+              {
+                "locations": [
+                  "/prs/0/k"
+                ],
+                "name": "k",
+                "value": "a"
+              },
+              {
+                "locations": [
+                  "/prs/0/xs/0/n"
+                ],
+                "name": "xs[].n",
+                "value": [
+                  1
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": 1,
+              "type": "pr"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/prs/0/id"
+                ],
+                "name": "id",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": 1,
+              "type": "pr"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]

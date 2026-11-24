@@ -7,6 +7,10 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "ts whose every xs.v, if any, is in $input.cs.name",
         "ts whose every xs.v, if any, is in $input.cs.name",
     ),
+    (
+        "every prs whose some xs.n equals $input.m named by k",
+        "every prs whose some xs.n equals $input.m named by k",
+    ),
     ("items.allowed", "items.allowed"),
     (
         "things whose t is in $params.l ignoring case",

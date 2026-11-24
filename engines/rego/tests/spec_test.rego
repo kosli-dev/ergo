@@ -19,6 +19,7 @@ known_differences := {
 	"messages / nothing hides a problem / the roots come first and then each item, and the row takes the worst cause",
 	"walks / a from line whose whose walks a list from outside the item on the right fails $applies as the same check does, on an empty list / an input list that is empty fails $applies as value, as the check does",
 	"walks / a from line whose whose walks a list from outside the item on the right fails $applies as the same check does, on an empty list / an item of an input list with no name fails $applies as absent, as the check does",
+	"walks / a from line whose whose compares an item's list with a root read through a key the item holds reads the part the key picks / m holds a part under the key k names, so the subject is in scope and the check passes",
 }
 
 _topic_cases(topic) := json.unmarshal(replace(json.marshal(data.spec.cases[topic]), "{{spec}}", ergo._spec))
