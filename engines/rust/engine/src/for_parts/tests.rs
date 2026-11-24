@@ -470,3 +470,19 @@ fn an_item_named_whole_under_a_sentence_is_said_by_its_item_and_not_by_the_asser
         ]
     );
 }
+
+#[test]
+fn a_tie_on_the_sort_key_is_said_by_the_tied_item_and_not_by_the_assertion() {
+    assert_eq!(
+        entries(
+            "first of owners sorted by name alphabetically as owner",
+            json!("owner.name is \"Zoe\""),
+            json!({"owners": [{"name": "Zoe"}, {"name": "Zoe"}]}),
+            json!({}),
+        ),
+        [
+            "item item 1 of owners [ambiguous] \"item 1 and item 2 of owners tie on name\" (\"owners[0].name\" \"usable\")",
+            "item item 2 of owners [ambiguous] \"item 1 and item 2 of owners tie on name\" (\"owners[1].name\" \"usable\")",
+        ]
+    );
+}

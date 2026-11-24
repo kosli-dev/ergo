@@ -741,13 +741,6 @@ pub fn for_failures(
             && !f.get("value").is_some_and(Value::is_object)
             && !list(f, "failed_assertions").is_empty()
     };
-    let key_texts: Vec<String> = line
-        .items
-        .iter()
-        .flat_map(|i| i.whose.iter())
-        .flat_map(|check| ops::key_base::unusable_keys(check, ctx))
-        .collect();
-    let item_made = item_made(failed, &key_texts);
     let whose_roots = line.whose_roots(ctx);
     let list_names: Vec<String> = line
         .items
@@ -1134,7 +1127,6 @@ pub fn for_failures(
                 })
             })
             || ops::message::cap_note(clause).is_some()
-            || item_made.iter().any(|t| t == clause)
             || row_said.iter().any(|t| t == clause)
             || walk_broke.iter().any(|t| t == clause)
             || sorted_said.iter().any(|t| t == clause)
