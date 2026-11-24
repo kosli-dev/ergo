@@ -5043,3 +5043,24 @@ fn an_items_own_problem_joined_with_a_root_of_the_second_whose_is_said_once_in_t
         "unusable"
     );
 }
+
+#[test]
+fn a_root_a_sentence_reads_sits_on_its_assertion_and_not_on_an_item_of_the_second_list() {
+    let row = row_with(
+        "every ws as w, every w.ys as x",
+        json!("x.v is at least $params.min"),
+        json!({"ws": [{"ys": [{"v": 3}, {}]}]}),
+        json!({"min": 2}),
+    );
+    let assertion = &row["failures"][0];
+    let inputs = |entry: &Value| -> Vec<String> {
+        entry["inputs"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|input| input["name"].as_str().unwrap().to_string())
+            .collect()
+    };
+    assert_eq!(inputs(assertion), ["$params.min"]);
+    assert_eq!(inputs(&assertion["failures"][0]["failures"][0]), ["x.v"]);
+}
