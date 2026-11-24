@@ -671,7 +671,7 @@ fn whose_roots_entries(
 }
 
 #[test]
-fn a_list_entry_that_holds_two_roots_of_the_lines_own_whose_takes_the_rows_cause() {
+fn a_list_entry_of_two_whose_roots_has_the_rows_cause_as_on_main_when_the_params_are_an_object() {
     assert_eq!(
         whose_roots_entries(
             "every xs whose v is at least $params.min and whose w is in $params.l as x",
@@ -688,7 +688,7 @@ fn a_list_entry_that_holds_two_roots_of_the_lines_own_whose_takes_the_rows_cause
 }
 
 #[test]
-fn a_list_entry_that_holds_two_roots_of_the_lines_own_whose_takes_their_worst_cause_when_the_params_arent_an_object()
+fn a_list_entry_of_two_whose_roots_has_their_worst_cause_as_on_main_when_the_params_arent_an_object()
  {
     assert_eq!(
         whose_roots_entries(
