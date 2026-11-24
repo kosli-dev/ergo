@@ -61,6 +61,7 @@ Three ways to settle it:
 - An elapsed time in the `whose` of a `count of`, a `sum of` or an `every`, when an item can't be decided: which path `failures` names when the check reads two, `started` or `ended`.
 - An elapsed time in a subject's `from` line, like `vulns whose days elapsed from started to ended is 1`: what the `$applies` row shows for it, and which paths its `inputs` list.
 - A `plus` in the `whose` of a `count of` or a `sum of`, like `count of xs whose a plus b is 3 is 1`: whether a `whose` condition can have `plus` on its left.
+- `ignoring case` after `is in`, `is not in`, `is one of` or `is not one of` with a list read through more than one step, like `x is in $input.cs.name ignoring case`: it is written wrong for now, with `"is in" can't take ignoring case yet`. The spec is [#779](https://github.com/kosli-dev/ergo/issues/779) (26.b), and the gaps in the engines are [#778](https://github.com/kosli-dev/ergo/issues/778) (26.ab).
 
 ## Numbers in a report's hash
 
