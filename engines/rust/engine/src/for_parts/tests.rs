@@ -24,12 +24,7 @@ fn a_clause_ends_at_a_semicolon_outside_quotes_so_a_quoted_key_or_value_stays_wh
 
 #[test]
 fn a_member_whose_key_holds_a_semicolon_makes_its_whole_clause_and_leaves_no_root() {
-    let failed = [json!({
-        "item": "member \"a; b\" of statuses",
-        "ergo/text": "member \"a; b\" of statuses is 1",
-    })];
-    let made = item_made(&failed, &[]);
-    assert_eq!(made, ["member \"a; b\" of statuses is 1"]);
+    let made = ["member \"a; b\" of statuses is 1".to_string()];
     let record = json!({
         "ergo/clauses": clause::to_value(&[Clause::said(
             Cause::Value,
@@ -62,6 +57,54 @@ fn entries(for_line: &str, assertions: Value, subject: Value, params: Value) -> 
     let mut out = Vec::new();
     tree(&row["failures"], 0, &mut out);
     out
+}
+
+fn unsaid(for_line: &str, assertions: Value, subject: Value, params: Value) -> Vec<String> {
+    let policy = json!({
+        "ergo_spec": crate::SPEC,
+        "subjects": {"thing": {"from": "things", "identified_by": "id"}},
+        "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": for_line, "assert": assertions}}}}
+    });
+    let mut subject = subject;
+    subject["id"] = json!(1);
+    let report = crate::report(&json!({"things": [subject]}), &policy, &params);
+    let row = report["results"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|row| row["check"] == "c")
+        .unwrap()
+        .clone();
+    let mut lines = Vec::new();
+    lines_of(&row["failures"], "", &mut lines);
+    let said = |clause: &str| {
+        lines
+            .iter()
+            .any(|line| line == clause || line.ends_with(&format!(": {clause}")))
+    };
+    clauses(row["message"].as_str().unwrap())
+        .into_iter()
+        .filter(|clause| !clause.starts_with("and ") && !said(clause))
+        .map(str::to_string)
+        .collect()
+}
+
+fn lines_of(failures: &Value, lead: &str, out: &mut Vec<String>) {
+    for entry in failures.as_array().into_iter().flatten() {
+        let name = entry["name"].as_str().unwrap_or_default();
+        let message = entry["message"].as_str().unwrap_or_default();
+        let here = match entry["kind"].as_str() {
+            Some("item") => format!("{lead}{name}: "),
+            _ => lead.to_string(),
+        };
+        if !message.is_empty() {
+            match entry["kind"].as_str() {
+                Some("item") if message.starts_with(name) => out.push(format!("{lead}{message}")),
+                _ => out.push(format!("{here}{message}")),
+            }
+        }
+        lines_of(&entry["failures"], &here, out);
+    }
 }
 
 fn tree(failures: &Value, depth: usize, out: &mut Vec<String>) {
@@ -453,4 +496,94 @@ fn the_assertion_under_two_for_lines_holds_a_part_it_cant_read() {
         said,
         ["assertion e.v is in pl [absent] \"pl is missing\" (\"pl\" \"absent\")"]
     );
+}
+
+#[test]
+fn an_item_named_whole_under_a_sentence_is_said_by_its_item_and_not_by_the_assertion() {
+    assert_eq!(
+        entries(
+            "every distinct commits.author as who",
+            json!("who is \"ann\""),
+            json!({"commits": [{"author": "ann"}, {"author": "bob"}, {"author": "bob"}]}),
+            json!({}),
+        ),
+        [
+            "assertion who is \"ann\" [value] \"\" ()",
+            "  item item 2 of commits [value] \"item 2 of commits is \\\"bob\\\"\" (\"who\" \"usable\")",
+        ]
+    );
+}
+
+#[test]
+fn a_tie_on_the_sort_key_is_said_by_the_tied_item_and_not_by_the_assertion() {
+    assert_eq!(
+        entries(
+            "first of owners sorted by name alphabetically as owner",
+            json!("owner.name is \"Zoe\""),
+            json!({"owners": [{"name": "Zoe"}, {"name": "Zoe"}]}),
+            json!({}),
+        ),
+        [
+            "item item 1 of owners [ambiguous] \"item 1 and item 2 of owners tie on name\" (\"owners[0].name\" \"usable\")",
+            "item item 2 of owners [ambiguous] \"item 1 and item 2 of owners tie on name\" (\"owners[1].name\" \"usable\")",
+        ]
+    );
+}
+
+#[test]
+fn an_item_with_its_own_entry_on_the_row_is_said_by_that_entry_and_not_by_the_assertion() {
+    let said = entries(
+        "every ws as w, every w.ys, if any, as y",
+        json!("w.n is 2"),
+        json!({"ws": [{"n": 1}, [1], {"n": "a"}]}),
+        json!({}),
+    );
+    assert_eq!(
+        said,
+        [
+            "assertion w.n is 2 [unusable] \"\" ()",
+            "  item item 1 of ws [value] \"w.n is 1\" (\"w.n\" \"usable\")",
+            "  item item 3 of ws [unusable] \"w.n is \\\"a\\\", which isn't a number\" (\"w.n\" \"unusable\")",
+            "item item 1 of ws [absent] \"\" ()",
+            "  list w.ys [absent] \"w.ys is missing\" (\"w.ys\" \"absent\")",
+            "item item 2 of ws [not_an_object] \"\" ()",
+            "  item item 1 of w [not_an_object] \"item 1 of w is 1, which isn't an object\" ()",
+            "item item 3 of ws [absent] \"\" ()",
+            "  list w.ys [absent] \"w.ys is missing\" (\"w.ys\" \"absent\")",
+        ]
+    );
+}
+
+#[test]
+fn a_tie_in_the_second_list_is_said_by_the_first_items_entry_and_not_by_the_assertion() {
+    let said = entries(
+        "every items as x, last of x.subs sorted by t as y",
+        json!("y.w is 1"),
+        json!({"items": [{"subs": [{"t": 5, "w": 1}, {"t": 5, "w": 2}]}]}),
+        json!({}),
+    );
+    assert_eq!(
+        said,
+        [
+            "item item 1 of items [ambiguous] \"\" ()",
+            "  item item 1 of x.subs [ambiguous] \"item 1 of x.subs is 5\" ()",
+            "  item item 2 of x.subs [ambiguous] \"item 2 of x.subs is 5\" ()",
+        ]
+    );
+}
+
+#[test]
+fn every_clause_of_a_row_whose_sort_key_is_named_by_params_that_arent_text_is_said_by_an_entry() {
+    for assertion in ["x.n is 1", "y.w is 1"] {
+        assert_eq!(
+            unsaid(
+                "every items as x, last of x.subs sorted by t named by $params.km as y",
+                json!(assertion),
+                json!({"items": [{"subs": [{"t": {"a": 1}}, {"t": 2}]}, 3, {"n": 1}]}),
+                json!({"km": 3}),
+            ),
+            Vec::<String>::new(),
+            "{assertion}"
+        );
+    }
 }

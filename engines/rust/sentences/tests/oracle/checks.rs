@@ -1376,6 +1376,7 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("b named by key is 9", "b named by key is 9", &[], &[]),
     ("b.v is 1", "b.v is 1", &[], &[]),
     ("y.v is 1", "y.v is 1", &[], &[]),
+    ("y.w is 2", "y.w is 2", &[], &[]),
     ("y.n is 1", "y.n is 1", &[], &[]),
     ("b.x is 1 and .b.x is 1", "b.x is 1 and b.x is 1", &[], &[]),
     ("b.x is 1 and b.x is 1", "b.x is 1 and b.x is 1", &[], &[]),
@@ -13709,6 +13710,12 @@ pub const CHECK_WRITTEN_WRONG: &[(&str, &[&str])] = &[
 ];
 
 pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
+    (
+        "every items as x, last of x.subs sorted by t named by $params.km as y",
+        "every items as x, last of x.subs sorted by t named by $params.km as y",
+        &[],
+        &[],
+    ),
     (
         "every gs as g, every g.xs as e",
         "every gs as g, every g.xs as e",

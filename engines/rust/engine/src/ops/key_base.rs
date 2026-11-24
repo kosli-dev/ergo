@@ -615,24 +615,6 @@ pub fn unreadable_key_reads(check: &Check, ctx: &Ctx) -> Vec<(Cause, String, Inp
     out
 }
 
-/// What a check says about each `$params` or `$input` key it reads that
-/// holds something other than text.
-pub fn unusable_keys(check: &Check, ctx: &Ctx) -> Vec<String> {
-    let mut out: Vec<String> = Vec::new();
-    for path in check.paths() {
-        for step in &path.steps {
-            if let Step::Ref(key) = step
-                && matches!(key.start, path::Start::Params | path::Start::Input)
-                && let Some((Outcome::Unusable, text, _)) = key_flaw(key, ctx)
-                && !out.contains(&text)
-            {
-                out.push(text);
-            }
-        }
-    }
-    out
-}
-
 /// Whether `path` has a `named by` key read from the subject or an alias,
 /// not from `$params` or `$input`, that can't be read or isn't text.
 pub fn field_key_flawed(path: &Path, ctx: &Ctx) -> bool {

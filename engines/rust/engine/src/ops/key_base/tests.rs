@@ -153,10 +153,6 @@ fn a_whose_says_a_missing_or_null_key_or_one_that_isnt_text_once() {
             "$params.k is 3, which isn't text".to_string()
         )]
     );
-    assert_eq!(
-        unusable_keys(&read, &ctx(&subject, &params, &[])),
-        vec!["$params.k is 3, which isn't text".to_string()]
-    );
 }
 
 #[test]

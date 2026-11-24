@@ -700,22 +700,6 @@ fn item_read(f: &Value) -> Value {
     })
 }
 
-fn item_made(failed: &[Value], key_texts: &[String]) -> Vec<String> {
-    let mut made: Vec<String> = Vec::new();
-    for f in failed {
-        let mut after_key = false;
-        for piece in clauses(&text(f, "ergo/text")) {
-            if after_key || crate::parts::is_item(piece) || !crate::parts::is_item(&text(f, "item"))
-            {
-                ops::push_new(&mut made, piece.to_string());
-            }
-            after_key = crate::parts::is_item(piece)
-                && key_texts.iter().any(|k| piece.ends_with(k.as_str()));
-        }
-    }
-    made
-}
-
 /// A failed `for` row: its cause, its `inputs`, its message and the
 /// clauses the message was made from.
 pub struct LineRow<'a> {
@@ -741,13 +725,6 @@ pub fn for_failures(
             && !f.get("value").is_some_and(Value::is_object)
             && !list(f, "failed_assertions").is_empty()
     };
-    let key_texts: Vec<String> = line
-        .items
-        .iter()
-        .flat_map(|i| i.whose.iter())
-        .flat_map(|check| ops::key_base::unusable_keys(check, ctx))
-        .collect();
-    let item_made = item_made(failed, &key_texts);
     let whose_roots = line.whose_roots(ctx);
     let list_names: Vec<String> = line
         .items
@@ -958,6 +935,159 @@ pub fn for_failures(
         .iter()
         .flat_map(|(_, texts)| texts.iter().flat_map(|t| clauses(t)))
         .collect();
+    let mut lists: Vec<Failure> = Vec::new();
+    let mut rest: Vec<Failure> = Vec::new();
+    for f in failed
+        .iter()
+        .filter(|f| !list(f, "failed_assertions").is_empty() && !bare(f))
+    {
+        if let Some(Failure::Item {
+            mut part,
+            value,
+            locations,
+        }) = dead_entry(line, f, ctx).filter(|_| !list(f, "failed_items").is_empty())
+        {
+            part.cause = Cause::worst(part.failures.iter().map(|kid| kid.part().cause))
+                .unwrap_or(part.cause);
+            rest.push(Failure::Item {
+                part,
+                value,
+                locations,
+            });
+        }
+    }
+    for f in failed
+        .iter()
+        .filter(|f| list(f, "failed_assertions").is_empty() || bare(f))
+    {
+        let said = text(f, "ergo/text");
+        if !said.is_empty()
+            && list(f, "failed_items").is_empty()
+            && clauses(&said)
+                .into_iter()
+                .all(|p| whose_roots.iter().any(|t| t == p))
+        {
+            let second = line.items.len() == 2
+                && !matches!(line.items[1].how, for_line::How::Pick { .. })
+                && cause_of(f) != Cause::NotAnObject
+                && crate::parts::is_item(&text(f, "item"))
+                && crate::parts::list_base(&text(f, "item")) == list_names[1];
+            if !second {
+                continue;
+            }
+        }
+        if f.get("ergo/sorted").is_some() && sort_key_said(f, row) {
+            if let Some(entry) = sorted_entry(line, f, row) {
+                rest.push(entry);
+            }
+            continue;
+        }
+        if !later_keys.is_empty() && !list(f, "failed_items").is_empty() {
+            if let Some(entry) = keyed_entry(line, f, row, ctx) {
+                rest.push(entry);
+            }
+            continue;
+        }
+        if let Some(entry) = dead_entry(line, f, ctx) {
+            match entry {
+                Failure::List(_) => lists.push(entry),
+                _ => rest.push(entry),
+            }
+        }
+    }
+    let mut under: Vec<(Vec<Cause>, Vec<Value>, Vec<Failure>)> = line
+        .sentences
+        .iter()
+        .enumerate()
+        .map(|(i, sentence)| {
+            let mut causes: Vec<Cause> = Vec::new();
+            let mut inputs: Vec<Value> = Vec::new();
+            let mut items: Vec<Failure> = Vec::new();
+            if line.sentences.iter().position(|s| s.text == sentence.text) != Some(i) {
+                return (causes, inputs, items);
+            }
+            for (at, f) in failed.iter().enumerate().filter(|(_, f)| !bare(f)) {
+                if let Some((_, _, (entry, outer))) = broke_runs
+                    .iter()
+                    .find(|(idx, found, _)| *idx == i && *found == at)
+                {
+                    causes.push(entry.part().cause);
+                    items.push(entry.clone());
+                    for x in outer {
+                        ops::push_new(&mut inputs, x.clone());
+                    }
+                }
+                for l in list(f, "failed_assertions") {
+                    if text(&l, "assertion") != sentence.text {
+                        continue;
+                    }
+                    causes.push(cause_of(&l));
+                    let pairs = list(&l, "items");
+                    for x in list(&l, "inputs")
+                        .into_iter()
+                        .chain(pairs.iter().flat_map(|y| list(y, "inputs")))
+                    {
+                        if !alias_named(&text(&x, "name"), &aliases) {
+                            ops::push_new(&mut inputs, x);
+                        }
+                    }
+                    if frees[i].is_none() {
+                        let walked = walked_under(line, &sentence.check, f, &l, &aliases, ctx);
+                        let lifted = alias_roots(line, i, f, row, ctx);
+                        if let Some(entry) =
+                            item_entry(f, &l, &aliases, &root_texts, &lifted, walked)
+                        {
+                            causes.push(entry.part().cause);
+                            items.push(entry);
+                        }
+                    }
+                }
+            }
+            (causes, inputs, items)
+        })
+        .collect();
+    let mut row_said: Vec<String> = Vec::new();
+    for entry in lists
+        .iter()
+        .chain(&rest)
+        .chain(under.iter().flat_map(|(_, _, items)| items))
+    {
+        said_by(entry, &[], &mut row_said);
+    }
+    for entry in &rest {
+        let part = entry.part();
+        for clause in row.iter().filter(|clause| {
+            clause.kind == Kind::Item
+                && !clause.text.is_empty()
+                && (clause.name == part.name || clause.text == part.message)
+        }) {
+            ops::push_new(&mut row_said, clause.text.clone());
+        }
+        let dead = failed
+            .iter()
+            .any(|f| text(f, "item") == part.name && list(f, "failed_assertions").is_empty());
+        for clause in row
+            .iter()
+            .filter(|clause| dead && clause.kind == Kind::Item && clause.name == part.name)
+        {
+            let mut kids_said: Vec<String> = Vec::new();
+            said_by(entry, &[], &mut kids_said);
+            for inner in clause.said.iter().filter(|inner| inner.kind == Kind::Item) {
+                let named = part
+                    .failures
+                    .iter()
+                    .any(|kid| kid.part().name == inner.name);
+                for line in clause::lines(std::slice::from_ref(inner))
+                    .into_iter()
+                    .filter(|line| !named || kids_said.contains(&format!("{}: {line}", part.name)))
+                {
+                    for piece in clauses(&line) {
+                        ops::push_new(&mut row_said, format!("{}: {piece}", part.name));
+                    }
+                }
+            }
+        }
+    }
     for whole in clauses(message) {
         let rest = broke_rest(whole);
         if let Some(rest) = rest.as_ref().filter(|rest| !rest.is_empty()) {
@@ -1015,7 +1145,7 @@ pub fn for_failures(
                 })
             })
             || ops::message::cap_note(clause).is_some()
-            || item_made.iter().any(|t| t == clause)
+            || row_said.iter().any(|t| t == clause)
             || walk_broke.iter().any(|t| t == clause)
             || sorted_said.iter().any(|t| t == clause)
             || free_said.iter().any(|t| t == clause)
@@ -1064,44 +1194,7 @@ pub fn for_failures(
         if first != i {
             continue;
         }
-        let mut causes: Vec<Cause> = Vec::new();
-        let mut inputs: Vec<Value> = Vec::new();
-        let mut items: Vec<Failure> = Vec::new();
-        for (at, f) in failed.iter().enumerate().filter(|(_, f)| !bare(f)) {
-            if let Some((_, _, (entry, outer))) = broke_runs
-                .iter()
-                .find(|(idx, found, _)| *idx == i && *found == at)
-            {
-                causes.push(entry.part().cause);
-                items.push(entry.clone());
-                for x in outer {
-                    ops::push_new(&mut inputs, x.clone());
-                }
-            }
-            for l in list(f, "failed_assertions") {
-                if text(&l, "assertion") != sentence.text {
-                    continue;
-                }
-                causes.push(cause_of(&l));
-                let pairs = list(&l, "items");
-                for x in list(&l, "inputs")
-                    .into_iter()
-                    .chain(pairs.iter().flat_map(|y| list(y, "inputs")))
-                {
-                    if !alias_named(&text(&x, "name"), &aliases) {
-                        ops::push_new(&mut inputs, x);
-                    }
-                }
-                if frees[i].is_none() {
-                    let walked = walked_under(line, &sentence.check, f, &l, &aliases, ctx);
-                    let lifted = alias_roots(line, i, f, row, ctx);
-                    if let Some(entry) = item_entry(f, &l, &aliases, &root_texts, &lifted, walked) {
-                        causes.push(entry.part().cause);
-                        items.push(entry);
-                    }
-                }
-            }
-        }
+        let (mut causes, mut inputs, items) = std::mem::take(&mut under[i]);
         let said = match &frees[i] {
             Some((cause, said, free_inputs)) => {
                 if causes.is_empty() {
@@ -1178,66 +1271,6 @@ pub fn for_failures(
             },
             locations: places.get(i).cloned().into_iter().collect(),
         });
-    }
-    let mut lists: Vec<Failure> = Vec::new();
-    let mut rest: Vec<Failure> = Vec::new();
-    for f in failed
-        .iter()
-        .filter(|f| !list(f, "failed_assertions").is_empty() && !bare(f))
-    {
-        if let Some(Failure::Item {
-            mut part,
-            value,
-            locations,
-        }) = dead_entry(line, f, ctx).filter(|_| !list(f, "failed_items").is_empty())
-        {
-            part.cause = Cause::worst(part.failures.iter().map(|kid| kid.part().cause))
-                .unwrap_or(part.cause);
-            rest.push(Failure::Item {
-                part,
-                value,
-                locations,
-            });
-        }
-    }
-    for f in failed
-        .iter()
-        .filter(|f| list(f, "failed_assertions").is_empty() || bare(f))
-    {
-        let said = text(f, "ergo/text");
-        if !said.is_empty()
-            && list(f, "failed_items").is_empty()
-            && clauses(&said)
-                .into_iter()
-                .all(|p| whose_roots.iter().any(|t| t == p))
-        {
-            let second = line.items.len() == 2
-                && !matches!(line.items[1].how, for_line::How::Pick { .. })
-                && cause_of(f) != Cause::NotAnObject
-                && crate::parts::is_item(&text(f, "item"))
-                && crate::parts::list_base(&text(f, "item")) == list_names[1];
-            if !second {
-                continue;
-            }
-        }
-        if f.get("ergo/sorted").is_some() && sort_key_said(f, row) {
-            if let Some(entry) = sorted_entry(line, f, row) {
-                rest.push(entry);
-            }
-            continue;
-        }
-        if !later_keys.is_empty() && !list(f, "failed_items").is_empty() {
-            if let Some(entry) = keyed_entry(line, f, row, ctx) {
-                rest.push(entry);
-            }
-            continue;
-        }
-        if let Some(entry) = dead_entry(line, f, ctx) {
-            match entry {
-                Failure::List(_) => lists.push(entry),
-                _ => rest.push(entry),
-            }
-        }
     }
     for (at, (label, texts)) in walked.into_iter().enumerate() {
         lists.insert(
