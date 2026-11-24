@@ -1116,6 +1116,11 @@ pub fn for_failures(
                                 .flat_map(|l| clause::lines(&own_said(l, &root_texts)))
                                 .collect();
                             joined.join(", and ") == rest
+                                || sentences.iter().any(|l| {
+                                    clause::lines(&own_said(l, &root_texts))
+                                        .iter()
+                                        .any(|t| clauses(t).contains(&rest))
+                                })
                         })
             })
             || failed.iter().any(|f| {
