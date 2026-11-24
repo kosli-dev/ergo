@@ -112279,5 +112279,265 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a distinct list beside the first, walked inside a list",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "pull request": {
+          "from": "pull_requests",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "pull request",
+          "checks": {
+            "c": {
+              "for": "every approvers as approver, every distinct commits.files.t as t",
+              "assert": "approver.t is more than t"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "each item of the list under an assertion sits under the item it is in, with that item's place and value",
+        "rules": [
+          "for.distinct",
+          "for.second_items",
+          "location.failed_items"
+        ],
+        "input": {
+          "pull_requests": [
+            {
+              "id": "p1",
+              "approvers": [
+                {
+                  "t": 5
+                },
+                {
+                  "t": 7
+                }
+              ],
+              "commits": [
+                {
+                  "files": [
+                    {
+                      "t": 1
+                    },
+                    {
+                      "t": 9
+                    }
+                  ]
+                },
+                {
+                  "files": [
+                    {
+                      "t": 9
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [
+                  {
+                    "cause": "value",
+                    "failures": [
+                      {
+                        "cause": "value",
+                        "failures": [
+                          {
+                            "cause": "value",
+                            "failures": [],
+                            "inputs": [
+                              {
+                                "locations": [
+                                  "/pull_requests/0/approvers/0/t"
+                                ],
+                                "name": "approver.t",
+                                "outcome": "usable",
+                                "value": 5
+                              },
+                              {
+                                "locations": [
+                                  "/pull_requests/0/commits/0/files/1/t"
+                                ],
+                                "name": "t",
+                                "outcome": "usable",
+                                "value": 9
+                              }
+                            ],
+                            "kind": "item",
+                            "locations": [
+                              "/pull_requests/0/commits/0/files/1/t",
+                              "/pull_requests/0/commits/1/files/0/t"
+                            ],
+                            "message": "approver.t is 5, and t is 9",
+                            "name": "item 2 of files",
+                            "value": 9
+                          }
+                        ],
+                        "inputs": [],
+                        "kind": "item",
+                        "locations": [
+                          "/pull_requests/0/commits/0"
+                        ],
+                        "message": "",
+                        "name": "item 1 of commits",
+                        "value": {
+                          "files": [
+                            {
+                              "t": 1
+                            },
+                            {
+                              "t": 9
+                            }
+                          ]
+                        }
+                      }
+                    ],
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/pull_requests/0/approvers/0"
+                    ],
+                    "message": "",
+                    "name": "item 1 of approvers",
+                    "value": {
+                      "t": 5
+                    }
+                  },
+                  {
+                    "cause": "value",
+                    "failures": [
+                      {
+                        "cause": "value",
+                        "failures": [
+                          {
+                            "cause": "value",
+                            "failures": [],
+                            "inputs": [
+                              {
+                                "locations": [
+                                  "/pull_requests/0/approvers/1/t"
+                                ],
+                                "name": "approver.t",
+                                "outcome": "usable",
+                                "value": 7
+                              },
+                              {
+                                "locations": [
+                                  "/pull_requests/0/commits/0/files/1/t"
+                                ],
+                                "name": "t",
+                                "outcome": "usable",
+                                "value": 9
+                              }
+                            ],
+                            "kind": "item",
+                            "locations": [
+                              "/pull_requests/0/commits/0/files/1/t",
+                              "/pull_requests/0/commits/1/files/0/t"
+                            ],
+                            "message": "approver.t is 7, and t is 9",
+                            "name": "item 2 of files",
+                            "value": 9
+                          }
+                        ],
+                        "inputs": [],
+                        "kind": "item",
+                        "locations": [
+                          "/pull_requests/0/commits/0"
+                        ],
+                        "message": "",
+                        "name": "item 1 of commits",
+                        "value": {
+                          "files": [
+                            {
+                              "t": 1
+                            },
+                            {
+                              "t": 9
+                            }
+                          ]
+                        }
+                      }
+                    ],
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/pull_requests/0/approvers/1"
+                    ],
+                    "message": "",
+                    "name": "item 2 of approvers",
+                    "value": {
+                      "t": 7
+                    }
+                  }
+                ],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/c/assert"
+                ],
+                "message": "",
+                "name": "approver.t is more than t"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "t": 5
+                  },
+                  {
+                    "t": 7
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0/files/0/t",
+                  "/pull_requests/0/commits/0/files/1/t",
+                  "/pull_requests/0/commits/1/files/0/t"
+                ],
+                "name": "commits[].files[].t",
+                "outcome": "usable",
+                "value": [
+                  1,
+                  9,
+                  9
+                ]
+              }
+            ],
+            "message": "item 1 of approvers: item 1 of commits: item 2 of files: approver.t is 5, and t is 9; item 2 of approvers: item 1 of commits: item 2 of files: approver.t is 7, and t is 9",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p1",
+              "type": "pull request"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]
