@@ -2222,3 +2222,18 @@ test_a_walk_among_several_assertions_says_a_missing_subject_field_once_on_its_as
 		["one", "assertion", "lo is missing", ["lo"], []],
 	]
 }
+
+_empty_right_rows(checks, doc) := {r.check: [r.cause, object.get(r, "message", null)] |
+	some r in ergo.report(doc, {"ergo_spec": ergo._spec, "subjects": {"t": {"from": "ts", "identified_by": "id", "has": {"pl": "p"}}}, "requirements": {"r": {"subject": "t", "checks": checks}}}, {}).results
+	r.check in object.keys(checks)
+}
+
+test_an_every_with_if_any_on_an_empty_list_fails_as_value_when_the_list_on_the_right_is_empty if {
+	checks := {"part": "every xs.v, if any, is in pl.name", "input": "every xs.v, if any, is in $input.cs.name", "not_in": "every xs.v, if any, is not one of pl.name"}
+	_empty_right_rows(checks, {"cs": [], "ts": [{"id": "t", "xs": [], "p": [{"name": []}]}]}) == {
+		"part": ["value", "item 1 of pl: name is []"],
+		"input": ["value", "$input.cs is []"],
+		"not_in": ["value", "item 1 of pl: name is []"],
+	}
+	_empty_right_rows({"part": checks.part}, {"ts": [{"id": "t", "xs": [], "p": []}]}) == {"part": ["value", "pl is []"]}
+}
