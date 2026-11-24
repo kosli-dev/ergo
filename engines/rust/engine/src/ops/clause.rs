@@ -9,7 +9,16 @@ pub enum Kind {
     More(usize),
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+/// The entry of a `for` row that says a clause: the assertion with that
+/// index, the item it is about, or the list the line walks.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Owner {
+    Sentence(usize),
+    Item,
+    List,
+}
+
+#[derive(Debug, Clone, Eq)]
 pub struct Clause {
     pub kind: Kind,
     pub name: String,
@@ -19,6 +28,20 @@ pub struct Clause {
     pub group: usize,
     pub last_of_cause: bool,
     pub said_first: bool,
+    pub owners: Vec<Owner>,
+}
+
+impl PartialEq for Clause {
+    fn eq(&self, other: &Clause) -> bool {
+        self.kind == other.kind
+            && self.name == other.name
+            && self.cause == other.cause
+            && self.text == other.text
+            && self.said == other.said
+            && self.group == other.group
+            && self.last_of_cause == other.last_of_cause
+            && self.said_first == other.said_first
+    }
 }
 
 impl Clause {
@@ -32,6 +55,7 @@ impl Clause {
             group: 0,
             last_of_cause: false,
             said_first: false,
+            owners: Vec::new(),
         }
     }
 
@@ -56,6 +80,21 @@ impl Clause {
 
     pub fn in_group(self, group: usize) -> Clause {
         Clause { group, ..self }
+    }
+
+    /// The same clause, said by `owner` too.
+    pub fn owned_by(mut self, owner: Owner) -> Clause {
+        self.take_owners(&[owner]);
+        self
+    }
+
+    /// Adds each of `owners` this clause doesn't have yet.
+    pub fn take_owners(&mut self, owners: &[Owner]) {
+        for owner in owners {
+            if !self.owners.contains(owner) {
+                self.owners.push(*owner);
+            }
+        }
     }
 
     pub fn last_of_its_cause(self) -> Clause {
@@ -117,6 +156,7 @@ pub fn shown(clauses: &[Clause]) -> Vec<Clause> {
         group: 0,
         last_of_cause: false,
         said_first: false,
+        owners: Vec::new(),
     });
     out
 }
@@ -133,7 +173,10 @@ fn said_once(clauses: &[Clause]) -> Vec<Clause> {
             clause.clone()
         };
         match once.iter_mut().find(|seen| says_alike(seen, &clause)) {
-            Some(seen) => seen.group = seen.group.min(clause.group),
+            Some(seen) => {
+                seen.group = seen.group.min(clause.group);
+                seen.take_owners(&clause.owners);
+            }
             None => once.push(clause),
         }
     }
@@ -275,6 +318,11 @@ pub fn to_value(clauses: &[Clause]) -> Value {
                     "said": to_value(&clause.said),
                     "group": clause.group,
                     "said_first": clause.said_first,
+                    "owners": clause.owners.iter().map(|owner| match owner {
+                        Owner::Sentence(idx) => json!(idx),
+                        Owner::Item => json!("item"),
+                        Owner::List => json!("list"),
+                    }).collect::<Vec<_>>(),
                 })
             })
             .collect(),
@@ -307,6 +355,19 @@ pub fn of_value(value: &Value) -> Option<Vec<Clause>> {
                     .get("said_first")
                     .and_then(Value::as_bool)
                     .unwrap_or(false),
+                owners: match clause.get("owners") {
+                    None => Vec::new(),
+                    Some(owners) => owners
+                        .as_array()?
+                        .iter()
+                        .map(|owner| match (owner.as_u64(), owner.as_str()) {
+                            (Some(idx), _) => usize::try_from(idx).ok().map(Owner::Sentence),
+                            (_, Some("item")) => Some(Owner::Item),
+                            (_, Some("list")) => Some(Owner::List),
+                            _ => None,
+                        })
+                        .collect::<Option<Vec<_>>>()?,
+                },
             })
         })
         .collect()

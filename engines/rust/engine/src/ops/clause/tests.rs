@@ -10,6 +10,7 @@ fn read(kind: Kind, name: &str, cause: Cause, text: &str) -> Clause {
         group: 0,
         last_of_cause: false,
         said_first: false,
+        owners: Vec::new(),
     }
 }
 

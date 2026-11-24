@@ -1,4 +1,4 @@
-use super::clause::Clause;
+use super::clause::{Clause, Owner};
 use super::tally::{Side, Tally, Term};
 use super::time::{self, Time};
 use super::walk::{self, Failure, Options, Seg, WalkItem};
@@ -1120,6 +1120,15 @@ struct Sfail {
     named: Vec<Clause>,
 }
 
+impl Sfail {
+    fn owns(&self, clause: &Clause) -> Clause {
+        clause
+            .clone()
+            .in_group(self.idx)
+            .owned_by(Owner::Sentence(self.idx))
+    }
+}
+
 struct Child {
     order: Vec<Seg>,
     entry: Dead,
@@ -2029,12 +2038,15 @@ impl For {
         }
         let mut clauses: Vec<Clause> = clauses
             .into_iter()
-            .map(|clause| clause.in_group(self.sentences.len()))
+            .map(|clause| clause.in_group(self.sentences.len()).owned_by(Owner::List))
             .collect();
         for (at, sentence) in self.sentences.iter().enumerate() {
             let said = sentence_roots_listed(&sentence.check, &outer);
             let group = self.sentence_group(at);
-            clauses.extend(said.into_iter().map(|clause| clause.in_group(group)));
+            clauses.extend(
+                said.into_iter()
+                    .map(|clause| clause.in_group(group).owned_by(Owner::Sentence(at))),
+            );
         }
         listed_roots(lines_once(clauses))
     }
@@ -2051,6 +2063,9 @@ impl For {
         let mut clauses = super::message::listed_root_clauses(&whose, &outer, true);
         clauses.extend(super::message::walked_root_clauses(&whose, &outer));
         listed_roots(lines_once(clauses))
+            .into_iter()
+            .map(|clause| clause.owned_by(Owner::List))
+            .collect()
     }
 
     /// What the sentence at `idx` says, for the item of the first list that
@@ -2545,7 +2560,9 @@ impl For {
                     .filter(|(_, text)| !roots.contains(text))
                     .map(|(name, text)| {
                         let name = if name.is_empty() { text.clone() } else { name };
-                        Clause::list(&name, cause, text).in_group(self.sentences.len())
+                        Clause::list(&name, cause, text)
+                            .in_group(self.sentences.len())
+                            .owned_by(Owner::List)
                     }),
             );
         }
@@ -2936,6 +2953,10 @@ impl For {
     }
 
     fn dead_clause(&self, dead: &Dead, ctx: &Ctx) -> Clause {
+        self.dead_said(dead, ctx).owned_by(Owner::Item)
+    }
+
+    fn dead_said(&self, dead: &Dead, ctx: &Ctx) -> Clause {
         if let Some(own) = self.unsorted_own(dead, ctx) {
             let (cause, text) = own.unwrap_or((dead.cause, String::new()));
             return Clause::item(dead.shown(), cause, text, Vec::new());
@@ -2956,7 +2977,7 @@ impl For {
     fn line_dead_clause(&self, dead: &Dead, ctx: &Ctx) -> Clause {
         let clause = self.dead_clause(dead, ctx);
         if dead.list {
-            return Clause::list(&clause.name, clause.cause, clause.text);
+            return Clause::list(&clause.name, clause.cause, clause.text).owned_by(Owner::List);
         }
         clause
     }
@@ -3026,7 +3047,7 @@ impl For {
                     !fail.reads_last && !self.is_free(fail) && !taken.contains(&fail.idx)
                 }) {
                     for clause in &fail.clauses {
-                        push_new(riders, (fail.idx, clause.clone().in_group(fail.idx)));
+                        push_new(riders, (fail.idx, fail.owns(clause)));
                     }
                 }
             }
@@ -3046,6 +3067,7 @@ impl For {
         let all_own = child.sfails.iter().all(|fail| fail.own);
         let mut marked: Option<&Clause> = None;
         let mut marked_causes: Vec<Cause> = Vec::new();
+        let mut marked_by: Vec<Owner> = Vec::new();
         for fail in &child.sfails {
             if !fail.reads_last && self.is_free(fail) {
                 continue;
@@ -3070,14 +3092,15 @@ impl For {
                         text = format!("{name}{rest}");
                         marked_causes.push(clause.cause);
                         marked = Some(clause);
+                        marked_by.push(Owner::Sentence(fail.idx));
                     }
                     None => match riders.as_deref_mut() {
                         Some(riders) if !fail.reads_last => {
                             if !taken.contains(&fail.idx) {
-                                push_new(riders, (fail.idx, clause.clone().in_group(fail.idx)));
+                                push_new(riders, (fail.idx, fail.owns(clause)));
                             }
                         }
-                        _ => merge_clause(&mut said, &clause.clone().in_group(fail.idx)),
+                        _ => merge_clause(&mut said, &fail.owns(clause)),
                     },
                 }
             }
@@ -3098,13 +3121,15 @@ impl For {
                 )
             })
             .unwrap_or(outcome.cause);
-            return Some(Clause::item(name, cause, text, said));
+            let mut clause = Clause::item(name, cause, text, said);
+            clause.take_owners(&marked_by);
+            return Some(clause);
         }
         let picks_second =
             matches!(self.items.get(1), Some(item) if matches!(item.how, How::Pick { .. }));
         (outcome.assertions.is_empty() && outcome.inner.is_empty() && !picks_second).then(|| {
             let text = super::message::is(name, &child.entry.value);
-            Clause::item(name, outcome.cause, text, Vec::new())
+            Clause::item(name, outcome.cause, text, Vec::new()).owned_by(Owner::Item)
         })
     }
 
@@ -3221,7 +3246,9 @@ impl For {
         self.later_key(depth, ctx)
             .map(|(outcome, text, input)| {
                 let cause = outcome.cause().unwrap_or(Cause::Unusable);
-                Clause::list(&input.name, cause, text).in_group(self.sentences.len() + 1)
+                Clause::list(&input.name, cause, text)
+                    .in_group(self.sentences.len() + 1)
+                    .owned_by(Owner::List)
             })
             .into_iter()
             .collect()
@@ -3462,6 +3489,7 @@ fn named_once(clauses: Vec<Clause>) -> Vec<Clause> {
         {
             Some((seen, texts)) => {
                 seen.cause = Cause::worst([seen.cause, clause.cause]).unwrap_or(seen.cause);
+                seen.take_owners(&clause.owners);
                 push_new(texts, clause.text);
             }
             None => {
@@ -3614,7 +3642,7 @@ fn key_paths_said(check: &Check, ctx: &Ctx) -> Vec<(String, String)> {
 }
 
 fn tie_clause(text: String) -> Clause {
-    Clause::item(&text.clone(), Cause::Ambiguous, text, Vec::new())
+    Clause::item(&text.clone(), Cause::Ambiguous, text, Vec::new()).owned_by(Owner::Item)
 }
 
 fn in_list_order(said: &mut [Clause]) {
@@ -3683,11 +3711,18 @@ fn merge_clause(said: &mut Vec<Clause>, clause: &Clause) {
             if seen.text.is_empty() {
                 seen.text = clause.text.clone();
             }
+            seen.take_owners(&clause.owners);
             for inner in &clause.said {
-                push_new(&mut seen.said, inner.clone());
+                match seen.said.iter_mut().find(|said| *said == inner) {
+                    Some(said) => said.take_owners(&inner.owners),
+                    None => seen.said.push(inner.clone()),
+                }
             }
         }
-        Some(seen) => seen.cause = Cause::worst([seen.cause, clause.cause]).unwrap_or(seen.cause),
+        Some(seen) => {
+            seen.cause = Cause::worst([seen.cause, clause.cause]).unwrap_or(seen.cause);
+            seen.take_owners(&clause.owners);
+        }
         None => said.push(clause.clone()),
     }
 }
