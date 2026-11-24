@@ -3277,3 +3277,48 @@ fn a_list_after_is_in_ignoring_case_that_walks_an_input_that_is_a_list_fails_a_c
     };
     assert_eq!(crate::ops::run(&check, &ctx).cause, Cause::Unusable);
 }
+
+#[test]
+fn a_count_over_an_empty_list_says_only_a_list_after_is_in_ignoring_case_that_walks_an_input_that_is_a_list()
+ {
+    let check = lowered("count of xs whose v is in $input.ok ignoring case is 1");
+    for (ok, cause, text) in [
+        (
+            json!(["B", 3]),
+            Cause::Unusable,
+            "item 2 of $input: item 2 of ok is 3, which isn't text",
+        ),
+        (
+            json!(["B", null]),
+            Cause::Null,
+            "item 2 of $input: item 2 of ok is null",
+        ),
+    ] {
+        let input = json!([{"xs": [], "ok": ["a"]}, {"xs": [], "ok": ok}]);
+        let ctx = Ctx {
+            label: None,
+            item_by_item: false,
+            subject: Located {
+                value: &input[0],
+                location: Location::input_root().index(0),
+            },
+            input: &input,
+            params: Some(&Value::Null),
+            aliases: BTreeMap::new(),
+        };
+        let verdict = crate::ops::run(&check, &ctx);
+        let Check::Tally(tally) = &check else {
+            panic!("not a count");
+        };
+        let said = super::row_said(
+            tally,
+            &ctx,
+            verdict.cause,
+            super::super::message::said(&check, &ctx, &verdict),
+        );
+        assert_eq!(
+            (verdict.cause, super::super::message::said_text(&said)),
+            (cause, text.to_string())
+        );
+    }
+}

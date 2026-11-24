@@ -704,7 +704,7 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
                 .chain(&roots)
                 .map(|root| root.cause),
         );
-    } else if !walked.failures.is_empty() {
+    } else {
         causes.extend(
             with_text_lists(Vec::new(), &whose, &outer)
                 .iter()
@@ -1839,10 +1839,8 @@ pub fn counted_said(counted: &Counted, ctx: &Ctx) -> (Vec<Clause>, Vec<Value>) {
         found.sort_by(|a, b| a.1.cmp(&b.1));
         out = if any_undecided {
             and_walked_roots(roots, &whose, &outer)
-        } else if !walked.failures.is_empty() {
-            with_text_lists(roots, &whose, &outer)
         } else {
-            roots
+            with_text_lists(roots, &whose, &outer)
         };
         for (said, _, record) in found {
             rich.extend(record);
