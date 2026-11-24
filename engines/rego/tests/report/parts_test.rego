@@ -266,3 +266,9 @@ test_a_list_after_is_in_ignoring_case_that_walks_a_subject_that_is_a_list_or_a_p
 	part := {"op": "compare", "cmp": "in", "left": ["$e", "v"], "right": [`${"alias":"pl","n":2,"of":null,"old":false}`, "items", "allowed"], "ignoring": "case"}
 	"items.allowed" in ergo._text_list_names(part)
 }
+
+test_the_text_lists_of_a_check_name_a_list_from_a_part_and_one_from_the_params_together if {
+	part := {"op": "compare", "cmp": "in", "left": ["$e", "v"], "right": [`${"alias":"pl","n":2,"of":null,"old":false}`, "items", "allowed"], "ignoring": "case"}
+	ref := {"op": "in", "path": ["x"], "values": {"ref": ["$$params", "l"]}, "ignoring": "case"}
+	{"items.allowed", "$params.l"} - ergo._text_list_names({"op": "for", "checks": [part, ref]}) == set()
+}

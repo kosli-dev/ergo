@@ -433,6 +433,12 @@ _text_list_input(name) if name in data.ergo_text_lists
 
 _text_list_input(name) if replace(name, "[]", "") in data.ergo_text_lists
 
+_text_list_input(name) if {
+	parts := split(name, "[].")
+	count(parts) > 1
+	replace(concat("[].", array.slice(parts, 1, count(parts))), "[]", "") in data.ergo_text_lists
+}
+
 _entry(kind, name, cause, inputs, failures, message) := {
 	"kind": kind,
 	"name": name,
@@ -1153,6 +1159,11 @@ _text_list_names(check) := {n |
 	is_object(x)
 	x.ignoring
 	n := _text_list_name(x)
+} | {n |
+	walk(check, [_, x])
+	is_object(x)
+	x.ignoring
+	n := _text_part_list_name(x)
 }
 
 _text_list_name(x) := _ref_label(x.values.ref) if {
@@ -1164,6 +1175,17 @@ _text_list_name(x) := _input_name(_as_subject_part(x.right)) if {
 	x.op == "compare"
 	x.cmp in _membership_ops
 	is_array(x.right)
+}
+
+_text_part_list_name(x) := n if {
+	x.op == "compare"
+	x.cmp in _membership_ops
+	_part_start(x.right)
+	count(x.right) > 1
+	n := _input_name(array.slice(x.right, 1, count(x.right)))
+	shown := _input_name(_as_subject_part(x.right))
+	shown != n
+	not endswith(shown, concat("", [".", n]))
 }
 
 _option_names(check) := {n | some n in check.option_of}
