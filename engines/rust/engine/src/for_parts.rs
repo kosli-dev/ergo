@@ -230,6 +230,132 @@ fn alias_roots(line: &For, idx: usize, f: &Value, row: &[Clause], ctx: &Ctx) -> 
         .collect()
 }
 
+fn broke_entry(
+    line: &For,
+    idx: usize,
+    f: &Value,
+    row: &[Clause],
+    aliases: &[&str],
+    ctx: &Ctx,
+) -> Option<Failure> {
+    let under = said_under(row, &text(f, "item"));
+    let at = bound(line, f, ctx)?;
+    let (_, said, inputs) = line.first_alias_run(idx, &at)?;
+    let lifted = alias_roots(line, idx, f, row, ctx);
+    let own: Vec<Clause> = said
+        .into_iter()
+        .filter(|piece| under.contains(&piece.text))
+        .collect();
+    let said: Vec<Clause> = lifted
+        .iter()
+        .filter(|root| !own.iter().any(|piece| piece.text == root.text))
+        .cloned()
+        .chain(own.iter().cloned())
+        .collect();
+    let cause = Cause::worst(said.iter().map(|piece| piece.cause))?;
+    Some(item(
+        text(f, "item"),
+        cause,
+        with_root_outcomes(
+            inputs
+                .into_iter()
+                .filter(|x| alias_named(&text(x, "name"), aliases))
+                .collect(),
+            &lifted,
+        ),
+        Vec::new(),
+        own_text(f, &said),
+        f,
+    ))
+}
+
+fn sort_key_said(f: &Value, row: &[Clause]) -> bool {
+    row.iter()
+        .any(|root| root.kind == Kind::Root && root.text == text(f, "ergo/text"))
+}
+
+fn sorted_entry(line: &For, f: &Value, row: &[Clause]) -> Option<Failure> {
+    let name = text(f, "item");
+    let said = row
+        .iter()
+        .find(|clause| clause.kind == Kind::Item && clause.name == name)?;
+    let sorted = f.get("ergo/sorted")?;
+    let key = line.items.iter().find_map(|item| match &item.how {
+        for_line::How::Pick {
+            sorted: Some(sorted),
+            ..
+        } => Some(&sorted.path),
+        _ => None,
+    })?;
+    let at = key
+        .steps
+        .iter()
+        .position(|step| matches!(step, crate::path::Step::Ref(_)))?;
+    let before = crate::name::name(&crate::path::Path {
+        start: key.start.clone(),
+        steps: key.steps[..at].to_vec(),
+    });
+    let outcome = match said.cause {
+        Cause::Absent | Cause::Null | Cause::Unusable | Cause::NotAnObject => said.cause.name(),
+        _ => "unusable",
+    };
+    let input = json!({
+        "name": format!("{}.{before}", crate::parts::position_name(&name)),
+        "value": f.get("value").cloned().unwrap_or(Value::Null),
+        "locations": f.get("locations").cloned().unwrap_or(json!([])),
+        "outcome": outcome,
+    });
+    Some(Failure::Item {
+        part: Part {
+            name: name.clone(),
+            cause: said.cause,
+            inputs: vec![input],
+            failures: Vec::new(),
+            message: entry_text(&said.text, &name),
+        },
+        value: sorted.get("value").cloned().unwrap_or(Value::Null),
+        locations: vec![text(sorted, "at")],
+    })
+}
+
+fn keyed_entry(line: &For, f: &Value, row: &[Clause], ctx: &Ctx) -> Option<Failure> {
+    let under = said_under(row, &text(f, "item"));
+    let path = &line.items.get(1)?.path;
+    let at = path
+        .steps
+        .iter()
+        .position(|step| matches!(step, crate::path::Step::Ref(_)))?;
+    let before = crate::path::Path {
+        start: path.start.clone(),
+        steps: path.steps[..at].to_vec(),
+    };
+    let bound = bound(line, f, ctx)?;
+    let read = ops::read_path(&before, &bound).inputs.into_iter().next()?;
+    let kids: Vec<Failure> = list(f, "failed_items")
+        .iter()
+        .filter(|x| under.contains(&text(x, "ergo/text")))
+        .map(|x| {
+            let cause = cause_of(x);
+            Failure::List(Part {
+                name: read.name.clone(),
+                cause,
+                inputs: vec![crate::parts::with_outcome(&read, cause == Cause::Unusable)],
+                failures: Vec::new(),
+                message: text(x, "ergo/text"),
+            })
+        })
+        .collect();
+    let cause = Cause::worst(kids.iter().map(|kid| kid.part().cause))?;
+    Some(item(
+        text(f, "item"),
+        cause,
+        Vec::new(),
+        kids,
+        String::new(),
+        f,
+    ))
+}
+
 fn with_root_outcomes(inputs: Vec<Value>, lifted: &[Clause]) -> Vec<Value> {
     inputs
         .into_iter()
@@ -711,6 +837,48 @@ pub fn for_failures(
             }
         }
     }
+    let broke_runs: Vec<(usize, usize, Failure)> = (0..line.sentences.len())
+        .flat_map(|i| {
+            failed
+                .iter()
+                .enumerate()
+                .filter(|(_, f)| {
+                    list(f, "failed_assertions").is_empty() && !list(f, "failed_items").is_empty()
+                })
+                .filter_map(|(at, f)| Some((i, at, broke_entry(line, i, f, row, &aliases, ctx)?)))
+                .collect::<Vec<_>>()
+        })
+        .collect();
+    let broke_rest = |clause: &str| -> Option<String> {
+        broke_runs.iter().find_map(|(_, _, entry)| {
+            let name = &entry.part().name;
+            let rest = clause.strip_prefix(&format!("{name}: "))?;
+            let pieces = ops::message::split_outside_quotes(rest, ", and ");
+            let left: Vec<&str> = pieces
+                .iter()
+                .copied()
+                .filter(|piece| {
+                    !broke_runs.iter().any(|(_, _, other)| {
+                        other.part().name == *name && clauses(&other.part().message).contains(piece)
+                    })
+                })
+                .collect();
+            (left.len() < pieces.len()).then(|| match left.is_empty() {
+                true => String::new(),
+                false => format!("{name}: {}", left.join(", and ")),
+            })
+        })
+    };
+    let sorted_said: Vec<String> = failed
+        .iter()
+        .filter(|f| f.get("ergo/sorted").is_some() && sort_key_said(f, row))
+        .flat_map(|f| {
+            row.iter()
+                .filter(|clause| clause.kind == Kind::Item && clause.name == text(f, "item"))
+                .map(|clause| clause.text.clone())
+                .collect::<Vec<_>>()
+        })
+        .collect();
     let mut leftover: Vec<String> = Vec::new();
     let first_items: Vec<String> = failed
         .iter()
@@ -742,7 +910,9 @@ pub fn for_failures(
         .iter()
         .flat_map(|(_, texts)| texts.iter().flat_map(|t| clauses(t)))
         .collect();
-    for clause in clauses(message) {
+    for whole in clauses(message) {
+        let rest = broke_rest(whole);
+        let clause = rest.as_deref().unwrap_or(whole);
         if let Some(middle) = &first_reads
             && crate::parts::is_item(clause)
             && clause.contains(middle.as_str())
@@ -795,6 +965,7 @@ pub fn for_failures(
             || ops::message::cap_note(clause).is_some()
             || item_made.iter().any(|t| t == clause)
             || walk_broke.iter().any(|t| t == clause)
+            || sorted_said.iter().any(|t| t == clause)
             || free_said.iter().any(|t| t == clause)
         {
             continue;
@@ -843,7 +1014,14 @@ pub fn for_failures(
         let mut causes: Vec<Cause> = Vec::new();
         let mut inputs: Vec<Value> = Vec::new();
         let mut items: Vec<Failure> = Vec::new();
-        for f in failed.iter().filter(|f| !bare(f)) {
+        for (at, f) in failed.iter().enumerate().filter(|(_, f)| !bare(f)) {
+            if let Some((_, _, entry)) = broke_runs
+                .iter()
+                .find(|(idx, found, _)| *idx == i && *found == at)
+            {
+                causes.push(entry.part().cause);
+                items.push(entry.clone());
+            }
             for l in list(f, "failed_assertions") {
                 if text(&l, "assertion") != sentence.text {
                     continue;
@@ -979,6 +1157,18 @@ pub fn for_failures(
             if !second {
                 continue;
             }
+        }
+        if f.get("ergo/sorted").is_some() && sort_key_said(f, row) {
+            if let Some(entry) = sorted_entry(line, f, row) {
+                rest.push(entry);
+            }
+            continue;
+        }
+        if !later_keys.is_empty() && !list(f, "failed_items").is_empty() {
+            if let Some(entry) = keyed_entry(line, f, row, ctx) {
+                rest.push(entry);
+            }
+            continue;
         }
         if let Some(entry) = dead_entry(line, f, ctx) {
             match entry {

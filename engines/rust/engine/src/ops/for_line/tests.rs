@@ -4961,7 +4961,10 @@ fn a_second_list_whose_key_cant_be_read_has_an_entry_only_where_it_fails_whateve
     );
     assert_eq!(
         entries(&fine["failures"]),
-        ["assertion w.n is 1 value: ", "  item item 1 of ws value: w.n is 2"]
+        [
+            "assertion w.n is 1 value: ",
+            "  item item 1 of ws value: w.n is 2"
+        ]
     );
 }
 
@@ -5000,8 +5003,43 @@ fn a_sort_key_that_cant_be_read_is_a_row_input_and_an_item_has_an_entry_only_for
             .collect();
         assert_eq!(
             keys,
-            [&json!({"name": "$params.km", "value": null, "outcome": "absent", "locations": ["$params:"]})],
+            [
+                &json!({"name": "$params.km", "value": null, "outcome": "absent", "locations": ["$params:"]})
+            ],
             "{rows}"
         );
     }
+}
+
+#[test]
+fn an_items_own_problem_joined_with_a_root_of_the_second_whose_is_said_once_in_the_entries() {
+    let row = row_with(
+        "every ws as w, every w.ys whose n is w.n as y",
+        json!(["y.n is 1", "w.v is at least $params.min"]),
+        json!({"ws": [{"n": 1, "v": 1, "ys": [{"n": 1}]}, {"v": "a"}, {"n": 1, "v": 2, "ys": null}]}),
+        json!({"min": null}),
+    );
+    assert_eq!(
+        row["message"],
+        "$params.min is null; item 2 of ws: w.n is missing, and w.v is \"a\", which isn't a number; item 2 of ws: w.ys is missing; item 3 of ws: w.ys is null"
+    );
+    let said = entries(&row["failures"]);
+    assert_eq!(
+        said[..2],
+        [
+            "assertion w.v is at least $params.min unusable: $params.min is null",
+            "  item item 2 of ws unusable: w.v is \"a\", which isn't a number"
+        ]
+    );
+    assert_eq!(
+        said.iter()
+            .filter(|entry| entry.contains("w.v is \"a\""))
+            .count(),
+        1,
+        "{said:?}"
+    );
+    assert_eq!(
+        row["failures"][0]["failures"][0]["inputs"][0]["outcome"],
+        "unusable"
+    );
 }
