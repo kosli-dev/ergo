@@ -231,6 +231,7 @@ const ROLE = { field: "field", alias: "alias", ref: "ref", subject: "subject" };
 
 /** Colours a sentence from its tree. The tree has no positions, so the names and values it holds are matched, in order, against the words, strings and numbers of the text. Gives a list of `{kind, text}` pieces that joins back to `text`, with the kinds `word`, `field`, `alias`, `subject`, `ref`, `string` and `number`, and `base` for the rest. Gives `null` when the text and the tree don't match, so the caller can colour it another way. */
 export const treeTokens = (kind, tree, text, aliases = [], base = "plain", subject = null) => {
+  if (tree === null || typeof tree !== "object") return null;
   const ops = operandsOf(kind, tree, new Set(aliases), subject);
   const tokens = [];
   let next = 0;
