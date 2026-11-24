@@ -593,3 +593,50 @@ test_a_for_line_fails_on_a_root_its_count_reads_through_a_key_from_the_item_even
 		}
 	}
 }
+
+_empty_root_rows(checks, doc, params) := {r.check: [r.cause, object.get(r, "message", null)] |
+	some r in ergo.report(doc, {"ergo_spec": ergo._spec, "subjects": {"c": {"from": "cs", "identified_by": "id", "has": {"pos": "os"}}}, "requirements": {"r": {"subject": "c", "checks": checks}}}, params).results
+	r.check in object.keys(checks)
+}
+
+test_a_walk_in_a_for_line_sentence_fails_as_value_when_the_list_on_its_right_is_empty if {
+	checks := {
+		"every": {"for": "every ms as m", "assert": "every rows.v, if any, is in $params.os.name"},
+		"some": {"for": "some ms as m", "assert": "every rows.v, if any, is in pos.name"},
+		"beside": {"for": "every rows, if any, as r", "assert": ["r.v exists", "every zs.v, if any, is in pos.name"]},
+		"item": {"for": "every ms as m", "assert": "every m.ys.v, if any, is in pos.name"},
+		"input": {"for": "every ms as m", "assert": "every m.ys.v, if any, is in $input.os.name"},
+	}
+	_empty_root_rows(checks, {"os": [], "cs": [{"id": "c", "rows": [], "zs": [], "ms": [{"ys": []}], "os": []}]}, {"os": []}) == {
+		"every": ["value", "$params.os is []"],
+		"some": ["value", "pos is []"],
+		"beside": ["value", "pos is []"],
+		"item": ["value", "pos is []"],
+		"input": ["value", "$input.os is []"],
+	}
+}
+
+test_a_for_line_on_an_empty_list_fails_as_value_when_a_list_its_sentence_walks_on_the_right_is_empty if {
+	checks := {
+		"in": {"for": "every rows, if any, as r", "assert": "r.v is in pos.name"},
+		"params": {"for": "every rows, if any, as r", "assert": "r.v is in $params.os.name"},
+		"all": {"for": "every rows, if any, as r", "assert": "r.tags contains all of pos.name"},
+		"not_in": {"for": "every rows, if any, as r", "assert": "r.v is not one of pos.name"},
+		"two": {"for": "every ms as m, every rows, if any, as r", "assert": "r.v is in pos.name"},
+		"walk": {"for": "every rows, if any, as r", "assert": "every r.ys.v, if any, is in pos.name"},
+	}
+	_empty_root_rows(checks, {"cs": [{"id": "c", "rows": [], "ms": [{}], "os": []}]}, {"os": []}) == {
+		"in": ["value", "pos is []"],
+		"params": ["value", "$params.os is []"],
+		"all": ["value", "pos is []"],
+		"not_in": ["value", "pos is []"],
+		"two": ["value", "pos is []"],
+		"walk": ["value", "pos is []"],
+	}
+	_empty_root_rows({"dot": {"for": "every rows, if any, as p", "assert": "p.v is in .p.name"}}, {"cs": [{"id": "c", "rows": [], "p": [{"name": []}]}]}, {}) == {"dot": ["value", "item 1 of .p: name is []"]}
+}
+
+test_a_for_line_on_an_empty_list_passes_when_the_list_its_sentence_walks_on_the_right_holds_names if {
+	checks := {"in": {"for": "every rows, if any, as r", "assert": "r.v is in pos.name"}, "walk": {"for": "every ms as m", "assert": "every m.ys.v, if any, is in pos.name"}}
+	_empty_root_rows(checks, {"cs": [{"id": "c", "rows": [], "ms": [{"ys": []}], "os": [{"name": "a"}]}]}, {}) == {"in": ["satisfied", null], "walk": ["satisfied", null]}
+}

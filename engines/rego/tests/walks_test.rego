@@ -2237,8 +2237,3 @@ test_an_every_with_if_any_on_an_empty_list_fails_as_value_when_the_list_on_the_r
 	}
 	_empty_right_rows({"part": checks.part}, {"ts": [{"id": "t", "xs": [], "p": []}]}) == {"part": ["value", "pl is []"]}
 }
-
-test_a_walk_under_a_for_line_beside_an_empty_list_on_the_right_never_fails_without_a_message if {
-	rows := _empty_right_rows({"for": {"for": "every xs as x", "assert": "every x.ys.v, if any, is in pl.name"}}, {"ts": [{"id": "t", "xs": [{"ys": []}], "p": []}]})
-	rows.for[1] != ""
-}
