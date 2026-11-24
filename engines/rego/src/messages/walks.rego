@@ -65,6 +65,14 @@ _m_unusable_names(check, subj) := {s.name |
 	some f in _m_fault(subj, check)
 	s := _m_shown(subj, f[0])
 	s.state == "value"
+} | _m_text_walked_names(check, subj)
+
+_m_text_walked_names(check, subj) := {s.name |
+	check.ignoring
+	check.cmp in _membership_ops
+	_walked_side(check.right)
+	_text_walk_state(subj, _rpath(check.right))
+	s := _m_shown(subj, check.right)
 }
 
 _m_marked(inputs, names) := [_m_marked_input(i, names) | some i in inputs]

@@ -541,5 +541,6 @@ test_a_list_after_is_in_ignoring_case_read_from_each_item_of_a_subject_that_is_a
 	c := {"op": "compare", "cmp": "in", "left": ["$$params", "v"], "right": [`${"alias":"thing","n":0,"of":null,"old":false}`, "states"], "ignoring": "case"}
 	subj := [{"states": ["A"]}, {"states": ["b", 3]}]
 	"thing[].states[]" in ergo._m_unusable_names_of(c, subj, "unusable") with input as {"ergo/names": {"ergo/subject": subj}} with data.ergo_params as {"v": "a"}
-	not "thing[].states[]" in ergo._m_unusable_names_of(object.remove(c, ["ignoring"]), subj, "unusable") with input as {"ergo/names": {"ergo/subject": subj}} with data.ergo_params as {"v": "a"}
+	text := [{"states": ["A"]}, {"states": ["b"]}]
+	not "thing[].states[]" in ergo._m_unusable_names_of(c, text, "unusable") with input as {"ergo/names": {"ergo/subject": text}} with data.ergo_params as {"v": 3}
 }
