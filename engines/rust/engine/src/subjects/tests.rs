@@ -2386,3 +2386,44 @@ fn reads_of_the_same_value_from_two_checks_merge_into_one_input_with_the_worst_o
         assert_eq!(super::merge_inputs(inputs), [read(Outcome::Unusable)]);
     }
 }
+
+#[test]
+fn a_filter_with_a_list_after_is_in_ignoring_case_names_its_items_after_what_the_field_cant_give() {
+    let subjects = json!({"thing": {"from": "things whose t is in $params.l ignoring case", "identified_by": "id"}});
+    let input = json!({"things": [{"id": "t1"}, {"id": "t2", "t": 3}, {"id": "t3", "t": "A"}]});
+    let r = report(
+        &input,
+        &policy(subjects, json!(0)),
+        &json!({"l": ["a", null]}),
+    );
+    let said: Vec<(Value, Value, Value)> = rows(&r, "$applies")
+        .iter()
+        .map(|row| {
+            (
+                row["subject"]["id"].clone(),
+                row["cause"].clone(),
+                row["message"].clone(),
+            )
+        })
+        .collect();
+    assert_eq!(
+        said,
+        vec![
+            (
+                json!("t1"),
+                json!("absent"),
+                json!("t is missing, and item 2 of $params.l is null")
+            ),
+            (
+                json!("t2"),
+                json!("unusable"),
+                json!("t is 3, which isn't text, and item 2 of $params.l is null")
+            ),
+            (
+                json!("t3"),
+                json!("null"),
+                json!("item 2 of $params.l is null")
+            ),
+        ]
+    );
+}
