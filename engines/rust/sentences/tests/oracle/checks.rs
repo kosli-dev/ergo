@@ -11,6 +11,14 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    ("e.v is in $input.ls", "e.v is in $input.ls", &[], &[]),
+    (
+        "e.v is in $input.ls ignoring case",
+        "e.v is in $input.ls ignoring case",
+        &[],
+        &[],
+    ),
+    ("e.v is in $params.ls", "e.v is in $params.ls", &[], &[]),
     (
         "every member of rs.statuses is \"DONE\"",
         "every member of rs.statuses is \"DONE\"",
@@ -13701,6 +13709,12 @@ pub const CHECK_WRITTEN_WRONG: &[(&str, &[&str])] = &[
 ];
 
 pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
+    (
+        "every gs as g, every g.xs as e",
+        "every gs as g, every g.xs as e",
+        &[],
+        &[],
+    ),
     (
         "every member of evidence whose kind is \"approval\" as e",
         "every member of evidence whose kind is \"approval\" as e",
