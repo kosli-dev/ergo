@@ -299,12 +299,6 @@ test_no_row_of_a_report_holds_the_clauses_of_a_count_or_a_sum if {
 	] {
 		rep := report(doc, {"r": object.union({"from": "every things", "identified_by": "id"}, check)})
 		count(rep.results) > 0
-		not _holds_key(rep, "ergo/clauses")
+		count([1 | walk(rep, [_, y]); is_object(y); "ergo/clauses" in object.keys(y)]) == 0
 	}
-}
-
-_holds_key(x, k) if {
-	walk(x, [_, y])
-	is_object(y)
-	k in object.keys(y)
 }
