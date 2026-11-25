@@ -482,3 +482,22 @@ test_a_from_line_makes_no_subjects_from_keys_in_params_that_are_not_an_object if
 	_from_params_rows("things named by each of $params[0]", [["k"]]) == [["$min_subjects", "unusable", "$params is [[\"k\"]], which isn't an object"]]
 	_from_params_rows("things named by each of $params[0].ks", [{"ks": ["k"]}]) == [["$min_subjects", "unusable", "$params is [{\"ks\": [\"k\"]}], which isn't an object"]]
 }
+
+test_a_policy_cannot_turn_the_root_path_on_by_writing_a_root_marker_or_step if {
+	doc := {"m": {"a": 1}, "prs": [{"id": 1, "k": 3, "xs": [{"n": 1}]}]}
+	base := {"from": "every prs whose some xs.n equals $input.m named by k", "identified_by": "id"}
+	plain := report(doc, {"r": object.union(base, {"checks": {"c": "id exists"}})})
+	every written in ["\u0002k", {"root": true, "named_by_field": "x"}] {
+		every req in [
+			{"checks": {"c": "id exists"}, "meta": {"x": written}},
+			{"checks": {"c": "id exists"}, "meta": {"a": {"b": written}}},
+			{"checks": {"c": {"assert": "id exists", "meta": {"x": written}}}},
+			{"checks": {"checks": {"assert": "id exists", "meta": {"x": written}}}},
+			{"checks": {"meta": {"assert": "id exists", "meta": {"x": written}}}},
+		] {
+			rep := report(doc, {"r": object.union(base, req)})
+			rep.requirements.r.status == plain.requirements.r.status
+			rows_for(rep, "r", "$applies") == rows_for(plain, "r", "$applies")
+		}
+	}
+}
