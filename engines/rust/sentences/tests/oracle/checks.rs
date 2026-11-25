@@ -27,6 +27,12 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ),
     ("count of m is 1", "count of m is 1", &[], &[]),
     (
+        "count of \"a is b\".xs whose v is at least 2 is 1",
+        "count of \"a is b\".xs whose v is at least 2 is 1",
+        &[],
+        &[],
+    ),
+    (
         "count of member of m is 1",
         "count of member of m is 1",
         &[],

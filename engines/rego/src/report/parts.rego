@@ -646,7 +646,7 @@ else := [_entry("list", n, cause, _tally_list_read(n, cause, row, ins, at), [], 
 	cause := _clause_cause(c)
 ]
 
-_list_clause_name(c) := substring(c, 0, indexof(c, " can't be read: ")) if contains(c, " can't be read: ")
+_list_clause_name(c) := _cut_before(c, " can't be read: ") if contains(c, " can't be read: ")
 
 else := _m_clause_name(c)
 

@@ -40912,5 +40912,111 @@
         ]
       }
     ]
+  },
+  {
+    "description": "count of a list whose key is quoted and holds is",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "release": {
+          "from": "releases",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": "count of \"a is b\".xs whose v is at least 2 is 1"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails as unusable when the list is a string and its key holds is",
+        "rules": [
+          "sentence.derived.count",
+          "tally.walk",
+          "tally.count",
+          "tally.inputs",
+          "tally.fail",
+          "sentence.derived.fail",
+          "sentence.phrase.is",
+          "path.unusable"
+        ],
+        "input": {
+          "releases": [
+            {
+              "a is b": "abc",
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/releases/0/a is b"
+                        ],
+                        "name": "\"a is b\"",
+                        "outcome": "unusable",
+                        "value": "abc"
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "\"a is b\" is \"abc\", which isn't a list or an object",
+                    "name": "\"a is b\""
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "count of \"a is b\".xs whose v is at least 2",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "",
+                "name": "count of \"a is b\".xs whose v is at least 2 is 1"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count of \"a is b\".xs whose v is at least 2",
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "\"a is b\".xs",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "\"a is b\" is \"abc\", which isn't a list or an object",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]
