@@ -160,3 +160,21 @@ test_an_alias_marker_step_in_a_check_named_meta_is_read_like_any_other_check if 
 	ergo._names_subject_in(req.checks.meta)
 	ergo._has_old_marker(req.checks.meta)
 }
+
+test_a_subject_keyed_step_under_meta_or_inside_a_literal_is_never_found if {
+	step := {"named_by_field": "\u0003k"}
+	ergo._has_root_field([step])
+	not ergo._has_root_field([{"named_by_field": "k"}, "\u0003"])
+	not ergo._has_root_field({"meta": {"x": step}})
+	not ergo._has_root_field({"right": [{"literal": step}]})
+	not ergo._has_root_check({"checks": {"c": {"assert": "id exists", "meta": {"x": step}}}})
+}
+
+test_an_alias_marker_inside_a_literal_names_no_subject_and_reads_no_whole_subject if {
+	ergo._names_subject_in([_alias_marker])
+	ergo._has_old_marker([_alias_marker])
+	not ergo._names_subject_in({"right": [{"literal": _alias_marker}]})
+	not ergo._has_old_marker({"right": [{"literal": _alias_marker}]})
+	not ergo._names_subject_in({"meta": {"x": _alias_marker}})
+	not ergo._has_old_marker({"meta": {"x": _alias_marker}})
+}
