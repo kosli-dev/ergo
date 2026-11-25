@@ -165,3 +165,20 @@ test_a_row_says_the_items_of_a_list_after_is_in_ignoring_case_read_from_each_ite
 	ergo._m_row_text(c, subj, "unusable") == "item 2 of thing: item 1 of states is null; item 2 of thing: item 2 of states is 4, which isn't text" with input as {"ergo/names": {"ergo/subject": subj}} with data.ergo_params as {"v": "a"}
 	ergo._m_row_text(c, [{"states": ["a", 3]}], "unusable") == "$params.v is null, and item 1 of thing: item 2 of states is 3, which isn't text" with input as {"ergo/names": {"ergo/subject": [{"states": ["a", 3]}]}} with data.ergo_params as {"v": null}
 }
+
+test_a_piece_that_is_a_clause_prints_as_its_text if {
+	c := ergo._m_clause("root", "a", "absent", "a is missing")
+	ergo._m_piece_text(c) == "a is missing"
+	ergo._m_pieces_text([c, "x is null"]) == "a is missing, and x is null"
+	ergo._m_pieces_once([c, "a is missing", "x is null"]) == [c, "x is null"]
+}
+
+test_a_state_piece_is_a_root_clause_with_the_state_as_its_cause if {
+	ergo._m_state_piece({"name": "a", "state": "absent"}) == ergo._m_clause("root", "a", "absent", "a is missing")
+	ergo._m_state_piece({"name": "a", "state": "null"}) == ergo._m_clause("root", "a", "null", "a is null")
+}
+
+test_a_state_piece_with_a_text_keeps_that_text if {
+	ergo._m_state_piece({"name": "xs", "state": "absent", "text": "xs can't be read: x"}).text == "xs can't be read: x"
+	ergo._m_state_piece({"name": "xs", "state": "absent", "text": "xs can't be read: x"}).cause == "absent"
+}
