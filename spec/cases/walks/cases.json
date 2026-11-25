@@ -47839,6 +47839,79 @@
             }
           }
         ]
+      },
+      {
+        "description": "an item of an input list that isn't an object fails $applies as unusable, as the check does",
+        "rules": [
+          "problems.same_path",
+          "walk.right"
+        ],
+        "input": {
+          "ts": [
+            {
+              "id": "t1",
+              "xs": []
+            }
+          ],
+          "cs": [
+            "a"
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "$applies",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0"
+                    ],
+                    "name": "$input.cs[].name",
+                    "outcome": "unusable",
+                    "value": [
+                      null
+                    ]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/subjects/t/from"
+                ],
+                "message": "item 1 of $input.cs is \"a\", which isn't an object",
+                "name": "every xs.v, if any, is in $input.cs.name"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0"
+                ],
+                "name": "$input.cs[].name",
+                "outcome": "unusable",
+                "value": [
+                  null
+                ]
+              },
+              {
+                "locations": [],
+                "name": "xs[].v",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "item 1 of $input.cs is \"a\", which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t1",
+              "type": "t"
+            }
+          }
+        ]
       }
     ]
   },
