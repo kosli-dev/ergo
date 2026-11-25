@@ -744,9 +744,14 @@ _names_subject(req) if {
 
 default _names_subject_of(_) := false
 
-_names_subject_of(req) if _names_subject_in(req)
-
 _names_subject_of(req) if _names_subject_in(_applies_to_of(req))
+
+_names_subject_of(req) if {
+	is_object(req)
+	is_object(req.checks)
+	some c in req.checks
+	_names_subject_in(c)
+}
 
 _names_subject_of(req) if _has_root_check(req)
 
@@ -785,14 +790,18 @@ _has_root_field(x) if {
 
 _has_root_field(x) if {
 	contains(json.marshal(x), "\\u0003")
-	walk(x, [_, s])
-	is_string(s)
-	startswith(s, _subject_key)
+	walk(x, [at, s])
+	not "meta" in at
+	not "literal" in at
+	_subject_keyed_step(s)
+	object.keys(s) == {"named_by_field"}
 }
 
 _names_subject_in(req) if {
 	contains(json.marshal(req), "\\\"of\\\":null")
-	walk(req, [_, s])
+	walk(req, [at, s])
+	not "meta" in at
+	not "literal" in at
 	is_string(s)
 	startswith(s, "${\"alias\":")
 	contains(s, "\"of\":null")
@@ -852,9 +861,14 @@ _scoped_of(req) if {
 	_reads_whole_subject(req)
 }
 
-_reads_whole_subject(req) if _has_old_marker(req)
-
 _reads_whole_subject(req) if _has_old_marker(_applies_to_of(req))
+
+_reads_whole_subject(req) if {
+	is_object(req)
+	is_object(req.checks)
+	some c in req.checks
+	_has_old_marker(c)
+}
 
 _reads_whole_subject(req) if _has_root_field(_applies_to_of(req))
 
@@ -863,7 +877,9 @@ _reads_whole_subject(req) if _has_root_check(req)
 _reads_whole_subject(req) if _has_for_check(req)
 
 _has_old_marker(x) if {
-	walk(x, [_, s])
+	walk(x, [at, s])
+	not "meta" in at
+	not "literal" in at
 	is_string(s)
 	startswith(s, "${\"alias\":")
 	_part_start([s])
