@@ -2427,3 +2427,52 @@ fn a_filter_with_a_list_after_is_in_ignoring_case_names_its_items_after_what_the
         ]
     );
 }
+
+fn applied_of(sentence: &str, subject: &Value, input: &Value) -> super::Applied {
+    let check = crate::ops::Check::Walk(Box::new(walk_of(sentence)));
+    let filters = vec![crate::reading::Filter {
+        text: sentence.to_string(),
+        check,
+        owner: "t".to_string(),
+    }];
+    let ctx = crate::path::Ctx {
+        label: Some("t".to_string()),
+        item_by_item: false,
+        subject: crate::path::Located {
+            value: subject,
+            location: crate::path::Location::input_root().key("ts").index(0),
+        },
+        input,
+        params: None,
+        aliases: std::collections::BTreeMap::new(),
+    };
+    super::apply(&filters, &ctx, false)
+}
+
+#[test]
+fn a_from_line_whose_reads_an_empty_input_list_on_the_right_of_an_empty_walked_list_as_a_check_does()
+ {
+    let applied = applied_of(
+        "every xs.v, if any, is in $input.cs.name",
+        &json!({"id": "t1", "xs": []}),
+        &json!({"cs": []}),
+    );
+    assert!(!applied.matched);
+    assert_eq!(applied.cause, crate::cause::Cause::Value);
+    assert_eq!(applied.message.as_deref(), Some("$input.cs is []"));
+}
+
+#[test]
+fn a_from_line_whose_reads_an_item_of_an_input_list_with_no_name_as_a_check_does() {
+    let applied = applied_of(
+        "every xs.v, if any, is in $input.cs.name",
+        &json!({"id": "t1", "xs": []}),
+        &json!({"cs": [{"id": "c1"}]}),
+    );
+    assert!(!applied.matched);
+    assert_eq!(applied.cause, crate::cause::Cause::Absent);
+    assert_eq!(
+        applied.message.as_deref(),
+        Some("item 1 of $input.cs: name is missing")
+    );
+}

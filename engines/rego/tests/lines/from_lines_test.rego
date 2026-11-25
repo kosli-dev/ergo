@@ -74,3 +74,19 @@ test_a_failing_for_row_is_read_again_only_when_one_of_its_own_assertions_has_the
 	if_any := {"op": "for", "checks": [nested], "items": [{"as": "e", "if_any": true, "path": ["xs"], "q": "every", "whose": []}]}
 	not ergo._walk_read_again({"passed": false, "inputs": []}, if_any) with input as {"ergo/names": {"ergo/subject": subj}}
 }
+
+test_a_from_line_whose_reads_an_empty_input_list_on_the_right_of_an_empty_walked_list_as_a_check_does if {
+	field := {"op": "in", "path": ["x"], "values": {"ref": ["$$input[]", "cs", "name"]}}
+	every_field := {"op": "every", "path": ["xs", "v"], "check": field, "whose": [], "if_any": true}
+	subj := {"id": "t1", "xs": []}
+	row := ergo._filter_walk(every_field, subj) with data.ergo_document as {"cs": []} with data.ergo_params as {} with input as {"ergo/names": {"ergo/subject": subj}}
+	row.cause == "value"
+}
+
+test_a_from_line_whose_reads_an_item_of_an_input_list_with_no_name_as_a_check_does if {
+	field := {"op": "in", "path": ["x"], "values": {"ref": ["$$input[]", "cs", "name"]}}
+	every_field := {"op": "every", "path": ["xs", "v"], "check": field, "whose": [], "if_any": true}
+	subj := {"id": "t1", "xs": []}
+	row := ergo._filter_walk(every_field, subj) with data.ergo_document as {"cs": [{"id": "c1"}]} with data.ergo_params as {} with input as {"ergo/names": {"ergo/subject": subj}}
+	row.cause == "absent"
+}

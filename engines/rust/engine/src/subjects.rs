@@ -1861,8 +1861,7 @@ fn apply(filters: &[Filter], ctx: &Ctx, unreadable: bool) -> Applied {
     let verdicts: Vec<(&Filter, Verdict)> = filters
         .iter()
         .map(|filter| {
-            let ran = ops::run_full(&filter.check, ctx);
-            let mut own = ops::message::ran_said(&ran);
+            let (ran, mut own) = walked_roots_run(&filter.check, ctx);
             let mut verdict = ran.verdict;
             failed_items = ran.failed_items.map(Value::Array);
             rich = ran.rich;

@@ -68,6 +68,8 @@ This file is about `ergo.rego` only. The Rust engine's changes are in [engines/r
 
 ### Fixed
 
+- A `from` line whose `whose` walks a list from outside the item on the right fails `$applies` on an empty list as the same check does ([problems.same_path](spec/semantics.md#which-problems-a-message-says)). With `xs` `[]` and `cs` `[]`, `from: ts whose every xs.v, if any, is in $input.cs.name` fails `$applies` as `value` with `$input.cs is []`, and as `absent` with `item 1 of $input.cs: name is missing` when an item of `cs` has no `name`, where the subject was kept before. Changes the report of a `from` line like that.
+
 - Under two `for` lines, the `assertion` entry of a sentence lists a root it can't read, with its outcome, as it does under one `for` line and as [for.failure_inputs](spec/semantics.md#for) says. With no params and `gs` holding `[{"xs": [{"v": "a"}]}]`, `for: every gs as g, every g.xs as e` with `e.v is in $params.ls` lists `$params.ls` with the outcome `absent`, where its `inputs` were `[]`.
 
 - A list after `is in` read from each item of a subject that is a list is said once, before any item, as [problems.where_said](spec/semantics.md#which-problems-a-message-says) says, when an item has no list, the list holds `null` or it isn't a list. With the subject holding `[{"ls": ["a"], "xs": [{"v": "a"}, {"v": "z"}]}, {"xs": [{"v": "a"}, {"v": "a"}]}]`, `every xs.v is in ls` says `item 2 of thing: ls is missing`, where it said it once for each item and ended with `; and 1 more`.

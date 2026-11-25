@@ -877,8 +877,17 @@ _filter_eval(req, check, subj, flaw) := object.union(
 	_m_filter_walk(_named_check(check, req, subj), subj, _filter_walk_passed(flaw, w), _filter_walk_cause(flaw, w), w),
 ) if {
 	_walks(check)
-	w := _walk_row(check, subj)
+	w := _filter_walk(check, subj)
 }
+
+_filter_walk(check, subj) := _filter_walk_again(_walk_row(check, subj), check, subj)
+
+_filter_walk_again(raw, check, subj) := again if {
+	raw.cause == "satisfied"
+	_may_hide_a_root({"inputs": raw.inputs}, check)
+	again := _walk_row(check, subj) with _walk_roots_on as true
+	again.cause != "satisfied"
+} else := raw
 
 _filter_eval(req, check, subj, flaw) := _m_filter(_named_check(check, req, subj), subj, {
 	"passed": passed,
