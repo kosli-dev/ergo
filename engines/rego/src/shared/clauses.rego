@@ -70,9 +70,17 @@ else := 3 if endswith(c, " needs more than 15 digits")
 
 else := 6
 
-_m_clause_name(c) := substring(c, 0, indexof(c, " is ")) if contains(c, " is ")
+_m_clause_name(c) := _cut_before(c, " is ")
 
-else := c
+_cut_before(c, sep) := substring(c, 0, indexof(c, sep)) if {
+	contains(c, sep)
+	not contains(c, "\"")
+} else := concat(sep, array.slice(parts, 0, min(js))) if {
+	contains(c, "\"")
+	parts := split(c, sep)
+	js := [j | some j in numbers.range(1, count(parts) - 1); _clause_quotes_shut(concat(sep, array.slice(parts, 0, j)))]
+	count(js) > 0
+} else := c
 
 _clause_quotes_shut(s) if count(split(replace(replace(s, "\\\\", ""), "\\\"", ""), "\"")) % 2 == 1
 
