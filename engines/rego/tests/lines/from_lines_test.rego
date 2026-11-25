@@ -90,3 +90,46 @@ test_a_from_line_whose_reads_an_item_of_an_input_list_with_no_name_as_a_check_do
 	row := ergo._filter_walk(every_field, subj) with data.ergo_document as {"cs": [{"id": "c1"}]} with data.ergo_params as {} with input as {"ergo/names": {"ergo/subject": subj}}
 	row.cause == "absent"
 }
+
+_root_step := {"named_by_field": "k", "root": true}
+
+test_a_root_step_in_a_condition_or_a_check_is_found if {
+	ergo._has_root_field([_root_step])
+	ergo._has_root_field({"right": ["$$input", "m", _root_step]})
+	ergo._has_root_check({"checks": {"c": {"right": ["$$input", _root_step]}}})
+}
+
+test_a_root_step_under_meta_is_never_found if {
+	not ergo._has_root_field({"meta": {"x": _root_step}})
+	not ergo._has_root_field({"check": {"meta": {"a": {"b": _root_step}}}})
+	not ergo._has_root_check({"checks": {"c": {"assert": "id exists", "meta": {"x": _root_step}}}})
+}
+
+test_a_root_step_inside_a_literal_is_never_found if {
+	not ergo._has_root_field({"right": [{"literal": _root_step}]})
+	not ergo._has_root_field({"right": [{"literal": {"a": [_root_step]}}]})
+}
+
+test_only_a_step_shaped_exactly_like_a_root_step_is_found if {
+	not ergo._has_root_field([{"named_by_field": "k", "root": false}])
+	not ergo._has_root_field([{"named_by_field": "k", "root": true, "x": 1}])
+	not ergo._has_root_field([{"root": true}])
+}
+
+test_a_check_named_meta_or_checks_is_read_like_any_other_check if {
+	ergo._has_root_check({"checks": {"meta": {"right": [_root_step]}}})
+	ergo._has_root_check({"checks": {"checks": {"right": [_root_step]}}})
+	not ergo._has_root_check({"checks": {"meta": {"meta": {"x": _root_step}}}})
+}
+
+test_a_root_step_in_the_meta_or_the_description_of_a_requirement_names_no_subject_and_reads_no_whole_subject if {
+	req := {"meta": {"x": _root_step}, "description": "\u0002k", "checks": {"c": "id exists"}}
+	not ergo._names_subject_of(req)
+	not ergo._reads_whole_subject(req)
+}
+
+test_a_root_step_in_a_check_named_meta_names_the_subject_and_reads_the_whole_subject if {
+	req := {"checks": {"meta": {"right": [_root_step]}}}
+	ergo._names_subject_of(req)
+	ergo._reads_whole_subject(req)
+}

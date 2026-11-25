@@ -58,7 +58,7 @@ _rooted_side(p) := array.concat([_root_marker], _root_fields(p)) if {
 
 _root_fields(p) := [_root_keyed_step(step) | some step in p]
 
-_root_keyed_step(step) := {"named_by_field": concat("", [_root_key, step.named_by_field])} if _field_step(step)
+_root_keyed_step(step) := {"named_by_field": step.named_by_field, "root": true} if _field_step(step)
 
 else := step
 
