@@ -515,7 +515,7 @@ _for_keyed_path(at, _) if at[count(at) - 1] in _tally_forms
 
 _for_root_key(step) := [_root_marker, _fk(step)] if {
 	_field_step(step)
-	startswith(step.named_by_field, _root_key)
+	step.root == true
 }
 
 _for_root_key(step) := [concat("", ["$", step.named_by])] if {

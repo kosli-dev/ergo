@@ -45,7 +45,7 @@ _name_step(seg) if {
 
 _field_step(seg) if {
 	is_object(seg)
-	object.keys(seg) == {"named_by_field"}
+	object.keys(seg) in {{"named_by_field"}, {"named_by_field", "root"}}
 	is_string(seg.named_by_field)
 }
 
@@ -64,11 +64,9 @@ _keys_in(subj, path) := ks if {
 	count(ks) == count(steps)
 }
 
-_root_key := "\u0002"
-
 _subject_key := "\u0003"
 
-_fk(seg) := substring(seg.named_by_field, count(_root_key), -1) if startswith(seg.named_by_field, _root_key)
+_fk(seg) := seg.named_by_field if seg.root == true
 
 else := split(seg.named_by_field, _subject_key)[2] if startswith(seg.named_by_field, _subject_key)
 
@@ -78,7 +76,7 @@ _fk_text(seg) := concat(".", [_s_key_text(split(seg.named_by_field, _subject_key
 
 else := _s_key_text(_fk(seg))
 
-_from_root(seg) if startswith(seg.named_by_field, _root_key)
+_from_root(seg) if seg.root == true
 
 _from_root(seg) if startswith(seg.named_by_field, _subject_key)
 

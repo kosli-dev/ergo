@@ -159,7 +159,7 @@ _m_key_name(step) := _ref_name(step.ref) if _is_ref(step)
 
 _m_key_name(step) := step.named_by if object.keys(step) == {"named_by"}
 
-_m_key_name(step) := _fk_text(step) if object.keys(step) == {"named_by_field"}
+_m_key_name(step) := _fk_text(step) if _field_step(step)
 
 _m_key_fault(_, step) := _m_isnt(_ref_name(step.ref), v, "text") if {
 	_is_ref(step)

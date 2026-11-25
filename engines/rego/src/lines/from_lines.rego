@@ -748,7 +748,7 @@ _names_subject_of(req) if _names_subject_in(req)
 
 _names_subject_of(req) if _names_subject_in(_applies_to_of(req))
 
-_names_subject_of(req) if _has_root_field(req)
+_names_subject_of(req) if _has_root_check(req)
 
 _names_subject_of(req) if _has_for_check(req)
 
@@ -766,11 +766,21 @@ _for_check(c) if "for" in object.keys(c)
 
 _names_subject_of(req) if _has_root_field(_applies_to_of(req))
 
+_has_root_check(req) if {
+	is_object(req)
+	is_object(req.checks)
+	some c in req.checks
+	_has_root_field(c)
+}
+
 _has_root_field(x) if {
-	contains(json.marshal(x), "\\u0002")
-	walk(x, [_, s])
-	is_string(s)
-	startswith(s, _root_key)
+	contains(json.marshal(x), "\"root\":true")
+	walk(x, [at, s])
+	not "meta" in at
+	not "literal" in at
+	is_object(s)
+	object.keys(s) == {"named_by_field", "root"}
+	s.root == true
 }
 
 _has_root_field(x) if {
@@ -846,7 +856,9 @@ _reads_whole_subject(req) if _has_old_marker(req)
 
 _reads_whole_subject(req) if _has_old_marker(_applies_to_of(req))
 
-_reads_whole_subject(req) if _has_root_field(req)
+_reads_whole_subject(req) if _has_root_field(_applies_to_of(req))
+
+_reads_whole_subject(req) if _has_root_check(req)
 
 _reads_whole_subject(req) if _has_for_check(req)
 
