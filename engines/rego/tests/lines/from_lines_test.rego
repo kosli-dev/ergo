@@ -133,3 +133,48 @@ test_a_root_step_in_a_check_named_meta_names_the_subject_and_reads_the_whole_sub
 	ergo._names_subject_of(req)
 	ergo._reads_whole_subject(req)
 }
+
+_alias_marker := "${\"alias\":\"a\",\"n\":1,\"of\":null,\"old\":true}"
+
+test_a_subject_key_marker_under_meta_or_inside_a_literal_is_never_found if {
+	not ergo._has_root_field({"meta": {"x": "\u0003k"}})
+	not ergo._has_root_field({"right": [{"literal": "\u0003k"}]})
+	not ergo._has_root_check({"checks": {"c": {"assert": "id exists", "meta": {"x": "\u0003k"}}}})
+	not ergo._has_root_check({"checks": {"meta": {"meta": {"x": "\u0003k"}}}})
+}
+
+test_only_a_step_shaped_like_a_subject_keyed_step_is_found if {
+	ergo._has_root_field([{"named_by_field": "\u0003k"}])
+	not ergo._has_root_field(["\u0003k"])
+	not ergo._has_root_field([{"named_by_field": "\u0003k", "x": 1}])
+}
+
+test_an_alias_marker_under_meta_or_in_the_description_names_no_subject_and_reads_no_whole_subject if {
+	req := {"meta": {"x": _alias_marker}, "description": _alias_marker, "checks": {"c": {"assert": "id exists", "meta": {"x": _alias_marker}}}}
+	not ergo._names_subject_of(req)
+	not ergo._reads_whole_subject(req)
+}
+
+test_an_alias_marker_step_in_a_check_named_meta_is_read_like_any_other_check if {
+	req := {"checks": {"meta": {"left": [_alias_marker]}}}
+	ergo._names_subject_in(req.checks.meta)
+	ergo._has_old_marker(req.checks.meta)
+}
+
+test_a_subject_keyed_step_under_meta_or_inside_a_literal_is_never_found if {
+	step := {"named_by_field": "\u0003k"}
+	ergo._has_root_field([step])
+	not ergo._has_root_field([{"named_by_field": "k"}, "\u0003"])
+	not ergo._has_root_field({"meta": {"x": step}})
+	not ergo._has_root_field({"right": [{"literal": step}]})
+	not ergo._has_root_check({"checks": {"c": {"assert": "id exists", "meta": {"x": step}}}})
+}
+
+test_an_alias_marker_inside_a_literal_names_no_subject_and_reads_no_whole_subject if {
+	ergo._names_subject_in([_alias_marker])
+	ergo._has_old_marker([_alias_marker])
+	not ergo._names_subject_in({"right": [{"literal": _alias_marker}]})
+	not ergo._has_old_marker({"right": [{"literal": _alias_marker}]})
+	not ergo._names_subject_in({"meta": {"x": _alias_marker}})
+	not ergo._has_old_marker({"meta": {"x": _alias_marker}})
+}

@@ -501,3 +501,20 @@ test_a_policy_cannot_turn_the_root_path_on_by_writing_a_root_marker_or_step if {
 		}
 	}
 }
+
+test_marker_strings_in_meta_description_names_and_input_values_change_no_report if {
+	doc := {"m": {"a": 1}, "prs": [{"id": 1, "k": 3, "xs": [{"n": 1}]}]}
+	base := {"from": "every prs whose some xs.n equals $input.m named by k", "identified_by": "id"}
+	plain := report(doc, {"r": object.union(base, {"checks": {"c": "id exists"}})})
+	every written in ["\u0002k", "\u0003k", "${\"alias\":\"a\",\"n\":1,\"of\":null,\"old\":true}"] {
+		rep := report(doc, {"r": object.union(base, {"description": written, "meta": {"x": written, "y": [written]}, "checks": {"c": {"assert": "id exists", "meta": {"x": written}}}})})
+		rep.requirements.r.status == plain.requirements.r.status
+		rows_for(rep, "r", "$applies") == rows_for(plain, "r", "$applies")
+		rows_for(rep, "r", "c") == rows_for(plain, "r", "c")
+		named := report(doc, {written: object.union(base, {"checks": {written: "id exists"}})})
+		named.requirements[written].status == plain.requirements.r.status
+		valued := report({"m": {"a": 1}, "prs": [{"id": written, "k": written, "xs": [{"n": written}]}]}, {"r": object.union(base, {"checks": {"c": "id exists"}})})
+		neutral := report({"m": {"a": 1}, "prs": [{"id": "z", "k": "z", "xs": [{"n": "z"}]}]}, {"r": object.union(base, {"checks": {"c": "id exists"}})})
+		valued.requirements.r.status == neutral.requirements.r.status
+	}
+}
