@@ -78,7 +78,7 @@ test_a_key_that_cant_be_read_and_the_value_before_it_are_two_groups_of_the_messa
 test_a_row_says_what_else_it_cant_read_beside_a_key_it_cant_read if {
 	check := {"op": "compare", "cmp": "eq", "left": ["k"], "right": ["m", {"ref": ["$$params", "k"]}], "expression": "k is m named by $params.k"}
 	row := object.union(check, {"ergo/row": true})
-	ergo._m_unkeyed_said({}, row, "absent") == ["k is missing"] with data.ergo_params as {}
+	_piece_strings(ergo._m_unkeyed_said({}, row, "absent")) == ["k is missing"] with data.ergo_params as {}
 	ergo._m_message(row, {}, "absent") == "$params.k is missing, and k is missing" with data.ergo_params as {}
 	ergo._m_unkeyed_said({}, check, "absent") == [] with data.ergo_params as {}
 }
@@ -139,14 +139,14 @@ test_a_walked_part_list_after_is_in_ignoring_case_names_each_item_as_a_walk_does
 	part := [`${"alias":"pl","n":1,"of":null,"old":true}`, "p", "name"]
 	leaf := {"op": "compare", "cmp": "in", "left": ["v"], "right": part, "ignoring": "case"}
 	three := {"v": 3, "p": [{"name": "a"}, {}]}
-	ergo._m_message_pieces(ergo._m_with_sides(ergo._m_walked(leaf, three)), three, "unusable") == ["v is 3, which isn't text", "item 2 of pl: name is missing"] with input as {"ergo/names": {"ergo/subject": three}}
+	_piece_strings(ergo._m_message_pieces(ergo._m_with_sides(ergo._m_walked(leaf, three)), three, "unusable")) == ["v is 3, which isn't text", "item 2 of pl: name is missing"] with input as {"ergo/names": {"ergo/subject": three}}
 	broken := {"v": "a", "p": [{"name": 3}, {}]}
-	ergo._m_message_pieces(ergo._m_with_sides(ergo._m_walked(leaf, broken)), broken, "unusable") == ["item 1 of pl: name is 3, which isn't text; item 2 of pl: name is missing"] with input as {"ergo/names": {"ergo/subject": broken}}
+	_piece_strings(ergo._m_message_pieces(ergo._m_with_sides(ergo._m_walked(leaf, broken)), broken, "unusable")) == ["item 1 of pl: name is 3, which isn't text; item 2 of pl: name is missing"] with input as {"ergo/names": {"ergo/subject": broken}}
 	five := {"v": 3, "p": [{"name": "a"}, {"name": 5}]}
-	ergo._m_message_pieces(ergo._m_with_sides(ergo._m_walked(leaf, five)), five, "unusable") == ["v is 3, which isn't text", "item 2 of pl: name is 5, which isn't text"] with input as {"ergo/names": {"ergo/subject": five}}
+	_piece_strings(ergo._m_message_pieces(ergo._m_with_sides(ergo._m_walked(leaf, five)), five, "unusable")) == ["v is 3, which isn't text", "item 2 of pl: name is 5, which isn't text"] with input as {"ergo/names": {"ergo/subject": five}}
 	params := {"p": [{"name": "a"}, {}]}
 	row := object.union(object.union(leaf, {"left": ["$$params", "k"]}), {"ergo/row": true})
-	ergo._m_message_pieces(ergo._m_with_sides(ergo._m_walked(row, params)), params, "absent") == ["$params.k is null", "item 2 of pl: name is missing"] with input as {"ergo/names": {"ergo/subject": params}} with data.ergo_params as {"k": null}
+	_piece_strings(ergo._m_message_pieces(ergo._m_with_sides(ergo._m_walked(row, params)), params, "absent")) == ["$params.k is null", "item 2 of pl: name is missing"] with input as {"ergo/names": {"ergo/subject": params}} with data.ergo_params as {"k": null}
 }
 
 test_a_walked_part_list_after_is_in_ignoring_case_is_said_after_the_field_so_its_part_is_one_of_the_lists_a_message_names_last if {
@@ -181,4 +181,12 @@ test_a_state_piece_is_a_root_clause_with_the_state_as_its_cause if {
 test_a_state_piece_with_a_text_keeps_that_text if {
 	ergo._m_state_piece({"name": "xs", "state": "absent", "text": "xs can't be read: x"}).text == "xs can't be read: x"
 	ergo._m_state_piece({"name": "xs", "state": "absent", "text": "xs can't be read: x"}).cause == "absent"
+}
+
+_piece_strings(ps) := [ergo._m_piece_string(p) | some p in ps]
+
+test_a_key_piece_is_a_root_clause_named_by_the_key_and_its_state if {
+	check := {"op": "compare", "cmp": "eq", "left": ["k"], "right": ["m", {"ref": ["$$params", "k"]}], "expression": "k is m named by $params.k"}
+	ergo._m_key_pieces({}, check, "absent") == [ergo._m_clause("root", "$params.k", "absent", "$params.k is missing")] with data.ergo_params as {}
+	ergo._m_key_states({}, check, "absent") == ["$params.k is missing"] with data.ergo_params as {}
 }

@@ -174,7 +174,7 @@ _m_says_all(check) if object.get(check, "ergo/row", false) == true
 
 _m_says_all(check) if object.get(check, "ergo/line", false) == true
 
-_m_text_side_said(subj, check) := [_m_state_clause(s)] if {
+_m_text_side_said(subj, check) := [_m_state_piece(s)] if {
 	check.ignoring
 	_list_flawed(check, subj)
 	s := _m_shown(subj, _m_text_side(check))
@@ -221,7 +221,15 @@ _m_pieces_text(ps) := concat(", and ", [_m_piece_text(p) | some p in ps])
 
 _m_piece_text(p) := p if is_string(p)
 
+else := p.text if is_object(p)
+
 else := _m_clauses_text(_m_clauses_shown(p))
+
+_m_piece_string(p) := p if is_string(p)
+
+else := p.text if is_object(p)
+
+else := p
 
 _m_pieces_once(ps) := [ps[i] | some i, t in ts; not t in array.slice(ts, 0, i)] if ts := [_m_piece_text(p) | some p in ps]
 
@@ -340,6 +348,8 @@ _ref_failed_walk(r) if {
 	_ref_walk(r).failed
 }
 
+_m_state_piece(s) := _m_clause("root", s.name, s.state, _m_state_clause(s))
+
 _m_state_clause(s) := s.text if "text" in object.keys(s)
 
 _m_state_clause(s) := concat("", [s.name, " is ", _m_state_word(s.state)]) if not "text" in object.keys(s)
@@ -451,12 +461,12 @@ _m_message_pieces(check, subj, "value") := clauses if {
 
 _m_message_pieces(check, subj, cause) := ps if {
 	cause in _no_value_states
-	keys := _m_key_states(subj, check, cause)
+	keys := _m_key_pieces(subj, check, cause)
 	count(keys) > 0
 	ps := _m_pieces_once(array.concat(keys, _m_unkeyed_said(subj, check, cause)))
 } else := clauses if {
 	cause in _no_value_states
-	clauses := _m_pieces_once(array.concat(array.concat([_m_state_clause(s) | some s in _m_sources(subj, check); _m_side_said(s, cause, check)], _m_tally_lists(subj, check, cause)), _m_text_list_said(subj, check, cause)))
+	clauses := _m_pieces_once(array.concat(array.concat([_m_state_piece(s) | some s in _m_sources(subj, check); _m_side_said(s, cause, check)], _m_tally_lists(subj, check, cause)), _m_text_list_said(subj, check, cause)))
 	count(clauses) > 0
 } else := [_m_fallback(check)] if cause in _no_value_states
 
@@ -472,7 +482,7 @@ _m_params_beside_input(check) := array.concat([_m_isnt("$input", data.ergo_docum
 _m_unkeyed_said(subj, check, cause) := [] if {
 	object.get(check, "ergo/row", false) != true
 } else := array.concat(
-	[_m_state_clause(s) | some s in _m_sources(subj, check); _m_side_said(s, cause, check); not _m_keyed_unread(subj, s.side)],
+	[_m_state_piece(s) | some s in _m_sources(subj, check); _m_side_said(s, cause, check); not _m_keyed_unread(subj, s.side)],
 	[c |
 		some side in _m_tally_parts(check)
 		not _m_keyed_unread(subj, side[_basic_form(side)])
@@ -495,7 +505,7 @@ _m_keyed_unread(subj, side) if {
 
 _m_unusable_beside_keys(_, _, []) := []
 
-_m_unusable_beside_keys(subj, check, kf) := [_m_state_clause(s) |
+_m_unusable_beside_keys(subj, check, kf) := [_m_state_piece(s) |
 	kf != []
 	some s in _m_sources(subj, check)
 	s.state in _no_value_states
