@@ -690,8 +690,9 @@ test_a_root_the_lines_whose_reads_has_a_list_entry_when_the_row_read_no_root if 
 	check := ergo._s_written_check({"for": "every xs whose v is in $input.os.name, if any, as x", "assert": ["x.w is 1", "z is 1"]})
 	outside := [ergo._m_root_in("item 2 of $input.os: name", "absent", "item 2 of $input.os: name is missing", 2)]
 	r := {"cause": "value", "failed": []}
-	ergo._for_line_rooted(check, {"xs": []}, r, outside).other_roots == ["item 2 of $input.os: name is missing"] with data.ergo_document as {"os": [{"name": 1}, {}]}
-	ergo._for_line_rooted(check, {"xs": []}, object.union(r, {"root_msgs": []}), outside) == object.union(r, {"root_msgs": []}) with data.ergo_document as {"os": [{"name": 1}, {}]}
+	names := {"ergo/names": {"ergo/subject": {"xs": []}, "$at": {"names": {}}}}
+	ergo._for_line_rooted(check, {"xs": []}, r, outside).other_roots == ["item 2 of $input.os: name is missing"] with input as names with data.ergo_document as {"os": [{"name": 1}, {}]}
+	ergo._for_line_rooted(check, {"xs": []}, object.union(r, {"root_msgs": []}), outside) == object.union(r, {"root_msgs": []}) with input as names with data.ergo_document as {"os": [{"name": 1}, {}]}
 }
 
 test_an_item_whose_lines_a_root_already_says_is_left_out if {
@@ -700,13 +701,13 @@ test_an_item_whose_lines_a_root_already_says_is_left_out if {
 	ergo._for_unrooted(item, {"item 1 of $input.lst: z is missing"}) == item
 }
 
-test_a_whose_conditions_problems_are_one_clause_each if {
+test_a_whose_beside_an_outside_list_root_says_only_its_own_read if {
 	check := ergo._s_written_check({"for": "every ws whose v is in $input.os.name as w", "assert": ["w.n is 2"]})
 	c := check.items[0].whose[0]
 	subj := {"ws": [{"n": 2}]}
 	names := {"ergo/subject": subj, "$at": {"names": {}}}
 	fe := {"i": ["ws", 0], "iv": {"n": 2}, "r": []}
-	[x.text | some x in ergo._for_own_said(c, fe, subj)] == ["v is missing", "item 2 of $input.os: name is missing"] with input as {"ergo/names": names} with data.ergo_document as {"os": [{"name": "bob"}, {}]}
+	[x.text | some x in ergo._for_own_said(c, fe, subj)] == ["v is missing"] with input as {"ergo/names": names} with data.ergo_document as {"os": [{"name": "bob"}, {}]}
 }
 
 test_a_whose_beside_an_outside_list_of_more_than_one_kind_is_checked_against_an_empty_list if {
@@ -714,7 +715,7 @@ test_a_whose_beside_an_outside_list_of_more_than_one_kind_is_checked_against_an_
 	c := check.items[0].whose[0]
 	subj := {"ws": [{"n": 2}]}
 	names := {"ergo/subject": subj, "$at": {"names": {}}}
-	ergo._for_own_check(c, subj).right == {"literal": []} with input as {"ergo/names": names} with data.ergo_document as {"os": [{"name": "bob"}, {"name": 3}]}
+	ergo._for_own_check(c, subj).values == [] with input as {"ergo/names": names} with data.ergo_document as {"os": [{"name": "bob"}, {"name": 3}]}
 }
 
 test_an_item_that_isnt_an_object_takes_the_cause_its_whose_failed_with_unless_that_cause_passes if {
