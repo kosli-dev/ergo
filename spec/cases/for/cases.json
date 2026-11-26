@@ -96055,7 +96055,7 @@
     ]
   },
   {
-    "description": "a list from $input that a for line's own whose reads fails it on an empty list, said after a sentence that reads no alias",
+    "description": "a list from $input that a for line's own whose reads fails it when the list is empty or the whose leaves nothing, said after a sentence that reads no alias",
     "policy": {
       "ergo_spec": "{{spec}}",
       "subjects": {
@@ -96161,6 +96161,123 @@
                 "name": "xs[]",
                 "outcome": "usable",
                 "value": []
+              },
+              {
+                "locations": [
+                  "/things/0/z"
+                ],
+                "name": "z",
+                "outcome": "usable",
+                "value": 2
+              }
+            ],
+            "message": "z is 2; item 2 of $input.os: name is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as absent, when the whose leaves nothing, with the root after the sentence",
+        "rules": [
+          "for.roots",
+          "for.pass",
+          "problems.all_said"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t",
+              "xs": [
+                {
+                  "v": 5
+                }
+              ],
+              "z": 2
+            }
+          ],
+          "os": [
+            {
+              "name": 1
+            },
+            {}
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/z"
+                    ],
+                    "name": "z",
+                    "outcome": "usable",
+                    "value": 2
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/c/assert/1"
+                ],
+                "message": "z is 2",
+                "name": "z is 1"
+              },
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/xs/0"
+                    ],
+                    "name": "xs[]",
+                    "outcome": "usable",
+                    "value": [
+                      {
+                        "v": 5
+                      }
+                    ]
+                  }
+                ],
+                "kind": "list",
+                "message": "item 2 of $input.os: name is missing",
+                "name": "xs"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/os/0/name",
+                  "/os/1"
+                ],
+                "name": "$input.os[].name",
+                "outcome": "usable",
+                "value": [
+                  1,
+                  null
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "v": 5
+                  }
+                ]
               },
               {
                 "locations": [
