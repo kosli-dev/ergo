@@ -116,6 +116,7 @@ struct Line {
     passes: bool,
     check: String,
     because: Option<String>,
+    parents: Vec<(String, Value)>,
 }
 
 fn read_line(text: &str, requirement: &str, report: &Value) -> Result<Line, String> {
@@ -125,6 +126,26 @@ fn read_line(text: &str, requirement: &str, report: &Value) -> Result<Line, Stri
         &outcome::names(&report["subjects"]),
         &outcome::names(&report["requirements"][requirement]["checks"]),
     )?;
+    let ancestors = outcome::ancestors(report, &line.subject);
+    let named: Vec<&String> = line.parents.iter().map(|(name, _)| name).collect();
+    if named != ancestors.iter().collect::<Vec<_>>() {
+        return Err(if ancestors.is_empty() {
+            format!(
+                "{} isn't read inside another subject, so nothing follows its id but passes or fails",
+                line.subject
+            )
+        } else {
+            let needed: String = ancestors
+                .iter()
+                .map(|name| format!(" in {name} <id>"))
+                .collect();
+            format!(
+                "{} is read inside {}, so its id is followed by{needed}",
+                line.subject,
+                ancestors.join(" inside ")
+            )
+        });
+    }
     Ok(Line {
         requirement: requirement.to_string(),
         subject: line.subject,
@@ -132,6 +153,7 @@ fn read_line(text: &str, requirement: &str, report: &Value) -> Result<Line, Stri
         passes: line.passes,
         check: line.check,
         because: line.because,
+        parents: line.parents,
     })
 }
 
@@ -186,7 +208,22 @@ fn same_row(row: &Value, line: &Line) -> bool {
         && row["check"] == line.check.as_str()
         && row["subject"]["type"] == line.subject.as_str()
         && outcome::same_id(&row["subject"]["id"], &line.id)
-        && row["subject"].get("in").is_none()
+        && same_parents(&row["subject"], &line.parents)
+}
+
+fn same_parents(subject: &Value, parents: &[(String, Value)]) -> bool {
+    match subject.get("in") {
+        None => parents.is_empty(),
+        Some(Value::Object(given)) => {
+            given.len() == parents.len()
+                && parents.iter().all(|(name, id)| {
+                    given
+                        .get(name)
+                        .is_some_and(|given| outcome::same_id(given, id))
+                })
+        }
+        Some(_) => false,
+    }
 }
 
 fn actual(row: &Value, report: &Value) -> String {
@@ -287,9 +324,8 @@ pub fn check(outcome: &Value, report: &Value) -> Checked {
         let matching: Vec<&Value> = rows.iter().filter(|row| same_row(row, line)).collect();
         if matching.is_empty() {
             problems.push(format!(
-                "the report has no row for {} {} and {} in {}",
-                line.subject,
-                outcome::id_text(&line.id).unwrap_or_default(),
+                "the report has no row for {} and {} in {}",
+                outcome::subject_words(&line.subject, &line.id, &line.parents),
                 line.check,
                 line.requirement
             ));
