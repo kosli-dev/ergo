@@ -141,6 +141,7 @@ failed: a deployment needs an approver
         - deployment d1 fails approver_set because approver is missing
         - deployment d2 fails approver_set because approver is ""
 passed: nobody approves their own deployment
+warning: no example shows approver_set of approved failing
 warning: no example shows approver_set of approved passing
 2 examples: 1 passed, 1 failed
 ```
