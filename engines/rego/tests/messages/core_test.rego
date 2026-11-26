@@ -27,6 +27,17 @@ test_a_null_before_an_unreadable_key_is_read_from_the_sides_a_check_already_carr
 	ergo._m_null_key_parts({"s": null, "p": null}, check) == ["p is null", "s is null"]
 }
 
+test_the_parts_said_for_a_null_before_a_key_are_clauses if {
+	check := {"$sides": [["s", {"named_by_field": "p"}]], "op": "present", "path": ["other"]}
+	ergo._m_null_key_parts({"s": null, "p": null}, check) == [ergo._m_clause("root", "p", "null", "p is null"), ergo._m_clause("root", "s", "null", "s is null")]
+	keyed := ergo._s_written_check("m named by $params.k is 1")
+	missing := ergo._m_clause("root", "$params.k", "absent", "$params.k is missing")
+	ergo._m_null_key_parts({"m": 3}, keyed) == [missing, ergo._m_clause("root", "m", "unusable", "m is 3, which isn't an object")] with data.ergo_params as {}
+	beside := object.union(check, {"$sides": [["s", {"named_by_field": "p"}], ["q"]]})
+	fault := ergo._m_clause("root", "p", "unusable", "p is 4, which isn't text")
+	ergo._m_null_key_parts({"s": null, "p": 4}, beside) == [fault, ergo._m_clause("root", "s", "null", "s is null"), ergo._m_clause("root", "q", "absent", "q is missing")]
+}
+
 test_message_of_an_unusable_check_with_nothing_to_blame_repeats_its_expression if {
 	check := {"$sides": [], "op": "present", "path": ["x"], "expression": "x exists"}
 	ergo._m_message(check, {"x": 1}, "unusable") == "x exists is false"
