@@ -470,7 +470,7 @@ _m_message_pieces(check, subj, "value") := clauses if {
 } else := tallies if {
 	tallies := _m_tally_lists(subj, check, "value")
 	count(tallies) > 0
-} else := [_m_fallback(check)]
+} else := _m_fallback(check)
 
 _m_message_pieces(check, subj, cause) := ps if {
 	cause in _no_value_states
@@ -481,7 +481,7 @@ _m_message_pieces(check, subj, cause) := ps if {
 	cause in _no_value_states
 	clauses := _m_pieces_once(array.concat(array.concat([_m_state_piece(s) | some s in _m_sources(subj, check); _m_side_said(s, cause, check)], _m_tally_lists(subj, check, cause)), _m_text_list_said(subj, check, cause)))
 	count(clauses) > 0
-} else := [_m_fallback(check)] if cause in _no_value_states
+} else := _m_fallback(check) if cause in _no_value_states
 
 _m_unusable_before_faults(subj, check, kf) := array.concat(array.concat(array.concat(kf, _m_blocked_early(subj, check)), _m_params_faults_early(subj, check)), _m_text_side_said(subj, check))
 
@@ -542,7 +542,7 @@ _m_message_pieces(check, subj, "unusable") := clauses if {
 		not _m_params_unread(check)
 	]
 	count(clauses) > 0
-} else := [_m_fallback(check)]
+} else := _m_fallback(check)
 
 _m_message_pieces(check, subj, "not_an_object") := [_m_isnt_piece(_m_label(check), subj, "an object", "not_an_object")] if {
 	not is_object(subj)
@@ -564,7 +564,7 @@ _m_message_pieces(check, subj, "not_an_object") := clauses if {
 	is_object(subj)
 	clauses := _m_pieces_once(array.concat(array.concat(_m_aliases_blocked(check), _m_input_one_refs(check)), _m_tally_lists(subj, check, "not_an_object")))
 	count(clauses) > 0
-} else := [_m_fallback(check)] if is_object(subj)
+} else := _m_fallback(check) if is_object(subj)
 
 _m_list_names(check) := _m_tally_list_names(check) | _m_text_list_names(check)
 

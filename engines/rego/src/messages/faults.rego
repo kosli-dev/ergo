@@ -103,15 +103,17 @@ _m_label(check) := check.label if {
 	is_string(object.get(check, "label", null))
 } else := "the subject"
 
-_m_fallback(check) := concat(", and ", cs) if {
+_m_fallback(check) := [x[1] | some x in cs] if {
 	_m_params_unread(check)
-	cs := sort({c | walk(check, [_, v]); some c in _m_params_break(v)})
+	cs := sort({[c.text, c] | walk(check, [_, v]); some c in _m_params_break_pieces(v)})
 	cs != []
-} else := _m_isnt("$params", data.ergo_params, "an object") if _m_params_unread(check)
+} else := [_m_isnt_piece("$params", data.ergo_params, "an object", "unusable")] if _m_params_unread(check)
 
-else := concat("", [check.expression, " is false"]) if _written_expression(check)
+else := [_m_clause("root", check.expression, "value", concat("", [check.expression, " is false"]))] if _written_expression(check)
 
-else := "the check is false"
+else := [_m_clause("root", "the check", "value", "the check is false")]
+
+_m_fallback_text(check) := _m_pieces_text(_m_fallback(check))
 
 _m_key_faults(subj, check) := [c.text | some c in _m_key_fault_pieces(subj, check)]
 

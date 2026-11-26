@@ -290,15 +290,23 @@ test_a_message_clause_whose_quoted_key_holds_is_is_dropped_by_its_whole_name if 
 	ergo._tally_rest_of(m, {`$input."a is b"`}, set()) == "xs is missing"
 }
 
-test_no_row_of_a_report_holds_the_clauses_of_a_count_or_a_sum if {
-	doc := {"things": [{"id": "t1", "xs": [{"v": 1}, {"v": "a"}], "prs": [{"es": [{"v": 1}]}]}]}
+test_no_row_of_a_report_its_violations_or_a_compiled_policy_holds_the_clauses_of_a_message if {
+	doc := {"things": [{"id": "t1", "xs": [{"v": 1}, {"v": "a"}], "prs": [{"es": [{"v": 1}]}], "n": null}]}
 	every check in [
 		{"checks": {"c": "count of xs whose v is at least 2 is 0"}},
 		{"checks": {"c": "sum of xs.v is 9"}},
 		{"checks": {"c": {"for": "every prs as p", "assert": ["count of p.es.v that is at least 2 is 3"]}}},
+		{"checks": {"c": "n is at least $params.m"}},
+		{"checks": {"c": "id is 3"}},
 	] {
-		rep := report(doc, {"r": object.union({"from": "every things", "identified_by": "id"}, check)})
+		policy := lifted({"r": object.union({"from": "every things", "identified_by": "id"}, check)})
+		compiled := ergo.compile(policy)
+		rep := ergo.report(doc, compiled, {})
 		count(rep.results) > 0
-		count([1 | walk(rep, [_, y]); is_object(y); "ergo/clauses" in object.keys(y)]) == 0
+		some row in rep.results
+		row.passed == false
+		every out in [rep, ergo.violations(rep), compiled, ergo.report(doc, policy, {})] {
+			count([1 | walk(out, [_, y]); is_object(y); "ergo/clauses" in object.keys(y)]) == 0
+		}
 	}
 }

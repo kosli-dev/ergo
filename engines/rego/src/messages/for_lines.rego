@@ -381,7 +381,7 @@ _m_for_empty(check, subj, cause) := cs if {
 } else := cs if {
 	cs := _once([c | some item in check.items; some c in _m_list_found(subj, item.path)])
 	cs != []
-} else := [_m_fallback(check)]
+} else := [_m_fallback_text(check)]
 
 _m_unbound_name(check, s) := _input_name(array.concat([{"plain": substring(s.side[0], 1, -1)}], array.slice(s.side, 1, count(s.side)))) if {
 	s.state == "absent"
@@ -1799,7 +1799,7 @@ _m_unclean_said(c, item, cause) := concat("; ", ps) if {
 	])
 	ps != []
 } else := concat("; ", bs) if {
-	_m_message(_m_with_sides(_m_walked(c, item)), item, cause) == _m_fallback(c)
+	_m_message(_m_with_sides(_m_walked(c, item)), item, cause) == _m_fallback_text(c)
 	bs := _m_cond_base_texts(item, c)
 	bs != []
 } else := _m_message(_m_with_sides(_m_walked(c, item)), item, cause)

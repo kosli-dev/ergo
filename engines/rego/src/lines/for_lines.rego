@@ -34,7 +34,7 @@ _for_row_of(check, subj, r) := r if {
 } else := object.union(object.remove(r, _row_extra_keys), {"failed": [], "message": m, "ergo/for_raw": {"check": check, "subj": subj, "r": object.union(r, {"failed": []}), "once": [], "line": [m]}}) if {
 	not r.cause in {"satisfied", "ambiguous"}
 	_m_params_unread(check)
-	m := _m_fallback(check)
+	m := _m_fallback_text(check)
 } else := object.union(object.remove(r, _row_extra_keys), {"failed": [_m_strip(f) | some f in r.failed], "message": "", "ergo/for_raw": {"check": check, "subj": subj, "r": r, "tree": true}}) if {
 	r.cause != "satisfied"
 	_for_on_tree(check, subj, r)
@@ -137,7 +137,7 @@ _params_not_an_object if {
 
 _for_row_text(check, _, r) := {"message": m, "once": [], "line": [m]} if {
 	object.get(r, "natural", null) == "satisfied"
-	m := _m_fallback(check)
+	m := _m_fallback_text(check)
 }
 
 _for_row_text(check, subj, r) := _for_row_message(check, subj, r) if object.get(r, "natural", null) != "satisfied"
