@@ -40,6 +40,17 @@
         "object",
         "null"
       ]
+    },
+    "examples": {
+      "description": "Experimental: inputs, each with the outcome its report must have. A report ignores them, and a runner like ergo test reads them.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/example"
+      }
+    },
+    "example_params": {
+      "description": "Experimental: the params of every example that has no params of its own. A report ignores them."
     }
   },
   "required": [
@@ -48,6 +59,62 @@
     "requirements"
   ],
   "$defs": {
+    "example": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "A short title, unique among the examples."
+        },
+        "description": {
+          "type": "string"
+        },
+        "input": {
+          "description": "The input to build the report from."
+        },
+        "params": {
+          "description": "The params to build the report with, in place of example_params."
+        },
+        "outcome": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "anyOf": [
+              {
+                "type": "string",
+                "description": "compliant, not compliant or a requirement line, like approved is not met."
+              },
+              {
+                "type": "object",
+                "description": "A requirement heading, with or without its status, holding its check lines, like deployment d1 fails approver_set.",
+                "minProperties": 1,
+                "maxProperties": 1,
+                "additionalProperties": {
+                  "anyOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      },
+      "required": [
+        "name",
+        "input",
+        "outcome"
+      ],
+      "additionalProperties": false
+    },
     "subject": {
       "type": "object",
       "properties": {

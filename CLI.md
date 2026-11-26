@@ -57,6 +57,98 @@ These differences are known:
 - `ergo` reads LS and PS (U+2028 and U+2029) as ordinary characters, and OPA reads them as line breaks. So `a: 1<LS>b: 2` is `{"a": 1, "b": 2}` in OPA and refused by `ergo`, `a: x<LS>y` is refused by OPA and read by `ergo` as text that holds the LS, and in quoted text OPA drops the spaces around one, so `"x <LS> y"` is `"x<LS>y"` in OPA and keeps the spaces in `ergo`.
 - The U+FFFD characters for bad UTF-8 in a `!!binary` differ.
 
+## Test a policy with examples
+
+**Experimental, from 0.5.0.** A policy can carry examples: inputs, each with the outcome its report must have, written in the words the report uses. `ergo test` runs them. The form of an outcome, and what it checks, is in the [reference](REFERENCE.md#examples).
+
+`ergo report --format outcome` prints a report as outcome lines in YAML, so you write an example by running the policy on its input and pasting what it prints under `outcome:`. With the policy below in `policy.yaml`, and `deployments.json` holding:
+
+```json
+{
+  "deployments": [
+    {"id": "d1", "author": "ann", "approver": "bob"},
+    {"id": "d2", "author": "cat", "approver": "cat"}
+  ]
+}
+```
+
+`ergo report --policy policy.yaml --input deployments.json --format outcome` prints:
+
+```yaml
+- not compliant
+- approved is not met:
+    - deployment d1 passes approver_set
+    - deployment d1 passes not_self_approved
+    - deployment d2 passes approver_set
+    - deployment d2 fails not_self_approved because approver is "cat", and author is "cat"
+```
+
+Each example keeps only the lines it is about. Here is the policy with two examples:
+
+```yaml
+ergo_spec: v0.7-dev
+subjects:
+  deployment:
+    from: deployments
+    identified_by: id
+requirements:
+  approved:
+    subject: deployment
+    checks:
+      approver_set: approver is a non-empty string
+      not_self_approved: approver does not equal author
+
+examples:
+  - name: a deployment needs an approver
+    input:
+      deployments:
+        - {id: d1, author: ann}
+        - {id: d2, author: ann, approver: bob}
+    outcome:
+      - approved:
+          - deployment d1 fails approver_set because approver is missing
+          - deployment d2 passes approver_set
+
+  - name: nobody approves their own deployment
+    input:
+      deployments:
+        - {id: d1, author: ann, approver: bob}
+        - {id: d2, author: cat, approver: cat}
+    outcome:
+      - approved:
+          - deployment d1 passes not_self_approved
+          - deployment d2 fails not_self_approved
+```
+
+`ergo test policy.yaml` prints:
+
+```
+passed: a deployment needs an approver
+passed: nobody approves their own deployment
+2 examples: 2 passed, 0 failed
+```
+
+A line covers its check, so every failure of that check must be listed. If the first example's `d2` had `approver: ""` and the example listed only `d1`, it would fail, and `ergo test` shows its lines next to the report's:
+
+```
+failed: a deployment needs an approver
+  no line says deployment d2 fails approver_set because approver is ""
+  expected:
+    - approved:
+        - deployment d1 fails approver_set because approver is missing
+  actual:
+    - approved:
+        - deployment d1 fails approver_set because approver is missing
+        - deployment d2 fails approver_set because approver is ""
+passed: nobody approves their own deployment
+warning: no example shows approver_set of approved passing
+2 examples: 1 passed, 1 failed
+```
+
+The last lines warn about each check that no example shows failing, or none shows passing. `--strict` makes a warning fail the run, for CI. `ergo test` exits 0 when every example passed, 1 when one failed or, with `--strict`, when there's a warning, and 2 when the policy file can't be read or its examples are written wrong, like two examples with the same name. `ergo report --format outcome` exits 2 for a report it can't show yet.
+
+For now, outcome lines cover the policy's own checks on subjects that aren't child subjects. A line for a child subject, for a check Ergo adds like `$min_subjects`, or for a subject out of scope can't be written yet, and `--format outcome` refuses a report that has a failed row of that kind. An example whose lines cover such a row fails and says it can't check it yet.
+
 ## Updating
 
 Run `cargo install --locked ergo-policy-cli` again, or download the newest release of the CLI. [`engines/rust/CHANGELOG.md`](engines/rust/CHANGELOG.md) says what each release changed, and which spec version it follows.

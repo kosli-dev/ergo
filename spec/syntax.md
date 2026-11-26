@@ -644,3 +644,34 @@ Each check's definition in the report has an `expression` that says what it chec
 **[added.inputs]** `$min_subjects` names its input `in-scope <type> count`, `$unique_ids` names its input `repeated <type> ids`, and `$unique_ancestor_ids` names its input `repeated <ancestor> ids`, where `<ancestor>` is the subject's parent or grandparent, outermost first ([unique_ids.ancestors](semantics.md#requirements)). `$well_formed` names its first two `count(checks)` and `require`, and when `require` is written wrong, its value is `["neither every nor some"]`. A field Ergo doesn't know is listed with `["unknown field"]`, and `checks: {}` with `["empty"]`. A requirement without a `subject` has `{"name": "subject", "value": ["missing"]}`, and one whose `subject` isn't in `subjects` has `["not in subjects"]`.
 
 **[added.causes]** The `causes` of a requirement entry is a list of `{"cause": <cause>, "rows": <number>}`, as in `[{"cause": "value", "rows": 2}]`.
+
+## Examples
+
+Experimental. A policy can carry examples: inputs, each with the outcome its report must have. Each engine's own tool runs them, like `ergo test` in the [CLI](../CLI.md). What an outcome means is in [semantics.md](semantics.md#examples).
+
+**[examples.shape]** `examples` is a list of examples, and `example_params` is the params every example runs with. Each example is an object with a `name`, any non-empty text, unique among the examples, an optional `description`, text for people, an `input`, any value, optional `params`, any value, and an `outcome` (see [outcome.lines](#examples)). An example's own `params` replace `example_params` completely, with no merge, and with neither the example runs with `{}`. A runner refuses examples where `examples` isn't a list or is empty, or where an example isn't an object, has no `name`, no `input` or no `outcome`, has a `description` that isn't text, has any other field, or has the same `name` as another.
+
+**[examples.ignored]** A report ignores `examples` and `example_params`, whether they are written correctly or not. They give no `$well_formed` problem and change nothing in the report, so a mistake in an example never fails a policy. Only a runner of the examples reads them.
+
+**[outcome.lines]** An outcome is a non-empty list. Each item is a string or an object with one key:
+
+- `compliant` or `not compliant`
+- a requirement line, `<requirement> is met`, `<requirement> is not met` or `<requirement> is not applicable`, with the requirement's name as the policy writes it
+- an object whose key is a heading and whose value is the list of check lines under it. The heading is a requirement line, or a requirement's name on its own. A heading with a status can have `null` or an empty list, and a heading without one needs at least one line.
+
+A check line is `<subject> <id> passes <check>`, or `<subject> <id> fails <check>`, optionally followed by ` because <message>`. `<subject>` is the subject's name as the policy writes it, spaces included and without quotes, `<check>` is the name of a check of the heading's requirement, and `<message>` runs to the end of the line. In YAML:
+
+```yaml
+outcome:
+  - not compliant
+  - released is met
+  - approved is not met:
+      - deployment d1 fails approver_set because approver is missing
+      - deployment d2 passes approver_set
+  - reviewed:
+      - pull request 7 passes peer_approved
+```
+
+As JSON, the same outcome is `["not compliant", "released is met", {"approved is not met": ["deployment d1 fails approver_set because approver is missing", "deployment d2 passes approver_set"]}, {"reviewed": ["pull request 7 passes peer_approved"]}]`. Lines for a child subject, for the checks Ergo adds and for a subject out of scope aren't part of the form yet, so a runner can't read them.
+
+**[outcome.ids]** An id in a check line is written as a JSON value, and a plain word needs no quotes. A word that reads as a JSON number, `true`, `false` or `null` is that value, and any other word is a string. A string goes in double quotes, as JSON writes it, when it would read as one of those values, when it's empty, starts with `"` or holds a space or a control character. So `pull request 7` is the number 7, `pull request "7"` is the string `"7"`, `deployment d1` is the string `"d1"`, and `artifact "web app"` holds a space. An id that is an object or a list can't be written yet. A runner reads the subject's name first, trying the policy's subject names longest first, so with subjects `pull` and `pull request`, `pull request 7` is the `pull request` 7, and the `pull` whose id is `request 7` is written `pull "request 7"`.

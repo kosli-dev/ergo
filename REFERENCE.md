@@ -115,6 +115,40 @@ Params are the values that change between runs, like the regions a policy allows
 
 A sentence reads them with `$params`, like `region is in $params.regions`. Params aren't part of the input, so `$input.params` doesn't reach them, and `$params` doesn't read the input. With params of `{}`, a read of a field in them, like `$params.regions`, fails as `absent`, as any missing field does. With no params, `null`, it fails as `absent` too, and that includes `exists`, which otherwise fails a missing field as `value`, and `does not exist`, which otherwise passes. So a condition like that on a param fails the requirement instead of deciding the scope. Params that are anything else, like a string or a list, can only be a mistake, so they fail every check and every `$min_subjects` row as `unusable`, even in a policy that reads no params. A check whose path into them stops there says what they are, like `$params is 3, which isn't an object` for `$params.a is 1`, and so does the `$min_subjects` message of a subject that isn't a child subject when its `from` line reads them with `named by` or `named by each of`, like `things named by each of $params.ks`, which then makes no subjects. A child subject's `from` line, like `t.m named by $params.env`, and a `whose` in a `from` line, like `things whose id is $params.x`, don't name them. A check that reads them whole, like `x is in $params`, says what it says with any params. `$min_subjects` also says why in its `inputs`: `{"name": "$params", "value": ["not an object"], "locations": []}`. Ergo has no defaults, so a policy run without its params fails instead of checking something nobody configured.
 
+### Examples
+
+**Experimental.** A policy can carry examples, to test it in any engine without writing Rego. Only the [`ergo` command](CLI.md#test-a-policy-with-examples) runs them for now, with `ergo test`, and `ergo report --format outcome` prints a report in the same form, ready to paste. A report ignores `examples` and `example_params`, even when they are written wrong, so a mistake in an example never fails the policy.
+
+`examples` is a list. Each example has a `name`, any text, unique in the policy, an optional `description`, an `input` and an `outcome`, the lines its report must have. `example_params` gives the params of every example, and an example's own `params` replace them completely. With neither, the example runs with `{}`. With the policy `approved` that checks `approver_set: approver is a non-empty string` on each `deployment`:
+
+```yaml
+examples:
+  - name: a deployment needs an approver
+    input: {deployments: [{id: d1}, {id: d2, approver: bob}]}
+    outcome:
+      - approved is not met:
+          - deployment d1 fails approver_set because approver is missing
+          - deployment d2 passes approver_set
+```
+
+An outcome is a list of lines:
+
+| Line                                                 | Says                                                   | Covers                         |
+| ---------------------------------------------------- | ------------------------------------------------------ | ------------------------------ |
+| `compliant`, `not compliant`                         | what `compliant` is                                    | the whole report               |
+| `approved is met`, `is not met`, `is not applicable` | the requirement's `status`                             | the whole requirement          |
+| `- approved is not met:` with check lines under it   | the status, and each line under it                     | the whole requirement          |
+| `- approved:` with check lines under it              | each line under it                                     | only the checks its lines name |
+| `deployment d1 passes approver_set`                  | the row passed                                         | the check                      |
+| `deployment d1 fails approver_set`                   | the row failed                                         | the check                      |
+| `deployment d1 fails approver_set because <message>` | the row failed, and its whole `message` is `<message>` | the check                      |
+
+Inside what the lines cover, every failed row must be listed with a `fails` line, so an example can't pass by missing a failure. Outside it, nothing is checked. A subject out of scope isn't a failure. When `$well_formed` fails, every example fails.
+
+The subject's name is written as the policy writes it, spaces included, like `pull request 7`. The id is written as JSON: a plain word needs no quotes, and a word that reads as a number, `true`, `false` or `null` is that value. So `pull request 7` is the number 7, `pull request "7"` is the string `"7"`, and an id with a space goes in quotes, like `artifact "web app"`.
+
+For now, lines can't name a child subject, a check Ergo adds like `$min_subjects`, or a subject out of scope, and an example whose lines cover such a failed row fails. The rules are in [syntax.md](spec/syntax.md#examples) and [semantics.md](spec/semantics.md#examples).
+
 ## Subjects
 
 A subject is the kind of thing a requirement checks, like a deployment or a pull request, and says where to find them in the input:

@@ -20417,5 +20417,27 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a policy with examples and example_params, neither written correctly",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {"thing": {"from": "things", "identified_by": "id"}},
+      "requirements": {"s": {"subject": "thing", "checks": {"c": "x exists"}}},
+      "examples": [{"name": "", "outcome": "compliant", "extra": 1}, 5],
+      "example_params": "not params"
+    },
+    "cases": [
+      {
+        "description": "ignores both, so the policy is written correctly and the report is the one it would be without them",
+        "rules": ["examples.ignored"],
+        "input": {"things": [{"id": "t1", "x": 1}]},
+        "compliant": true,
+        "results": [
+          {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "s", "subject": {"id": null, "type": "thing"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": 1}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      }
+    ]
   }
 ]

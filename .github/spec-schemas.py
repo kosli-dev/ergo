@@ -23,6 +23,8 @@ for case in cases:
     well_formed = all(r["passed"] for r in case["report"]["results"] if r["check"] == "$well_formed")
     if well_formed:
         for e in policy.iter_errors(case["policy"]):
+            if list(e.absolute_path)[:1] in (["examples"], ["example_params"]):
+                continue
             problems.append(f"{case['where']}: Ergo reads the policy as written correctly, but it doesn't match policy/schema.json at /{'/'.join(map(str, e.absolute_path))}: {e.message}")
 for p in problems:
     print(p)
