@@ -333,6 +333,33 @@ fn examples_are_read_in_order_with_their_params() {
 }
 
 #[test]
+fn a_line_must_agree_with_every_row_that_shares_its_check_and_subject() {
+    let mut input = input();
+    input["deployments"] =
+        json!([{"id": "d1", "approver": "ann", "approvals": 1}, {"id": "d1", "approvals": 1}]);
+    let report = ergo_policy_engine::report(&input, &policy(), &json!({}));
+    assert_eq!(
+        examples::check(
+            &json!([{"approved": ["deployment d1 passes approver_set"]}]),
+            &report
+        )
+        .problems,
+        vec![
+            "the report says deployment d1 fails approver_set because approver is missing",
+            "no line says deployment d1 fails approver_set because approver is missing",
+        ]
+    );
+    assert_eq!(
+        examples::check(
+            &json!([{"approved": ["deployment d1 fails approver_set"]}]),
+            &report
+        )
+        .problems,
+        vec!["the report says deployment d1 passes approver_set"]
+    );
+}
+
+#[test]
 fn only_the_lines_of_an_example_that_passed_count_for_the_warnings() {
     let mut policy = policy();
     policy["requirements"] = json!({"reviewed": policy["requirements"]["reviewed"].clone()});

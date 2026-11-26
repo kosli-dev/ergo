@@ -145,9 +145,9 @@ An outcome is a list of lines:
 
 Inside what the lines cover, every failed row must be listed with a `fails` line, so an example can't pass by missing a failure. Outside it, nothing is checked. A subject out of scope isn't a failure. When `$well_formed` fails, every example fails.
 
-The subject's name is written as the policy writes it, spaces included, like `pull request 7`. The id is written as JSON: a plain word needs no quotes, and a word that reads as a number, `true`, `false` or `null` is that value. So `pull request 7` is the number 7, `pull request "7"` is the string `"7"`, and an id with a space goes in quotes, like `artifact "web app"`.
+The subject's name is written as the policy writes it, spaces included, like `pull request 7`. The id is written as JSON: a plain word needs no quotes, and a word that reads as a number, `true`, `false` or `null` is that value. So `pull request 7` is the number 7, `pull request "7"` is the string `"7"`, and an id with a space, or any other whitespace, goes in quotes, like `artifact "web app"`. A number matches an id of the same value, so `pull request 7` and `pull request 7.0` both match the id `7.0`.
 
-For now, lines can't name a child subject, a check Ergo adds like `$min_subjects`, or a subject out of scope, and an example whose lines cover such a failed row fails. The rules are in [syntax.md](spec/syntax.md#examples) and [semantics.md](spec/semantics.md#examples).
+For now, lines can't name a child subject, a check Ergo adds like `$min_subjects`, a subject out of scope, or an id that is an object or a list, and an example whose lines cover such a failed row fails. The rules are in [syntax.md](spec/syntax.md#examples) and [semantics.md](spec/semantics.md#examples).
 
 ## Subjects
 
