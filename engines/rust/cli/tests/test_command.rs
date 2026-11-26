@@ -205,6 +205,38 @@ fn test_refuses_examples_written_wrong() {
 }
 
 #[test]
+fn test_refuses_an_outcome_written_wrong_as_it_refuses_a_missing_one() {
+    for (n, (outcome, problem)) in [
+        ("    outcome:\n", "example e: the outcome isn't a list"),
+        ("    outcome: []\n", "example e: the outcome is empty"),
+        ("    outcome: compliant\n", "example e: the outcome isn't a list"),
+        (
+            "    outcome:\n      - approved:\n",
+            "example e: the heading approved lists no lines",
+        ),
+    ]
+    .into_iter()
+    .enumerate()
+    {
+        let examples = format!("examples:\n  - name: e\n    input: {{}}\n{outcome}");
+        let policy = file(
+            &format!("test-outcome-wrong-{n}"),
+            "policy.yaml",
+            &format!("{POLICY}{examples}"),
+        );
+        let got = run(&args(&["test", &policy]));
+        assert_eq!(
+            got,
+            Err(Failure::File(format!(
+                "the examples in the policy file {policy} are written wrong: {problem}"
+            ))),
+            "{outcome}"
+        );
+        assert_eq!(got.unwrap_err().code(), 2);
+    }
+}
+
+#[test]
 fn test_takes_one_policy_file_and_strict() {
     let cases = [
         (vec!["test"], "test needs a policy file"),

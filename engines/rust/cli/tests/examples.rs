@@ -363,6 +363,30 @@ fn examples_written_wrong_are_refused() {
             json!([example("a"), example("b"), example("a")]),
             "two examples are called a",
         ),
+        (
+            json!([{"name": "a", "input": {}, "outcome": []}]),
+            "example a: the outcome is empty",
+        ),
+        (
+            json!([{"name": "a", "input": {}, "outcome": null}]),
+            "example a: the outcome isn't a list",
+        ),
+        (
+            json!([{"name": "a", "input": {}, "outcome": "compliant"}]),
+            "example a: the outcome isn't a list",
+        ),
+        (
+            json!([{"name": "a", "input": {}, "outcome": [{"approved": []}]}]),
+            "example a: the heading approved lists no lines",
+        ),
+        (
+            json!([{"name": "a", "input": {}, "outcome": ["compliant", {"approved": null}]}]),
+            "example a: the heading approved lists no lines",
+        ),
+        (
+            json!([{"name": "a", "input": {}, "outcome": ["compliant", 5]}]),
+            "example a: outcome item 2 isn't a line or a heading with its lines",
+        ),
     ];
     for (examples, problem) in cases {
         let mut policy = policy();
