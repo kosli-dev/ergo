@@ -131,10 +131,12 @@ fn read_line(text: &str, requirement: &str, policy: &Value) -> Result<Line, Stri
     )?;
     let ancestors = ergo_policy_engine::ancestors(policy, &line.subject);
     let named: Vec<&String> = line.parents.iter().map(|(name, _)| name).collect();
-    if named != ancestors.iter().collect::<Vec<_>>() {
+    let no_parent_at_all = line.id.is_none() && named.is_empty();
+    if named != ancestors.iter().collect::<Vec<_>>() && !no_parent_at_all {
+        let what = if line.id.is_some() { "its id" } else { "it" };
         return Err(if ancestors.is_empty() {
             format!(
-                "{} isn't read inside another subject, so nothing follows its id but passes or fails",
+                "{} isn't read inside another subject, so nothing follows {what} but passes or fails",
                 line.subject
             )
         } else {
@@ -143,7 +145,7 @@ fn read_line(text: &str, requirement: &str, policy: &Value) -> Result<Line, Stri
                 .map(|name| format!(" in {name} <id>"))
                 .collect();
             format!(
-                "{} is read inside {}, so its id is followed by{needed}",
+                "{} is read inside {}, so {what} is followed by{needed}",
                 line.subject,
                 ancestors.join(" inside ")
             )

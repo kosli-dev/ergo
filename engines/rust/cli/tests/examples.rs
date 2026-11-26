@@ -216,7 +216,7 @@ fn a_policy_written_wrong_breaks_every_example_whatever_the_lines_say() {
 }
 
 #[test]
-fn a_failure_the_lines_cover_but_cannot_name_yet_fails_the_example() {
+fn a_failure_of_a_check_ergo_adds_that_the_lines_cover_must_be_listed() {
     let mut policy = policy();
     policy["requirements"]["reviewed"]["min_subjects"] = json!(2);
     let report = ergo_policy_engine::report(&input(), &policy, &json!({}));
@@ -226,10 +226,9 @@ fn a_failure_the_lines_cover_but_cannot_name_yet_fails_the_example() {
         &policy,
     )
     .problems;
-    assert_eq!(problems.len(), 1, "{problems:?}");
-    assert!(
-        problems[0].starts_with("can't check this yet: lines for checks Ergo adds"),
-        "{problems:?}"
+    assert_eq!(
+        problems,
+        vec!["no line says fails $min_subjects because in-scope pull request count is 1"]
     );
     let problems = examples::check(
         &json!([{"reviewed": ["pull request 7 passes peer_approved"]}]),

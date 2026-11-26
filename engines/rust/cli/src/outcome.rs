@@ -278,6 +278,10 @@ fn parents_of(row: &Value, policy: &Value) -> Result<Vec<(String, Value)>, Strin
         Some(Value::Object(given)) if !given.is_empty() => Some(given.clone()),
         Some(_) => None,
     };
+    let added = row["check"].as_str().is_some_and(|c| ADDED.contains(&c));
+    if added && subject.get("in").is_none() {
+        return Ok(Vec::new());
+    }
     let Some(given) = given.filter(|given| {
         given.len() == order.len() && order.iter().all(|name| given.contains_key(name))
     }) else {
@@ -303,34 +307,41 @@ fn parents_of(row: &Value, policy: &Value) -> Result<Vec<(String, Value)>, Strin
         .collect()
 }
 
-fn row_parts(row: &Value, policy: &Value) -> Result<Option<CheckLine>, String> {
+fn row_parts(row: &Value, policy: &Value) -> Result<CheckLine, String> {
     let check = row["check"].as_str().unwrap_or_default();
+    let requirement = row["requirement"].as_str().unwrap_or_default();
     let passed = row["passed"] == true;
     let not_yet = |what: &str| {
         Err(format!(
-            "lines for {what} aren't supported yet, as for {check} in {}",
-            row["requirement"].as_str().unwrap_or_default()
+            "lines for {what} aren't supported yet, as for {check} in {requirement}"
         ))
     };
-    if check.starts_with('$') {
-        return if passed {
-            Ok(None)
-        } else if check == "$applies" {
-            not_yet("subjects out of scope")
-        } else {
-            not_yet("checks Ergo adds")
-        };
+    let id = &row["subject"]["id"];
+    let added = ADDED.contains(&check);
+    if check.starts_with('$') && check != APPLIES && !added {
+        return not_yet("this check");
     }
-    if id_text(&row["subject"]["id"]).is_none() {
+    if added && !id.is_null() {
+        return not_yet("a row of a check Ergo adds that has an id");
+    }
+    if !added && id_text(id).is_none() {
         return not_yet("ids that are objects or lists");
     }
     let parents = parents_of(row, policy)?;
-    Ok(Some(CheckLine {
-        subject: row["subject"]["type"]
-            .as_str()
-            .unwrap_or_default()
-            .to_string(),
-        id: Some(row["subject"]["id"].clone()),
+    let subject = row["subject"]["type"]
+        .as_str()
+        .unwrap_or_default()
+        .to_string();
+    if check == APPLIES && !passed && row["cause"] != "value" {
+        return Err(format!(
+            "lines for an $applies row that failed with {}, not value, aren't supported yet, as for {} in {requirement}",
+            row["cause"].as_str().unwrap_or("no cause"),
+            subject_words(&subject, Some(id), &parents)
+        ));
+    }
+    Ok(CheckLine {
+        subject,
+        id: (!added).then(|| id.clone()),
         passes: passed,
         check: check.to_string(),
         because: row["message"]
@@ -338,7 +349,11 @@ fn row_parts(row: &Value, policy: &Value) -> Result<Option<CheckLine>, String> {
             .filter(|message| !passed && !message.is_empty())
             .map(str::to_string),
         parents,
-    }))
+    })
+}
+
+fn left_out(row: &Value) -> bool {
+    row["passed"] == true && row["check"].as_str().is_some_and(|c| c.starts_with('$'))
 }
 
 fn id_written(id: &Value, quoted: bool) -> String {
@@ -380,10 +395,13 @@ fn write(line: &CheckLine, own: &str, quoted: bool) -> String {
         quoted,
     );
     let check = &line.check;
-    let said = match (line.passes, &line.because) {
-        (true, _) => format!("passes {check}"),
-        (false, Some(message)) => format!("fails {check} because {message}"),
-        (false, None) => format!("fails {check}"),
+    let said = match (check == APPLIES, line.passes, &line.because) {
+        (true, true, _) => "is in scope".to_string(),
+        (true, false, Some(message)) => format!("is out of scope because {message}"),
+        (true, false, None) => "is out of scope".to_string(),
+        (false, true, _) => format!("passes {check}"),
+        (false, false, Some(message)) => format!("fails {check} because {message}"),
+        (false, false, None) => format!("fails {check}"),
     };
     if who.is_empty() {
         said
@@ -414,10 +432,19 @@ pub fn same_line(a: &CheckLine, b: &CheckLine) -> bool {
             .all(|((x, i), (y, j))| x == y && same_id(i, j))
 }
 
-/// The line for a report row as it is, with the parents the `from` lines in `policy` give, `None` for a passed row of a check Ergo adds, or why the line can't be written yet.
+/// The line for a report row as it is, with the parents the `from` lines in `policy` give, `None` for a passed row of a check Ergo adds, a subject in scope included, or why the line can't be written yet.
 pub fn row_line(row: &Value, policy: &Value) -> Result<Option<String>, String> {
+    if left_out(row) {
+        return Ok(None);
+    }
     let own = own_subject(row, policy);
-    Ok(row_parts(row, policy)?.map(|line| write(&line, own, false)))
+    Ok(Some(write(&row_parts(row, policy)?, own, false)))
+}
+
+/// The line for any report row, even one `--format outcome` leaves out, like a subject in scope: the one that reads back as the row, as [line_for] gives it, or else the row's line as it is, or why it can't be written yet.
+pub fn said(row: &Value, policy: &Value) -> Result<String, String> {
+    let line = row_parts(row, policy)?;
+    Ok(read_back(row, policy, &line).unwrap_or_else(|_| write(&line, own_subject(row, policy), false)))
 }
 
 fn own_subject<'a>(row: &Value, policy: &'a Value) -> &'a str {
@@ -427,11 +454,15 @@ fn own_subject<'a>(row: &Value, policy: &'a Value) -> &'a str {
         .unwrap_or_default()
 }
 
-/// The line for a report row that reads back as that row against the subject and check names in `policy`: it quotes an id that would read as part of a longer subject name, and leaves out a `because` that would read as part of a longer check name. `None` for a passed row of a check Ergo adds, or why no such line can be written.
+/// The line for a report row that reads back as that row against the subject and check names in `policy`: it quotes an id that would read as part of a longer subject name, and leaves out a `because` that would read as part of a longer check name. `None` for a passed row of a check Ergo adds, a subject in scope included, or why no such line can be written.
 pub fn line_for(row: &Value, policy: &Value) -> Result<Option<String>, String> {
-    let Some(line) = row_parts(row, policy)? else {
+    if left_out(row) {
         return Ok(None);
-    };
+    }
+    read_back(row, policy, &row_parts(row, policy)?).map(Some)
+}
+
+fn read_back(row: &Value, policy: &Value, line: &CheckLine) -> Result<String, String> {
     let requirement = row["requirement"].as_str().unwrap_or_default();
     let own = own_subject(row, policy);
     let subjects = names(&policy["subjects"]);
@@ -441,15 +472,15 @@ pub fn line_for(row: &Value, policy: &Value) -> Result<Option<String>, String> {
         ..line.clone()
     };
     for (want, quoted) in [
-        (&line, false),
-        (&line, true),
+        (line, false),
+        (line, true),
         (&without_because, false),
         (&without_because, true),
     ] {
         let text = write(want, own, quoted);
         let read = read_check_line(&text, requirement, own, &subjects, &checks);
         if read.is_ok_and(|read| same_line(&read, want)) {
-            return Ok(Some(text));
+            return Ok(text);
         }
     }
     Err(format!(
@@ -621,6 +652,16 @@ fn items(
         .as_array()
         .map(Vec::as_slice)
         .unwrap_or_default();
+    let written_wrong = rows
+        .iter()
+        .find(|row| row["check"] == "$well_formed" && row["passed"] != true);
+    if let (true, Some(row)) = (strict, written_wrong) {
+        return Err(format!(
+            "requirement {} is written wrong: {}",
+            row["requirement"].as_str().unwrap_or_default(),
+            row["message"].as_str().unwrap_or_default()
+        ));
+    }
     let requirements = report["requirements"].as_object().into_iter().flatten();
     for (name, entry) in requirements {
         let whole = region.compliant || region.requirements.contains(name);

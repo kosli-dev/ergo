@@ -213,6 +213,10 @@ fn the_outcome_of_a_report_names_no_subject_for_a_check_ergo_adds_on_the_require
         group(&items, "approved"),
         vec!["fails $min_subjects because in-scope deployment count is 0"]
     );
+    assert_eq!(
+        group(&items, "tested"),
+        vec!["fails $min_subjects because in-scope artifact count is 0"]
+    );
     let items = shown(
         scoped(),
         json!({"deployments": [
@@ -268,6 +272,7 @@ fn a_line_for_a_check_ergo_adds_or_for_scope_quotes_the_ids_that_would_read_as_p
     let mut policy = shadowed();
     policy["subjects"]["deployment"]["from"] = json!("deployments whose ok is true");
     policy["subjects"]["deployment y"] = json!({"from": "ys", "identified_by": "id"});
+    policy["requirements"]["approved"] = json!({"subject": "deployment", "checks": {"c": "ok is true"}});
     let report = report(
         policy.clone(),
         json!({"xs": [], "webs": [], "ys": [], "deployments": [
