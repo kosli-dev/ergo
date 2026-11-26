@@ -400,7 +400,7 @@ fn line_of(report: &Value, requirement: &str, id: &str) -> Result<Option<String>
             row["requirement"] == requirement && row["check"] == "c" && row["subject"]["id"] == id
         })
         .unwrap();
-    outcome::line_for(row, report)
+    outcome::line_for(row, &colliding())
 }
 
 #[test]
@@ -462,17 +462,6 @@ fn children_input() -> Value {
 }
 
 #[test]
-fn the_ancestors_of_a_subject_come_from_the_from_lines_the_report_keeps() {
-    let report = report(children(), children_input());
-    assert_eq!(
-        outcome::ancestors(&report, "test run"),
-        vec!["artifact", "release"]
-    );
-    assert_eq!(outcome::ancestors(&report, "artifact"), vec!["release"]);
-    assert_eq!(outcome::ancestors(&report, "release"), Vec::<String>::new());
-}
-
-#[test]
 fn the_outcome_of_a_report_names_the_parents_of_a_child_subject_outermost_last() {
     let report = report(children(), children_input());
     assert_eq!(
@@ -496,7 +485,7 @@ fn the_outcome_of_a_report_names_the_parents_of_a_child_subject_outermost_last()
 }
 
 #[test]
-fn a_row_whose_in_does_not_follow_the_from_lines_of_the_report_has_no_line() {
+fn a_row_whose_in_does_not_follow_the_from_lines_of_the_policy_has_no_line() {
     let report = report(children(), children_input());
     let mut row = report["results"]
         .as_array()
@@ -505,7 +494,7 @@ fn a_row_whose_in_does_not_follow_the_from_lines_of_the_report_has_no_line() {
         .find(|row| row["check"] == "ok")
         .unwrap()
         .clone();
-    assert!(outcome::line_for(&row, &report).is_ok());
+    assert!(outcome::line_for(&row, &children()).is_ok());
     for parents in [
         json!({"artifact": "web"}),
         json!({"release": "r1", "deployment": "d1"}),
@@ -515,10 +504,10 @@ fn a_row_whose_in_does_not_follow_the_from_lines_of_the_report_has_no_line() {
         json!({"artifact": {"a": 1}, "release": "r1"}),
     ] {
         row["subject"]["in"] = parents.clone();
-        assert!(outcome::line_for(&row, &report).is_err(), "{parents}");
+        assert!(outcome::line_for(&row, &children()).is_err(), "{parents}");
     }
     row["subject"].as_object_mut().unwrap().remove("in");
-    assert!(outcome::line_for(&row, &report).is_err());
+    assert!(outcome::line_for(&row, &children()).is_err());
 }
 
 #[test]
@@ -603,7 +592,7 @@ fn a_line_for_a_child_row_quotes_the_ids_that_would_read_as_part_of_a_longer_sub
     let printed: Vec<String> = rows
         .iter()
         .filter(|row| row["requirement"] == "tested" && row["check"] == "c")
-        .map(|row| outcome::line_for(row, &report).unwrap().unwrap())
+        .map(|row| outcome::line_for(row, &shadowed()).unwrap().unwrap())
         .collect();
     assert_eq!(
         printed,

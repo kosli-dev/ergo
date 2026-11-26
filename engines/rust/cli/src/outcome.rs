@@ -75,29 +75,6 @@ pub struct CheckLine {
     pub parents: Vec<(String, Value)>,
 }
 
-/// The subjects whose ids a row of `subject` carries under `in`, parent first, read from the `from` lines the report keeps in its `subjects`.
-pub fn ancestors(report: &Value, subject: &str) -> Vec<String> {
-    let subjects: Map<String, Value> = report["subjects"]
-        .as_object()
-        .into_iter()
-        .flatten()
-        .map(|(name, entry)| {
-            (
-                name.clone(),
-                Value::Object(Map::from_iter([(
-                    "from".to_string(),
-                    entry["from"].clone(),
-                )])),
-            )
-        })
-        .collect();
-    let policy = Value::Object(Map::from_iter([(
-        "subjects".to_string(),
-        Value::Object(subjects),
-    )]));
-    ergo_policy_engine::ancestors(&policy, subject)
-}
-
 fn longest_first<'a>(names: &[&'a str]) -> Vec<&'a str> {
     let mut names = names.to_vec();
     names.sort_by_key(|name| std::cmp::Reverse(name.len()));
@@ -110,7 +87,7 @@ fn subject_at<'a>(text: &str, subjects: &[&'a str]) -> Option<&'a str> {
         .find(|name| text.starts_with(&format!("{name} ")))
 }
 
-/// The names of a report's `subjects` or of a requirement's `checks`, leaving out Ergo's own.
+/// The names of a policy's `subjects` or of a requirement's `checks`, leaving out Ergo's own.
 pub fn names(map: &Value) -> Vec<&str> {
     map.as_object()
         .into_iter()
@@ -194,10 +171,10 @@ pub fn read_check_line(
     })
 }
 
-fn parents_of(row: &Value, report: &Value) -> Result<Vec<(String, Value)>, String> {
+fn parents_of(row: &Value, policy: &Value) -> Result<Vec<(String, Value)>, String> {
     let subject = &row["subject"];
     let kind = subject["type"].as_str().unwrap_or_default();
-    let order = ancestors(report, kind);
+    let order = ergo_policy_engine::ancestors(policy, kind);
     let given = match subject.get("in") {
         None => Some(Map::new()),
         Some(Value::Object(given)) if !given.is_empty() => Some(given.clone()),
@@ -228,7 +205,7 @@ fn parents_of(row: &Value, report: &Value) -> Result<Vec<(String, Value)>, Strin
         .collect()
 }
 
-fn row_parts(row: &Value, report: &Value) -> Result<Option<CheckLine>, String> {
+fn row_parts(row: &Value, policy: &Value) -> Result<Option<CheckLine>, String> {
     let check = row["check"].as_str().unwrap_or_default();
     let passed = row["passed"] == true;
     let not_yet = |what: &str| {
@@ -249,7 +226,7 @@ fn row_parts(row: &Value, report: &Value) -> Result<Option<CheckLine>, String> {
     if id_text(&row["subject"]["id"]).is_none() {
         return not_yet("ids that are objects or lists");
     }
-    let parents = parents_of(row, report)?;
+    let parents = parents_of(row, policy)?;
     Ok(Some(CheckLine {
         subject: row["subject"]["type"]
             .as_str()
@@ -310,19 +287,19 @@ pub fn same_line(a: &CheckLine, b: &CheckLine) -> bool {
             .all(|((x, i), (y, j))| x == y && same_id(i, j))
 }
 
-/// The line for a report row as it is, with the parents the `from` lines in `report` give, `None` for a passed row of a check Ergo adds, or why the line can't be written yet.
-pub fn row_line(row: &Value, report: &Value) -> Result<Option<String>, String> {
-    Ok(row_parts(row, report)?.map(|line| write(&line, false)))
+/// The line for a report row as it is, with the parents the `from` lines in `policy` give, `None` for a passed row of a check Ergo adds, or why the line can't be written yet.
+pub fn row_line(row: &Value, policy: &Value) -> Result<Option<String>, String> {
+    Ok(row_parts(row, policy)?.map(|line| write(&line, false)))
 }
 
-/// The line for a report row that reads back as that row against the names in `report`: it quotes an id that would read as part of a longer subject name, and leaves out a `because` that would read as part of a longer check name. `None` for a passed row of a check Ergo adds, or why no such line can be written.
-pub fn line_for(row: &Value, report: &Value) -> Result<Option<String>, String> {
-    let Some(line) = row_parts(row, report)? else {
+/// The line for a report row that reads back as that row against the subject and check names in `policy`: it quotes an id that would read as part of a longer subject name, and leaves out a `because` that would read as part of a longer check name. `None` for a passed row of a check Ergo adds, or why no such line can be written.
+pub fn line_for(row: &Value, policy: &Value) -> Result<Option<String>, String> {
+    let Some(line) = row_parts(row, policy)? else {
         return Ok(None);
     };
     let requirement = row["requirement"].as_str().unwrap_or_default();
-    let subjects = names(&report["subjects"]);
-    let checks = names(&report["requirements"][requirement]["checks"]);
+    let subjects = names(&policy["subjects"]);
+    let checks = names(&policy["requirements"][requirement]["checks"]);
     let without_because = CheckLine {
         because: None,
         ..line.clone()
@@ -432,7 +409,7 @@ pub struct Region {
     pub checks: BTreeSet<(String, String)>,
 }
 
-/// The whole outcome of a report, as `ergo report --format outcome` prints it, or why a row can't be shown yet.
+/// The whole outcome of a report made from `policy`, as `ergo report --format outcome` prints it, or why a row can't be shown yet.
 pub fn of(report: &Value, policy: &Value) -> Result<Vec<Item>, String> {
     let whole = Region {
         compliant: true,
@@ -441,7 +418,7 @@ pub fn of(report: &Value, policy: &Value) -> Result<Vec<Item>, String> {
     items(report, policy, &whole, true)
 }
 
-/// The items of a report inside `region`, leaving out the rows that can't be shown yet.
+/// The items of a report made from `policy` inside `region`, leaving out the rows that can't be shown yet.
 pub fn part(report: &Value, policy: &Value, region: &Region) -> Vec<Item> {
     items(report, policy, region, false).unwrap_or_default()
 }
@@ -489,7 +466,7 @@ pub fn heading<'a>(text: &'a str, requirements: &Value) -> Result<Heading<'a>, S
 
 fn items(
     report: &Value,
-    _policy: &Value,
+    policy: &Value,
     region: &Region,
     strict: bool,
 ) -> Result<Vec<Item>, String> {
@@ -523,7 +500,7 @@ fn items(
             {
                 continue;
             }
-            match line_for(row, report) {
+            match line_for(row, policy) {
                 Ok(Some(line)) => lines.push(line),
                 Ok(None) => {}
                 Err(problem) if strict => return Err(problem),

@@ -119,14 +119,14 @@ struct Line {
     parents: Vec<(String, Value)>,
 }
 
-fn read_line(text: &str, requirement: &str, report: &Value) -> Result<Line, String> {
+fn read_line(text: &str, requirement: &str, policy: &Value) -> Result<Line, String> {
     let line = outcome::read_check_line(
         text,
         requirement,
-        &outcome::names(&report["subjects"]),
-        &outcome::names(&report["requirements"][requirement]["checks"]),
+        &outcome::names(&policy["subjects"]),
+        &outcome::names(&policy["requirements"][requirement]["checks"]),
     )?;
-    let ancestors = outcome::ancestors(report, &line.subject);
+    let ancestors = ergo_policy_engine::ancestors(policy, &line.subject);
     let named: Vec<&String> = line.parents.iter().map(|(name, _)| name).collect();
     if named != ancestors.iter().collect::<Vec<_>>() {
         return Err(if ancestors.is_empty() {
@@ -226,15 +226,15 @@ fn same_parents(subject: &Value, parents: &[(String, Value)]) -> bool {
     }
 }
 
-fn actual(row: &Value, report: &Value) -> String {
-    outcome::line_for(row, report)
+fn actual(row: &Value, policy: &Value) -> String {
+    outcome::line_for(row, policy)
         .ok()
         .flatten()
-        .or_else(|| outcome::row_line(row, report).ok().flatten())
+        .or_else(|| outcome::row_line(row, policy).ok().flatten())
         .unwrap_or_default()
 }
 
-/// Checks an outcome against a report, by the matching and coverage rules of the spec.
+/// Checks an outcome against a report made from `policy`, by the matching and coverage rules of the spec, reading its lines with the subject and check names of `policy`.
 pub fn check(outcome: &Value, report: &Value, policy: &Value) -> Checked {
     let mut checked = Checked::default();
     let rows = report["results"]
@@ -309,7 +309,7 @@ pub fn check(outcome: &Value, report: &Value, policy: &Value) -> Checked {
                     Ok(Some((name, None))) => name,
                 };
                 for text in group {
-                    match read_line(text, name, report) {
+                    match read_line(text, name, policy) {
                         Ok(line) => lines.push(line),
                         Err(reason) => problems.push(format!("can't read the line '{text}': {reason}")),
                     }
@@ -339,7 +339,7 @@ pub fn check(outcome: &Value, report: &Value, policy: &Value) -> Checked {
                     .is_none_or(|because| row["message"] == because.as_str());
             if !agrees {
                 agreed = false;
-                problems.push(format!("the report says {}", actual(row, report)));
+                problems.push(format!("the report says {}", actual(row, policy)));
             }
         }
         if agreed {
@@ -360,7 +360,7 @@ pub fn check(outcome: &Value, report: &Value, policy: &Value) -> Checked {
         if row["passed"] == true || out_of_scope || !covered {
             continue;
         }
-        match outcome::line_for(row, report) {
+        match outcome::line_for(row, policy) {
             Err(reason) => problems.push(format!("can't check this yet: {reason}")),
             Ok(Some(line)) if !lines.iter().any(|l| !l.passes && same_row(row, l)) => {
                 problems.push(format!("no line says {line}"))
