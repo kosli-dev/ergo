@@ -229,3 +229,100 @@ fn test_takes_one_policy_file_and_strict() {
         );
     }
 }
+
+const ODD_POLICY: &str = r#"ergo_spec: {{spec}}
+subjects:
+  pull:
+    from: pulls
+    identified_by: id
+  pull request:
+    from: prs
+    identified_by: id
+  t:
+    from: ts
+    identified_by: id
+  t x:
+    from: txs
+    identified_by: id
+requirements:
+  pulled:
+    subject: pull
+    checks:
+      c: name is "ok"
+  reviewed:
+    subject: pull request
+    min_subjects: 0
+    checks:
+      c: name is "ok"
+  checked:
+    subject: t
+    checks:
+      c: name is "ok"
+      'c because name is "x"': name exists
+  'a: b':
+    subject: t x
+    checks:
+      'c #1': name is "ok"
+"#;
+
+fn ascii_json(value: &serde_json::Value) -> String {
+    value
+        .to_string()
+        .chars()
+        .map(|c| {
+            if c.is_ascii() && !c.is_control() {
+                c.to_string()
+            } else {
+                format!("\\u{:04x}", c as u32)
+            }
+        })
+        .collect()
+}
+
+#[test]
+fn what_format_outcome_prints_pasted_under_outcome_passes_ergo_test() {
+    let mut odd = vec!["request".to_string()];
+    for c in [
+        '\u{7f}', '\u{80}', '\u{85}', '\u{9b}', '\u{9f}', '\u{2028}', '\u{2029}', '\u{1}', '\t',
+        '\n', '"', '\\', ':', '#', '\'',
+    ] {
+        odd.push(format!("a{c}b"));
+        odd.push(c.to_string());
+    }
+    let pulls: Vec<serde_json::Value> = odd
+        .iter()
+        .enumerate()
+        .map(|(n, id)| serde_json::json!({"id": id, "name": if n % 2 == 0 { "ok" } else { id }}))
+        .collect();
+    let txs: Vec<serde_json::Value> = ["7.0", "1.50", "1e3", "-0", "1e400"]
+        .iter()
+        .map(|n| serde_json::json!({"id": serde_json::from_str::<serde_json::Value>(n).unwrap(), "name": "no"}))
+        .collect();
+    let input = serde_json::json!({
+        "pulls": pulls,
+        "prs": [],
+        "ts": [{"id": "x", "name": "x"}, {"id": "y", "name": "ok"}],
+        "txs": txs,
+    });
+    let policy = file("round-trip", "policy.yaml", ODD_POLICY);
+    let input_file = file("round-trip", "input.json", &ascii_json(&input));
+    let Ok(Outcome::Print(printed)) = run(&args(&[
+        "report", "--policy", &policy, "--input", &input_file, "--format", "outcome",
+    ])) else {
+        panic!("--format outcome failed");
+    };
+    let pasted: String = printed
+        .lines()
+        .map(|line| format!("      {line}\n"))
+        .collect();
+    let with_example = format!(
+        "{ODD_POLICY}examples:\n  - name: round trip\n    input: {}\n    outcome:\n{pasted}",
+        ascii_json(&input)
+    );
+    let tested = file("round-trip", "tested.yaml", &with_example);
+    let got = run(&args(&["test", &tested]));
+    assert!(
+        matches!(&got, Ok(Outcome::Print(text)) if text.starts_with("passed: round trip\n")),
+        "{printed}\n{got:?}"
+    );
+}

@@ -263,3 +263,116 @@ fn a_part_of_the_outcome_shows_a_bare_heading_for_a_requirement_only_some_checks
         ]
     );
 }
+
+#[test]
+fn yaml_escapes_the_characters_yaml_cannot_hold_as_they_are() {
+    for c in [
+        '\u{7f}', '\u{80}', '\u{85}', '\u{9b}', '\u{9f}', '\u{2028}', '\u{2029}', '\u{1}',
+    ] {
+        let line = format!("t \"a{c}b\" fails c because x is \"a{c}b\"");
+        let items = vec![Item::Group("r is not met".to_string(), vec![line.clone()])];
+        let text = outcome::yaml(&items);
+        assert!(!text.contains(c), "U+{:04X}: {text:?}", c as u32);
+        assert_eq!(
+            ergo_policy_cli::yaml::parse(&text),
+            Ok(json!([{"r is not met": [line]}])),
+            "U+{:04X}: {text:?}",
+            c as u32
+        );
+    }
+}
+
+#[test]
+fn a_check_line_names_the_longest_subject_and_the_longest_check_that_fit() {
+    let subjects = ["t", "t x"];
+    let checks = ["c", "c because d"];
+    let read = |text: &str| outcome::read_check_line(text, "r", &subjects, &checks);
+    let line = |subject: &str, id: Value, passes: bool, check: &str, because: Option<&str>| {
+        Ok(outcome::CheckLine {
+            subject: subject.to_string(),
+            id,
+            passes,
+            check: check.to_string(),
+            because: because.map(str::to_string),
+        })
+    };
+    assert_eq!(read("t x 1 passes c"), line("t x", json!(1), true, "c", None));
+    assert_eq!(read("t \"x\" passes c"), line("t", json!("x"), true, "c", None));
+    assert_eq!(
+        read("t 1 fails c because d"),
+        line("t", json!(1), false, "c because d", None)
+    );
+    assert_eq!(
+        read("t 1 fails c because d because e"),
+        line("t", json!(1), false, "c because d", Some("e"))
+    );
+    assert_eq!(
+        read("t 1 fails c because e"),
+        line("t", json!(1), false, "c", Some("e"))
+    );
+    assert_eq!(
+        read("t 1 passes c because d"),
+        line("t", json!(1), true, "c because d", None)
+    );
+    assert!(read("t 1 passes c because e").is_err());
+}
+
+fn colliding() -> Value {
+    json!({
+        "subjects": {
+            "pull": {"from": "pulls", "identified_by": "id"},
+            "pull request": {"from": "prs", "identified_by": "id"},
+            "t": {"from": "ts", "identified_by": "id"},
+            "t x": {"from": "txs", "identified_by": "id"}
+        },
+        "requirements": {
+            "pulled": {"subject": "pull", "checks": {"c": "ok is true"}},
+            "reviewed": {"subject": "pull request", "min_subjects": 0, "checks": {"c": "ok is true"}},
+            "checked": {"subject": "t", "checks": {"c": "ok is true", "c because ok is false": "ok exists"}},
+            "crossed": {"subject": "t x", "min_subjects": 0, "checks": {"c": "ok is true"}}
+        }
+    })
+}
+
+fn line_of(report: &Value, requirement: &str, id: &str) -> Result<Option<String>, String> {
+    let rows = report["results"].as_array().unwrap();
+    let row = rows
+        .iter()
+        .find(|row| {
+            row["requirement"] == requirement && row["check"] == "c" && row["subject"]["id"] == id
+        })
+        .unwrap();
+    outcome::line_for(row, report)
+}
+
+#[test]
+fn a_line_for_a_row_quotes_an_id_that_would_read_as_part_of_a_longer_subject_name() {
+    let report = report(
+        colliding(),
+        json!({"pulls": [{"id": "request", "ok": true}], "prs": [], "ts": [{"id": "x", "ok": true}], "txs": []}),
+    );
+    assert_eq!(
+        line_of(&report, "pulled", "request"),
+        Ok(Some("pull \"request\" passes c".to_string()))
+    );
+    assert_eq!(
+        line_of(&report, "checked", "x"),
+        Ok(Some("t \"x\" passes c".to_string()))
+    );
+}
+
+#[test]
+fn a_line_for_a_row_leaves_out_a_because_that_would_read_as_part_of_a_longer_check_name() {
+    let report = report(
+        colliding(),
+        json!({"pulls": [], "prs": [], "ts": [{"id": "y", "ok": false}, {"id": "z", "ok": 3}], "txs": []}),
+    );
+    assert_eq!(
+        line_of(&report, "checked", "y"),
+        Ok(Some("t y fails c".to_string()))
+    );
+    assert_eq!(
+        line_of(&report, "checked", "z"),
+        Ok(Some("t z fails c because ok is 3".to_string()))
+    );
+}
