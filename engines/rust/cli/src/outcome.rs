@@ -71,6 +71,40 @@ pub struct CheckLine {
     pub check: String,
     /// The message after `because`, if the line has one.
     pub because: Option<String>,
+    /// The type and id of each subject the line names after `in`, parent first.
+    pub parents: Vec<(String, Value)>,
+}
+
+/// The subjects whose ids a row of `subject` carries under `in`, parent first, read from the `from` lines the report keeps in its `subjects`.
+pub fn ancestors(report: &Value, subject: &str) -> Vec<String> {
+    let subjects: Map<String, Value> = report["subjects"]
+        .as_object()
+        .into_iter()
+        .flatten()
+        .map(|(name, entry)| {
+            (
+                name.clone(),
+                Value::Object(Map::from_iter([("from".to_string(), entry["from"].clone())])),
+            )
+        })
+        .collect();
+    let policy = Value::Object(Map::from_iter([(
+        "subjects".to_string(),
+        Value::Object(subjects),
+    )]));
+    ergo_policy_engine::ancestors(&policy, subject)
+}
+
+fn longest_first<'a>(names: &[&'a str]) -> Vec<&'a str> {
+    let mut names = names.to_vec();
+    names.sort_by_key(|name| std::cmp::Reverse(name.len()));
+    names
+}
+
+fn subject_at<'a>(text: &str, subjects: &[&'a str]) -> Option<&'a str> {
+    longest_first(subjects)
+        .into_iter()
+        .find(|name| text.starts_with(&format!("{name} ")))
 }
 
 /// The names of a report's `subjects` or of a requirement's `checks`, leaving out Ergo's own.
@@ -82,39 +116,53 @@ pub fn names(map: &Value) -> Vec<&str> {
         .collect()
 }
 
-/// Reads a check line under `requirement`, with the longest of `subjects` it starts with, then an id, `passes` or `fails`, and the longest of `checks` that the rest is or that is followed by ` because `. Gives why it can't be read otherwise.
+/// Reads a check line under `requirement`, with the longest of `subjects` it starts with, then an id, then for each ` in ` the longest of `subjects` that follows and an id, then `passes` or `fails`, and the longest of `checks` that the rest is or that is followed by ` because `. Gives why it can't be read otherwise.
 pub fn read_check_line(
     text: &str,
     requirement: &str,
     subjects: &[&str],
     checks: &[&str],
 ) -> Result<CheckLine, String> {
-    fn longest_first<'a>(names: &[&'a str]) -> Vec<&'a str> {
-        let mut names = names.to_vec();
-        names.sort_by_key(|name| std::cmp::Reverse(name.len()));
-        names
-    }
     let not_yet = |what: &str| Err(format!("lines for {what} aren't supported yet"));
-    let Some(subject) = longest_first(subjects)
-        .into_iter()
-        .find(|name| text.starts_with(&format!("{name} ")))
-    else {
-        if text.starts_with("fails ") || text.starts_with("passes ") {
+    let added = text.starts_with("fails $")
+        || text.starts_with("passes $")
+        || text.contains(" fails $")
+        || text.contains(" passes $");
+    let Some(subject) = subject_at(text, subjects) else {
+        if added {
             return not_yet("checks Ergo adds");
         }
         return Err("it doesn't start with a subject of the policy".to_string());
     };
-    let Some((id, rest)) = read_id(&text[subject.len() + 1..]) else {
+    let Some((id, mut rest)) = read_id(&text[subject.len() + 1..]) else {
         return Err(format!("it has no id after {subject}"));
     };
+    let mut parents = Vec::new();
+    while let Some(after) = rest.strip_prefix(" in ") {
+        let Some(parent) = subject_at(after, subjects).or_else(|| {
+            longest_first(subjects)
+                .into_iter()
+                .find(|name| after == *name)
+        }) else {
+            if added {
+                return not_yet("checks Ergo adds");
+            }
+            return Err("it has no subject of the policy after in".to_string());
+        };
+        let Some((parent_id, after)) = read_id(after.get(parent.len() + 1..).unwrap_or_default()) else {
+            return Err(format!("it has no id after in {parent}"));
+        };
+        parents.push((parent.to_string(), parent_id));
+        rest = after;
+    }
     let (passes, rest) = if let Some(rest) = rest.strip_prefix(" passes ") {
         (true, rest)
     } else if let Some(rest) = rest.strip_prefix(" fails ") {
         (false, rest)
-    } else if rest.starts_with(" in ") {
-        return not_yet("child subjects");
     } else if rest.starts_with(" is out of scope") || rest.starts_with(" is in scope") {
         return not_yet("subjects in or out of scope");
+    } else if added {
+        return not_yet("checks Ergo adds");
     } else {
         return Err("it needs passes or fails after the id".to_string());
     };
@@ -138,10 +186,43 @@ pub fn read_check_line(
         passes,
         check: check.to_string(),
         because,
+        parents,
     })
 }
 
-fn row_parts(row: &Value) -> Result<Option<CheckLine>, String> {
+fn parents_of(row: &Value, report: &Value) -> Result<Vec<(String, Value)>, String> {
+    let subject = &row["subject"];
+    let kind = subject["type"].as_str().unwrap_or_default();
+    let order = ancestors(report, kind);
+    let given = match subject.get("in") {
+        None => Map::new(),
+        Some(Value::Object(given)) if !given.is_empty() => given.clone(),
+        Some(_) => Map::from_iter([(String::new(), Value::Null)]),
+    };
+    if given.len() != order.len() || !order.iter().all(|name| given.contains_key(name)) {
+        return Err(format!(
+            "the in of a {kind} row doesn't name the subjects its from line is read inside, as for {} in {}",
+            row["check"].as_str().unwrap_or_default(),
+            row["requirement"].as_str().unwrap_or_default()
+        ));
+    }
+    order
+        .into_iter()
+        .map(|name| {
+            let id = given[&name].clone();
+            match id_text(&id) {
+                Some(_) => Ok((name, id)),
+                None => Err(format!(
+                    "lines for ids that are objects or lists aren't supported yet, as for {} in {}",
+                    row["check"].as_str().unwrap_or_default(),
+                    row["requirement"].as_str().unwrap_or_default()
+                )),
+            }
+        })
+        .collect()
+}
+
+fn row_parts(row: &Value, report: &Value) -> Result<Option<CheckLine>, String> {
     let check = row["check"].as_str().unwrap_or_default();
     let passed = row["passed"] == true;
     let not_yet = |what: &str| {
@@ -159,12 +240,10 @@ fn row_parts(row: &Value) -> Result<Option<CheckLine>, String> {
             not_yet("checks Ergo adds")
         };
     }
-    if row["subject"].get("in").is_some() {
-        return not_yet("child subjects");
-    }
     if id_text(&row["subject"]["id"]).is_none() {
         return not_yet("ids that are objects or lists");
     }
+    let parents = parents_of(row, report)?;
     Ok(Some(CheckLine {
         subject: row["subject"]["type"]
             .as_str()
@@ -177,30 +256,62 @@ fn row_parts(row: &Value) -> Result<Option<CheckLine>, String> {
             .as_str()
             .filter(|message| !passed && !message.is_empty())
             .map(str::to_string),
+        parents,
     }))
 }
 
-fn write(line: &CheckLine, quoted: bool) -> String {
-    let id = match &line.id {
-        Value::String(_) if quoted => line.id.to_string(),
+fn id_written(id: &Value, quoted: bool) -> String {
+    match id {
+        Value::String(_) if quoted => id.to_string(),
         id => id_text(id).unwrap_or_default(),
-    };
-    let CheckLine { subject, check, .. } = line;
-    match (line.passes, &line.because) {
-        (true, _) => format!("{subject} {id} passes {check}"),
-        (false, Some(message)) => format!("{subject} {id} fails {check} because {message}"),
-        (false, None) => format!("{subject} {id} fails {check}"),
     }
 }
 
-/// The line for a report row as it is, `None` for a passed row of a check Ergo adds, or why the line can't be written yet.
-pub fn row_line(row: &Value) -> Result<Option<String>, String> {
-    Ok(row_parts(row)?.map(|line| write(&line, false)))
+/// The subject a check line names, with its id and each parent after `in`, like `artifact web in deployment d1`.
+pub fn subject_words(subject: &str, id: &Value, parents: &[(String, Value)]) -> String {
+    written_subject(subject, id, parents, false)
+}
+
+fn written_subject(subject: &str, id: &Value, parents: &[(String, Value)], quoted: bool) -> String {
+    let mut text = format!("{subject} {}", id_written(id, quoted));
+    for (parent, parent_id) in parents {
+        text.push_str(&format!(" in {parent} {}", id_written(parent_id, quoted)));
+    }
+    text
+}
+
+fn write(line: &CheckLine, quoted: bool) -> String {
+    let who = written_subject(&line.subject, &line.id, &line.parents, quoted);
+    let check = &line.check;
+    match (line.passes, &line.because) {
+        (true, _) => format!("{who} passes {check}"),
+        (false, Some(message)) => format!("{who} fails {check} because {message}"),
+        (false, None) => format!("{who} fails {check}"),
+    }
+}
+
+/// Whether two check lines say the same, with ids compared as [same_id] does.
+pub fn same_line(a: &CheckLine, b: &CheckLine) -> bool {
+    a.subject == b.subject
+        && same_id(&a.id, &b.id)
+        && a.passes == b.passes
+        && a.check == b.check
+        && a.because == b.because
+        && a.parents.len() == b.parents.len()
+        && a.parents
+            .iter()
+            .zip(&b.parents)
+            .all(|((x, i), (y, j))| x == y && same_id(i, j))
+}
+
+/// The line for a report row as it is, with the parents the `from` lines in `report` give, `None` for a passed row of a check Ergo adds, or why the line can't be written yet.
+pub fn row_line(row: &Value, report: &Value) -> Result<Option<String>, String> {
+    Ok(row_parts(row, report)?.map(|line| write(&line, false)))
 }
 
 /// The line for a report row that reads back as that row against the names in `report`: it quotes an id that would read as part of a longer subject name, and leaves out a `because` that would read as part of a longer check name. `None` for a passed row of a check Ergo adds, or why no such line can be written.
 pub fn line_for(row: &Value, report: &Value) -> Result<Option<String>, String> {
-    let Some(line) = row_parts(row)? else {
+    let Some(line) = row_parts(row, report)? else {
         return Ok(None);
     };
     let requirement = row["requirement"].as_str().unwrap_or_default();
@@ -218,20 +329,13 @@ pub fn line_for(row: &Value, report: &Value) -> Result<Option<String>, String> {
     ] {
         let text = write(want, quoted);
         let read = read_check_line(&text, requirement, &subjects, &checks);
-        if read.is_ok_and(|read| {
-            same_id(&read.id, &want.id)
-                && CheckLine {
-                    id: want.id.clone(),
-                    ..read
-                } == *want
-        }) {
+        if read.is_ok_and(|read| same_line(&read, want)) {
             return Ok(Some(text));
         }
     }
     Err(format!(
-        "no line for {} {} and {} in {requirement} reads back as its row, because a longer subject or check name starts the same way",
-        line.subject,
-        id_text(&line.id).unwrap_or_default(),
+        "no line for {} and {} in {requirement} reads back as its row, because a longer subject or check name starts the same way",
+        subject_words(&line.subject, &line.id, &line.parents),
         line.check
     ))
 }

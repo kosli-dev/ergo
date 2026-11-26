@@ -143,7 +143,7 @@ fn a_line_the_policy_cannot_read_is_a_problem() {
         ),
         (
             "deployment d1 in release r1 passes approver_set",
-            "child subjects",
+            "no subject of the policy after in",
         ),
         (
             "deployment d1 is out of scope",

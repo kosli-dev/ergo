@@ -193,7 +193,7 @@ fn actual(row: &Value, report: &Value) -> String {
     outcome::line_for(row, report)
         .ok()
         .flatten()
-        .or_else(|| outcome::row_line(row).ok().flatten())
+        .or_else(|| outcome::row_line(row, report).ok().flatten())
         .unwrap_or_default()
 }
 

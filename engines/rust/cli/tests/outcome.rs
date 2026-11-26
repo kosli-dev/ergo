@@ -453,9 +453,9 @@ fn children_input() -> Value {
     json!({"releases": [
         {"id": "r1", "artifacts": [
             {"name": "web", "status": "passed", "runs": [{"n": 1, "ok": true}]},
-            {"name": "api", "status": "failed"}
+            {"name": "api", "status": "failed", "runs": []}
         ]},
-        {"id": "r2", "artifacts": [{"name": "web", "status": "passed"}]}
+        {"id": "r2", "artifacts": [{"name": "web", "status": "passed", "runs": []}]}
     ]})
 }
 
