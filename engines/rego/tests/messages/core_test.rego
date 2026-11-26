@@ -192,6 +192,11 @@ test_the_items_of_a_list_that_arent_text_are_one_list_clause if {
 	said == [ergo._m_clause("list", "$params.l", "unusable", "item 2 of $params.l is 3, which isn't text")]
 }
 
+test_the_values_a_message_shows_are_root_clauses_with_their_state if {
+	ergo._m_value_clauses({"v": 3}, ["v"]) == [ergo._m_clause("root", "v", "value", "v is 3")]
+	ergo._m_value_clauses({}, ["v"]) == [ergo._m_clause("root", "v", "absent", "v is missing")]
+}
+
 test_a_sum_that_needs_more_than_15_digits_is_a_clause if {
 	subj := {"ns": [123456789012345678, 1]}
 	c := ergo._m_with_sides(ergo._s_written_check("sum of ns is 3"))
