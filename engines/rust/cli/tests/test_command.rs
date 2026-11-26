@@ -98,6 +98,41 @@ fn format_outcome_fails_on_a_row_it_cannot_show_yet() {
 }
 
 #[test]
+fn format_outcome_with_fail_exits_three_on_a_policy_written_wrong_as_json_does() {
+    let wrong = POLICY.replace("approver is a non-empty string", "approver sparkles");
+    let policy = file("format-written-wrong", "policy.yaml", &wrong);
+    let input = file(
+        "format-written-wrong",
+        "input.json",
+        r#"{"deployments": [{"id": "d1", "author": "ann", "approver": "bob"}]}"#,
+    );
+    let json = run(&args(&[
+        "report", "--policy", &policy, "--input", &input, "--fail",
+    ]));
+    assert!(matches!(json, Ok(Outcome::PrintAndFail(_, 3))), "{json:?}");
+    let got = run(&args(&[
+        "report", "--policy", &policy, "--input", &input, "--format", "outcome", "--fail",
+    ]));
+    let Err(failure) = got else {
+        panic!("{got:?}");
+    };
+    assert_eq!(failure.code(), 3, "{failure:?}");
+    assert!(
+        failure.message().starts_with(&format!(
+            "the policy file {policy} is written wrong, so the report can't be shown as an outcome: "
+        )),
+        "{failure:?}"
+    );
+    let without_fail = run(&args(&[
+        "report", "--policy", &policy, "--input", &input, "--format", "outcome",
+    ]));
+    assert!(
+        matches!(&without_fail, Err(failure) if failure.code() == 2),
+        "{without_fail:?}"
+    );
+}
+
+#[test]
 fn format_takes_json_or_outcome_and_outcome_only_with_report() {
     let policy = file("format-wrong", "policy.yaml", POLICY);
     let input = file("format-wrong", "input.json", r#"{"deployments": []}"#);
