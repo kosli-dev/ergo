@@ -239,7 +239,7 @@ else := p
 
 _m_pieces_once(ps) := [ps[i] | some i, t in ts; not t in array.slice(ts, 0, i)] if ts := [_m_piece_text(p) | some p in ps]
 
-_m_null_key_parts(subj, check) := _once([x |
+_m_null_key_parts(subj, check) := _m_pieces_once([x |
 	some [p, mode] in _m_key_paths(check)
 	some x in _m_path_said(subj, p, mode)
 ]) if {
@@ -258,7 +258,7 @@ _m_key_paths(check) := [[p, _key_base_mode(piece)] |
 _m_path_said(subj, p, mode) := xs if {
 	_key_step_later(p)
 	xs := _m_null_key_pair(subj, p, mode)
-} else := [_m_state_clause(s)] if {
+} else := [_m_state_piece(s)] if {
 	not _key_step_later(p)
 	s := _m_shown(subj, p)
 	s.state in _no_value_states
@@ -283,23 +283,28 @@ _key_step_later(p) if {
 	is_object(step)
 }
 
-_m_null_key_pair(subj, p, mode) := _m_key_first(concat("", [_input_name(array.slice(p, 0, j)), " is null"]), _m_key_text(subj, p[i])) if {
+_m_null_key_pair(subj, p, mode) := _m_key_first(_m_clause("root", n, "null", concat("", [n, " is null"])), _m_key_piece(subj, p[i])) if {
 	i := min({k | some k, step in p; _m_key_text(subj, step)})
 	i > 0
 	j := min({m | some m in numbers.range(1, i); _resolved(subj, array.slice(p, 0, m)) == null})
-	_input_name(array.slice(p, 0, j)) != "$params"
-} else := [_m_key_text(subj, p[i]), _m_key_list_text(_input_name(f.prefix), f)] if {
+	n := _input_name(array.slice(p, 0, j))
+	n != "$params"
+} else := [_m_key_piece(subj, p[i]), _m_key_list_piece(_input_name(f.prefix), f)] if {
 	i := min({k | some k, step in p; _m_key_text(subj, step)})
 	some f in _key_base_flaws(subj, p, mode)
 }
 
-_m_key_first(base, key) := [key] if _m_aliased(base) == key
+_m_key_first(base, key) := [key] if _m_aliased(base.text) == key.text
 
-else := _m_root_sorted([key, base])
+else := [x | some t in _m_root_sorted([key.text, base.text]); some x in [key, base]; x.text == t]
 
-_m_key_text(subj, step) := t if {
-	t := _m_key_fault(subj, step)
-} else := concat("", [_m_key_name(step), " is ", _m_state_word(st)]) if {
+_m_key_text(subj, step) := _m_key_piece(subj, step).text
+
+_m_key_list_piece(name, f) := _m_clause("root", name, f.cause, _m_key_list_text(name, f))
+
+_m_key_piece(subj, step) := c if {
+	c := _m_key_fault_piece(subj, step)
+} else := _m_clause("root", _m_key_name(step), st, concat("", [_m_key_name(step), " is ", _m_state_word(st)])) if {
 	st := _m_key_state(subj, step)
 	st in _no_value_states
 }

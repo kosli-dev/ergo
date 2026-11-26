@@ -142,7 +142,7 @@ _row_message(check, subj, raw) := _m_row_text(check, subj, raw.cause) if {
 
 _m_row_text(check, subj, cause) := concat("; ", _roots_then_lists(ps, _m_list_names(check))) if {
 	cause in _value_fault_causes
-	ps := _m_null_key_parts(subj, check)
+	ps := [_m_piece_string(x) | some x in _m_null_key_parts(subj, check)]
 	ps != []
 } else := _m_top_sorted(_m_message(object.union(_m_with_sides(_m_walked(check, subj)), {"ergo/row": true}), subj, cause), _m_list_names(check)) if cause != "value"
 

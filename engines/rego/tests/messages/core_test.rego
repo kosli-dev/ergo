@@ -24,7 +24,7 @@ test_message_a_check_whose_path_is_not_a_path_has_only_its_refs_as_sides if {
 
 test_a_null_before_an_unreadable_key_is_read_from_the_sides_a_check_already_carries if {
 	check := {"$sides": [["s", {"named_by_field": "p"}]], "op": "present", "path": ["other"]}
-	ergo._m_null_key_parts({"s": null, "p": null}, check) == ["p is null", "s is null"]
+	_piece_strings(ergo._m_null_key_parts({"s": null, "p": null}, check)) == ["p is null", "s is null"]
 }
 
 test_the_parts_said_for_a_null_before_a_key_are_clauses if {
@@ -82,7 +82,7 @@ test_a_message_keeps_what_a_count_says_as_its_clauses if {
 }
 
 test_a_key_that_cant_be_read_and_the_value_before_it_are_two_groups_of_the_message if {
-	_said_of("m named by $params.k is 1", {"m": 3}, "unusable", {}) == [["$params.k is missing"], ["m is 3, which isn't an object"]]
+	[_piece_strings(g) | some g in _said_of("m named by $params.k is 1", {"m": 3}, "unusable", {})] == [["$params.k is missing"], ["m is 3, which isn't an object"]]
 	_message_of("m named by $params.k is 1", {"m": 3}, "unusable", {}) == "$params.k is missing; m is 3, which isn't an object"
 }
 
