@@ -459,7 +459,12 @@ default _walk_passed(_, _, _, _) := false
 
 _walk_passed([], true, leaf, v) if _op_passed(leaf, v)
 
-_walk_failure(path, w, e, [], true, leaf, false) := {"path": e.c, "item": e.i, "cause": cause, "value": _walk_value(e.v, e, w), "at": _walk_at(w, e), "iv": e.iv, "iat": _item_at(w, e), "lv": _item_levels(w, e), "msg": _m_leaf_message(e, leaf, cause, path)} if cause := _row_cause(leaf, e.iv, "")
+_walk_failure(path, w, e, [], true, leaf, false) := object.union({"path": e.c, "item": e.i, "cause": cause, "value": _walk_value(e.v, e, w), "at": _walk_at(w, e), "iv": e.iv, "iat": _item_at(w, e), "lv": _item_levels(w, e), "msg": _m_leaf_message(e, leaf, cause, path)}, _walk_absent_read(e, cause)) if cause := _row_cause(leaf, e.iv, "")
+
+_walk_absent_read(e, cause) := {"read_outcome": "absent"} if {
+	not cause in _failed_read_states
+	e.v == _absent
+} else := {}
 
 _walk_failure(path, w, e, undecided, _, _, _) := {"path": e.c, "item": e.i, "cause": undecided[0][1], "value": null, "at": _walk_at(w, e), "iv": e.iv, "iat": _item_at(w, e), "lv": _item_levels(w, e), "msg": _m_walk_leaf(e, {"op": "present", "path": e.r}, undecided[0][1], _dotted_roots([path]))} if {
 	undecided != []

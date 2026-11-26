@@ -1125,17 +1125,12 @@ _walk_entry(row, texts, name, at) := object.union(
 		_walk_kind(name),
 		name,
 		_worst_or_value({f.cause | some f in row.failed_items; f.item == name}),
-		[_said_missing(r, texts[k]) | some k, f in row.failed_items; f.item == name; some r in _walk_reads(f, name)],
+		[r | some f in row.failed_items; f.item == name; some r in _walk_reads(f, name)],
 		[],
 		concat("; ", _once([_entry_text(texts[k], name) | some k, f in row.failed_items; f.item == name; texts[k] != ""])),
 	),
 	_item_seen(row, name, at),
 )
-
-_said_missing(r, t) := object.union(r, {"outcome": "absent"}) if {
-	r.outcome == "null"
-	endswith(t, " is missing")
-} else := r
 
 _walk_reads(f, name) := [_item_read(f)] if _reads_inside(f, name)
 
