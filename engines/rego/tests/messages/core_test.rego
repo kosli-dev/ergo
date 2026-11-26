@@ -185,6 +185,19 @@ test_a_state_piece_with_a_text_keeps_that_text if {
 
 _piece_strings(ps) := [ergo._m_piece_string(p) | some p in ps]
 
+test_the_items_of_a_list_that_arent_text_are_one_list_clause if {
+	subj := {"v": "a"}
+	c := ergo._m_with_sides(ergo._s_written_check("v is in $params.l ignoring case"))
+	said := ergo._m_text_list_said(subj, c, "unusable") with data.ergo_params as {"l": ["a", 3]} with input as {"ergo/names": {"ergo/subject": subj}}
+	said == [ergo._m_clause("list", "$params.l", "unusable", "item 2 of $params.l is 3, which isn't text")]
+}
+
+test_a_sum_that_needs_more_than_15_digits_is_a_clause if {
+	subj := {"ns": [123456789012345678, 1]}
+	c := ergo._m_with_sides(ergo._s_written_check("sum of ns is 3"))
+	ergo._m_message_pieces(c, subj, "unusable") == [ergo._m_clause("root", "sum of ns", "unusable", "sum of ns needs more than 15 digits")] with input as {"ergo/names": {"ergo/subject": subj}}
+}
+
 test_a_key_piece_is_a_root_clause_named_by_the_key_and_its_state if {
 	check := {"op": "compare", "cmp": "eq", "left": ["k"], "right": ["m", {"ref": ["$$params", "k"]}], "expression": "k is m named by $params.k"}
 	ergo._m_key_pieces({}, check, "absent") == [ergo._m_clause("root", "$params.k", "absent", "$params.k is missing")] with data.ergo_params as {}
