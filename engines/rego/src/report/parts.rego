@@ -507,6 +507,8 @@ _sub_mcheck(where, c, row) := m if {
 
 _tally_said_texts(said) := {c.text | some c in _said_clauses(said)}
 
+_tally_said_parts(said) := _tally_said_texts(said) | {p | some c in _said_clauses(said); some p in object.get(c, "ergo/parts", [])}
+
 _tally_cut(said) if {
 	some c in _said_clauses(said)
 	c.kind == "more"
@@ -521,6 +523,7 @@ _tally_item_texts(c, subj, cause, said) := _tally_record_texts(c, subj, cause, s
 _tally_record_texts(c, subj, cause, said) := {_m_aliased(r[1]) |
 	is_object(c)
 	texts := _tally_said_texts(said)
+	parts := _tally_said_parts(said)
 	cut := _tally_cut(said)
 	mc := object.union(_m_with_sides(_m_walked(c, subj)), {"ergo/row": true})
 	some side in _m_tally_parts(mc)
@@ -531,7 +534,7 @@ _tally_record_texts(c, subj, cause, said) := {_m_aliased(r[1]) |
 	r := _tally_unrooted(r0, texts)
 	r != null
 	_tally_record_listed(r[2])
-	_tally_said_in(_m_aliased(r[1]), texts, cut)
+	_tally_said_in(_m_aliased(r[1]), parts, cut)
 }
 
 _tally_root_said(r, rs) if {
@@ -548,7 +551,15 @@ _tally_record_listed(src) if _m_positions(src.fail.path) != []
 
 _tally_rest_of(row, names, texts) := _tally_said_rest(row, names) if count(texts) == 0
 
-else := concat(_said_joint(row), [c.text | some c in _said_clauses(row); not c.text in texts; not c.name in names; c.kind != "more"])
+else := concat(_said_joint(row), [t | some c in _said_clauses(row); not c.text in texts; t := _tally_clause_rest(c, names, texts); t != ""])
+
+_tally_clause_rest(c, names, texts) := concat(", and ", [p | some p in ps; not p in texts; not _m_list_name(p) in names; not _m_more_clause(p)]) if ps := c["ergo/parts"]
+
+else := "" if c.name in names
+
+else := "" if c.kind == "more"
+
+else := c.text
 
 _tally_own_read(i, c, _, _) if {
 	contains(i.name, "[]")
@@ -638,24 +649,21 @@ _said_joint(said) := object.get(said, "ergo/joint", "; ")
 
 _said_of(x) := {"message": x.message, "ergo/clauses": _said_clauses(x), "ergo/joint": _said_joint(x)}
 
-_for_text_said(m) := {"message": m, "ergo/clauses": [{"kind": _for_clause_kind(c), "name": _m_list_name(c), "cause": _clause_cause(c), "text": c, "said": []} | some c in cs], "ergo/joint": _tally_sep(m, cs)} if cs := _tally_clauses(m)
+_for_text_said(m) := {"message": m, "ergo/clauses": [_for_text_clause(c, _m_and_parts(c)) | some c in cs.clauses], "ergo/joint": cs.joint} if cs := _tally_clauses(m)
 
-_for_clause_kind(c) := "more" if _m_more_clause(c)
+_for_text_clause(c, ps) := {"kind": _for_clause_kind(ps), "name": _m_list_name(c), "cause": _clause_cause(c), "text": c, "said": [], "ergo/parts": ps}
 
-else := "list"
+_for_clause_kind(ps) := "more" if {
+	some p in ps
+	_m_more_clause(p)
+} else := "list"
 
-_tally_clauses(m) := ps if {
+_tally_clauses(m) := {"clauses": ps, "joint": "; "} if {
 	ps := _m_top_split(m, "; ")
 	count(ps) > 1
-} else := _m_top_split(m, ", and ")
+} else := {"clauses": _m_and_parts(m), "joint": ", and "}
 
-_tally_sep(_, cs) := ", and " if count(cs) == 1
-
-_tally_sep(m, cs) := _semi_or_and(count(_m_top_split(m, "; "))) if count(cs) != 1
-
-_semi_or_and(1) := ", and "
-
-_semi_or_and(n) := "; " if n != 1
+_m_and_parts(t) := _m_top_split(t, ", and ")
 
 _clause_cause(c) := "absent" if endswith(c, " is missing")
 
@@ -1540,6 +1548,7 @@ _tally_outside_keyed(side, subj) if {
 _tally_item_records(c, subj, cause, at, said) := [x |
 	is_object(c)
 	texts := _tally_said_texts(said)
+	parts := _tally_said_parts(said)
 	cut := _tally_cut(said)
 	mc := object.union(_m_with_sides(_m_walked(c, subj)), {"ergo/row": true})
 	some side in _m_tally_parts(mc)
@@ -1552,7 +1561,7 @@ _tally_item_records(c, subj, cause, at, said) := [x |
 	not _tally_root_said(r0, rs)
 	r := _tally_unrooted(r0, texts)
 	r != null
-	_tally_said_in(_m_aliased(r[1]), texts, cut)
+	_tally_said_in(_m_aliased(r[1]), parts, cut)
 	x := _tally_record_entry(r, side, w, roots, at, subj)
 ]
 
