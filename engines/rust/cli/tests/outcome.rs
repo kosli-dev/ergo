@@ -160,6 +160,10 @@ fn report(policy: Value, input: Value) -> Value {
     ergo_policy_engine::report(&input, &policy, &json!({}))
 }
 
+fn shown(policy: Value, input: Value) -> Result<Vec<Item>, String> {
+    outcome::of(&report(policy.clone(), input), &policy)
+}
+
 fn two_requirements() -> Value {
     json!({
         "subjects": {
@@ -192,7 +196,7 @@ fn lines(lines: &[&str]) -> Vec<String> {
 fn the_outcome_of_a_report_has_compliant_then_each_requirement_with_its_status_and_rows() {
     let report = report(two_requirements(), two_requirements_input());
     assert_eq!(
-        outcome::of(&report),
+        outcome::of(&report, &two_requirements()),
         Ok(vec![
             Item::Line("not compliant".to_string()),
             Item::Group(
@@ -222,10 +226,9 @@ fn the_outcome_of_a_report_with_a_row_it_cannot_show_yet_is_an_error() {
     policy["subjects"]["pull request"]["from"] = json!("prs whose lines is 3");
     let mut input = two_requirements_input();
     input["prs"][1]["lines"] = json!(5);
-    let error = outcome::of(&report(policy, input)).unwrap_err();
+    let error = shown(policy, input).unwrap_err();
     assert!(error.contains("subjects out of scope"), "{error}");
-    let error =
-        outcome::of(&report(two_requirements(), json!({"prs": [], "scans": []}))).unwrap_err();
+    let error = shown(two_requirements(), json!({"prs": [], "scans": []})).unwrap_err();
     assert!(error.contains("checks Ergo adds"), "{error}");
 }
 
@@ -234,7 +237,7 @@ fn a_requirement_with_no_row_to_show_is_a_line_on_its_own() {
     let mut policy = two_requirements();
     policy["requirements"] = json!({"spare": policy["requirements"]["spare"].clone()});
     assert_eq!(
-        outcome::of(&report(policy, json!({"scans": []}))),
+        shown(policy, json!({"scans": []})),
         Ok(vec![
             Item::Line("compliant".to_string()),
             Item::Line("spare is not applicable".to_string()),
@@ -255,14 +258,13 @@ fn named_with_a_status(short: &str, long: &str) -> Value {
 #[test]
 fn the_outcome_of_a_report_with_a_heading_that_could_name_two_requirements_is_an_error() {
     let input = json!({"ts": [{"id": "t1", "p": true, "w": false}]});
-    let error =
-        outcome::of(&report(named_with_a_status("x", "x is met"), input.clone())).unwrap_err();
+    let error = shown(named_with_a_status("x", "x is met"), input.clone()).unwrap_err();
     assert_eq!(
         error,
         "the heading x is met, for the status of x, would also name the requirement x is met, so it can't read back"
     );
     let input = json!({"ts": [{"id": "t1", "p": false, "w": true}]});
-    let error = outcome::of(&report(named_with_a_status("a", "a is not met"), input)).unwrap_err();
+    let error = shown(named_with_a_status("a", "a is not met"), input).unwrap_err();
     assert_eq!(
         error,
         "the heading a is not met, for the status of a, would also name the requirement a is not met, so it can't read back"
@@ -273,7 +275,7 @@ fn the_outcome_of_a_report_with_a_heading_that_could_name_two_requirements_is_an
 fn the_outcome_of_a_report_whose_headings_name_one_requirement_each_is_shown() {
     let input = json!({"ts": [{"id": "t1", "p": false, "w": false}]});
     assert_eq!(
-        outcome::of(&report(named_with_a_status("x", "x is met"), input)),
+        shown(named_with_a_status("x", "x is met"), input),
         Ok(vec![
             Item::Line("not compliant".to_string()),
             Item::Group(
@@ -296,7 +298,7 @@ fn a_part_of_the_outcome_shows_a_bare_heading_for_a_requirement_only_some_checks
         .insert(("reviewed".to_string(), "approved".to_string()));
     part.requirements.insert("scanned".to_string());
     assert_eq!(
-        outcome::part(&report, &part),
+        outcome::part(&report, &two_requirements(), &part),
         vec![
             Item::Group(
                 "reviewed".to_string(),
@@ -474,7 +476,7 @@ fn the_ancestors_of_a_subject_come_from_the_from_lines_the_report_keeps() {
 fn the_outcome_of_a_report_names_the_parents_of_a_child_subject_outermost_last() {
     let report = report(children(), children_input());
     assert_eq!(
-        outcome::of(&report),
+        outcome::of(&report, &children()),
         Ok(vec![
             Item::Line("not compliant".to_string()),
             Item::Group(

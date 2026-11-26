@@ -31,7 +31,7 @@ fn input() -> Value {
 
 fn problems(outcome: Value) -> Vec<String> {
     let report = ergo_policy_engine::report(&input(), &policy(), &json!({}));
-    examples::check(&outcome, &report).problems
+    examples::check(&outcome, &report, &policy()).problems
 }
 
 #[test]
@@ -83,7 +83,7 @@ fn a_number_in_a_line_matches_an_id_of_the_same_value_however_either_is_written(
     for id in ["7", "7.0", "7.00", "7e0", "0.7e1"] {
         let line = format!("pull request {id} passes peer_approved");
         assert_eq!(
-            examples::check(&json!([{"reviewed": [line]}]), &report).problems,
+            examples::check(&json!([{"reviewed": [line]}]), &report, &policy()).problems,
             Vec::<String>::new(),
             "{id}"
         );
@@ -91,6 +91,7 @@ fn a_number_in_a_line_matches_an_id_of_the_same_value_however_either_is_written(
     let problems = examples::check(
         &json!([{"reviewed": ["pull request \"7\" passes peer_approved"]}]),
         &report,
+        &policy(),
     )
     .problems;
     assert_eq!(
@@ -208,6 +209,7 @@ fn a_policy_written_wrong_breaks_every_example_whatever_the_lines_say() {
     let checked = examples::check(
         &json!([{"approved": ["deployment d1 passes has approvals"]}]),
         &report,
+        &policy,
     );
     assert_eq!(checked.problems.len(), 1, "{:?}", checked.problems);
     assert!(
@@ -225,6 +227,7 @@ fn a_failure_the_lines_cover_but_cannot_name_yet_fails_the_example() {
     let problems = examples::check(
         &json!([{"reviewed is not met": ["pull request 7 passes peer_approved"]}]),
         &report,
+        &policy,
     )
     .problems;
     assert_eq!(problems.len(), 1, "{problems:?}");
@@ -235,6 +238,7 @@ fn a_failure_the_lines_cover_but_cannot_name_yet_fails_the_example() {
     let problems = examples::check(
         &json!([{"reviewed": ["pull request 7 passes peer_approved"]}]),
         &report,
+        &policy,
     )
     .problems;
     assert_eq!(problems, Vec::<String>::new());
@@ -249,7 +253,7 @@ fn a_subject_out_of_scope_is_not_a_failure() {
     let report = ergo_policy_engine::report(&input, &policy, &json!({}));
     let problems = examples::check(
         &json!([{"approved is not met": ["deployment d1 fails approver_set", "deployment d1 passes has approvals"]}]),
-        &report,
+        &report, &policy,
     )
     .problems;
     assert_eq!(problems, Vec::<String>::new());
@@ -261,6 +265,7 @@ fn the_check_lines_of_an_outcome_say_which_checks_it_shows_passing_and_failing()
     let checked = examples::check(
         &json!([{"approved": ["deployment d1 fails approver_set", "deployment d2 fails approver_set", "deployment d1 passes has approvals"]}]),
         &report,
+        &policy(),
     );
     let shown: Vec<_> = checked.shown.into_iter().collect();
     assert_eq!(
@@ -278,6 +283,7 @@ fn a_failed_example_shows_its_lines_next_to_those_of_the_report_for_what_they_co
     let checked = examples::check(
         &json!([{"approved": ["deployment d1 passes approver_set"]}]),
         &report,
+        &policy(),
     );
     assert_eq!(
         checked.expected,
@@ -341,7 +347,8 @@ fn a_line_must_agree_with_every_row_that_shares_its_check_and_subject() {
     assert_eq!(
         examples::check(
             &json!([{"approved": ["deployment d1 passes approver_set"]}]),
-            &report
+            &report,
+            &policy()
         )
         .problems,
         vec![
@@ -352,7 +359,8 @@ fn a_line_must_agree_with_every_row_that_shares_its_check_and_subject() {
     assert_eq!(
         examples::check(
             &json!([{"approved": ["deployment d1 fails approver_set"]}]),
-            &report
+            &report,
+            &policy()
         )
         .problems,
         vec!["the report says deployment d1 passes approver_set"]
@@ -467,7 +475,7 @@ fn colliding_problems(ok: bool, outcome: Value) -> Vec<String> {
     let input =
         json!({"ts": [{"id": 7, "ok": ok}, {"id": 1, "ok": ok}], "others": [], "extra": []});
     let report = ergo_policy_engine::report(&input, &colliding_policy(), &json!({}));
-    examples::check(&outcome, &report).problems
+    examples::check(&outcome, &report, &colliding_policy()).problems
 }
 
 #[test]
@@ -507,7 +515,7 @@ fn a_line_that_disagrees_with_its_row_shows_no_check_passing_or_failing() {
         json!([{"r": ["t 7.0 fails c"]}]),
         json!([{"r": ["t 8 passes c"]}]),
     ] {
-        let checked = examples::check(&outcome, &report);
+        let checked = examples::check(&outcome, &report, &colliding_policy());
         assert!(checked.shown.is_empty(), "{outcome}: {:?}", checked.shown);
     }
 }
@@ -551,7 +559,7 @@ fn a_heading_that_is_one_requirement_on_its_own_and_another_with_a_status_is_ref
             );
             let input = json!({"ts": [{"id": "t1", "ok": true}]});
             let report = ergo_policy_engine::report(&input, &policy, &json!({}));
-            let problems = examples::check(&json!([{heading: lines}]), &report).problems;
+            let problems = examples::check(&json!([{heading: lines}]), &report, &policy).problems;
             assert_eq!(problems.len(), 1, "{problems:?}");
             assert!(
                 problems[0].starts_with(&format!("the heading {heading} could name")),
@@ -603,7 +611,7 @@ fn child_problems(outcome: Value) -> Vec<String> {
         {"id": "r2", "artifacts": [{"name": "web", "status": "passed", "runs": []}]}
     ]});
     let report = ergo_policy_engine::report(&input, &children(), &json!({}));
-    examples::check(&outcome, &report).problems
+    examples::check(&outcome, &report, &children()).problems
 }
 
 #[test]

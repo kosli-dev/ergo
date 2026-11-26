@@ -235,7 +235,7 @@ fn actual(row: &Value, report: &Value) -> String {
 }
 
 /// Checks an outcome against a report, by the matching and coverage rules of the spec.
-pub fn check(outcome: &Value, report: &Value) -> Checked {
+pub fn check(outcome: &Value, report: &Value, policy: &Value) -> Checked {
     let mut checked = Checked::default();
     let rows = report["results"]
         .as_array()
@@ -368,7 +368,7 @@ pub fn check(outcome: &Value, report: &Value) -> Checked {
             Ok(_) => {}
         }
     }
-    checked.actual = outcome::part(report, &region);
+    checked.actual = outcome::part(report, policy, &region);
     checked.problems = problems;
     checked
 }
@@ -388,7 +388,7 @@ pub fn run(policy: &Value, strict: bool) -> Result<(String, u8), String> {
     let mut shown = BTreeSet::new();
     for example in &examples {
         let report = ergo_policy_engine::report(&example.input, policy, &example.params);
-        let checked = check(&example.outcome, &report);
+        let checked = check(&example.outcome, &report, policy);
         if checked.problems.is_empty() {
             shown.extend(checked.shown);
             text.push_str(&format!("passed: {}\n", example.name));

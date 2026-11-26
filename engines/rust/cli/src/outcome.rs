@@ -433,17 +433,17 @@ pub struct Region {
 }
 
 /// The whole outcome of a report, as `ergo report --format outcome` prints it, or why a row can't be shown yet.
-pub fn of(report: &Value) -> Result<Vec<Item>, String> {
+pub fn of(report: &Value, policy: &Value) -> Result<Vec<Item>, String> {
     let whole = Region {
         compliant: true,
         ..Region::default()
     };
-    items(report, &whole, true)
+    items(report, policy, &whole, true)
 }
 
 /// The items of a report inside `region`, leaving out the rows that can't be shown yet.
-pub fn part(report: &Value, region: &Region) -> Vec<Item> {
-    items(report, region, false).unwrap_or_default()
+pub fn part(report: &Value, policy: &Value, region: &Region) -> Vec<Item> {
+    items(report, policy, region, false).unwrap_or_default()
 }
 
 /// The words a requirement line puts after the requirement's name for a report status, like `is not met` for `not_met`.
@@ -487,7 +487,12 @@ pub fn heading<'a>(text: &'a str, requirements: &Value) -> Result<Heading<'a>, S
     }
 }
 
-fn items(report: &Value, region: &Region, strict: bool) -> Result<Vec<Item>, String> {
+fn items(
+    report: &Value,
+    _policy: &Value,
+    region: &Region,
+    strict: bool,
+) -> Result<Vec<Item>, String> {
     let mut items = Vec::new();
     if region.compliant {
         items.push(Item::Line(
