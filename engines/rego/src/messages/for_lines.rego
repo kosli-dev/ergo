@@ -1307,7 +1307,7 @@ _m_clash_named(m, e, leaf, path) := concat("", [substring(m, 0, at), ": ", _path
 	at >= 0
 } else := m
 
-_m_aliases_blocked(check) := [_m_isnt(_m_marked_alias(p[0]), v, _m_holder(p[1])) |
+_m_aliases_blocked(check) := [_m_isnt_piece(_m_marked_alias(p[0]), v, _m_holder(p[1]), "not_an_object") |
 	some side in _m_sides(check)
 	some p in _m_side_paths(side)
 	is_array(p)

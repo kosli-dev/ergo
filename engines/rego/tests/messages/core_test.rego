@@ -24,7 +24,18 @@ test_message_a_check_whose_path_is_not_a_path_has_only_its_refs_as_sides if {
 
 test_a_null_before_an_unreadable_key_is_read_from_the_sides_a_check_already_carries if {
 	check := {"$sides": [["s", {"named_by_field": "p"}]], "op": "present", "path": ["other"]}
-	ergo._m_null_key_parts({"s": null, "p": null}, check) == ["p is null", "s is null"]
+	_piece_strings(ergo._m_null_key_parts({"s": null, "p": null}, check)) == ["p is null", "s is null"]
+}
+
+test_the_parts_said_for_a_null_before_a_key_are_clauses if {
+	check := {"$sides": [["s", {"named_by_field": "p"}]], "op": "present", "path": ["other"]}
+	ergo._m_null_key_parts({"s": null, "p": null}, check) == [ergo._m_clause("root", "p", "null", "p is null"), ergo._m_clause("root", "s", "null", "s is null")]
+	keyed := ergo._s_written_check("m named by $params.k is 1")
+	missing := ergo._m_clause("root", "$params.k", "absent", "$params.k is missing")
+	ergo._m_null_key_parts({"m": 3}, keyed) == [missing, ergo._m_clause("root", "m", "unusable", "m is 3, which isn't an object")] with data.ergo_params as {}
+	beside := object.union(check, {"$sides": [["s", {"named_by_field": "p"}], ["q"]]})
+	fault := ergo._m_clause("root", "p", "unusable", "p is 4, which isn't text")
+	ergo._m_null_key_parts({"s": null, "p": 4}, beside) == [fault, ergo._m_clause("root", "s", "null", "s is null"), ergo._m_clause("root", "q", "absent", "q is missing")]
 }
 
 test_message_of_an_unusable_check_with_nothing_to_blame_repeats_its_expression if {
@@ -57,7 +68,7 @@ _message_of(sentence, subj, cause, params) := m if {
 }
 
 test_a_message_is_its_pieces_joined_with_and if {
-	_said_of("v is w", {"v": 3, "w": 4}, "value", {}) == [["v is 3", "w is 4"]]
+	[_piece_strings(g) | some g in _said_of("v is w", {"v": 3, "w": 4}, "value", {})] == [["v is 3", "w is 4"]]
 	_message_of("v is w", {"v": 3, "w": 4}, "value", {}) == "v is 3, and w is 4"
 }
 
@@ -71,7 +82,7 @@ test_a_message_keeps_what_a_count_says_as_its_clauses if {
 }
 
 test_a_key_that_cant_be_read_and_the_value_before_it_are_two_groups_of_the_message if {
-	_said_of("m named by $params.k is 1", {"m": 3}, "unusable", {}) == [["$params.k is missing"], ["m is 3, which isn't an object"]]
+	[_piece_strings(g) | some g in _said_of("m named by $params.k is 1", {"m": 3}, "unusable", {})] == [["$params.k is missing"], ["m is 3, which isn't an object"]]
 	_message_of("m named by $params.k is 1", {"m": 3}, "unusable", {}) == "$params.k is missing; m is 3, which isn't an object"
 }
 
@@ -184,6 +195,29 @@ test_a_state_piece_with_a_text_keeps_that_text if {
 }
 
 _piece_strings(ps) := [ergo._m_piece_string(p) | some p in ps]
+
+test_the_items_of_a_list_that_arent_text_are_one_list_clause if {
+	subj := {"v": "a"}
+	c := ergo._m_with_sides(ergo._s_written_check("v is in $params.l ignoring case"))
+	said := ergo._m_text_list_said(subj, c, "unusable") with data.ergo_params as {"l": ["a", 3]} with input as {"ergo/names": {"ergo/subject": subj}}
+	said == [ergo._m_clause("list", "$params.l", "unusable", "item 2 of $params.l is 3, which isn't text")]
+}
+
+test_the_values_a_message_shows_are_root_clauses_with_their_state if {
+	ergo._m_value_clauses({"v": 3}, ["v"]) == [ergo._m_clause("root", "v", "value", "v is 3")]
+	ergo._m_value_clauses({}, ["v"]) == [ergo._m_clause("root", "v", "absent", "v is missing")]
+}
+
+test_a_subject_that_isnt_an_object_is_a_clause_with_that_cause if {
+	check := {"$sides": [["x"]], "op": "present", "path": ["x"], "expression": "x exists"}
+	ergo._m_message_pieces(check, 3, "not_an_object") == [ergo._m_clause("root", "the subject", "not_an_object", "the subject is 3, which isn't an object")]
+}
+
+test_a_sum_that_needs_more_than_15_digits_is_a_clause if {
+	subj := {"ns": [123456789012345678, 1]}
+	c := ergo._m_with_sides(ergo._s_written_check("sum of ns is 3"))
+	ergo._m_message_pieces(c, subj, "unusable") == [ergo._m_clause("root", "sum of ns", "unusable", "sum of ns needs more than 15 digits")] with input as {"ergo/names": {"ergo/subject": subj}}
+}
 
 test_a_key_piece_is_a_root_clause_named_by_the_key_and_its_state if {
 	check := {"op": "compare", "cmp": "eq", "left": ["k"], "right": ["m", {"ref": ["$$params", "k"]}], "expression": "k is m named by $params.k"}

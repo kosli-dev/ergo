@@ -145,6 +145,12 @@ _m_isnt(name, v, kind) := _m_text_items(name, v) if kind == _text_items_kind
 
 else := concat("", [name, " is ", _m_print_at(v, name, null), ", which isn't ", kind])
 
+_m_isnt_piece(name, v, kind, cause) := _m_clause(_m_isnt_kind(kind), name, cause, _m_isnt(name, v, kind))
+
+_m_isnt_kind(kind) := "list" if kind == _text_items_kind
+
+else := "root"
+
 _m_text_items(name, v) := _m_joined([_m_text_item(concat("", ["item ", format_int(i + 1, 10), " of ", name]), x) |
 	some i, x in v
 	not is_string(x)
@@ -154,7 +160,7 @@ _m_text_item(name, null) := concat("", [name, " is null"])
 
 _m_text_item(name, x) := concat("", [name, " is ", _m_print_at(x, name, null), ", which isn't text"]) if x != null
 
-_m_text_list_said(subj, check, cause) := [_m_text_items(s.name, s.value)] if {
+_m_text_list_said(subj, check, cause) := [_m_clause("list", s.name, _text_items_state(s.value), _m_text_items(s.name, s.value))] if {
 	check.ignoring
 	s := _m_shown(subj, _m_text_list_side(check))
 	s.state == "value"
@@ -233,7 +239,7 @@ else := p
 
 _m_pieces_once(ps) := [ps[i] | some i, t in ts; not t in array.slice(ts, 0, i)] if ts := [_m_piece_text(p) | some p in ps]
 
-_m_null_key_parts(subj, check) := _once([x |
+_m_null_key_parts(subj, check) := _m_pieces_once([x |
 	some [p, mode] in _m_key_paths(check)
 	some x in _m_path_said(subj, p, mode)
 ]) if {
@@ -252,7 +258,7 @@ _m_key_paths(check) := [[p, _key_base_mode(piece)] |
 _m_path_said(subj, p, mode) := xs if {
 	_key_step_later(p)
 	xs := _m_null_key_pair(subj, p, mode)
-} else := [_m_state_clause(s)] if {
+} else := [_m_state_piece(s)] if {
 	not _key_step_later(p)
 	s := _m_shown(subj, p)
 	s.state in _no_value_states
@@ -277,23 +283,28 @@ _key_step_later(p) if {
 	is_object(step)
 }
 
-_m_null_key_pair(subj, p, mode) := _m_key_first(concat("", [_input_name(array.slice(p, 0, j)), " is null"]), _m_key_text(subj, p[i])) if {
+_m_null_key_pair(subj, p, mode) := _m_key_first(_m_clause("root", n, "null", concat("", [n, " is null"])), _m_key_piece(subj, p[i])) if {
 	i := min({k | some k, step in p; _m_key_text(subj, step)})
 	i > 0
 	j := min({m | some m in numbers.range(1, i); _resolved(subj, array.slice(p, 0, m)) == null})
-	_input_name(array.slice(p, 0, j)) != "$params"
-} else := [_m_key_text(subj, p[i]), _m_key_list_text(_input_name(f.prefix), f)] if {
+	n := _input_name(array.slice(p, 0, j))
+	n != "$params"
+} else := [_m_key_piece(subj, p[i]), _m_key_list_piece(_input_name(f.prefix), f)] if {
 	i := min({k | some k, step in p; _m_key_text(subj, step)})
 	some f in _key_base_flaws(subj, p, mode)
 }
 
-_m_key_first(base, key) := [key] if _m_aliased(base) == key
+_m_key_first(base, key) := [key] if _m_aliased(base.text) == key.text
 
-else := _m_root_sorted([key, base])
+else := [x | some t in _m_root_sorted([key.text, base.text]); some x in [key, base]; x.text == t]
 
-_m_key_text(subj, step) := t if {
-	t := _m_key_fault(subj, step)
-} else := concat("", [_m_key_name(step), " is ", _m_state_word(st)]) if {
+_m_key_text(subj, step) := _m_key_piece(subj, step).text
+
+_m_key_list_piece(name, f) := _m_clause("root", name, f.cause, _m_key_list_text(name, f))
+
+_m_key_piece(subj, step) := c if {
+	c := _m_key_fault_piece(subj, step)
+} else := _m_clause("root", _m_key_name(step), st, concat("", [_m_key_name(step), " is ", _m_state_word(st)])) if {
 	st := _m_key_state(subj, step)
 	st in _no_value_states
 }
@@ -413,12 +424,14 @@ _m_shown(subj, side) := {"name": side.text, "state": "value", "value": v} if {
 
 _m_value_clauses(subj, side) := [c] if {
 	s := _m_shown(subj, side)
-	c := _m_value_clause(s, subj)
-} else := [c | some p in [side.elapsed_from, side.elapsed_to]; c := _m_value_clause(_m_shown(subj, p), subj)] if _side_form(side) == "elapsed"
+	c := _m_value_piece(s, subj)
+} else := [c | some p in [side.elapsed_from, side.elapsed_to]; c := _m_value_piece(_m_shown(subj, p), subj)] if _side_form(side) == "elapsed"
 
-else := [c | some e in sort({x | walk(side, [_, x]); _side_form(x) == "elapsed"}); some p in [e.elapsed_from, e.elapsed_to]; c := _m_value_clause(_m_shown(subj, p), subj)] if _side_form(side) == "add"
+else := [c | some e in sort({x | walk(side, [_, x]); _side_form(x) == "elapsed"}); some p in [e.elapsed_from, e.elapsed_to]; c := _m_value_piece(_m_shown(subj, p), subj)] if _side_form(side) == "add"
 
 else := []
+
+_m_value_piece(s, subj) := _m_clause("root", s.name, s.state, _m_value_clause(s, subj))
 
 _m_value_clause(s, subj) := concat("", [s.name, " is ", _m_print_at(s.value, s, subj)]) if {
 	s.state == "value"
@@ -452,7 +465,7 @@ _m_side_sources(_, side) := [] if _m_tally_side(side)
 _m_tally_side(side) if _basic_form(side) in _tally_forms
 
 _m_message_pieces(check, subj, "value") := clauses if {
-	clauses := _once([c | some side in _m_sides(check); some c in _m_value_clauses(subj, side)])
+	clauses := _m_pieces_once([c | some side in _m_sides(check); some c in _m_value_clauses(subj, side)])
 	count(clauses) > 0
 } else := tallies if {
 	tallies := _m_tally_lists(subj, check, "value")
@@ -474,7 +487,7 @@ _m_unusable_before_faults(subj, check, kf) := array.concat(array.concat(array.co
 
 _m_unusable_after_faults(subj, check) := array.concat(array.concat(array.concat(array.concat(_m_blocked_late(subj, check), _m_walk_ref_faults(subj, check)), _m_tally_lists(subj, check, "unusable")), _m_params_beside_input(check)), _m_text_list_said(subj, check, "null"))
 
-_m_params_beside_input(check) := array.concat([_m_isnt("$input", data.ergo_document, "an object")], sort({c | walk(check, [_, v]); some c in _m_params_break(v)})) if {
+_m_params_beside_input(check) := array.concat([_m_isnt_piece("$input", data.ergo_document, "an object", "unusable")], [x[1] | some x in sort({[c.text, c] | walk(check, [_, v]); some c in _m_params_break_pieces(v)})]) if {
 	_reads_input_key(check)
 	_m_params_unread(check)
 } else := []
@@ -514,7 +527,7 @@ _m_unusable_beside_keys(subj, check, kf) := [_m_state_piece(s) |
 ]
 
 _m_message_pieces(check, subj, "unusable") := clauses if {
-	kf := _m_key_faults(subj, check)
+	kf := _m_key_fault_pieces(subj, check)
 	clauses := _m_pieces_once(array.concat(array.concat(array.concat(_m_unusable_before_faults(subj, check, kf), _m_faults(subj, check)), _m_unusable_after_faults(subj, check)), _m_unusable_beside_keys(subj, check, kf)))
 	count(clauses) > 0
 } else := clauses if {
@@ -522,7 +535,7 @@ _m_message_pieces(check, subj, "unusable") := clauses if {
 	clauses := _m_ref_blocked(check)
 	count(clauses) > 0
 } else := clauses if {
-	clauses := [concat("", [side.text, " needs more than 15 digits"]) |
+	clauses := [_m_clause("root", side.text, "unusable", concat("", [side.text, " needs more than 15 digits"])) |
 		some side in _m_sides(check)
 		_side_form(side) in {"add", "sum_of"}
 		_side_eval(subj, side).v == []
@@ -531,7 +544,7 @@ _m_message_pieces(check, subj, "unusable") := clauses if {
 	count(clauses) > 0
 } else := [_m_fallback(check)]
 
-_m_message_pieces(check, subj, "not_an_object") := [_m_isnt(_m_label(check), subj, "an object")] if {
+_m_message_pieces(check, subj, "not_an_object") := [_m_isnt_piece(_m_label(check), subj, "an object", "not_an_object")] if {
 	not is_object(subj)
 	not _m_list_items(check, subj)
 	_m_input_one_refs(check) == []

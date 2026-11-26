@@ -142,7 +142,7 @@ _row_message(check, subj, raw) := _m_row_text(check, subj, raw.cause) if {
 
 _m_row_text(check, subj, cause) := concat("; ", _roots_then_lists(ps, _m_list_names(check))) if {
 	cause in _value_fault_causes
-	ps := _m_null_key_parts(subj, check)
+	ps := [_m_piece_string(x) | some x in _m_null_key_parts(subj, check)]
 	ps != []
 } else := _m_top_sorted(_m_message(object.union(_m_with_sides(_m_walked(check, subj)), {"ergo/row": true}), subj, cause), _m_list_names(check)) if cause != "value"
 
@@ -292,7 +292,7 @@ _m_whose_ref_faults(check) := [f | some c in object.get(check, "whose", []); som
 
 _m_assertion_ref_faults(check) := [f | is_object(object.get(check, "check", null)); some f in _m_ref_faults_text(check.check)]
 
-_m_walk_blocked(subj, check) := [c |
+_m_walk_blocked(subj, check) := [c.text |
 	some c in _m_blocked(subj, {"op": "present", "path": check.path})
 	not _m_walk_through_list(subj, check.path)
 ] if is_array(check.path)
@@ -754,7 +754,7 @@ _m_undecided_text(subj, c, e, cause, roots) := _m_isnt(_m_item_name(e.i, roots),
 	off != []
 } else := concat(", and ", off) if {
 	cause == "not_an_object"
-	off := _m_input_one_refs(c)
+	off := [x.text | some x in _m_input_one_refs(c)]
 	off != []
 } else := _m_leaf_in(e.i, _m_cond_message(c, e.iv, cause), roots)
 
@@ -946,7 +946,7 @@ _m_cond_message(c, item, cause) := concat("; ", array.concat(_m_null_before_key(
 } else := concat(", and ", cs) if {
 	cause == "unusable"
 	wc := _m_walked(c, item)
-	cs := _once(array.concat(array.concat(array.concat(array.concat(array.concat(_m_key_faults(item, wc), _m_blocked_early(item, wc)), _m_faults(item, wc)), _m_blocked_late(item, wc)), _m_walk_ref_faults(item, c)), _m_item_tallies(item, c, cause)))
+	cs := _once([_m_piece_string(x) | some x in array.concat(array.concat(array.concat(array.concat(array.concat(_m_key_faults(item, wc), _m_blocked_early(item, wc)), _m_faults(item, wc)), _m_blocked_late(item, wc)), _m_walk_ref_faults(item, c)), _m_item_tallies(item, c, cause))])
 	cs != []
 } else := _m_fallback(c)
 
