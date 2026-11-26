@@ -1,6 +1,7 @@
 //! Experimental: turns a report into outcome lines, the form a policy's examples write what they expect in.
 
 use serde_json::{Map, Value};
+use std::collections::BTreeSet;
 
 /// One item of an outcome: a line, or a heading with the lines under it.
 #[derive(Debug, PartialEq, Eq, Clone)]
@@ -133,4 +134,25 @@ pub fn to_json(items: &[Item]) -> Value {
             })
             .collect(),
     )
+}
+
+/// The part of a report an example's lines cover.
+#[derive(Debug, Default, PartialEq, Eq, Clone)]
+pub struct Region {
+    /// The whole policy, as `compliant` or `not compliant` covers it.
+    pub compliant: bool,
+    /// Whole requirements, as a requirement line or a heading with a status covers one.
+    pub requirements: BTreeSet<String>,
+    /// Checks, as requirement and check, as a check line covers one.
+    pub checks: BTreeSet<(String, String)>,
+}
+
+/// The whole outcome of a report, as `ergo report --format outcome` prints it, or why a row can't be shown yet.
+pub fn of(_report: &Value) -> Result<Vec<Item>, String> {
+    Ok(vec![])
+}
+
+/// The items of a report inside `region`, leaving out the rows that can't be shown yet.
+pub fn part(_report: &Value, _region: &Region) -> Vec<Item> {
+    vec![]
 }

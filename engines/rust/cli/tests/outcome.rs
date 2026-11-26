@@ -121,3 +121,112 @@ fn yaml_quotes_a_heading_that_yaml_would_read_otherwise() {
         json!([{"a: b is met": ["t 1 passes c"]}])
     );
 }
+
+fn report(policy: Value, input: Value) -> Value {
+    let mut policy = policy;
+    policy["ergo_spec"] = json!(ergo_policy_engine::SPEC);
+    ergo_policy_engine::report(&input, &policy, &json!({}))
+}
+
+fn two_requirements() -> Value {
+    json!({
+        "subjects": {
+            "pull request": {"from": "prs", "identified_by": "number"},
+            "scan": {"from": "scans", "identified_by": "name"}
+        },
+        "requirements": {
+            "reviewed": {"subject": "pull request", "checks": {
+                "approved": "approver is a non-empty string",
+                "small": "lines is at most 10"
+            }},
+            "scanned": {"subject": "scan", "checks": {"clean": "findings is 0"}},
+            "spare": {"subject": "scan", "min_subjects": 0, "checks": {"never": "findings is 0"}}
+        }
+    })
+}
+
+fn two_requirements_input() -> Value {
+    json!({
+        "prs": [{"number": 7, "approver": "ann", "lines": 3}, {"number": 8, "lines": 3}],
+        "scans": [{"name": "sast", "findings": 0}]
+    })
+}
+
+fn lines(lines: &[&str]) -> Vec<String> {
+    lines.iter().map(|line| line.to_string()).collect()
+}
+
+#[test]
+fn the_outcome_of_a_report_has_compliant_then_each_requirement_with_its_status_and_rows() {
+    let report = report(two_requirements(), two_requirements_input());
+    assert_eq!(
+        outcome::of(&report),
+        Ok(vec![
+            Item::Line("not compliant".to_string()),
+            Item::Group(
+                "reviewed is not met".to_string(),
+                lines(&[
+                    "pull request 7 passes approved",
+                    "pull request 7 passes small",
+                    "pull request 8 fails approved because approver is missing",
+                    "pull request 8 passes small",
+                ])
+            ),
+            Item::Group(
+                "scanned is met".to_string(),
+                lines(&["scan sast passes clean"])
+            ),
+            Item::Group("spare is met".to_string(), lines(&["scan sast passes never"])),
+        ])
+    );
+}
+
+#[test]
+fn the_outcome_of_a_report_with_a_row_it_cannot_show_yet_is_an_error() {
+    let mut policy = two_requirements();
+    policy["subjects"]["pull request"]["from"] = json!("prs whose lines is 3");
+    let mut input = two_requirements_input();
+    input["prs"][1]["lines"] = json!(5);
+    let error = outcome::of(&report(policy, input)).unwrap_err();
+    assert!(error.contains("subjects out of scope"), "{error}");
+    let error = outcome::of(&report(two_requirements(), json!({"prs": [], "scans": []}))).unwrap_err();
+    assert!(error.contains("checks Ergo adds"), "{error}");
+}
+
+#[test]
+fn a_requirement_with_no_row_to_show_is_a_line_on_its_own() {
+    let mut policy = two_requirements();
+    policy["requirements"] = json!({"spare": policy["requirements"]["spare"].clone()});
+    assert_eq!(
+        outcome::of(&report(policy, json!({"scans": []}))),
+        Ok(vec![
+            Item::Line("compliant".to_string()),
+            Item::Line("spare is not applicable".to_string()),
+        ])
+    );
+}
+
+#[test]
+fn a_part_of_the_outcome_shows_a_bare_heading_for_a_requirement_only_some_checks_cover() {
+    let report = report(two_requirements(), two_requirements_input());
+    let mut part = outcome::Region::default();
+    part.checks
+        .insert(("reviewed".to_string(), "approved".to_string()));
+    part.requirements.insert("scanned".to_string());
+    assert_eq!(
+        outcome::part(&report, &part),
+        vec![
+            Item::Group(
+                "reviewed".to_string(),
+                lines(&[
+                    "pull request 7 passes approved",
+                    "pull request 8 fails approved because approver is missing",
+                ])
+            ),
+            Item::Group(
+                "scanned is met".to_string(),
+                lines(&["scan sast passes clean"])
+            ),
+        ]
+    );
+}
