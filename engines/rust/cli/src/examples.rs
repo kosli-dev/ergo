@@ -414,15 +414,28 @@ fn indented(items: &[Item]) -> String {
         .collect()
 }
 
-/// Runs every example of a policy and gives the text to print with the exit code: 1 when an example failed, or when `strict` is set and there is a warning, and 0 otherwise. Gives why the examples are written wrong when they are.
+/// Runs every example of a policy with the Rust engine and gives what [results] gives. Gives why the examples are written wrong when they are.
 pub fn run(policy: &Value, strict: bool) -> Result<(String, u8), String> {
     let examples = read(policy)?;
+    let reports: Vec<Value> = examples
+        .iter()
+        .map(|e| ergo_policy_engine::report(&e.input, policy, &e.params))
+        .collect();
+    Ok(results(policy, &examples, &reports, strict))
+}
+
+/// Checks each example of a policy against its report, the one at the same place in `reports`, and gives the text to print with the exit code: 1 when an example failed, or when `strict` is set and there is a warning, and 0 otherwise.
+pub fn results(
+    policy: &Value,
+    examples: &[Example],
+    reports: &[Value],
+    strict: bool,
+) -> (String, u8) {
     let mut text = String::new();
     let mut failed = 0;
     let mut shown = BTreeSet::new();
-    for example in &examples {
-        let report = ergo_policy_engine::report(&example.input, policy, &example.params);
-        let checked = check(&example.outcome, &report, policy);
+    for (example, report) in examples.iter().zip(reports) {
+        let checked = check(&example.outcome, report, policy);
         if checked.problems.is_empty() {
             shown.extend(checked.shown);
             text.push_str(&format!("passed: {}\n", example.name));
@@ -466,5 +479,5 @@ pub fn run(policy: &Value, strict: bool) -> Result<(String, u8), String> {
     } else {
         0
     };
-    Ok((text, code))
+    (text, code)
 }
