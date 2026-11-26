@@ -142,3 +142,8 @@ test_a_walk_through_a_for_alias_leaves_a_root_after_the_phrase_to_the_for_line_s
 	r.cause == "absent"
 	not "root_msgs" in object.keys(r)
 }
+
+test_an_item_whose_walked_field_is_missing_reads_as_absent_even_when_the_check_fails_it_with_value if {
+	r := ergo._walk_row(ergo._s_written_check("every xs.v exists"), {"xs": [{"v": 1}, {}, {"v": null}]})
+	[[f.cause, object.get(f, "read_outcome", "")] | some f in r.fails] == [["value", "absent"], ["value", ""]]
+}
