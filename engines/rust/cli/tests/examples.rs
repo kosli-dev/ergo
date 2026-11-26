@@ -446,3 +446,67 @@ fn examples_written_wrong_are_refused() {
         );
     }
 }
+
+fn colliding_policy() -> Value {
+    json!({
+        "ergo_spec": ergo_policy_engine::SPEC,
+        "subjects": {
+            "t": {"from": "ts", "identified_by": "id"},
+            "t 7": {"from": "others", "identified_by": "id"},
+            "t 1 passes": {"from": "extra", "identified_by": "id"}
+        },
+        "requirements": {
+            "r": {"subject": "t", "checks": {"c": "ok is true"}},
+            "q": {"subject": "t 7", "min_subjects": 0, "checks": {"d": "ok is true"}},
+            "p": {"subject": "t 1 passes", "min_subjects": 0, "checks": {"e": "ok is true"}}
+        }
+    })
+}
+
+fn colliding_problems(ok: bool, outcome: Value) -> Vec<String> {
+    let input = json!({"ts": [{"id": 7, "ok": ok}, {"id": 1, "ok": ok}], "others": [], "extra": []});
+    let report = ergo_policy_engine::report(&input, &colliding_policy(), &json!({}));
+    examples::check(&outcome, &report).problems
+}
+
+#[test]
+fn a_line_that_disagrees_with_a_row_no_line_reads_back_as_is_still_a_problem() {
+    let passing = [
+        json!(["compliant", {"r is met": ["t 7.0 fails c because anything at all"]}]),
+        json!([{"r": ["t 7.0 fails c"]}]),
+        json!([{"r": ["t 7e0 fails c"]}]),
+        json!([{"r": ["t 1.0 fails c"]}]),
+    ];
+    for outcome in passing {
+        let got = colliding_problems(true, outcome.clone());
+        assert!(
+            got.iter()
+                .any(|p| p.starts_with("the report says t ") && p.ends_with(" passes c")),
+            "{outcome}: {got:?}"
+        );
+    }
+    let failing = [
+        json!([{"r": ["t 7.0 passes c"]}]),
+        json!([{"r": ["t 7.0 fails c because wrong"]}]),
+    ];
+    for outcome in failing {
+        let got = colliding_problems(false, outcome.clone());
+        assert!(
+            got.contains(&"the report says t 7 fails c because ok is false".to_string()),
+            "{outcome}: {got:?}"
+        );
+    }
+}
+
+#[test]
+fn a_line_that_disagrees_with_its_row_shows_no_check_passing_or_failing() {
+    let input = json!({"ts": [{"id": 7, "ok": true}], "others": [], "extra": []});
+    let report = ergo_policy_engine::report(&input, &colliding_policy(), &json!({}));
+    for outcome in [
+        json!([{"r": ["t 7.0 fails c"]}]),
+        json!([{"r": ["t 8 passes c"]}]),
+    ] {
+        let checked = examples::check(&outcome, &report);
+        assert!(checked.shown.is_empty(), "{outcome}: {:?}", checked.shown);
+    }
+}
