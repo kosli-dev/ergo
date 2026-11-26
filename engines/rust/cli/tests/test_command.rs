@@ -177,6 +177,16 @@ warning: no example shows not_self_approved of approved passing
 }
 
 #[test]
+fn test_counts_one_example_as_one_example() {
+    let one = EXAMPLES.split("  - name: nobody").next().unwrap();
+    let policy = file("test-one", "policy.yaml", &format!("{POLICY}{one}"));
+    let Ok(Outcome::Print(text)) = run(&args(&["test", &policy])) else {
+        panic!();
+    };
+    assert!(text.ends_with("\n1 example: 1 passed, 0 failed\n"), "{text}");
+}
+
+#[test]
 fn test_refuses_examples_written_wrong() {
     let twice = EXAMPLES.replace(
         "nobody approves their own deployment",
