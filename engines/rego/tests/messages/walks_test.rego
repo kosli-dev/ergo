@@ -447,25 +447,52 @@ test_a_named_failure_a_member_walk_wanted_as_an_object_says_it_isnt_one if {
 	ergo._m_named_fail({"path": "r.s", "cause": "unusable", "value": [1]}) == "r.s is [1], which isn't a list or an object"
 }
 
-test_a_failed_row_carries_the_clauses_its_message_is_printed_from if {
+test_a_failed_row_carries_the_lines_its_message_is_printed_from_as_clauses_and_the_joint_between_them if {
 	c := {"op": "compare", "cmp": "eq", "left": ["v"], "right": ["w"]}
 	ergo._m_row_said(c, {}, "absent") == {
 		"message": "v is missing, and w is missing",
 		"ergo/clauses": [ergo._m_clause("root", "v", "absent", "v is missing"), ergo._m_clause("root", "w", "absent", "w is missing")],
+		"ergo/joint": ", and ",
 	}
 	k := ergo._s_written_check("count of xs whose v is at least 2 is 0")
 	tally := ergo._m_row_said(k, {"xs": [{"v": 3}, {}, null]}, "unusable")
 	tally.message == "item 2 of xs: v is missing; item 3 of xs is null, which isn't an object"
 	tally["ergo/clauses"] == [
-		ergo._m_item_clause("item 2 of xs", "absent", [ergo._m_clause("root", "v", "absent", "v is missing")]),
+		ergo._m_clause("item", "item 2 of xs", "absent", "item 2 of xs: v is missing"),
 		ergo._m_clause("item", "item 3 of xs", "not_an_object", "item 3 of xs is null, which isn't an object"),
 	]
+	tally["ergo/joint"] == "; "
 	keyed := {"$sides": [["s", {"named_by_field": "p"}]], "op": "present", "path": ["other"]}
 	ergo._m_row_said(keyed, {"s": null, "p": null}, "null") == {
 		"message": "p is null; s is null",
 		"ergo/clauses": [ergo._m_clause("root", "p", "null", "p is null"), ergo._m_clause("root", "s", "null", "s is null")],
+		"ergo/joint": "; ",
 	}
 	ergo._m_row_said(c, {"v": 1, "w": 2}, "value")["ergo/clauses"] == [ergo._m_clause("root", "v", "value", "v is 1"), ergo._m_clause("root", "w", "value", "w is 2")]
+}
+
+test_a_line_is_printed_from_its_clauses_with_its_roots_by_name_before_the_list_it_counts if {
+	c := ergo._s_written_check("count of xs plus z is y")
+	said := ergo._m_line_said(c, {"xs": null}, "absent")
+	said.message == "y is missing, and z is missing, and xs is null"
+	[[x.name, x.cause] | some x in said["ergo/clauses"]] == [["y", "absent"], ["z", "absent"], ["xs", "null"]]
+	said["ergo/joint"] == ", and "
+	quoted := ergo._m_line_said(c, {"xs": "a; b, and item 1 of xs: v is missing", "z": null}, "unusable")
+	[[x.name, x.text] | some x in quoted["ergo/clauses"]] == [["xs", `xs is "a; b, and item 1 of xs: v is missing", which isn't a list or an object`]]
+}
+
+test_a_line_that_says_several_items_joins_its_clauses_with_a_semicolon if {
+	c := ergo._s_written_check("count of xs whose v is 1 is $params.n")
+	said := ergo._m_line_said(c, {"xs": [{}, {}]}, "absent") with data.ergo_params as {}
+	said.message == "$params.n is missing; item 1 of xs: v is missing; item 2 of xs: v is missing"
+	[x.name | some x in said["ergo/clauses"]] == ["$params.n", "item 1 of xs", "item 2 of xs"]
+	said["ergo/joint"] == "; "
+}
+
+test_a_record_of_a_part_that_cant_be_reached_is_named_by_the_part_not_by_its_text if {
+	start := `${"alias":"cov","n":3,"of":null,"old":false}`
+	c := ergo._m_record_clause(["unusable", `cov can't be read: reports is "none", which isn't a list or an object`, {"fail": {"path": [start, "reports"]}}], {"count_of": [start, "files"], "whose": [], "text": "count of cov.files"})
+	[c.kind, c.name, c.cause] == ["item", "cov", "unusable"]
 }
 
 test_a_root_before_several_items_of_a_count_is_cut_from_them_like_the_items if {
@@ -595,10 +622,10 @@ test_a_list_after_is_in_ignoring_case_read_from_each_item_of_a_subject_that_is_a
 
 test_an_option_or_a_filter_says_the_items_of_a_list_after_is_in_ignoring_case_after_what_the_field_cant_give if {
 	c := {"op": "in", "path": ["t"], "values": {"ref": ["$$params[]", "l"]}, "ignoring": "case"}
-	ergo._m_line_sorted(c, {}, "absent") == ["t is missing, and item 2 of $params.l is null"] with data.ergo_params as {"l": ["a", null]}
-	ergo._m_line_sorted(c, {"t": 3}, "unusable") == ["t is 3, which isn't text, and item 2 of $params.l is null"] with data.ergo_params as {"l": ["a", null]}
-	ergo._m_line_sorted(c, {}, "absent") == ["t is missing"] with data.ergo_params as {"l": ["a"]}
-	ergo._m_line_sorted(object.remove(c, ["ignoring"]), {}, "absent") == ["t is missing"] with data.ergo_params as {"l": ["a", null]}
+	ergo._m_line_said(c, {}, "absent").message == "t is missing, and item 2 of $params.l is null" with data.ergo_params as {"l": ["a", null]}
+	ergo._m_line_said(c, {"t": 3}, "unusable").message == "t is 3, which isn't text, and item 2 of $params.l is null" with data.ergo_params as {"l": ["a", null]}
+	ergo._m_line_said(c, {}, "absent").message == "t is missing" with data.ergo_params as {"l": ["a"]}
+	ergo._m_line_said(object.remove(c, ["ignoring"]), {}, "absent").message == "t is missing" with data.ergo_params as {"l": ["a", null]}
 }
 
 test_a_list_after_is_in_ignoring_case_read_from_each_item_of_a_subject_that_is_a_list_is_marked_unusable_when_an_item_isnt_text if {

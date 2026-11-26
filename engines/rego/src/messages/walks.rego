@@ -83,20 +83,22 @@ _m_marked_input(i, names) := object.union(i, {"ergo/outcome": "unusable"}) if {
 	not i["ergo/worked"]
 } else := i
 
-_row_said(check, subj, raw) := {"message": concat("; ", ms), "ergo/texts": ts} if {
+_row_said(check, subj, raw) := {"message": concat("; ", ms), "ergo/texts": ts, "ergo/text_said": said} if {
 	_all_of_run(check)
-	ts := [_m_joined(_m_line_sorted(check.checks[i], subj, fa.cause)) |
+	said := [_m_line_said(check.checks[i], subj, fa.cause) |
 		some fa in raw.failed_assertions
 		i := min({j | some j, a in check.assertions; a == fa.assertion})
 	]
+	ts := [x.message | some x in said]
 	ms := _m_said_new(ts)
 	ms != []
 } else := {"message": _m_fallback_text(check)} if _all_of_run(check)
 
-_row_said(check, subj, _) := {"message": concat("; ", ms), "ergo/texts": [_or_blank(t) | some t in said]} if {
+_row_said(check, subj, _) := {"message": concat("; ", ms), "ergo/texts": [_or_blank(t) | some t in said], "ergo/text_said": [_said_or_blank(t, lines[i]) | some i, t in said]} if {
 	_any_of_run(check)
 	causes := [_m_undecided(_option_line_cause(c, _assertion_cause(c, subj, ""), subj)) | some c in check.checks]
-	said := [_option_said(c, subj, causes[i]) | some i, c in check.checks]
+	lines := [_option_said(c, subj, causes[i]) | some i, c in check.checks]
+	said := [_option_message(x) | some x in lines]
 	texts := [_option_first(check.option_of, said, i) | some i, _ in said]
 	ms := [concat("", [nm, ": ", concat(", and ", _m_said_new(lines))]) |
 		some k, nm in check.option_of
@@ -109,7 +111,15 @@ _row_said(check, subj, _) := {"message": concat("; ", ms), "ergo/texts": [_or_bl
 
 _option_said(_, _, "satisfied") := null
 
-_option_said(c, subj, cause) := _m_joined(_m_line_sorted(c, subj, cause)) if cause != "satisfied"
+_option_said(c, subj, cause) := _m_line_said(c, subj, cause) if cause != "satisfied"
+
+_option_message(x) := x.message if x != null
+
+else := null
+
+_said_or_blank(t, x) := x if t != null
+
+else := {"message": ""}
 
 _option_first(option_of, said, i) := null if said[i] == null
 
@@ -137,22 +147,51 @@ _for_once_said(o, check) := object.union(o, {"message": _for_deduped(o.message)}
 
 _m_row_text(check, subj, cause) := _m_row_said(check, subj, cause).message
 
-_m_row_said(check, subj, cause) := _m_said_row(concat("; ", _roots_then_lists([_m_piece_string(x) | some x in ps], _m_list_names(check))), ps) if {
+_m_row_said(check, subj, cause) := _m_lines_said(_m_lines_sorted(_m_piece_lines(ps), _m_list_names(check)), "; ") if {
 	cause in _value_fault_causes
 	ps := _m_null_key_parts(subj, check)
 	ps != []
 } else := _m_ordered_row(ps) if {
 	cause != "value"
 	ps := _m_row_pieces(check, subj, cause)
-} else := _m_said_row(_m_pieces_text(ps), ps) if ps := _m_row_pieces(check, subj, cause)
+} else := {"message": _m_pieces_text(ps), "ergo/clauses": _m_piece_lines(ps), "ergo/joint": _m_row_joint(ps)} if ps := _m_row_pieces(check, subj, cause)
 
 _m_row_pieces(check, subj, cause) := _m_message_pieces(object.union(_m_with_sides(_m_walked(check, subj)), {"ergo/row": true}), subj, cause)
 
-_m_said_row(message, pieces) := {"message": message, "ergo/clauses": _m_pieces_clauses(pieces)}
+_m_lines_said(lines, joint) := {"message": concat(joint, [l.text | some l in lines]), "ergo/clauses": lines, "ergo/joint": joint}
 
-_m_pieces_clauses(pieces) := [c | some p in pieces; some c in _m_piece_clauses(p)]
+_m_ordered_row(pieces) := _m_lines_said(_m_clause_lines_of(_m_clauses_order([c | some p in pieces; some c in _m_piece_shown(p)])), _m_row_joint(pieces))
 
-_m_ordered_row(pieces) := {"message": concat(_m_row_joint(pieces), _m_clause_texts(_m_clauses_order([c | some p in pieces; some c in _m_piece_shown(p)]))), "ergo/clauses": _m_pieces_clauses(pieces)}
+_m_piece_lines(ps) := [l | some p in ps; some l in _m_clause_lines_of(_m_piece_shown(p))]
+
+_m_clause_lines_of(clauses) := [_m_line_clause(c, t) | some c in clauses; some t in _m_clause_lines(c)]
+
+_m_line_clause(c, t) := c if t == c.text
+
+else := object.union(c, {"text": t, "said": []})
+
+_m_lines_sorted(lines, lists) := array.concat(
+	array.concat(
+		[x[3] | some x in sort([[_m_clause_rank(l.text), _m_clause_name(l.text), l.text, l] | some l in lines; _m_root_clause(l.text, lists); not _m_clause_name(l.text) in lists])],
+		[l | some l in lines; _m_root_clause(l.text, lists); _m_clause_name(l.text) in lists],
+	),
+	[l | some l in lines; not _m_root_clause(l.text, lists)],
+)
+
+_m_line_said(c, subj, cause) := _m_lines_said(_m_lines_sorted(_m_said_lines(said), _m_list_names(c)), _m_said_joint(said)) if {
+	not _walks(c)
+	cause != "value"
+	said := _message_said(object.union(c, {"ergo/line": true}), subj, cause)
+} else := {"message": concat("; ", [_m_pieces_text(ps) | some ps in said]), "ergo/clauses": _m_said_lines(said), "ergo/joint": _m_said_joint(said)} if {
+	not _walks(c)
+	said := _message_said(c, subj, cause)
+} else := {"message": _m_joined(_m_line(c, subj, cause)), "ergo/clauses": [], "ergo/joint": "; "}
+
+_m_said_lines(said) := [l | some ps in said; some l in _m_piece_lines(ps)]
+
+_m_said_joint(said) := "; " if count(said) > 1
+
+else := _m_row_joint(said[0])
 
 _m_piece_shown(p) := _m_clauses_shown(p) if is_array(p)
 
@@ -163,10 +202,6 @@ _m_row_joint(pieces) := "; " if {
 	is_array(p)
 	count(_m_clause_texts(_m_clauses_shown(p))) > 1
 } else := ", and "
-
-_m_piece_clauses(p) := p if is_array(p)
-
-else := [p]
 
 _walk_message(check, subj, raw, r) := _with_roots(_m_clauses_shown(_walk_parts(check, subj, raw, r)), roots) if {
 	walked := _m_for_said_pairs(check)
@@ -496,11 +531,17 @@ _m_tally_records(subj, side, cause) := [x | some x in _m_tally(subj, side); _m_r
 
 _m_record_clause([state, text], _) := _m_clause("root", _m_clause_name(text), substring(state, 5, -1), text) if startswith(state, "root ")
 
-_m_record_clause([state, text], _) := _m_clause("list", _m_clause_name(text), substring(state, 5, -1), text) if startswith(state, "list ")
+_m_record_clause([state, text], _) := _m_clause("list", _m_list_name(text), substring(state, 5, -1), text) if startswith(state, "list ")
 
-_m_record_clause([state, text], _) := _m_clause("list", _m_clause_name(text), state, text) if state in _failed_read_states
+_m_record_clause([state, text], _) := _m_clause("list", _m_list_name(text), state, text) if state in _failed_read_states
 
-_m_record_clause([state, text, src], side) := _m_item_text_clause(_m_item_name(_m_src_path(src), _dotted_roots([side[_basic_form(side)]])), _m_src_cause(state), text)
+_m_record_clause([state, text, src], side) := _m_record_item(_m_src_path(src), side, _m_src_cause(state), text)
+
+_m_record_item(path, side, cause, text) := _m_clause("item", _m_part_label(path), cause, text) if {
+	_m_part_unreached(path)
+	count([j | some j, step in path; _item_step(step)]) == 0
+	not _m_off_item_path(path)
+} else := _m_item_text_clause(_m_item_name(path, _dotted_roots([side[_basic_form(side)]])), cause, text)
 
 _m_src_path(src) := src.item.i
 
@@ -1047,11 +1088,6 @@ _m_tally_item("sum_of", e, roots) := [["unusable", _m_isnt(_m_item_name(e.c, roo
 }
 
 _m_sentence(c, subj, cause) := [_message(c, subj, cause)] if not _walks(c)
-
-_m_line_sorted(c, subj, cause) := [_m_top_sorted(_message(object.union(c, {"ergo/line": true}), subj, cause), _m_list_names(c))] if {
-	not _walks(c)
-	cause != "value"
-} else := _m_line(c, subj, cause)
 
 _m_sentence(c, subj, cause) := _m_walk_sentence(c, subj, cause, _walk_row(c, subj)) if _walks(c)
 

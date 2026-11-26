@@ -39,15 +39,6 @@ _m_names_list(rest, l) if startswith(rest, concat("", [l, ":"]))
 
 _m_names_list(rest, l) if startswith(rest, concat("", [l, " "]))
 
-_m_top_sorted(m, lists) := m if {
-	not contains(m, "; ")
-	not contains(m, ", and ")
-	_ = lists
-} else := concat("; ", _roots_then_lists(ps, lists)) if {
-	ps := _m_top_split(m, "; ")
-	count(ps) > 1
-} else := concat(", and ", _roots_then_lists(_m_top_split(m, ", and "), lists))
-
 _m_top_split(t, sep) := [concat(sep, array.slice(ps, cuts[g], cuts[g + 1])) | some g in numbers.range(0, count(cuts) - 2)] if {
 	ps := split(t, sep)
 	ends := [e | some i, _ in ps; e := i + 1; _m_top_shut(concat(sep, array.slice(ps, 0, e)))]
@@ -71,6 +62,10 @@ else := 3 if endswith(c, " needs more than 15 digits")
 else := 6
 
 _m_clause_name(c) := _cut_before(c, " is ")
+
+_m_list_name(c) := _cut_before(c, " can't be read: ") if contains(c, " can't be read: ")
+
+else := _m_clause_name(c)
 
 _cut_before(c, sep) := substring(c, 0, indexof(c, sep)) if {
 	contains(c, sep)

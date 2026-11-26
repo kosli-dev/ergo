@@ -137,7 +137,7 @@ test_a_counted_list_written_with_a_dot_is_never_an_input_of_an_assertion_in_an_o
 	c := {"cmp": "eq", "left": {"count_of": [{"literal": "lock"}, "pkgs"], "text": "count of .lock.pkgs", "whose": []}, "op": "compare", "right": {"literal": 1}}
 	e := {"kind": "assertion", "name": "count of .lock.pkgs is 1", "cause": "value", "inputs": [{"name": "count of .lock.pkgs", "value": 2}, {"name": ".lock.pkgs[]", "outcome": "usable", "value": [{"n": 1}, {"n": 2}]}], "failures": [], "message": "count of .lock.pkgs is 2"}
 	row := {"ergo/subj": {"id": "t1", "lock": {"pkgs": [{"n": 1}, {"n": 2}]}}, "ergo/req": {}}
-	[i.name | some i in ergo._tallied_entry(e, c, {"cause": "value"}, "/repos/0", {"check": {"op": "sentence_any_of"}}, row).inputs] == ["count of .lock.pkgs"]
+	[i.name | some i in ergo._tallied_entry(e, {"message": e.message}, c, {"cause": "value"}, "/repos/0", {"check": {"op": "sentence_any_of"}}, row).inputs] == ["count of .lock.pkgs"]
 }
 
 test_a_count_gives_an_item_entry_for_each_item_beside_a_key_it_cant_read if {
@@ -145,7 +145,7 @@ test_a_count_gives_an_item_entry_for_each_item_beside_a_key_it_cant_read if {
 	m := "$params.k is missing; item 1 of es: m is missing; item 2 of es: m is missing; item 3 of es: m is missing; and 1 more"
 	parts := ergo._tally_item_parts(check, {"es": [{"zz": 1}, {"zz": 1}, {"zz": 1}, {"zz": 1}]}, "absent", "/things/0", m) with data.ergo_params as {}
 	[[p.name, p.cause, p.message] | some p in parts] == [["item 1 of es", "absent", "m is missing"], ["item 2 of es", "absent", "m is missing"], ["item 3 of es", "absent", "m is missing"], ["item 4 of es", "absent", "m is missing"]]
-	ergo._tally_rest_of(m, set(), ergo._tally_item_texts(check, {"es": [{"zz": 1}, {"zz": 1}, {"zz": 1}, {"zz": 1}]}, "absent", m)) == "$params.k is missing" with data.ergo_params as {}
+	ergo._tally_rest_of({"message": m}, set(), ergo._tally_item_texts(check, {"es": [{"zz": 1}, {"zz": 1}, {"zz": 1}, {"zz": 1}]}, "absent", m)) == "$params.k is missing" with data.ergo_params as {}
 }
 
 test_a_count_item_beside_a_key_it_cant_read_reads_the_value_before_the_key_as_an_every_item_does if {
@@ -280,14 +280,55 @@ test_a_list_read_through_an_alias_after_is_in_ignoring_case_is_named_as_the_item
 	ergo._with_outcome({"name": "g", "value": ["a", null]}).outcome == "unusable" with data.ergo_text_lists as ergo._text_list_names(alias)
 }
 
-test_a_list_clause_whose_quoted_key_holds_is_keeps_its_whole_name if {
-	ergo._list_clause_name(`$input."a is b" is missing`) == `$input."a is b"`
-	ergo._list_clause_name(`$input."a is b" can't be read: x`) == `$input."a is b"`
+test_a_message_clause_whose_quoted_key_holds_is_is_dropped_by_its_whole_name if {
+	said := {
+		"message": "", "ergo/clauses": [
+			ergo._m_clause("root", `$input."a is b"`, "absent", `$input."a is b" is missing`),
+			ergo._m_clause("root", "v", "unusable", `v is "x; y, and item 1", which isn't a number`),
+			ergo._m_clause("list", "xs", "absent", "xs is missing"),
+		],
+		"ergo/joint": "; ",
+	}
+	ergo._tally_rest_of(said, {`$input."a is b"`, "xs"}, set()) == `v is "x; y, and item 1", which isn't a number`
+	ergo._tally_rest_of(said, set(), set()) == ""
 }
 
-test_a_message_clause_whose_quoted_key_holds_is_is_dropped_by_its_whole_name if {
-	m := `$input."a is b" is missing; xs is missing`
-	ergo._tally_rest_of(m, {`$input."a is b"`}, set()) == "xs is missing"
+test_a_for_line_text_is_read_as_clauses_and_a_quoted_key_holding_is_keeps_its_whole_name if {
+	said := ergo._for_text_said(`$input."a is b" is missing; xs is null`)
+	[[c.name, c.cause] | some c in said["ergo/clauses"]] == [[`$input."a is b"`, "absent"], ["xs", "null"]]
+	said["ergo/joint"] == "; "
+	ergo._tally_rest_of(said, {`$input."a is b"`}, set()) == "xs is null"
+	[[c.name, c.cause] | some c in ergo._for_text_said(`xs is 3, which isn't a list`)["ergo/clauses"]] == [["xs", "unusable"]]
+}
+
+test_a_count_reads_its_list_entries_from_the_clauses_of_its_message_not_from_its_text if {
+	said := {
+		"message": "", "ergo/clauses": [
+			ergo._m_clause("list", "xs", "null", "xs is null"),
+			ergo._m_clause("item", "ys", "not_an_object", `ys is "a; b, and item 1 of ys", which isn't a list`),
+			ergo._m_clause("root", "z", "absent", "z is missing"),
+		],
+		"ergo/joint": "; ",
+	}
+	es := ergo._tally_list_entries(said, "/things/0", {"xs", "ys"}, [{"name": "xs", "value": null}, {"name": "ys", "value": "a"}])
+	[[e.name, e.cause, e.message] | some e in es] == [["xs", "null", "xs is null"], ["ys", "unusable", `ys is "a; b, and item 1 of ys", which isn't a list`]]
+}
+
+test_a_counted_list_takes_the_outcome_of_its_clause if {
+	check := ergo._s_written_check("count of xs is 1")
+	row := {"message": "", "ergo/clauses": [ergo._m_clause("list", "xs", "null", "xs is null")], "ergo/joint": "; "}
+	ergo._tally_outcomes([{"name": "xs", "outcome": "usable"}, {"name": "ys", "outcome": "usable"}], row, check) == [{"name": "xs", "outcome": "null"}, {"name": "ys", "outcome": "usable"}]
+}
+
+test_a_filter_with_one_condition_reads_the_clauses_of_that_condition if {
+	row := {"message": "xs is null", "passed": false}
+	e := {"message": "xs is null", "ergo/clauses": [ergo._m_clause("list", "xs", "null", "xs is null")], "ergo/joint": ", and "}
+	ergo._applies_said(row, {"c": e}) == {"message": "xs is null", "passed": false, "ergo/clauses": e["ergo/clauses"], "ergo/joint": ", and "}
+	ergo._applies_said(row, {"c": e, "d": e}) == row
+}
+
+test_a_walk_says_its_own_texts_without_the_lists_it_gives_entries_of if {
+	ergo._walk_rest(["xs is missing", `item 1 of ys: v is "a; b, and zs is null"`, "zs is null"], {"xs", "zs"}) == `item 1 of ys: v is "a; b, and zs is null"`
 }
 
 test_no_row_of_a_report_its_violations_or_a_compiled_policy_holds_the_clauses_of_a_message if {
@@ -298,6 +339,9 @@ test_no_row_of_a_report_its_violations_or_a_compiled_policy_holds_the_clauses_of
 		{"checks": {"c": {"for": "every prs as p", "assert": ["count of p.es.v that is at least 2 is 3"]}}},
 		{"checks": {"c": "n is at least $params.m"}},
 		{"checks": {"c": "id is 3"}},
+		{"checks": {"c": ["count of ys is 1", "n is 3"]}},
+		{"checks": {"c": {"any_of": {"one": "count of ys is 1", "two": "n is 3"}}}},
+		{"from": "every things whose count of ys is 1", "checks": {"c": "id is 3"}},
 	] {
 		policy := lifted({"r": object.union({"from": "every things", "identified_by": "id"}, check)})
 		compiled := ergo.compile(policy)
@@ -306,7 +350,7 @@ test_no_row_of_a_report_its_violations_or_a_compiled_policy_holds_the_clauses_of
 		some row in rep.results
 		row.passed == false
 		every out in [rep, ergo.violations(rep), compiled, ergo.report(doc, policy, {})] {
-			count([1 | walk(out, [_, y]); is_object(y); "ergo/clauses" in object.keys(y)]) == 0
+			count([1 | walk(out, [_, y]); is_object(y); some k in ["ergo/clauses", "ergo/joint", "ergo/text_said"]; k in object.keys(y)]) == 0
 		}
 	}
 }

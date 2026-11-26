@@ -261,9 +261,11 @@ _m_part_unreached(p) if {
 	count(p) - 1 < _part_of(p).n
 }
 
-_m_part_name(p) := concat("", [_m_part_prefix(_part_of(p)), _part_of(p).alias, " can't be read: ", _m_part_prefix(_part_of(p)), _input_name(array.slice(p, 1, count(p)))]) if _m_part_unreached(p)
+_m_part_name(p) := concat("", [_m_part_label(p), " can't be read: ", _m_part_prefix(_part_of(p)), _input_name(array.slice(p, 1, count(p)))]) if _m_part_unreached(p)
 
 else := _input_name(p)
+
+_m_part_label(p) := concat("", [_m_part_prefix(_part_of(p)), _part_of(p).alias])
 
 _m_part_prefix(m) := "" if m.of == null
 
