@@ -496,11 +496,17 @@ _m_tally_records(subj, side, cause) := [x | some x in _m_tally(subj, side); _m_r
 
 _m_record_clause([state, text], _) := _m_clause("root", _m_clause_name(text), substring(state, 5, -1), text) if startswith(state, "root ")
 
-_m_record_clause([state, text], _) := _m_clause("list", _m_clause_name(text), substring(state, 5, -1), text) if startswith(state, "list ")
+_m_record_clause([state, text], _) := _m_clause("list", _m_list_name(text), substring(state, 5, -1), text) if startswith(state, "list ")
 
-_m_record_clause([state, text], _) := _m_clause("list", _m_clause_name(text), state, text) if state in _failed_read_states
+_m_record_clause([state, text], _) := _m_clause("list", _m_list_name(text), state, text) if state in _failed_read_states
 
-_m_record_clause([state, text, src], side) := _m_item_text_clause(_m_item_name(_m_src_path(src), _dotted_roots([side[_basic_form(side)]])), _m_src_cause(state), text)
+_m_record_clause([state, text, src], side) := _m_record_item(_m_src_path(src), side, _m_src_cause(state), text)
+
+_m_record_item(path, side, cause, text) := _m_clause("item", _m_part_label(path), cause, text) if {
+	_m_part_unreached(path)
+	count([j | some j, step in path; _item_step(step)]) == 0
+	not _m_off_item_path(path)
+} else := _m_item_text_clause(_m_item_name(path, _dotted_roots([side[_basic_form(side)]])), cause, text)
 
 _m_src_path(src) := src.item.i
 

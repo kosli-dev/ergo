@@ -28,7 +28,7 @@ _tally_outcomes(ins, row, check) := [_tally_outcome(i, said) | some i in ins] if
 	check.op != "for"
 	lists := _tally_list_names(check)
 	count(lists) > 0
-	said := {_list_clause_name(c): _clause_cause(c) | some c in _tally_clauses(row.message); _list_clause_name(c) in lists}
+	said := {_m_list_name(c): _clause_cause(c) | some c in _tally_clauses(row.message); _m_list_name(c) in lists}
 } else := ins
 
 _tally_outcome(i, said) := object.union(i, {"outcome": said[i.name]}) if _ = said[i.name]
@@ -542,7 +542,7 @@ _tally_rest_of(m, names, texts) := _tally_rest(m, names) if count(texts) == 0
 else := concat("; ", [c |
 	some p in _m_top_split(m, "; ")
 	not p in texts
-	c := concat(", and ", [q | some q in _m_top_split(p, ", and "); not q in texts; not _list_clause_name(q) in names; not _and_more(q)])
+	c := concat(", and ", [q | some q in _m_top_split(p, ", and "); not q in texts; not _m_list_name(q) in names; not _and_more(q)])
 	c != ""
 ])
 
@@ -614,7 +614,7 @@ _tally_clauses(m) := ps if {
 
 _tally_rest(m, names) := m if count(names) == 0
 
-else := concat(sep, [c | some c in cs; not _list_clause_name(c) in names]) if {
+else := concat(sep, [c | some c in cs; not _m_list_name(c) in names]) if {
 	cs := _tally_clauses(m)
 	sep := _tally_sep(m, cs)
 }
@@ -641,14 +641,10 @@ _tally_list_entries(row, at, lists, ins) := [] if count(lists) == 0
 
 else := [_entry("list", n, cause, _tally_list_read(n, cause, row, ins, at), [], c) |
 	some c in _tally_clauses(row.message)
-	n := _list_clause_name(c)
+	n := _m_list_name(c)
 	n in lists
 	cause := _clause_cause(c)
 ]
-
-_list_clause_name(c) := _cut_before(c, " can't be read: ") if contains(c, " can't be read: ")
-
-else := _m_clause_name(c)
 
 _tally_keyed_list_names(check, subj) := {_m_aliased(_input_name(array.concat(array.slice(p, 0, i), [k]))) |
 	some side in _m_tally_parts(check)

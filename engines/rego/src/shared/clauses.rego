@@ -72,6 +72,10 @@ else := 6
 
 _m_clause_name(c) := _cut_before(c, " is ")
 
+_m_list_name(c) := _cut_before(c, " can't be read: ") if contains(c, " can't be read: ")
+
+else := _m_clause_name(c)
+
 _cut_before(c, sep) := substring(c, 0, indexof(c, sep)) if {
 	contains(c, sep)
 	not contains(c, "\"")
