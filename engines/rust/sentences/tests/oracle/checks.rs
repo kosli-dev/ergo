@@ -4478,6 +4478,7 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("x.t is \"k1\"", "x.t is \"k1\"", &[], &[]),
     ("x.t is more than y.t", "x.t is more than y.t", &[], &[]),
     ("x.v is 1", "x.v is 1", &[], &[]),
+    ("x.w is 1", "x.w is 1", &[], &[]),
     ("x.y does not exist", "x.y does not exist", &[], &[]),
     (
         "x.y equals x.y",
@@ -16158,6 +16159,12 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "every xs whose v is in $input.cs.name as m",
         "every xs whose v is in $input.cs.name as m",
+        &[],
+        &[],
+    ),
+    (
+        "every xs whose v is in $input.os.name, if any, as x",
+        "every xs whose v is in $input.os.name, if any, as x",
         &[],
         &[],
     ),
