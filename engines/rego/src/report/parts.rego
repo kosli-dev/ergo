@@ -93,16 +93,6 @@ _for_key_flaws(check) := _once(array.concat(
 	),
 ))
 
-_key_flaw_entries(path) := [object.union(object.remove(x, _input_stash_keys), {"outcome": f}) |
-	some seg in path
-	f := _ref_step_flaw(seg)
-	some x in _ref_read_entries({seg.ref})
-]
-
-_for_key_text(x, "unusable") := _m_isnt(x.name, x.value, "text")
-
-_for_key_text(x, f) := concat("", [x.name, " is ", _key_ref_word[f]]) if f in _no_value_states
-
 _for_row_inputs(row, where) := _once(array.concat(_with_outcomes(row.inputs), [x[0] | some x in _for_key_flaws(where.check)]))
 
 _for_key_pruned(e, ks) := [] if _for_key_leaf(e, ks)

@@ -928,6 +928,7 @@ _for_item_own(check, f, walked) := _for_whose_item_clause(check.items[0], e, _fo
 	wh := _for_whose(check.items[0], e, _for_names)
 	wh.undecided != []
 	object.get(check.items[0], "whose", []) != []
+	not _for_key_flawed(check)
 }
 
 _for_item_own(check, f, walked) := c if {
@@ -935,7 +936,12 @@ _for_item_own(check, f, walked) := c if {
 	c := _for_item_kept(check, f, walked)
 }
 
+_for_key_flawed(check) if _for_key_not_text(check)
+
+_for_key_flawed(check) if _for_key_unread(check)
+
 _for_whose_undecided(check, f, walked) if {
+	not _for_key_flawed(check)
 	object.get(check.items[0], "whose", []) != []
 	_for_whose(check.items[0], walked.items[f.path], _for_names).undecided != []
 }
@@ -1103,7 +1109,8 @@ _for_parts_tree(check, p) := array.concat(array.concat(array.concat(_for_tally_j
 
 _for_row_parts(check, subj, r) := {"roots": roots, "outside": outside, "free": free, "items": items, "lists": array.concat(listed, line), "line": line, "said": ssaid, "own": {k: c.cause | some [k, c] in failed}} if {
 	ssaid := _for_row_said(check, subj, r)
-	roots := [_for_root_item(c) | some c in array.concat(_for_row_roots(check, subj, r, ssaid), _for_why_roots(check, r)); not _for_subject_root(c, subj, r)]
+	keys := _for_whose_key_roots(check, r)
+	roots := array.concat(keys, [_for_root_item(c) | some c in array.concat(_for_row_roots(check, subj, r, ssaid), _for_why_roots(check, r)); not _for_subject_root(c, subj, r); not c.text in {k.text | some k in keys}])
 	rooted := {c.text | some c in roots}
 	sroots := {i: {x[1] | some x in xs} | some i, xs in ssaid}
 	free := [x | some c in _for_free_clauses(check, subj, r, sroots); x := _for_free_unrooted(c, rooted)]
@@ -1120,6 +1127,27 @@ _for_row_parts(check, subj, r) := {"roots": roots, "outside": outside, "free": f
 _for_outside_roots(check, said) := [_for_root_item(_m_root_in(_m_clause_name(x[1]), x[0], x[1], count(check.checks))) | some i, x in xs; not x[1] in said; not x[1] in {y[1] | some y in array.slice(xs, 0, i)}] if {
 	xs := array.concat(sort(_m_for_said_pairs(check)), [[x[0], t] | some x in sort(_m_for_tally_pairs(check)); some t in x[1]])
 }
+
+_for_whose_key_roots(check, r) := [_m_root_in(x.name, x.outcome, t, -1) |
+	some x in _once([x | some item in check.items; some c in object.get(item, "whose", []); some [p, _] in _key_base_reads(c); some x in _key_flaw_entries(p)])
+	t := _for_key_text(x, x.outcome)
+	not _for_key_said_by_an_item(r, t)
+]
+
+_for_key_said_by_an_item(r, t) if {
+	some f in r.failed
+	_m_under(f.said, t) in object.get(f, "msg", [])
+}
+
+_key_flaw_entries(path) := [object.union(object.remove(x, _input_stash_keys), {"outcome": f}) |
+	some seg in path
+	f := _ref_step_flaw(seg)
+	some x in _ref_read_entries({seg.ref})
+]
+
+_for_key_text(x, "unusable") := _m_isnt(x.name, x.value, "text")
+
+_for_key_text(x, f) := concat("", [x.name, " is ", _key_ref_word[f]]) if f in _no_value_states
 
 _for_tally_joined(check, cs) := [_for_tally_unit(lists, c) | some c in cs; not _for_later_in(lists, c.text)] if {
 	texts := {c.text | some c in cs}
