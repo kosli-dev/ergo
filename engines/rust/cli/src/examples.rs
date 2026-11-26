@@ -198,6 +198,14 @@ fn same_row(row: &Value, line: &Line) -> bool {
         && row["subject"].get("in").is_none()
 }
 
+fn actual(row: &Value, report: &Value) -> String {
+    outcome::line_for(row, report)
+        .ok()
+        .flatten()
+        .or_else(|| outcome::row_line(row).ok().flatten())
+        .unwrap_or_default()
+}
+
 /// Checks an outcome against a report, by the matching and coverage rules of the spec.
 pub fn check(outcome: &Value, report: &Value) -> Checked {
     let mut checked = Checked::default();
@@ -281,9 +289,6 @@ pub fn check(outcome: &Value, report: &Value) -> Checked {
         region
             .checks
             .insert((line.requirement.clone(), line.check.clone()));
-        checked
-            .shown
-            .insert((line.requirement.clone(), line.check.clone(), line.passes));
         let matching: Vec<&Value> = rows.iter().filter(|row| same_row(row, line)).collect();
         if matching.is_empty() {
             problems.push(format!(
@@ -294,15 +299,22 @@ pub fn check(outcome: &Value, report: &Value) -> Checked {
                 line.requirement
             ));
         }
+        let mut agreed = !matching.is_empty();
         for row in matching {
             let agrees = (row["passed"] == true) == line.passes
                 && line
                     .because
                     .as_ref()
                     .is_none_or(|because| row["message"] == because.as_str());
-            if !agrees && let Ok(Some(actual)) = outcome::line_for(row, report) {
-                problems.push(format!("the report says {actual}"));
+            if !agrees {
+                agreed = false;
+                problems.push(format!("the report says {}", actual(row, report)));
             }
+        }
+        if agreed {
+            checked
+                .shown
+                .insert((line.requirement.clone(), line.check.clone(), line.passes));
         }
     }
     for row in rows {

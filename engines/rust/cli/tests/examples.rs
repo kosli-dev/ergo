@@ -464,7 +464,8 @@ fn colliding_policy() -> Value {
 }
 
 fn colliding_problems(ok: bool, outcome: Value) -> Vec<String> {
-    let input = json!({"ts": [{"id": 7, "ok": ok}, {"id": 1, "ok": ok}], "others": [], "extra": []});
+    let input =
+        json!({"ts": [{"id": 7, "ok": ok}, {"id": 1, "ok": ok}], "others": [], "extra": []});
     let report = ergo_policy_engine::report(&input, &colliding_policy(), &json!({}));
     examples::check(&outcome, &report).problems
 }
