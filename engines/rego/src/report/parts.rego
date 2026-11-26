@@ -516,7 +516,7 @@ _tally_said_in(t, texts, _) if t in texts
 
 _tally_said_in(_, _, true)
 
-_tally_item_texts(c, subj, cause, said) := _tally_record_texts(c, subj, cause, said) | {f.clause | some f in _tally_keyed_found(c, subj, said.message)}
+_tally_item_texts(c, subj, cause, said) := _tally_record_texts(c, subj, cause, said) | {f.clause.text | some f in _tally_keyed_found(c, subj, said)}
 
 _tally_record_texts(c, subj, cause, said) := {_m_aliased(r[1]) |
 	is_object(c)
@@ -1481,7 +1481,7 @@ _parted_applies_in(raw, at, evals, req, conds, subj) := p if {
 	p := _parted_applies(raw, at, evals, req, conds, subj) with data.ergo_unfit as unfit with data.ergo_text_lists as lists
 } else := _parted_applies(raw, at, evals, req, conds, subj)
 
-_tally_item_parts(c, subj, cause, at, said) := _nested_items(_tally_one_per_item(array.concat(xs, _tally_keyed_extra(c, subj, at, said.message, xs)))) if {
+_tally_item_parts(c, subj, cause, at, said) := _nested_items(_tally_one_per_item(array.concat(xs, _tally_keyed_extra(c, subj, at, said, xs)))) if {
 	xs := _tally_item_records(c, subj, cause, at, said)
 }
 
@@ -1505,13 +1505,13 @@ _tally_joined_item(e, same) := e if count(same) < 2
 
 else := object.union(e, {"message": concat("; ", _once([y.message | some y in same; y.message != ""])), "cause": _worst_of({y.cause | some y in same})})
 
-_tally_keyed_extra(c, subj, at, m, xs) := [x |
-	some f in _tally_keyed_found(c, subj, m)
-	not f.lead in {y.name | some y in xs}
-	x := _tally_leveled(_tally_item_entry(f.e, _tally_clause_cause(_m_after_lead(f.lead, f.clause), "unusable"), f.clause, f.side, f.w, f.roots, subj), f.e.i, f.w, at)
+_tally_keyed_extra(c, subj, at, said, xs) := [x |
+	some f in _tally_keyed_found(c, subj, said)
+	not f.clause.name in {y.name | some y in xs}
+	x := _tally_leveled(_tally_item_entry(f.e, _tally_list_cause(f.clause), f.clause.text, f.side, f.w, f.roots, subj), f.e.i, f.w, at)
 ]
 
-_tally_keyed_found(c, subj, m) := [{"side": side, "w": w, "roots": roots, "e": e, "lead": lead, "clause": clause} |
+_tally_keyed_found(c, subj, said) := [{"side": side, "w": w, "roots": roots, "e": e, "clause": clause} |
 	is_object(c)
 	mc := object.union(_m_with_sides(_m_walked(c, subj)), {"ergo/row": true})
 	some side in _m_tally_parts(mc)
@@ -1522,10 +1522,10 @@ _tally_keyed_found(c, subj, m) := [{"side": side, "w": w, "roots": roots, "e": e
 	}
 	w := _tally_walk(subj, side)
 	roots := _dotted_roots([side[f]])
-	some clause in _m_top_split(m, "; ")
-	lead := _m_lead_of(clause)
+	some clause in _said_clauses(said)
+	clause.kind == "item"
 	some e in w.items
-	_m_item_name(e.i, roots) == lead
+	_m_item_name(e.i, roots) == clause.name
 ]
 
 _tally_outside_keyed(side, subj) if {
