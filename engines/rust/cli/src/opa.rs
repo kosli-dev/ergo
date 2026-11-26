@@ -18,7 +18,11 @@ impl Folder {
             std::process::id(),
             MADE.fetch_add(1, Ordering::Relaxed)
         ));
-        fs::create_dir(&path)
+        let mut builder = fs::DirBuilder::new();
+        #[cfg(unix)]
+        std::os::unix::fs::DirBuilderExt::mode(&mut builder, 0o700);
+        builder
+            .create(&path)
             .map(|()| Folder(path))
             .map_err(|e| format!("can't make a folder for opa's data: {e}"))
     }
@@ -37,6 +41,11 @@ pub fn run(
     policy: &Value,
     examples: &[Example],
 ) -> Result<Vec<Value>, String> {
+    if ergo_rego.contains(':') {
+        return Err(format!(
+            "the path of ergo.rego ({ergo_rego}) holds a ':', which opa reads as a prefix; move the file"
+        ));
+    }
     let unreadable = |problem: String| format!("can't read ergo.rego at {ergo_rego}: {problem}");
     let metadata = fs::metadata(ergo_rego).map_err(|e| unreadable(e.to_string()))?;
     if !metadata.is_file() {
@@ -44,8 +53,14 @@ pub fn run(
     }
     fs::File::open(ergo_rego).map_err(|e| unreadable(e.to_string()))?;
     let folder = Folder::new()?;
+    if folder.0.to_string_lossy().contains(':') {
+        return Err(format!(
+            "the temp folder ({}) holds a ':', which opa reads as a prefix; move the file",
+            folder.0.display()
+        ));
+    }
     let file = folder.0.join("data.json");
-    fs::write(&file, data(policy, examples).to_string())
+    write_private(&file, &data(policy, examples).to_string())
         .map_err(|e| format!("can't write opa's data in {}: {e}", file.display()))?;
     let output = Command::new(opa)
         .args(["eval", "--format", "raw", "-d", ergo_rego, "-d"])
@@ -70,6 +85,15 @@ pub fn run(
     let printed = String::from_utf8(output.stdout).unwrap_or_default();
     reports(&printed, examples.len())
         .map_err(|problem| format!("{problem}, with ergo.rego at {ergo_rego}"))
+}
+
+fn write_private(path: &std::path::Path, text: &str) -> std::io::Result<()> {
+    use std::io::Write;
+    let mut options = fs::OpenOptions::new();
+    options.write(true).create_new(true);
+    #[cfg(unix)]
+    std::os::unix::fs::OpenOptionsExt::mode(&mut options, 0o600);
+    options.open(path)?.write_all(text.as_bytes())
 }
 
 /// The query `opa eval` runs: it compiles the policy once with `ergo.compile` and builds one report per example with `ergo.report`.
