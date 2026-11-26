@@ -3,6 +3,8 @@ package ergo_test
 import data.ergo
 import rego.v1
 
+said_of(clauses) := {"message": concat("; ", [c.text | some c in clauses]), "ergo/clauses": clauses, "ergo/joint": "; "}
+
 test_a_for_entry_keeps_its_own_cause_when_it_has_one_and_the_rows_cause_otherwise if {
 	ergo._for_entry_cause("null", "absent") == "null"
 	ergo._for_entry_cause(null, "absent") == "absent"
@@ -74,7 +76,11 @@ test_an_item_two_conditions_of_a_count_cant_decide_is_one_entry_that_says_both i
 		]},
 		"right": {"literal": 0},
 	}
-	parts := ergo._tally_item_parts(check, {"es": [{}]}, "absent", "/things/0", "item 1 of es: v is missing; item 1 of es: w is missing")
+	said := said_of([
+		ergo._m_clause("item", "item 1 of es", "absent", "item 1 of es: v is missing"),
+		ergo._m_clause("item", "item 1 of es", "absent", "item 1 of es: w is missing"),
+	])
+	parts := ergo._tally_item_parts(check, {"es": [{}]}, "absent", "/things/0", said)
 	[[p.name, p.cause, p.message] | some p in parts] == [["item 1 of es", "absent", "v is missing; w is missing"]]
 }
 
@@ -168,16 +174,24 @@ test_a_counted_list_written_with_a_dot_is_never_an_input_of_an_assertion_in_an_o
 
 test_a_count_gives_an_item_entry_for_each_item_beside_a_key_it_cant_read if {
 	check := ergo._s_written_check("count of es whose zz is m named by $params.k is 0")
-	m := "$params.k is missing; item 1 of es: m is missing; item 2 of es: m is missing; item 3 of es: m is missing; and 1 more"
-	parts := ergo._tally_item_parts(check, {"es": [{"zz": 1}, {"zz": 1}, {"zz": 1}, {"zz": 1}]}, "absent", "/things/0", m) with data.ergo_params as {}
+	said := said_of(array.concat(
+		[ergo._m_clause("root", "$params.k", "absent", "$params.k is missing")],
+		array.concat([ergo._m_clause("item", concat("", ["item ", n, " of es"]), "absent", concat("", ["item ", n, " of es: m is missing"])) | some n in ["1", "2", "3"]], [ergo._m_clause_more(1)]),
+	))
+	parts := ergo._tally_item_parts(check, {"es": [{"zz": 1}, {"zz": 1}, {"zz": 1}, {"zz": 1}]}, "absent", "/things/0", said) with data.ergo_params as {}
 	[[p.name, p.cause, p.message] | some p in parts] == [["item 1 of es", "absent", "m is missing"], ["item 2 of es", "absent", "m is missing"], ["item 3 of es", "absent", "m is missing"], ["item 4 of es", "absent", "m is missing"]]
-	ergo._tally_rest_of({"message": m}, set(), ergo._tally_item_texts(check, {"es": [{"zz": 1}, {"zz": 1}, {"zz": 1}, {"zz": 1}]}, "absent", m)) == "$params.k is missing" with data.ergo_params as {}
+	ergo._tally_rest_of(said, set(), ergo._tally_item_texts(check, {"es": [{"zz": 1}, {"zz": 1}, {"zz": 1}, {"zz": 1}]}, "absent", said)) == "$params.k is missing" with data.ergo_params as {}
 }
 
 test_a_count_item_beside_a_key_it_cant_read_reads_the_value_before_the_key_as_an_every_item_does if {
 	check := ergo._s_written_check("count of es whose zz is m named by $params.k is 0")
-	m := "$params.k is missing; item 1 of es: m is missing; item 2 of es: m is null; item 3 of es: m is 3, which isn't an object"
-	parts := ergo._tally_item_parts(check, {"es": [{"zz": 1}, {"zz": 1, "m": null}, {"zz": 1, "m": 3}]}, "unusable", "/things/0", m) with data.ergo_params as {}
+	said := said_of([
+		ergo._m_clause("root", "$params.k", "absent", "$params.k is missing"),
+		ergo._m_clause("item", "item 1 of es", "absent", "item 1 of es: m is missing"),
+		ergo._m_clause("item", "item 2 of es", "null", "item 2 of es: m is null"),
+		ergo._m_clause("item", "item 3 of es", "unusable", "item 3 of es: m is 3, which isn't an object"),
+	])
+	parts := ergo._tally_item_parts(check, {"es": [{"zz": 1}, {"zz": 1, "m": null}, {"zz": 1, "m": 3}]}, "unusable", "/things/0", said) with data.ergo_params as {}
 	[[p.name, p.cause, p.inputs] | some p in parts] == [
 		["item 1 of es", "absent", [{"name": "es[0].m", "value": null, "locations": ["/things/0/es/0"], "outcome": "absent"}]],
 		["item 2 of es", "null", [{"name": "es[1].m", "value": null, "locations": ["/things/0/es/1/m"], "outcome": "absent"}]],

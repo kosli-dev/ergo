@@ -483,21 +483,21 @@ _subj_tally_lists(row, at, lists, ins, subj, c) := [] if count(lists) == 0
 
 else := _tally_list_entries(object.union(row, {"ergo/subj": subj, "ergo/check": c}), at, lists, ins)
 
-_gated_tally_parts(c, expr, subj, cause, at, m) := _tally_item_parts(c, subj, cause, at, m) if _tally_worded({"expression": expr})
+_gated_tally_parts(c, expr, subj, cause, at, said) := _tally_item_parts(c, subj, cause, at, said) if _tally_worded({"expression": expr})
 
 else := []
 
-_gated_tally_texts(c, expr, subj, cause, m) := _tally_item_texts(c, subj, cause, m) if _tally_worded({"expression": expr})
+_gated_tally_texts(c, expr, subj, cause, said) := _tally_item_texts(c, subj, cause, said) if _tally_worded({"expression": expr})
 
 else := set()
 
 _tally_item_parts_of(row, c, at) := [] if not _tally_worded(c)
 
-else := _tally_item_parts(_row_mcheck(row, c), row["ergo/subj"], row.cause, at, row.message)
+else := _tally_item_parts(_row_mcheck(row, c), row["ergo/subj"], row.cause, at, row)
 
 _tally_item_texts_of(row, c) := set() if not _tally_worded(c)
 
-else := _tally_item_texts(_row_mcheck(row, c), row["ergo/subj"], row.cause, row.message)
+else := _tally_item_texts(_row_mcheck(row, c), row["ergo/subj"], row.cause, row)
 
 _sub_mcheck(where, c, row) := m if {
 	some i, x in where.check.checks
@@ -505,24 +505,33 @@ _sub_mcheck(where, c, row) := m if {
 	m := _row_mcheck(row, where.check).checks[i]
 } else := c
 
-_tally_said_in(t, m) if contains(m, t)
+_tally_said_texts(said) := {c.text | some c in _said_clauses(said)}
 
-_tally_said_in(_, m) if regex.match(`(^|; )and [0-9]+ more$`, m)
+_tally_cut(said) if {
+	some c in _said_clauses(said)
+	c.kind == "more"
+} else := false
 
-_tally_item_texts(c, subj, cause, m) := _tally_record_texts(c, subj, cause, m) | {f.clause | some f in _tally_keyed_found(c, subj, m)}
+_tally_said_in(t, texts, _) if t in texts
 
-_tally_record_texts(c, subj, cause, m) := {_m_aliased(r[1]) |
+_tally_said_in(_, _, true)
+
+_tally_item_texts(c, subj, cause, said) := _tally_record_texts(c, subj, cause, said) | {f.clause | some f in _tally_keyed_found(c, subj, said.message)}
+
+_tally_record_texts(c, subj, cause, said) := {_m_aliased(r[1]) |
 	is_object(c)
+	texts := _tally_said_texts(said)
+	cut := _tally_cut(said)
 	mc := object.union(_m_with_sides(_m_walked(c, subj)), {"ergo/row": true})
 	some side in _m_tally_parts(mc)
 	rs := _m_tally_records(subj, side, cause)
 	some r0 in rs
 	count(r0) == 3
 	not _tally_root_said(r0, rs)
-	r := _tally_unrooted(r0, m)
+	r := _tally_unrooted(r0, said.message)
 	r != null
 	_tally_record_listed(r[2])
-	_tally_said_in(_m_aliased(r[1]), m)
+	_tally_said_in(_m_aliased(r[1]), texts, cut)
 }
 
 _tally_root_said(r, rs) if {
@@ -776,8 +785,8 @@ _tallied_entry(e, said, c, o, at, where, row) := object.union(e, {"inputs": x.in
 	lists := _tally_list_names(c) | _tally_keyed_list_names(c, subj)
 	ls := _tally_list_entries(object.union(_said_of(said), {"ergo/key_bases": object.get(o, "key_bases", []), "ergo/subj": subj, "ergo/req": row["ergo/req"], "ergo/check": mc}), at, lists, e.inputs)
 	names := {x.name | some x in ls}
-	items := _tally_item_parts(mc, subj, o.cause, at, e.message)
-	texts := _tally_item_texts(mc, subj, o.cause, e.message)
+	items := _tally_item_parts(mc, subj, o.cause, at, said)
+	texts := _tally_item_texts(mc, subj, o.cause, said)
 	count(names) + count(items) > 0
 } else := object.union(e, {"inputs": [i | some i in e.inputs; not _item_input(i, lists); not _tally_own_read(i, c, set(), [])]}) if {
 	not _walks(c)
@@ -1325,8 +1334,8 @@ _applies_entries(row, at, evals, req, conds, ins, subj) := [_policy_entry(
 	said := object.union(row, object.remove(_said_of(e), ["message"]))
 	ls := _subj_tally_lists(said, at, lists, ins, subj, c)
 	names := {x.name | some x in ls}
-	items := _gated_tally_parts(c, conds[name].expression, subj, e.assertion_cause, at, row.message)
-	texts := _gated_tally_texts(c, conds[name].expression, subj, e.assertion_cause, row.message)
+	items := _gated_tally_parts(c, conds[name].expression, subj, e.assertion_cause, at, said)
+	texts := _gated_tally_texts(c, conds[name].expression, subj, e.assertion_cause, said)
 }
 
 _applies_entries(_, at, evals, req, conds, _, subj) := [_applies_cond_entry(evals[name], _applies_to_of(req)[name], conds[name], texts[k], at, subj) |
@@ -1358,8 +1367,8 @@ _applies_cond_entry(e, c, cond, text, at, subj) := _walk_assertion_entry(
 	said := object.union(_said_of(e), {"message": text})
 	ls := _subj_tally_lists(said, at, lists, _with_outcomes(_anchored_inputs(e.inputs, at)), subj, c)
 	names := {x.name | some x in ls}
-	items := _gated_tally_parts(c, cond.expression, subj, e.assertion_cause, at, text)
-	texts := _gated_tally_texts(c, cond.expression, subj, e.assertion_cause, text)
+	items := _gated_tally_parts(c, cond.expression, subj, e.assertion_cause, at, said)
+	texts := _gated_tally_texts(c, cond.expression, subj, e.assertion_cause, said)
 }
 
 _condition_at(req, name) := _joined("$policy:", ["subjects", owner, "from"]) if {
@@ -1475,8 +1484,8 @@ _parted_applies_in(raw, at, evals, req, conds, subj) := p if {
 	p := _parted_applies(raw, at, evals, req, conds, subj) with data.ergo_unfit as unfit with data.ergo_text_lists as lists
 } else := _parted_applies(raw, at, evals, req, conds, subj)
 
-_tally_item_parts(c, subj, cause, at, m) := _nested_items(_tally_one_per_item(array.concat(xs, _tally_keyed_extra(c, subj, at, m, xs)))) if {
-	xs := _tally_item_records(c, subj, cause, at, m)
+_tally_item_parts(c, subj, cause, at, said) := _nested_items(_tally_one_per_item(array.concat(xs, _tally_keyed_extra(c, subj, at, said.message, xs)))) if {
+	xs := _tally_item_records(c, subj, cause, at, said)
 }
 
 _tally_one_per_item(es) := [_tally_joined_item(e, [y | some y in es; _tally_same_item(y, e)]) |
@@ -1531,8 +1540,10 @@ _tally_outside_keyed(side, subj) if {
 	_keyed_base_fine(s[0], subj)
 }
 
-_tally_item_records(c, subj, cause, at, m) := [x |
+_tally_item_records(c, subj, cause, at, said) := [x |
 	is_object(c)
+	texts := _tally_said_texts(said)
+	cut := _tally_cut(said)
 	mc := object.union(_m_with_sides(_m_walked(c, subj)), {"ergo/row": true})
 	some side in _m_tally_parts(mc)
 	f := _basic_form(side)
@@ -1542,9 +1553,9 @@ _tally_item_records(c, subj, cause, at, m) := [x |
 	some r0 in rs
 	count(r0) == 3
 	not _tally_root_said(r0, rs)
-	r := _tally_unrooted(r0, m)
+	r := _tally_unrooted(r0, said.message)
 	r != null
-	_tally_said_in(_m_aliased(r[1]), m)
+	_tally_said_in(_m_aliased(r[1]), texts, cut)
 	x := _tally_record_entry(r, side, w, roots, at, subj)
 ]
 
