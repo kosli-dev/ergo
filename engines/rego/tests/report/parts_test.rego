@@ -295,8 +295,19 @@ test_the_lists_a_check_compares_ignoring_case_are_named_as_its_inputs_name_them 
 }
 
 test_an_item_record_that_only_repeats_what_the_row_already_says_gives_no_entry if {
-	ergo._tally_unrooted(["null", "item 1 of xs: $input.m is null", {}], "$input.m is null") == null
-	ergo._tally_unrooted(["absent", "item 1 of xs: $input.m is null; key is missing", {}], "$input.m is null") == ["absent", "item 1 of xs: key is missing", {}]
+	ergo._tally_unrooted(["null", "item 1 of xs: $input.m is null", {}], {"$input.m is null"}) == null
+	ergo._tally_unrooted(["focus absent", "item 1 of xs: $input.m is null; key is missing", {}], {"$input.m is null"}) == ["focus absent", "item 1 of xs: key is missing", {}]
+}
+
+test_an_item_keeps_what_its_own_clause_says_after_a_semicolon_though_the_row_text_cut_there_says_it_too if {
+	check := {"op": "compare", "cmp": "eq", "expression": "count of xs whose $input.m named by key is 1 is 0", "left": {"count_of": ["xs"], "text": "count of xs whose $input.m named by key is 1", "whose": [{"op": "equals", "path": ["$$input", "m", {"named_by_field": "key"}], "value": 1}]}, "right": {"literal": 0}}
+	subj := {"id": "a", "xs": [{"key": "a", "v": 1}, {"v": 1}]}
+	said := said_of([
+		ergo._m_clause("item", "item 1 of xs", "null", "item 1 of xs: $input.m is null"),
+		ergo._m_clause("item", "item 2 of xs", "absent", "item 2 of xs: $input.m is null; key is missing"),
+	])
+	parts := ergo._tally_item_parts(check, subj, "absent", "/things/0", said) with data.ergo_document as {"m": null}
+	[[p.name, p.cause, p.message] | some p in parts] == [["item 1 of xs", "null", "$input.m is null"], ["item 2 of xs", "absent", "$input.m is null; key is missing"]]
 }
 
 test_a_list_after_is_in_ignoring_case_that_walks_a_subject_that_is_a_list_or_a_part_is_unusable_when_an_item_isnt_text if {
