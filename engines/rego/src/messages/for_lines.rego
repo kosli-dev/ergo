@@ -1469,18 +1469,18 @@ _m_from_ref_fits(v, "a list of text") if {
 
 _m_filter(_, _, row) := row if row.passed == true
 
-_m_filter(check, subj, row) := object.union(row, {"message": _m_joined(_m_line(check, subj, "value"))}) if {
+_m_filter(check, subj, row) := object.union(row, _m_line_said(check, subj, "value")) if {
 	row.passed == false
 	row.cause == "missing"
 }
 
-_m_filter(check, subj, row) := object.union(row, {"message": _m_joined(_m_line_sorted(check, subj, row.cause))}) if {
+_m_filter(check, subj, row) := object.union(row, _m_line_said(check, subj, row.cause)) if {
 	row.passed == false
 	row.cause != "missing"
 	row.cause != "unusable"
 }
 
-_m_filter(check, subj, row) := object.union(object.union(row, {"message": _m_joined(_m_line_sorted(check, subj, row.cause))}), _m_unusable_marks(check, subj, row)) if {
+_m_filter(check, subj, row) := object.union(object.union(row, _m_line_said(check, subj, row.cause)), _m_unusable_marks(check, subj, row)) if {
 	row.passed == false
 	row.cause == "unusable"
 }

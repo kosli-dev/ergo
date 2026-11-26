@@ -39,15 +39,6 @@ _m_names_list(rest, l) if startswith(rest, concat("", [l, ":"]))
 
 _m_names_list(rest, l) if startswith(rest, concat("", [l, " "]))
 
-_m_top_sorted(m, lists) := m if {
-	not contains(m, "; ")
-	not contains(m, ", and ")
-	_ = lists
-} else := concat("; ", _roots_then_lists(ps, lists)) if {
-	ps := _m_top_split(m, "; ")
-	count(ps) > 1
-} else := concat(", and ", _roots_then_lists(_m_top_split(m, ", and "), lists))
-
 _m_top_split(t, sep) := [concat(sep, array.slice(ps, cuts[g], cuts[g + 1])) | some g in numbers.range(0, count(cuts) - 2)] if {
 	ps := split(t, sep)
 	ends := [e | some i, _ in ps; e := i + 1; _m_top_shut(concat(sep, array.slice(ps, 0, e)))]
