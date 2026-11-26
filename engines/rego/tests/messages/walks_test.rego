@@ -447,6 +447,27 @@ test_a_named_failure_a_member_walk_wanted_as_an_object_says_it_isnt_one if {
 	ergo._m_named_fail({"path": "r.s", "cause": "unusable", "value": [1]}) == "r.s is [1], which isn't a list or an object"
 }
 
+test_a_failed_row_carries_the_clauses_its_message_is_printed_from if {
+	c := {"op": "compare", "cmp": "eq", "left": ["v"], "right": ["w"]}
+	ergo._m_row_said(c, {}, "absent") == {
+		"message": "v is missing, and w is missing",
+		"ergo/clauses": [ergo._m_clause("root", "v", "absent", "v is missing"), ergo._m_clause("root", "w", "absent", "w is missing")],
+	}
+	k := ergo._s_written_check("count of xs whose v is at least 2 is 0")
+	tally := ergo._m_row_said(k, {"xs": [{"v": 3}, {}, null]}, "unusable")
+	tally.message == "item 2 of xs: v is missing; item 3 of xs is null, which isn't an object"
+	tally["ergo/clauses"] == [
+		ergo._m_item_clause("item 2 of xs", "absent", [ergo._m_clause("root", "v", "absent", "v is missing")]),
+		ergo._m_clause("item", "item 3 of xs", "not_an_object", "item 3 of xs is null, which isn't an object"),
+	]
+	keyed := {"$sides": [["s", {"named_by_field": "p"}]], "op": "present", "path": ["other"]}
+	ergo._m_row_said(keyed, {"s": null, "p": null}, "null") == {
+		"message": "p is null; s is null",
+		"ergo/clauses": [ergo._m_clause("root", "p", "null", "p is null"), ergo._m_clause("root", "s", "null", "s is null")],
+	}
+	ergo._m_row_said(c, {"v": 1, "w": 2}, "value")["ergo/clauses"] == [ergo._m_clause("root", "v", "value", "v is 1"), ergo._m_clause("root", "w", "value", "w is 2")]
+}
+
 test_a_row_keeps_the_items_of_a_list_after_is_in_ignoring_case_in_list_order if {
 	ref := {"op": "in", "path": ["x"], "values": {"ref": ["$$params[]", "l"]}, "ignoring": "case"}
 	ergo._m_row_text(ref, {"x": "a"}, "unusable") == "item 2 of $params.l is null; item 3 of $params.l is 3, which isn't text" with data.ergo_params as {"l": ["a", null, 3]}
