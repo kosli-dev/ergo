@@ -661,13 +661,14 @@ _for_unsortable(item, w, names) := array.concat(unread, mixed) if {
 	]
 }
 
-_m_sort_why(item, e, names) := {"why": array.concat(array.slice(ps, 0, n), [_m_leaf(e.i, concat("; ", array.slice(ps, n, count(ps))))])} if {
+_m_sort_why(item, e, names) := {"why": array.concat(array.slice(ps, 0, n), [_m_leaf(e.i, concat("; ", array.slice(ps, n, count(ps))))]), "why_roots": [[f, ps[i]] | some i, f in fs]} if {
 	is_object(e.iv)
 	_key_base_flaws(e.iv, item.pick.by, "object") != [] with input as {"ergo/names": names}
-	n := count([seg | some seg in item.pick.by; _ref_step_flaw(seg)]) with input as {"ergo/names": names}
+	fs := [f | some seg in item.pick.by; f := _ref_step_flaw(seg)] with input as {"ergo/names": names}
+	n := count(fs)
 	ps := split(_m_sort_text(item, e, "absent"), "; ") with input as {"ergo/names": names}
 	count(ps) > n
-} else := {"why": [m]} if {
+} else := {"why": [m], "why_roots": [[state, m]]} if {
 	is_object(e.iv)
 	state := _for_sort_state(item, e, names)
 	m := _m_sort_text(item, e, state) with input as {"ergo/names": names}
@@ -1091,7 +1092,7 @@ _for_failed_base(check, f) := {
 	"bare": _m_rest_named(_m_for_item_name(check, f.item), f),
 }
 
-_for_failed_flags(f) := object.union(object.union(object.union(object.union({"msg": f.why | "why" in object.keys(f)}, {"raw": f.raw | "raw" in object.keys(f)}), {"hoisted": true | object.get(f, "hoisted", false) == true}), {"whose_of": f.whose_of | "whose_of" in object.keys(f)}), object.union(object.union(_fail_levels(f), {"ergo/sorted": f.sorted | "sorted" in object.keys(f)}), {"wants": f.msg | object.get(f, "msg", "") == "an object"}))
+_for_failed_flags(f) := object.union(object.union(object.union(object.union({"msg": f.why | "why" in object.keys(f)}, {"raw": f.raw | "raw" in object.keys(f)}), {"hoisted": true | object.get(f, "hoisted", false) == true}), {"whose_of": f.whose_of | "whose_of" in object.keys(f)}), object.union(object.union(_fail_levels(f), {"ergo/sorted": f.sorted | "sorted" in object.keys(f)}), object.union({"wants": f.msg | object.get(f, "msg", "") == "an object"}, {"ergo/why_roots": f.why_roots | "why_roots" in object.keys(f)})))
 
 _fail_levels(f) := {"ergo/levels": f.lv} if {
 	"lv" in object.keys(f)
