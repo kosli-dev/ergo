@@ -148,7 +148,6 @@ test_a_one_list_for_row_with_nothing_read_outside_it_that_fails_takes_its_messag
 
 test_a_for_row_keeps_its_message_off_the_tree_while_the_tree_cant_say_its_roots_keys_or_second_list if {
 	not _on_tree("every xs as x, every x.ys as y", ["y.v is 1"], {"xs": [{"ys": [{"v": 2}]}]}, {})
-	not _on_tree("every es whose zz is m named by $params.k as e", ["e.v is 1"], {"es": [{"zz": 1}]}, {"k": 3})
 	not _on_tree("every xs as x", ["every x.ys.n is 1", "every x.ys.m is 1"], {"xs": [{"ys": [{"n": 2, "m": 2}]}]}, {})
 	not _on_tree("every xs as x", ["every x.ys exists", "sum of x.ys.n is 3"], {"xs": [{"ys": [{"n": 1}, null]}]}, {})
 }
@@ -174,9 +173,10 @@ test_a_for_row_whose_list_or_sort_key_has_a_step_from_params_takes_its_message_f
 	_on_tree("first of xs sorted by m named by $params.k as x", ["x.v is 1"], {"xs": [{"m": {"a": 1}, "v": 2}]}, {"k": "a"})
 }
 
-test_a_for_row_whose_whose_key_from_params_cant_be_read_keeps_its_message_off_the_tree if {
-	not _on_tree("every es whose zz is m named by $params.k as e", ["e.v exists", "z is 1"], {"z": 2, "es": [{"zz": 2, "m": {"a": 1}, "v": 1}]}, {})
-	not _on_tree("every es whose zz is m named by $params.k as e", ["e.v exists", "z is 1"], {"z": 2, "es": [{"zz": 2, "m": {"a": 1}, "v": 1}]}, {"k": null})
+test_a_for_row_whose_whose_key_from_params_cant_be_read_takes_its_message_from_the_tree if {
+	_on_tree("every es whose zz is m named by $params.k as e", ["e.v exists", "z is 1"], {"z": 2, "es": [{"zz": 2, "m": {"a": 1}, "v": 1}]}, {})
+	_on_tree("every es whose zz is m named by $params.k as e", ["e.v exists", "z is 1"], {"z": 2, "es": [{"zz": 2, "m": {"a": 1}, "v": 1}]}, {"k": null})
+	_on_tree("every es whose zz is m named by $params.k as e", ["e.v is 1"], {"es": [{"zz": 1}]}, {"k": 3})
 	_on_tree("every es whose zz is m named by $params.k as e", ["e.v is 2"], {"es": [{"zz": 2, "m": {"a": 2}, "v": 1}]}, {"k": "a"})
 }
 

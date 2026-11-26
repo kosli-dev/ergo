@@ -664,6 +664,28 @@ test_a_row_whose_sentence_reads_a_list_outside_its_item_keeps_the_text_the_tree_
 	said.message == "item 2 of $input.os: name is missing"
 }
 
+test_a_whose_key_that_isnt_text_is_said_in_each_member if {
+	_row_tree_text("every member of ev whose kind is m named by $params.k as e", ["e.v is 1"], {"ev": {"a": {"kind": "a", "m": {}, "v": 1}, "b": {"m": {}, "v": 1}}}, {"k": 3}) == "member a of ev: $params.k is 3, which isn't text; member b of ev: $params.k is 3, which isn't text"
+}
+
+test_a_whose_key_that_cant_be_read_comes_before_the_sentences_that_read_no_alias_and_the_items if {
+	_row_tree_text("every es whose zz is m named by $params.k as e", ["e.v exists", "z is 1"], {"z": 2, "es": []}, {}) == "$params.k is missing; z is 2; es is []"
+	_row_tree_text("every es whose zz is m named by $params.k as e", ["e.v exists", "z is 1"], {"z": 2, "es": ["s"]}, {"k": null}) == `$params.k is null; z is 2; item 1 of es is "s", which isn't an object`
+}
+
+test_a_whose_key_that_isnt_text_is_said_once_before_a_list_that_cant_be_walked if {
+	_row_tree_text("every es whose zz is m named by $params.k as e", ["e.v exists"], {}, {"k": 3}) == "$params.k is 3, which isn't text; es is missing"
+	_row_tree_text("every es whose zz is m named by $params.k as e", ["e.v exists", "z is 1"], {"z": 2, "es": ["s"]}, {"k": 3}) == `$params.k is 3, which isn't text; z is 2; item 1 of es is "s", which isn't an object`
+}
+
+test_an_item_beside_a_whose_key_that_is_null_says_only_what_its_whose_said if {
+	_row_tree_text("every es whose zz is m named by $params.k as e", ["e.v exists"], {"es": [{"v": 2}, {"zz": 2, "m": null}]}, {"k": null}) == "$params.k is null; item 1 of es: zz is missing; item 2 of es: m is null"
+}
+
+test_a_for_row_whose_whose_key_isnt_text_says_the_key_on_an_empty_list_it_tolerates if {
+	_row_tree_text("every es whose zz is m named by $input.k, if any, as e", ["e.v is 2"], {"es": []}, {}) == "$input.k is 3, which isn't text" with data.ergo_document as {"k": 3, "m": {"a": 2}}
+}
+
 test_a_row_on_the_tree_takes_the_worst_cause_of_what_it_says if {
 	_tree_said("every xs as x", ["x.v is 1"], {"xs": [{}]}, {}, "value").cause == "absent"
 	_tree_said("every xs as x", ["x.v is 1"], {"xs": [{}]}, {}, "not_an_object").cause == "not_an_object"
