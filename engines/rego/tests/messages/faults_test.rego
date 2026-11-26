@@ -33,7 +33,7 @@ test_the_fallback_of_a_message_is_clauses_printed_as_the_old_text if {
 	written := {"op": "present", "path": ["v"], "expression": "v is present"}
 	ergo._m_fallback(written) == [ergo._m_clause("root", "v is present", "value", "v is present is false")]
 	ergo._m_fallback({"op": "present", "path": ["v"]}) == [ergo._m_clause("root", "the check", "value", "the check is false")]
-	params := {"op": "compare", "cmp": "eq", "left": ["v"], "right": ["$params", "n"]}
+	params := {"op": "compare", "cmp": "eq", "left": ["v"], "right": ["$$params", "n"]}
 	ergo._m_fallback(params) == [ergo._m_clause("root", "$params", "unusable", "$params is 3, which isn't an object")] with data.ergo_params as 3
 	ergo._m_fallback_text(written) == "v is present is false"
 	ergo._m_fallback_text(params) == "$params is 3, which isn't an object" with data.ergo_params as 3
