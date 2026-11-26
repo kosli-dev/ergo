@@ -839,3 +839,267 @@ fn the_lines_for_a_child_subject_count_for_the_warnings() {
         )
     );
 }
+
+fn scoped() -> Value {
+    json!({
+        "ergo_spec": ergo_policy_engine::SPEC,
+        "subjects": {
+            "deployment": {"from": "deployments whose env is \"prod\"", "identified_by": "id"},
+            "artifact": {"from": "every deployment.artifacts", "identified_by": "name"}
+        },
+        "requirements": {
+            "approved": {"subject": "deployment", "checks": {"approver_set": "approver is a non-empty string"}},
+            "tested": {"subject": "artifact", "checks": {"scanned": "scan is 0"}}
+        }
+    })
+}
+
+fn scoped_problems(input: Value, outcome: Value) -> Vec<String> {
+    let report = ergo_policy_engine::report(&input, &scoped(), &json!({}));
+    examples::check(&outcome, &report, &scoped()).problems
+}
+
+fn three_deployments() -> Value {
+    json!({"deployments": [
+        {"id": "d1", "env": "prod", "approver": "a", "artifacts": [{"name": "x", "scan": 0}]},
+        {"id": "d3", "env": "dev"},
+        {"id": "d4", "approver": "a"}
+    ]})
+}
+
+#[test]
+fn a_scope_line_agrees_with_the_applies_row_of_its_subject() {
+    let mut two_deployments = three_deployments();
+    two_deployments["deployments"].as_array_mut().unwrap().pop();
+    for line in [
+        "deployment d3 is out of scope because env is \"dev\"",
+        "deployment d3 is out of scope",
+        "deployment d1 is in scope",
+    ] {
+        assert_eq!(
+            scoped_problems(two_deployments.clone(), json!([{"approved": [line]}])),
+            Vec::<String>::new(),
+            "{line}"
+        );
+    }
+    for (line, problem) in [
+        (
+            "deployment d3 is in scope",
+            "the report says deployment d3 is out of scope because env is \"dev\"",
+        ),
+        (
+            "deployment d3 is out of scope because env is missing",
+            "the report says deployment d3 is out of scope because env is \"dev\"",
+        ),
+        (
+            "deployment d1 is out of scope",
+            "the report says deployment d1 is in scope",
+        ),
+        (
+            "deployment d9 is in scope",
+            "the report has no row for deployment d9 and $applies in approved",
+        ),
+    ] {
+        let problems = scoped_problems(two_deployments.clone(), json!([{"approved": [line]}]));
+        assert_eq!(problems, vec![problem.to_string()], "{line}");
+    }
+}
+
+#[test]
+fn a_scope_line_covers_applies_so_a_subject_ergo_cannot_tell_is_in_scope_fails_the_example() {
+    assert_eq!(
+        scoped_problems(
+            three_deployments(),
+            json!([{"approved": ["deployment d3 is out of scope"]}])
+        ),
+        vec!["can't check this yet: lines for an $applies row that failed with absent, not value, aren't supported yet, as for deployment d4 in approved"]
+    );
+}
+
+#[test]
+fn an_out_of_scope_line_never_agrees_with_a_subject_ergo_cannot_tell_is_in_scope() {
+    let unreadable = "can't check this yet: lines for an $applies row that failed with absent, not value, aren't supported yet, as for deployment d4 in approved";
+    for line in [
+        "deployment d4 is out of scope because env is missing",
+        "deployment d4 is out of scope",
+        "deployment d4 is in scope",
+    ] {
+        let problems = scoped_problems(three_deployments(), json!([{"approved": [line]}]));
+        assert_eq!(
+            problems.first().map(String::as_str),
+            Some(unreadable),
+            "{line}"
+        );
+    }
+    assert_eq!(
+        scoped_problems(
+            three_deployments(),
+            json!([{"approved": ["deployment d1 passes approver_set"]}])
+        ),
+        Vec::<String>::new()
+    );
+    assert_eq!(
+        scoped_problems(
+            three_deployments(),
+            json!([{"approved is not met": ["deployment d1 passes approver_set"]}])
+        ),
+        vec![unreadable]
+    );
+}
+
+#[test]
+fn a_line_for_a_check_ergo_adds_agrees_with_its_row_that_has_no_id() {
+    let empty =
+        json!({"deployments": [{"id": "d1", "env": "prod", "approver": "a", "artifacts": []}]});
+    assert_eq!(
+        scoped_problems(
+            json!({"deployments": []}),
+            json!([
+                {"approved is not met": ["fails $min_subjects because in-scope deployment count is 0"]},
+                {"tested is not met": ["fails $min_subjects because in-scope artifact count is 0"]}
+            ])
+        ),
+        Vec::<String>::new()
+    );
+    assert_eq!(
+        scoped_problems(
+            empty.clone(),
+            json!([{"tested is not met": ["artifact in deployment d1 fails $min_subjects because in-scope artifact count is 0"]}])
+        ),
+        Vec::<String>::new()
+    );
+    for (outcome, problem) in [
+        (
+            json!([{"approved": ["fails $min_subjects"]}]),
+            "the report says passes $min_subjects",
+        ),
+        (
+            json!([{"tested": ["artifact in deployment d2 fails $min_subjects"]}]),
+            "the report has no row for artifact in deployment d2 and $min_subjects in tested",
+        ),
+        (
+            json!([{"tested": ["fails $min_subjects"]}]),
+            "the report has no row for artifact and $min_subjects in tested",
+        ),
+        (
+            json!([{"tested is not met": ["artifact in deployment d1 passes $unique_ids"]}]),
+            "no line says artifact in deployment d1 fails $min_subjects because in-scope artifact count is 0",
+        ),
+    ] {
+        let problems = scoped_problems(empty.clone(), outcome.clone());
+        assert_eq!(
+            problems.first().map(String::as_str),
+            Some(problem),
+            "{outcome}"
+        );
+    }
+}
+
+#[test]
+fn a_line_for_a_check_ergo_adds_on_a_child_subject_names_every_parent_or_none() {
+    let input =
+        json!({"deployments": [{"id": "d1", "env": "prod", "approver": "a", "artifacts": []}]});
+    for (line, reason) in [
+        (
+            "artifact fails $min_subjects",
+            "the row of a check Ergo adds for artifact itself has no subject to name, so its line starts with passes or fails",
+        ),
+        (
+            "deployment in deployment d1 fails $unique_ancestor_ids",
+            "deployment isn't read inside another subject, so nothing follows it but passes or fails",
+        ),
+    ] {
+        assert_eq!(
+            scoped_problems(input.clone(), json!([{"tested": [line]}])),
+            vec![format!("can't read the line '{line}': {reason}")],
+            "{line}"
+        );
+    }
+}
+
+fn round_trip(policy: &Value, input: &Value) {
+    let report = ergo_policy_engine::report(input, policy, &json!({}));
+    let printed =
+        ergo_policy_cli::outcome::yaml(&ergo_policy_cli::outcome::of(&report, policy).unwrap());
+    let outcome = ergo_policy_cli::yaml::parse(&printed).unwrap();
+    assert_eq!(
+        examples::check(&outcome, &report, policy).problems,
+        Vec::<String>::new(),
+        "{printed}"
+    );
+}
+
+#[test]
+fn the_printed_outcome_with_checks_ergo_adds_and_subjects_out_of_scope_passes_when_pasted_back() {
+    for input in [
+        json!({"deployments": []}),
+        json!({"deployments": [
+            {"id": "d1", "env": "prod", "approver": "a", "artifacts": []},
+            {"id": "d3", "env": "dev"},
+            {"id": "d2", "env": "prod", "approver": "", "artifacts": [{"name": "x", "scan": 1}, {"name": "x", "scan": 1}]}
+        ]}),
+        json!({"deployments": [
+            {"id": "d1", "env": "prod", "approver": "a", "artifacts": []},
+            {"id": "d1", "env": "prod", "approver": "a", "artifacts": []}
+        ]}),
+        json!({"deployments": [{"id": "in", "env": "prod", "approver": "a", "artifacts": [{"name": "in", "scan": 0}]}]}),
+    ] {
+        round_trip(&scoped(), &input);
+    }
+}
+
+#[test]
+fn the_lines_of_checks_ergo_adds_and_of_scope_count_for_no_warning() {
+    let mut policy = scoped();
+    policy["examples"] = json!([
+        {"name": "no deployment", "input": {"deployments": []},
+         "outcome": [{"approved is not met": ["fails $min_subjects because in-scope deployment count is 0"]}]},
+        {"name": "dev is left out", "input": {"deployments": [{"id": "d3", "env": "dev"}]},
+         "outcome": [{"approved": ["deployment d3 is out of scope"]}]}
+    ]);
+    let (text, code) = examples::run(&policy, false).unwrap();
+    assert_eq!(code, 0, "{text}");
+    assert_eq!(
+        text,
+        "passed: no deployment\npassed: dev is left out\nwarning: no example shows approver_set of approved failing\nwarning: no example shows approver_set of approved passing\nwarning: no example shows scanned of tested failing\nwarning: no example shows scanned of tested passing\n2 examples: 2 passed, 0 failed\n"
+    );
+}
+
+#[test]
+fn a_line_for_well_formed_does_not_stop_a_policy_written_wrong_from_breaking_the_example() {
+    let mut policy = scoped();
+    policy["requirements"]["approved"]["subject"] = json!("nothing");
+    let report = ergo_policy_engine::report(&json!({"deployments": []}), &policy, &json!({}));
+    let checked = examples::check(
+        &json!([{"approved": ["fails $well_formed because subject: not in subjects"]}]),
+        &report,
+        &policy,
+    );
+    assert_eq!(
+        checked.problems,
+        vec!["the policy is written wrong: approved: subject: not in subjects"]
+    );
+}
+
+#[test]
+fn a_subject_out_of_scope_under_require_some_is_not_a_failure_but_a_failed_subject_is() {
+    let mut policy = scoped();
+    policy["requirements"]["approved"]["require"] = json!("some");
+    let input = json!({"deployments": [
+        {"id": "d1", "env": "prod", "approver": "a"},
+        {"id": "d2", "env": "prod"},
+        {"id": "d3", "env": "dev"}
+    ]});
+    let report = ergo_policy_engine::report(&input, &policy, &json!({}));
+    let check = |outcome: Value| examples::check(&outcome, &report, &policy).problems;
+    assert_eq!(
+        check(json!([{"approved is met": [
+            "deployment d2 fails approver_set because approver is missing"
+        ]}])),
+        Vec::<String>::new()
+    );
+    assert_eq!(
+        check(json!([{"approved is met": ["deployment d3 is out of scope"]}])),
+        vec!["no line says deployment d2 fails approver_set because approver is missing"]
+    );
+}

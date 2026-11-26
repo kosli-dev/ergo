@@ -244,6 +244,37 @@ fn the_outcome_of_a_report_names_no_subject_for_a_check_ergo_adds_on_the_require
 }
 
 #[test]
+fn the_outcome_of_a_report_where_rows_of_one_check_and_subject_say_different_things_is_an_error() {
+    let twins = |second: Value| {
+        json!({"deployments": [
+            {"id": "d1", "env": "prod", "approver": "a", "artifacts": []},
+            second
+        ]})
+    };
+    assert_eq!(
+        shown(
+            scoped(),
+            twins(json!({"id": "d1", "env": "prod", "approver": "", "artifacts": []}))
+        ),
+        Err("the rows of approver_set in approved for deployment d1 don't all say the same, so no line agrees with every one of them: deployment d1 passes approver_set, and deployment d1 fails approver_set because approver is \"\"".to_string())
+    );
+    assert_eq!(
+        shown(
+            scoped(),
+            twins(json!({"id": "d1", "env": "prod", "approver": "a", "artifacts": [{"name": "x", "scan": 0}]}))
+        ),
+        Err("the rows of $min_subjects in tested for artifact in deployment d1 don't all say the same, so no line agrees with every one of them: artifact in deployment d1 fails $min_subjects because in-scope artifact count is 0, and artifact in deployment d1 passes $min_subjects".to_string())
+    );
+    assert!(
+        shown(
+            scoped(),
+            twins(json!({"id": "d1", "env": "prod", "approver": "a", "artifacts": []}))
+        )
+        .is_ok()
+    );
+}
+
+#[test]
 fn the_outcome_of_a_report_where_ergo_cannot_tell_whether_a_subject_is_in_scope_is_an_error() {
     let error = shown(
         scoped(),
