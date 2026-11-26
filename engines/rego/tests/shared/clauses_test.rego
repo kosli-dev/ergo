@@ -413,3 +413,8 @@ test_a_problem_outside_the_items_that_every_item_gives_with_the_same_text_is_sai
 	ergo._m_walk_said(said, []).message == text
 	ergo._m_walk_said(array.slice(said, 0, 2), []).message == text
 }
+
+test_a_list_clause_whose_quoted_key_holds_is_keeps_its_whole_name if {
+	ergo._m_list_name(`$input."a is b" is missing`) == `$input."a is b"`
+	ergo._m_list_name(`$input."a is b" can't be read: x`) == `$input."a is b"`
+}

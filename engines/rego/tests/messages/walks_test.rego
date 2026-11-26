@@ -468,6 +468,12 @@ test_a_failed_row_carries_the_clauses_its_message_is_printed_from if {
 	ergo._m_row_said(c, {"v": 1, "w": 2}, "value")["ergo/clauses"] == [ergo._m_clause("root", "v", "value", "v is 1"), ergo._m_clause("root", "w", "value", "w is 2")]
 }
 
+test_a_record_of_a_part_that_cant_be_reached_is_named_by_the_part_not_by_its_text if {
+	start := `${"alias":"cov","n":3,"of":null,"old":false}`
+	c := ergo._m_record_clause(["unusable", `cov can't be read: reports is "none", which isn't a list or an object`, {"fail": {"path": [start, "reports"]}}], {"count_of": [start, "files"], "whose": [], "text": "count of cov.files"})
+	[c.kind, c.name, c.cause] == ["item", "cov", "unusable"]
+}
+
 test_a_root_before_several_items_of_a_count_is_cut_from_them_like_the_items if {
 	c := ergo._s_written_check("count of xs whose v is 1 is $params.n")
 	ergo._m_row_text(c, {"xs": [{}, {}]}, "absent") == "$params.n is missing; item 1 of xs: v is missing; item 2 of xs: v is missing" with data.ergo_params as {}

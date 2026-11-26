@@ -280,11 +280,6 @@ test_a_list_read_through_an_alias_after_is_in_ignoring_case_is_named_as_the_item
 	ergo._with_outcome({"name": "g", "value": ["a", null]}).outcome == "unusable" with data.ergo_text_lists as ergo._text_list_names(alias)
 }
 
-test_a_list_clause_whose_quoted_key_holds_is_keeps_its_whole_name if {
-	ergo._list_clause_name(`$input."a is b" is missing`) == `$input."a is b"`
-	ergo._list_clause_name(`$input."a is b" can't be read: x`) == `$input."a is b"`
-}
-
 test_a_message_clause_whose_quoted_key_holds_is_is_dropped_by_its_whole_name if {
 	m := `$input."a is b" is missing; xs is missing`
 	ergo._tally_rest_of(m, {`$input."a is b"`}, set()) == "xs is missing"
