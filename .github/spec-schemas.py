@@ -5,8 +5,7 @@ query = '[{"where": concat(" / ", [t, g.description, c.description]), "rules": o
 examples_policy = {
     "subjects": {"deployment": {"from": "deployments", "identified_by": "id"}},
     "requirements": {"approved": {"subject": "deployment", "checks": {"approver_set": "approver is a non-empty string"}}},
-    "example_params": {"max": 1},
-    "examples": [
+    "tests": {"params": {"max": 1}, "examples": [
         {
             "name": "a deployment needs an approver",
             "description": "Shows both lines.",
@@ -18,7 +17,7 @@ examples_policy = {
             ],
         },
         {"name": "met", "input": {"deployments": [{"id": "d1", "approver": "ann"}]}, "outcome": [{"approved is met": None}]},
-    ],
+    ]},
 }
 bad_examples = [
     [],
@@ -50,8 +49,11 @@ examples_policy = {"ergo_spec": spec, **examples_policy}
 for e in policy.iter_errors(examples_policy):
     problems.append(f"examples that are written correctly don't match policy/schema.json at /{'/'.join(map(str, e.absolute_path))}: {e.message}")
 for bad in bad_examples:
-    if policy.is_valid({**examples_policy, "examples": bad}):
+    if policy.is_valid({**examples_policy, "tests": {"examples": bad}}):
         problems.append(f"examples written wrong match policy/schema.json: {json.dumps(bad)}")
+for bad in [{"exmples": []}, {"inputs": {}}, []]:
+    if policy.is_valid({**examples_policy, "tests": bad}):
+        problems.append(f"tests written wrong match policy/schema.json: {json.dumps(bad)}")
 for case in cases:
     for e in report.iter_errors(case["report"]):
         problems.append(f"{case['where']}: report doesn't match report/schema.json at /{'/'.join(map(str, e.absolute_path))}: {e.message}")
@@ -62,7 +64,7 @@ for case in cases:
     if well_formed:
         checked = case["policy"]
         if "examples.ignored" in case["rules"]:
-            checked = {k: v for k, v in checked.items() if k not in ("examples", "example_params")}
+            checked = {k: v for k, v in checked.items() if k != "tests"}
         for e in policy.iter_errors(checked):
             problems.append(f"{case['where']}: Ergo reads the policy as written correctly, but it doesn't match policy/schema.json at /{'/'.join(map(str, e.absolute_path))}: {e.message}")
 for p in problems:

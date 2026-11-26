@@ -41,16 +41,23 @@
         "null"
       ]
     },
-    "examples": {
-      "description": "Experimental: inputs, each with the outcome its report must have. A report ignores them, and a runner like ergo test reads them.",
-      "type": "array",
-      "minItems": 1,
-      "items": {
-        "$ref": "#/$defs/example"
-      }
-    },
-    "example_params": {
-      "description": "Experimental: the params of every example that has no params of its own. A report ignores them."
+    "tests": {
+      "description": "Experimental: everything for testing the policy. A report ignores it, and a runner like ergo test reads it.",
+      "type": "object",
+      "properties": {
+        "examples": {
+          "description": "Inputs, each with the outcome its report must have.",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/example"
+          }
+        },
+        "params": {
+          "description": "The params of every example that has no params of its own."
+        }
+      },
+      "additionalProperties": false
     }
   },
   "required": [
@@ -74,7 +81,7 @@
           "description": "The input to build the report from."
         },
         "params": {
-          "description": "The params to build the report with, in place of example_params."
+          "description": "The params to build the report with, in place of tests.params."
         },
         "outcome": {
           "type": "array",

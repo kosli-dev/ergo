@@ -20419,17 +20419,16 @@
     ]
   },
   {
-    "description": "a policy with examples and example_params, neither written correctly",
+    "description": "a policy with tests that is not written correctly",
     "policy": {
       "ergo_spec": "{{spec}}",
       "subjects": {"thing": {"from": "things", "identified_by": "id"}},
       "requirements": {"s": {"subject": "thing", "checks": {"c": "x exists"}}},
-      "examples": [{"name": "", "outcome": "compliant", "extra": 1}, 5],
-      "example_params": "not params"
+      "tests": {"examples": [{"name": "", "outcome": "compliant", "extra": 1}, 5], "params": "not params", "exmples": 1}
     },
     "cases": [
       {
-        "description": "ignores both, so the policy is written correctly and the report is the one it would be without them",
+        "description": "ignores it, so the policy is written correctly and the report is the one it would be without them",
         "rules": ["examples.ignored"],
         "input": {"things": [{"id": "t1", "x": 1}]},
         "compliant": true,
