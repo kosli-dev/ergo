@@ -360,6 +360,25 @@ test_a_for_line_text_that_counts_the_items_it_leaves_out_is_read_as_that_clause 
 	[c.kind | some c in ergo._for_text_said("item 1 of xs: v is missing; and 2 more")["ergo/clauses"]] == ["list", "more"]
 }
 
+test_a_count_finds_an_item_whose_key_names_a_field_outside_it_from_the_item_clauses_of_its_message if {
+	pr := `${"alias":"pr","n":0,"of":null,"old":true}`
+	check := {"op": "compare", "cmp": "eq", "expression": "count of xs whose v equals pr named by k is 1", "left": {"count_of": ["xs"], "text": "count of xs whose v equals pr named by k", "whose": [{"op": "compare", "cmp": "eq", "left": ["v"], "right": [pr, {"named_by_field": "k"}]}]}, "right": {"literal": 1}}
+	null_key := {"id": "p", "a": 5, "xs": [{"v": 5, "k": "a"}, {"v": 5, "k": null}]}
+	said := {
+		"message": "$params.z is missing, and item 2 of xs: k is null",
+		"ergo/clauses": [
+			ergo._m_clause("root", "$params.z", "absent", "$params.z is missing"),
+			ergo._m_clause("item", "item 2 of xs", "null", "item 2 of xs: k is null"),
+		],
+		"ergo/joint": ", and ",
+	}
+	[[p.name, p.cause, p.message] | some p in ergo._tally_item_parts(check, null_key, "null", "/things/0", said)] == [["item 2 of xs", "null", "k is null"]]
+	ergo._tally_item_texts(check, null_key, "null", said) == {"item 2 of xs: k is null"}
+	number_key := {"id": "p", "a": 5, "xs": [{"v": 5, "k": "a"}, {"v": 5, "k": 3}]}
+	text := said_of([ergo._m_clause("item", "item 2 of xs", "not_an_object", "item 2 of xs: k is 3, which isn't text")])
+	[[p.name, p.cause] | some p in ergo._tally_item_parts(check, number_key, "unusable", "/things/0", text)] == [["item 2 of xs", "unusable"]]
+}
+
 test_a_count_reads_its_list_entries_from_the_clauses_of_its_message_not_from_its_text if {
 	said := {
 		"message": "", "ergo/clauses": [
