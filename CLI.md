@@ -145,7 +145,7 @@ warning: no example shows approver_set of approved passing
 2 examples: 1 passed, 1 failed
 ```
 
-The last lines warn about each check that no example shows failing, or none shows passing. `--strict` makes a warning fail the run, for CI. `ergo test` exits 0 when every example passed, 1 when one failed or, with `--strict`, when there's a warning, and 2 when the policy file can't be read or its examples are written wrong, like two examples with the same name, or an outcome that is empty, isn't a list, or has a heading with no status and no lines. `ergo report --format outcome` exits 2 for a report it can't show yet, and with `--fail` it exits 3 for a policy written wrong, as it does without `--format`.
+The last lines warn about each check that no example shows failing, or none shows passing, counting only the examples that passed. `--strict` makes a warning fail the run, for CI. `ergo test` exits 0 when every example passed, 1 when one failed or, with `--strict`, when there's a warning, and 2 when the policy file can't be read or its examples are written wrong, like two examples with the same name, or an outcome that is empty, isn't a list, or has a heading with no status and no lines. `ergo report --format outcome` exits 2 for a report it can't show yet, and with `--fail` it exits 3 for a policy written wrong, as it does without `--format`.
 
 For now, outcome lines cover the policy's own checks on subjects that aren't child subjects. A line for a child subject, for a check Ergo adds like `$min_subjects`, or for a subject out of scope can't be written yet, and `--format outcome` refuses a report that has a failed row of that kind. An example whose lines cover such a row fails and says it can't check it yet.
 

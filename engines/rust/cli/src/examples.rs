@@ -318,8 +318,8 @@ pub fn run(policy: &Value, strict: bool) -> Result<(String, u8), String> {
     for example in &examples {
         let report = ergo_policy_engine::report(&example.input, policy, &example.params);
         let checked = check(&example.outcome, &report);
-        shown.extend(checked.shown);
         if checked.problems.is_empty() {
+            shown.extend(checked.shown);
             text.push_str(&format!("passed: {}\n", example.name));
             continue;
         }
