@@ -505,12 +505,121 @@ requirements:
   a is not met: {subject: t, checks: {c: w is true}}
 "#;
 
+const CHILD_POLICY: &str = r#"ergo_spec: {{spec}}
+subjects:
+  pull request:
+    from: prs
+    identified_by: number
+  release:
+    from: 'every "pull request".releases'
+    identified_by: tag
+  test run:
+    from: every release.runs
+    identified_by: id
+  release train:
+    from: trains
+    identified_by: id
+requirements:
+  shipped:
+    subject: release
+    checks:
+      signed: signed is true
+  ran:
+    subject: test run
+    checks:
+      ok: ok is true
+  spare:
+    subject: release train
+    min_subjects: 0
+    checks:
+      ok: ok is true
+"#;
+
+fn child_input() -> serde_json::Value {
+    serde_json::json!({"trains": [], "prs": [
+        {"number": 7, "releases": [
+            {"tag": "release", "signed": true, "runs": [
+                {"id": true, "ok": true},
+                {"id": "pull request", "ok": false},
+                {"id": "in", "ok": true}
+            ]},
+            {"tag": "train", "signed": false, "runs": [{"id": 1.50, "ok": true}]},
+            {"tag": "v 1", "signed": true, "runs": [{"id": "release", "ok": false}]}
+        ]},
+        {"number": 8, "releases": [
+            {"tag": "release", "signed": true, "runs": [{"id": true, "ok": false}]}
+        ]}
+    ]})
+}
+
+const NUMBER_PARENT_POLICY: &str = r#"ergo_spec: {{spec}}
+subjects:
+  deployment:
+    from: deployments
+    identified_by: id
+  deployment 7:
+    from: sevens
+    identified_by: id
+  artifact:
+    from: every deployment.artifacts
+    identified_by: name
+requirements:
+  tested:
+    subject: artifact
+    checks:
+      ok: ok is true
+  spare:
+    subject: deployment 7
+    min_subjects: 0
+    checks:
+      ok: ok is true
+"#;
+
+#[test]
+fn format_outcome_prints_a_child_subject_with_each_parent_after_in() {
+    let policy = file("format-child", "policy.yaml", CHILD_POLICY);
+    let input = file("format-child", "input.json", &ascii_json(&child_input()));
+    let Ok(Outcome::Print(printed)) = run(&args(&[
+        "report", "--policy", &policy, "--input", &input, "--format", "outcome",
+    ])) else {
+        panic!();
+    };
+    assert_eq!(
+        printed,
+        r#"- not compliant
+- ran is not met:
+    - test run true in release release in pull request 7 passes ok
+    - test run "pull request" in release release in pull request 7 fails ok because ok is false
+    - test run in in release release in pull request 7 passes ok
+    - test run 1.5 in release "train" in pull request 7 passes ok
+    - test run release in release "v 1" in pull request 7 fails ok because ok is false
+    - test run true in release release in pull request 8 fails ok because ok is false
+- shipped is not met:
+    - release release in pull request 7 passes signed
+    - release "train" in pull request 7 fails signed because signed is false
+    - release "v 1" in pull request 7 passes signed
+    - release release in pull request 8 passes signed
+- spare is not applicable
+"#
+    );
+}
+
 #[test]
 fn what_format_outcome_prints_pasted_under_outcome_passes_ergo_test_or_is_refused() {
     let met = serde_json::json!({"ts": [{"id": "t1", "p": true, "w": false}]});
     let not_met = serde_json::json!({"ts": [{"id": "t1", "p": false, "w": false}]});
+    let number_parent = serde_json::json!({"sevens": [], "deployments": [
+        {"id": 7, "artifacts": [{"name": "a", "ok": true}]}
+    ]});
     for (name, policy, input, pasted_back) in [
         ("round-trip", ODD_POLICY, odd_input(), true),
+        ("round-trip-child", CHILD_POLICY, child_input(), true),
+        (
+            "round-trip-number-parent",
+            NUMBER_PARENT_POLICY,
+            number_parent,
+            false,
+        ),
         ("round-trip-x-met", NAMED_WITH_A_STATUS, met.clone(), false),
         (
             "round-trip-x-not-met",
