@@ -15,23 +15,23 @@ use args::{Command, Parsed};
 pub enum Failure {
     /// The command line is wrong.
     Usage(String),
-    /// A file can't be read or parsed.
+    /// A file can't be read or parsed, or a policy's examples are written wrong.
     File(String),
+    /// The output asked for can't show something in the report yet.
+    Unsupported(String),
 }
 
 impl Failure {
     /// The text to print on stderr.
     pub fn message(&self) -> &str {
         match self {
-            Failure::Usage(m) | Failure::File(m) => m,
+            Failure::Usage(m) | Failure::File(m) | Failure::Unsupported(m) => m,
         }
     }
 
-    /// The exit code: 2, for a wrong command line and for a bad file alike.
+    /// The exit code: 2, for a wrong command line, a bad file and output that can't be written alike.
     pub fn code(&self) -> i32 {
-        match self {
-            Failure::Usage(_) | Failure::File(_) => 2,
-        }
+        2
     }
 }
 
