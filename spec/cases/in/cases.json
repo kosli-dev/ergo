@@ -3349,7 +3349,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "id is missing, and item 2 of $input: id is missing",
+                "message": "item 2 of $input: id is missing, and id is missing",
                 "name": "id is in $input.id"
               }
             ],
@@ -3375,7 +3375,7 @@
                 ]
               }
             ],
-            "message": "id is missing, and item 2 of $input: id is missing",
+            "message": "item 2 of $input: id is missing, and id is missing",
             "passed": false,
             "requirement": "s",
             "subject": {

@@ -37089,7 +37089,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/n"
                 ],
-                "message": "$params.n is missing, and $params.k is missing",
+                "message": "$params.k is missing; $params.n is missing",
                 "name": "count of es whose zz equals m named by $params.k equals $params.n"
               }
             ],
@@ -37142,7 +37142,7 @@
                 "value": null
               }
             ],
-            "message": "$params.n is missing, and $params.k is missing; item 1 of es: m is missing; item 2 of es: m is missing; item 3 of es: m is missing; and 2 more",
+            "message": "$params.k is missing; $params.n is missing; item 1 of es: m is missing; item 2 of es: m is missing; item 3 of es: m is missing; and 2 more",
             "passed": false,
             "requirement": "s",
             "subject": {
