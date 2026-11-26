@@ -613,3 +613,73 @@ fn a_line_for_a_child_row_quotes_the_ids_that_would_read_as_part_of_a_longer_sub
         ]
     );
 }
+
+fn unused_names(parent: &str, used: bool) -> Value {
+    let mut policy = json!({
+        "subjects": {
+            "deployment": {"from": "deployments", "identified_by": "id"},
+            parent: {"from": "others", "identified_by": "id"},
+            "artifact": {"from": "every deployment.artifacts", "identified_by": "name"},
+            "pull": {"from": "pulls", "identified_by": "id"},
+            "pull request": {"from": "prs", "identified_by": "number"}
+        },
+        "requirements": {
+            "p": {"subject": "pull", "checks": {"c": "x is 1"}},
+            "q": {"subject": "artifact", "checks": {"c": "x is 1"}}
+        }
+    });
+    if used {
+        policy["requirements"]["spare"] =
+            json!({"subject": parent, "min_subjects": 0, "checks": {"c": "x is 1"}});
+        policy["requirements"]["spare pr"] =
+            json!({"subject": "pull request", "min_subjects": 0, "checks": {"c": "x is 1"}});
+    }
+    policy
+}
+
+fn unused_names_input(parent_id: Value) -> Value {
+    json!({
+        "others": [], "prs": [],
+        "deployments": [{"id": parent_id, "artifacts": [{"name": "web", "x": 2}]}],
+        "pulls": [{"id": "request", "x": 2}]
+    })
+}
+
+fn group(items: &[Item], requirement: &str) -> Vec<String> {
+    items
+        .iter()
+        .find_map(|item| match item {
+            Item::Group(heading, lines) if heading.starts_with(&format!("{requirement} is ")) => {
+                Some(lines.clone())
+            }
+            _ => None,
+        })
+        .unwrap_or_default()
+}
+
+#[test]
+fn the_outcome_of_a_report_reads_back_with_every_subject_name_of_the_policy_even_one_no_requirement_uses()
+ {
+    for used in [false, true] {
+        assert_eq!(
+            shown(unused_names("deployment 7", used), unused_names_input(json!(7))),
+            Err("no line for artifact web in deployment 7 and c in q reads back as its row, because a longer subject or check name starts the same way".to_string()),
+            "used: {used}"
+        );
+        let items = shown(
+            unused_names("deployment x", used),
+            unused_names_input(json!("x")),
+        )
+        .unwrap();
+        assert_eq!(
+            group(&items, "q"),
+            vec!["artifact \"web\" in deployment \"x\" fails c because x is 2"],
+            "used: {used}"
+        );
+        assert_eq!(
+            group(&items, "p"),
+            vec!["pull \"request\" fails c because x is 2"],
+            "used: {used}"
+        );
+    }
+}

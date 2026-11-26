@@ -604,6 +604,29 @@ fn format_outcome_prints_a_child_subject_with_each_parent_after_in() {
     );
 }
 
+fn without_spare(policy: &str) -> &str {
+    policy.split("  spare:\n").next().unwrap()
+}
+
+#[test]
+fn format_outcome_prints_the_same_lines_whether_or_not_a_requirement_uses_every_subject() {
+    let input = file("format-unused", "input.json", &ascii_json(&child_input()));
+    let printed = |policy_text: &str| {
+        let policy = file("format-unused", "policy.yaml", policy_text);
+        let Ok(Outcome::Print(printed)) = run(&args(&[
+            "report", "--policy", &policy, "--input", &input, "--format", "outcome",
+        ])) else {
+            panic!();
+        };
+        printed
+    };
+    let used = printed(CHILD_POLICY);
+    assert_eq!(
+        printed(without_spare(CHILD_POLICY)),
+        used.strip_suffix("- spare is not applicable\n").unwrap()
+    );
+}
+
 #[test]
 fn what_format_outcome_prints_pasted_under_outcome_passes_ergo_test_or_is_refused() {
     let met = serde_json::json!({"ts": [{"id": "t1", "p": true, "w": false}]});
@@ -615,8 +638,20 @@ fn what_format_outcome_prints_pasted_under_outcome_passes_ergo_test_or_is_refuse
         ("round-trip", ODD_POLICY, odd_input(), true),
         ("round-trip-child", CHILD_POLICY, child_input(), true),
         (
+            "round-trip-child-unused",
+            without_spare(CHILD_POLICY),
+            child_input(),
+            true,
+        ),
+        (
             "round-trip-number-parent",
             NUMBER_PARENT_POLICY,
+            number_parent.clone(),
+            false,
+        ),
+        (
+            "round-trip-number-parent-unused",
+            without_spare(NUMBER_PARENT_POLICY),
             number_parent,
             false,
         ),

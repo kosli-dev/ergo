@@ -677,3 +677,86 @@ fn a_line_for_a_child_subject_without_the_in_its_from_line_gives_cannot_be_read(
         );
     }
 }
+
+fn unused_names(parent: &str, used: bool) -> Value {
+    let mut policy = json!({
+        "ergo_spec": ergo_policy_engine::SPEC,
+        "subjects": {
+            "deployment": {"from": "deployments", "identified_by": "id"},
+            parent: {"from": "others", "identified_by": "id"},
+            "artifact": {"from": "every deployment.artifacts", "identified_by": "name"},
+            "pull": {"from": "pulls", "identified_by": "id"},
+            "pull request": {"from": "prs", "identified_by": "number"}
+        },
+        "requirements": {
+            "q": {"subject": "artifact", "checks": {"c": "x is 1"}},
+            "p": {"subject": "pull", "checks": {"c": "x is 1"}}
+        }
+    });
+    if used {
+        policy["requirements"]["spare"] =
+            json!({"subject": parent, "min_subjects": 0, "checks": {"c": "x is 1"}});
+        policy["requirements"]["spare pr"] =
+            json!({"subject": "pull request", "min_subjects": 0, "checks": {"c": "x is 1"}});
+    }
+    policy
+}
+
+fn unused_names_input(parent_id: Value) -> Value {
+    json!({
+        "others": [], "prs": [],
+        "deployments": [{"id": parent_id, "artifacts": [{"name": "web", "x": 2}]}],
+        "pulls": [{"id": "request", "x": 2}]
+    })
+}
+
+#[test]
+fn a_line_is_read_with_every_subject_name_of_the_policy_even_one_no_requirement_uses() {
+    for (parent, id, unreadable, readable) in [
+        (
+            "deployment 7",
+            json!(7),
+            "artifact web in deployment 7 fails c",
+            None,
+        ),
+        (
+            "deployment x",
+            json!("x"),
+            "artifact web in deployment x fails c",
+            Some("artifact web in deployment \"x\" fails c"),
+        ),
+    ] {
+        for used in [false, true] {
+            let policy = unused_names(parent, used);
+            let report =
+                ergo_policy_engine::report(&unused_names_input(id.clone()), &policy, &json!({}));
+            let check = |lines: Value| examples::check(&lines, &report, &policy).problems;
+            assert_eq!(
+                check(json!([{"q": [unreadable]}])),
+                vec![format!(
+                    "can't read the line '{unreadable}': it needs passes or fails after the id"
+                )],
+                "{parent} used: {used}"
+            );
+            if let Some(readable) = readable {
+                assert_eq!(
+                    check(json!([{"q": [readable]}])),
+                    Vec::<String>::new(),
+                    "{parent} used: {used}"
+                );
+            }
+            assert_eq!(
+                check(json!([{"p": ["pull request fails c"]}])),
+                vec![
+                    "can't read the line 'pull request fails c': it needs passes or fails after the id"
+                ],
+                "{parent} used: {used}"
+            );
+            assert_eq!(
+                check(json!([{"p": ["pull \"request\" fails c"]}])),
+                Vec::<String>::new(),
+                "{parent} used: {used}"
+            );
+        }
+    }
+}
