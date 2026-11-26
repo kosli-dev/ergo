@@ -117,18 +117,19 @@ A sentence reads them with `$params`, like `region is in $params.regions`. Param
 
 ### Examples
 
-**Experimental.** A policy can carry examples, to test it in any engine without writing Rego. Only the [`ergo` command](CLI.md#test-a-policy-with-examples-experimental) runs them for now, with `ergo test`, and `ergo report --format outcome` prints a report in the same form, ready to paste. A report ignores `examples` and `example_params`, even when they are written wrong, so a mistake in an example never fails the policy.
+**Experimental.** A policy can carry examples, to test it in any engine without writing Rego. Only the [`ergo` command](CLI.md#test-a-policy-with-examples-experimental) runs them for now, with `ergo test`, and `ergo report --format outcome` prints a report in the same form, ready to paste. Everything for testing sits under one field, `tests`, and a report ignores it, even when it is written wrong, so a mistake in an example never fails the policy. `ergo test` refuses a `tests` with a field it doesn't know, so a mistyped name isn't skipped without a word, and a policy that still writes `examples` or `example_params` at the top level, which are now `tests.examples` and `tests.params`.
 
-`examples` is a list. Each example has a `name`, any text, unique in the policy, an optional `description`, an `input` and an `outcome`, the lines its report must have. `example_params` gives the params of every example, and an example's own `params` replace them completely. With neither, the example runs with `{}`. With the policy `approved` that checks `approver_set: approver is a non-empty string` on each `deployment`:
+`tests.examples` is a list. Each example has a `name`, any text, unique in the policy, an optional `description`, an `input` and an `outcome`, the lines its report must have. `tests.params` gives the params of every example, and an example's own `params` replace them completely. With neither, the example runs with `{}`. With the policy `approved` that checks `approver_set: approver is a non-empty string` on each `deployment`:
 
 ```yaml
-examples:
-  - name: a deployment needs an approver
-    input: {deployments: [{id: d1}, {id: d2, approver: bob}]}
-    outcome:
-      - approved is not met:
-          - deployment d1 fails approver_set because approver is missing
-          - deployment d2 passes approver_set
+tests:
+  examples:
+    - name: a deployment needs an approver
+      input: {deployments: [{id: d1}, {id: d2, approver: bob}]}
+      outcome:
+        - approved is not met:
+            - deployment d1 fails approver_set because approver is missing
+            - deployment d2 passes approver_set
 ```
 
 An outcome is a list of lines:

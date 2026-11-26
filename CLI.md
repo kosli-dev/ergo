@@ -98,26 +98,27 @@ requirements:
       approver_set: approver is a non-empty string
       not_self_approved: approver does not equal author
 
-examples:
-  - name: a deployment needs an approver
-    input:
-      deployments:
-        - {id: d1, author: ann}
-        - {id: d2, author: ann, approver: bob}
-    outcome:
-      - approved:
-          - deployment d1 fails approver_set because approver is missing
-          - deployment d2 passes approver_set
+tests:
+  examples:
+    - name: a deployment needs an approver
+      input:
+        deployments:
+          - {id: d1, author: ann}
+          - {id: d2, author: ann, approver: bob}
+      outcome:
+        - approved:
+            - deployment d1 fails approver_set because approver is missing
+            - deployment d2 passes approver_set
 
-  - name: nobody approves their own deployment
-    input:
-      deployments:
-        - {id: d1, author: ann, approver: bob}
-        - {id: d2, author: cat, approver: cat}
-    outcome:
-      - approved:
-          - deployment d1 passes not_self_approved
-          - deployment d2 fails not_self_approved
+    - name: nobody approves their own deployment
+      input:
+        deployments:
+          - {id: d1, author: ann, approver: bob}
+          - {id: d2, author: cat, approver: cat}
+      outcome:
+        - approved:
+            - deployment d1 passes not_self_approved
+            - deployment d2 fails not_self_approved
 ```
 
 `ergo test policy.yaml` prints:
@@ -146,7 +147,7 @@ warning: no example shows approver_set of approved passing
 2 examples: 1 passed, 1 failed
 ```
 
-The last lines warn about each check that no example shows failing, or none shows passing, counting only the examples that passed. `--strict` makes a warning fail the run, for CI. `ergo test` exits 0 when every example passed, 1 when one failed or, with `--strict`, when there's a warning, and 2 when the policy file can't be read or its examples are written wrong, like two examples with the same name, or an outcome that is empty, isn't a list, or has a heading with no status and no lines. It also refuses a YAML policy file that writes a key twice in the same mapping anywhere inside `examples` or `example_params`, like two `outcome` keys in one example, because the second would replace the first and the example would lose its lines without a word. A JSON policy file isn't checked for that yet, and neither is a mapping that writes a key twice outside `examples` and that an alias brings into it. `ergo report --format outcome` exits 2 for a report it can't show yet, and with `--fail` it exits 3 for a policy written wrong, as it does without `--format`.
+The last lines warn about each check that no example shows failing, or none shows passing, counting only the examples that passed. `--strict` makes a warning fail the run, for CI. `ergo test` exits 0 when every example passed, 1 when one failed or, with `--strict`, when there's a warning, and 2 when the policy file can't be read or its examples are written wrong, like two examples with the same name, a field under `tests` it doesn't know, `examples` or `example_params` still at the top level of the policy (they are `tests.examples` and `tests.params` now), or an outcome that is empty, isn't a list, or has a heading with no status and no lines. It also refuses a YAML policy file that writes a key twice in the same mapping anywhere inside `tests`, like two `outcome` keys in one example, because the second would replace the first and the example would lose its lines without a word. A JSON policy file isn't checked for that yet, and neither is a mapping that writes a key twice outside `tests` and that an alias brings into it. `ergo report --format outcome` exits 2 for a report it can't show yet, and with `--fail` it exits 3 for a policy written wrong, as it does without `--format`.
 
 A child subject's line names its parent after its id, with `in`, every time, and a grandchild's names its grandparent after that. With this policy in `artifacts.yaml`:
 
@@ -165,16 +166,17 @@ requirements:
     checks:
       tests_passed: tests is "passed"
 
-examples:
-  - name: every artifact's tests pass
-    input:
-      deployments:
-        - {id: d1, artifacts: [{name: web, tests: failed}]}
-        - {id: d2, artifacts: [{name: web, tests: passed}]}
-    outcome:
-      - tested:
-          - artifact web in deployment d1 fails tests_passed
-          - artifact web in deployment d2 passes tests_passed
+tests:
+  examples:
+    - name: every artifact's tests pass
+      input:
+        deployments:
+          - {id: d1, artifacts: [{name: web, tests: failed}]}
+          - {id: d2, artifacts: [{name: web, tests: passed}]}
+      outcome:
+        - tested:
+            - artifact web in deployment d1 fails tests_passed
+            - artifact web in deployment d2 passes tests_passed
 ```
 
 and `artifacts.json` holding:
@@ -228,23 +230,24 @@ requirements:
     checks:
       tests_passed: tests is "passed"
 
-examples:
-  - name: only production deployments need an approver
-    input:
-      deployments:
-        - {id: d1, environment: prod, approver: bob}
-        - {id: d3, environment: dev}
-    outcome:
-      - approved is met:
-          - deployment d3 is out of scope because environment is "dev"
+tests:
+  examples:
+    - name: only production deployments need an approver
+      input:
+        deployments:
+          - {id: d1, environment: prod, approver: bob}
+          - {id: d3, environment: dev}
+      outcome:
+        - approved is met:
+            - deployment d3 is out of scope because environment is "dev"
 
-  - name: a production deployment with no artifacts fails
-    input:
-      deployments:
-        - {id: d4, environment: prod, approver: bob, artifacts: []}
-    outcome:
-      - tested is not met:
-          - artifact in deployment d4 fails $min_subjects because in-scope artifact count is 0
+    - name: a production deployment with no artifacts fails
+      input:
+        deployments:
+          - {id: d4, environment: prod, approver: bob, artifacts: []}
+      outcome:
+        - tested is not met:
+            - artifact in deployment d4 fails $min_subjects because in-scope artifact count is 0
 ```
 
 and `production.json` holding:
