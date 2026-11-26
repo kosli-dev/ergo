@@ -982,6 +982,46 @@ fn a_line_for_a_check_ergo_adds_with_an_id_a_subject_it_does_not_need_or_another
 }
 
 #[test]
+fn a_check_of_the_policy_named_like_a_check_ergo_adds_is_read_as_the_policys_check_after_an_id() {
+    let checks = ["fails $min_subjects", "c"];
+    let read =
+        |text: &str| outcome::read_check_line(text, "r", "deployment", &["deployment"], &checks);
+    assert_eq!(
+        read("deployment d1 passes fails $min_subjects"),
+        Ok(check_line(
+            "deployment",
+            Some(json!("d1")),
+            true,
+            "fails $min_subjects",
+            None,
+            &[]
+        ))
+    );
+    assert_eq!(
+        read("deployment d1 fails fails $min_subjects because x"),
+        Ok(check_line(
+            "deployment",
+            Some(json!("d1")),
+            false,
+            "fails $min_subjects",
+            Some("x"),
+            &[]
+        ))
+    );
+    assert_eq!(
+        read("fails $min_subjects"),
+        Ok(check_line(
+            "deployment",
+            None,
+            false,
+            "$min_subjects",
+            None,
+            &[]
+        ))
+    );
+}
+
+#[test]
 fn a_scope_line_says_a_subject_is_in_or_out_of_scope_as_its_applies_row_does() {
     let cases = [
         (
