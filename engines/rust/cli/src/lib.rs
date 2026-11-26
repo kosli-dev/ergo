@@ -1,34 +1,44 @@
 //! The command-line tool behind the `ergo` binary: reads a policy, an input and params from JSON or YAML files and prints the report or the violations.
 
 pub mod args;
+pub mod examples;
 pub mod files;
 pub mod number;
+pub mod outcome;
 pub mod output;
 pub mod yaml;
 
-use args::{Command, Parsed};
+use args::{Command, Format, Parsed};
 
 /// Why a run failed. The message is one line and names the problem and the file.
 #[derive(Debug, PartialEq, Eq)]
 pub enum Failure {
     /// The command line is wrong.
     Usage(String),
-    /// A file can't be read or parsed.
+    /// A file can't be read or parsed, or a policy's examples are written wrong.
     File(String),
+    /// The output asked for can't show something in the report yet.
+    Unsupported(String),
+    /// With `--fail`, the policy is written wrong and the output asked for can't show the report.
+    WrittenWrong(String),
 }
 
 impl Failure {
     /// The text to print on stderr.
     pub fn message(&self) -> &str {
         match self {
-            Failure::Usage(m) | Failure::File(m) => m,
+            Failure::Usage(m)
+            | Failure::File(m)
+            | Failure::Unsupported(m)
+            | Failure::WrittenWrong(m) => m,
         }
     }
 
-    /// The exit code: 2, for a wrong command line and for a bad file alike.
+    /// The exit code: 3 when, with `--fail`, the policy is written wrong, and 2 for a wrong command line, a bad file and output that can't be written alike.
     pub fn code(&self) -> i32 {
         match self {
-            Failure::Usage(_) | Failure::File(_) => 2,
+            Failure::WrittenWrong(_) => 3,
+            _ => 2,
         }
     }
 }
@@ -36,10 +46,13 @@ impl Failure {
 /// The usage text.
 pub const USAGE: &str =
     "Usage: ergo <command> --policy <file> --input <file> [--params <file>] [--compact] [--fail]
+       ergo report --format outcome --policy <file> --input <file> [--params <file>] [--fail]
+       ergo test <policy file> [--strict]
 
 Commands:
   report       print the report as JSON
   violations   print what failed in the report as JSON
+  test         experimental: run the examples in a policy
   help         print this text
 
 ergo --version prints the version and the commit it was built from.
@@ -47,9 +60,13 @@ ergo --version prints the version and the commit it was built from.
 Files can be .json, .yaml or .yml. Without --params the params are {}.
 The output is pretty-printed with sorted keys; --compact prints one line.
 
+Experimental: --format outcome prints the report as outcome lines in YAML,
+ready to paste into an example. test --strict also fails when no example
+shows a check failing, or none shows it passing.
+
 Exit codes:
   0  the output was printed: the policy is met, or --fail isn't given
-  1  with --fail, a check failed
+  1  with --fail, a check failed; with test, an example failed, or --strict and a warning
   2  the command line is wrong, a file can't be read, or the output couldn't be written
   3  with --fail, the policy is written wrong or has no requirements
 ";
@@ -92,6 +109,21 @@ pub fn run(arguments: &[String]) -> Result<Outcome, Failure> {
             )));
         }
         Parsed::Run(options) => options,
+        Parsed::Test(options) => {
+            let policy = files::load("policy", &options.policy)?;
+            let written_wrong = |problem| {
+                Failure::File(format!(
+                    "the examples in the policy file {} are written wrong: {problem}",
+                    options.policy
+                ))
+            };
+            examples::repeated(&files::repeated_keys(&options.policy)).map_err(written_wrong)?;
+            let (text, code) = examples::run(&policy, options.strict).map_err(written_wrong)?;
+            return Ok(match code {
+                0 => Outcome::Print(text),
+                code => Outcome::PrintAndFail(text, code),
+            });
+        }
     };
     let policy = files::load("policy", &options.policy)?;
     let input = files::load("input", &options.input)?;
@@ -101,11 +133,21 @@ pub fn run(arguments: &[String]) -> Result<Outcome, Failure> {
     };
     let report = ergo_policy_engine::report(&input, &policy, &params);
     let code = if options.fail { fail_code(&report) } else { 0 };
-    let value = match options.command {
-        Command::Report => report,
-        Command::Violations => ergo_policy_engine::violations(&report),
+    let text = match (options.command, options.format) {
+        (_, Format::Outcome) => {
+            outcome::yaml(&outcome::of(&report).map_err(|problem| match code {
+                3 => Failure::WrittenWrong(format!(
+                    "the policy file {} is written wrong, so the report can't be shown as an outcome: {problem}",
+                    options.policy
+                )),
+                _ => Failure::Unsupported(problem),
+            })?)
+        }
+        (Command::Report, Format::Json) => output::render(&report, options.compact),
+        (Command::Violations, Format::Json) => {
+            output::render(&ergo_policy_engine::violations(&report), options.compact)
+        }
     };
-    let text = output::render(&value, options.compact);
     Ok(match code {
         0 => Outcome::Print(text),
         code => Outcome::PrintAndFail(text, code),

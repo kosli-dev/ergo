@@ -1,6 +1,7 @@
 //! Reads the command line by hand.
 
 use crate::Failure;
+use std::collections::{BTreeMap, BTreeSet};
 
 /// The two commands that print something built from the files.
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
@@ -9,6 +10,15 @@ pub enum Command {
     Report,
     /// `ergo violations`
     Violations,
+}
+
+/// How `ergo report` prints the report.
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+pub enum Format {
+    /// As JSON, the default.
+    Json,
+    /// Experimental: as outcome lines in YAML, as a policy's examples write them.
+    Outcome,
 }
 
 /// What the command line asks for.
@@ -26,6 +36,17 @@ pub struct Options {
     pub compact: bool,
     /// Whether to exit non-zero when the report isn't compliant.
     pub fail: bool,
+    /// How to print the report.
+    pub format: Format,
+}
+
+/// What `ergo test` is asked to run.
+#[derive(Debug, PartialEq, Eq)]
+pub struct TestOptions {
+    /// Path of the policy file that holds the examples.
+    pub policy: String,
+    /// Whether a warning fails the run.
+    pub strict: bool,
 }
 
 /// The result of reading the command line.
@@ -37,6 +58,8 @@ pub enum Parsed {
     Version,
     /// Run a command.
     Run(Options),
+    /// Experimental: run a policy's examples.
+    Test(TestOptions),
 }
 
 /// Reads the arguments after the program name.
@@ -48,15 +71,14 @@ pub fn parse(arguments: &[String]) -> Result<Parsed, Failure> {
     let command = match first.as_str() {
         "help" | "--help" | "-h" => return Ok(Parsed::Help),
         "--version" => return Ok(Parsed::Version),
-        "report" => Command::Report,
-        "violations" => Command::Violations,
+        "report" => Some(Command::Report),
+        "violations" => Some(Command::Violations),
+        "test" => None,
         other => return Err(usage(format!("unknown command '{other}'"))),
     };
-    let mut policy = None;
-    let mut input = None;
-    let mut params = None;
-    let mut compact = false;
-    let mut fail = false;
+    let mut values: BTreeMap<&str, String> = BTreeMap::new();
+    let mut switches = BTreeSet::new();
+    let mut positional = Vec::new();
     let mut rest = arguments[1..].iter();
     while let Some(argument) = rest.next() {
         let (name, attached) = match argument.split_once('=') {
@@ -65,17 +87,13 @@ pub fn parse(arguments: &[String]) -> Result<Parsed, Failure> {
         };
         match name {
             "--help" | "-h" => return Ok(Parsed::Help),
-            "--compact" | "--fail" => {
+            "--compact" | "--fail" | "--strict" => {
                 if attached.is_some() {
                     return Err(usage(format!("{name} takes no value")));
                 }
-                if name == "--compact" {
-                    compact = true;
-                } else {
-                    fail = true;
-                }
+                switches.insert(name);
             }
-            "--policy" | "--input" | "--params" => {
+            "--policy" | "--input" | "--params" | "--format" => {
                 let value = match attached {
                     Some(value) => Some(value),
                     None => rest.next().filter(|v| !v.starts_with("--")).cloned(),
@@ -83,27 +101,67 @@ pub fn parse(arguments: &[String]) -> Result<Parsed, Failure> {
                 let Some(value) = value.filter(|v| !v.is_empty()) else {
                     return Err(usage(format!("{name} needs a value")));
                 };
-                let slot = match name {
-                    "--policy" => &mut policy,
-                    "--input" => &mut input,
-                    _ => &mut params,
-                };
-                if slot.replace(value).is_some() {
+                if values.insert(name, value).is_some() {
                     return Err(usage(format!("{name} given twice")));
                 }
             }
             other if other.starts_with("--") => {
                 return Err(usage(format!("unknown flag '{other}'")));
             }
-            other => return Err(usage(format!("unexpected argument '{other}'"))),
+            other => positional.push(other.to_string()),
         }
+    }
+    let Some(command) = command else {
+        let report_only = values.keys().copied();
+        let report_only = report_only.chain(switches.iter().copied().filter(|s| *s != "--strict"));
+        if let Some(flag) = report_only.min() {
+            return Err(usage(format!(
+                "{flag} only goes with report and violations"
+            )));
+        }
+        let mut positional = positional.into_iter();
+        let policy = positional
+            .next()
+            .ok_or_else(|| usage("test needs a policy file".to_string()))?;
+        if let Some(extra) = positional.next() {
+            return Err(usage(format!("unexpected argument '{extra}'")));
+        }
+        return Ok(Parsed::Test(TestOptions {
+            policy,
+            strict: switches.contains("--strict"),
+        }));
+    };
+    if let Some(extra) = positional.first() {
+        return Err(usage(format!("unexpected argument '{extra}'")));
+    }
+    if switches.contains("--strict") {
+        return Err(usage("--strict only goes with test".to_string()));
+    }
+    let format = match values.get("--format").map(String::as_str) {
+        None | Some("json") => Format::Json,
+        Some("outcome") => Format::Outcome,
+        Some(_) => return Err(usage("--format must be json or outcome".to_string())),
+    };
+    let compact = switches.contains("--compact");
+    if format == Format::Outcome && command == Command::Violations {
+        return Err(usage("--format outcome only goes with report".to_string()));
+    }
+    if format == Format::Outcome && compact {
+        return Err(usage(
+            "--compact can't go with --format outcome".to_string(),
+        ));
     }
     Ok(Parsed::Run(Options {
         command,
-        policy: policy.ok_or_else(|| usage("--policy is missing".to_string()))?,
-        input: input.ok_or_else(|| usage("--input is missing".to_string()))?,
-        params,
+        policy: values
+            .remove("--policy")
+            .ok_or_else(|| usage("--policy is missing".to_string()))?,
+        input: values
+            .remove("--input")
+            .ok_or_else(|| usage("--input is missing".to_string()))?,
+        params: values.remove("--params"),
         compact,
-        fail,
+        fail: switches.contains("--fail"),
+        format,
     }))
 }

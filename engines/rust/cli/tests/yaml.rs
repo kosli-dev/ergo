@@ -22,6 +22,24 @@ fn same(text: &str, expected: Value) {
 }
 
 #[test]
+fn the_keys_written_twice_in_one_mapping_are_listed_with_where_they_are() {
+    let text = "a: 1\na: 2\nb:\n  - {c: 1, d: 2}\n  - {c: 1, c: 2}\n";
+    assert_eq!(
+        parse(text),
+        Ok(json!({"a": 2, "b": [{"c": 1, "d": 2}, {"c": 2}]}))
+    );
+    assert_eq!(
+        ergo_policy_cli::yaml::repeated_keys(text),
+        Ok(vec![
+            vec!["a".to_string()],
+            vec!["b".to_string(), "[1]".to_string(), "c".to_string()],
+        ])
+    );
+    let merged = "x: &m {a: 1}\ny:\n  <<: *m\n  a: 2\n";
+    assert_eq!(ergo_policy_cli::yaml::repeated_keys(merged), Ok(vec![]));
+}
+
+#[test]
 fn only_true_and_false_are_booleans() {
     for t in ["true", "True", "TRUE"] {
         same(t, json!(true));
