@@ -63,8 +63,8 @@ pub fn read_id(text: &str) -> Option<(Value, &str)> {
 pub struct CheckLine {
     /// The subject's name, as the policy writes it.
     pub subject: String,
-    /// The subject's id.
-    pub id: Value,
+    /// The subject's id, or `None` for a row of a check Ergo adds, which has none.
+    pub id: Option<Value>,
     /// Whether the line says `passes`.
     pub passes: bool,
     /// The check's name.
@@ -96,10 +96,11 @@ pub fn names(map: &Value) -> Vec<&str> {
         .collect()
 }
 
-/// Reads a check line under `requirement`, with the longest of `subjects` it starts with, then an id, then for each ` in ` the longest of `subjects` that follows and an id, then `passes` or `fails`, and the longest of `checks` that the rest is or that is followed by ` because `. Gives why it can't be read otherwise.
+/// Reads a check line under `requirement`, whose subject is `own`, with the longest of `subjects` it starts with, then an id, then for each ` in ` the longest of `subjects` that follows and an id, then `passes` or `fails`, and the longest of `checks` that the rest is or that is followed by ` because `. Gives why it can't be read otherwise.
 pub fn read_check_line(
     text: &str,
     requirement: &str,
+    _own: &str,
     subjects: &[&str],
     checks: &[&str],
 ) -> Result<CheckLine, String> {
@@ -164,7 +165,7 @@ pub fn read_check_line(
     };
     Ok(CheckLine {
         subject: subject.to_string(),
-        id,
+        id: Some(id),
         passes,
         check: check.to_string(),
         because,
@@ -233,7 +234,7 @@ fn row_parts(row: &Value, policy: &Value) -> Result<Option<CheckLine>, String> {
             .as_str()
             .unwrap_or_default()
             .to_string(),
-        id: row["subject"]["id"].clone(),
+        id: Some(row["subject"]["id"].clone()),
         passes: passed,
         check: check.to_string(),
         because: row["message"]
@@ -251,33 +252,62 @@ fn id_written(id: &Value, quoted: bool) -> String {
     }
 }
 
-/// The subject a check line names, with its id and each parent after `in`, like `artifact web in deployment d1`.
-pub fn subject_words(subject: &str, id: &Value, parents: &[(String, Value)]) -> String {
-    written_subject(subject, id, parents, false)
+/// The subject a check line names, with its id, if it has one, and each parent after `in`, like `artifact web in deployment d1`.
+pub fn subject_words(subject: &str, id: Option<&Value>, parents: &[(String, Value)]) -> String {
+    written_subject(subject, id, parents, None, false)
 }
 
-fn written_subject(subject: &str, id: &Value, parents: &[(String, Value)], quoted: bool) -> String {
-    let mut text = format!("{subject} {}", id_written(id, quoted));
+fn written_subject(
+    subject: &str,
+    id: Option<&Value>,
+    parents: &[(String, Value)],
+    own: Option<&str>,
+    quoted: bool,
+) -> String {
+    let mut text = match id {
+        Some(id) => format!("{subject} {}", id_written(id, quoted)),
+        None if parents.is_empty() && own == Some(subject) => String::new(),
+        None => subject.to_string(),
+    };
     for (parent, parent_id) in parents {
         text.push_str(&format!(" in {parent} {}", id_written(parent_id, quoted)));
     }
     text
 }
 
-fn write(line: &CheckLine, quoted: bool) -> String {
-    let who = written_subject(&line.subject, &line.id, &line.parents, quoted);
+fn write(line: &CheckLine, own: &str, quoted: bool) -> String {
+    let who = written_subject(
+        &line.subject,
+        line.id.as_ref(),
+        &line.parents,
+        Some(own),
+        quoted,
+    );
     let check = &line.check;
-    match (line.passes, &line.because) {
-        (true, _) => format!("{who} passes {check}"),
-        (false, Some(message)) => format!("{who} fails {check} because {message}"),
-        (false, None) => format!("{who} fails {check}"),
+    let said = match (line.passes, &line.because) {
+        (true, _) => format!("passes {check}"),
+        (false, Some(message)) => format!("fails {check} because {message}"),
+        (false, None) => format!("fails {check}"),
+    };
+    if who.is_empty() {
+        said
+    } else {
+        format!("{who} {said}")
+    }
+}
+
+fn same_ids(a: Option<&Value>, b: Option<&Value>) -> bool {
+    match (a, b) {
+        (Some(a), Some(b)) => same_id(a, b),
+        (None, None) => true,
+        _ => false,
     }
 }
 
 /// Whether two check lines say the same, with ids compared as [same_id] does.
 pub fn same_line(a: &CheckLine, b: &CheckLine) -> bool {
     a.subject == b.subject
-        && same_id(&a.id, &b.id)
+        && same_ids(a.id.as_ref(), b.id.as_ref())
         && a.passes == b.passes
         && a.check == b.check
         && a.because == b.because
@@ -290,7 +320,15 @@ pub fn same_line(a: &CheckLine, b: &CheckLine) -> bool {
 
 /// The line for a report row as it is, with the parents the `from` lines in `policy` give, `None` for a passed row of a check Ergo adds, or why the line can't be written yet.
 pub fn row_line(row: &Value, policy: &Value) -> Result<Option<String>, String> {
-    Ok(row_parts(row, policy)?.map(|line| write(&line, false)))
+    let own = own_subject(row, policy);
+    Ok(row_parts(row, policy)?.map(|line| write(&line, own, false)))
+}
+
+fn own_subject<'a>(row: &Value, policy: &'a Value) -> &'a str {
+    let requirement = row["requirement"].as_str().unwrap_or_default();
+    policy["requirements"][requirement]["subject"]
+        .as_str()
+        .unwrap_or_default()
 }
 
 /// The line for a report row that reads back as that row against the subject and check names in `policy`: it quotes an id that would read as part of a longer subject name, and leaves out a `because` that would read as part of a longer check name. `None` for a passed row of a check Ergo adds, or why no such line can be written.
@@ -299,6 +337,7 @@ pub fn line_for(row: &Value, policy: &Value) -> Result<Option<String>, String> {
         return Ok(None);
     };
     let requirement = row["requirement"].as_str().unwrap_or_default();
+    let own = own_subject(row, policy);
     let subjects = names(&policy["subjects"]);
     let checks = names(&policy["requirements"][requirement]["checks"]);
     let without_because = CheckLine {
@@ -311,15 +350,15 @@ pub fn line_for(row: &Value, policy: &Value) -> Result<Option<String>, String> {
         (&without_because, false),
         (&without_because, true),
     ] {
-        let text = write(want, quoted);
-        let read = read_check_line(&text, requirement, &subjects, &checks);
+        let text = write(want, own, quoted);
+        let read = read_check_line(&text, requirement, own, &subjects, &checks);
         if read.is_ok_and(|read| same_line(&read, want)) {
             return Ok(Some(text));
         }
     }
     Err(format!(
         "no line for {} and {} in {requirement} reads back as its row, because a longer subject or check name starts the same way",
-        subject_words(&line.subject, &line.id, &line.parents),
+        subject_words(&line.subject, line.id.as_ref(), &line.parents),
         line.check
     ))
 }

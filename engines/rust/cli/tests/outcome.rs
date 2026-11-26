@@ -337,11 +337,11 @@ fn yaml_escapes_the_characters_yaml_cannot_hold_as_they_are() {
 fn a_check_line_names_the_longest_subject_and_the_longest_check_that_fit() {
     let subjects = ["t", "t x"];
     let checks = ["c", "c because d"];
-    let read = |text: &str| outcome::read_check_line(text, "r", &subjects, &checks);
+    let read = |text: &str| outcome::read_check_line(text, "r", "t", &subjects, &checks);
     let line = |subject: &str, id: Value, passes: bool, check: &str, because: Option<&str>| {
         Ok(outcome::CheckLine {
             subject: subject.to_string(),
-            id,
+            id: Some(id),
             passes,
             check: check.to_string(),
             because: because.map(str::to_string),
@@ -544,7 +544,7 @@ fn a_row_whose_in_names_other_subjects_than_its_from_line_says_so_and_has_no_lin
 fn a_check_line_reads_each_in_after_the_id_with_the_longest_subject_name_that_fits() {
     let subjects = ["artifact", "deployment", "release", "release train"];
     let checks = ["c"];
-    let read = |text: &str| outcome::read_check_line(text, "r", &subjects, &checks);
+    let read = |text: &str| outcome::read_check_line(text, "r", "t", &subjects, &checks);
     let parents = |pairs: &[(&str, Value)]| -> Vec<(String, Value)> {
         pairs
             .iter()
@@ -553,19 +553,19 @@ fn a_check_line_reads_each_in_after_the_id_with_the_longest_subject_name_that_fi
     };
     let line = read("artifact web in deployment d1 fails c because x in y").unwrap();
     assert_eq!(
-        (line.subject.as_str(), &line.id, line.because.as_deref()),
-        ("artifact", &json!("web"), Some("x in y"))
+        (line.subject.as_str(), line.id.as_ref(), line.because.as_deref()),
+        ("artifact", Some(&json!("web")), Some("x in y"))
     );
     assert_eq!(line.parents, parents(&[("deployment", json!("d1"))]));
     let line =
         read("artifact deployment in deployment 7 in release train \"r 1\" passes c").unwrap();
-    assert_eq!(line.id, json!("deployment"));
+    assert_eq!(line.id, Some(json!("deployment")));
     assert_eq!(
         line.parents,
         parents(&[("deployment", json!(7)), ("release train", json!("r 1"))])
     );
     let line = read("artifact in in release r1 passes c").unwrap();
-    assert_eq!(line.id, json!("in"));
+    assert_eq!(line.id, Some(json!("in")));
     assert_eq!(line.parents, parents(&[("release", json!("r1"))]));
     for (text, reason) in [
         (
@@ -597,7 +597,7 @@ fn a_check_line_reads_each_in_after_the_id_with_the_longest_subject_name_that_fi
 fn a_line_is_taken_for_a_check_ergo_adds_by_where_its_check_name_goes_not_by_its_message() {
     let subjects = ["artifact", "deployment"];
     let checks = ["c"];
-    let read = |text: &str| outcome::read_check_line(text, "r", &subjects, &checks);
+    let read = |text: &str| outcome::read_check_line(text, "r", "t", &subjects, &checks);
     for (text, reason) in [
         (
             "artifact w in deploymnt d1 fails c because a fails $p",

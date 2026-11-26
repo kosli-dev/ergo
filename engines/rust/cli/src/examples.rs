@@ -112,7 +112,7 @@ pub fn read(policy: &Value) -> Result<Vec<Example>, String> {
 struct Line {
     requirement: String,
     subject: String,
-    id: Value,
+    id: Option<Value>,
     passes: bool,
     check: String,
     because: Option<String>,
@@ -123,6 +123,9 @@ fn read_line(text: &str, requirement: &str, policy: &Value) -> Result<Line, Stri
     let line = outcome::read_check_line(
         text,
         requirement,
+        policy["requirements"][requirement]["subject"]
+            .as_str()
+            .unwrap_or_default(),
         &outcome::names(&policy["subjects"]),
         &outcome::names(&policy["requirements"][requirement]["checks"]),
     )?;
@@ -207,7 +210,10 @@ fn same_row(row: &Value, line: &Line) -> bool {
     row["requirement"] == line.requirement.as_str()
         && row["check"] == line.check.as_str()
         && row["subject"]["type"] == line.subject.as_str()
-        && outcome::same_id(&row["subject"]["id"], &line.id)
+        && match &line.id {
+            Some(id) => outcome::same_id(&row["subject"]["id"], id),
+            None => row["subject"]["id"].is_null(),
+        }
         && same_parents(&row["subject"], &line.parents)
 }
 
@@ -325,7 +331,7 @@ pub fn check(outcome: &Value, report: &Value, policy: &Value) -> Checked {
         if matching.is_empty() {
             problems.push(format!(
                 "the report has no row for {} and {} in {}",
-                outcome::subject_words(&line.subject, &line.id, &line.parents),
+                outcome::subject_words(&line.subject, line.id.as_ref(), &line.parents),
                 line.check,
                 line.requirement
             ));
