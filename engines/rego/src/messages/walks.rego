@@ -24,9 +24,10 @@ _m_marked_cause("not_an_object")
 
 _m_marked_cause("ambiguous")
 
-_row_said(check, subj, raw) := {"message": _row_message(check, subj, raw)} if {
+_row_said(check, subj, raw) := _m_row_said(check, subj, raw.cause) if {
 	not _all_of_run(check)
 	not _any_of_run(check)
+	not _walk_run(check)
 }
 
 _m_marks(check, subj, raw) := _m_all_of_marks(check, subj, raw) if _all_of_run(check)
@@ -134,19 +135,24 @@ _for_once_said(o, check) := object.union(o, {"message": _for_deduped(o.message)}
 	is_string(o.message)
 } else := o
 
-_row_message(check, subj, raw) := _m_row_text(check, subj, raw.cause) if {
-	not _all_of_run(check)
-	not _any_of_run(check)
-	not _walk_run(check)
-}
+_m_row_text(check, subj, cause) := _m_row_said(check, subj, cause).message
 
-_m_row_text(check, subj, cause) := concat("; ", _roots_then_lists(ps, _m_list_names(check))) if {
+_m_row_said(check, subj, cause) := _m_said_row(concat("; ", _roots_then_lists([_m_piece_string(x) | some x in ps], _m_list_names(check))), ps) if {
 	cause in _value_fault_causes
-	ps := [_m_piece_string(x) | some x in _m_null_key_parts(subj, check)]
+	ps := _m_null_key_parts(subj, check)
 	ps != []
-} else := _m_top_sorted(_m_message(object.union(_m_with_sides(_m_walked(check, subj)), {"ergo/row": true}), subj, cause), _m_list_names(check)) if cause != "value"
+} else := _m_said_row(_m_top_sorted(_m_pieces_text(ps), _m_list_names(check)), ps) if {
+	cause != "value"
+	ps := _m_row_pieces(check, subj, cause)
+} else := _m_said_row(_m_pieces_text(ps), ps) if ps := _m_row_pieces(check, subj, cause)
 
-else := _m_message(object.union(_m_with_sides(_m_walked(check, subj)), {"ergo/row": true}), subj, cause)
+_m_row_pieces(check, subj, cause) := _m_message_pieces(object.union(_m_with_sides(_m_walked(check, subj)), {"ergo/row": true}), subj, cause)
+
+_m_said_row(message, pieces) := {"message": message, "ergo/clauses": [c | some p in pieces; some c in _m_piece_clauses(p)]}
+
+_m_piece_clauses(p) := p if is_array(p)
+
+else := [p]
 
 _walk_message(check, subj, raw, r) := _with_roots(_m_clauses_shown(_walk_parts(check, subj, raw, r)), roots) if {
 	walked := _m_for_said_pairs(check)
