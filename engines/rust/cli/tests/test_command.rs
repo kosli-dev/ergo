@@ -201,6 +201,7 @@ fn test_shows_a_failed_example_with_its_lines_next_to_the_report_and_exits_one()
         - deployment d1 fails approver_set because approver is missing
         - deployment d2 passes approver_set
 passed: nobody approves their own deployment
+warning: no example shows approver_set of approved failing
 warning: no example shows approver_set of approved passing
 warning: no example shows not_self_approved of approved passing
 2 examples: 1 passed, 1 failed

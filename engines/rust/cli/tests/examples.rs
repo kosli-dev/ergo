@@ -333,6 +333,25 @@ fn examples_are_read_in_order_with_their_params() {
 }
 
 #[test]
+fn only_the_lines_of_an_example_that_passed_count_for_the_warnings() {
+    let mut policy = policy();
+    policy["requirements"] = json!({"reviewed": policy["requirements"]["reviewed"].clone()});
+    policy["examples"] = json!([
+        {"name": "fails", "input": {"prs": [{"number": 7, "approved": true}]},
+         "outcome": [{"reviewed": ["pull request 7 fails peer_approved"]}]},
+        {"name": "passes", "input": {"prs": [{"number": 7, "approved": true}]},
+         "outcome": [{"reviewed": ["pull request 7 passes peer_approved"]}]}
+    ]);
+    let (text, code) = examples::run(&policy, false).unwrap();
+    assert_eq!(code, 1);
+    assert!(
+        text.contains("\nwarning: no example shows peer_approved of reviewed failing\n"),
+        "{text}"
+    );
+    assert!(!text.contains("passing\n"), "{text}");
+}
+
+#[test]
 fn examples_written_wrong_are_refused() {
     let mut missing_input = example("a");
     missing_input.as_object_mut().unwrap().remove("input");
