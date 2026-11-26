@@ -718,6 +718,28 @@ test_a_whose_beside_an_outside_list_of_more_than_one_kind_is_checked_against_an_
 	ergo._for_own_check(c, subj).values == [] with input as {"ergo/names": names} with data.ergo_document as {"os": [{"name": "bob"}, {"name": 3}]}
 }
 
+test_a_whose_key_that_isnt_text_is_said_in_each_member if {
+	_row_tree_text("every member of ev whose kind is m named by $params.k as e", ["e.v is 1"], {"ev": {"a": {"kind": "a", "m": {}, "v": 1}, "b": {"m": {}, "v": 1}}}, {"k": 3}) == "member a of ev: $params.k is 3, which isn't text; member b of ev: $params.k is 3, which isn't text"
+}
+
+test_a_whose_key_that_cant_be_read_comes_before_the_sentences_that_read_no_alias_and_the_items if {
+	_row_tree_text("every es whose zz is m named by $params.k as e", ["e.v exists", "z is 1"], {"z": 2, "es": []}, {}) == "$params.k is missing; z is 2; es is []"
+	_row_tree_text("every es whose zz is m named by $params.k as e", ["e.v exists", "z is 1"], {"z": 2, "es": ["s"]}, {"k": null}) == `$params.k is null; z is 2; item 1 of es is "s", which isn't an object`
+}
+
+test_a_whose_key_that_isnt_text_is_said_once_before_a_list_that_cant_be_walked if {
+	_row_tree_text("every es whose zz is m named by $params.k as e", ["e.v exists"], {}, {"k": 3}) == "$params.k is 3, which isn't text; es is missing"
+	_row_tree_text("every es whose zz is m named by $params.k as e", ["e.v exists", "z is 1"], {"z": 2, "es": ["s"]}, {"k": 3}) == `$params.k is 3, which isn't text; z is 2; item 1 of es is "s", which isn't an object`
+}
+
+test_an_item_beside_a_whose_key_that_is_null_says_only_what_its_whose_said if {
+	_row_tree_text("every es whose zz is m named by $params.k as e", ["e.v exists"], {"es": [{"v": 2}, {"zz": 2, "m": null}]}, {"k": null}) == "$params.k is null; item 1 of es: zz is missing; item 2 of es: m is null"
+}
+
+test_a_for_row_whose_whose_key_isnt_text_says_the_key_on_an_empty_list_it_tolerates if {
+	_row_tree_text("every es whose zz is m named by $input.k, if any, as e", ["e.v is 2"], {"es": []}, {}) == "$input.k is 3, which isn't text" with data.ergo_document as {"k": 3, "m": {"a": 2}}
+}
+
 test_an_item_that_isnt_an_object_takes_the_cause_its_whose_failed_with_unless_that_cause_passes if {
 	ergo._for_whose_item_cause("absent") == "absent"
 	ergo._for_whose_item_cause("value") == "not_an_object"
