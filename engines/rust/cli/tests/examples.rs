@@ -390,7 +390,7 @@ fn examples_written_wrong_are_refused() {
     missing_input.as_object_mut().unwrap().remove("input");
     let cases = [
         (Value::Null, "the policy has no examples"),
-        (json!({}), "examples isn't a list"),
+        (json!({}), "tests.examples isn't a list"),
         (json!([]), "the policy has no examples"),
         (json!([5]), "example 1 isn't an object"),
         (

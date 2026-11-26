@@ -11,7 +11,7 @@ pub struct Example {
     pub name: String,
     /// The input to build the report from.
     pub input: Value,
-    /// The example's own `params`, or else the policy's `example_params`, or else `{}`.
+    /// The example's own `params`, or else the policy's `tests.params`, or else `{}`.
     pub params: Value,
     /// The outcome as written, a list of lines and headings.
     pub outcome: Value,
@@ -30,16 +30,11 @@ pub struct Checked {
     pub shown: BTreeSet<(String, String, bool)>,
 }
 
-/// Says which key is written twice inside `examples` or `example_params`, given the paths that [crate::yaml::repeated_keys] gives, like `the key outcome is written twice in examples[1]`.
+/// Says which key is written twice inside `tests`, given the paths that [crate::yaml::repeated_keys] gives, like `the key outcome is written twice in tests.examples[1]`.
 pub fn repeated(paths: &[Vec<String>]) -> Result<(), String> {
     let Some((key, outer)) = paths
         .iter()
-        .find(|path| {
-            matches!(
-                path.first().map(String::as_str),
-                Some("examples" | "example_params")
-            )
-        })
+        .find(|path| matches!(path.first().map(String::as_str), Some("tests")))
         .and_then(|path| path.split_last())
     else {
         return Ok(());
@@ -60,15 +55,40 @@ pub fn repeated(paths: &[Vec<String>]) -> Result<(), String> {
 
 /// Reads the examples of a policy, or says why they're written wrong.
 pub fn read(policy: &Value) -> Result<Vec<Example>, String> {
-    let list = match &policy["examples"] {
-        Value::Null => &Vec::new(),
-        Value::Array(list) => list,
-        _ => return Err("examples isn't a list".to_string()),
+    let mut moved = Vec::new();
+    if policy.get("examples").is_some() {
+        moved.push("examples moved under tests, write it as tests.examples");
+    }
+    if policy.get("example_params").is_some() {
+        moved.push("example_params moved under tests, write it as tests.params");
+    }
+    if !moved.is_empty() {
+        return Err(moved.join("; "));
+    }
+    let tests = match policy.get("tests") {
+        None => &serde_json::Map::new(),
+        Some(Value::Object(tests)) => tests,
+        Some(_) => return Err("tests isn't an object".to_string()),
+    };
+    if let Some(key) = tests
+        .keys()
+        .find(|k| !["examples", "params"].contains(&k.as_str()))
+    {
+        return Err(if matches!(key.as_str(), "inputs" | "rules") {
+            format!("tests.{key} isn't supported yet")
+        } else {
+            format!("tests has an unknown key {key}")
+        });
+    }
+    let list = match tests.get("examples") {
+        None | Some(Value::Null) => &Vec::new(),
+        Some(Value::Array(list)) => list,
+        _ => return Err("tests.examples isn't a list".to_string()),
     };
     if list.is_empty() {
         return Err("the policy has no examples".to_string());
     }
-    let shared = policy.get("example_params").cloned().unwrap_or(json!({}));
+    let shared = tests.get("params").cloned().unwrap_or(json!({}));
     let mut names = BTreeSet::new();
     let mut examples = Vec::new();
     for (n, example) in list.iter().enumerate() {
