@@ -1,6 +1,6 @@
 //! Experimental: reads the examples of a policy and checks each one's outcome against its report.
 
-use crate::outcome::{self, Item, Region};
+use crate::outcome::{self, Item, Region, heading, requirement_line};
 use serde_json::{Value, json};
 use std::collections::BTreeSet;
 
@@ -133,31 +133,6 @@ fn read_line(text: &str, requirement: &str, report: &Value) -> Result<Line, Stri
         check: line.check,
         because: line.because,
     })
-}
-
-fn requirement_line<'a>(text: &'a str, requirements: &Value) -> Option<(&'a str, &'static str)> {
-    ["is met", "is not met", "is not applicable"]
-        .into_iter()
-        .find_map(|words| {
-            let name = text.strip_suffix(words)?.strip_suffix(' ')?;
-            requirements.get(name).map(|_| (name, words))
-        })
-}
-
-type Heading<'a> = Option<(&'a str, Option<&'static str>)>;
-
-fn heading<'a>(text: &'a str, requirements: &Value) -> Result<Heading<'a>, String> {
-    match (
-        requirement_line(text, requirements),
-        requirements.get(text).is_some(),
-    ) {
-        (Some((name, _)), true) => Err(format!(
-            "the heading {text} could name the requirement {text} or the status of {name}: write the requirement's whole name and a status, like {text} is met, or for {name} write the line {text} and the heading {name}"
-        )),
-        (Some((name, words)), false) => Ok(Some((name, Some(words)))),
-        (None, true) => Ok(Some((text, None))),
-        (None, false) => Ok(None),
-    }
 }
 
 fn written(outcome: &Value, requirements: &Value) -> Result<(), String> {

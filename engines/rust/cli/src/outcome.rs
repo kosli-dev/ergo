@@ -346,6 +346,37 @@ pub fn status_words(status: &Value) -> Option<&'static str> {
     }
 }
 
+/// Reads a requirement line, like `released is met`, against the `requirements` of a policy or a report, and gives the requirement's name and the status words.
+pub fn requirement_line<'a>(
+    text: &'a str,
+    requirements: &Value,
+) -> Option<(&'a str, &'static str)> {
+    ["is met", "is not met", "is not applicable"]
+        .into_iter()
+        .find_map(|words| {
+            let name = text.strip_suffix(words)?.strip_suffix(' ')?;
+            requirements.get(name).map(|_| (name, words))
+        })
+}
+
+/// What a heading reads as: a requirement's name with its status words, a requirement's name on its own, or `None` when it names no requirement.
+pub type Heading<'a> = Option<(&'a str, Option<&'static str>)>;
+
+/// Reads a heading against `requirements`, or gives why it is written wrong when it is one requirement's name and also another's name with a status.
+pub fn heading<'a>(text: &'a str, requirements: &Value) -> Result<Heading<'a>, String> {
+    match (
+        requirement_line(text, requirements),
+        requirements.get(text).is_some(),
+    ) {
+        (Some((name, _)), true) => Err(format!(
+            "the heading {text} could name the requirement {text} or the status of {name}: write the requirement's whole name and a status, like {text} is met, or for {name} write the line {text} and the heading {name}"
+        )),
+        (Some((name, words)), false) => Ok(Some((name, Some(words)))),
+        (None, true) => Ok(Some((text, None))),
+        (None, false) => Ok(None),
+    }
+}
+
 fn items(report: &Value, region: &Region, strict: bool) -> Result<Vec<Item>, String> {
     let mut items = Vec::new();
     if region.compliant {
@@ -391,11 +422,16 @@ fn items(report: &Value, region: &Region, strict: bool) -> Result<Vec<Item>, Str
         let Some(words) = status_words(&entry["status"]) else {
             return Err(format!("requirement {name} has no status"));
         };
-        let heading = format!("{name} {words}");
+        let text = format!("{name} {words}");
+        if strict && !lines.is_empty() && heading(&text, &report["requirements"]).is_err() {
+            return Err(format!(
+                "the heading {text}, for the status of {name}, would also name the requirement {text}, so it can't read back"
+            ));
+        }
         items.push(if lines.is_empty() {
-            Item::Line(heading)
+            Item::Line(text)
         } else {
-            Item::Group(heading, lines)
+            Item::Group(text, lines)
         });
     }
     Ok(items)
