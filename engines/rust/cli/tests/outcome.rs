@@ -605,7 +605,7 @@ fn a_line_is_taken_for_a_check_ergo_adds_by_where_its_check_name_goes_not_by_its
         ),
         (
             "artifact w in deploymnt d1 fails $min_subjects because a fails $p",
-            "it has no subject of the policy after in",
+            "a line for a check Ergo adds has no id, so passes or fails comes right after the subject and its parents",
         ),
         (
             "artifact w in deployment d1 fails $min_subjects because a fails $p",

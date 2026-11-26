@@ -147,14 +147,10 @@ fn a_line_the_policy_cannot_read_is_a_problem() {
             "no subject of the policy after in",
         ),
         (
-            "deployment d1 is out of scope",
-            "subjects in or out of scope",
+            "deployment d1 passes $applies",
+            "is in scope or is out of scope",
         ),
-        (
-            "fails $min_subjects because in-scope deployment count is 0",
-            "checks Ergo adds",
-        ),
-        ("deployment d1 fails $unique_ids", "checks Ergo adds"),
+        ("deployment d1 fails $unique_ids", "a check Ergo adds has no id"),
     ];
     for (line, reason) in cases {
         let got = read(line);

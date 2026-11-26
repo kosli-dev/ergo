@@ -96,29 +96,21 @@ pub fn names(map: &Value) -> Vec<&str> {
         .collect()
 }
 
-/// Reads a check line under `requirement`, whose subject is `own`, with the longest of `subjects` it starts with, then an id, then for each ` in ` the longest of `subjects` that follows and an id, then `passes` or `fails`, and the longest of `checks` that the rest is or that is followed by ` because `. Gives why it can't be read otherwise.
-pub fn read_check_line(
-    text: &str,
-    requirement: &str,
-    _own: &str,
-    subjects: &[&str],
-    checks: &[&str],
-) -> Result<CheckLine, String> {
-    let not_yet = |what: &str| Err(format!("lines for {what} aren't supported yet"));
-    let head = text.find(" because ").map_or(text, |at| &text[..at]);
-    let added = head.starts_with("fails $")
-        || head.starts_with("passes $")
-        || head.contains(" fails $")
-        || head.contains(" passes $");
-    let Some(subject) = subject_at(text, subjects) else {
-        if added {
-            return not_yet("checks Ergo adds");
-        }
-        return Err("it doesn't start with a subject of the policy".to_string());
-    };
-    let Some((id, mut rest)) = read_id(&text[subject.len() + 1..]) else {
-        return Err(format!("it has no id after {subject}"));
-    };
+/// The checks Ergo adds whose rows have no id, so their lines have none: `$min_subjects`, `$unique_ids`, `$unique_ancestor_ids` and `$well_formed`.
+pub const ADDED: [&str; 4] = [
+    "$min_subjects",
+    "$unique_ids",
+    "$unique_ancestor_ids",
+    "$well_formed",
+];
+
+const APPLIES: &str = "$applies";
+
+const SCOPE_WORDS: &str = "a subject in or out of scope is written with is in scope or is out of scope, not with passes or fails";
+
+type Parents = Vec<(String, Value)>;
+
+fn read_parents<'t>(mut rest: &'t str, subjects: &[&str]) -> Result<(Parents, &'t str), String> {
     let mut parents = Vec::new();
     while let Some(after) = rest.strip_prefix(" in ") {
         let Some(parent) = subject_at(after, subjects).or_else(|| {
@@ -126,9 +118,6 @@ pub fn read_check_line(
                 .into_iter()
                 .find(|name| after == *name)
         }) else {
-            if added {
-                return not_yet("checks Ergo adds");
-            }
             return Err("it has no subject of the policy after in".to_string());
         };
         let Some((parent_id, after)) = read_id(after.get(parent.len() + 1..).unwrap_or_default())
@@ -138,39 +127,146 @@ pub fn read_check_line(
         parents.push((parent.to_string(), parent_id));
         rest = after;
     }
-    let (passes, rest) = if let Some(rest) = rest.strip_prefix(" passes ") {
-        (true, rest)
-    } else if let Some(rest) = rest.strip_prefix(" fails ") {
-        (false, rest)
-    } else if rest.starts_with(" is out of scope") || rest.starts_with(" is in scope") {
-        return not_yet("subjects in or out of scope");
-    } else if added {
-        return not_yet("checks Ergo adds");
+    Ok((parents, rest))
+}
+
+fn verb(rest: &str) -> Option<(bool, &str)> {
+    if let Some(rest) = rest.strip_prefix(" passes ") {
+        Some((true, rest))
     } else {
-        return Err("it needs passes or fails after the id".to_string());
-    };
-    let found = longest_first(checks).into_iter().find_map(|check| {
+        rest.strip_prefix(" fails ").map(|rest| (false, rest))
+    }
+}
+
+fn check_named<'a>(
+    rest: &str,
+    passes: bool,
+    checks: &[&'a str],
+) -> Option<(&'a str, Option<String>)> {
+    longest_first(checks).into_iter().find_map(|check| {
         if rest == check {
             Some((check, None))
         } else {
             let because = rest.strip_prefix(check)?.strip_prefix(" because ")?;
             (!passes).then(|| (check, Some(because.to_string())))
         }
-    });
-    let Some((check, because)) = found else {
-        if rest.starts_with('$') {
-            return not_yet("checks Ergo adds");
+    })
+}
+
+fn names_applies(rest: &str) -> bool {
+    rest == APPLIES || rest.starts_with(&format!("{APPLIES} "))
+}
+
+fn read_with_id(
+    text: &str,
+    requirement: &str,
+    subjects: &[&str],
+    checks: &[&str],
+) -> Result<CheckLine, String> {
+    let Some(subject) = subject_at(text, subjects) else {
+        return Err("it doesn't start with a subject of the policy".to_string());
+    };
+    let Some((id, rest)) = read_id(&text[subject.len() + 1..]) else {
+        return Err(format!("it has no id after {subject}"));
+    };
+    let (parents, rest) = read_parents(rest, subjects)?;
+    let line = |passes: bool, check: &str, because: Option<&str>| CheckLine {
+        subject: subject.to_string(),
+        id: Some(id.clone()),
+        passes,
+        check: check.to_string(),
+        because: because.map(str::to_string),
+        parents: parents.clone(),
+    };
+    if rest == " is in scope" {
+        return Ok(line(true, APPLIES, None));
+    }
+    if rest.starts_with(" is in scope ") {
+        return Err("is in scope has nothing after it".to_string());
+    }
+    if let Some(after) = rest.strip_prefix(" is out of scope") {
+        if after.is_empty() {
+            return Ok(line(false, APPLIES, None));
         }
+        if let Some(because) = after.strip_prefix(" because ") {
+            return Ok(line(false, APPLIES, Some(because)));
+        }
+    }
+    let Some((passes, rest)) = verb(rest) else {
+        return Err("it needs passes or fails after the id".to_string());
+    };
+    if names_applies(rest) {
+        return Err(SCOPE_WORDS.to_string());
+    }
+    let Some((check, because)) = check_named(rest, passes, checks) else {
         return Err(format!("it names no check of {requirement}"));
+    };
+    Ok(line(passes, check, because.as_deref()))
+}
+
+fn read_without_id(text: &str, own: &str, subjects: &[&str]) -> Result<CheckLine, String> {
+    let spaced = format!(" {text}");
+    let (subject, parents, rest) = if verb(&spaced).is_some() {
+        (own, Vec::new(), spaced.as_str())
+    } else {
+        let Some(subject) = subject_at(text, subjects) else {
+            return Err("it doesn't start with a subject of the policy".to_string());
+        };
+        let (parents, rest) = read_parents(&text[subject.len()..], subjects)?;
+        if verb(rest).is_some() && parents.is_empty() && subject == own {
+            return Err(format!(
+                "the row of a check Ergo adds for {own} itself has no subject to name, so its line starts with passes or fails"
+            ));
+        }
+        (subject, parents, rest)
+    };
+    let Some((passes, rest)) = verb(rest) else {
+        return Err("a line for a check Ergo adds has no id, so passes or fails comes right after the subject and its parents".to_string());
+    };
+    if names_applies(rest) {
+        return Err(SCOPE_WORDS.to_string());
+    }
+    let Some((check, because)) = check_named(rest, passes, &ADDED) else {
+        return Err("it names no check Ergo adds".to_string());
     };
     Ok(CheckLine {
         subject: subject.to_string(),
-        id: Some(id),
+        id: None,
         passes,
         check: check.to_string(),
         because,
         parents,
     })
+}
+
+fn names_a_check_ergo_adds(text: &str) -> bool {
+    let head = text.find(" because ").map_or(text, |at| &text[..at]);
+    ["passes ", "fails "].into_iter().any(|verb| {
+        ADDED.iter().chain([&APPLIES]).any(|name| {
+            let said = format!("{verb}{name}");
+            head.starts_with(&said) || head.contains(&format!(" {said}"))
+        })
+    })
+}
+
+/// Reads a line under `requirement`, whose subject is `own`, against the policy's `subjects` and the requirement's `checks`. A check line is the longest of `subjects` it starts with, then an id, then for each ` in ` the longest of `subjects` that follows and an id, then `passes` or `fails`, and the longest of `checks` that the rest is or that is followed by ` because `. A scope line has `is in scope`, `is out of scope` or `is out of scope because <message>` in place of `passes` or `fails` and a check, and reads as the check `$applies`. A line for a check Ergo adds ([ADDED]) has no id, and starts with `passes` or `fails` when its row is for `own` and has no `in`. Gives why it can't be read otherwise.
+pub fn read_check_line(
+    text: &str,
+    requirement: &str,
+    own: &str,
+    subjects: &[&str],
+    checks: &[&str],
+) -> Result<CheckLine, String> {
+    let with_id = read_with_id(text, requirement, subjects, checks);
+    if with_id.is_ok() {
+        return with_id;
+    }
+    let without_id = read_without_id(text, own, subjects);
+    if without_id.is_ok() || (names_a_check_ergo_adds(text) && with_id != Err(SCOPE_WORDS.into()))
+    {
+        return without_id;
+    }
+    with_id
 }
 
 fn parents_of(row: &Value, policy: &Value) -> Result<Vec<(String, Value)>, String> {
