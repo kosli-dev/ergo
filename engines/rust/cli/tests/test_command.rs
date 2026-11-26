@@ -241,6 +241,58 @@ fn test_refuses_examples_written_wrong() {
 }
 
 #[test]
+fn test_refuses_a_key_written_twice_in_examples_or_example_params() {
+    let cases = [
+        (
+            format!("{EXAMPLES}    outcome:\n      - compliant\n"),
+            "the key outcome is written twice in examples[1]",
+        ),
+        (
+            EXAMPLES.replace("example_params: {}", "example_params: {a: 1, a: 2}"),
+            "the key a is written twice in example_params",
+        ),
+        (
+            EXAMPLES.replace(
+                "{id: d1, author: ann}",
+                "{id: d1, author: ann, author: bob}",
+            ),
+            "the key author is written twice in examples[0].input.deployments[0]",
+        ),
+        (
+            format!("{EXAMPLES}examples: []\n"),
+            "the key examples is written twice",
+        ),
+    ];
+    for (n, (examples, problem)) in cases.into_iter().enumerate() {
+        let policy = file(
+            &format!("test-key-twice-{n}"),
+            "policy.yaml",
+            &format!("{POLICY}{examples}"),
+        );
+        assert_eq!(
+            run(&args(&["test", &policy])),
+            Err(Failure::File(format!(
+                "the examples in the policy file {policy} are written wrong: {problem}"
+            ))),
+            "{problem}"
+        );
+    }
+    let elsewhere = POLICY.replace(
+        "    identified_by: id\n",
+        "    identified_by: id\n    identified_by: id\n",
+    );
+    let policy = file(
+        "test-key-twice-elsewhere",
+        "policy.yaml",
+        &format!("{elsewhere}{EXAMPLES}"),
+    );
+    assert!(matches!(
+        run(&args(&["test", &policy])),
+        Ok(Outcome::Print(_))
+    ));
+}
+
+#[test]
 fn test_refuses_an_outcome_written_wrong_as_it_refuses_a_missing_one() {
     for (n, (outcome, problem)) in [
         ("    outcome:\n", "example e: the outcome isn't a list"),
