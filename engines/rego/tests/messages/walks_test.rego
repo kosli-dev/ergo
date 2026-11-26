@@ -489,6 +489,13 @@ test_an_item_of_the_input_read_on_the_right_is_a_root_sorted_by_the_name_of_its_
 	ergo._m_row_text(c, {}, "absent") == "item 2 of $input: id is missing, and id is missing" with data.ergo_document as [{"id": "a"}, {}]
 }
 
+test_a_list_on_the_right_that_cant_be_walked_is_a_root_sorted_by_its_name if {
+	ref := ergo._s_written_check("x contains all of $input.sbom.components.name")
+	ergo._m_row_text(ref, {"x": "click"}, "unusable") == `item 1 of $input.sbom.components is "click", which isn't an object, and x is "click", which isn't a list` with data.ergo_document as {"sbom": {"components": ["click"]}}
+	field := ergo._s_written_check("z contains all of ys.v")
+	ergo._m_row_text(field, {"z": "click", "ys": ["a"]}, "unusable") == `item 1 of ys is "a", which isn't an object, and z is "click", which isn't a list`
+}
+
 test_a_row_keeps_the_items_of_a_list_after_is_in_ignoring_case_in_list_order if {
 	ref := {"op": "in", "path": ["x"], "values": {"ref": ["$$params[]", "l"]}, "ignoring": "case"}
 	ergo._m_row_text(ref, {"x": "a"}, "unusable") == "item 2 of $params.l is null; item 3 of $params.l is 3, which isn't text" with data.ergo_params as {"l": ["a", null, 3]}
