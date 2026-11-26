@@ -982,6 +982,20 @@ fn a_line_for_a_check_ergo_adds_with_an_id_a_subject_it_does_not_need_or_another
 }
 
 #[test]
+fn a_scope_line_with_nothing_after_because_says_the_reason_is_empty() {
+    for text in [
+        "deployment d3 is out of scope because",
+        "deployment d3 is out of scope because ",
+    ] {
+        assert_eq!(
+            read_line("deployment", text),
+            Err("it has nothing after because".to_string()),
+            "{text}"
+        );
+    }
+}
+
+#[test]
 fn a_check_of_the_policy_named_like_a_check_ergo_adds_is_read_as_the_policys_check_after_an_id() {
     let checks = ["fails $min_subjects", "c"];
     let read =
