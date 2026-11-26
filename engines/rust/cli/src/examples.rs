@@ -116,15 +116,36 @@ struct Line {
     passes: bool,
     check: String,
     because: Option<String>,
+    parents: Vec<(String, Value)>,
 }
 
-fn read_line(text: &str, requirement: &str, report: &Value) -> Result<Line, String> {
+fn read_line(text: &str, requirement: &str, policy: &Value) -> Result<Line, String> {
     let line = outcome::read_check_line(
         text,
         requirement,
-        &outcome::names(&report["subjects"]),
-        &outcome::names(&report["requirements"][requirement]["checks"]),
+        &outcome::names(&policy["subjects"]),
+        &outcome::names(&policy["requirements"][requirement]["checks"]),
     )?;
+    let ancestors = ergo_policy_engine::ancestors(policy, &line.subject);
+    let named: Vec<&String> = line.parents.iter().map(|(name, _)| name).collect();
+    if named != ancestors.iter().collect::<Vec<_>>() {
+        return Err(if ancestors.is_empty() {
+            format!(
+                "{} isn't read inside another subject, so nothing follows its id but passes or fails",
+                line.subject
+            )
+        } else {
+            let needed: String = ancestors
+                .iter()
+                .map(|name| format!(" in {name} <id>"))
+                .collect();
+            format!(
+                "{} is read inside {}, so its id is followed by{needed}",
+                line.subject,
+                ancestors.join(" inside ")
+            )
+        });
+    }
     Ok(Line {
         requirement: requirement.to_string(),
         subject: line.subject,
@@ -132,6 +153,7 @@ fn read_line(text: &str, requirement: &str, report: &Value) -> Result<Line, Stri
         passes: line.passes,
         check: line.check,
         because: line.because,
+        parents: line.parents,
     })
 }
 
@@ -186,19 +208,34 @@ fn same_row(row: &Value, line: &Line) -> bool {
         && row["check"] == line.check.as_str()
         && row["subject"]["type"] == line.subject.as_str()
         && outcome::same_id(&row["subject"]["id"], &line.id)
-        && row["subject"].get("in").is_none()
+        && same_parents(&row["subject"], &line.parents)
 }
 
-fn actual(row: &Value, report: &Value) -> String {
-    outcome::line_for(row, report)
+fn same_parents(subject: &Value, parents: &[(String, Value)]) -> bool {
+    match subject.get("in") {
+        None => parents.is_empty(),
+        Some(Value::Object(given)) => {
+            given.len() == parents.len()
+                && parents.iter().all(|(name, id)| {
+                    given
+                        .get(name)
+                        .is_some_and(|given| outcome::same_id(given, id))
+                })
+        }
+        Some(_) => false,
+    }
+}
+
+fn actual(row: &Value, policy: &Value) -> String {
+    outcome::line_for(row, policy)
         .ok()
         .flatten()
-        .or_else(|| outcome::row_line(row).ok().flatten())
+        .or_else(|| outcome::row_line(row, policy).ok().flatten())
         .unwrap_or_default()
 }
 
-/// Checks an outcome against a report, by the matching and coverage rules of the spec.
-pub fn check(outcome: &Value, report: &Value) -> Checked {
+/// Checks an outcome against a report made from `policy`, by the matching and coverage rules of the spec, reading its lines with the subject and check names of `policy`.
+pub fn check(outcome: &Value, report: &Value, policy: &Value) -> Checked {
     let mut checked = Checked::default();
     let rows = report["results"]
         .as_array()
@@ -272,7 +309,7 @@ pub fn check(outcome: &Value, report: &Value) -> Checked {
                     Ok(Some((name, None))) => name,
                 };
                 for text in group {
-                    match read_line(text, name, report) {
+                    match read_line(text, name, policy) {
                         Ok(line) => lines.push(line),
                         Err(reason) => problems.push(format!("can't read the line '{text}': {reason}")),
                     }
@@ -287,9 +324,8 @@ pub fn check(outcome: &Value, report: &Value) -> Checked {
         let matching: Vec<&Value> = rows.iter().filter(|row| same_row(row, line)).collect();
         if matching.is_empty() {
             problems.push(format!(
-                "the report has no row for {} {} and {} in {}",
-                line.subject,
-                outcome::id_text(&line.id).unwrap_or_default(),
+                "the report has no row for {} and {} in {}",
+                outcome::subject_words(&line.subject, &line.id, &line.parents),
                 line.check,
                 line.requirement
             ));
@@ -303,7 +339,7 @@ pub fn check(outcome: &Value, report: &Value) -> Checked {
                     .is_none_or(|because| row["message"] == because.as_str());
             if !agrees {
                 agreed = false;
-                problems.push(format!("the report says {}", actual(row, report)));
+                problems.push(format!("the report says {}", actual(row, policy)));
             }
         }
         if agreed {
@@ -324,7 +360,7 @@ pub fn check(outcome: &Value, report: &Value) -> Checked {
         if row["passed"] == true || out_of_scope || !covered {
             continue;
         }
-        match outcome::line_for(row, report) {
+        match outcome::line_for(row, policy) {
             Err(reason) => problems.push(format!("can't check this yet: {reason}")),
             Ok(Some(line)) if !lines.iter().any(|l| !l.passes && same_row(row, l)) => {
                 problems.push(format!("no line says {line}"))
@@ -332,7 +368,7 @@ pub fn check(outcome: &Value, report: &Value) -> Checked {
             Ok(_) => {}
         }
     }
-    checked.actual = outcome::part(report, &region);
+    checked.actual = outcome::part(report, policy, &region);
     checked.problems = problems;
     checked
 }
@@ -352,7 +388,7 @@ pub fn run(policy: &Value, strict: bool) -> Result<(String, u8), String> {
     let mut shown = BTreeSet::new();
     for example in &examples {
         let report = ergo_policy_engine::report(&example.input, policy, &example.params);
-        let checked = check(&example.outcome, &report);
+        let checked = check(&example.outcome, &report, policy);
         if checked.problems.is_empty() {
             shown.extend(checked.shown);
             text.push_str(&format!("passed: {}\n", example.name));

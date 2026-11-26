@@ -135,7 +135,7 @@ pub fn run(arguments: &[String]) -> Result<Outcome, Failure> {
     let code = if options.fail { fail_code(&report) } else { 0 };
     let text = match (options.command, options.format) {
         (_, Format::Outcome) => {
-            outcome::yaml(&outcome::of(&report).map_err(|problem| match code {
+            outcome::yaml(&outcome::of(&report, &policy).map_err(|problem| match code {
                 3 => Failure::WrittenWrong(format!(
                     "the policy file {} is written wrong, so the report can't be shown as an outcome: {problem}",
                     options.policy

@@ -75,11 +75,14 @@ fn an_id_that_is_an_object_or_a_list_has_no_text_yet() {
 #[test]
 fn a_row_of_a_check_is_a_passes_or_fails_line() {
     assert_eq!(
-        outcome::row_line(&row("peer_approved", json!(7), true, None)),
+        outcome::row_line(&row("peer_approved", json!(7), true, None), &json!({})),
         Ok(Some("pull request 7 passes peer_approved".to_string()))
     );
     assert_eq!(
-        outcome::row_line(&row("peer_approved", json!("a b"), false, Some("x is 1"))),
+        outcome::row_line(
+            &row("peer_approved", json!("a b"), false, Some("x is 1")),
+            &json!({})
+        ),
         Ok(Some(
             "pull request \"a b\" fails peer_approved because x is 1".to_string()
         ))
@@ -89,11 +92,11 @@ fn a_row_of_a_check_is_a_passes_or_fails_line() {
 #[test]
 fn a_passed_row_of_a_check_ergo_adds_is_not_a_line() {
     assert_eq!(
-        outcome::row_line(&row("$applies", json!(7), true, None)),
+        outcome::row_line(&row("$applies", json!(7), true, None), &json!({})),
         Ok(None)
     );
     assert_eq!(
-        outcome::row_line(&row("$min_subjects", json!(null), true, None)),
+        outcome::row_line(&row("$min_subjects", json!(null), true, None), &json!({})),
         Ok(None)
     );
 }
@@ -109,7 +112,7 @@ fn a_row_the_outcome_form_cannot_show_yet_is_an_error() {
         row("c", json!({"a": 1}), true, None),
     ];
     for row in shown {
-        assert!(outcome::row_line(&row).is_err(), "{row}");
+        assert!(outcome::row_line(&row, &json!({})).is_err(), "{row}");
     }
 }
 
@@ -157,6 +160,10 @@ fn report(policy: Value, input: Value) -> Value {
     ergo_policy_engine::report(&input, &policy, &json!({}))
 }
 
+fn shown(policy: Value, input: Value) -> Result<Vec<Item>, String> {
+    outcome::of(&report(policy.clone(), input), &policy)
+}
+
 fn two_requirements() -> Value {
     json!({
         "subjects": {
@@ -189,7 +196,7 @@ fn lines(lines: &[&str]) -> Vec<String> {
 fn the_outcome_of_a_report_has_compliant_then_each_requirement_with_its_status_and_rows() {
     let report = report(two_requirements(), two_requirements_input());
     assert_eq!(
-        outcome::of(&report),
+        outcome::of(&report, &two_requirements()),
         Ok(vec![
             Item::Line("not compliant".to_string()),
             Item::Group(
@@ -219,10 +226,9 @@ fn the_outcome_of_a_report_with_a_row_it_cannot_show_yet_is_an_error() {
     policy["subjects"]["pull request"]["from"] = json!("prs whose lines is 3");
     let mut input = two_requirements_input();
     input["prs"][1]["lines"] = json!(5);
-    let error = outcome::of(&report(policy, input)).unwrap_err();
+    let error = shown(policy, input).unwrap_err();
     assert!(error.contains("subjects out of scope"), "{error}");
-    let error =
-        outcome::of(&report(two_requirements(), json!({"prs": [], "scans": []}))).unwrap_err();
+    let error = shown(two_requirements(), json!({"prs": [], "scans": []})).unwrap_err();
     assert!(error.contains("checks Ergo adds"), "{error}");
 }
 
@@ -231,7 +237,7 @@ fn a_requirement_with_no_row_to_show_is_a_line_on_its_own() {
     let mut policy = two_requirements();
     policy["requirements"] = json!({"spare": policy["requirements"]["spare"].clone()});
     assert_eq!(
-        outcome::of(&report(policy, json!({"scans": []}))),
+        shown(policy, json!({"scans": []})),
         Ok(vec![
             Item::Line("compliant".to_string()),
             Item::Line("spare is not applicable".to_string()),
@@ -252,14 +258,13 @@ fn named_with_a_status(short: &str, long: &str) -> Value {
 #[test]
 fn the_outcome_of_a_report_with_a_heading_that_could_name_two_requirements_is_an_error() {
     let input = json!({"ts": [{"id": "t1", "p": true, "w": false}]});
-    let error =
-        outcome::of(&report(named_with_a_status("x", "x is met"), input.clone())).unwrap_err();
+    let error = shown(named_with_a_status("x", "x is met"), input.clone()).unwrap_err();
     assert_eq!(
         error,
         "the heading x is met, for the status of x, would also name the requirement x is met, so it can't read back"
     );
     let input = json!({"ts": [{"id": "t1", "p": false, "w": true}]});
-    let error = outcome::of(&report(named_with_a_status("a", "a is not met"), input)).unwrap_err();
+    let error = shown(named_with_a_status("a", "a is not met"), input).unwrap_err();
     assert_eq!(
         error,
         "the heading a is not met, for the status of a, would also name the requirement a is not met, so it can't read back"
@@ -270,7 +275,7 @@ fn the_outcome_of_a_report_with_a_heading_that_could_name_two_requirements_is_an
 fn the_outcome_of_a_report_whose_headings_name_one_requirement_each_is_shown() {
     let input = json!({"ts": [{"id": "t1", "p": false, "w": false}]});
     assert_eq!(
-        outcome::of(&report(named_with_a_status("x", "x is met"), input)),
+        shown(named_with_a_status("x", "x is met"), input),
         Ok(vec![
             Item::Line("not compliant".to_string()),
             Item::Group(
@@ -293,7 +298,7 @@ fn a_part_of_the_outcome_shows_a_bare_heading_for_a_requirement_only_some_checks
         .insert(("reviewed".to_string(), "approved".to_string()));
     part.requirements.insert("scanned".to_string());
     assert_eq!(
-        outcome::part(&report, &part),
+        outcome::part(&report, &two_requirements(), &part),
         vec![
             Item::Group(
                 "reviewed".to_string(),
@@ -340,6 +345,7 @@ fn a_check_line_names_the_longest_subject_and_the_longest_check_that_fit() {
             passes,
             check: check.to_string(),
             because: because.map(str::to_string),
+            parents: Vec::new(),
         })
     };
     assert_eq!(
@@ -394,7 +400,7 @@ fn line_of(report: &Value, requirement: &str, id: &str) -> Result<Option<String>
             row["requirement"] == requirement && row["check"] == "c" && row["subject"]["id"] == id
         })
         .unwrap();
-    outcome::line_for(row, report)
+    outcome::line_for(row, &colliding())
 }
 
 #[test]
@@ -429,4 +435,301 @@ fn a_line_for_a_row_leaves_out_a_because_that_would_read_as_part_of_a_longer_che
             "t z fails c because ok is 3, which isn't true or false".to_string()
         ))
     );
+}
+
+fn children() -> Value {
+    json!({
+        "subjects": {
+            "release": {"from": "releases", "identified_by": "id"},
+            "artifact": {"from": "every release.artifacts", "identified_by": "name"},
+            "test run": {"from": "every artifact.runs", "identified_by": "n"}
+        },
+        "requirements": {
+            "tested": {"subject": "artifact", "checks": {"passed": "status is \"passed\""}},
+            "ran": {"subject": "test run", "min_subjects": 0, "checks": {"ok": "ok is true"}}
+        }
+    })
+}
+
+fn children_input() -> Value {
+    json!({"releases": [
+        {"id": "r1", "artifacts": [
+            {"name": "web", "status": "passed", "runs": [{"n": 1, "ok": true}]},
+            {"name": "api", "status": "failed", "runs": []}
+        ]},
+        {"id": "r2", "artifacts": [{"name": "web", "status": "passed", "runs": []}]}
+    ]})
+}
+
+#[test]
+fn the_outcome_of_a_report_names_the_parents_of_a_child_subject_outermost_last() {
+    let report = report(children(), children_input());
+    assert_eq!(
+        outcome::of(&report, &children()),
+        Ok(vec![
+            Item::Line("not compliant".to_string()),
+            Item::Group(
+                "ran is met".to_string(),
+                lines(&["test run 1 in artifact web in release r1 passes ok"])
+            ),
+            Item::Group(
+                "tested is not met".to_string(),
+                lines(&[
+                    "artifact web in release r1 passes passed",
+                    "artifact api in release r1 fails passed because status is \"failed\"",
+                    "artifact web in release r2 passes passed",
+                ])
+            ),
+        ])
+    );
+}
+
+#[test]
+fn a_row_whose_in_does_not_follow_the_from_lines_of_the_policy_has_no_line() {
+    let report = report(children(), children_input());
+    let mut row = report["results"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|row| row["check"] == "ok")
+        .unwrap()
+        .clone();
+    assert!(outcome::line_for(&row, &children()).is_ok());
+    for parents in [
+        json!({"artifact": "web"}),
+        json!({"release": "r1", "deployment": "d1"}),
+        json!({"artifact": "web", "release": "r1", "deployment": "d1"}),
+        json!({}),
+        json!(["web", "r1"]),
+        json!({"artifact": {"a": 1}, "release": "r1"}),
+    ] {
+        row["subject"]["in"] = parents.clone();
+        assert!(outcome::line_for(&row, &children()).is_err(), "{parents}");
+    }
+    row["subject"].as_object_mut().unwrap().remove("in");
+    assert!(outcome::line_for(&row, &children()).is_err());
+}
+
+#[test]
+fn a_row_whose_in_names_other_subjects_than_its_from_line_says_so_and_has_no_line() {
+    let report = report(children(), children_input());
+    let rows = report["results"].as_array().unwrap();
+    let find = |check: &str| {
+        rows.iter()
+            .find(|row| row["check"] == check)
+            .unwrap()
+            .clone()
+    };
+    let mut run = find("ok");
+    run["subject"]["in"] = json!({"artifact": "web"});
+    assert_eq!(
+        outcome::line_for(&run, &children()),
+        Err("the in of a test run row doesn't name the subjects its from line is read inside, as for ok in ran".to_string())
+    );
+    let mut artifact = find("passed");
+    artifact["subject"]["type"] = json!("release");
+    for parents in [json!({"release": "r1"}), json!({})] {
+        artifact["subject"]["in"] = parents.clone();
+        assert_eq!(
+            outcome::line_for(&artifact, &children()),
+            Err("the in of a release row doesn't name the subjects its from line is read inside, as for passed in tested".to_string()),
+            "{parents}"
+        );
+    }
+    artifact["subject"].as_object_mut().unwrap().remove("in");
+    assert!(outcome::line_for(&artifact, &children()).is_ok());
+}
+
+#[test]
+fn a_check_line_reads_each_in_after_the_id_with_the_longest_subject_name_that_fits() {
+    let subjects = ["artifact", "deployment", "release", "release train"];
+    let checks = ["c"];
+    let read = |text: &str| outcome::read_check_line(text, "r", &subjects, &checks);
+    let parents = |pairs: &[(&str, Value)]| -> Vec<(String, Value)> {
+        pairs
+            .iter()
+            .map(|(name, id)| (name.to_string(), id.clone()))
+            .collect()
+    };
+    let line = read("artifact web in deployment d1 fails c because x in y").unwrap();
+    assert_eq!(
+        (line.subject.as_str(), &line.id, line.because.as_deref()),
+        ("artifact", &json!("web"), Some("x in y"))
+    );
+    assert_eq!(line.parents, parents(&[("deployment", json!("d1"))]));
+    let line =
+        read("artifact deployment in deployment 7 in release train \"r 1\" passes c").unwrap();
+    assert_eq!(line.id, json!("deployment"));
+    assert_eq!(
+        line.parents,
+        parents(&[("deployment", json!(7)), ("release train", json!("r 1"))])
+    );
+    let line = read("artifact in in release r1 passes c").unwrap();
+    assert_eq!(line.id, json!("in"));
+    assert_eq!(line.parents, parents(&[("release", json!("r1"))]));
+    for (text, reason) in [
+        (
+            "artifact web in robot r1 passes c",
+            "it has no subject of the policy after in",
+        ),
+        (
+            "artifact web in deployment",
+            "it has no id after in deployment",
+        ),
+        (
+            "artifact web in deployment ",
+            "it has no id after in deployment",
+        ),
+        (
+            "artifact web in deployment d1 is out of scope",
+            "lines for subjects in or out of scope aren't supported yet",
+        ),
+        (
+            "artifact in deployment d4 fails $min_subjects because in-scope artifact count is 0",
+            "lines for checks Ergo adds aren't supported yet",
+        ),
+    ] {
+        assert_eq!(read(text), Err(reason.to_string()), "{text}");
+    }
+}
+
+#[test]
+fn a_line_is_taken_for_a_check_ergo_adds_by_where_its_check_name_goes_not_by_its_message() {
+    let subjects = ["artifact", "deployment"];
+    let checks = ["c"];
+    let read = |text: &str| outcome::read_check_line(text, "r", &subjects, &checks);
+    for (text, reason) in [
+        (
+            "artifact w in deploymnt d1 fails c because a fails $p",
+            "it has no subject of the policy after in",
+        ),
+        (
+            "artefact w fails c because a passes $p",
+            "it doesn't start with a subject of the policy",
+        ),
+        (
+            "artifact w in deployment d1 fail c because a fails $p",
+            "it needs passes or fails after the id",
+        ),
+        (
+            "artifact w in deploymnt d1 fails $min_subjects because a fails $p",
+            "lines for checks Ergo adds aren't supported yet",
+        ),
+        (
+            "fails $min_subjects because in-scope artifact count is 0",
+            "lines for checks Ergo adds aren't supported yet",
+        ),
+    ] {
+        assert_eq!(read(text), Err(reason.to_string()), "{text}");
+    }
+}
+
+fn shadowed() -> Value {
+    json!({
+        "subjects": {
+            "deployment": {"from": "deployments", "identified_by": "id"},
+            "deployment x": {"from": "xs", "identified_by": "id"},
+            "artifact": {"from": "every deployment.artifacts", "identified_by": "name"},
+            "artifact web": {"from": "webs", "identified_by": "id"}
+        },
+        "requirements": {
+            "tested": {"subject": "artifact", "checks": {"c": "ok is true"}},
+            "spare": {"subject": "deployment x", "min_subjects": 0, "checks": {"c": "ok is true"}},
+            "spare web": {"subject": "artifact web", "min_subjects": 0, "checks": {"c": "ok is true"}}
+        }
+    })
+}
+
+#[test]
+fn a_line_for_a_child_row_quotes_the_ids_that_would_read_as_part_of_a_longer_subject_name() {
+    let report = report(
+        shadowed(),
+        json!({"xs": [], "webs": [], "deployments": [
+            {"id": "x", "artifacts": [{"name": "deployment", "ok": true}]},
+            {"id": "d1", "artifacts": [{"name": "web", "ok": true}]}
+        ]}),
+    );
+    let rows = report["results"].as_array().unwrap();
+    let printed: Vec<String> = rows
+        .iter()
+        .filter(|row| row["requirement"] == "tested" && row["check"] == "c")
+        .map(|row| outcome::line_for(row, &shadowed()).unwrap().unwrap())
+        .collect();
+    assert_eq!(
+        printed,
+        vec![
+            "artifact \"deployment\" in deployment \"x\" passes c",
+            "artifact \"web\" in deployment \"d1\" passes c",
+        ]
+    );
+}
+
+fn unused_names(parent: &str, used: bool) -> Value {
+    let mut policy = json!({
+        "subjects": {
+            "deployment": {"from": "deployments", "identified_by": "id"},
+            parent: {"from": "others", "identified_by": "id"},
+            "artifact": {"from": "every deployment.artifacts", "identified_by": "name"},
+            "pull": {"from": "pulls", "identified_by": "id"},
+            "pull request": {"from": "prs", "identified_by": "number"}
+        },
+        "requirements": {
+            "p": {"subject": "pull", "checks": {"c": "x is 1"}},
+            "q": {"subject": "artifact", "checks": {"c": "x is 1"}}
+        }
+    });
+    if used {
+        policy["requirements"]["spare"] =
+            json!({"subject": parent, "min_subjects": 0, "checks": {"c": "x is 1"}});
+        policy["requirements"]["spare pr"] =
+            json!({"subject": "pull request", "min_subjects": 0, "checks": {"c": "x is 1"}});
+    }
+    policy
+}
+
+fn unused_names_input(parent_id: Value) -> Value {
+    json!({
+        "others": [], "prs": [],
+        "deployments": [{"id": parent_id, "artifacts": [{"name": "web", "x": 2}]}],
+        "pulls": [{"id": "request", "x": 2}]
+    })
+}
+
+fn group(items: &[Item], requirement: &str) -> Vec<String> {
+    items
+        .iter()
+        .find_map(|item| match item {
+            Item::Group(heading, lines) if heading.starts_with(&format!("{requirement} is ")) => {
+                Some(lines.clone())
+            }
+            _ => None,
+        })
+        .unwrap_or_default()
+}
+
+#[test]
+fn the_outcome_of_a_report_reads_back_with_every_subject_name_of_the_policy_even_one_no_requirement_uses()
+ {
+    for used in [false, true] {
+        assert_eq!(
+            shown(unused_names("deployment 7", used), unused_names_input(json!(7))),
+            Err("no line for artifact web in deployment 7 and c in q reads back as its row, because a longer subject or check name starts the same way".to_string()),
+            "used: {used}"
+        );
+        let items = shown(
+            unused_names("deployment x", used),
+            unused_names_input(json!("x")),
+        )
+        .unwrap();
+        assert_eq!(
+            group(&items, "q"),
+            vec!["artifact \"web\" in deployment \"x\" fails c because x is 2"],
+            "used: {used}"
+        );
+        assert_eq!(
+            group(&items, "p"),
+            vec!["pull \"request\" fails c because x is 2"],
+            "used: {used}"
+        );
+    }
 }

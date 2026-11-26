@@ -31,7 +31,7 @@ fn input() -> Value {
 
 fn problems(outcome: Value) -> Vec<String> {
     let report = ergo_policy_engine::report(&input(), &policy(), &json!({}));
-    examples::check(&outcome, &report).problems
+    examples::check(&outcome, &report, &policy()).problems
 }
 
 #[test]
@@ -83,7 +83,7 @@ fn a_number_in_a_line_matches_an_id_of_the_same_value_however_either_is_written(
     for id in ["7", "7.0", "7.00", "7e0", "0.7e1"] {
         let line = format!("pull request {id} passes peer_approved");
         assert_eq!(
-            examples::check(&json!([{"reviewed": [line]}]), &report).problems,
+            examples::check(&json!([{"reviewed": [line]}]), &report, &policy()).problems,
             Vec::<String>::new(),
             "{id}"
         );
@@ -91,6 +91,7 @@ fn a_number_in_a_line_matches_an_id_of_the_same_value_however_either_is_written(
     let problems = examples::check(
         &json!([{"reviewed": ["pull request \"7\" passes peer_approved"]}]),
         &report,
+        &policy(),
     )
     .problems;
     assert_eq!(
@@ -143,7 +144,7 @@ fn a_line_the_policy_cannot_read_is_a_problem() {
         ),
         (
             "deployment d1 in release r1 passes approver_set",
-            "child subjects",
+            "no subject of the policy after in",
         ),
         (
             "deployment d1 is out of scope",
@@ -208,6 +209,7 @@ fn a_policy_written_wrong_breaks_every_example_whatever_the_lines_say() {
     let checked = examples::check(
         &json!([{"approved": ["deployment d1 passes has approvals"]}]),
         &report,
+        &policy,
     );
     assert_eq!(checked.problems.len(), 1, "{:?}", checked.problems);
     assert!(
@@ -225,6 +227,7 @@ fn a_failure_the_lines_cover_but_cannot_name_yet_fails_the_example() {
     let problems = examples::check(
         &json!([{"reviewed is not met": ["pull request 7 passes peer_approved"]}]),
         &report,
+        &policy,
     )
     .problems;
     assert_eq!(problems.len(), 1, "{problems:?}");
@@ -235,6 +238,7 @@ fn a_failure_the_lines_cover_but_cannot_name_yet_fails_the_example() {
     let problems = examples::check(
         &json!([{"reviewed": ["pull request 7 passes peer_approved"]}]),
         &report,
+        &policy,
     )
     .problems;
     assert_eq!(problems, Vec::<String>::new());
@@ -249,7 +253,7 @@ fn a_subject_out_of_scope_is_not_a_failure() {
     let report = ergo_policy_engine::report(&input, &policy, &json!({}));
     let problems = examples::check(
         &json!([{"approved is not met": ["deployment d1 fails approver_set", "deployment d1 passes has approvals"]}]),
-        &report,
+        &report, &policy,
     )
     .problems;
     assert_eq!(problems, Vec::<String>::new());
@@ -261,6 +265,7 @@ fn the_check_lines_of_an_outcome_say_which_checks_it_shows_passing_and_failing()
     let checked = examples::check(
         &json!([{"approved": ["deployment d1 fails approver_set", "deployment d2 fails approver_set", "deployment d1 passes has approvals"]}]),
         &report,
+        &policy(),
     );
     let shown: Vec<_> = checked.shown.into_iter().collect();
     assert_eq!(
@@ -278,6 +283,7 @@ fn a_failed_example_shows_its_lines_next_to_those_of_the_report_for_what_they_co
     let checked = examples::check(
         &json!([{"approved": ["deployment d1 passes approver_set"]}]),
         &report,
+        &policy(),
     );
     assert_eq!(
         checked.expected,
@@ -341,7 +347,8 @@ fn a_line_must_agree_with_every_row_that_shares_its_check_and_subject() {
     assert_eq!(
         examples::check(
             &json!([{"approved": ["deployment d1 passes approver_set"]}]),
-            &report
+            &report,
+            &policy()
         )
         .problems,
         vec![
@@ -352,7 +359,8 @@ fn a_line_must_agree_with_every_row_that_shares_its_check_and_subject() {
     assert_eq!(
         examples::check(
             &json!([{"approved": ["deployment d1 fails approver_set"]}]),
-            &report
+            &report,
+            &policy()
         )
         .problems,
         vec!["the report says deployment d1 passes approver_set"]
@@ -467,7 +475,7 @@ fn colliding_problems(ok: bool, outcome: Value) -> Vec<String> {
     let input =
         json!({"ts": [{"id": 7, "ok": ok}, {"id": 1, "ok": ok}], "others": [], "extra": []});
     let report = ergo_policy_engine::report(&input, &colliding_policy(), &json!({}));
-    examples::check(&outcome, &report).problems
+    examples::check(&outcome, &report, &colliding_policy()).problems
 }
 
 #[test]
@@ -507,7 +515,7 @@ fn a_line_that_disagrees_with_its_row_shows_no_check_passing_or_failing() {
         json!([{"r": ["t 7.0 fails c"]}]),
         json!([{"r": ["t 8 passes c"]}]),
     ] {
-        let checked = examples::check(&outcome, &report);
+        let checked = examples::check(&outcome, &report, &colliding_policy());
         assert!(checked.shown.is_empty(), "{outcome}: {:?}", checked.shown);
     }
 }
@@ -551,7 +559,7 @@ fn a_heading_that_is_one_requirement_on_its_own_and_another_with_a_status_is_ref
             );
             let input = json!({"ts": [{"id": "t1", "ok": true}]});
             let report = ergo_policy_engine::report(&input, &policy, &json!({}));
-            let problems = examples::check(&json!([{heading: lines}]), &report).problems;
+            let problems = examples::check(&json!([{heading: lines}]), &report, &policy).problems;
             assert_eq!(problems.len(), 1, "{problems:?}");
             assert!(
                 problems[0].starts_with(&format!("the heading {heading} could name")),
@@ -577,4 +585,262 @@ fn a_heading_that_is_one_requirement_on_its_own_and_another_with_a_status_is_ref
             "{outcome}"
         );
     }
+}
+
+fn children() -> Value {
+    json!({
+        "ergo_spec": ergo_policy_engine::SPEC,
+        "subjects": {
+            "release": {"from": "releases", "identified_by": "id"},
+            "artifact": {"from": "every release.artifacts", "identified_by": "name"},
+            "test run": {"from": "every artifact.runs", "identified_by": "n"}
+        },
+        "requirements": {
+            "tested": {"subject": "artifact", "checks": {"passed": "status is \"passed\""}},
+            "ran": {"subject": "test run", "min_subjects": 0, "checks": {"ok": "ok is true"}}
+        }
+    })
+}
+
+fn child_problems(outcome: Value) -> Vec<String> {
+    let input = json!({"releases": [
+        {"id": "r1", "artifacts": [
+            {"name": "web", "status": "failed", "runs": [{"n": 1, "ok": true}]},
+            {"name": "api", "status": "passed", "runs": []}
+        ]},
+        {"id": "r2", "artifacts": [{"name": "web", "status": "passed", "runs": []}]}
+    ]});
+    let report = ergo_policy_engine::report(&input, &children(), &json!({}));
+    examples::check(&outcome, &report, &children()).problems
+}
+
+#[test]
+fn a_line_for_a_child_subject_matches_the_row_with_its_id_and_the_ids_of_its_parents() {
+    assert_eq!(
+        child_problems(json!([
+            {"tested is not met": [
+                "artifact web in release r1 fails passed because status is \"failed\"",
+                "artifact web in release r2 passes passed"
+            ]},
+            {"ran is met": ["test run 1 in artifact web in release r1 passes ok"]}
+        ])),
+        Vec::<String>::new()
+    );
+    assert_eq!(
+        child_problems(json!([{"tested": [
+            "artifact web in release r2 fails passed",
+            "artifact web in release r9 passes passed"
+        ]}])),
+        vec![
+            "the report says artifact web in release r2 passes passed",
+            "the report has no row for artifact web in release r9 and passed in tested",
+            "no line says artifact web in release r1 fails passed because status is \"failed\"",
+        ]
+    );
+}
+
+#[test]
+fn a_line_for_a_child_subject_without_the_in_its_from_line_gives_cannot_be_read() {
+    let cases = [
+        (
+            "artifact web passes passed",
+            "artifact is read inside release, so its id is followed by in release <id>",
+        ),
+        (
+            "artifact web in artifact web passes passed",
+            "artifact is read inside release, so its id is followed by in release <id>",
+        ),
+        (
+            "artifact web in release r1 in release r1 passes passed",
+            "artifact is read inside release, so its id is followed by in release <id>",
+        ),
+        (
+            "test run 1 in release r1 in artifact web passes ok",
+            "test run is read inside artifact inside release, so its id is followed by in artifact <id> in release <id>",
+        ),
+        (
+            "release r1 in release r1 passes ok",
+            "release isn't read inside another subject, so nothing follows its id but passes or fails",
+        ),
+    ];
+    for (line, reason) in cases {
+        let requirement = if line.contains(" passed") {
+            "tested"
+        } else {
+            "ran"
+        };
+        let got = child_problems(json!([{requirement: [line]}]));
+        assert_eq!(
+            got.first(),
+            Some(&format!("can't read the line '{line}': {reason}")),
+            "{line}: {got:?}"
+        );
+    }
+}
+
+fn unused_names(parent: &str, used: bool) -> Value {
+    let mut policy = json!({
+        "ergo_spec": ergo_policy_engine::SPEC,
+        "subjects": {
+            "deployment": {"from": "deployments", "identified_by": "id"},
+            parent: {"from": "others", "identified_by": "id"},
+            "artifact": {"from": "every deployment.artifacts", "identified_by": "name"},
+            "pull": {"from": "pulls", "identified_by": "id"},
+            "pull request": {"from": "prs", "identified_by": "number"}
+        },
+        "requirements": {
+            "q": {"subject": "artifact", "checks": {"c": "x is 1"}},
+            "p": {"subject": "pull", "checks": {"c": "x is 1"}}
+        }
+    });
+    if used {
+        policy["requirements"]["spare"] =
+            json!({"subject": parent, "min_subjects": 0, "checks": {"c": "x is 1"}});
+        policy["requirements"]["spare pr"] =
+            json!({"subject": "pull request", "min_subjects": 0, "checks": {"c": "x is 1"}});
+    }
+    policy
+}
+
+fn unused_names_input(parent_id: Value) -> Value {
+    json!({
+        "others": [], "prs": [],
+        "deployments": [{"id": parent_id, "artifacts": [{"name": "web", "x": 2}]}],
+        "pulls": [{"id": "request", "x": 2}]
+    })
+}
+
+#[test]
+fn a_line_is_read_with_every_subject_name_of_the_policy_even_one_no_requirement_uses() {
+    for (parent, id, unreadable, readable) in [
+        (
+            "deployment 7",
+            json!(7),
+            "artifact web in deployment 7 fails c",
+            None,
+        ),
+        (
+            "deployment x",
+            json!("x"),
+            "artifact web in deployment x fails c",
+            Some("artifact web in deployment \"x\" fails c"),
+        ),
+    ] {
+        for used in [false, true] {
+            let policy = unused_names(parent, used);
+            let report =
+                ergo_policy_engine::report(&unused_names_input(id.clone()), &policy, &json!({}));
+            let check = |lines: Value| examples::check(&lines, &report, &policy).problems;
+            assert_eq!(
+                check(json!([{"q": [unreadable]}])),
+                vec![format!(
+                    "can't read the line '{unreadable}': it needs passes or fails after the id"
+                )],
+                "{parent} used: {used}"
+            );
+            if let Some(readable) = readable {
+                assert_eq!(
+                    check(json!([{"q": [readable]}])),
+                    Vec::<String>::new(),
+                    "{parent} used: {used}"
+                );
+            }
+            assert_eq!(
+                check(json!([{"p": ["pull request fails c"]}])),
+                vec![
+                    "can't read the line 'pull request fails c': it needs passes or fails after the id"
+                ],
+                "{parent} used: {used}"
+            );
+            assert_eq!(
+                check(json!([{"p": ["pull \"request\" fails c"]}])),
+                Vec::<String>::new(),
+                "{parent} used: {used}"
+            );
+        }
+    }
+}
+
+fn artifacts() -> Value {
+    json!({
+        "ergo_spec": ergo_policy_engine::SPEC,
+        "subjects": {
+            "deployment": {"from": "deployments", "identified_by": "id"},
+            "artifact": {"from": "every deployment.artifacts", "identified_by": "name"}
+        },
+        "requirements": {"q": {"subject": "artifact", "checks": {"c": "x is 1"}}}
+    })
+}
+
+fn artifact_problems(items: Value, line: &str) -> Vec<String> {
+    let input = json!({"deployments": [{"id": 7, "artifacts": items}]});
+    let report = ergo_policy_engine::report(&input, &artifacts(), &json!({}));
+    examples::check(&json!([{"q": [line]}]), &report, &artifacts()).problems
+}
+
+#[test]
+fn a_parent_id_in_a_line_matches_the_id_of_the_same_value_however_it_is_written() {
+    let web = json!([{"name": "web", "x": 2}]);
+    for line in [
+        "artifact web in deployment 7 fails c",
+        "artifact web in deployment 7.0 fails c",
+        "artifact web in deployment 7e0 fails c",
+    ] {
+        assert_eq!(
+            artifact_problems(web.clone(), line),
+            Vec::<String>::new(),
+            "{line}"
+        );
+    }
+    assert_eq!(
+        artifact_problems(web, "artifact web in deployment \"7\" fails c"),
+        vec![
+            "the report has no row for artifact web in deployment \"7\" and c in q",
+            "no line says artifact web in deployment 7 fails c because x is 2",
+        ]
+    );
+}
+
+#[test]
+fn a_line_for_a_child_subject_must_agree_with_every_row_that_shares_its_check_and_subject() {
+    let twins = json!([{"name": "web", "x": 1}, {"name": "web", "x": 2}]);
+    assert_eq!(
+        artifact_problems(twins.clone(), "artifact web in deployment 7 passes c"),
+        vec![
+            "the report says artifact web in deployment 7 fails c because x is 2",
+            "no line says artifact web in deployment 7 fails c because x is 2",
+        ]
+    );
+    assert_eq!(
+        artifact_problems(twins, "artifact web in deployment 7 fails c"),
+        vec!["the report says artifact web in deployment 7 passes c"]
+    );
+}
+
+#[test]
+fn the_lines_for_a_child_subject_count_for_the_warnings() {
+    let mut policy = artifacts();
+    let example = |name: &str, x: i64, line: &str| {
+        json!({"name": name,
+               "input": {"deployments": [{"id": 7, "artifacts": [{"name": "web", "x": x}]}]},
+               "outcome": [{"q": [line]}]})
+    };
+    policy["examples"] = json!([example("fails", 2, "artifact web in deployment 7 fails c")]);
+    let (text, code) = examples::run(&policy, false).unwrap();
+    assert_eq!(code, 0, "{text}");
+    assert_eq!(
+        text,
+        "passed: fails\nwarning: no example shows c of q passing\n1 example: 1 passed, 0 failed\n"
+    );
+    policy["examples"] = json!([
+        example("fails", 2, "artifact web in deployment 7 fails c"),
+        example("passes", 1, "artifact web in deployment 7 passes c")
+    ]);
+    assert_eq!(
+        examples::run(&policy, true).unwrap(),
+        (
+            "passed: fails\npassed: passes\n2 examples: 2 passed, 0 failed\n".to_string(),
+            0
+        )
+    );
 }

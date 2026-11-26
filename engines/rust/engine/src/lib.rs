@@ -103,6 +103,21 @@ pub fn report(input: &Value, policy: &Value, params: &Value) -> Value {
     report_with(input, policy, params, &BTreeMap::new())
 }
 
+/// The subjects whose ids a row of `subject` carries under `in`, parent first.
+///
+/// Only the policy's `subjects` are read. With `file` read from
+/// `every commit.files` and `commit` from `every "pull request".commits`, the
+/// ancestors of `file` are `["commit", "pull request"]`. A subject that narrows
+/// another has that subject's ancestors. A subject read from the input, or one
+/// the policy doesn't have, has none.
+pub fn ancestors(policy: &Value, subject: &str) -> Vec<String> {
+    let read = Policy::read(policy);
+    let reading = reading::Reading::of(&read);
+    let mut chain = subjects::chain_of(&reading, subject);
+    chain.reverse();
+    chain
+}
+
 /// Lists what failed in a report made by [`report`].
 ///
 /// It returns a JSON array with one entry for each failed check. The array is

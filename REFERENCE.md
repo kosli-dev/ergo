@@ -142,12 +142,15 @@ An outcome is a list of lines:
 | `deployment d1 passes approver_set`                  | the row passed                                         | the check                      |
 | `deployment d1 fails approver_set`                   | the row failed                                         | the check                      |
 | `deployment d1 fails approver_set because <message>` | the row failed, and its whole `message` is `<message>` | the check                      |
+| `artifact web in deployment d1 passes tests_passed`  | the row of the `web` in `d1` passed                    | the check                      |
 
 Inside what the lines cover, every failed row must be listed with a `fails` line, so an example can't pass by missing a failure. Outside it, nothing is checked. A subject out of scope isn't a failure. When `$well_formed` fails, every example fails. A heading that could name two requirements is written wrong: with requirements `x` and `x is met`, write `x is met is met:` for the status of `x is met`, and the line `x is met` with the heading `x:` for `x`. `ergo report --format outcome` refuses a report it would have to print with such a heading, so what it prints always pastes back.
 
-The subject's name is written as the policy writes it, spaces included, like `pull request 7`. The id is written as JSON: a plain word needs no quotes, and a word that reads as a number, `true`, `false` or `null` is that value. So `pull request 7` is the number 7, `pull request "7"` is the string `"7"`, and an id with a space, or any other whitespace, goes in quotes, like `artifact "web app"`. A number matches an id of the same value, so `pull request 7` and `pull request 7.0` both match the id `7.0`.
+The subject's name is written as the policy writes it, spaces included, like `pull request 7`. The id is written as JSON: a plain word needs no quotes, and a word that reads as a number, `true`, `false` or `null` is that value. So `pull request 7` is the number 7, `pull request "7"` is the string `"7"`, and an id with a space, or any other whitespace, goes in quotes, like `artifact "web app"`. A number matches an id of the same value, so `pull request 7` and `pull request 7.0` both match the id `7.0`. A line is read against every subject name in the policy, longest first, even one no requirement uses, so with subjects `pull` and `pull request`, the `pull` whose id is `request` is written `pull "request"`.
 
-For now, lines can't name a child subject, a check Ergo adds like `$min_subjects`, a subject out of scope, or an id that is an object or a list, and an example whose lines cover such a failed row fails. The rules are in [syntax.md](spec/syntax.md#examples) and [semantics.md](spec/semantics.md#examples).
+A child subject's line names its parent after its id, with `in <parent> <id>`, every time, like `artifact web in deployment d1`, and a grandchild's adds its grandparent last, like `test run 1 in artifact web in deployment d1`. So `artifact web in deployment d1` and `artifact web in deployment d2` are two rows. A line that leaves out the `in`, or names other subjects after it than the ones the artifact is read inside, fails its example, and `ergo report --format outcome` always prints it.
+
+For now, lines can't name a check Ergo adds like `$min_subjects`, a subject out of scope, or an id that is an object or a list, and an example whose lines cover such a failed row fails. The rules are in [syntax.md](spec/syntax.md#examples) and [semantics.md](spec/semantics.md#examples).
 
 ## Subjects
 
