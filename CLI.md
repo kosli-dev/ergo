@@ -148,7 +148,30 @@ warning: no example shows approver_set of approved passing
 
 The last lines warn about each check that no example shows failing, or none shows passing, counting only the examples that passed. `--strict` makes a warning fail the run, for CI. `ergo test` exits 0 when every example passed, 1 when one failed or, with `--strict`, when there's a warning, and 2 when the policy file can't be read or its examples are written wrong, like two examples with the same name, or an outcome that is empty, isn't a list, or has a heading with no status and no lines. It also refuses a YAML policy file that writes a key twice in the same mapping anywhere inside `examples` or `example_params`, like two `outcome` keys in one example, because the second would replace the first and the example would lose its lines without a word. A JSON policy file isn't checked for that yet, and neither is a mapping that writes a key twice outside `examples` and that an alias brings into it. `ergo report --format outcome` exits 2 for a report it can't show yet, and with `--fail` it exits 3 for a policy written wrong, as it does without `--format`.
 
-For now, outcome lines cover the policy's own checks on subjects that aren't child subjects. A line for a child subject, for a check Ergo adds like `$min_subjects`, for a subject out of scope, or for a subject whose id is an object or a list can't be written yet, and `--format outcome` refuses a report that has a row of that kind it would have to print. It also refuses a report whose heading could name two requirements, like `x is met:` for `x` when the policy also has a requirement called `x is met`, because `ergo test` would refuse that heading. An example whose lines cover such a row fails and says it can't check it yet.
+A child subject's line names its parent after its id, with `in`, every time, and a grandchild's names its grandparent after that. With `artifact` read from `every deployment.artifacts` and `tested` checking `tests_passed: tests is "passed"` on each artifact, and `deployments.json` holding:
+
+```json
+{
+  "deployments": [
+    {"id": "d1", "artifacts": [{"name": "web", "tests": "failed"}, {"name": "api", "tests": "passed"}]},
+    {"id": "d2", "artifacts": [{"name": "web", "tests": "passed"}]}
+  ]
+}
+```
+
+`ergo report --policy policy.yaml --input deployments.json --format outcome` prints:
+
+```yaml
+- not compliant
+- tested is not met:
+    - artifact web in deployment d1 fails tests_passed because tests is "failed"
+    - artifact api in deployment d1 passes tests_passed
+    - artifact web in deployment d2 passes tests_passed
+```
+
+So the two artifacts called `web` are two lines. A line for a child subject that leaves out its `in`, like `artifact web passes tests_passed`, fails its example with `can't read the line 'artifact web passes tests_passed': artifact is read inside deployment, so its id is followed by in deployment <id>`.
+
+For now, outcome lines cover the policy's own checks. A line for a check Ergo adds like `$min_subjects`, for a subject out of scope, or for a subject whose id is an object or a list can't be written yet, and `--format outcome` refuses a report that has a row of that kind it would have to print. It also refuses a report whose heading could name two requirements, like `x is met:` for `x` when the policy also has a requirement called `x is met`, because `ergo test` would refuse that heading. An example whose lines cover such a row fails and says it can't check it yet.
 
 ## Updating
 
