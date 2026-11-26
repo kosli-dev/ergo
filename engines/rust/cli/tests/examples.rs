@@ -511,3 +511,70 @@ fn a_line_that_disagrees_with_its_row_shows_no_check_passing_or_failing() {
         assert!(checked.shown.is_empty(), "{outcome}: {:?}", checked.shown);
     }
 }
+
+fn requirements_named(names: &[&str]) -> Value {
+    let requirements: serde_json::Map<String, Value> = names
+        .iter()
+        .map(|name| {
+            (
+                name.to_string(),
+                json!({"subject": "t", "checks": {"c": "ok is true"}}),
+            )
+        })
+        .collect();
+    json!({
+        "ergo_spec": ergo_policy_engine::SPEC,
+        "subjects": {"t": {"from": "ts", "identified_by": "id"}},
+        "requirements": requirements
+    })
+}
+
+#[test]
+fn a_heading_that_is_one_requirement_on_its_own_and_another_with_a_status_is_refused() {
+    let ambiguous = [
+        (&["x", "x is met"][..], "x is met"),
+        (&["a", "a is not met"][..], "a is not met"),
+        (&["a", "a is not applicable"][..], "a is not applicable"),
+    ];
+    for (names, heading) in ambiguous {
+        for lines in [json!(["t t1 passes c"]), Value::Null] {
+            let mut policy = requirements_named(names);
+            policy["examples"] = json!([
+                {"name": "e", "input": {"ts": [{"id": "t1", "ok": true}]}, "outcome": [{heading: lines}]}
+            ]);
+            let got = examples::read(&policy);
+            assert!(
+                got.as_ref().is_err_and(|problem| problem.starts_with(&format!(
+                    "example e: the heading {heading} could name the requirement {heading} or the status of "
+                ))),
+                "{names:?} {heading} {lines}: {got:?}"
+            );
+            let input = json!({"ts": [{"id": "t1", "ok": true}]});
+            let report = ergo_policy_engine::report(&input, &policy, &json!({}));
+            let problems = examples::check(&json!([{heading: lines}]), &report).problems;
+            assert_eq!(problems.len(), 1, "{problems:?}");
+            assert!(
+                problems[0].starts_with(&format!("the heading {heading} could name")),
+                "{problems:?}"
+            );
+        }
+    }
+    let clear = [
+        (&["x is met"][..], json!([{"x is met": ["t t1 passes c"]}])),
+        (
+            &["x", "x is met"][..],
+            json!([{"x is met is met": ["t t1 passes c"]}, "x is met", {"x": ["t t1 passes c"]}]),
+        ),
+    ];
+    for (names, outcome) in clear {
+        let mut policy = requirements_named(names);
+        policy["examples"] = json!([
+            {"name": "e", "input": {"ts": [{"id": "t1", "ok": true}]}, "outcome": outcome.clone()}
+        ]);
+        assert_eq!(
+            examples::run(&policy, false).map(|(_, code)| code),
+            Ok(0),
+            "{outcome}"
+        );
+    }
+}
