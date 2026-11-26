@@ -3567,7 +3567,7 @@ fn merge(evaluations: Vec<Evaluation>) -> Evaluation {
     merged
 }
 
-fn chain_of(reading: &Reading, subject: &str) -> Vec<String> {
+pub(crate) fn chain_of(reading: &Reading, subject: &str) -> Vec<String> {
     let mut chain = Vec::new();
     let mut at = subject.to_string();
     while let Some(parent) = reading.parent_of(&at) {
