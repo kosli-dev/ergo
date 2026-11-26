@@ -148,11 +148,74 @@ pub struct Region {
 }
 
 /// The whole outcome of a report, as `ergo report --format outcome` prints it, or why a row can't be shown yet.
-pub fn of(_report: &Value) -> Result<Vec<Item>, String> {
-    Ok(vec![])
+pub fn of(report: &Value) -> Result<Vec<Item>, String> {
+    let whole = Region {
+        compliant: true,
+        ..Region::default()
+    };
+    items(report, &whole, true)
 }
 
 /// The items of a report inside `region`, leaving out the rows that can't be shown yet.
-pub fn part(_report: &Value, _region: &Region) -> Vec<Item> {
-    vec![]
+pub fn part(report: &Value, region: &Region) -> Vec<Item> {
+    items(report, region, false).unwrap_or_default()
+}
+
+/// The words a requirement line puts after the requirement's name for a report status, like `is not met` for `not_met`.
+pub fn status_words(status: &Value) -> Option<&'static str> {
+    match status.as_str()? {
+        "met" => Some("is met"),
+        "not_met" => Some("is not met"),
+        "not_applicable" => Some("is not applicable"),
+        _ => None,
+    }
+}
+
+fn items(report: &Value, region: &Region, strict: bool) -> Result<Vec<Item>, String> {
+    let mut items = Vec::new();
+    if region.compliant {
+        items.push(Item::Line(
+            if report["compliant"] == true {
+                "compliant"
+            } else {
+                "not compliant"
+            }
+            .to_string(),
+        ));
+    }
+    let rows = report["results"].as_array().map(Vec::as_slice).unwrap_or_default();
+    let requirements = report["requirements"].as_object().into_iter().flatten();
+    for (name, entry) in requirements {
+        let whole = region.compliant || region.requirements.contains(name);
+        let covers = |check: &str| whole || region.checks.contains(&(name.clone(), check.to_string()));
+        if !whole && !region.checks.iter().any(|(r, _)| r == name) {
+            continue;
+        }
+        let mut lines = Vec::new();
+        for row in rows {
+            if row["requirement"] != name.as_str() || !covers(row["check"].as_str().unwrap_or_default()) {
+                continue;
+            }
+            match row_line(row) {
+                Ok(Some(line)) => lines.push(line),
+                Ok(None) => {}
+                Err(problem) if strict => return Err(problem),
+                Err(_) => {}
+            }
+        }
+        if !whole {
+            items.push(Item::Group(name.clone(), lines));
+            continue;
+        }
+        let Some(words) = status_words(&entry["status"]) else {
+            return Err(format!("requirement {name} has no status"));
+        };
+        let heading = format!("{name} {words}");
+        items.push(if lines.is_empty() {
+            Item::Line(heading)
+        } else {
+            Item::Group(heading, lines)
+        });
+    }
+    Ok(items)
 }
