@@ -355,6 +355,25 @@ test_a_for_line_text_that_counts_the_items_it_leaves_out_is_read_as_that_clause 
 	[c.kind | some c in ergo._for_text_said("item 1 of xs: v is missing; and 2 more")["ergo/clauses"]] == ["list", "more"]
 }
 
+test_a_for_line_text_says_each_item_of_a_second_sum_joined_after_the_items_of_the_first if {
+	check := ergo._s_written_check("sum of xs.v plus sum of ys.v is 0")
+	subj := {"xs": [{"v": "s"}, null], "ys": [{"v": null}]}
+	said := ergo._for_text_said(`item 1 of xs: v is "s", which isn't a number; item 2 of xs is null, which isn't an object, and item 1 of ys: v is null`)
+	texts := ergo._tally_item_texts(check, subj, "unusable", said)
+	texts == {`item 1 of xs: v is "s", which isn't a number`, "item 2 of xs is null, which isn't an object", "item 1 of ys: v is null"}
+	[p.name | some p in ergo._tally_item_parts(check, subj, "unusable", "/things/0", said)] == ["item 1 of xs", "item 2 of xs", "item 1 of ys"]
+	ergo._tally_rest_of(said, set(), texts) == ""
+}
+
+test_a_for_line_text_cut_short_before_a_second_sum_says_every_item_it_leaves_out if {
+	check := ergo._s_written_check("sum of xs.v plus sum of ys.v is 0")
+	subj := {"xs": [{"v": "s"}, null, {"v": "t"}, {"v": "u"}, {}], "ys": [{"v": null}]}
+	said := ergo._for_text_said(`item 1 of xs: v is "s", which isn't a number; item 2 of xs is null, which isn't an object; item 3 of xs: v is "t", which isn't a number; and 2 more, and item 1 of ys: v is null`)
+	texts := ergo._tally_item_texts(check, subj, "unusable", said)
+	[p.name | some p in ergo._tally_item_parts(check, subj, "unusable", "/things/0", said)] == ["item 1 of xs", "item 2 of xs", "item 3 of xs", "item 4 of xs", "item 5 of xs", "item 1 of ys"]
+	ergo._tally_rest_of(said, set(), texts) == ""
+}
+
 test_a_count_finds_an_item_whose_key_names_a_field_outside_it_from_the_item_clauses_of_its_message if {
 	pr := `${"alias":"pr","n":0,"of":null,"old":true}`
 	check := {"op": "compare", "cmp": "eq", "expression": "count of xs whose v equals pr named by k is 1", "left": {"count_of": ["xs"], "text": "count of xs whose v equals pr named by k", "whose": [{"op": "compare", "cmp": "eq", "left": ["v"], "right": [pr, {"named_by_field": "k"}]}]}, "right": {"literal": 1}}
