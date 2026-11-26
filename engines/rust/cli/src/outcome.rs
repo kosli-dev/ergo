@@ -104,10 +104,11 @@ pub fn read_check_line(
     checks: &[&str],
 ) -> Result<CheckLine, String> {
     let not_yet = |what: &str| Err(format!("lines for {what} aren't supported yet"));
-    let added = text.starts_with("fails $")
-        || text.starts_with("passes $")
-        || text.contains(" fails $")
-        || text.contains(" passes $");
+    let head = text.find(" because ").map_or(text, |at| &text[..at]);
+    let added = head.starts_with("fails $")
+        || head.starts_with("passes $")
+        || head.contains(" fails $")
+        || head.contains(" passes $");
     let Some(subject) = subject_at(text, subjects) else {
         if added {
             return not_yet("checks Ergo adds");
