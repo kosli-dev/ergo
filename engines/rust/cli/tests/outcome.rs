@@ -511,6 +511,36 @@ fn a_row_whose_in_does_not_follow_the_from_lines_of_the_policy_has_no_line() {
 }
 
 #[test]
+fn a_row_whose_in_names_other_subjects_than_its_from_line_says_so_and_has_no_line() {
+    let report = report(children(), children_input());
+    let rows = report["results"].as_array().unwrap();
+    let find = |check: &str| {
+        rows.iter()
+            .find(|row| row["check"] == check)
+            .unwrap()
+            .clone()
+    };
+    let mut run = find("ok");
+    run["subject"]["in"] = json!({"artifact": "web"});
+    assert_eq!(
+        outcome::line_for(&run, &children()),
+        Err("the in of a test run row doesn't name the subjects its from line is read inside, as for ok in ran".to_string())
+    );
+    let mut artifact = find("passed");
+    artifact["subject"]["type"] = json!("release");
+    for parents in [json!({"release": "r1"}), json!({})] {
+        artifact["subject"]["in"] = parents.clone();
+        assert_eq!(
+            outcome::line_for(&artifact, &children()),
+            Err("the in of a release row doesn't name the subjects its from line is read inside, as for passed in tested".to_string()),
+            "{parents}"
+        );
+    }
+    artifact["subject"].as_object_mut().unwrap().remove("in");
+    assert!(outcome::line_for(&artifact, &children()).is_ok());
+}
+
+#[test]
 fn a_check_line_reads_each_in_after_the_id_with_the_longest_subject_name_that_fits() {
     let subjects = ["artifact", "deployment", "release", "release train"];
     let checks = ["c"];

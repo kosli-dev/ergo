@@ -760,3 +760,87 @@ fn a_line_is_read_with_every_subject_name_of_the_policy_even_one_no_requirement_
         }
     }
 }
+
+fn artifacts() -> Value {
+    json!({
+        "ergo_spec": ergo_policy_engine::SPEC,
+        "subjects": {
+            "deployment": {"from": "deployments", "identified_by": "id"},
+            "artifact": {"from": "every deployment.artifacts", "identified_by": "name"}
+        },
+        "requirements": {"q": {"subject": "artifact", "checks": {"c": "x is 1"}}}
+    })
+}
+
+fn artifact_problems(items: Value, line: &str) -> Vec<String> {
+    let input = json!({"deployments": [{"id": 7, "artifacts": items}]});
+    let report = ergo_policy_engine::report(&input, &artifacts(), &json!({}));
+    examples::check(&json!([{"q": [line]}]), &report, &artifacts()).problems
+}
+
+#[test]
+fn a_parent_id_in_a_line_matches_the_id_of_the_same_value_however_it_is_written() {
+    let web = json!([{"name": "web", "x": 2}]);
+    for line in [
+        "artifact web in deployment 7 fails c",
+        "artifact web in deployment 7.0 fails c",
+        "artifact web in deployment 7e0 fails c",
+    ] {
+        assert_eq!(
+            artifact_problems(web.clone(), line),
+            Vec::<String>::new(),
+            "{line}"
+        );
+    }
+    assert_eq!(
+        artifact_problems(web, "artifact web in deployment \"7\" fails c"),
+        vec![
+            "the report has no row for artifact web in deployment \"7\" and c in q",
+            "no line says artifact web in deployment 7 fails c because x is 2",
+        ]
+    );
+}
+
+#[test]
+fn a_line_for_a_child_subject_must_agree_with_every_row_that_shares_its_check_and_subject() {
+    let twins = json!([{"name": "web", "x": 1}, {"name": "web", "x": 2}]);
+    assert_eq!(
+        artifact_problems(twins.clone(), "artifact web in deployment 7 passes c"),
+        vec![
+            "the report says artifact web in deployment 7 fails c because x is 2",
+            "no line says artifact web in deployment 7 fails c because x is 2",
+        ]
+    );
+    assert_eq!(
+        artifact_problems(twins, "artifact web in deployment 7 fails c"),
+        vec!["the report says artifact web in deployment 7 passes c"]
+    );
+}
+
+#[test]
+fn the_lines_for_a_child_subject_count_for_the_warnings() {
+    let mut policy = artifacts();
+    let example = |name: &str, x: i64, line: &str| {
+        json!({"name": name,
+               "input": {"deployments": [{"id": 7, "artifacts": [{"name": "web", "x": x}]}]},
+               "outcome": [{"q": [line]}]})
+    };
+    policy["examples"] = json!([example("fails", 2, "artifact web in deployment 7 fails c")]);
+    let (text, code) = examples::run(&policy, false).unwrap();
+    assert_eq!(code, 0, "{text}");
+    assert_eq!(
+        text,
+        "passed: fails\nwarning: no example shows c of q passing\n1 example: 1 passed, 0 failed\n"
+    );
+    policy["examples"] = json!([
+        example("fails", 2, "artifact web in deployment 7 fails c"),
+        example("passes", 1, "artifact web in deployment 7 passes c")
+    ]);
+    assert_eq!(
+        examples::run(&policy, true).unwrap(),
+        (
+            "passed: fails\npassed: passes\n2 examples: 2 passed, 0 failed\n".to_string(),
+            0
+        )
+    );
+}
