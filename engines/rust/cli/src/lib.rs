@@ -163,8 +163,7 @@ fn test(options: args::TestOptions, environment: &Environment) -> Result<Outcome
         ),
         Some(ergo_rego) => {
             let opa = environment.opa.as_deref().unwrap_or(OsStr::new("opa"));
-            let reports =
-                opa::run(opa, &ergo_rego, &policy, &examples).map_err(Failure::Engine)?;
+            let reports = opa::run(opa, &ergo_rego, &policy, &examples).map_err(Failure::Engine)?;
             if let Some(problem) = reports.iter().find_map(opa::unsupported_spec) {
                 return Err(Failure::Engine(format!(
                     "the ergo.rego at {ergo_rego} refuses the policy file {}: {problem}",

@@ -55,7 +55,10 @@ fn opa_output_is_read_as_one_report_per_example_or_refused() {
         (&two, 3),
         ("[{}]", 1),
         ("[1]", 1),
-        (r#"[{"engine": {"name": "ergo-rego", "version": "1"}, "results": {}}]"#, 1),
+        (
+            r#"[{"engine": {"name": "ergo-rego", "version": "1"}, "results": {}}]"#,
+            1,
+        ),
         (r#"[{"engine": {"name": "ergo-rego"}, "results": []}]"#, 1),
         (r#"[{"engine": "ergo-rego 1", "results": []}]"#, 1),
         (r#"[{"results": []}]"#, 1),
@@ -99,7 +102,11 @@ fn a_policy_spec_that_ergo_rego_does_not_support_is_found_in_its_well_formed_row
         json!([row("$well_formed", false, json!(["missing"]))]),
         json!([row("$well_formed", false, json!(["not a version v"]))]),
         json!([row("c", false, unsupported.clone())]),
-        json!([row("$well_formed", false, json!("unsupported version v0.5"))]),
+        json!([row(
+            "$well_formed",
+            false,
+            json!("unsupported version v0.5")
+        )]),
     ] {
         assert_eq!(
             opa::unsupported_spec(&report(engine.clone(), results.clone())),
@@ -398,7 +405,10 @@ fn the_ergo_command_reads_ergo_rego_and_ergo_opa_from_its_environment() {
     let policy = file("environment", "policy.yaml", POLICY);
     let ergo = |all: &[&str], vars: &[(&str, &str)]| {
         let mut command = std::process::Command::new(env!("CARGO_BIN_EXE_ergo"));
-        command.args(all).env_remove("ERGO_REGO").env_remove("ERGO_OPA");
+        command
+            .args(all)
+            .env_remove("ERGO_REGO")
+            .env_remove("ERGO_OPA");
         command.envs(vars.iter().copied());
         let output = command.output().unwrap();
         (
@@ -437,10 +447,21 @@ fn args(args: &[&str]) -> Vec<String> {
 fn test_takes_an_engine_and_the_path_of_ergo_rego() {
     let cases = [
         (vec!["test", "p.yaml"], Engine::Rust, None),
-        (vec!["test", "p.yaml", "--engine", "rust"], Engine::Rust, None),
+        (
+            vec!["test", "p.yaml", "--engine", "rust"],
+            Engine::Rust,
+            None,
+        ),
         (vec!["test", "p.yaml", "--engine=rego"], Engine::Rego, None),
         (
-            vec!["test", "--engine", "rego", "--ergo-rego", "e.rego", "p.yaml"],
+            vec![
+                "test",
+                "--engine",
+                "rego",
+                "--ergo-rego",
+                "e.rego",
+                "p.yaml",
+            ],
             Engine::Rego,
             Some("e.rego".to_string()),
         ),
@@ -472,15 +493,32 @@ fn engine_and_ergo_rego_are_refused_where_they_do_not_go() {
             "--ergo-rego only goes with --engine rego",
         ),
         (
-            vec!["test", "p.yaml", "--engine", "rust", "--ergo-rego", "e.rego"],
+            vec![
+                "test",
+                "p.yaml",
+                "--engine",
+                "rust",
+                "--ergo-rego",
+                "e.rego",
+            ],
             "--ergo-rego only goes with --engine rego",
         ),
         (
-            vec!["report", "--policy", "p.yaml", "--input", "i.json", "--engine", "rego"],
+            vec![
+                "report", "--policy", "p.yaml", "--input", "i.json", "--engine", "rego",
+            ],
             "--engine only goes with test",
         ),
         (
-            vec!["violations", "--policy", "p.yaml", "--input", "i.json", "--ergo-rego", "e.rego"],
+            vec![
+                "violations",
+                "--policy",
+                "p.yaml",
+                "--input",
+                "i.json",
+                "--ergo-rego",
+                "e.rego",
+            ],
             "--ergo-rego only goes with test",
         ),
     ];

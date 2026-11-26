@@ -91,7 +91,8 @@ fn is_report(value: &Value) -> bool {
 
 /// Reads what `opa eval --format raw` printed for [QUERY] as `count` reports, or says why it can't: each must be an object with a `results` list and an `engine` that has a `name` and a `version`.
 pub fn reports(printed: &str, count: usize) -> Result<Vec<Value>, String> {
-    let wrong = || format!("opa printed something that isn't a report for each of the {count} examples");
+    let wrong =
+        || format!("opa printed something that isn't a report for each of the {count} examples");
     let Ok(Value::Array(reports)) = serde_json::from_str::<Value>(printed) else {
         return Err(wrong());
     };
