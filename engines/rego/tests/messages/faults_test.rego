@@ -29,6 +29,16 @@ test_a_key_fault_piece_is_a_clause_that_says_the_key_isnt_text if {
 	ergo._m_key_fault_pieces({}, named) == [ergo._m_clause("root", "e", "unusable", "e is 5, which isn't text")] with input as {"ergo/names": {"e": 5}}
 }
 
+test_the_fallback_of_a_message_is_clauses_printed_as_the_old_text if {
+	written := {"op": "present", "path": ["v"], "expression": "v is present"}
+	ergo._m_fallback(written) == [ergo._m_clause("root", "v is present", "value", "v is present is false")]
+	ergo._m_fallback({"op": "present", "path": ["v"]}) == [ergo._m_clause("root", "the check", "value", "the check is false")]
+	params := {"op": "compare", "cmp": "eq", "left": ["v"], "right": ["$params", "n"]}
+	ergo._m_fallback(params) == [ergo._m_clause("root", "$params", "unusable", "$params is 3, which isn't an object")] with data.ergo_params as 3
+	ergo._m_fallback_text(written) == "v is present is false"
+	ergo._m_fallback_text(params) == "$params is 3, which isn't an object" with data.ergo_params as 3
+}
+
 test_the_faults_of_a_message_are_clauses_that_say_what_a_value_isnt if {
 	c := ergo._m_with_sides(ergo._s_written_check("v is at least 3"))
 	ergo._m_faults({"v": "a"}, c) == [ergo._m_clause("root", "v", "unusable", `v is "a", which isn't a number`)]
