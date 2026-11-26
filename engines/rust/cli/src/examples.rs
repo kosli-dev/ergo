@@ -196,7 +196,7 @@ fn same_row(row: &Value, line: &Line) -> bool {
     row["requirement"] == line.requirement.as_str()
         && row["check"] == line.check.as_str()
         && row["subject"]["type"] == line.subject.as_str()
-        && row["subject"]["id"] == line.id
+        && outcome::same_id(&row["subject"]["id"], &line.id)
         && row["subject"].get("in").is_none()
 }
 

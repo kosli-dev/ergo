@@ -19,6 +19,14 @@ fn word_value(word: &str) -> Value {
     }
 }
 
+/// Whether two ids are the same: numbers by value, so `7.0` is `7`, and anything else as JSON values.
+pub fn same_id(a: &Value, b: &Value) -> bool {
+    match (a, b) {
+        (Value::Number(a), Value::Number(b)) => crate::number::same_value(a, b),
+        _ => a == b,
+    }
+}
+
 /// The shortest text that reads back as `id`, or `None` for an object or a list.
 pub fn id_text(id: &Value) -> Option<String> {
     match id {
