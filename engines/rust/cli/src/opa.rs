@@ -112,7 +112,7 @@ pub fn engine_line(report: &Value) -> String {
     )
 }
 
-/// The problem a failed `$well_formed` row of `report` gives when `ergo.rego` doesn't support the policy's `ergo_spec`, like `policy ergo_spec: unsupported version v0.5, expected v0.7-dev`.
+/// The problem a failed `$well_formed` row of `report` gives when `ergo.rego` doesn't support the policy's `ergo_spec`, like `policy ergo_spec: unsupported version v0.5, expected v0.6`.
 pub fn unsupported_spec(report: &Value) -> Option<String> {
     let rows = report["results"].as_array()?;
     rows.iter()

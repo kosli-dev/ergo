@@ -89,13 +89,13 @@ fn a_policy_spec_that_ergo_rego_does_not_support_is_found_in_its_well_formed_row
         ]})
     };
     let engine = json!({"name": "ergo-rego", "version": "0.5.1"});
-    let unsupported = json!(["unsupported version v0.5, expected v0.7-dev"]);
+    let unsupported = json!(["unsupported version v0.5, expected v9.9-dev"]);
     assert_eq!(
         opa::unsupported_spec(&report(
             engine.clone(),
             json!([row("$well_formed", false, unsupported.clone())])
         )),
-        Some("policy ergo_spec: unsupported version v0.5, expected v0.7-dev".to_string())
+        Some("policy ergo_spec: unsupported version v0.5, expected v9.9-dev".to_string())
     );
     for results in [
         json!([]),
