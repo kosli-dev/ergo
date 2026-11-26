@@ -4,6 +4,7 @@ pub mod args;
 pub mod examples;
 pub mod files;
 pub mod number;
+pub mod opa;
 pub mod outcome;
 pub mod output;
 pub mod yaml;
