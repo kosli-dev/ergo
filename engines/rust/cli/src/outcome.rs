@@ -189,7 +189,13 @@ fn read_with_id(
             return Ok(line(false, APPLIES, None));
         }
         if let Some(because) = after.strip_prefix(" because ") {
+            if because.is_empty() {
+                return Err("it has nothing after because".to_string());
+            }
             return Ok(line(false, APPLIES, Some(because)));
+        }
+        if after == " because" {
+            return Err("it has nothing after because".to_string());
         }
     }
     let Some((passes, rest)) = verb(rest) else {
