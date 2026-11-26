@@ -46,6 +46,18 @@ fn args(args: &[&str]) -> Vec<String> {
 }
 
 #[test]
+fn help_lists_test_format_outcome_and_strict_as_experimental() {
+    let usage = ergo_policy_cli::USAGE;
+    for needle in [
+        "\n       ergo report --format outcome --policy <file> --input <file> [--params <file>] [--fail]\n       ergo test <policy file> [--strict]\n",
+        "\n  test         experimental: run the examples in a policy\n",
+        "\n  1  with --fail, a check failed; with test, an example failed, or --strict and a warning\n",
+    ] {
+        assert!(usage.contains(needle), "{usage}");
+    }
+}
+
+#[test]
 fn report_with_format_outcome_prints_the_outcome_as_yaml() {
     let policy = file("format", "policy.yaml", POLICY);
     let input = file(
