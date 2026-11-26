@@ -381,8 +381,9 @@ pub fn run(policy: &Value, strict: bool) -> Result<(String, u8), String> {
         }
     }
     text.push_str(&format!(
-        "{} examples: {} passed, {failed} failed\n",
+        "{} example{}: {} passed, {failed} failed\n",
         examples.len(),
+        if examples.len() == 1 { "" } else { "s" },
         examples.len() - failed
     ));
     let code = if failed > 0 || (strict && warnings > 0) {

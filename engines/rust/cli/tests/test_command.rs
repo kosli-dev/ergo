@@ -183,7 +183,10 @@ fn test_counts_one_example_as_one_example() {
     let Ok(Outcome::Print(text)) = run(&args(&["test", &policy])) else {
         panic!();
     };
-    assert!(text.ends_with("\n1 example: 1 passed, 0 failed\n"), "{text}");
+    assert!(
+        text.ends_with("\n1 example: 1 passed, 0 failed\n"),
+        "{text}"
+    );
 }
 
 #[test]
