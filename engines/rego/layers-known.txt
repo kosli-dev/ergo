@@ -76,10 +76,10 @@ _for_row_message -> _for_message
 _for_row_message -> _m_joined
 _for_row_message -> _m_tally_grouped
 _for_row_message -> _m_unskipped
-_for_row_of -> _m_fallback
+_for_row_of -> _m_fallback_text
 _for_row_of -> _m_params_unread
 _for_row_of -> _m_strip
-_for_row_text -> _m_fallback
+_for_row_text -> _m_fallback_text
 _for_second_roots -> _m_aliased
 _for_second_roots -> _m_under
 _for_unchecked_item -> _m_inner_free
