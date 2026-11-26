@@ -116,7 +116,14 @@ _m_clause_texts(clauses) := [t | some c in clauses; some t in _m_clause_lines(c)
 _m_clauses_shown(clauses) := _m_clauses_cut(_m_clauses_order(clauses))
 
 _m_clauses_order(clauses) := [c | some i, c in sorted; not _m_said_before(c, array.slice(sorted, 0, i))] if {
-	sorted := [x[5] | some x in sort([_m_clause_place(i, c) | some i, c in _once(clauses)])]
+	sorted := [x[5] | some x in sort([_m_clause_place(i, c) | some i, c in clauses; _m_clause_first(c, array.slice(clauses, 0, i))])]
+}
+
+_m_clause_first(c, _) if c.kind == "more"
+
+_m_clause_first(c, earlier) if {
+	c.kind != "more"
+	not c in earlier
 }
 
 _m_clause_place(i, c) := [object.get(c, "group", 0), 0, object.get(_m_clause_ranks, c.cause, 6), c.name, c.text, c] if {
@@ -126,7 +133,7 @@ _m_clause_place(i, c) := [object.get(c, "group", 0), 0, object.get(_m_clause_ran
 
 else := [object.get(c, "group", 0), object.get(_m_clause_kind_ranks, c.kind, 3), 0, "", i, c]
 
-_m_clause_kind_ranks := {"list": 1, "item": 2}
+_m_clause_kind_ranks := {"list": 1, "item": 2, "more": 2}
 
 _m_said_before(c, earlier) if {
 	c.kind in {"root", "list"}

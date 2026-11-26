@@ -152,7 +152,11 @@ _m_said_row(message, pieces) := {"message": message, "ergo/clauses": _m_pieces_c
 
 _m_pieces_clauses(pieces) := [c | some p in pieces; some c in _m_piece_clauses(p)]
 
-_m_ordered_row(pieces) := {"message": concat(_m_row_joint(pieces), _m_clause_texts(_m_clauses_shown(clauses))), "ergo/clauses": clauses} if clauses := _m_pieces_clauses(pieces)
+_m_ordered_row(pieces) := {"message": concat(_m_row_joint(pieces), _m_clause_texts(_m_clauses_order([c | some p in pieces; some c in _m_piece_shown(p)]))), "ergo/clauses": _m_pieces_clauses(pieces)}
+
+_m_piece_shown(p) := _m_clauses_shown(p) if is_array(p)
+
+else := [p]
 
 _m_row_joint(pieces) := "; " if {
 	some p in pieces
