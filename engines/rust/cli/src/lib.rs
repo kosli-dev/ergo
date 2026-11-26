@@ -19,19 +19,27 @@ pub enum Failure {
     File(String),
     /// The output asked for can't show something in the report yet.
     Unsupported(String),
+    /// With `--fail`, the policy is written wrong and the output asked for can't show the report.
+    WrittenWrong(String),
 }
 
 impl Failure {
     /// The text to print on stderr.
     pub fn message(&self) -> &str {
         match self {
-            Failure::Usage(m) | Failure::File(m) | Failure::Unsupported(m) => m,
+            Failure::Usage(m)
+            | Failure::File(m)
+            | Failure::Unsupported(m)
+            | Failure::WrittenWrong(m) => m,
         }
     }
 
-    /// The exit code: 2, for a wrong command line, a bad file and output that can't be written alike.
+    /// The exit code: 3 when, with `--fail`, the policy is written wrong, and 2 for a wrong command line, a bad file and output that can't be written alike.
     pub fn code(&self) -> i32 {
-        2
+        match self {
+            Failure::WrittenWrong(_) => 3,
+            _ => 2,
+        }
     }
 }
 
@@ -124,7 +132,15 @@ pub fn run(arguments: &[String]) -> Result<Outcome, Failure> {
     let report = ergo_policy_engine::report(&input, &policy, &params);
     let code = if options.fail { fail_code(&report) } else { 0 };
     let text = match (options.command, options.format) {
-        (_, Format::Outcome) => outcome::yaml(&outcome::of(&report).map_err(Failure::Unsupported)?),
+        (_, Format::Outcome) => {
+            outcome::yaml(&outcome::of(&report).map_err(|problem| match code {
+                3 => Failure::WrittenWrong(format!(
+                    "the policy file {} is written wrong, so the report can't be shown as an outcome: {problem}",
+                    options.policy
+                )),
+                _ => Failure::Unsupported(problem),
+            })?)
+        }
         (Command::Report, Format::Json) => output::render(&report, options.compact),
         (Command::Violations, Format::Json) => {
             output::render(&ergo_policy_engine::violations(&report), options.compact)
