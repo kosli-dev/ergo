@@ -47,18 +47,13 @@ _for_on_tree(check, subj, r) if {
 	count(check.items) == 1
 	object.get(r, "natural", null) != "satisfied"
 	not _walk_flawed(check)
-	not _for_walked_root_fails(check, subj)
 	not _for_key_not_text(check)
 	not _for_key_unread(check)
-	not _for_key_is_alias(check)
 	count([c | some c in check.checks; _for_reads_an_alias(check, c); _for_reads_a_list(c)]) < 2
 	every c in object.get(check.items[0], "whose", []) {
 		every p in _condition_paths(c) {
 			p != []
 		}
-	}
-	every step in array.concat(check.items[0].path, object.get(object.get(check.items[0], "pick", {}), "by", [])) {
-		_for_plain_step(step)
 	}
 }
 
@@ -70,18 +65,6 @@ _for_key_unread(check) if {
 	_ref_step_flaw(seg) in {"absent", "null"}
 }
 
-_for_walked_root_fails(check, subj) if {
-	_walk_roots_on
-	_walk_root_flaw(check, subj) != ""
-}
-
-_for_key_is_alias(check) if {
-	walk(check.checks, [_, y])
-	is_object(y)
-	some item in check.items
-	object.get(y, "named_by", null) == item.as
-}
-
 _for_reads_a_list(c) if _walks(c)
 
 _for_reads_a_list(c) if {
@@ -90,10 +73,6 @@ _for_reads_a_list(c) if {
 	some f in _tally_forms
 	is_array(object.get(y, f, null))
 }
-
-_for_plain_step(step) if is_string(step)
-
-_for_plain_step(step) if is_number(step)
 
 _for_row_raw(check, subj) := object.union(r, {"cause": _for_shape_cause(r), "natural": r.cause}) if {
 	_params_shape_only_unreadable(check)
