@@ -28,7 +28,7 @@ _tally_outcomes(ins, row, check) := [_tally_outcome(i, said) | some i in ins] if
 	check.op != "for"
 	lists := _tally_list_names(check)
 	count(lists) > 0
-	said := {c.name: _tally_list_cause(c) | some c in _tally_said_lists(row, lists)}
+	said := {c.name: _tally_clause_cause(c) | some c in _tally_said_lists(row, lists)}
 } else := ins
 
 _tally_outcome(i, said) := object.union(i, {"outcome": said[i.name]}) if _ = said[i.name]
@@ -627,7 +627,7 @@ _tally_list_entries(row, at, lists, ins) := [] if count(lists) == 0
 
 else := [_entry("list", c.name, cause, _tally_list_read(c.name, cause, row, ins, at), [], c.text) |
 	some c in _tally_said_lists(row, lists)
-	cause := _tally_list_cause(c)
+	cause := _tally_clause_cause(c)
 ]
 
 _tally_said_lists(said, lists) := [c | some c in _said_clauses(said); c.name in lists]
@@ -666,7 +666,7 @@ _clause_cause(c) := "unusable" if {
 	not endswith(c, " is null")
 }
 
-_tally_list_cause(c) := c.cause if c.cause in {"absent", "null"}
+_tally_clause_cause(c) := c.cause if c.cause in {"absent", "null"}
 
 else := "unusable"
 
@@ -1508,7 +1508,7 @@ else := object.union(e, {"message": concat("; ", _once([y.message | some y in sa
 _tally_keyed_extra(c, subj, at, said, xs) := [x |
 	some f in _tally_keyed_found(c, subj, said)
 	not f.clause.name in {y.name | some y in xs}
-	x := _tally_leveled(_tally_item_entry(f.e, _tally_list_cause(f.clause), f.clause.text, f.side, f.w, f.roots, subj), f.e.i, f.w, at)
+	x := _tally_leveled(_tally_item_entry(f.e, _tally_clause_cause(f.clause), f.clause.text, f.side, f.w, f.roots, subj), f.e.i, f.w, at)
 ]
 
 _tally_keyed_found(c, subj, said) := [{"side": side, "w": w, "roots": roots, "e": e, "clause": clause} |
