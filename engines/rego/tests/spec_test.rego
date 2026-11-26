@@ -17,6 +17,8 @@ known_differences := {
 	"for / a walk through a for line's alias leaves a root after the phrase to the assertion, and each item keeps its own cause and the items of its list / an item whose list holds five items without v",
 	"for / the roots of the line's own whose come before the roots of its sentences, whatever their causes / $params.min is missing and says first, though $params.a has the worse cause",
 	"messages / nothing hides a problem / the roots come first and then each item, and the row takes the worst cause",
+	"row_parts / a count whose reads a null root through a key the item holds says the root once on the assertion and each item that can't give the key as an entry / the root is null, one item has no key and one has a null key",
+	"row_parts / a count whose reads a null root through a key the item holds, and a field after the key, says the root once on the assertion and each item that can't give the key as an entry / the root is null, one item has no key and one has a null key",
 }
 
 _topic_cases(topic) := json.unmarshal(replace(json.marshal(data.spec.cases[topic]), "{{spec}}", ergo._spec))

@@ -371,6 +371,8 @@ parts / a part's alias on the right of a whose, with a part that is missing, nul
 parts / the same check written with an alias and with the path it stands for / gives the same rows when the part is missing, null or a string
 requirements / a child subject of the whole input when it is a list / reads the child under each item, though the items aren't all of one type
 row_parts / a count of and a sum of on a for line name the items they can't read under the item of the for line / items named through the alias, an inner list that is missing, a sentence that doesn't read the alias, and a second list
+row_parts / a count whose reads a null root through a key the item holds says the root once on the assertion and each item that can't give the key as an entry / the root is null, one item has no key and one has a null key
+row_parts / a count whose reads a null root through a key the item holds, and a field after the key, says the root once on the assertion and each item that can't give the key as an entry / the root is null, one item has no key and one has a null key
 row_parts / a list walked by a sentence on a for line with two lists sits under the item of the second list, named with its alias / an inner item that is missing a field, an inner list that is null, and an inner item that isn't an object
 row_parts / an every or a some that asks whether a field exists gives a missing field the outcome absent, as every other check does / a some with no item that has the field, beside an item that isn't an object
 row_parts / an every or a some that asks whether a field exists gives a missing field the outcome absent, as every other check does / an item without the field gives its input the outcome absent, and one whose field is null the outcome null

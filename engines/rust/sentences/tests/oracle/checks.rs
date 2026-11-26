@@ -514,6 +514,12 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    (
+        "sum of g.xs.v plus sum of g.ys.v is 0",
+        "sum of g.xs.v plus sum of g.ys.v is 0",
+        &[],
+        &[],
+    ),
     ("sum of u.xs.v is 5", "sum of u.xs.v is 5", &[], &[]),
     ("sum of w.xs.v is 5", "sum of w.xs.v is 5", &[], &[]),
     ("sum of xs.v is 5", "sum of xs.v is 5", &[], &[]),

@@ -15073,5 +15073,317 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a sum of plus a sum of on a for line names every item of both lists under the item of the line",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": "every gs as g", "assert": "sum of g.xs.v plus sum of g.ys.v is 0"}}}}},
+    "cases": [
+      {
+        "description": "an item of the second list comes after an item of the first that isn't an object, and each is an entry",
+        "rules": ["row.parts", "tally.sum", "message.items", "problems.all_said", "problems.item_order", "for.failed_items"],
+        "input": {"things": [{"id": "t0", "gs": [{"xs": [{"v": "s"}, null], "ys": [{"v": null}]}]}]},
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {"type": "thing", "id": "t0"},
+            "check": "c",
+            "passed": false,
+            "cause": "not_an_object",
+            "message": "item 1 of gs: item 1 of g.xs: v is \"s\", which isn't a number; item 1 of gs: item 2 of g.xs is null, which isn't an object; item 1 of gs: item 1 of g.ys: v is null",
+            "inputs": [
+              {"name": "gs[]", "value": [{"xs": [{"v": "s"}, null], "ys": [{"v": null}]}], "locations": ["/things/0/gs/0"], "outcome": "usable"}
+            ],
+            "failures": [
+              {
+                "kind": "assertion",
+                "name": "sum of g.xs.v plus sum of g.ys.v is 0",
+                "cause": "not_an_object",
+                "message": "",
+                "inputs": [],
+                "locations": ["$policy:/requirements/r/checks/c/assert"],
+                "failures": [
+                  {
+                    "kind": "item",
+                    "name": "item 1 of gs",
+                    "cause": "not_an_object",
+                    "message": "",
+                    "value": {"xs": [{"v": "s"}, null], "ys": [{"v": null}]},
+                    "locations": ["/things/0/gs/0"],
+                    "inputs": [
+                      {"name": "sum of g.xs.v plus sum of g.ys.v", "value": null, "locations": ["/things/0/gs/0/xs/0/v", "/things/0/gs/0/xs/1", "/things/0/gs/0/ys/0/v"]},
+                      {"name": "sum of g.xs.v", "value": null, "locations": ["/things/0/gs/0/xs/0/v", "/things/0/gs/0/xs/1"]},
+                      {"name": "sum of g.ys.v", "value": null, "locations": ["/things/0/gs/0/ys/0/v"]}
+                    ],
+                    "failures": [
+                      {
+                        "kind": "item",
+                        "name": "item 1 of g.xs",
+                        "cause": "unusable",
+                        "message": "v is \"s\", which isn't a number",
+                        "value": {"v": "s"},
+                        "locations": ["/things/0/gs/0/xs/0"],
+                        "inputs": [{"name": "g.xs[0].v", "value": "s", "locations": ["/things/0/gs/0/xs/0/v"], "outcome": "unusable"}],
+                        "failures": []
+                      },
+                      {
+                        "kind": "item",
+                        "name": "item 2 of g.xs",
+                        "cause": "not_an_object",
+                        "message": "item 2 of g.xs is null, which isn't an object",
+                        "value": null,
+                        "locations": ["/things/0/gs/0/xs/1"],
+                        "inputs": [{"name": "g.xs[1].v", "value": null, "locations": ["/things/0/gs/0/xs/1"], "outcome": "not_an_object"}],
+                        "failures": []
+                      },
+                      {
+                        "kind": "item",
+                        "name": "item 1 of g.ys",
+                        "cause": "null",
+                        "message": "v is null",
+                        "value": {"v": null},
+                        "locations": ["/things/0/gs/0/ys/0"],
+                        "inputs": [{"name": "g.ys[0].v", "value": null, "locations": ["/things/0/gs/0/ys/0/v"], "outcome": "null"}],
+                        "failures": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "an item the message leaves out in and N more, before the items of the second list, is still an entry",
+        "rules": ["row.parts", "tally.sum", "message.items", "problems.all_said", "problems.item_order", "for.failed_items"],
+        "input": {"things": [{"id": "t0", "gs": [{"xs": [{"v": "s"}, null, {"v": "t"}, {}], "ys": [{"v": null}]}]}]},
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {"type": "thing", "id": "t0"},
+            "check": "c",
+            "passed": false,
+            "cause": "not_an_object",
+            "message": "item 1 of gs: item 1 of g.xs: v is \"s\", which isn't a number; item 1 of gs: item 2 of g.xs is null, which isn't an object; item 1 of gs: item 3 of g.xs: v is \"t\", which isn't a number; and 2 more",
+            "inputs": [
+              {"name": "gs[]", "value": [{"xs": [{"v": "s"}, null, {"v": "t"}, {}], "ys": [{"v": null}]}], "locations": ["/things/0/gs/0"], "outcome": "usable"}
+            ],
+            "failures": [
+              {
+                "kind": "assertion",
+                "name": "sum of g.xs.v plus sum of g.ys.v is 0",
+                "cause": "not_an_object",
+                "message": "",
+                "inputs": [],
+                "locations": ["$policy:/requirements/r/checks/c/assert"],
+                "failures": [
+                  {
+                    "kind": "item",
+                    "name": "item 1 of gs",
+                    "cause": "not_an_object",
+                    "message": "",
+                    "value": {"xs": [{"v": "s"}, null, {"v": "t"}, {}], "ys": [{"v": null}]},
+                    "locations": ["/things/0/gs/0"],
+                    "inputs": [
+                      {"name": "sum of g.xs.v plus sum of g.ys.v", "value": null, "locations": ["/things/0/gs/0/xs/0/v", "/things/0/gs/0/xs/1", "/things/0/gs/0/xs/2/v", "/things/0/gs/0/xs/3", "/things/0/gs/0/ys/0/v"]},
+                      {"name": "sum of g.xs.v", "value": null, "locations": ["/things/0/gs/0/xs/0/v", "/things/0/gs/0/xs/1", "/things/0/gs/0/xs/2/v", "/things/0/gs/0/xs/3"]},
+                      {"name": "sum of g.ys.v", "value": null, "locations": ["/things/0/gs/0/ys/0/v"]}
+                    ],
+                    "failures": [
+                      {
+                        "kind": "item",
+                        "name": "item 1 of g.xs",
+                        "cause": "unusable",
+                        "message": "v is \"s\", which isn't a number",
+                        "value": {"v": "s"},
+                        "locations": ["/things/0/gs/0/xs/0"],
+                        "inputs": [{"name": "g.xs[0].v", "value": "s", "locations": ["/things/0/gs/0/xs/0/v"], "outcome": "unusable"}],
+                        "failures": []
+                      },
+                      {
+                        "kind": "item",
+                        "name": "item 2 of g.xs",
+                        "cause": "not_an_object",
+                        "message": "item 2 of g.xs is null, which isn't an object",
+                        "value": null,
+                        "locations": ["/things/0/gs/0/xs/1"],
+                        "inputs": [{"name": "g.xs[1].v", "value": null, "locations": ["/things/0/gs/0/xs/1"], "outcome": "not_an_object"}],
+                        "failures": []
+                      },
+                      {
+                        "kind": "item",
+                        "name": "item 3 of g.xs",
+                        "cause": "unusable",
+                        "message": "v is \"t\", which isn't a number",
+                        "value": {"v": "t"},
+                        "locations": ["/things/0/gs/0/xs/2"],
+                        "inputs": [{"name": "g.xs[2].v", "value": "t", "locations": ["/things/0/gs/0/xs/2/v"], "outcome": "unusable"}],
+                        "failures": []
+                      },
+                      {
+                        "kind": "item",
+                        "name": "item 4 of g.xs",
+                        "cause": "absent",
+                        "message": "v is missing",
+                        "value": {},
+                        "locations": ["/things/0/gs/0/xs/3"],
+                        "inputs": [{"name": "g.xs[3].v", "value": null, "locations": ["/things/0/gs/0/xs/3"], "outcome": "absent"}],
+                        "failures": []
+                      },
+                      {
+                        "kind": "item",
+                        "name": "item 1 of g.ys",
+                        "cause": "null",
+                        "message": "v is null",
+                        "value": {"v": null},
+                        "locations": ["/things/0/gs/0/ys/0"],
+                        "inputs": [{"name": "g.ys[0].v", "value": null, "locations": ["/things/0/gs/0/ys/0/v"], "outcome": "null"}],
+                        "failures": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a sum of plus a sum of names the items each list's and N more leaves out in the middle of the message",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "thing", "checks": {"c": "sum of xs.v plus sum of ys.v is 0"}}}},
+    "cases": [
+      {
+        "description": "the fourth item of the first list is an entry though the message counts it in and 1 more before the items of the second list",
+        "rules": ["row.parts", "tally.sum", "message.items", "problems.all_said", "problems.item_order"],
+        "input": {"things": [{"id": "t0", "xs": [{"v": "s"}, {"v": "a; b"}, {}, {"v": null}], "ys": [{"v": null}, {"v": "x, and y"}]}]},
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {"type": "thing", "id": "t0"},
+            "check": "c",
+            "passed": false,
+            "cause": "unusable",
+            "message": "item 1 of xs: v is \"s\", which isn't a number; item 2 of xs: v is \"a; b\", which isn't a number; item 3 of xs: v is missing; and 1 more; item 1 of ys: v is null; item 2 of ys: v is \"x, and y\", which isn't a number",
+            "inputs": [
+              {"name": "sum of xs.v plus sum of ys.v", "value": null, "locations": ["/things/0/xs/0/v", "/things/0/xs/1/v", "/things/0/xs/2", "/things/0/xs/3/v", "/things/0/ys/0/v", "/things/0/ys/1/v"]},
+              {"name": "sum of xs.v", "value": null, "locations": ["/things/0/xs/0/v", "/things/0/xs/1/v", "/things/0/xs/2", "/things/0/xs/3/v"]},
+              {"name": "xs[].v", "value": ["s", "a; b", null, null], "locations": ["/things/0/xs/0/v", "/things/0/xs/1/v", "/things/0/xs/2", "/things/0/xs/3/v"], "outcome": "usable"},
+              {"name": "sum of ys.v", "value": null, "locations": ["/things/0/ys/0/v", "/things/0/ys/1/v"]},
+              {"name": "ys[].v", "value": [null, "x, and y"], "locations": ["/things/0/ys/0/v", "/things/0/ys/1/v"], "outcome": "usable"}
+            ],
+            "failures": [
+              {
+                "kind": "assertion",
+                "name": "sum of xs.v plus sum of ys.v is 0",
+                "cause": "unusable",
+                "message": "",
+                "inputs": [
+                  {"name": "sum of xs.v plus sum of ys.v", "value": null, "locations": ["/things/0/xs/0/v", "/things/0/xs/1/v", "/things/0/xs/2", "/things/0/xs/3/v", "/things/0/ys/0/v", "/things/0/ys/1/v"]},
+                  {"name": "sum of xs.v", "value": null, "locations": ["/things/0/xs/0/v", "/things/0/xs/1/v", "/things/0/xs/2", "/things/0/xs/3/v"]},
+                  {"name": "sum of ys.v", "value": null, "locations": ["/things/0/ys/0/v", "/things/0/ys/1/v"]}
+                ],
+                "locations": ["$policy:/requirements/r/checks/c"],
+                "failures": [
+                  {"kind": "item", "name": "item 1 of xs", "cause": "unusable", "message": "v is \"s\", which isn't a number", "value": {"v": "s"}, "locations": ["/things/0/xs/0"], "inputs": [{"name": "xs[0].v", "value": "s", "locations": ["/things/0/xs/0/v"], "outcome": "unusable"}], "failures": []},
+                  {"kind": "item", "name": "item 2 of xs", "cause": "unusable", "message": "v is \"a; b\", which isn't a number", "value": {"v": "a; b"}, "locations": ["/things/0/xs/1"], "inputs": [{"name": "xs[1].v", "value": "a; b", "locations": ["/things/0/xs/1/v"], "outcome": "unusable"}], "failures": []},
+                  {"kind": "item", "name": "item 3 of xs", "cause": "absent", "message": "v is missing", "value": {}, "locations": ["/things/0/xs/2"], "inputs": [{"name": "xs[2].v", "value": null, "locations": ["/things/0/xs/2"], "outcome": "absent"}], "failures": []},
+                  {"kind": "item", "name": "item 4 of xs", "cause": "null", "message": "v is null", "value": {"v": null}, "locations": ["/things/0/xs/3"], "inputs": [{"name": "xs[3].v", "value": null, "locations": ["/things/0/xs/3/v"], "outcome": "null"}], "failures": []},
+                  {"kind": "item", "name": "item 1 of ys", "cause": "null", "message": "v is null", "value": {"v": null}, "locations": ["/things/0/ys/0"], "inputs": [{"name": "ys[0].v", "value": null, "locations": ["/things/0/ys/0/v"], "outcome": "null"}], "failures": []},
+                  {"kind": "item", "name": "item 2 of ys", "cause": "unusable", "message": "v is \"x, and y\", which isn't a number", "value": {"v": "x, and y"}, "locations": ["/things/0/ys/1"], "inputs": [{"name": "ys[1].v", "value": "x, and y", "locations": ["/things/0/ys/1/v"], "outcome": "unusable"}], "failures": []}
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a count whose reads a null root through a key the item holds says the root once on the assertion and each item that can't give the key as an entry",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "thing", "checks": {"c": "count of xs whose $input.m named by key is 1 is 0"}}}},
+    "cases": [
+      {
+        "description": "the root is null, one item has no key and one has a null key",
+        "rules": ["row.parts", "tally.whose", "message.items", "problems.where_said", "problems.all_said"],
+        "input": {"m": null, "things": [{"id": "a", "xs": [{"v": 1, "key": "a"}, {"v": 1}, {"v": 1, "key": null}]}]},
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {"type": "thing", "id": "a"},
+            "check": "c",
+            "passed": false,
+            "cause": "absent",
+            "message": "$input.m is null; item 2 of xs: key is missing; item 3 of xs: key is null",
+            "inputs": [
+              {"name": "count of xs whose $input.m named by key is 1", "value": null, "locations": ["/things/0/xs/0", "/things/0/xs/1", "/things/0/xs/2"]},
+              {"name": "xs[]", "value": [{"v": 1, "key": "a"}, {"v": 1}, {"v": 1, "key": null}], "locations": ["/things/0/xs/0", "/things/0/xs/1", "/things/0/xs/2"], "outcome": "usable"},
+              {"name": "$input.m", "value": null, "locations": ["/m"], "outcome": "null"}
+            ],
+            "failures": [
+              {
+                "kind": "assertion",
+                "name": "count of xs whose $input.m named by key is 1 is 0",
+                "cause": "absent",
+                "message": "$input.m is null",
+                "inputs": [
+                  {"name": "count of xs whose $input.m named by key is 1", "value": null, "locations": ["/things/0/xs/0", "/things/0/xs/1", "/things/0/xs/2"]},
+                  {"name": "$input.m", "value": null, "locations": ["/m"], "outcome": "null"}
+                ],
+                "locations": ["$policy:/requirements/r/checks/c"],
+                "failures": [
+                  {"kind": "item", "name": "item 2 of xs", "cause": "absent", "message": "key is missing", "value": {"v": 1}, "locations": ["/things/0/xs/1"], "inputs": [{"name": "xs[1].key", "value": null, "locations": ["/things/0/xs/1"], "outcome": "absent"}], "failures": []},
+                  {"kind": "item", "name": "item 3 of xs", "cause": "null", "message": "key is null", "value": {"v": 1, "key": null}, "locations": ["/things/0/xs/2"], "inputs": [{"name": "xs[2].key", "value": null, "locations": ["/things/0/xs/2/key"], "outcome": "null"}], "failures": []}
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a count whose reads a null root through a key the item holds, and a field after the key, says the root once on the assertion and each item that can't give the key as an entry",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "thing", "checks": {"c": "count of xs whose v is $input.m named by key.z is 0"}}}},
+    "cases": [
+      {
+        "description": "the root is null, one item has no key and one has a null key",
+        "rules": ["row.parts", "tally.whose", "message.items", "problems.where_said", "problems.all_said"],
+        "input": {"m": null, "things": [{"id": "a", "xs": [{"v": 1, "key": "a"}, {"v": 1}, {"v": 1, "key": null}]}]},
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {"type": "thing", "id": "a"},
+            "check": "c",
+            "passed": false,
+            "cause": "absent",
+            "message": "$input.m is null; item 2 of xs: key is missing; item 3 of xs: key is null",
+            "inputs": [
+              {"name": "count of xs whose v equals $input.m named by key.z", "value": null, "locations": ["/things/0/xs/0", "/things/0/xs/1", "/things/0/xs/2"]},
+              {"name": "xs[]", "value": [{"v": 1, "key": "a"}, {"v": 1}, {"v": 1, "key": null}], "locations": ["/things/0/xs/0", "/things/0/xs/1", "/things/0/xs/2"], "outcome": "usable"},
+              {"name": "$input.m", "value": null, "locations": ["/m"], "outcome": "null"}
+            ],
+            "failures": [
+              {
+                "kind": "assertion",
+                "name": "count of xs whose v equals $input.m named by key.z is 0",
+                "cause": "absent",
+                "message": "$input.m is null",
+                "inputs": [
+                  {"name": "count of xs whose v equals $input.m named by key.z", "value": null, "locations": ["/things/0/xs/0", "/things/0/xs/1", "/things/0/xs/2"]},
+                  {"name": "$input.m", "value": null, "locations": ["/m"], "outcome": "null"}
+                ],
+                "locations": ["$policy:/requirements/r/checks/c"],
+                "failures": [
+                  {"kind": "item", "name": "item 2 of xs", "cause": "absent", "message": "key is missing", "value": {"v": 1}, "locations": ["/things/0/xs/1"], "inputs": [{"name": "xs[1].key", "value": null, "locations": ["/things/0/xs/1"], "outcome": "absent"}], "failures": []},
+                  {"kind": "item", "name": "item 3 of xs", "cause": "null", "message": "key is null", "value": {"v": 1, "key": null}, "locations": ["/things/0/xs/2"], "inputs": [{"name": "xs[2].key", "value": null, "locations": ["/things/0/xs/2/key"], "outcome": "null"}], "failures": []}
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
   }
 ]
