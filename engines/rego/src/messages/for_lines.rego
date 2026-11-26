@@ -1105,17 +1105,20 @@ _for_list_rank(lists, l) := [i | some i, x in lists; x == l][0]
 
 _for_row_clauses(check, subj, r) := _for_parts_tree(check, _for_row_parts(check, subj, r))
 
-_for_parts_tree(check, p) := array.concat(array.concat(array.concat(_for_tally_joined(check, array.concat(p.roots, p.outside)), p.free), p.items), p.lists)
+_for_parts_tree(_, p) := array.concat(array.concat(array.concat(p.shown, p.free), p.items), p.lists)
 
-_for_row_parts(check, subj, r) := {"roots": roots, "outside": outside, "free": free, "items": items, "lists": array.concat(listed, line), "line": line, "said": ssaid, "own": {k: c.cause | some [k, c] in failed}} if {
+_for_row_parts(check, subj, r) := {"roots": roots, "outside": outside, "shown": shown, "free": free, "items": items, "lists": array.concat(listed, line), "line": line, "said": ssaid, "own": {k: c.cause | some [k, c] in failed}, "outside_said": {x[1] | some x in pairs} | {_m_joined(x[1]) | some x in tallies}} if {
 	ssaid := _for_row_said(check, subj, r)
 	keys := _for_whose_key_roots(check, r)
 	roots := array.concat(keys, [_for_root_item(c) | some c in array.concat(_for_row_roots(check, subj, r, ssaid), _for_why_roots(check, r)); not _for_subject_root(c, subj, r); not c.text in {k.text | some k in keys}])
 	rooted := {c.text | some c in roots}
 	sroots := {i: {x[1] | some x in xs} | some i, xs in ssaid}
 	free := [x | some c in _for_free_clauses(check, subj, r, sroots); x := _for_free_unrooted(c, rooted)]
-	outside := _for_outside_roots(check, {t | some c in array.concat(roots, free); some t in _m_clause_lines(c)})
-	said := {t | some c in array.concat(array.concat(array.concat(roots, outside), _for_tally_joined(check, array.concat(roots, outside))), free); some t in _m_clause_lines(c)}
+	pairs := sort(_m_for_said_pairs(check))
+	tallies := sort(_m_for_tally_pairs(check))
+	outside := _for_outside_roots(check, {t | some c in array.concat(roots, free); some t in _m_clause_lines(c)}, pairs, tallies)
+	shown := _for_tally_joined(tallies, array.concat(roots, outside))
+	said := {t | some c in array.concat(array.concat(array.concat(roots, outside), shown), free); some t in _m_clause_lines(c)}
 	name := _input_name(check.items[0].path)
 	after := (3 * count(check.checks)) + 2
 	failed := _for_failed_clauses(check, r, sroots)
@@ -1124,8 +1127,8 @@ _for_row_parts(check, subj, r) := {"roots": roots, "outside": outside, "free": f
 	line := [object.union(_m_clause("list", t, r.cause, t), {"group": after}) | some t in _for_list_texts(check, subj, r)]
 }
 
-_for_outside_roots(check, said) := [_for_root_item(_m_root_in(_m_clause_name(x[1]), x[0], x[1], count(check.checks))) | some i, x in xs; not x[1] in said; not x[1] in {y[1] | some y in array.slice(xs, 0, i)}] if {
-	xs := array.concat(sort(_m_for_said_pairs(check)), [[x[0], t] | some x in sort(_m_for_tally_pairs(check)); some t in x[1]])
+_for_outside_roots(check, said, pairs, tallies) := [_for_root_item(_m_root_in(_m_clause_name(x[1]), x[0], x[1], count(check.checks))) | some i, x in xs; not x[1] in said; not x[1] in {y[1] | some y in array.slice(xs, 0, i)}] if {
+	xs := array.concat(pairs, [[x[0], t] | some x in tallies; some t in x[1]])
 }
 
 _for_whose_key_roots(check, r) := [_m_root_in(x.name, x.outcome, t, -1) |
@@ -1149,9 +1152,12 @@ _for_key_text(x, "unusable") := _m_isnt(x.name, x.value, "text")
 
 _for_key_text(x, f) := concat("", [x.name, " is ", _key_ref_word[f]]) if f in _no_value_states
 
-_for_tally_joined(check, cs) := [_for_tally_unit(lists, c) | some c in cs; not _for_later_in(lists, c.text)] if {
+_for_tally_joined([], cs) := cs
+
+_for_tally_joined(tallies, cs) := [_for_tally_unit(lists, c) | some c in cs; not _for_later_in(lists, c.text)] if {
+	tallies != []
 	texts := {c.text | some c in cs}
-	lists := [x[1] | some x in sort(_m_for_tally_pairs(check)); count(x[1]) > 3; every t in x[1] { t in texts }]
+	lists := [x[1] | some x in tallies; count(x[1]) > 3; every t in x[1] { t in texts }]
 }
 
 _for_later_in(lists, t) if {
@@ -1586,7 +1592,7 @@ _m_applies(evals, req, false) := {"message": concat("; ", ms)} if {
 _for_said(raw) := object.union(object.remove(raw, ["ergo/for_raw"]), {
 	"message": _m_aliased(_m_clauses_text(_m_clauses_shown(tree))),
 	"cause": cause,
-	"ergo/for_texts": object.union(_for_said_texts(s.check, s.subj, rr, _m_clause_texts(array.concat(p.roots, p.free)), _m_clause_texts(p.line), p.said, _m_for_said(s.check) | _m_for_tally_said(s.check), own.texts), {"own": own.items}),
+	"ergo/for_texts": object.union(_for_said_texts(s.check, s.subj, rr, _m_clause_texts(array.concat(p.roots, p.free)), _m_clause_texts(p.line), p.said, p.outside_said, own.texts), {"own": own.items}),
 }) if {
 	s := raw["ergo/for_raw"]
 	s.tree == true
@@ -1636,6 +1642,7 @@ _for_texts_cause(causes, ts) := _worst_or_value({causes[t] | some t in ts}) if {
 } else := null
 
 _for_line_rooted(check, subj, r, outside) := object.union(r, {"other_roots": ts}) if {
+	outside != []
 	not _for_row_rooted(r, subj)
 	line := {x[1] | some x in _m_for_said_pairs(object.union(check, {"checks": [], "assertions": []}))}
 	ts := [c.text | some c in outside; c.text in line]
