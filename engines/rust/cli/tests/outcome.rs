@@ -105,15 +105,192 @@ fn a_passed_row_of_a_check_ergo_adds_is_not_a_line() {
 fn a_row_the_outcome_form_cannot_show_yet_is_an_error() {
     let mut child = row("c", json!("web"), true, None);
     child["subject"]["in"] = json!({"type": "deployment", "id": "d1"});
+    let mut unreadable = row("$applies", json!("d3"), false, Some("env is missing"));
+    unreadable["cause"] = json!("absent");
     let shown = [
         child,
-        row("$applies", json!("d3"), false, Some("env is \"dev\"")),
-        row("$min_subjects", json!(null), false, Some("count is 0")),
+        unreadable,
+        row("$min_subjects", json!("d1"), false, Some("count is 0")),
+        row("$other", json!(null), false, Some("count is 0")),
         row("c", json!({"a": 1}), true, None),
     ];
     for row in shown {
         assert!(outcome::row_line(&row, &json!({})).is_err(), "{row}");
     }
+}
+
+#[test]
+fn an_applies_row_that_failed_with_another_cause_than_value_has_no_line_yet() {
+    let mut row = row("$applies", json!("d3"), false, Some("env is missing"));
+    row["cause"] = json!("absent");
+    assert_eq!(
+        outcome::row_line(&row, &json!({})),
+        Err("lines for an $applies row that failed with absent, not value, aren't supported yet, as for pull request d3 in approved".to_string())
+    );
+}
+
+#[test]
+fn a_row_of_a_check_ergo_adds_that_failed_or_of_a_subject_out_of_scope_is_a_line() {
+    let policy = json!({"requirements": {"approved": {"subject": "pull request"}}});
+    let cases = [
+        (
+            row("$applies", json!("d3"), false, Some("env is \"dev\"")),
+            "pull request d3 is out of scope because env is \"dev\"",
+        ),
+        (
+            row("$applies", json!(7), false, None),
+            "pull request 7 is out of scope",
+        ),
+        (
+            row("$min_subjects", json!(null), false, Some("count is 0")),
+            "fails $min_subjects because count is 0",
+        ),
+        (
+            row("$unique_ids", json!(null), false, Some("x")),
+            "fails $unique_ids because x",
+        ),
+    ];
+    for (row, line) in cases {
+        assert_eq!(
+            outcome::row_line(&row, &policy),
+            Ok(Some(line.to_string())),
+            "{row}"
+        );
+    }
+}
+
+fn scoped() -> Value {
+    json!({
+        "subjects": {
+            "deployment": {"from": "deployments whose env is \"prod\"", "identified_by": "id"},
+            "artifact": {"from": "every deployment.artifacts", "identified_by": "name"}
+        },
+        "requirements": {
+            "approved": {"subject": "deployment", "checks": {"approver_set": "approver is a non-empty string"}},
+            "tested": {"subject": "artifact", "checks": {"scanned": "scan is 0"}}
+        }
+    })
+}
+
+#[test]
+fn the_outcome_of_a_report_shows_the_checks_ergo_adds_that_failed_and_the_subjects_out_of_scope()
+{
+    let input = json!({"deployments": [
+        {"id": "d1", "env": "prod", "approver": "a", "artifacts": []},
+        {"id": "d3", "env": "dev"},
+        {"id": "d2", "env": "prod", "approver": "b", "artifacts": [{"name": "x", "scan": 0}, {"name": "x", "scan": 0}]}
+    ]});
+    assert_eq!(
+        shown(scoped(), input),
+        Ok(vec![
+            Item::Line("not compliant".to_string()),
+            Item::Group(
+                "approved is met".to_string(),
+                lines(&[
+                    "deployment d3 is out of scope because env is \"dev\"",
+                    "deployment d1 passes approver_set",
+                    "deployment d2 passes approver_set",
+                ])
+            ),
+            Item::Group(
+                "tested is not met".to_string(),
+                lines(&[
+                    "artifact in deployment d1 fails $min_subjects because in-scope artifact count is 0",
+                    "artifact in deployment d2 fails $unique_ids because repeated artifact ids is [\"x\"]",
+                    "artifact x in deployment d2 passes scanned",
+                    "artifact x in deployment d2 passes scanned",
+                ])
+            ),
+        ])
+    );
+}
+
+#[test]
+fn the_outcome_of_a_report_names_no_subject_for_a_check_ergo_adds_on_the_requirements_own_subject()
+{
+    let items = shown(scoped(), json!({"deployments": []})).unwrap();
+    assert_eq!(
+        group(&items, "approved"),
+        vec!["fails $min_subjects because in-scope deployment count is 0"]
+    );
+    let items = shown(
+        scoped(),
+        json!({"deployments": [
+            {"id": "d1", "env": "prod", "approver": "a", "artifacts": [{"name": "x", "scan": 0}]},
+            {"id": "d1", "env": "prod", "approver": "a", "artifacts": [{"name": "y", "scan": 0}]}
+        ]}),
+    )
+    .unwrap();
+    assert_eq!(
+        group(&items, "approved"),
+        vec![
+            "fails $unique_ids because repeated deployment ids is [\"d1\"]",
+            "deployment d1 passes approver_set",
+            "deployment d1 passes approver_set",
+        ]
+    );
+    assert_eq!(
+        group(&items, "tested"),
+        vec![
+            "deployment fails $unique_ancestor_ids because repeated deployment ids is [\"d1\"]",
+            "artifact x in deployment d1 passes scanned",
+            "artifact y in deployment d1 passes scanned",
+        ]
+    );
+}
+
+#[test]
+fn the_outcome_of_a_report_where_ergo_cannot_tell_whether_a_subject_is_in_scope_is_an_error() {
+    let error = shown(
+        scoped(),
+        json!({"deployments": [{"id": "d4", "approver": "a", "artifacts": []}]}),
+    )
+    .unwrap_err();
+    assert_eq!(
+        error,
+        "lines for an $applies row that failed with absent, not value, aren't supported yet, as for deployment d4 in approved"
+    );
+}
+
+#[test]
+fn the_outcome_of_a_report_on_a_policy_written_wrong_is_an_error() {
+    let mut policy = scoped();
+    policy["requirements"]["approved"]["subject"] = json!("nothing");
+    assert_eq!(
+        shown(policy, json!({"deployments": []})),
+        Err("requirement approved is written wrong: subject: not in subjects".to_string())
+    );
+}
+
+#[test]
+fn a_line_for_a_check_ergo_adds_or_for_scope_quotes_the_ids_that_would_read_as_part_of_a_longer_subject_name()
+ {
+    let mut policy = shadowed();
+    policy["subjects"]["deployment"]["from"] = json!("deployments whose ok is true");
+    policy["subjects"]["deployment y"] = json!({"from": "ys", "identified_by": "id"});
+    let report = report(
+        policy.clone(),
+        json!({"xs": [], "webs": [], "ys": [], "deployments": [
+            {"id": "x", "ok": true, "artifacts": []},
+            {"id": "y", "ok": false},
+            {"id": "web", "ok": false}
+        ]}),
+    );
+    let printed: Vec<String> = report["results"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter_map(|row| outcome::line_for(row, &policy).unwrap())
+        .filter(|line| !line.contains(" passes "))
+        .collect();
+    assert_eq!(
+        printed,
+        vec![
+            "artifact in deployment \"x\" fails $min_subjects because in-scope artifact count is 0",
+            "deployment \"y\" is out of scope because ok is false",
+            "deployment web is out of scope because ok is false",
+        ]
+    );
 }
 
 #[test]
@@ -223,13 +400,12 @@ fn the_outcome_of_a_report_has_compliant_then_each_requirement_with_its_status_a
 #[test]
 fn the_outcome_of_a_report_with_a_row_it_cannot_show_yet_is_an_error() {
     let mut policy = two_requirements();
-    policy["subjects"]["pull request"]["from"] = json!("prs whose lines is 3");
-    let mut input = two_requirements_input();
-    input["prs"][1]["lines"] = json!(5);
-    let error = shown(policy, input).unwrap_err();
-    assert!(error.contains("subjects out of scope"), "{error}");
-    let error = shown(two_requirements(), json!({"prs": [], "scans": []})).unwrap_err();
-    assert!(error.contains("checks Ergo adds"), "{error}");
+    policy["subjects"]["pull request"]
+        .as_object_mut()
+        .unwrap()
+        .remove("identified_by");
+    let error = shown(policy, two_requirements_input()).unwrap_err();
+    assert!(error.contains("ids that are objects or lists"), "{error}");
 }
 
 #[test]

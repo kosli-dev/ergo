@@ -85,16 +85,38 @@ fn report_with_format_outcome_prints_the_outcome_as_yaml() {
 }
 
 #[test]
+fn format_outcome_prints_a_check_ergo_adds_that_failed() {
+    let policy = file("format-added", "policy.yaml", POLICY);
+    let input = file("format-added", "input.json", r#"{"deployments": []}"#);
+    assert_eq!(
+        run(&args(&[
+            "report", "--policy", &policy, "--input", &input, "--format", "outcome",
+        ])),
+        Ok(Outcome::Print(
+            "- not compliant\n- approved is not met:\n    - fails $min_subjects because in-scope deployment count is 0\n".to_string()
+        ))
+    );
+}
+
+#[test]
 fn format_outcome_fails_on_a_row_it_cannot_show_yet() {
-    let policy = file("format-not-yet", "policy.yaml", POLICY);
-    let input = file("format-not-yet", "input.json", r#"{"deployments": []}"#);
+    let scoped = POLICY.replace("from: deployments", "from: deployments whose env is \"prod\"");
+    let policy = file("format-not-yet", "policy.yaml", &scoped);
+    let input = file(
+        "format-not-yet",
+        "input.json",
+        r#"{"deployments": [{"id": "d1", "author": "ann", "approver": "bob"}]}"#,
+    );
     let got = run(&args(&[
         "report", "--policy", &policy, "--input", &input, "--format", "outcome",
     ]));
     let Err(Failure::Unsupported(message)) = got else {
         panic!("{got:?}");
     };
-    assert!(message.contains("checks Ergo adds"), "{message}");
+    assert_eq!(
+        message,
+        "lines for an $applies row that failed with absent, not value, aren't supported yet, as for deployment d1 in approved"
+    );
 }
 
 const NAMED_WITH_A_STATUS: &str = r#"ergo_spec: {{spec}}
