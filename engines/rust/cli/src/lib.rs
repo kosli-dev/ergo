@@ -111,12 +111,14 @@ pub fn run(arguments: &[String]) -> Result<Outcome, Failure> {
         Parsed::Run(options) => options,
         Parsed::Test(options) => {
             let policy = files::load("policy", &options.policy)?;
-            let (text, code) = examples::run(&policy, options.strict).map_err(|problem| {
+            let written_wrong = |problem| {
                 Failure::File(format!(
                     "the examples in the policy file {} are written wrong: {problem}",
                     options.policy
                 ))
-            })?;
+            };
+            examples::repeated(&files::repeated_keys(&options.policy)).map_err(written_wrong)?;
+            let (text, code) = examples::run(&policy, options.strict).map_err(written_wrong)?;
             return Ok(match code {
                 0 => Outcome::Print(text),
                 code => Outcome::PrintAndFail(text, code),

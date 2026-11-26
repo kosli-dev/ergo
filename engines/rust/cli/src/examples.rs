@@ -30,6 +30,34 @@ pub struct Checked {
     pub shown: BTreeSet<(String, String, bool)>,
 }
 
+/// Says which key is written twice inside `examples` or `example_params`, given the paths that [crate::yaml::repeated_keys] gives, like `the key outcome is written twice in examples[1]`.
+pub fn repeated(paths: &[Vec<String>]) -> Result<(), String> {
+    let Some((key, outer)) = paths
+        .iter()
+        .find(|path| {
+            matches!(
+                path.first().map(String::as_str),
+                Some("examples" | "example_params")
+            )
+        })
+        .and_then(|path| path.split_last())
+    else {
+        return Ok(());
+    };
+    let mut place = String::new();
+    for step in outer {
+        if !place.is_empty() && !step.starts_with('[') {
+            place.push('.');
+        }
+        place.push_str(step);
+    }
+    Err(if place.is_empty() {
+        format!("the key {key} is written twice")
+    } else {
+        format!("the key {key} is written twice in {place}")
+    })
+}
+
 /// Reads the examples of a policy, or says why they're written wrong.
 pub fn read(policy: &Value) -> Result<Vec<Example>, String> {
     let list = match &policy["examples"] {

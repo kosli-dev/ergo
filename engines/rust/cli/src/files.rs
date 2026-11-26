@@ -5,6 +5,23 @@ use serde_json::Value;
 use std::fs;
 use std::path::Path;
 
+/// The keys written twice in one mapping of the YAML file at `path`, as [yaml::repeated_keys] gives them, and none for a JSON file or a file that can't be read.
+pub fn repeated_keys(path: &str) -> Vec<Vec<String>> {
+    let yaml = Path::new(path).extension().is_some_and(|e| {
+        matches!(
+            e.to_string_lossy().to_ascii_lowercase().as_str(),
+            "yaml" | "yml"
+        )
+    });
+    if !yaml {
+        return Vec::new();
+    }
+    fs::read_to_string(path)
+        .ok()
+        .and_then(|text| yaml::repeated_keys(&text).ok())
+        .unwrap_or_default()
+}
+
 /// Reads the file at `path` as JSON or YAML, by its extension. `what` is `policy`, `input` or `params` and goes into the error message.
 pub fn load(what: &str, path: &str) -> Result<Value, Failure> {
     let extension = Path::new(path)

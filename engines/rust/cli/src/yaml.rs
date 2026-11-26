@@ -27,12 +27,21 @@ const MAX_DEPTH: usize = 10_000;
 
 /// Reads the first document of `text` as a JSON value. An empty file is `null`. It fails on a syntax error in any document, on `.inf` and `.nan`, on a core tag that doesn't fit its value, on a key that isn't a scalar, is `null` or is a `!!timestamp`, on the same alias used twice as a key of one mapping, on an alias with no anchor, on more than 10,000 levels of nesting, on more aliases than OPA reads, on control characters, on a directive other than `%YAML` and `%TAG`, and on a `%YAML` version other than 1.1.
 pub fn parse(text: &str) -> Result<Value, Error> {
+    Ok(parse_all(text)?.0)
+}
+
+/// Each key written more than once in the same mapping of the first document of `text`, as the path to it from the top: a key of a mapping as it is, an item of a list as `[n]` counting from 0, and the repeated key last. A key a merge key brings in isn't counted. It fails as [parse] does.
+pub fn repeated_keys(text: &str) -> Result<Vec<Vec<String>>, Error> {
+    Ok(parse_all(text)?.1)
+}
+
+fn parse_all(text: &str) -> Result<(Value, Vec<Vec<String>>), Error> {
     characters(text)?;
     version(text)?;
     let mut text = text.replace('\u{85}', "\n");
     loop {
         match read(&text) {
-            Ok(value) => return Ok(value),
+            Ok(read) => return Ok(read),
             Err(Stop::Error(error)) => return Err(error),
             Err(Stop::Quoted(start, error)) => match indent_quoted(&text, start) {
                 Some(indented) => text = indented,
@@ -53,16 +62,16 @@ impl From<Error> for Stop {
     }
 }
 
-fn read(text: &str) -> Result<Value, Stop> {
+fn read(text: &str) -> Result<(Value, Vec<Vec<String>>), Stop> {
     let mut events = Parser::new_from_str(text).keep_tags(true);
     loop {
         match next(&mut events)? {
             Event::StreamStart | Event::Nothing => {}
-            Event::StreamEnd => return Ok(Value::Null),
+            Event::StreamEnd => return Ok((Value::Null, Vec::new())),
             Event::DocumentStart(_) => {
-                let value = Reader::default().document(&mut events, text)?;
+                let read = Reader::default().document(&mut events, text)?;
                 rest(&mut events)?;
-                return Ok(value);
+                return Ok(read);
             }
             _ => return Err(invalid("unexpected content").into()),
         }
@@ -276,10 +285,15 @@ struct Reader {
     decoded: u64,
     aliased: u64,
     cursor: (usize, usize),
+    repeated: Vec<Vec<String>>,
 }
 
 impl Reader {
-    fn document<'a>(mut self, events: &mut Events<'a>, source: &str) -> Result<Value, Stop> {
+    fn document<'a>(
+        mut self,
+        events: &mut Events<'a>,
+        source: &str,
+    ) -> Result<(Value, Vec<Vec<String>>), Stop> {
         self.decoded = 1;
         loop {
             let (event, span) = spanned(events)?;
@@ -351,10 +365,13 @@ impl Reader {
                 }
                 _ => return Err(invalid("unexpected content").into()),
             };
+            if let Some(path) = self.repeated_key(&node) {
+                self.repeated.push(path);
+            }
             match self.frames.last_mut() {
                 None => {
                     let root: Rc<Tree> = node.value?;
-                    return Ok(json(&root));
+                    return Ok((json(&root), std::mem::take(&mut self.repeated)));
                 }
                 Some(frame) => {
                     frame.size += node.size;
@@ -362,6 +379,30 @@ impl Reader {
                 }
             }
         }
+    }
+
+    fn repeated_key(&self, node: &Node) -> Option<Vec<String>> {
+        let (last, outer) = self.frames.split_last()?;
+        let Collection::Map(entries) = &last.collection else {
+            return None;
+        };
+        let name = node.key.as_ref().ok()?;
+        if !matches!(entries.slot, Slot::Key) || !entries.written.iter().any(|(n, _)| n == name) {
+            return None;
+        }
+        let mut path: Vec<String> = outer
+            .iter()
+            .map(|frame| match &frame.collection {
+                Collection::List(items) => format!("[{}]", items.len()),
+                Collection::Map(Entries {
+                    slot: Slot::Value(key),
+                    ..
+                }) => key.clone(),
+                Collection::Map(_) => "<<".to_string(),
+            })
+            .collect();
+        path.push(name.clone());
+        Some(path)
     }
 
     fn expects_key(&self) -> bool {
