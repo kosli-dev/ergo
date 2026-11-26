@@ -341,6 +341,25 @@ test_a_for_line_text_is_read_as_clauses_and_a_quoted_key_holding_is_keeps_its_wh
 	[[c.name, c.cause] | some c in ergo._for_text_said(`xs is 3, which isn't a list`)["ergo/clauses"]] == [["xs", "unusable"]]
 }
 
+test_a_count_says_what_its_items_and_lists_leave_clause_by_clause_even_when_an_item_clause_holds_a_semicolon if {
+	said := {
+		"message": "v is missing, and item 1 of xs: w is null; key is missing, and ys is null",
+		"ergo/clauses": [
+			ergo._m_clause("root", "v", "absent", "v is missing"),
+			ergo._m_clause("item", "item 1 of xs", "null", "item 1 of xs: w is null; key is missing"),
+			ergo._m_clause("list", "ys", "null", "ys is null"),
+		],
+		"ergo/joint": ", and ",
+	}
+	ergo._tally_rest_of(said, {"ys"}, {"item 1 of xs: w is null; key is missing"}) == "v is missing"
+	cut := said_of([ergo._m_clause("root", "v", "absent", "v is missing"), ergo._m_clause("item", "item 1 of xs", "null", "item 1 of xs: w is null"), ergo._m_clause_more(2)])
+	ergo._tally_rest_of(cut, set(), {"item 1 of xs: w is null"}) == "v is missing"
+}
+
+test_a_for_line_text_that_counts_the_items_it_leaves_out_is_read_as_that_clause if {
+	[c.kind | some c in ergo._for_text_said("item 1 of xs: v is missing; and 2 more")["ergo/clauses"]] == ["list", "more"]
+}
+
 test_a_count_reads_its_list_entries_from_the_clauses_of_its_message_not_from_its_text if {
 	said := {
 		"message": "", "ergo/clauses": [
