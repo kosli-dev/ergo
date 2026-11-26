@@ -85,16 +85,41 @@ fn report_with_format_outcome_prints_the_outcome_as_yaml() {
 }
 
 #[test]
+fn format_outcome_prints_a_check_ergo_adds_that_failed() {
+    let policy = file("format-added", "policy.yaml", POLICY);
+    let input = file("format-added", "input.json", r#"{"deployments": []}"#);
+    assert_eq!(
+        run(&args(&[
+            "report", "--policy", &policy, "--input", &input, "--format", "outcome",
+        ])),
+        Ok(Outcome::Print(
+            "- not compliant\n- approved is not met:\n    - fails $min_subjects because in-scope deployment count is 0\n".to_string()
+        ))
+    );
+}
+
+#[test]
 fn format_outcome_fails_on_a_row_it_cannot_show_yet() {
-    let policy = file("format-not-yet", "policy.yaml", POLICY);
-    let input = file("format-not-yet", "input.json", r#"{"deployments": []}"#);
+    let scoped = POLICY.replace(
+        "from: deployments",
+        "from: deployments whose env is \"prod\"",
+    );
+    let policy = file("format-not-yet", "policy.yaml", &scoped);
+    let input = file(
+        "format-not-yet",
+        "input.json",
+        r#"{"deployments": [{"id": "d1", "author": "ann", "approver": "bob"}]}"#,
+    );
     let got = run(&args(&[
         "report", "--policy", &policy, "--input", &input, "--format", "outcome",
     ]));
     let Err(Failure::Unsupported(message)) = got else {
         panic!("{got:?}");
     };
-    assert!(message.contains("checks Ergo adds"), "{message}");
+    assert_eq!(
+        message,
+        "lines for an $applies row that failed with absent, not value, aren't supported yet, as for deployment d1 in approved"
+    );
 }
 
 const NAMED_WITH_A_STATUS: &str = r#"ergo_spec: {{spec}}
@@ -552,6 +577,28 @@ fn child_input() -> serde_json::Value {
     ]})
 }
 
+const SCOPED_POLICY: &str = r#"ergo_spec: {{spec}}
+subjects:
+  deployment:
+    from: deployments whose env is "prod"
+    identified_by: id
+  deployment d3 is out of:
+    from: others
+    identified_by: id
+  artifact:
+    from: every deployment.artifacts
+    identified_by: name
+requirements:
+  approved:
+    subject: deployment
+    checks:
+      approver_set: approver is a non-empty string
+  tested:
+    subject: artifact
+    checks:
+      scanned: scan is 0
+"#;
+
 const NUMBER_PARENT_POLICY: &str = r#"ergo_spec: {{spec}}
 subjects:
   deployment:
@@ -664,6 +711,46 @@ fn what_format_outcome_prints_pasted_under_outcome_passes_ergo_test_or_is_refuse
         ),
         ("round-trip-a-met", NAMED_NOT_MET, met, true),
         ("round-trip-a-not-met", NAMED_NOT_MET, not_met, false),
+        (
+            "round-trip-scoped-empty",
+            SCOPED_POLICY,
+            serde_json::json!({"others": [], "deployments": []}),
+            true,
+        ),
+        (
+            "round-trip-scoped",
+            SCOPED_POLICY,
+            serde_json::json!({"others": [], "deployments": [
+                {"id": "d1", "env": "prod", "approver": "a", "artifacts": []},
+                {"id": "d3", "env": "dev"},
+                {"id": "in", "env": "prod", "approver": "", "artifacts": [{"name": "in", "scan": 1}, {"name": "in", "scan": 1}]}
+            ]}),
+            true,
+        ),
+        (
+            "round-trip-scoped-twins",
+            SCOPED_POLICY,
+            serde_json::json!({"others": [], "deployments": [
+                {"id": "d1", "env": "prod", "approver": "a", "artifacts": [{"name": "x", "scan": 0}]},
+                {"id": "d1", "env": "prod", "approver": "a", "artifacts": [{"name": "x", "scan": 0}]}
+            ]}),
+            true,
+        ),
+        (
+            "round-trip-scoped-twins-differ",
+            SCOPED_POLICY,
+            serde_json::json!({"others": [], "deployments": [
+                {"id": "d1", "env": "prod", "approver": "a", "artifacts": []},
+                {"id": "d1", "env": "prod", "approver": "a", "artifacts": [{"name": "x", "scan": 0}]}
+            ]}),
+            false,
+        ),
+        (
+            "round-trip-scoped-unreadable",
+            SCOPED_POLICY,
+            serde_json::json!({"others": [], "deployments": [{"id": "d4", "approver": "a"}]}),
+            false,
+        ),
     ] {
         let got = round_trip(name, policy, &input);
         assert_eq!(matches!(got, RoundTrip::PastedBack), pasted_back, "{name}");

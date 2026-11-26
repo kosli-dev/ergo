@@ -105,15 +105,228 @@ fn a_passed_row_of_a_check_ergo_adds_is_not_a_line() {
 fn a_row_the_outcome_form_cannot_show_yet_is_an_error() {
     let mut child = row("c", json!("web"), true, None);
     child["subject"]["in"] = json!({"type": "deployment", "id": "d1"});
+    let mut unreadable = row("$applies", json!("d3"), false, Some("env is missing"));
+    unreadable["cause"] = json!("absent");
     let shown = [
         child,
-        row("$applies", json!("d3"), false, Some("env is \"dev\"")),
-        row("$min_subjects", json!(null), false, Some("count is 0")),
+        unreadable,
+        row("$min_subjects", json!("d1"), false, Some("count is 0")),
+        row("$other", json!(null), false, Some("count is 0")),
         row("c", json!({"a": 1}), true, None),
     ];
     for row in shown {
         assert!(outcome::row_line(&row, &json!({})).is_err(), "{row}");
     }
+}
+
+#[test]
+fn an_applies_row_that_failed_with_another_cause_than_value_has_no_line_yet() {
+    let mut row = row("$applies", json!("d3"), false, Some("env is missing"));
+    row["cause"] = json!("absent");
+    assert_eq!(
+        outcome::row_line(&row, &json!({})),
+        Err("lines for an $applies row that failed with absent, not value, aren't supported yet, as for pull request d3 in approved".to_string())
+    );
+}
+
+#[test]
+fn a_row_of_a_check_ergo_adds_that_failed_or_of_a_subject_out_of_scope_is_a_line() {
+    let policy = json!({"requirements": {"approved": {"subject": "pull request"}}});
+    let cases = [
+        (
+            row("$applies", json!("d3"), false, Some("env is \"dev\"")),
+            "pull request d3 is out of scope because env is \"dev\"",
+        ),
+        (
+            row("$applies", json!(7), false, None),
+            "pull request 7 is out of scope",
+        ),
+        (
+            row("$min_subjects", json!(null), false, Some("count is 0")),
+            "fails $min_subjects because count is 0",
+        ),
+        (
+            row("$unique_ids", json!(null), false, Some("x")),
+            "fails $unique_ids because x",
+        ),
+    ];
+    for (row, line) in cases {
+        assert_eq!(
+            outcome::row_line(&row, &policy),
+            Ok(Some(line.to_string())),
+            "{row}"
+        );
+    }
+}
+
+fn scoped() -> Value {
+    json!({
+        "subjects": {
+            "deployment": {"from": "deployments whose env is \"prod\"", "identified_by": "id"},
+            "artifact": {"from": "every deployment.artifacts", "identified_by": "name"}
+        },
+        "requirements": {
+            "approved": {"subject": "deployment", "checks": {"approver_set": "approver is a non-empty string"}},
+            "tested": {"subject": "artifact", "checks": {"scanned": "scan is 0"}}
+        }
+    })
+}
+
+#[test]
+fn the_outcome_of_a_report_shows_the_checks_ergo_adds_that_failed_and_the_subjects_out_of_scope() {
+    let input = json!({"deployments": [
+        {"id": "d1", "env": "prod", "approver": "a", "artifacts": []},
+        {"id": "d3", "env": "dev"},
+        {"id": "d2", "env": "prod", "approver": "b", "artifacts": [{"name": "x", "scan": 0}, {"name": "x", "scan": 0}]}
+    ]});
+    assert_eq!(
+        shown(scoped(), input),
+        Ok(vec![
+            Item::Line("not compliant".to_string()),
+            Item::Group(
+                "approved is met".to_string(),
+                lines(&[
+                    "deployment d3 is out of scope because env is \"dev\"",
+                    "deployment d1 passes approver_set",
+                    "deployment d2 passes approver_set",
+                ])
+            ),
+            Item::Group(
+                "tested is not met".to_string(),
+                lines(&[
+                    "artifact in deployment d1 fails $min_subjects because in-scope artifact count is 0",
+                    "artifact in deployment d2 fails $unique_ids because repeated artifact ids is [\"x\"]",
+                    "artifact x in deployment d2 passes scanned",
+                    "artifact x in deployment d2 passes scanned",
+                ])
+            ),
+        ])
+    );
+}
+
+#[test]
+fn the_outcome_of_a_report_names_no_subject_for_a_check_ergo_adds_on_the_requirements_own_subject()
+{
+    let items = shown(scoped(), json!({"deployments": []})).unwrap();
+    assert_eq!(
+        group(&items, "approved"),
+        vec!["fails $min_subjects because in-scope deployment count is 0"]
+    );
+    assert_eq!(
+        group(&items, "tested"),
+        vec!["fails $min_subjects because in-scope artifact count is 0"]
+    );
+    let items = shown(
+        scoped(),
+        json!({"deployments": [
+            {"id": "d1", "env": "prod", "approver": "a", "artifacts": [{"name": "x", "scan": 0}]},
+            {"id": "d1", "env": "prod", "approver": "a", "artifacts": [{"name": "y", "scan": 0}]}
+        ]}),
+    )
+    .unwrap();
+    assert_eq!(
+        group(&items, "approved"),
+        vec![
+            "fails $unique_ids because repeated deployment ids is [\"d1\"]",
+            "deployment d1 passes approver_set",
+            "deployment d1 passes approver_set",
+        ]
+    );
+    assert_eq!(
+        group(&items, "tested"),
+        vec![
+            "deployment fails $unique_ancestor_ids because repeated deployment ids is [\"d1\"]",
+            "artifact x in deployment d1 passes scanned",
+            "artifact y in deployment d1 passes scanned",
+        ]
+    );
+}
+
+#[test]
+fn the_outcome_of_a_report_where_rows_of_one_check_and_subject_say_different_things_is_an_error() {
+    let twins = |second: Value| {
+        json!({"deployments": [
+            {"id": "d1", "env": "prod", "approver": "a", "artifacts": []},
+            second
+        ]})
+    };
+    assert_eq!(
+        shown(
+            scoped(),
+            twins(json!({"id": "d1", "env": "prod", "approver": "", "artifacts": []}))
+        ),
+        Err("the rows of approver_set in approved for deployment d1 don't all say the same, so no line agrees with every one of them: deployment d1 passes approver_set, and deployment d1 fails approver_set because approver is \"\"".to_string())
+    );
+    assert_eq!(
+        shown(
+            scoped(),
+            twins(json!({"id": "d1", "env": "prod", "approver": "a", "artifacts": [{"name": "x", "scan": 0}]}))
+        ),
+        Err("the rows of $min_subjects in tested for artifact in deployment d1 don't all say the same, so no line agrees with every one of them: artifact in deployment d1 fails $min_subjects because in-scope artifact count is 0, and artifact in deployment d1 passes $min_subjects".to_string())
+    );
+    assert!(
+        shown(
+            scoped(),
+            twins(json!({"id": "d1", "env": "prod", "approver": "a", "artifacts": []}))
+        )
+        .is_ok()
+    );
+}
+
+#[test]
+fn the_outcome_of_a_report_where_ergo_cannot_tell_whether_a_subject_is_in_scope_is_an_error() {
+    let error = shown(
+        scoped(),
+        json!({"deployments": [{"id": "d4", "approver": "a", "artifacts": []}]}),
+    )
+    .unwrap_err();
+    assert_eq!(
+        error,
+        "lines for an $applies row that failed with absent, not value, aren't supported yet, as for deployment d4 in approved"
+    );
+}
+
+#[test]
+fn the_outcome_of_a_report_on_a_policy_written_wrong_is_an_error() {
+    let mut policy = scoped();
+    policy["requirements"]["approved"]["subject"] = json!("nothing");
+    assert_eq!(
+        shown(policy, json!({"deployments": []})),
+        Err("requirement approved is written wrong: subject: not in subjects".to_string())
+    );
+}
+
+#[test]
+fn a_line_for_a_check_ergo_adds_or_for_scope_quotes_the_ids_that_would_read_as_part_of_a_longer_subject_name()
+ {
+    let mut policy = shadowed();
+    policy["subjects"]["deployment"]["from"] = json!("deployments whose ok is true");
+    policy["subjects"]["deployment y"] = json!({"from": "ys", "identified_by": "id"});
+    policy["requirements"]["approved"] =
+        json!({"subject": "deployment", "checks": {"c": "ok is true"}});
+    let report = report(
+        policy.clone(),
+        json!({"xs": [], "webs": [], "ys": [], "deployments": [
+            {"id": "x", "ok": true, "artifacts": []},
+            {"id": "y", "ok": false},
+            {"id": "web", "ok": false}
+        ]}),
+    );
+    let printed: Vec<String> = report["results"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter_map(|row| outcome::line_for(row, &policy).unwrap())
+        .filter(|line| !line.contains(" passes "))
+        .collect();
+    assert_eq!(
+        printed,
+        vec![
+            "artifact in deployment \"x\" fails $min_subjects because in-scope artifact count is 0",
+            "deployment \"y\" is out of scope because ok is false",
+            "deployment web is out of scope because ok is false",
+        ]
+    );
 }
 
 #[test]
@@ -223,13 +436,12 @@ fn the_outcome_of_a_report_has_compliant_then_each_requirement_with_its_status_a
 #[test]
 fn the_outcome_of_a_report_with_a_row_it_cannot_show_yet_is_an_error() {
     let mut policy = two_requirements();
-    policy["subjects"]["pull request"]["from"] = json!("prs whose lines is 3");
-    let mut input = two_requirements_input();
-    input["prs"][1]["lines"] = json!(5);
-    let error = shown(policy, input).unwrap_err();
-    assert!(error.contains("subjects out of scope"), "{error}");
-    let error = shown(two_requirements(), json!({"prs": [], "scans": []})).unwrap_err();
-    assert!(error.contains("checks Ergo adds"), "{error}");
+    policy["subjects"]["pull request"]
+        .as_object_mut()
+        .unwrap()
+        .remove("identified_by");
+    let error = shown(policy, two_requirements_input()).unwrap_err();
+    assert!(error.contains("ids that are objects or lists"), "{error}");
 }
 
 #[test]
@@ -337,11 +549,11 @@ fn yaml_escapes_the_characters_yaml_cannot_hold_as_they_are() {
 fn a_check_line_names_the_longest_subject_and_the_longest_check_that_fit() {
     let subjects = ["t", "t x"];
     let checks = ["c", "c because d"];
-    let read = |text: &str| outcome::read_check_line(text, "r", &subjects, &checks);
+    let read = |text: &str| outcome::read_check_line(text, "r", "t", &subjects, &checks);
     let line = |subject: &str, id: Value, passes: bool, check: &str, because: Option<&str>| {
         Ok(outcome::CheckLine {
             subject: subject.to_string(),
-            id,
+            id: Some(id),
             passes,
             check: check.to_string(),
             because: because.map(str::to_string),
@@ -544,7 +756,7 @@ fn a_row_whose_in_names_other_subjects_than_its_from_line_says_so_and_has_no_lin
 fn a_check_line_reads_each_in_after_the_id_with_the_longest_subject_name_that_fits() {
     let subjects = ["artifact", "deployment", "release", "release train"];
     let checks = ["c"];
-    let read = |text: &str| outcome::read_check_line(text, "r", &subjects, &checks);
+    let read = |text: &str| outcome::read_check_line(text, "r", "t", &subjects, &checks);
     let parents = |pairs: &[(&str, Value)]| -> Vec<(String, Value)> {
         pairs
             .iter()
@@ -553,19 +765,23 @@ fn a_check_line_reads_each_in_after_the_id_with_the_longest_subject_name_that_fi
     };
     let line = read("artifact web in deployment d1 fails c because x in y").unwrap();
     assert_eq!(
-        (line.subject.as_str(), &line.id, line.because.as_deref()),
-        ("artifact", &json!("web"), Some("x in y"))
+        (
+            line.subject.as_str(),
+            line.id.as_ref(),
+            line.because.as_deref()
+        ),
+        ("artifact", Some(&json!("web")), Some("x in y"))
     );
     assert_eq!(line.parents, parents(&[("deployment", json!("d1"))]));
     let line =
         read("artifact deployment in deployment 7 in release train \"r 1\" passes c").unwrap();
-    assert_eq!(line.id, json!("deployment"));
+    assert_eq!(line.id, Some(json!("deployment")));
     assert_eq!(
         line.parents,
         parents(&[("deployment", json!(7)), ("release train", json!("r 1"))])
     );
     let line = read("artifact in in release r1 passes c").unwrap();
-    assert_eq!(line.id, json!("in"));
+    assert_eq!(line.id, Some(json!("in")));
     assert_eq!(line.parents, parents(&[("release", json!("r1"))]));
     for (text, reason) in [
         (
@@ -580,14 +796,6 @@ fn a_check_line_reads_each_in_after_the_id_with_the_longest_subject_name_that_fi
             "artifact web in deployment ",
             "it has no id after in deployment",
         ),
-        (
-            "artifact web in deployment d1 is out of scope",
-            "lines for subjects in or out of scope aren't supported yet",
-        ),
-        (
-            "artifact in deployment d4 fails $min_subjects because in-scope artifact count is 0",
-            "lines for checks Ergo adds aren't supported yet",
-        ),
     ] {
         assert_eq!(read(text), Err(reason.to_string()), "{text}");
     }
@@ -597,7 +805,7 @@ fn a_check_line_reads_each_in_after_the_id_with_the_longest_subject_name_that_fi
 fn a_line_is_taken_for_a_check_ergo_adds_by_where_its_check_name_goes_not_by_its_message() {
     let subjects = ["artifact", "deployment"];
     let checks = ["c"];
-    let read = |text: &str| outcome::read_check_line(text, "r", &subjects, &checks);
+    let read = |text: &str| outcome::read_check_line(text, "r", "t", &subjects, &checks);
     for (text, reason) in [
         (
             "artifact w in deploymnt d1 fails c because a fails $p",
@@ -613,14 +821,298 @@ fn a_line_is_taken_for_a_check_ergo_adds_by_where_its_check_name_goes_not_by_its
         ),
         (
             "artifact w in deploymnt d1 fails $min_subjects because a fails $p",
-            "lines for checks Ergo adds aren't supported yet",
+            "a line for a check Ergo adds has no id, so passes or fails comes right after the subject and its parents",
         ),
         (
-            "fails $min_subjects because in-scope artifact count is 0",
-            "lines for checks Ergo adds aren't supported yet",
+            "artifact w in deployment d1 fails $min_subjects because a fails $p",
+            "a line for a check Ergo adds has no id, so passes or fails comes right after the subject and its parents",
         ),
     ] {
         assert_eq!(read(text), Err(reason.to_string()), "{text}");
+    }
+}
+
+fn read_line(own: &str, text: &str) -> Result<outcome::CheckLine, String> {
+    let subjects = ["deployment", "artifact", "pull request", "pull"];
+    outcome::read_check_line(text, "r", own, &subjects, &["c", "c is in scope"])
+}
+
+fn check_line(
+    subject: &str,
+    id: Option<Value>,
+    passes: bool,
+    check: &str,
+    because: Option<&str>,
+    parents: &[(&str, Value)],
+) -> outcome::CheckLine {
+    outcome::CheckLine {
+        subject: subject.to_string(),
+        id,
+        passes,
+        check: check.to_string(),
+        because: because.map(str::to_string),
+        parents: parents
+            .iter()
+            .map(|(name, id)| (name.to_string(), id.clone()))
+            .collect(),
+    }
+}
+
+#[test]
+fn a_line_for_a_check_ergo_adds_has_no_id_and_no_subject_when_its_row_is_for_the_requirements_own_subject()
+ {
+    let cases = [
+        (
+            "deployment",
+            "fails $min_subjects because in-scope deployment count is 0",
+            check_line(
+                "deployment",
+                None,
+                false,
+                "$min_subjects",
+                Some("in-scope deployment count is 0"),
+                &[],
+            ),
+        ),
+        (
+            "deployment",
+            "passes $unique_ids",
+            check_line("deployment", None, true, "$unique_ids", None, &[]),
+        ),
+        (
+            "pull request",
+            "fails $well_formed because subject: not in subjects",
+            check_line(
+                "pull request",
+                None,
+                false,
+                "$well_formed",
+                Some("subject: not in subjects"),
+                &[],
+            ),
+        ),
+        (
+            "artifact",
+            "artifact in deployment d4 fails $min_subjects because in-scope artifact count is 0",
+            check_line(
+                "artifact",
+                None,
+                false,
+                "$min_subjects",
+                Some("in-scope artifact count is 0"),
+                &[("deployment", json!("d4"))],
+            ),
+        ),
+        (
+            "artifact",
+            "deployment fails $unique_ancestor_ids because repeated deployment ids is [\"d1\"]",
+            check_line(
+                "deployment",
+                None,
+                false,
+                "$unique_ancestor_ids",
+                Some("repeated deployment ids is [\"d1\"]"),
+                &[],
+            ),
+        ),
+        (
+            "artifact",
+            "artifact in in deployment d4 passes c",
+            check_line(
+                "artifact",
+                Some(json!("in")),
+                true,
+                "c",
+                None,
+                &[("deployment", json!("d4"))],
+            ),
+        ),
+        (
+            "pull",
+            "pull request passes $unique_ancestor_ids",
+            check_line(
+                "pull request",
+                None,
+                true,
+                "$unique_ancestor_ids",
+                None,
+                &[],
+            ),
+        ),
+    ];
+    for (own, text, line) in cases {
+        assert_eq!(read_line(own, text), Ok(line), "{text}");
+    }
+}
+
+#[test]
+fn a_line_for_a_check_ergo_adds_with_an_id_a_subject_it_does_not_need_or_another_check_is_refused()
+{
+    let no_id = "a line for a check Ergo adds has no id, so passes or fails comes right after the subject and its parents";
+    let scope = "a subject in or out of scope is written with is in scope or is out of scope, not with passes or fails";
+    let cases = [
+        ("deployment", "deployment d1 fails $unique_ids", no_id),
+        (
+            "artifact",
+            "artifact in in deployment d4 fails $min_subjects",
+            "it has no subject of the policy after in",
+        ),
+        (
+            "deployment",
+            "deployment fails $min_subjects because in-scope deployment count is 0",
+            "the row of a check Ergo adds for deployment itself has no subject to name, so its line starts with passes or fails",
+        ),
+        ("deployment", "fails $applies", scope),
+        ("deployment", "deployment d1 fails $applies", scope),
+        ("deployment", "deployment d1 passes $applies", scope),
+        (
+            "deployment",
+            "passes $min_subjects because x",
+            "it names no check Ergo adds",
+        ),
+        (
+            "deployment",
+            "fails $min_subjectz",
+            "it doesn't start with a subject of the policy",
+        ),
+    ];
+    for (own, text, reason) in cases {
+        assert_eq!(read_line(own, text), Err(reason.to_string()), "{text}");
+    }
+}
+
+#[test]
+fn a_scope_line_with_nothing_after_because_says_the_reason_is_empty() {
+    for text in [
+        "deployment d3 is out of scope because",
+        "deployment d3 is out of scope because ",
+    ] {
+        assert_eq!(
+            read_line("deployment", text),
+            Err("it has nothing after because".to_string()),
+            "{text}"
+        );
+    }
+}
+
+#[test]
+fn a_check_of_the_policy_named_like_a_check_ergo_adds_is_read_as_the_policys_check_after_an_id() {
+    let checks = ["fails $min_subjects", "c"];
+    let read =
+        |text: &str| outcome::read_check_line(text, "r", "deployment", &["deployment"], &checks);
+    assert_eq!(
+        read("deployment d1 passes fails $min_subjects"),
+        Ok(check_line(
+            "deployment",
+            Some(json!("d1")),
+            true,
+            "fails $min_subjects",
+            None,
+            &[]
+        ))
+    );
+    assert_eq!(
+        read("deployment d1 fails fails $min_subjects because x"),
+        Ok(check_line(
+            "deployment",
+            Some(json!("d1")),
+            false,
+            "fails $min_subjects",
+            Some("x"),
+            &[]
+        ))
+    );
+    assert_eq!(
+        read("fails $min_subjects"),
+        Ok(check_line(
+            "deployment",
+            None,
+            false,
+            "$min_subjects",
+            None,
+            &[]
+        ))
+    );
+}
+
+#[test]
+fn a_scope_line_says_a_subject_is_in_or_out_of_scope_as_its_applies_row_does() {
+    let cases = [
+        (
+            "deployment d3 is out of scope because env is \"dev\"",
+            check_line(
+                "deployment",
+                Some(json!("d3")),
+                false,
+                "$applies",
+                Some("env is \"dev\""),
+                &[],
+            ),
+        ),
+        (
+            "deployment d3 is out of scope",
+            check_line(
+                "deployment",
+                Some(json!("d3")),
+                false,
+                "$applies",
+                None,
+                &[],
+            ),
+        ),
+        (
+            "deployment 7 is in scope",
+            check_line("deployment", Some(json!(7)), true, "$applies", None, &[]),
+        ),
+        (
+            "deployment is is in scope",
+            check_line("deployment", Some(json!("is")), true, "$applies", None, &[]),
+        ),
+        (
+            "artifact in in deployment d1 is out of scope because x is in scope",
+            check_line(
+                "artifact",
+                Some(json!("in")),
+                false,
+                "$applies",
+                Some("x is in scope"),
+                &[("deployment", json!("d1"))],
+            ),
+        ),
+        (
+            "deployment d1 passes c is in scope",
+            check_line(
+                "deployment",
+                Some(json!("d1")),
+                true,
+                "c is in scope",
+                None,
+                &[],
+            ),
+        ),
+    ];
+    for (text, line) in cases {
+        assert_eq!(read_line("deployment", text), Ok(line), "{text}");
+    }
+    for (text, reason) in [
+        (
+            "deployment d1 is in scope because x",
+            "is in scope has nothing after it",
+        ),
+        (
+            "deployment d1 is out of scopes",
+            "it needs passes or fails after the id",
+        ),
+        (
+            "deployment is in scope",
+            "it has no subject of the policy after in",
+        ),
+    ] {
+        assert_eq!(
+            read_line("deployment", text),
+            Err(reason.to_string()),
+            "{text}"
+        );
     }
 }
 
