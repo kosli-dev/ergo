@@ -111,12 +111,14 @@ else := concat("", [check.expression, " is false"]) if _written_expression(check
 
 else := "the check is false"
 
-_m_key_faults(subj, check) := [c |
+_m_key_faults(subj, check) := [c.text | some c in _m_key_fault_pieces(subj, check)]
+
+_m_key_fault_pieces(subj, check) := [c |
 	some side in _m_sides(check)
 	some p in _m_side_paths(side)
 	is_array(p)
 	some step in p
-	c := _m_key_fault(subj, step)
+	c := _m_key_fault_piece(subj, step)
 ]
 
 _m_key_states(subj, check, cause) := [c.text | some c in _m_key_pieces(subj, check, cause)]
@@ -163,14 +165,16 @@ _m_key_name(step) := step.named_by if object.keys(step) == {"named_by"}
 
 _m_key_name(step) := _fk_text(step) if _field_step(step)
 
-_m_key_fault(_, step) := _m_isnt(_ref_name(step.ref), v, "text") if {
+_m_key_fault(subj, step) := _m_key_fault_piece(subj, step).text
+
+_m_key_fault_piece(_, step) := _m_isnt_piece(_ref_name(step.ref), v, "text", "unusable") if {
 	_is_ref(step)
 	_ref_state(step.ref) == "value"
 	v := _ref_shown(step.ref)
 	not is_string(v)
 }
 
-_m_key_fault(_, step) := _m_isnt(step.named_by, v, "text") if {
+_m_key_fault_piece(_, step) := _m_isnt_piece(step.named_by, v, "text", "unusable") if {
 	is_object(step)
 	object.keys(step) == {"named_by"}
 	is_string(step.named_by)
@@ -179,7 +183,7 @@ _m_key_fault(_, step) := _m_isnt(step.named_by, v, "text") if {
 	not is_string(v)
 }
 
-_m_key_fault(subj, step) := _m_isnt(_fk_text(step), v, "text") if {
+_m_key_fault_piece(subj, step) := _m_isnt_piece(_fk_text(step), v, "text", "unusable") if {
 	is_object(step)
 	is_string(_fk(step))
 	is_object(subj)

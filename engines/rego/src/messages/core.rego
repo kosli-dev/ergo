@@ -145,6 +145,12 @@ _m_isnt(name, v, kind) := _m_text_items(name, v) if kind == _text_items_kind
 
 else := concat("", [name, " is ", _m_print_at(v, name, null), ", which isn't ", kind])
 
+_m_isnt_piece(name, v, kind, cause) := _m_clause(_m_isnt_kind(kind), name, cause, _m_isnt(name, v, kind))
+
+_m_isnt_kind(kind) := "list" if kind == _text_items_kind
+
+else := "root"
+
 _m_text_items(name, v) := _m_joined([_m_text_item(concat("", ["item ", format_int(i + 1, 10), " of ", name]), x) |
 	some i, x in v
 	not is_string(x)
@@ -514,7 +520,7 @@ _m_unusable_beside_keys(subj, check, kf) := [_m_state_piece(s) |
 ]
 
 _m_message_pieces(check, subj, "unusable") := clauses if {
-	kf := _m_key_faults(subj, check)
+	kf := _m_key_fault_pieces(subj, check)
 	clauses := _m_pieces_once(array.concat(array.concat(array.concat(_m_unusable_before_faults(subj, check, kf), _m_faults(subj, check)), _m_unusable_after_faults(subj, check)), _m_unusable_beside_keys(subj, check, kf)))
 	count(clauses) > 0
 } else := clauses if {
