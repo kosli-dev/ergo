@@ -528,7 +528,7 @@ _tally_record_texts(c, subj, cause, said) := {_m_aliased(r[1]) |
 	some r0 in rs
 	count(r0) == 3
 	not _tally_root_said(r0, rs)
-	r := _tally_unrooted(r0, said.message)
+	r := _tally_unrooted(r0, texts)
 	r != null
 	_tally_record_listed(r[2])
 	_tally_said_in(_m_aliased(r[1]), texts, cut)
@@ -1550,44 +1550,25 @@ _tally_item_records(c, subj, cause, at, said) := [x |
 	some r0 in rs
 	count(r0) == 3
 	not _tally_root_said(r0, rs)
-	r := _tally_unrooted(r0, said.message)
+	r := _tally_unrooted(r0, texts)
 	r != null
 	_tally_said_in(_m_aliased(r[1]), texts, cut)
 	x := _tally_record_entry(r, side, w, roots, at, subj)
 ]
 
-_tally_unrooted(r, m) := _tally_kept(r, lead, ps, [p | some p in ps; not p in tops]) if {
+_tally_unrooted(r, texts) := _tally_kept(r, lead, ps, [p | some p in ps; not p in texts]) if {
 	head := _m_lead_of(r[1])
 	head != ""
 	lead := concat("", [head, ": "])
 	startswith(r[1], lead)
 	ps := _m_top_split(substring(r[1], count(lead), -1), "; ")
-	tops := {t | some t in _m_top_split(m, "; ")}
 } else := r
 
 _tally_kept(r, lead, ps, kept) := r if count(kept) == count(ps)
 
 else := null if kept == []
 
-else := [_worst_of({_tally_clause_cause(c, r[0]) | some c in kept}), concat("", [lead, concat("; ", kept)]), r[2]]
-
-_tally_clause_cause(c, state) := _tally_word_cause(c, _m_src_cause(state))
-
-_tally_word_cause(c, _) := "absent" if endswith(c, " is missing")
-
-_tally_word_cause(c, _) := "null" if endswith(c, " is null")
-
-_tally_word_cause(c, cause) := cause if {
-	not endswith(c, " is missing")
-	not endswith(c, " is null")
-	not cause in {"absent", "null"}
-}
-
-_tally_word_cause(c, cause) := "unusable" if {
-	not endswith(c, " is missing")
-	not endswith(c, " is null")
-	cause in {"absent", "null"}
-}
+else := [r[0], concat("", [lead, concat("; ", kept)]), r[2]]
 
 _tally_record_entry([state, text, src], side, w, roots, at, subj) := _tally_leveled(_tally_item_entry(e, _m_src_cause(state), text, side, w, roots, subj), e.i, w, at) if {
 	e := src.item
