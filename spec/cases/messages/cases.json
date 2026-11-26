@@ -45930,5 +45930,368 @@
           ]
         }
       ]
+    },
+    {
+      "description": "a row that walks two lists says up to three items of each list",
+      "policy": {
+        "ergo_spec": "{{spec}}",
+        "subjects": {
+          "thing": {
+            "from": "things",
+            "identified_by": "id"
+          }
+        },
+        "requirements": {
+          "s": {
+            "subject": "thing",
+            "checks": {
+              "c": "sum of xs.v plus sum of ys.v is 0"
+            }
+          }
+        }
+      },
+      "cases": [
+        {
+          "description": "two items without v in each list, so all four are said",
+          "rules": [
+            "message.items",
+            "problems.all_said",
+            "problems.item_order"
+          ],
+          "input": {
+            "things": [
+              {
+                "id": "t",
+                "xs": [
+                  {},
+                  {}
+                ],
+                "ys": [
+                  {},
+                  {}
+                ]
+              }
+            ]
+          },
+          "results": [
+            {
+              "cause": "absent",
+              "check": "c",
+              "failures": [
+                {
+                  "cause": "absent",
+                  "failures": [
+                    {
+                      "cause": "absent",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": ["/things/0/xs/0"],
+                          "name": "xs[0].v",
+                          "outcome": "absent",
+                          "value": null
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": ["/things/0/xs/0"],
+                      "message": "v is missing",
+                      "name": "item 1 of xs",
+                      "value": {}
+                    },
+                    {
+                      "cause": "absent",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": ["/things/0/xs/1"],
+                          "name": "xs[1].v",
+                          "outcome": "absent",
+                          "value": null
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": ["/things/0/xs/1"],
+                      "message": "v is missing",
+                      "name": "item 2 of xs",
+                      "value": {}
+                    },
+                    {
+                      "cause": "absent",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": ["/things/0/ys/0"],
+                          "name": "ys[0].v",
+                          "outcome": "absent",
+                          "value": null
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": ["/things/0/ys/0"],
+                      "message": "v is missing",
+                      "name": "item 1 of ys",
+                      "value": {}
+                    },
+                    {
+                      "cause": "absent",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": ["/things/0/ys/1"],
+                          "name": "ys[1].v",
+                          "outcome": "absent",
+                          "value": null
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": ["/things/0/ys/1"],
+                      "message": "v is missing",
+                      "name": "item 2 of ys",
+                      "value": {}
+                    }
+                  ],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0/xs/0",
+                        "/things/0/xs/1",
+                        "/things/0/ys/0",
+                        "/things/0/ys/1"
+                      ],
+                      "name": "sum of xs.v plus sum of ys.v",
+                      "value": null
+                    },
+                    {
+                      "locations": [
+                        "/things/0/xs/0",
+                        "/things/0/xs/1"
+                      ],
+                      "name": "sum of xs.v",
+                      "value": null
+                    },
+                    {
+                      "locations": [
+                        "/things/0/ys/0",
+                        "/things/0/ys/1"
+                      ],
+                      "name": "sum of ys.v",
+                      "value": null
+                    }
+                  ],
+                  "kind": "assertion",
+                  "locations": ["$policy:/requirements/s/checks/c"],
+                  "message": "",
+                  "name": "sum of xs.v plus sum of ys.v is 0"
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/xs/0",
+                    "/things/0/xs/1",
+                    "/things/0/ys/0",
+                    "/things/0/ys/1"
+                  ],
+                  "name": "sum of xs.v plus sum of ys.v",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/xs/0",
+                    "/things/0/xs/1"
+                  ],
+                  "name": "sum of xs.v",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/xs/0",
+                    "/things/0/xs/1"
+                  ],
+                  "name": "xs[].v",
+                  "outcome": "usable",
+                  "value": [
+                    null,
+                    null
+                  ]
+                },
+                {
+                  "locations": [
+                    "/things/0/ys/0",
+                    "/things/0/ys/1"
+                  ],
+                  "name": "sum of ys.v",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/ys/0",
+                    "/things/0/ys/1"
+                  ],
+                  "name": "ys[].v",
+                  "outcome": "usable",
+                  "value": [
+                    null,
+                    null
+                  ]
+                }
+              ],
+              "message": "item 1 of xs: v is missing; item 2 of xs: v is missing; item 1 of ys: v is missing; item 2 of ys: v is missing",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "description": "a counted list that is null beside a missing $params root in the whose of another count",
+      "policy": {
+        "ergo_spec": "{{spec}}",
+        "subjects": {
+          "thing": {
+            "from": "things",
+            "identified_by": "id"
+          }
+        },
+        "requirements": {
+          "s": {
+            "subject": "thing",
+            "checks": {
+              "c": "count of fs plus count of es whose v is in $params.x is 0"
+            }
+          }
+        }
+      },
+      "params": {},
+      "cases": [
+        {
+          "description": "fs is null, no x in the params, and one item of es without v",
+          "rules": [
+            "problems.same_path",
+            "problems.all_said",
+            "problems.item_order"
+          ],
+          "input": {
+            "things": [
+              {
+                "id": "t",
+                "fs": null,
+                "es": [
+                  {}
+                ]
+              }
+            ]
+          },
+          "results": [
+            {
+              "cause": "absent",
+              "check": "c",
+              "failures": [
+                {
+                  "cause": "absent",
+                  "failures": [
+                    {
+                      "cause": "null",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": ["/things/0/fs"],
+                          "name": "fs",
+                          "outcome": "null",
+                          "value": null
+                        }
+                      ],
+                      "kind": "list",
+                      "message": "fs is null",
+                      "name": "fs"
+                    },
+                    {
+                      "cause": "absent",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": ["/things/0/es/0"],
+                          "name": "es[0].v",
+                          "outcome": "absent",
+                          "value": null
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": ["/things/0/es/0"],
+                      "message": "v is missing",
+                      "name": "item 1 of es",
+                      "value": {}
+                    }
+                  ],
+                  "inputs": [
+                    {
+                      "locations": ["/things/0/es/0"],
+                      "name": "count of fs plus count of es whose v is in $params.x",
+                      "value": null
+                    },
+                    {
+                      "locations": [],
+                      "name": "count of fs",
+                      "value": null
+                    },
+                    {
+                      "locations": ["/things/0/es/0"],
+                      "name": "count of es whose v is in $params.x",
+                      "value": null
+                    }
+                  ],
+                  "kind": "assertion",
+                  "locations": ["$policy:/requirements/s/checks/c"],
+                  "message": "$params.x is missing",
+                  "name": "count of fs plus count of es whose v is in $params.x is 0"
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": ["/things/0/es/0"],
+                  "name": "count of fs plus count of es whose v is in $params.x",
+                  "value": null
+                },
+                {
+                  "locations": [],
+                  "name": "count of fs",
+                  "value": null
+                },
+                {
+                  "locations": [],
+                  "name": "fs",
+                  "outcome": "null",
+                  "value": []
+                },
+                {
+                  "locations": ["/things/0/es/0"],
+                  "name": "count of es whose v is in $params.x",
+                  "value": null
+                },
+                {
+                  "locations": ["/things/0/es/0"],
+                  "name": "es[]",
+                  "outcome": "usable",
+                  "value": [
+                    {}
+                  ]
+                }
+              ],
+              "message": "$params.x is missing; fs is null; item 1 of es: v is missing",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      ]
     }
 ]

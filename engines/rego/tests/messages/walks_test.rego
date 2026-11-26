@@ -474,6 +474,21 @@ test_a_root_before_several_items_of_a_count_is_cut_from_them_like_the_items if {
 	ergo._m_row_text(c, {"xs": [{}]}, "absent") == "$params.n is missing, and item 1 of xs: v is missing" with data.ergo_params as {}
 }
 
+test_a_row_that_says_two_lists_of_two_items_says_all_four if {
+	c := ergo._s_written_check("sum of xs.v plus sum of ys.v is 0")
+	ergo._m_row_text(c, {"xs": [{}, {}], "ys": [{}, {}]}, "absent") == "item 1 of xs: v is missing; item 2 of xs: v is missing; item 1 of ys: v is missing; item 2 of ys: v is missing"
+}
+
+test_a_row_says_a_second_list_after_a_first_list_of_three_items if {
+	c := ergo._s_written_check("sum of xs.v is at most sum of ys.v")
+	ergo._m_row_text(c, {"xs": [{}, {}, {}], "ys": [{}]}, "absent") == "item 1 of xs: v is missing; item 2 of xs: v is missing; item 3 of xs: v is missing; item 1 of ys: v is missing"
+}
+
+test_a_row_says_three_items_of_each_list_and_how_many_more_after_each if {
+	c := ergo._s_written_check("sum of xs.v plus sum of ys.v is 0")
+	ergo._m_row_text(c, {"xs": [{}, {}, {}, {}], "ys": [{}, {}, {}, {}]}, "absent") == "item 1 of xs: v is missing; item 2 of xs: v is missing; item 3 of xs: v is missing; and 1 more; item 1 of ys: v is missing; item 2 of ys: v is missing; item 3 of ys: v is missing; and 1 more"
+}
+
 test_the_roots_of_a_count_and_of_its_whose_are_sorted_together_by_name if {
 	c := ergo._s_written_check("count of es whose zz is m named by $params.k is $params.n")
 	ergo._m_row_text(c, {"es": [{"zz": 2}, {"zz": 2}]}, "absent") == "$params.k is missing; $params.n is missing; item 1 of es: m is missing; item 2 of es: m is missing" with data.ergo_params as {}
