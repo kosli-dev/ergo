@@ -76,6 +76,30 @@ fn a_line_that_disagrees_with_its_row_names_what_the_report_says() {
 }
 
 #[test]
+fn a_number_in_a_line_matches_an_id_of_the_same_value_however_either_is_written() {
+    let input: Value =
+        serde_json::from_str(r#"{"prs": [{"number": 7.0, "approved": true}]}"#).unwrap();
+    let report = ergo_policy_engine::report(&input, &policy(), &json!({}));
+    for id in ["7", "7.0", "7.00", "7e0", "0.7e1"] {
+        let line = format!("pull request {id} passes peer_approved");
+        assert_eq!(
+            examples::check(&json!([{"reviewed": [line]}]), &report).problems,
+            Vec::<String>::new(),
+            "{id}"
+        );
+    }
+    let problems = examples::check(
+        &json!([{"reviewed": ["pull request \"7\" passes peer_approved"]}]),
+        &report,
+    )
+    .problems;
+    assert_eq!(
+        problems,
+        vec!["the report has no row for pull request \"7\" and peer_approved in reviewed"]
+    );
+}
+
+#[test]
 fn a_check_line_covers_its_check_so_every_failure_of_that_check_must_be_listed() {
     assert_eq!(
         problems(

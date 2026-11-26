@@ -41,6 +41,32 @@ fn a_plain_word_id_is_written_bare_and_anything_else_as_json() {
 }
 
 #[test]
+fn ids_that_are_numbers_are_the_same_when_their_values_are() {
+    let number = |text: &str| serde_json::from_str::<Value>(text).unwrap();
+    for (a, b) in [
+        ("7.0", "7"),
+        ("7.00", "7"),
+        ("1.50", "1.5"),
+        ("1e3", "1000"),
+        ("1E+3", "1000"),
+        ("-0", "0"),
+        ("-0.0", "0"),
+        ("0.0010", "1e-3"),
+        ("1e400", "10e399"),
+    ] {
+        assert!(outcome::same_id(&number(a), &number(b)), "{a} and {b}");
+    }
+    for (a, b) in [("7", "8"), ("-1", "1"), ("1e400", "1e401"), ("0.1", "1")] {
+        assert!(!outcome::same_id(&number(a), &number(b)), "{a} and {b}");
+    }
+    assert!(!outcome::same_id(&json!(7), &json!("7")));
+    assert!(!outcome::same_id(&json!(1), &json!(true)));
+    assert!(outcome::same_id(&json!("d1"), &json!("d1")));
+    assert!(!outcome::same_id(&json!("7.0"), &json!("7")));
+    assert!(outcome::same_id(&json!(null), &json!(null)));
+}
+
+#[test]
 fn an_id_that_is_an_object_or_a_list_has_no_text_yet() {
     assert_eq!(outcome::id_text(&json!({"a": 1})), None);
     assert_eq!(outcome::id_text(&json!([1])), None);
