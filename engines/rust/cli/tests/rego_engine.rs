@@ -530,3 +530,46 @@ fn engine_and_ergo_rego_are_refused_where_they_do_not_go() {
         );
     }
 }
+
+#[cfg(unix)]
+#[test]
+fn engine_rego_keeps_the_folder_and_file_it_gives_opa_private_to_its_user() {
+    let policy = file("opa-private", "policy.yaml", POLICY);
+    let ergo_rego = file("opa-private", "ergo.rego", "package ergo\n");
+    let seen = file("opa-private", "seen", "");
+    let opa = fake_opa(
+        "opa-private",
+        &format!("ls -ld \"$(dirname \"$7\")\" \"$7\" > {seen}\necho '[]'\n"),
+    );
+    let _ = run_in(
+        &args(&["test", "--engine", "rego", &policy]),
+        &with_opa(&ergo_rego, opa),
+    );
+    let listing = std::fs::read_to_string(&seen).unwrap();
+    let modes: Vec<&str> = listing
+        .lines()
+        .map(|l| l.split_whitespace().next().unwrap())
+        .collect();
+    assert_eq!(modes.len(), 2, "{listing}");
+    assert!(modes[0].starts_with("drwx------"), "{listing}");
+    assert!(modes[1].starts_with("-rw-------"), "{listing}");
+}
+
+#[cfg(unix)]
+#[test]
+fn engine_rego_refuses_a_path_of_ergo_rego_with_a_colon_before_running_opa() {
+    let policy = file("opa-colon", "policy.yaml", POLICY);
+    let ran = file("opa-colon", "ran", "");
+    let opa = fake_opa("opa-colon", &format!("echo ran > {ran}\necho '[]'\n"));
+    let path = "c:d/ergo.rego";
+    assert_eq!(
+        run_in(
+            &args(&["test", "--engine", "rego", &policy]),
+            &with_opa(path, opa)
+        ),
+        Err(Failure::Engine(format!(
+            "the path of ergo.rego ({path}) holds a ':', which opa reads as a prefix; move the file"
+        ))),
+    );
+    assert_eq!(std::fs::read_to_string(&ran).unwrap(), "");
+}
