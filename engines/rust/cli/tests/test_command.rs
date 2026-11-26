@@ -31,7 +31,10 @@ examples:
 "#;
 
 fn file(name: &str, file: &str, text: &str) -> String {
-    let dir = std::env::temp_dir().join(format!("ergo-policy-cli-test-{}-{name}", std::process::id()));
+    let dir = std::env::temp_dir().join(format!(
+        "ergo-policy-cli-test-{}-{name}",
+        std::process::id()
+    ));
     fs::create_dir_all(&dir).unwrap();
     let path = dir.join(file);
     fs::write(&path, text.replace("{{spec}}", SPEC)).unwrap();
@@ -63,7 +66,9 @@ fn report_with_format_outcome_prints_the_outcome_as_yaml() {
             1
         ))
     );
-    let json = run(&args(&["report", "--policy", &policy, "--input", &input, "--format", "json"]));
+    let json = run(&args(&[
+        "report", "--policy", &policy, "--input", &input, "--format", "json",
+    ]));
     assert!(matches!(json, Ok(Outcome::Print(text)) if text.starts_with('{')));
 }
 
@@ -71,7 +76,9 @@ fn report_with_format_outcome_prints_the_outcome_as_yaml() {
 fn format_outcome_fails_on_a_row_it_cannot_show_yet() {
     let policy = file("format-not-yet", "policy.yaml", POLICY);
     let input = file("format-not-yet", "input.json", r#"{"deployments": []}"#);
-    let got = run(&args(&["report", "--policy", &policy, "--input", &input, "--format", "outcome"]));
+    let got = run(&args(&[
+        "report", "--policy", &policy, "--input", &input, "--format", "outcome",
+    ]));
     let Err(Failure::Unsupported(message)) = got else {
         panic!("{got:?}");
     };
@@ -83,15 +90,28 @@ fn format_takes_json_or_outcome_and_outcome_only_with_report() {
     let policy = file("format-wrong", "policy.yaml", POLICY);
     let input = file("format-wrong", "input.json", r#"{"deployments": []}"#);
     let cases = [
-        (vec!["report", "--format", "xml"], "--format must be json or outcome"),
-        (vec!["violations", "--format", "outcome"], "--format outcome only goes with report"),
-        (vec!["report", "--format", "outcome", "--compact"], "--compact can't go with --format outcome"),
+        (
+            vec!["report", "--format", "xml"],
+            "--format must be json or outcome",
+        ),
+        (
+            vec!["violations", "--format", "outcome"],
+            "--format outcome only goes with report",
+        ),
+        (
+            vec!["report", "--format", "outcome", "--compact"],
+            "--compact can't go with --format outcome",
+        ),
         (vec!["report", "--strict"], "--strict only goes with test"),
     ];
     for (start, message) in cases {
         let mut all = start.clone();
         all.extend(["--policy", &policy, "--input", &input]);
-        assert_eq!(run(&args(&all)), Err(Failure::Usage(message.to_string())), "{start:?}");
+        assert_eq!(
+            run(&args(&all)),
+            Err(Failure::Usage(message.to_string())),
+            "{start:?}"
+        );
     }
 }
 
@@ -115,7 +135,10 @@ fn test_runs_every_example_and_passes_when_each_says_what_its_report_says() {
 
 #[test]
 fn test_shows_a_failed_example_with_its_lines_next_to_the_report_and_exits_one() {
-    let failing = EXAMPLES.replace("deployment d2 passes approver_set", "deployment d2 fails approver_set");
+    let failing = EXAMPLES.replace(
+        "deployment d2 passes approver_set",
+        "deployment d2 fails approver_set",
+    );
     let policy = file("test-fail", "policy.yaml", &format!("{POLICY}{failing}"));
     assert_eq!(
         run(&args(&["test", &policy])),
@@ -143,7 +166,10 @@ warning: no example shows not_self_approved of approved passing
 
 #[test]
 fn test_refuses_examples_written_wrong() {
-    let twice = EXAMPLES.replace("nobody approves their own deployment", "a deployment needs an approver");
+    let twice = EXAMPLES.replace(
+        "nobody approves their own deployment",
+        "a deployment needs an approver",
+    );
     let policy = file("test-twice", "policy.yaml", &format!("{POLICY}{twice}"));
     assert_eq!(
         run(&args(&["test", &policy])),
@@ -157,11 +183,24 @@ fn test_refuses_examples_written_wrong() {
 fn test_takes_one_policy_file_and_strict() {
     let cases = [
         (vec!["test"], "test needs a policy file"),
-        (vec!["test", "a.yaml", "b.yaml"], "unexpected argument 'b.yaml'"),
-        (vec!["test", "a.yaml", "--input", "i.json"], "--input only goes with report and violations"),
-        (vec!["test", "a.yaml", "--strict=yes"], "--strict takes no value"),
+        (
+            vec!["test", "a.yaml", "b.yaml"],
+            "unexpected argument 'b.yaml'",
+        ),
+        (
+            vec!["test", "a.yaml", "--input", "i.json"],
+            "--input only goes with report and violations",
+        ),
+        (
+            vec!["test", "a.yaml", "--strict=yes"],
+            "--strict takes no value",
+        ),
     ];
     for (all, message) in cases {
-        assert_eq!(run(&args(&all)), Err(Failure::Usage(message.to_string())), "{all:?}");
+        assert_eq!(
+            run(&args(&all)),
+            Err(Failure::Usage(message.to_string())),
+            "{all:?}"
+        );
     }
 }

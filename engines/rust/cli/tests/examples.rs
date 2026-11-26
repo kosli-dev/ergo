@@ -78,7 +78,9 @@ fn a_line_that_disagrees_with_its_row_names_what_the_report_says() {
 #[test]
 fn a_check_line_covers_its_check_so_every_failure_of_that_check_must_be_listed() {
     assert_eq!(
-        problems(json!([{"approved": ["deployment d1 fails approver_set because approver is missing"]}])),
+        problems(
+            json!([{"approved": ["deployment d1 fails approver_set because approver is missing"]}])
+        ),
         vec!["no line says deployment d2 fails approver_set because approver is \"\""]
     );
     assert_eq!(
@@ -103,27 +105,55 @@ fn a_line_the_policy_cannot_read_is_a_problem() {
     let read = |line: &str| problems(json!([{"approved": [line]}]));
     let cases = [
         ("deployment d1 passes nothing", "names no check of approved"),
-        ("robot d1 passes approver_set", "doesn't start with a subject"),
-        ("deployment d1 approves approver_set", "needs passes or fails"),
-        ("deployment d1 passes approver_set because x", "names no check of approved"),
-        ("deployment d1 in release r1 passes approver_set", "child subjects"),
-        ("deployment d1 is out of scope", "subjects in or out of scope"),
-        ("fails $min_subjects because in-scope deployment count is 0", "checks Ergo adds"),
+        (
+            "robot d1 passes approver_set",
+            "doesn't start with a subject",
+        ),
+        (
+            "deployment d1 approves approver_set",
+            "needs passes or fails",
+        ),
+        (
+            "deployment d1 passes approver_set because x",
+            "names no check of approved",
+        ),
+        (
+            "deployment d1 in release r1 passes approver_set",
+            "child subjects",
+        ),
+        (
+            "deployment d1 is out of scope",
+            "subjects in or out of scope",
+        ),
+        (
+            "fails $min_subjects because in-scope deployment count is 0",
+            "checks Ergo adds",
+        ),
         ("deployment d1 fails $unique_ids", "checks Ergo adds"),
     ];
     for (line, reason) in cases {
         let got = read(line);
         assert!(
-            got.first().is_some_and(|p| p.starts_with(&format!("can't read the line '{line}'")) && p.contains(reason)),
+            got.first()
+                .is_some_and(|p| p.starts_with(&format!("can't read the line '{line}'"))
+                    && p.contains(reason)),
             "{line}: {got:?}"
         );
     }
-    let top = problems(json!(["deployment d1 passes approver_set", {"nobody": ["x"]}, {"approved": []}, 5, []]));
+    let top = problems(
+        json!(["deployment d1 passes approver_set", {"nobody": ["x"]}, {"approved": []}, 5, []]),
+    );
     assert_eq!(top.len(), 1, "{top:?}");
     assert!(top[0].contains("outcome item 4"), "{top:?}");
     let shapes = [
-        (json!(["deployment d1 passes approver_set"]), "isn't compliant, not compliant or a requirement"),
-        (json!([{"nobody": ["x"]}]), "no requirement is called nobody"),
+        (
+            json!(["deployment d1 passes approver_set"]),
+            "isn't compliant, not compliant or a requirement",
+        ),
+        (
+            json!([{"nobody": ["x"]}]),
+            "no requirement is called nobody",
+        ),
         (json!([{"approved": []}]), "lists no lines"),
         (json!([{"approved": null}]), "lists no lines"),
         (json!([]), "outcome is empty"),
@@ -131,7 +161,10 @@ fn a_line_the_policy_cannot_read_is_a_problem() {
     ];
     for (outcome, reason) in shapes {
         let got = problems(outcome.clone());
-        assert!(got.first().is_some_and(|p| p.contains(reason)), "{outcome}: {got:?}");
+        assert!(
+            got.first().is_some_and(|p| p.contains(reason)),
+            "{outcome}: {got:?}"
+        );
     }
 }
 
@@ -148,9 +181,16 @@ fn a_policy_written_wrong_breaks_every_example_whatever_the_lines_say() {
     let mut policy = policy();
     policy["requirements"]["reviewed"]["checks"]["typo"] = json!("approved sparkles");
     let report = ergo_policy_engine::report(&input(), &policy, &json!({}));
-    let checked = examples::check(&json!([{"approved": ["deployment d1 passes has approvals"]}]), &report);
+    let checked = examples::check(
+        &json!([{"approved": ["deployment d1 passes has approvals"]}]),
+        &report,
+    );
     assert_eq!(checked.problems.len(), 1, "{:?}", checked.problems);
-    assert!(checked.problems[0].starts_with("the policy is written wrong: reviewed: "), "{:?}", checked.problems);
+    assert!(
+        checked.problems[0].starts_with("the policy is written wrong: reviewed: "),
+        "{:?}",
+        checked.problems
+    );
 }
 
 #[test]
@@ -158,10 +198,21 @@ fn a_failure_the_lines_cover_but_cannot_name_yet_fails_the_example() {
     let mut policy = policy();
     policy["requirements"]["reviewed"]["min_subjects"] = json!(2);
     let report = ergo_policy_engine::report(&input(), &policy, &json!({}));
-    let problems = examples::check(&json!([{"reviewed is not met": ["pull request 7 passes peer_approved"]}]), &report).problems;
+    let problems = examples::check(
+        &json!([{"reviewed is not met": ["pull request 7 passes peer_approved"]}]),
+        &report,
+    )
+    .problems;
     assert_eq!(problems.len(), 1, "{problems:?}");
-    assert!(problems[0].starts_with("can't check this yet: lines for checks Ergo adds"), "{problems:?}");
-    let problems = examples::check(&json!([{"reviewed": ["pull request 7 passes peer_approved"]}]), &report).problems;
+    assert!(
+        problems[0].starts_with("can't check this yet: lines for checks Ergo adds"),
+        "{problems:?}"
+    );
+    let problems = examples::check(
+        &json!([{"reviewed": ["pull request 7 passes peer_approved"]}]),
+        &report,
+    )
+    .problems;
     assert_eq!(problems, Vec::<String>::new());
 }
 
@@ -200,10 +251,16 @@ fn the_check_lines_of_an_outcome_say_which_checks_it_shows_passing_and_failing()
 #[test]
 fn a_failed_example_shows_its_lines_next_to_those_of_the_report_for_what_they_cover() {
     let report = ergo_policy_engine::report(&input(), &policy(), &json!({}));
-    let checked = examples::check(&json!([{"approved": ["deployment d1 passes approver_set"]}]), &report);
+    let checked = examples::check(
+        &json!([{"approved": ["deployment d1 passes approver_set"]}]),
+        &report,
+    );
     assert_eq!(
         checked.expected,
-        vec![Item::Group("approved".to_string(), vec!["deployment d1 passes approver_set".to_string()])]
+        vec![Item::Group(
+            "approved".to_string(),
+            vec!["deployment d1 passes approver_set".to_string()]
+        )]
     );
     assert_eq!(
         checked.actual,
@@ -260,19 +317,38 @@ fn examples_written_wrong_are_refused() {
         (json!({}), "examples isn't a list"),
         (json!([]), "the policy has no examples"),
         (json!([5]), "example 1 isn't an object"),
-        (json!([{"input": {}, "outcome": ["compliant"]}]), "example 1 has no name"),
+        (
+            json!([{"input": {}, "outcome": ["compliant"]}]),
+            "example 1 has no name",
+        ),
         (json!([example("")]), "example 1 has no name"),
         (json!([missing_input]), "example a has no input"),
-        (json!([{"name": "a", "input": {}}]), "example a has no outcome"),
-        (json!([{"name": "a", "input": {}, "outcome": [], "extra": 1}]), "example a has an unknown field extra"),
-        (json!([{"name": "a", "input": {}, "outcome": [], "description": 1}]), "example a has a description that isn't text"),
-        (json!([example("a"), example("b"), example("a")]), "two examples are called a"),
+        (
+            json!([{"name": "a", "input": {}}]),
+            "example a has no outcome",
+        ),
+        (
+            json!([{"name": "a", "input": {}, "outcome": [], "extra": 1}]),
+            "example a has an unknown field extra",
+        ),
+        (
+            json!([{"name": "a", "input": {}, "outcome": [], "description": 1}]),
+            "example a has a description that isn't text",
+        ),
+        (
+            json!([example("a"), example("b"), example("a")]),
+            "two examples are called a",
+        ),
     ];
     for (examples, problem) in cases {
         let mut policy = policy();
         if !examples.is_null() {
             policy["examples"] = examples.clone();
         }
-        assert_eq!(examples::read(&policy), Err(problem.to_string()), "{examples}");
+        assert_eq!(
+            examples::read(&policy),
+            Err(problem.to_string()),
+            "{examples}"
+        );
     }
 }

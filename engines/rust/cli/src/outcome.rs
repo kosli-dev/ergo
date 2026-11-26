@@ -183,17 +183,23 @@ fn items(report: &Value, region: &Region, strict: bool) -> Result<Vec<Item>, Str
             .to_string(),
         ));
     }
-    let rows = report["results"].as_array().map(Vec::as_slice).unwrap_or_default();
+    let rows = report["results"]
+        .as_array()
+        .map(Vec::as_slice)
+        .unwrap_or_default();
     let requirements = report["requirements"].as_object().into_iter().flatten();
     for (name, entry) in requirements {
         let whole = region.compliant || region.requirements.contains(name);
-        let covers = |check: &str| whole || region.checks.contains(&(name.clone(), check.to_string()));
+        let covers =
+            |check: &str| whole || region.checks.contains(&(name.clone(), check.to_string()));
         if !whole && !region.checks.iter().any(|(r, _)| r == name) {
             continue;
         }
         let mut lines = Vec::new();
         for row in rows {
-            if row["requirement"] != name.as_str() || !covers(row["check"].as_str().unwrap_or_default()) {
+            if row["requirement"] != name.as_str()
+                || !covers(row["check"].as_str().unwrap_or_default())
+            {
                 continue;
             }
             match row_line(row) {

@@ -8,7 +8,7 @@ pub mod outcome;
 pub mod output;
 pub mod yaml;
 
-use args::{Command, Parsed};
+use args::{Command, Format, Parsed};
 
 /// Why a run failed. The message is one line and names the problem and the file.
 #[derive(Debug, PartialEq, Eq)]
@@ -94,6 +94,19 @@ pub fn run(arguments: &[String]) -> Result<Outcome, Failure> {
             )));
         }
         Parsed::Run(options) => options,
+        Parsed::Test(options) => {
+            let policy = files::load("policy", &options.policy)?;
+            let (text, code) = examples::run(&policy, options.strict).map_err(|problem| {
+                Failure::File(format!(
+                    "the examples in the policy file {} are written wrong: {problem}",
+                    options.policy
+                ))
+            })?;
+            return Ok(match code {
+                0 => Outcome::Print(text),
+                code => Outcome::PrintAndFail(text, code),
+            });
+        }
     };
     let policy = files::load("policy", &options.policy)?;
     let input = files::load("input", &options.input)?;
@@ -103,11 +116,13 @@ pub fn run(arguments: &[String]) -> Result<Outcome, Failure> {
     };
     let report = ergo_policy_engine::report(&input, &policy, &params);
     let code = if options.fail { fail_code(&report) } else { 0 };
-    let value = match options.command {
-        Command::Report => report,
-        Command::Violations => ergo_policy_engine::violations(&report),
+    let text = match (options.command, options.format) {
+        (_, Format::Outcome) => outcome::yaml(&outcome::of(&report).map_err(Failure::Unsupported)?),
+        (Command::Report, Format::Json) => output::render(&report, options.compact),
+        (Command::Violations, Format::Json) => {
+            output::render(&ergo_policy_engine::violations(&report), options.compact)
+        }
     };
-    let text = output::render(&value, options.compact);
     Ok(match code {
         0 => Outcome::Print(text),
         code => Outcome::PrintAndFail(text, code),

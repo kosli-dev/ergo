@@ -33,7 +33,10 @@ fn a_plain_word_id_is_written_bare_and_anything_else_as_json() {
     ];
     for (id, text) in cases {
         assert_eq!(outcome::id_text(&id).as_deref(), Some(text), "{id}");
-        assert_eq!(outcome::read_id(&format!("{text} rest")), Some((id, " rest")));
+        assert_eq!(
+            outcome::read_id(&format!("{text} rest")),
+            Some((id, " rest"))
+        );
     }
 }
 
@@ -176,7 +179,10 @@ fn the_outcome_of_a_report_has_compliant_then_each_requirement_with_its_status_a
                 "scanned is met".to_string(),
                 lines(&["scan sast passes clean"])
             ),
-            Item::Group("spare is met".to_string(), lines(&["scan sast passes never"])),
+            Item::Group(
+                "spare is met".to_string(),
+                lines(&["scan sast passes never"])
+            ),
         ])
     );
 }
@@ -189,7 +195,8 @@ fn the_outcome_of_a_report_with_a_row_it_cannot_show_yet_is_an_error() {
     input["prs"][1]["lines"] = json!(5);
     let error = outcome::of(&report(policy, input)).unwrap_err();
     assert!(error.contains("subjects out of scope"), "{error}");
-    let error = outcome::of(&report(two_requirements(), json!({"prs": [], "scans": []}))).unwrap_err();
+    let error =
+        outcome::of(&report(two_requirements(), json!({"prs": [], "scans": []}))).unwrap_err();
     assert!(error.contains("checks Ergo adds"), "{error}");
 }
 

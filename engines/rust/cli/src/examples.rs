@@ -59,7 +59,11 @@ pub fn read(policy: &Value) -> Result<Vec<Example>, String> {
             return Err(format!("example {name} has a description that isn't text"));
         }
         let (Some(input), Some(outcome)) = (map.get("input"), map.get("outcome")) else {
-            let missing = if map.contains_key("input") { "outcome" } else { "input" };
+            let missing = if map.contains_key("input") {
+                "outcome"
+            } else {
+                "input"
+            };
             return Err(format!("example {name} has no {missing}"));
         };
         if !names.insert(name.clone()) {
@@ -172,7 +176,11 @@ fn shape(outcome: &Value) -> Result<Vec<Item>, String> {
                     Value::Null => Vec::new(),
                     Value::Array(lines) => lines
                         .iter()
-                        .map(|line| line.as_str().map(str::to_string).ok_or_else(|| wrong(n + 1)))
+                        .map(|line| {
+                            line.as_str()
+                                .map(str::to_string)
+                                .ok_or_else(|| wrong(n + 1))
+                        })
                         .collect::<Result<_, _>>()?,
                     _ => return Err(wrong(n + 1)),
                 };
@@ -195,7 +203,10 @@ fn same_row(row: &Value, line: &Line) -> bool {
 /// Checks an outcome against a report, by the matching and coverage rules of the spec.
 pub fn check(outcome: &Value, report: &Value) -> Checked {
     let mut checked = Checked::default();
-    let rows = report["results"].as_array().map(Vec::as_slice).unwrap_or_default();
+    let rows = report["results"]
+        .as_array()
+        .map(Vec::as_slice)
+        .unwrap_or_default();
     for row in rows {
         if row["check"] == "$well_formed" && row["passed"] != true {
             checked.problems.push(format!(
@@ -222,7 +233,10 @@ pub fn check(outcome: &Value, report: &Value) -> Checked {
         region.requirements.insert(name.to_string());
         let actual = outcome::status_words(&report["requirements"][name]["status"]);
         if actual != Some(words) {
-            problems.push(format!("the report says {name} {}", actual.unwrap_or("has no status")));
+            problems.push(format!(
+                "the report says {name} {}",
+                actual.unwrap_or("has no status")
+            ));
         }
     };
     for item in &checked.expected {
@@ -266,8 +280,12 @@ pub fn check(outcome: &Value, report: &Value) -> Checked {
         }
     }
     for line in &lines {
-        region.checks.insert((line.requirement.clone(), line.check.clone()));
-        checked.shown.insert((line.requirement.clone(), line.check.clone(), line.passes));
+        region
+            .checks
+            .insert((line.requirement.clone(), line.check.clone()));
+        checked
+            .shown
+            .insert((line.requirement.clone(), line.check.clone(), line.passes));
         let matching: Vec<&Value> = rows.iter().filter(|row| same_row(row, line)).collect();
         if matching.is_empty() {
             problems.push(format!(
@@ -280,7 +298,10 @@ pub fn check(outcome: &Value, report: &Value) -> Checked {
         }
         for row in matching {
             let agrees = (row["passed"] == true) == line.passes
-                && line.because.as_ref().is_none_or(|because| row["message"] == because.as_str());
+                && line
+                    .because
+                    .as_ref()
+                    .is_none_or(|because| row["message"] == because.as_str());
             if !agrees && let Ok(Some(actual)) = outcome::row_line(row) {
                 problems.push(format!("the report says {actual}"));
             }
@@ -292,7 +313,9 @@ pub fn check(outcome: &Value, report: &Value) -> Checked {
         let out_of_scope = check == "$applies" && row["cause"] == "value";
         let covered = region.compliant
             || region.requirements.contains(requirement)
-            || region.checks.contains(&(requirement.to_string(), check.to_string()));
+            || region
+                .checks
+                .contains(&(requirement.to_string(), check.to_string()));
         if row["passed"] == true || out_of_scope || !covered {
             continue;
         }
@@ -307,4 +330,65 @@ pub fn check(outcome: &Value, report: &Value) -> Checked {
     checked.actual = outcome::part(report, &region);
     checked.problems = problems;
     checked
+}
+
+fn indented(items: &[Item]) -> String {
+    outcome::yaml(items)
+        .lines()
+        .map(|line| format!("    {line}\n"))
+        .collect()
+}
+
+/// Runs every example of a policy and gives the text to print with the exit code: 1 when an example failed, or when `strict` is set and there is a warning, and 0 otherwise. Gives why the examples are written wrong when they are.
+pub fn run(policy: &Value, strict: bool) -> Result<(String, u8), String> {
+    let examples = read(policy)?;
+    let mut text = String::new();
+    let mut failed = 0;
+    let mut shown = BTreeSet::new();
+    for example in &examples {
+        let report = ergo_policy_engine::report(&example.input, policy, &example.params);
+        let checked = check(&example.outcome, &report);
+        shown.extend(checked.shown);
+        if checked.problems.is_empty() {
+            text.push_str(&format!("passed: {}\n", example.name));
+            continue;
+        }
+        failed += 1;
+        text.push_str(&format!("failed: {}\n", example.name));
+        for problem in &checked.problems {
+            text.push_str(&format!("  {problem}\n"));
+        }
+        if !checked.expected.is_empty() {
+            text.push_str("  expected:\n");
+            text.push_str(&indented(&checked.expected));
+            text.push_str("  actual:\n");
+            text.push_str(&indented(&checked.actual));
+        }
+    }
+    let mut warnings = 0;
+    let requirements = policy["requirements"].as_object().into_iter().flatten();
+    for (requirement, entry) in requirements.filter(|(name, _)| !name.starts_with('$')) {
+        let checks = entry["checks"].as_object().into_iter().flatten();
+        for (check, _) in checks.filter(|(name, _)| !name.starts_with('$')) {
+            for (passes, words) in [(false, "failing"), (true, "passing")] {
+                if !shown.contains(&(requirement.clone(), check.clone(), passes)) {
+                    warnings += 1;
+                    text.push_str(&format!(
+                        "warning: no example shows {check} of {requirement} {words}\n"
+                    ));
+                }
+            }
+        }
+    }
+    text.push_str(&format!(
+        "{} examples: {} passed, {failed} failed\n",
+        examples.len(),
+        examples.len() - failed
+    ));
+    let code = if failed > 0 || (strict && warnings > 0) {
+        1
+    } else {
+        0
+    };
+    Ok((text, code))
 }
