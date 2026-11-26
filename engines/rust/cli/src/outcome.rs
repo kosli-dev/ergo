@@ -199,17 +199,19 @@ fn parents_of(row: &Value, report: &Value) -> Result<Vec<(String, Value)>, Strin
     let kind = subject["type"].as_str().unwrap_or_default();
     let order = ancestors(report, kind);
     let given = match subject.get("in") {
-        None => Map::new(),
-        Some(Value::Object(given)) if !given.is_empty() => given.clone(),
-        Some(_) => Map::from_iter([(String::new(), Value::Null)]),
+        None => Some(Map::new()),
+        Some(Value::Object(given)) if !given.is_empty() => Some(given.clone()),
+        Some(_) => None,
     };
-    if given.len() != order.len() || !order.iter().all(|name| given.contains_key(name)) {
+    let Some(given) = given.filter(|given| {
+        given.len() == order.len() && order.iter().all(|name| given.contains_key(name))
+    }) else {
         return Err(format!(
             "the in of a {kind} row doesn't name the subjects its from line is read inside, as for {} in {}",
             row["check"].as_str().unwrap_or_default(),
             row["requirement"].as_str().unwrap_or_default()
         ));
-    }
+    };
     order
         .into_iter()
         .map(|name| {
