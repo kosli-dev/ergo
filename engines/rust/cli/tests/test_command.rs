@@ -97,6 +97,37 @@ fn format_outcome_fails_on_a_row_it_cannot_show_yet() {
     assert!(message.contains("checks Ergo adds"), "{message}");
 }
 
+const NAMED_WITH_A_STATUS: &str = r#"ergo_spec: {{spec}}
+subjects:
+  t: {from: ts, identified_by: id}
+requirements:
+  x: {subject: t, checks: {c: p is true}}
+  x is met: {subject: t, checks: {c: w is true}}
+"#;
+
+#[test]
+fn format_outcome_refuses_a_heading_that_could_name_two_requirements() {
+    let policy = file("format-two-names", "policy.yaml", NAMED_WITH_A_STATUS);
+    let input = file(
+        "format-two-names",
+        "input.json",
+        r#"{"ts": [{"id": "t1", "p": true, "w": false}]}"#,
+    );
+    let got = run(&args(&[
+        "report", "--policy", &policy, "--input", &input, "--format", "outcome",
+    ]));
+    let Err(failure) = got else {
+        panic!("{got:?}");
+    };
+    assert_eq!(failure.code(), 2, "{failure:?}");
+    assert!(
+        failure.message().contains(
+            "the heading x is met, for the status of x, would also name the requirement x is met"
+        ),
+        "{failure:?}"
+    );
+}
+
 #[test]
 fn format_outcome_with_fail_exits_three_on_a_policy_written_wrong_as_json_does() {
     let wrong = POLICY.replace("approver is a non-empty string", "approver sparkles");
@@ -402,8 +433,7 @@ fn ascii_json(value: &serde_json::Value) -> String {
         .collect()
 }
 
-#[test]
-fn what_format_outcome_prints_pasted_under_outcome_passes_ergo_test() {
+fn odd_input() -> serde_json::Value {
     let mut odd = vec!["request".to_string()];
     for c in [
         '\u{7f}', '\u{80}', '\u{85}', '\u{9b}', '\u{9f}', '\u{2028}', '\u{2029}', '\u{1}', '\t',
@@ -421,15 +451,23 @@ fn what_format_outcome_prints_pasted_under_outcome_passes_ergo_test() {
         .iter()
         .map(|n| serde_json::json!({"id": serde_json::from_str::<serde_json::Value>(n).unwrap(), "name": "no"}))
         .collect();
-    let input = serde_json::json!({
+    serde_json::json!({
         "pulls": pulls,
         "prs": [],
         "ts": [{"id": "x", "name": "x"}, {"id": "y", "name": "ok"}],
         "txs": txs,
-    });
-    let policy = file("round-trip", "policy.yaml", ODD_POLICY);
-    let input_file = file("round-trip", "input.json", &ascii_json(&input));
-    let Ok(Outcome::Print(printed)) = run(&args(&[
+    })
+}
+
+enum RoundTrip {
+    PastedBack,
+    Refused,
+}
+
+fn round_trip(name: &str, policy_text: &str, input: &serde_json::Value) -> RoundTrip {
+    let policy = file(name, "policy.yaml", policy_text);
+    let input_file = file(name, "input.json", &ascii_json(input));
+    let printed = match run(&args(&[
         "report",
         "--policy",
         &policy,
@@ -437,21 +475,53 @@ fn what_format_outcome_prints_pasted_under_outcome_passes_ergo_test() {
         &input_file,
         "--format",
         "outcome",
-    ])) else {
-        panic!("--format outcome failed");
+    ])) {
+        Ok(Outcome::Print(printed)) => printed,
+        Err(failure) if failure.code() == 2 => return RoundTrip::Refused,
+        got => panic!("{name}: --format outcome gave {got:?}"),
     };
     let pasted: String = printed
         .lines()
         .map(|line| format!("      {line}\n"))
         .collect();
     let with_example = format!(
-        "{ODD_POLICY}examples:\n  - name: round trip\n    input: {}\n    outcome:\n{pasted}",
-        ascii_json(&input)
+        "{policy_text}examples:\n  - name: round trip\n    input: {}\n    outcome:\n{pasted}",
+        ascii_json(input)
     );
-    let tested = file("round-trip", "tested.yaml", &with_example);
+    let tested = file(name, "tested.yaml", &with_example);
     let got = run(&args(&["test", &tested]));
     assert!(
         matches!(&got, Ok(Outcome::Print(text)) if text.starts_with("passed: round trip\n")),
-        "{printed}\n{got:?}"
+        "{name}: printed\n{printed}\nbut ergo test gave {got:?}"
     );
+    RoundTrip::PastedBack
+}
+
+const NAMED_NOT_MET: &str = r#"ergo_spec: {{spec}}
+subjects:
+  t: {from: ts, identified_by: id}
+requirements:
+  a: {subject: t, checks: {c: p is true}}
+  a is not met: {subject: t, checks: {c: w is true}}
+"#;
+
+#[test]
+fn what_format_outcome_prints_pasted_under_outcome_passes_ergo_test_or_is_refused() {
+    let met = serde_json::json!({"ts": [{"id": "t1", "p": true, "w": false}]});
+    let not_met = serde_json::json!({"ts": [{"id": "t1", "p": false, "w": false}]});
+    for (name, policy, input, pasted_back) in [
+        ("round-trip", ODD_POLICY, odd_input(), true),
+        ("round-trip-x-met", NAMED_WITH_A_STATUS, met.clone(), false),
+        (
+            "round-trip-x-not-met",
+            NAMED_WITH_A_STATUS,
+            not_met.clone(),
+            true,
+        ),
+        ("round-trip-a-met", NAMED_NOT_MET, met, true),
+        ("round-trip-a-not-met", NAMED_NOT_MET, not_met, false),
+    ] {
+        let got = round_trip(name, policy, &input);
+        assert_eq!(matches!(got, RoundTrip::PastedBack), pasted_back, "{name}");
+    }
 }

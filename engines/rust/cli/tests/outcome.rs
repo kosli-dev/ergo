@@ -239,6 +239,52 @@ fn a_requirement_with_no_row_to_show_is_a_line_on_its_own() {
     );
 }
 
+fn named_with_a_status(short: &str, long: &str) -> Value {
+    json!({
+        "subjects": {"t": {"from": "ts", "identified_by": "id"}},
+        "requirements": {
+            short: {"subject": "t", "checks": {"c": "p is true"}},
+            long: {"subject": "t", "checks": {"c": "w is true"}}
+        }
+    })
+}
+
+#[test]
+fn the_outcome_of_a_report_with_a_heading_that_could_name_two_requirements_is_an_error() {
+    let input = json!({"ts": [{"id": "t1", "p": true, "w": false}]});
+    let error =
+        outcome::of(&report(named_with_a_status("x", "x is met"), input.clone())).unwrap_err();
+    assert_eq!(
+        error,
+        "the heading x is met, for the status of x, would also name the requirement x is met, so it can't read back"
+    );
+    let input = json!({"ts": [{"id": "t1", "p": false, "w": true}]});
+    let error = outcome::of(&report(named_with_a_status("a", "a is not met"), input)).unwrap_err();
+    assert_eq!(
+        error,
+        "the heading a is not met, for the status of a, would also name the requirement a is not met, so it can't read back"
+    );
+}
+
+#[test]
+fn the_outcome_of_a_report_whose_headings_name_one_requirement_each_is_shown() {
+    let input = json!({"ts": [{"id": "t1", "p": false, "w": false}]});
+    assert_eq!(
+        outcome::of(&report(named_with_a_status("x", "x is met"), input)),
+        Ok(vec![
+            Item::Line("not compliant".to_string()),
+            Item::Group(
+                "x is not met".to_string(),
+                lines(&["t t1 fails c because p is false"])
+            ),
+            Item::Group(
+                "x is met is not met".to_string(),
+                lines(&["t t1 fails c because w is false"])
+            ),
+        ])
+    );
+}
+
 #[test]
 fn a_part_of_the_outcome_shows_a_bare_heading_for_a_requirement_only_some_checks_cover() {
     let report = report(two_requirements(), two_requirements_input());
