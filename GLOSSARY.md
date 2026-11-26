@@ -68,7 +68,7 @@ The code also says `flaw` for two ideas, and `flaw` isn't a word of Ergo: use `c
 
 One input in a policy's `tests` field, with the outcome its report must have, so a policy can be tested. `REFERENCE.md` says "A policy can carry examples". It is experimental, and `ergo test` runs them.
 
-- Rust: the `tests` field is read in `policy.rs`, and `ergo test` in the `ergo` command runs each example.
+- Rust: `ergo test` in the `ergo` command reads the `tests` field and runs each example, in `cli/src/examples.rs`.
 - Rego: `ergo.rego` doesn't run examples. `ergo test --engine rego` builds each example's report with it.
 
 ## outcome
