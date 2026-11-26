@@ -303,6 +303,7 @@ messages / a count of a path with a key from a field names the value once whatev
 messages / a count of a path with a key from a field names the value once whatever the field holds / the key field isn't text
 messages / a count of in a for line, and the order of its roots / names the $params root first and each root once
 messages / a counted list that is null beside a missing $params root in the whose of another count / fs is null, no x in the params, and one item of es without v
+messages / a counted list that is null beside a missing $params root in the whose of another count / fs is text, no x in the params, and one item of es without v, so the list entry for fs says only fs and fails as unusable
 messages / a field after is in ignoring case that isn't a list is a root, sorted with the others by cause / x is null and ls is text
 messages / a for alias after is in that isn't a list, missing or null, on an empty list / names the alias's field, with the item of the for line in front
 messages / a for alias after is in that isn't a list, missing or null, on an empty list / says the alias's field is missing, then the list, in the item
