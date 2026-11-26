@@ -40,6 +40,15 @@ pub struct Options {
     pub format: Format,
 }
 
+/// Which engine builds the reports of `ergo test`.
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+pub enum Engine {
+    /// The Rust engine in this command, the default.
+    Rust,
+    /// `ergo.rego`, run with `opa`.
+    Rego,
+}
+
 /// What `ergo test` is asked to run.
 #[derive(Debug, PartialEq, Eq)]
 pub struct TestOptions {
@@ -47,6 +56,10 @@ pub struct TestOptions {
     pub policy: String,
     /// Whether a warning fails the run.
     pub strict: bool,
+    /// The engine that builds each example's report.
+    pub engine: Engine,
+    /// Path of `ergo.rego`, when `--ergo-rego` is given.
+    pub ergo_rego: Option<String>,
 }
 
 /// The result of reading the command line.
@@ -93,7 +106,7 @@ pub fn parse(arguments: &[String]) -> Result<Parsed, Failure> {
                 }
                 switches.insert(name);
             }
-            "--policy" | "--input" | "--params" | "--format" => {
+            "--policy" | "--input" | "--params" | "--format" | "--engine" | "--ergo-rego" => {
                 let value = match attached {
                     Some(value) => Some(value),
                     None => rest.next().filter(|v| !v.starts_with("--")).cloned(),
@@ -111,8 +124,9 @@ pub fn parse(arguments: &[String]) -> Result<Parsed, Failure> {
             other => positional.push(other.to_string()),
         }
     }
+    let test_only = ["--engine", "--ergo-rego"];
     let Some(command) = command else {
-        let report_only = values.keys().copied();
+        let report_only = values.keys().copied().filter(|v| !test_only.contains(v));
         let report_only = report_only.chain(switches.iter().copied().filter(|s| *s != "--strict"));
         if let Some(flag) = report_only.min() {
             return Err(usage(format!(
@@ -126,16 +140,31 @@ pub fn parse(arguments: &[String]) -> Result<Parsed, Failure> {
         if let Some(extra) = positional.next() {
             return Err(usage(format!("unexpected argument '{extra}'")));
         }
+        let engine = match values.get("--engine").map(String::as_str) {
+            None | Some("rust") => Engine::Rust,
+            Some("rego") => Engine::Rego,
+            Some(_) => return Err(usage("--engine must be rust or rego".to_string())),
+        };
+        let ergo_rego = values.remove("--ergo-rego");
+        if ergo_rego.is_some() && engine != Engine::Rego {
+            return Err(usage(
+                "--ergo-rego only goes with --engine rego".to_string(),
+            ));
+        }
         return Ok(Parsed::Test(TestOptions {
             policy,
             strict: switches.contains("--strict"),
+            engine,
+            ergo_rego,
         }));
     };
     if let Some(extra) = positional.first() {
         return Err(usage(format!("unexpected argument '{extra}'")));
     }
-    if switches.contains("--strict") {
-        return Err(usage("--strict only goes with test".to_string()));
+    let test_flags = switches.iter().copied().filter(|s| *s == "--strict");
+    let test_flags = test_flags.chain(test_only.into_iter().filter(|f| values.contains_key(f)));
+    if let Some(flag) = test_flags.min() {
+        return Err(usage(format!("{flag} only goes with test")));
     }
     let format = match values.get("--format").map(String::as_str) {
         None | Some("json") => Format::Json,

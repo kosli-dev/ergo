@@ -245,7 +245,7 @@ jobs:
   tests-rust:
     if: github.event.action != 'edited'
     runs-on: ubuntu-latest
-    timeout-minutes: 6
+    timeout-minutes: 10
     defaults:
       run:
         working-directory: engines/rust
@@ -256,6 +256,12 @@ jobs:
           name: tests-rust
       - name: Install the Rust version in rust-toolchain.toml
         run: rustup toolchain install
+      - uses: open-policy-agent/setup-opa@v2
+        with:
+          version: 1.22.0
+      - name: Build dist/ergo.rego for the tests of ergo test --engine rego
+        working-directory: .
+        run: .github/build-ergo.sh
       - run: cargo fmt --check
       - run: cargo clippy --locked --all-targets --all-features -- -D warnings
       - run: cargo test --locked --all-features -- --show-output
@@ -367,6 +373,11 @@ jobs:
           rustup toolchain install
       - name: Install cargo-mutants
         run: cargo install cargo-mutants --locked --version 27.1.0
+      - uses: open-policy-agent/setup-opa@v2
+        with:
+          version: 1.22.0
+      - name: Build dist/ergo.rego for the tests of ergo test --engine rego
+        run: .github/build-ergo.sh
       - name: Write what cargo-mutants misses on the changed Rust lines in the job summary
         env:
           BASE: origin/${{ github.base_ref }}

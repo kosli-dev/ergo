@@ -86,7 +86,7 @@ COMMAND
 )
 
 rust_command=$(cat <<'COMMAND'
-docker run --rm -v "$PWD":/src -v ergo-rust-target:/target -v ergo-cargo-registry:/usr/local/cargo/registry ergo-rust sh -c '
+docker run --rm -e ERGO_TEST_NO_OPA=1 -v "$PWD":/src -v ergo-rust-target:/target -v ergo-cargo-registry:/usr/local/cargo/registry ergo-rust sh -c '
   find . -name "*.rs" -exec touch {} + &&
   cargo fmt --check &&
   cargo clippy -j 4 --locked --all-targets --all-features -- -D warnings &&

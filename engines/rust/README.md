@@ -35,7 +35,7 @@ docker build -t ergo-rust engines/rust
 Then run the same checks as CI:
 
 ```sh
-docker run --rm -v "$PWD":/src -v ergo-rust-target:/target -v ergo-cargo-registry:/usr/local/cargo/registry ergo-rust sh -c '
+docker run --rm -e ERGO_TEST_NO_OPA=1 -v "$PWD":/src -v ergo-rust-target:/target -v ergo-cargo-registry:/usr/local/cargo/registry ergo-rust sh -c '
   find . -name "*.rs" -exec touch {} + &&
   cargo fmt --check &&
   cargo clippy -j 4 --locked --all-targets --all-features -- -D warnings &&
@@ -49,7 +49,7 @@ docker run --rm -v "$PWD":/src -v ergo-rust-target:/target -v ergo-cargo-registr
 
 The second `cargo test` runs `tests/key_order.rs` again with serde_json's `preserve_order`, which keeps an object's keys in the order they were read. The report must stay byte for byte the same whatever order a policy, an input or params write their keys in, and if a dependency ever turned that feature on, `meta` and any object copied from the input would follow the order they were written in. The engine sorts every object in the report, and this run checks it does.
 
-The image is `rust:1.99.0`, the version in `rust-toolchain.toml`, with rustfmt, Clippy and the Wasm target added. `touch` is there because Cargo in Docker can miss an edit made outside the container, and then tests the old code.
+The image is `rust:1.99.0`, the version in `rust-toolchain.toml`, with rustfmt, Clippy and the Wasm target added. It has no `opa`, so `ERGO_TEST_NO_OPA=1` skips the CLI tests of `ergo test --engine rego`, which need `opa` and `dist/ergo.rego`. CI runs them, and so does a native `cargo test` with `opa` on the PATH after `.github/build-ergo.sh`. Without `ERGO_TEST_NO_OPA` those tests fail when `opa` or `dist/ergo.rego` is missing, and they never skip on their own. `touch` is there because Cargo in Docker can miss an edit made outside the container, and then tests the old code.
 
 The build goes to the `ergo-rust-target` volume and not to `engines/rust/target`, so the build stays out of your checkout. When several sessions or people run the checks at the same time, each should give the target volume their own name, like `ergo-rust-target-<name>`, because two builds sharing one volume can fail with "Permission denied". Change the `-v ergo-rust-target:/target` part of the command and keep the rest.
 
