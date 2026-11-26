@@ -119,14 +119,16 @@ _m_key_faults(subj, check) := [c |
 	c := _m_key_fault(subj, step)
 ]
 
-_m_key_states(subj, check, cause) := _once([c |
+_m_key_states(subj, check, cause) := [c.text | some c in _m_key_pieces(subj, check, cause)]
+
+_m_key_pieces(subj, check, cause) := _once([c |
 	some side in _m_sides(check)
 	some p in _m_side_paths(side)
 	is_array(p)
 	some i, step in p
 	not _null_stop_before(subj, p, i)
 	_m_key_state(subj, step) == cause
-	c := concat("", [_m_key_name(step), " is ", _m_state_word(cause)])
+	c := _m_clause("root", _m_key_name(step), cause, concat("", [_m_key_name(step), " is ", _m_state_word(cause)]))
 ])
 
 _null_stop_before(subj, p, i) if {

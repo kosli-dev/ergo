@@ -864,7 +864,7 @@ _for_rooted_clauses(check, c, subj, cause, roots) := _once([x | some g in said; 
 	cause != "satisfied"
 	not _m_params_unread(c)
 	not _walks(c)
-	said := _message_said(c, subj, cause)
+	said := [[_m_piece_string(p) | some p in g] | some g in _message_said(c, subj, cause)]
 	whole := _for_says_whole(check, c)
 }
 
