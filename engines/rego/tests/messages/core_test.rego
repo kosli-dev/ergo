@@ -197,6 +197,11 @@ test_the_values_a_message_shows_are_root_clauses_with_their_state if {
 	ergo._m_value_clauses({}, ["v"]) == [ergo._m_clause("root", "v", "absent", "v is missing")]
 }
 
+test_a_subject_that_isnt_an_object_is_a_clause_with_that_cause if {
+	check := {"$sides": [["x"]], "op": "present", "path": ["x"], "expression": "x exists"}
+	ergo._m_message_pieces(check, 3, "not_an_object") == [ergo._m_clause("root", "the subject", "not_an_object", "the subject is 3, which isn't an object")]
+}
+
 test_a_sum_that_needs_more_than_15_digits_is_a_clause if {
 	subj := {"ns": [123456789012345678, 1]}
 	c := ergo._m_with_sides(ergo._s_written_check("sum of ns is 3"))

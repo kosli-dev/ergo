@@ -67,6 +67,11 @@ test_the_walks_a_message_blames_are_list_clauses if {
 	ergo._m_text_side_walks(broken, c) == [ergo._m_clause("list", "pl.name", "unusable", "item 1 of pl: name is 3, which isn't text; item 2 of pl: name is missing")] with input as {"ergo/names": {"ergo/subject": broken}}
 }
 
+test_an_input_that_isnt_an_object_is_a_clause_with_that_cause if {
+	c := ergo._m_with_sides(ergo._s_written_check("v is $input.k"))
+	ergo._m_input_one_refs(c) == [ergo._m_clause("root", "$input", "not_an_object", "$input is [1], which isn't an object")] with data.ergo_document as [1]
+}
+
 test_the_input_and_the_params_said_beside_each_other_are_clauses if {
 	c := ergo._m_with_sides(ergo._s_written_check("v is $params.m named by $input.k"))
 	input_clause := ergo._m_clause("root", "$input", "unusable", "$input is [1], which isn't an object")

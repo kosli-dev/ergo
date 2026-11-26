@@ -687,3 +687,9 @@ test_a_for_item_keeps_the_cut_of_its_count_after_its_items_and_apart_from_a_root
 		"item 1 of ws: and 1 more",
 	]
 }
+
+test_an_alias_that_cant_hold_the_next_key_is_a_clause_that_isnt_an_object if {
+	check := {"op": "present", "path": ["$e", "x"]}
+	name := ergo._m_marked_alias("$e")
+	ergo._m_aliases_blocked(check) == [ergo._m_clause("root", name, "not_an_object", concat("", [name, " is 3, which isn't an object"]))] with input as {"ergo/names": {"e": 3}}
+}
