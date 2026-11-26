@@ -548,14 +548,7 @@ _tally_record_listed(src) if _m_positions(src.fail.path) != []
 
 _tally_rest_of(row, names, texts) := _tally_said_rest(row, names) if count(texts) == 0
 
-else := concat("; ", [c |
-	some p in _m_top_split(row.message, "; ")
-	not p in texts
-	c := concat(", and ", [q | some q in _m_top_split(p, ", and "); not q in texts; not _m_list_name(q) in names; not _and_more(q)])
-	c != ""
-])
-
-_and_more(q) if regex.match(`^and [0-9]+ more$`, q)
+else := concat(_said_joint(row), [c.text | some c in _said_clauses(row); not c.text in texts; not c.name in names; c.kind != "more"])
 
 _tally_own_read(i, c, _, _) if {
 	contains(i.name, "[]")
@@ -645,7 +638,11 @@ _said_joint(said) := object.get(said, "ergo/joint", "; ")
 
 _said_of(x) := {"message": x.message, "ergo/clauses": _said_clauses(x), "ergo/joint": _said_joint(x)}
 
-_for_text_said(m) := {"message": m, "ergo/clauses": [{"kind": "list", "name": _m_list_name(c), "cause": _clause_cause(c), "text": c, "said": []} | some c in cs], "ergo/joint": _tally_sep(m, cs)} if cs := _tally_clauses(m)
+_for_text_said(m) := {"message": m, "ergo/clauses": [{"kind": _for_clause_kind(c), "name": _m_list_name(c), "cause": _clause_cause(c), "text": c, "said": []} | some c in cs], "ergo/joint": _tally_sep(m, cs)} if cs := _tally_clauses(m)
+
+_for_clause_kind(c) := "more" if _m_more_clause(c)
+
+else := "list"
 
 _tally_clauses(m) := ps if {
 	ps := _m_top_split(m, "; ")
