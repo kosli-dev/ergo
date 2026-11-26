@@ -207,7 +207,90 @@ passed: every artifact's tests pass
 
 A line for a child subject that leaves out its `in`, like `artifact web passes tests_passed`, fails its example with `can't read the line 'artifact web passes tests_passed': artifact is read inside deployment, so its id is followed by in deployment <id>`.
 
-For now, outcome lines cover the policy's own checks. A line for a check Ergo adds like `$min_subjects`, for a subject out of scope, or for a subject whose id is an object or a list can't be written yet, and `--format outcome` refuses a report that has a row of that kind it would have to print. It also refuses a report whose heading could name two requirements, like `x is met:` for `x` when the policy also has a requirement called `x is met`, because `ergo test` would refuse that heading. An example whose lines cover such a row fails and says it can't check it yet.
+The checks Ergo adds, `$min_subjects`, `$unique_ids`, `$unique_ancestor_ids` and `$well_formed`, have lines too, under their own names. Their rows have no id, so their lines have none. A row for the requirement's own subject names no subject at all, like `fails $min_subjects because in-scope deployment count is 0`, and a row with an `in` names the subject and its parents, like `artifact in deployment d4 fails $min_subjects because in-scope artifact count is 0`. A subject out of scope isn't a failure, so its line says `is out of scope`, like `deployment d3 is out of scope because environment is "dev"`, and `is in scope` says the opposite. With this policy in `production.yaml`:
+
+```yaml
+ergo_spec: v0.7-dev
+subjects:
+  deployment:
+    from: deployments whose environment is "prod"
+    identified_by: id
+  artifact:
+    from: every deployment.artifacts
+    identified_by: name
+requirements:
+  approved:
+    subject: deployment
+    checks:
+      approver_set: approver is a non-empty string
+  tested:
+    subject: artifact
+    checks:
+      tests_passed: tests is "passed"
+
+examples:
+  - name: only production deployments need an approver
+    input:
+      deployments:
+        - {id: d1, environment: prod, approver: bob}
+        - {id: d3, environment: dev}
+    outcome:
+      - approved is met:
+          - deployment d3 is out of scope because environment is "dev"
+
+  - name: a production deployment with no artifacts fails
+    input:
+      deployments:
+        - {id: d4, environment: prod, approver: bob, artifacts: []}
+    outcome:
+      - tested is not met:
+          - artifact in deployment d4 fails $min_subjects because in-scope artifact count is 0
+```
+
+and `production.json` holding:
+
+```json
+{
+  "deployments": [
+    {"id": "d1", "environment": "prod", "approver": "bob", "artifacts": [{"name": "web", "tests": "passed"}]},
+    {"id": "d3", "environment": "dev"},
+    {"id": "d4", "environment": "prod", "approver": "bob", "artifacts": []}
+  ]
+}
+```
+
+`ergo report --policy production.yaml --input production.json --format outcome` prints:
+
+```yaml
+- not compliant
+- approved is met:
+    - deployment d3 is out of scope because environment is "dev"
+    - deployment d1 passes approver_set
+    - deployment d4 passes approver_set
+- tested is not met:
+    - artifact in deployment d4 fails $min_subjects because in-scope artifact count is 0
+    - artifact web in deployment d1 passes tests_passed
+```
+
+`--format outcome` prints a check Ergo adds only when it fails, and a subject's scope only when it is out of scope. `ergo test production.yaml` prints:
+
+```
+passed: only production deployments need an approver
+passed: a production deployment with no artifacts fails
+warning: no example shows approver_set of approved failing
+warning: no example shows approver_set of approved passing
+warning: no example shows tests_passed of tested failing
+warning: no example shows tests_passed of tested passing
+2 examples: 2 passed, 0 failed
+```
+
+The lines of Ergo's own checks and of scope count for no warning. A line that says a subject is out of scope only agrees when Ergo read its condition and the value didn't match. When Ergo can't tell, like for a deployment with no `environment`, the row is a failure that no line can name yet, so `ergo report --policy production.yaml --input unknown.json --format outcome`, with `unknown.json` holding `{"deployments": [{"id": "d5", "approver": "bob", "artifacts": []}]}`, exits 2 with:
+
+```
+ergo: lines for an $applies row that failed with absent, not value, aren't supported yet, as for deployment d5 in approved
+```
+
+`--format outcome` also refuses a report with a row whose id is an object or a list, a policy written wrong, two rows of one check and one subject that say different things, like two deployments `d1` where one passes and one fails, and a report whose heading could name two requirements, like `x is met:` for `x` when the policy also has a requirement called `x is met`, because `ergo test` would refuse that heading or no line would agree with both rows. An example whose lines cover a row that can't be written fails and says it can't check it yet.
 
 ## Updating
 
