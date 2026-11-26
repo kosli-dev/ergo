@@ -578,3 +578,94 @@ fn a_heading_that_is_one_requirement_on_its_own_and_another_with_a_status_is_ref
         );
     }
 }
+
+fn children() -> Value {
+    json!({
+        "ergo_spec": ergo_policy_engine::SPEC,
+        "subjects": {
+            "release": {"from": "releases", "identified_by": "id"},
+            "artifact": {"from": "every release.artifacts", "identified_by": "name"},
+            "test run": {"from": "every artifact.runs", "identified_by": "n"}
+        },
+        "requirements": {
+            "tested": {"subject": "artifact", "checks": {"passed": "status is \"passed\""}},
+            "ran": {"subject": "test run", "min_subjects": 0, "checks": {"ok": "ok is true"}}
+        }
+    })
+}
+
+fn child_problems(outcome: Value) -> Vec<String> {
+    let input = json!({"releases": [
+        {"id": "r1", "artifacts": [
+            {"name": "web", "status": "failed", "runs": [{"n": 1, "ok": true}]},
+            {"name": "api", "status": "passed", "runs": []}
+        ]},
+        {"id": "r2", "artifacts": [{"name": "web", "status": "passed", "runs": []}]}
+    ]});
+    let report = ergo_policy_engine::report(&input, &children(), &json!({}));
+    examples::check(&outcome, &report).problems
+}
+
+#[test]
+fn a_line_for_a_child_subject_matches_the_row_with_its_id_and_the_ids_of_its_parents() {
+    assert_eq!(
+        child_problems(json!([
+            {"tested is not met": [
+                "artifact web in release r1 fails passed because status is \"failed\"",
+                "artifact web in release r2 passes passed"
+            ]},
+            {"ran is met": ["test run 1 in artifact web in release r1 passes ok"]}
+        ])),
+        Vec::<String>::new()
+    );
+    assert_eq!(
+        child_problems(json!([{"tested": [
+            "artifact web in release r2 fails passed",
+            "artifact web in release r9 passes passed"
+        ]}])),
+        vec![
+            "the report says artifact web in release r2 passes passed",
+            "the report has no row for artifact web in release r9 and passed in tested",
+            "no line says artifact web in release r1 fails passed because status is \"failed\"",
+        ]
+    );
+}
+
+#[test]
+fn a_line_for_a_child_subject_without_the_in_its_from_line_gives_cannot_be_read() {
+    let cases = [
+        (
+            "artifact web passes passed",
+            "artifact is read inside release, so its id is followed by in release <id>",
+        ),
+        (
+            "artifact web in artifact web passes passed",
+            "artifact is read inside release, so its id is followed by in release <id>",
+        ),
+        (
+            "artifact web in release r1 in release r1 passes passed",
+            "artifact is read inside release, so its id is followed by in release <id>",
+        ),
+        (
+            "test run 1 in release r1 in artifact web passes ok",
+            "test run is read inside artifact inside release, so its id is followed by in artifact <id> in release <id>",
+        ),
+        (
+            "release r1 in release r1 passes ok",
+            "release isn't read inside another subject, so nothing follows its id but passes or fails",
+        ),
+    ];
+    for (line, reason) in cases {
+        let requirement = if line.contains(" passed") {
+            "tested"
+        } else {
+            "ran"
+        };
+        let got = child_problems(json!([{requirement: [line]}]));
+        assert_eq!(
+            got.first(),
+            Some(&format!("can't read the line '{line}': {reason}")),
+            "{line}: {got:?}"
+        );
+    }
+}
