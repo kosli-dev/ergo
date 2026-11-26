@@ -57,7 +57,7 @@ _message_of(sentence, subj, cause, params) := m if {
 }
 
 test_a_message_is_its_pieces_joined_with_and if {
-	_said_of("v is w", {"v": 3, "w": 4}, "value", {}) == [["v is 3", "w is 4"]]
+	[_piece_strings(g) | some g in _said_of("v is w", {"v": 3, "w": 4}, "value", {})] == [["v is 3", "w is 4"]]
 	_message_of("v is w", {"v": 3, "w": 4}, "value", {}) == "v is 3, and w is 4"
 }
 

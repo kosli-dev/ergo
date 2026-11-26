@@ -419,12 +419,14 @@ _m_shown(subj, side) := {"name": side.text, "state": "value", "value": v} if {
 
 _m_value_clauses(subj, side) := [c] if {
 	s := _m_shown(subj, side)
-	c := _m_value_clause(s, subj)
-} else := [c | some p in [side.elapsed_from, side.elapsed_to]; c := _m_value_clause(_m_shown(subj, p), subj)] if _side_form(side) == "elapsed"
+	c := _m_value_piece(s, subj)
+} else := [c | some p in [side.elapsed_from, side.elapsed_to]; c := _m_value_piece(_m_shown(subj, p), subj)] if _side_form(side) == "elapsed"
 
-else := [c | some e in sort({x | walk(side, [_, x]); _side_form(x) == "elapsed"}); some p in [e.elapsed_from, e.elapsed_to]; c := _m_value_clause(_m_shown(subj, p), subj)] if _side_form(side) == "add"
+else := [c | some e in sort({x | walk(side, [_, x]); _side_form(x) == "elapsed"}); some p in [e.elapsed_from, e.elapsed_to]; c := _m_value_piece(_m_shown(subj, p), subj)] if _side_form(side) == "add"
 
 else := []
+
+_m_value_piece(s, subj) := _m_clause("root", s.name, s.state, _m_value_clause(s, subj))
 
 _m_value_clause(s, subj) := concat("", [s.name, " is ", _m_print_at(s.value, s, subj)]) if {
 	s.state == "value"
@@ -458,7 +460,7 @@ _m_side_sources(_, side) := [] if _m_tally_side(side)
 _m_tally_side(side) if _basic_form(side) in _tally_forms
 
 _m_message_pieces(check, subj, "value") := clauses if {
-	clauses := _once([c | some side in _m_sides(check); some c in _m_value_clauses(subj, side)])
+	clauses := _m_pieces_once([c | some side in _m_sides(check); some c in _m_value_clauses(subj, side)])
 	count(clauses) > 0
 } else := tallies if {
 	tallies := _m_tally_lists(subj, check, "value")
