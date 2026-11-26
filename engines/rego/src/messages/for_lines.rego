@@ -1103,11 +1103,11 @@ _for_numbered(c) if {
 
 _for_list_rank(lists, l) := [i | some i, x in lists; x == l][0]
 
-_for_row_clauses(check, subj, r) := _for_parts_tree(check, _for_row_parts(check, subj, r))
+_for_row_clauses(check, subj, r) := _for_parts_tree(_for_row_parts(check, subj, r))
 
-_for_parts_tree(_, p) := array.concat(array.concat(array.concat(p.shown, p.free), p.items), p.lists)
+_for_parts_tree(p) := array.concat(array.concat(array.concat(p.shown, p.free), p.items), p.lists)
 
-_for_row_parts(check, subj, r) := {"roots": roots, "outside": outside, "shown": shown, "free": free, "items": items, "lists": array.concat(listed, line), "line": line, "said": ssaid, "own": {k: c.cause | some [k, c] in failed}, "outside_said": {x[1] | some x in pairs} | {_m_joined(x[1]) | some x in tallies}} if {
+_for_row_parts(check, subj, r) := {"roots": roots, "outside": outside, "shown": shown, "free": free, "items": items, "lists": array.concat(listed, line), "line": line, "said": ssaid, "own": {k: c.cause | some [k, c] in failed}, "outside_said": ({x[1] | some x in pairs} | {_m_joined(x[1]) | some x in tallies})} if {
 	ssaid := _for_row_said(check, subj, r)
 	keys := _for_whose_key_roots(check, r)
 	roots := array.concat(keys, [_for_root_item(c) | some c in array.concat(_for_row_roots(check, subj, r, ssaid), _for_why_roots(check, r)); not _for_subject_root(c, subj, r); not c.text in {k.text | some k in keys}])
@@ -1597,7 +1597,7 @@ _for_said(raw) := object.union(object.remove(raw, ["ergo/for_raw"]), {
 	s := raw["ergo/for_raw"]
 	s.tree == true
 	p := _for_row_parts(s.check, s.subj, s.r)
-	tree := _for_parts_tree(s.check, p)
+	tree := _for_parts_tree(p)
 	cause := _worst_or_value({raw.cause} | {v.cause | walk(tree, [_, v]); is_object(v); "cause" in object.keys(v)})
 	rr := _for_line_rooted(s.check, s.subj, s.r, p.outside)
 	own := _for_own_causes(object.union(s, {"r": rr}), object.union(p, {"roots": array.concat(p.roots, [c | some c in p.outside; c.text in {t | some t in rr.other_roots}])}), raw.cause, cause)
