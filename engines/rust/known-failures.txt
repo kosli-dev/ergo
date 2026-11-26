@@ -302,6 +302,7 @@ messages / a count of a path with a key from a field names the value once whatev
 messages / a count of a path with a key from a field names the value once whatever the field holds / the key field is null
 messages / a count of a path with a key from a field names the value once whatever the field holds / the key field isn't text
 messages / a count of in a for line, and the order of its roots / names the $params root first and each root once
+messages / a field after is in ignoring case that isn't a list is a root, sorted with the others by cause / x is null and ls is text
 messages / a for alias after is in that isn't a list, missing or null, on an empty list / names the alias's field, with the item of the for line in front
 messages / a for alias after is in that isn't a list, missing or null, on an empty list / says the alias's field is missing, then the list, in the item
 messages / a for alias after is in that isn't a list, missing or null, on an empty list / says the alias's field is null, then the list, in the item
@@ -343,6 +344,7 @@ messages / a subject read at the position of a list of the input / says which it
 messages / a subject read from the first item of a list of the input / says the first item is missing when the list is empty
 messages / a subject read from the first item of a list of the input / says the list is missing
 messages / a whose that leaves no item of a part prints the part's list / the part's list is printed
+messages / an item of $input read on the right is a root, sorted with the others by the name of its path / the second subject has no id, and neither has the second item of $input
 messages / both sides of a comparison that can't be read / names the missing side and the null one
 messages / contains with text on the left and a key of a number in the input on the right / fails as unusable and names the left side first, then the input
 messages / does not exist on a for alias read by a position and a key from a field fails when the key can't be read / the field is a number and the alias is an empty list
@@ -351,6 +353,7 @@ messages / does not exist on a path whose key from a field can't be read fails, 
 messages / nothing hides a problem / the roots come first and then the list's own problem
 messages / the order of the roots a count of names / puts a root of the wrong type first, then the missing or null $params and $input roots sorted by name
 messages / the order of the roots a count of names when $params holds null / names a root of the wrong type first, then each null $params root sorted by name
+messages / the roots of a count and the roots of its whose are sorted together, by name / no k and no n in the params, and two items without m
 messages / the roots of one sentence, keys and sides alike, are said worst cause first and then by name / a missing key comes before a null value before it
 messages / the roots of one sentence, keys and sides alike, are said worst cause first and then by name / roots of one cause come by name, $params first
 messages / the roots of one sentence, with a key from $params that is null and nothing on the subject / says each missing root by name, then the null key
