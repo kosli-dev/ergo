@@ -514,6 +514,12 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    (
+        "sum of g.xs.v plus sum of g.ys.v is 0",
+        "sum of g.xs.v plus sum of g.ys.v is 0",
+        &[],
+        &[],
+    ),
     ("sum of u.xs.v is 5", "sum of u.xs.v is 5", &[], &[]),
     ("sum of w.xs.v is 5", "sum of w.xs.v is 5", &[], &[]),
     ("sum of xs.v is 5", "sum of xs.v is 5", &[], &[]),
@@ -5480,6 +5486,18 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "count of xs whose $input.m named by key is v is 0",
         "count of xs whose $input.m named by key equals v is 0",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose $input.m named by key is 1 is 0",
+        "count of xs whose $input.m named by key is 1 is 0",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose v is $input.m named by key.z is 0",
+        "count of xs whose v equals $input.m named by key.z is 0",
         &[],
         &[],
     ),
