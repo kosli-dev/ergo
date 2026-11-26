@@ -57,7 +57,7 @@ These differences are known:
 - `ergo` reads LS and PS (U+2028 and U+2029) as ordinary characters, and OPA reads them as line breaks. So `a: 1<LS>b: 2` is `{"a": 1, "b": 2}` in OPA and refused by `ergo`, `a: x<LS>y` is refused by OPA and read by `ergo` as text that holds the LS, and in quoted text OPA drops the spaces around one, so `"x <LS> y"` is `"x<LS>y"` in OPA and keeps the spaces in `ergo`.
 - The U+FFFD characters for bad UTF-8 in a `!!binary` differ.
 
-## Test a policy with examples
+## Test a policy with examples (experimental)
 
 **Experimental, from 0.5.0.** A policy can carry examples: inputs, each with the outcome its report must have, written in the words the report uses. `ergo test` runs them. The form of an outcome, and what it checks, is in the [reference](REFERENCE.md#examples).
 
