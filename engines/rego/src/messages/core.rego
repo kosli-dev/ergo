@@ -539,7 +539,7 @@ _m_message_pieces(check, subj, "unusable") := clauses if {
 	count(clauses) > 0
 } else := [_m_fallback(check)]
 
-_m_message_pieces(check, subj, "not_an_object") := [_m_isnt(_m_label(check), subj, "an object")] if {
+_m_message_pieces(check, subj, "not_an_object") := [_m_isnt_piece(_m_label(check), subj, "an object", "not_an_object")] if {
 	not is_object(subj)
 	not _m_list_items(check, subj)
 	_m_input_one_refs(check) == []

@@ -62,7 +62,7 @@ _m_list_read_plain(check, subj) if {
 	_plain_root_flaw(subj, c) == "not_an_object"
 }
 
-_m_input_one_refs(check) := [_m_isnt("$input", data.ergo_document, "an object") |
+_m_input_one_refs(check) := [_m_isnt_piece("$input", data.ergo_document, "an object", "not_an_object") |
 	_reads_input_one(check)
 	is_array(data.ergo_document)
 ]
