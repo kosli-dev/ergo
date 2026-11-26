@@ -234,12 +234,21 @@ fn same_parents(subject: &Value, parents: &[(String, Value)]) -> bool {
     }
 }
 
-fn actual(row: &Value, policy: &Value) -> String {
-    outcome::line_for(row, policy)
-        .ok()
-        .flatten()
-        .or_else(|| outcome::row_line(row, policy).ok().flatten())
-        .unwrap_or_default()
+fn agrees(row: &Value, line: &Line) -> bool {
+    let out_of_scope = line.check == "$applies" && !line.passes;
+    (row["passed"] == true) == line.passes
+        && (!out_of_scope || row["cause"] == "value")
+        && line
+            .because
+            .as_ref()
+            .is_none_or(|because| row["message"] == because.as_str())
+}
+
+fn disagreement(row: &Value, policy: &Value) -> String {
+    match outcome::said(row, policy) {
+        Ok(line) => format!("the report says {line}"),
+        Err(reason) => format!("can't check this yet: {reason}"),
+    }
 }
 
 /// Checks an outcome against a report made from `policy`, by the matching and coverage rules of the spec, reading its lines with the subject and check names of `policy`.
@@ -340,14 +349,9 @@ pub fn check(outcome: &Value, report: &Value, policy: &Value) -> Checked {
         }
         let mut agreed = !matching.is_empty();
         for row in matching {
-            let agrees = (row["passed"] == true) == line.passes
-                && line
-                    .because
-                    .as_ref()
-                    .is_none_or(|because| row["message"] == because.as_str());
-            if !agrees {
+            if !agrees(row, line) {
                 agreed = false;
-                problems.push(format!("the report says {}", actual(row, policy)));
+                problems.push(disagreement(row, policy));
             }
         }
         if agreed {
@@ -377,6 +381,8 @@ pub fn check(outcome: &Value, report: &Value, policy: &Value) -> Checked {
         }
     }
     checked.actual = outcome::part(report, policy, &region);
+    let mut seen = BTreeSet::new();
+    problems.retain(|problem| seen.insert(problem.clone()));
     checked.problems = problems;
     checked
 }

@@ -150,7 +150,10 @@ fn a_line_the_policy_cannot_read_is_a_problem() {
             "deployment d1 passes $applies",
             "is in scope or is out of scope",
         ),
-        ("deployment d1 fails $unique_ids", "a check Ergo adds has no id"),
+        (
+            "deployment d1 fails $unique_ids",
+            "a check Ergo adds has no id",
+        ),
     ];
     for (line, reason) in cases {
         let got = read(line);
@@ -912,7 +915,9 @@ fn a_scope_line_covers_applies_so_a_subject_ergo_cannot_tell_is_in_scope_fails_t
             three_deployments(),
             json!([{"approved": ["deployment d3 is out of scope"]}])
         ),
-        vec!["can't check this yet: lines for an $applies row that failed with absent, not value, aren't supported yet, as for deployment d4 in approved"]
+        vec![
+            "can't check this yet: lines for an $applies row that failed with absent, not value, aren't supported yet, as for deployment d4 in approved"
+        ]
     );
 }
 

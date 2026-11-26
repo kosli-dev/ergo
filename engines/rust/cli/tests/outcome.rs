@@ -173,8 +173,7 @@ fn scoped() -> Value {
 }
 
 #[test]
-fn the_outcome_of_a_report_shows_the_checks_ergo_adds_that_failed_and_the_subjects_out_of_scope()
-{
+fn the_outcome_of_a_report_shows_the_checks_ergo_adds_that_failed_and_the_subjects_out_of_scope() {
     let input = json!({"deployments": [
         {"id": "d1", "env": "prod", "approver": "a", "artifacts": []},
         {"id": "d3", "env": "dev"},
@@ -303,7 +302,8 @@ fn a_line_for_a_check_ergo_adds_or_for_scope_quotes_the_ids_that_would_read_as_p
     let mut policy = shadowed();
     policy["subjects"]["deployment"]["from"] = json!("deployments whose ok is true");
     policy["subjects"]["deployment y"] = json!({"from": "ys", "identified_by": "id"});
-    policy["requirements"]["approved"] = json!({"subject": "deployment", "checks": {"c": "ok is true"}});
+    policy["requirements"]["approved"] =
+        json!({"subject": "deployment", "checks": {"c": "ok is true"}});
     let report = report(
         policy.clone(),
         json!({"xs": [], "webs": [], "ys": [], "deployments": [
@@ -765,7 +765,11 @@ fn a_check_line_reads_each_in_after_the_id_with_the_longest_subject_name_that_fi
     };
     let line = read("artifact web in deployment d1 fails c because x in y").unwrap();
     assert_eq!(
-        (line.subject.as_str(), line.id.as_ref(), line.because.as_deref()),
+        (
+            line.subject.as_str(),
+            line.id.as_ref(),
+            line.because.as_deref()
+        ),
         ("artifact", Some(&json!("web")), Some("x in y"))
     );
     assert_eq!(line.parents, parents(&[("deployment", json!("d1"))]));
@@ -926,7 +930,14 @@ fn a_line_for_a_check_ergo_adds_has_no_id_and_no_subject_when_its_row_is_for_the
         (
             "pull",
             "pull request passes $unique_ancestor_ids",
-            check_line("pull request", None, true, "$unique_ancestor_ids", None, &[]),
+            check_line(
+                "pull request",
+                None,
+                true,
+                "$unique_ancestor_ids",
+                None,
+                &[],
+            ),
         ),
     ];
     for (own, text, line) in cases {
@@ -936,7 +947,7 @@ fn a_line_for_a_check_ergo_adds_has_no_id_and_no_subject_when_its_row_is_for_the
 
 #[test]
 fn a_line_for_a_check_ergo_adds_with_an_id_a_subject_it_does_not_need_or_another_check_is_refused()
- {
+{
     let no_id = "a line for a check Ergo adds has no id, so passes or fails comes right after the subject and its parents";
     let scope = "a subject in or out of scope is written with is in scope or is out of scope, not with passes or fails";
     let cases = [
@@ -986,7 +997,14 @@ fn a_scope_line_says_a_subject_is_in_or_out_of_scope_as_its_applies_row_does() {
         ),
         (
             "deployment d3 is out of scope",
-            check_line("deployment", Some(json!("d3")), false, "$applies", None, &[]),
+            check_line(
+                "deployment",
+                Some(json!("d3")),
+                false,
+                "$applies",
+                None,
+                &[],
+            ),
         ),
         (
             "deployment 7 is in scope",

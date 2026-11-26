@@ -262,8 +262,7 @@ pub fn read_check_line(
         return with_id;
     }
     let without_id = read_without_id(text, own, subjects);
-    if without_id.is_ok() || (names_a_check_ergo_adds(text) && with_id != Err(SCOPE_WORDS.into()))
-    {
+    if without_id.is_ok() || (names_a_check_ergo_adds(text) && with_id != Err(SCOPE_WORDS.into())) {
         return without_id;
     }
     with_id
@@ -350,6 +349,24 @@ fn row_parts(row: &Value, policy: &Value) -> Result<CheckLine, String> {
             .map(str::to_string),
         parents,
     })
+}
+
+fn same_row_of(a: &Value, b: &Value) -> bool {
+    let ids = |a: &Value, b: &Value| (a.is_null() && b.is_null()) || same_id(a, b);
+    if a["check"] != b["check"] {
+        return false;
+    }
+    let (a, b) = (&a["subject"], &b["subject"]);
+    let same_in = match (a.get("in"), b.get("in")) {
+        (None, None) => true,
+        (Some(Value::Object(x)), Some(Value::Object(y))) => {
+            x.len() == y.len()
+                && x.iter()
+                    .all(|(name, id)| y.get(name).is_some_and(|other| ids(id, other)))
+        }
+        _ => false,
+    };
+    a["type"] == b["type"] && ids(&a["id"], &b["id"]) && same_in
 }
 
 fn left_out(row: &Value) -> bool {
@@ -444,7 +461,8 @@ pub fn row_line(row: &Value, policy: &Value) -> Result<Option<String>, String> {
 /// The line for any report row, even one `--format outcome` leaves out, like a subject in scope: the one that reads back as the row, as [line_for] gives it, or else the row's line as it is, or why it can't be written yet.
 pub fn said(row: &Value, policy: &Value) -> Result<String, String> {
     let line = row_parts(row, policy)?;
-    Ok(read_back(row, policy, &line).unwrap_or_else(|_| write(&line, own_subject(row, policy), false)))
+    Ok(read_back(row, policy, &line)
+        .unwrap_or_else(|_| write(&line, own_subject(row, policy), false)))
 }
 
 fn own_subject<'a>(row: &Value, policy: &'a Value) -> &'a str {
@@ -671,11 +689,29 @@ fn items(
             continue;
         }
         let mut lines = Vec::new();
+        let mut said_before: Vec<(&Value, String)> = Vec::new();
         for row in rows {
             if row["requirement"] != name.as_str()
                 || !covers(row["check"].as_str().unwrap_or_default())
             {
                 continue;
+            }
+            if let (true, Ok(text)) = (strict, said(row, policy)) {
+                let twin = said_before
+                    .iter()
+                    .find(|(other, said)| *said != text && same_row_of(other, row));
+                if let Some((other, said)) = twin {
+                    return Err(format!(
+                        "the rows of {} in {name} for {} don't all say the same, so no line agrees with every one of them: {said}, and {text}",
+                        row["check"].as_str().unwrap_or_default(),
+                        row_parts(other, policy).map_or(String::new(), |line| subject_words(
+                            &line.subject,
+                            line.id.as_ref(),
+                            &line.parents
+                        ))
+                    ));
+                }
+                said_before.push((row, text));
             }
             match line_for(row, policy) {
                 Ok(Some(line)) => lines.push(line),
