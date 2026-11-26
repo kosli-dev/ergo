@@ -1,6 +1,7 @@
 //! The command-line tool behind the `ergo` binary: reads a policy, an input and params from JSON or YAML files and prints the report or the violations.
 
 pub mod args;
+pub mod examples;
 pub mod files;
 pub mod number;
 pub mod outcome;
