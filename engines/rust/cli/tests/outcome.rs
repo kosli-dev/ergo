@@ -580,14 +580,6 @@ fn a_check_line_reads_each_in_after_the_id_with_the_longest_subject_name_that_fi
             "artifact web in deployment ",
             "it has no id after in deployment",
         ),
-        (
-            "artifact web in deployment d1 is out of scope",
-            "lines for subjects in or out of scope aren't supported yet",
-        ),
-        (
-            "artifact in deployment d4 fails $min_subjects because in-scope artifact count is 0",
-            "lines for checks Ergo adds aren't supported yet",
-        ),
     ] {
         assert_eq!(read(text), Err(reason.to_string()), "{text}");
     }
@@ -613,14 +605,230 @@ fn a_line_is_taken_for_a_check_ergo_adds_by_where_its_check_name_goes_not_by_its
         ),
         (
             "artifact w in deploymnt d1 fails $min_subjects because a fails $p",
-            "lines for checks Ergo adds aren't supported yet",
+            "it has no subject of the policy after in",
         ),
         (
-            "fails $min_subjects because in-scope artifact count is 0",
-            "lines for checks Ergo adds aren't supported yet",
+            "artifact w in deployment d1 fails $min_subjects because a fails $p",
+            "a line for a check Ergo adds has no id, so passes or fails comes right after the subject and its parents",
         ),
     ] {
         assert_eq!(read(text), Err(reason.to_string()), "{text}");
+    }
+}
+
+fn read_line(own: &str, text: &str) -> Result<outcome::CheckLine, String> {
+    let subjects = ["deployment", "artifact", "pull request", "pull"];
+    outcome::read_check_line(text, "r", own, &subjects, &["c", "c is in scope"])
+}
+
+fn check_line(
+    subject: &str,
+    id: Option<Value>,
+    passes: bool,
+    check: &str,
+    because: Option<&str>,
+    parents: &[(&str, Value)],
+) -> outcome::CheckLine {
+    outcome::CheckLine {
+        subject: subject.to_string(),
+        id,
+        passes,
+        check: check.to_string(),
+        because: because.map(str::to_string),
+        parents: parents
+            .iter()
+            .map(|(name, id)| (name.to_string(), id.clone()))
+            .collect(),
+    }
+}
+
+#[test]
+fn a_line_for_a_check_ergo_adds_has_no_id_and_no_subject_when_its_row_is_for_the_requirements_own_subject()
+ {
+    let cases = [
+        (
+            "deployment",
+            "fails $min_subjects because in-scope deployment count is 0",
+            check_line(
+                "deployment",
+                None,
+                false,
+                "$min_subjects",
+                Some("in-scope deployment count is 0"),
+                &[],
+            ),
+        ),
+        (
+            "deployment",
+            "passes $unique_ids",
+            check_line("deployment", None, true, "$unique_ids", None, &[]),
+        ),
+        (
+            "pull request",
+            "fails $well_formed because subject: not in subjects",
+            check_line(
+                "pull request",
+                None,
+                false,
+                "$well_formed",
+                Some("subject: not in subjects"),
+                &[],
+            ),
+        ),
+        (
+            "artifact",
+            "artifact in deployment d4 fails $min_subjects because in-scope artifact count is 0",
+            check_line(
+                "artifact",
+                None,
+                false,
+                "$min_subjects",
+                Some("in-scope artifact count is 0"),
+                &[("deployment", json!("d4"))],
+            ),
+        ),
+        (
+            "artifact",
+            "deployment fails $unique_ancestor_ids because repeated deployment ids is [\"d1\"]",
+            check_line(
+                "deployment",
+                None,
+                false,
+                "$unique_ancestor_ids",
+                Some("repeated deployment ids is [\"d1\"]"),
+                &[],
+            ),
+        ),
+        (
+            "artifact",
+            "artifact in in deployment d4 passes c",
+            check_line(
+                "artifact",
+                Some(json!("in")),
+                true,
+                "c",
+                None,
+                &[("deployment", json!("d4"))],
+            ),
+        ),
+        (
+            "pull",
+            "pull request passes $unique_ancestor_ids",
+            check_line("pull request", None, true, "$unique_ancestor_ids", None, &[]),
+        ),
+    ];
+    for (own, text, line) in cases {
+        assert_eq!(read_line(own, text), Ok(line), "{text}");
+    }
+}
+
+#[test]
+fn a_line_for_a_check_ergo_adds_with_an_id_a_subject_it_does_not_need_or_another_check_is_refused()
+ {
+    let no_id = "a line for a check Ergo adds has no id, so passes or fails comes right after the subject and its parents";
+    let scope = "a subject in or out of scope is written with is in scope or is out of scope, not with passes or fails";
+    let cases = [
+        ("deployment", "deployment d1 fails $unique_ids", no_id),
+        (
+            "artifact",
+            "artifact in in deployment d4 fails $min_subjects",
+            "it has no subject of the policy after in",
+        ),
+        (
+            "deployment",
+            "deployment fails $min_subjects because in-scope deployment count is 0",
+            "the row of a check Ergo adds for deployment itself has no subject to name, so its line starts with passes or fails",
+        ),
+        ("deployment", "fails $applies", scope),
+        ("deployment", "deployment d1 fails $applies", scope),
+        ("deployment", "deployment d1 passes $applies", scope),
+        (
+            "deployment",
+            "passes $min_subjects because x",
+            "it names no check Ergo adds",
+        ),
+        (
+            "deployment",
+            "fails $min_subjectz",
+            "it doesn't start with a subject of the policy",
+        ),
+    ];
+    for (own, text, reason) in cases {
+        assert_eq!(read_line(own, text), Err(reason.to_string()), "{text}");
+    }
+}
+
+#[test]
+fn a_scope_line_says_a_subject_is_in_or_out_of_scope_as_its_applies_row_does() {
+    let cases = [
+        (
+            "deployment d3 is out of scope because env is \"dev\"",
+            check_line(
+                "deployment",
+                Some(json!("d3")),
+                false,
+                "$applies",
+                Some("env is \"dev\""),
+                &[],
+            ),
+        ),
+        (
+            "deployment d3 is out of scope",
+            check_line("deployment", Some(json!("d3")), false, "$applies", None, &[]),
+        ),
+        (
+            "deployment 7 is in scope",
+            check_line("deployment", Some(json!(7)), true, "$applies", None, &[]),
+        ),
+        (
+            "deployment is is in scope",
+            check_line("deployment", Some(json!("is")), true, "$applies", None, &[]),
+        ),
+        (
+            "artifact in in deployment d1 is out of scope because x is in scope",
+            check_line(
+                "artifact",
+                Some(json!("in")),
+                false,
+                "$applies",
+                Some("x is in scope"),
+                &[("deployment", json!("d1"))],
+            ),
+        ),
+        (
+            "deployment d1 passes c is in scope",
+            check_line(
+                "deployment",
+                Some(json!("d1")),
+                true,
+                "c is in scope",
+                None,
+                &[],
+            ),
+        ),
+    ];
+    for (text, line) in cases {
+        assert_eq!(read_line("deployment", text), Ok(line), "{text}");
+    }
+    for (text, reason) in [
+        (
+            "deployment d1 is in scope because x",
+            "is in scope has nothing after it",
+        ),
+        (
+            "deployment d1 is out of scopes",
+            "it needs passes or fails after the id",
+        ),
+        (
+            "deployment is in scope",
+            "it has no subject of the policy after in",
+        ),
+    ] {
+        assert_eq!(
+            read_line("deployment", text),
+            Err(reason.to_string()),
+            "{text}"
+        );
     }
 }
 
