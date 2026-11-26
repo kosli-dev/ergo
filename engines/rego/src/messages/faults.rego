@@ -195,7 +195,7 @@ _m_key_fault_piece(subj, step) := _m_isnt_piece(_fk_text(step), v, "text", "unus
 _m_blocked(subj, check) := [c |
 	some s in _m_sources(subj, check)
 	s.state == "unusable"
-	some c in _m_parent_clause(subj, check, s.name)
+	some c in _m_parent_pieces(subj, check, s.name)
 ]
 
 _m_blocked_early(subj, check) := [c | some c in _m_blocked(subj, check); not c in _m_blocked_late(subj, check)]
@@ -205,7 +205,7 @@ _m_params_faults_early(subj, check) := [c | some c in _m_params_faults(subj, che
 _m_blocked_late(subj, check) := _once([c |
 	some side in _m_sides(check)
 	_m_late_side(check, side)
-	some c in array.concat(_m_parent_clause(subj, {"$sides": [side]}, _input_name(side)), _m_params_faults(subj, {"$sides": [side]}))
+	some c in array.concat(_m_parent_pieces(subj, {"$sides": [side]}, _input_name(side)), _m_params_faults(subj, {"$sides": [side]}))
 ])
 
 _m_late_side(check, side) if {
@@ -216,7 +216,7 @@ _m_late_side(check, side) if {
 	side[0] in _input_and_params_walk_roots
 }
 
-_m_params_faults(subj, check) := [_m_isnt(_ref_name(prefix), v, _m_holder(k)) |
+_m_params_faults(subj, check) := [_m_isnt_piece(_ref_name(prefix), v, _m_holder(k), "unusable") |
 	some side in _m_sides(check)
 	is_array(side)
 	side[0] in _params_starts
@@ -229,7 +229,9 @@ _m_params_faults(subj, check) := [_m_isnt(_ref_name(prefix), v, _m_holder(k)) |
 	not _can_hold(v, k)
 ]
 
-_m_parent_clause(subj, check, name) := [c |
+_m_parent_clause(subj, check, name) := [c.text | some c in _m_parent_pieces(subj, check, name)]
+
+_m_parent_pieces(subj, check, name) := [c |
 	some side in _m_paths_named(check, name)
 	is_array(side)
 	some i in numbers.range(count(side) - 1, 1)
@@ -238,7 +240,7 @@ _m_parent_clause(subj, check, name) := [c |
 	v != null
 	k := _m_step_key(subj, side[i])
 	not _can_hold(v, k)
-	c := _m_isnt(_m_part_name(array.slice(side, 0, i)), v, _m_holder(k))
+	c := _m_isnt_piece(_m_part_name(array.slice(side, 0, i)), v, _m_holder(k), "unusable")
 ]
 
 _m_resolved_prefix(subj, prefix) := _resolved(subj, prefix) if not _params_prefix(prefix)
@@ -298,7 +300,7 @@ _m_holder(step) := "a list" if is_number(step)
 
 _m_holder(step) := "an object" if not is_number(step)
 
-_m_faults(subj, check) := [_m_isnt(s.name, s.value, kind) |
+_m_faults(subj, check) := [_m_isnt_piece(s.name, s.value, kind, "unusable") |
 	some f in _m_fault(subj, check)
 	s := _m_shown(subj, f[0])
 	s.state == "value"

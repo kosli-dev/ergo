@@ -292,7 +292,7 @@ _m_whose_ref_faults(check) := [f | some c in object.get(check, "whose", []); som
 
 _m_assertion_ref_faults(check) := [f | is_object(object.get(check, "check", null)); some f in _m_ref_faults_text(check.check)]
 
-_m_walk_blocked(subj, check) := [c |
+_m_walk_blocked(subj, check) := [c.text |
 	some c in _m_blocked(subj, {"op": "present", "path": check.path})
 	not _m_walk_through_list(subj, check.path)
 ] if is_array(check.path)
@@ -946,7 +946,7 @@ _m_cond_message(c, item, cause) := concat("; ", array.concat(_m_null_before_key(
 } else := concat(", and ", cs) if {
 	cause == "unusable"
 	wc := _m_walked(c, item)
-	cs := _once(array.concat(array.concat(array.concat(array.concat(array.concat(_m_key_faults(item, wc), _m_blocked_early(item, wc)), _m_faults(item, wc)), _m_blocked_late(item, wc)), _m_walk_ref_faults(item, c)), _m_item_tallies(item, c, cause)))
+	cs := _once([_m_piece_string(x) | some x in array.concat(array.concat(array.concat(array.concat(array.concat(_m_key_faults(item, wc), _m_blocked_early(item, wc)), _m_faults(item, wc)), _m_blocked_late(item, wc)), _m_walk_ref_faults(item, c)), _m_item_tallies(item, c, cause))])
 	cs != []
 } else := _m_fallback(c)
 
