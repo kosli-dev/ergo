@@ -331,7 +331,7 @@ fn help_lists_fail_and_every_exit_code() {
     assert!(usage.ends_with(
         "Exit codes:
   0  the output was printed: the policy is met, or --fail isn't given
-  1  with --fail, a check failed
+  1  with --fail, a check failed; with test, an example failed, or --strict and a warning
   2  the command line is wrong, a file can't be read, or the output couldn't be written
   3  with --fail, the policy is written wrong or has no requirements
 "

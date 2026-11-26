@@ -38,10 +38,13 @@ impl Failure {
 /// The usage text.
 pub const USAGE: &str =
     "Usage: ergo <command> --policy <file> --input <file> [--params <file>] [--compact] [--fail]
+       ergo report --format outcome --policy <file> --input <file> [--params <file>] [--fail]
+       ergo test <policy file> [--strict]
 
 Commands:
   report       print the report as JSON
   violations   print what failed in the report as JSON
+  test         experimental: run the examples in a policy
   help         print this text
 
 ergo --version prints the version and the commit it was built from.
@@ -49,9 +52,13 @@ ergo --version prints the version and the commit it was built from.
 Files can be .json, .yaml or .yml. Without --params the params are {}.
 The output is pretty-printed with sorted keys; --compact prints one line.
 
+Experimental: --format outcome prints the report as outcome lines in YAML,
+ready to paste into an example. test --strict also fails when no example
+shows a check failing, or none shows it passing.
+
 Exit codes:
   0  the output was printed: the policy is met, or --fail isn't given
-  1  with --fail, a check failed
+  1  with --fail, a check failed; with test, an example failed, or --strict and a warning
   2  the command line is wrong, a file can't be read, or the output couldn't be written
   3  with --fail, the policy is written wrong or has no requirements
 ";
