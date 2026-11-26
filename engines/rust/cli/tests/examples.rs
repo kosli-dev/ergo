@@ -309,11 +309,11 @@ fn example(name: &str) -> Value {
 #[test]
 fn examples_are_read_in_order_with_their_params() {
     let mut policy = policy();
-    policy["example_params"] = json!({"max": 1});
+    policy["tests"]["params"] = json!({"max": 1});
     let mut own = example("own params");
     own["params"] = json!({"other": 2});
-    own["description"] = json!("Replaces example_params");
-    policy["examples"] = json!([example("shared params"), own]);
+    own["description"] = json!("Replaces tests.params");
+    policy["tests"]["examples"] = json!([example("shared params"), own]);
     assert_eq!(
         examples::read(&policy),
         Ok(vec![
@@ -331,8 +331,8 @@ fn examples_are_read_in_order_with_their_params() {
             },
         ])
     );
-    policy["example_params"] = Value::Null;
-    policy.as_object_mut().unwrap().remove("example_params");
+    policy["tests"]["params"] = Value::Null;
+    policy["tests"].as_object_mut().unwrap().remove("params");
     assert_eq!(examples::read(&policy).unwrap()[0].params, json!({}));
 }
 
@@ -369,7 +369,7 @@ fn a_line_must_agree_with_every_row_that_shares_its_check_and_subject() {
 fn only_the_lines_of_an_example_that_passed_count_for_the_warnings() {
     let mut policy = policy();
     policy["requirements"] = json!({"reviewed": policy["requirements"]["reviewed"].clone()});
-    policy["examples"] = json!([
+    policy["tests"]["examples"] = json!([
         {"name": "fails", "input": {"prs": [{"number": 7, "approved": true}]},
          "outcome": [{"reviewed": ["pull request 7 fails peer_approved"]}]},
         {"name": "passes", "input": {"prs": [{"number": 7, "approved": true}]},
@@ -443,7 +443,7 @@ fn examples_written_wrong_are_refused() {
     for (examples, problem) in cases {
         let mut policy = policy();
         if !examples.is_null() {
-            policy["examples"] = examples.clone();
+            policy["tests"]["examples"] = examples.clone();
         }
         assert_eq!(
             examples::read(&policy),
@@ -545,7 +545,7 @@ fn a_heading_that_is_one_requirement_on_its_own_and_another_with_a_status_is_ref
     for (names, heading) in ambiguous {
         for lines in [json!(["t t1 passes c"]), Value::Null] {
             let mut policy = requirements_named(names);
-            policy["examples"] = json!([
+            policy["tests"]["examples"] = json!([
                 {"name": "e", "input": {"ts": [{"id": "t1", "ok": true}]}, "outcome": [{heading: lines}]}
             ]);
             let got = examples::read(&policy);
@@ -574,7 +574,7 @@ fn a_heading_that_is_one_requirement_on_its_own_and_another_with_a_status_is_ref
     ];
     for (names, outcome) in clear {
         let mut policy = requirements_named(names);
-        policy["examples"] = json!([
+        policy["tests"]["examples"] = json!([
             {"name": "e", "input": {"ts": [{"id": "t1", "ok": true}]}, "outcome": outcome.clone()}
         ]);
         assert_eq!(
@@ -823,14 +823,15 @@ fn the_lines_for_a_child_subject_count_for_the_warnings() {
                "input": {"deployments": [{"id": 7, "artifacts": [{"name": "web", "x": x}]}]},
                "outcome": [{"q": [line]}]})
     };
-    policy["examples"] = json!([example("fails", 2, "artifact web in deployment 7 fails c")]);
+    policy["tests"]["examples"] =
+        json!([example("fails", 2, "artifact web in deployment 7 fails c")]);
     let (text, code) = examples::run(&policy, false).unwrap();
     assert_eq!(code, 0, "{text}");
     assert_eq!(
         text,
         "passed: fails\nwarning: no example shows c of q passing\n1 example: 1 passed, 0 failed\n"
     );
-    policy["examples"] = json!([
+    policy["tests"]["examples"] = json!([
         example("fails", 2, "artifact web in deployment 7 fails c"),
         example("passes", 1, "artifact web in deployment 7 passes c")
     ]);
@@ -1056,7 +1057,7 @@ fn the_printed_outcome_with_checks_ergo_adds_and_subjects_out_of_scope_passes_wh
 #[test]
 fn the_lines_of_checks_ergo_adds_and_of_scope_count_for_no_warning() {
     let mut policy = scoped();
-    policy["examples"] = json!([
+    policy["tests"]["examples"] = json!([
         {"name": "no deployment", "input": {"deployments": []},
          "outcome": [{"approved is not met": ["fails $min_subjects because in-scope deployment count is 0"]}]},
         {"name": "dev is left out", "input": {"deployments": [{"id": "d3", "env": "dev"}]},
@@ -1107,4 +1108,53 @@ fn a_subject_out_of_scope_under_require_some_is_not_a_failure_but_a_failed_subje
         check(json!([{"approved is met": ["deployment d3 is out of scope"]}])),
         vec!["no line says deployment d2 fails approver_set because approver is missing"]
     );
+}
+
+#[test]
+fn examples_left_at_the_top_level_are_refused_not_read_as_none() {
+    let mut policy = policy();
+    policy["examples"] = json!([example("e")]);
+    assert_eq!(
+        examples::read(&policy),
+        Err("examples moved under tests, write it as tests.examples".to_string())
+    );
+    policy["example_params"] = json!({});
+    policy["tests"] = json!({"examples": [example("e")]});
+    assert_eq!(
+        examples::read(&policy),
+        Err("examples moved under tests, write it as tests.examples; example_params moved under tests, write it as tests.params".to_string())
+    );
+}
+
+#[test]
+fn a_key_under_tests_other_than_examples_and_params_is_refused() {
+    for (tests, problem) in [
+        (json!({"exmples": []}), "tests has an unknown key exmples"),
+        (json!({"inputs": {}}), "tests.inputs isn't supported yet"),
+        (json!({"rules": []}), "tests.rules isn't supported yet"),
+        (json!([]), "tests isn't an object"),
+        (Value::Null, "tests isn't an object"),
+    ] {
+        let mut policy = policy();
+        policy["tests"] = tests.clone();
+        assert_eq!(examples::read(&policy), Err(problem.to_string()), "{tests}");
+    }
+}
+
+#[test]
+fn a_key_written_twice_under_tests_is_named_with_its_place() {
+    let path = |steps: &[&str]| steps.iter().map(|s| s.to_string()).collect::<Vec<_>>();
+    assert_eq!(
+        examples::repeated(&[path(&["tests", "examples", "[1]", "outcome"])]),
+        Err("the key outcome is written twice in tests.examples[1]".to_string())
+    );
+    assert_eq!(
+        examples::repeated(&[path(&["tests", "params", "a"])]),
+        Err("the key a is written twice in tests.params".to_string())
+    );
+    assert_eq!(
+        examples::repeated(&[path(&["tests"])]),
+        Err("the key tests is written twice".to_string())
+    );
+    assert_eq!(examples::repeated(&[path(&["examples", "x"])]), Ok(()));
 }
