@@ -293,6 +293,9 @@ test_no_row_of_a_report_its_violations_or_a_compiled_policy_holds_the_clauses_of
 		{"checks": {"c": {"for": "every prs as p", "assert": ["count of p.es.v that is at least 2 is 3"]}}},
 		{"checks": {"c": "n is at least $params.m"}},
 		{"checks": {"c": "id is 3"}},
+		{"checks": {"c": ["count of ys is 1", "n is 3"]}},
+		{"checks": {"c": {"any_of": {"one": "count of ys is 1", "two": "n is 3"}}}},
+		{"from": "every things whose count of ys is 1", "checks": {"c": "id is 3"}},
 	] {
 		policy := lifted({"r": object.union({"from": "every things", "identified_by": "id"}, check)})
 		compiled := ergo.compile(policy)
@@ -301,7 +304,7 @@ test_no_row_of_a_report_its_violations_or_a_compiled_policy_holds_the_clauses_of
 		some row in rep.results
 		row.passed == false
 		every out in [rep, ergo.violations(rep), compiled, ergo.report(doc, policy, {})] {
-			count([1 | walk(out, [_, y]); is_object(y); "ergo/clauses" in object.keys(y)]) == 0
+			count([1 | walk(out, [_, y]); is_object(y); some k in ["ergo/clauses", "ergo/joint", "ergo/text_said"]; k in object.keys(y)]) == 0
 		}
 	}
 }
