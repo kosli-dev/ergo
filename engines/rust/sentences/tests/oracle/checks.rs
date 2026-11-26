@@ -5490,6 +5490,18 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
+        "count of xs whose $input.m named by key is 1 is 0",
+        "count of xs whose $input.m named by key is 1 is 0",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose v is $input.m named by key.z is 0",
+        "count of xs whose v equals $input.m named by key.z is 0",
+        &[],
+        &[],
+    ),
+    (
         "count of xs whose v is at least $input.m named by key is 0",
         "count of xs whose v is at least $input.m named by key is 0",
         &[],
