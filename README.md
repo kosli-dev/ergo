@@ -178,6 +178,47 @@ The report holds every row, passed or failed. To tell someone only what went wro
 
 `violations` is built from the report. It keeps only the failed rows that are real problems and adds each check's `description` and `expression`, so you have what you need to write a message. `d-3` isn't listed: it failed `$applies`, but being out of scope isn't a problem.
 
+## Test a policy with examples (experimental)
+
+This is experimental, and it is in the `ergo` command from 0.5.0. The releases before that don't have it, so if `ergo test` isn't a command you have, your release is older. A policy can carry examples under a top-level `tests` field. An example is an input and the outcome its report must have, written in the words the report uses. `ergo test policy.yaml` runs them, and `ergo report --format outcome` prints the outcome of a report, so you can paste it into an example. Here is a policy with one example. The `ergo_spec` is the one in development, which is the one that reads `tests`:
+
+```yaml
+ergo_spec: v0.7-dev
+subjects:
+  deployment:
+    from: deployments
+    identified_by: id
+requirements:
+  approved:
+    subject: deployment
+    checks:
+      approver_set: approver is a non-empty string
+      not_self_approved: approver does not equal author
+
+tests:
+  examples:
+    - name: nobody approves their own deployment
+      input:
+        deployments:
+          - {id: d1, author: ann, approver: bob}
+          - {id: d2, author: cat, approver: cat}
+      outcome:
+        - approved:
+            - deployment d1 passes not_self_approved
+            - deployment d2 fails not_self_approved
+```
+
+`ergo test policy.yaml` prints:
+
+```
+passed: nobody approves their own deployment
+warning: no example shows approver_set of approved failing
+warning: no example shows approver_set of approved passing
+1 example: 1 passed, 0 failed
+```
+
+An example keeps only the lines it is about. The warnings say that no example covers `approver_set`, so you know what the examples leave untested. If the policy changes so that `d2` passes `not_self_approved`, the example fails, and `ergo test` exits 1 and prints the lines it expected next to the lines the report has. [Test a policy with examples](CLI.md#test-a-policy-with-examples-experimental) shows how to write an outcome from a real run, and [the reference](REFERENCE.md#examples) says what an outcome checks.
+
 ## Going further
 
 Install an engine and run the policy: [Ergo with OPA](OPA.md) or [Ergo CLI](CLI.md). The [reference](REFERENCE.md) covers every field, operator and cause, including the ones this example doesn't use.

@@ -64,6 +64,27 @@ Why a check got its verdict: `Satisfied`, `NotAnObject`, `Ambiguous`, `Unusable`
 
 The code also says `flaw` for two ideas, and `flaw` isn't a word of Ergo: use `cause` for why a check got its verdict, including when a root couldn't be read (`root_flaw` in Rust and the `flaw` arguments in `checks/derived.rego` are causes), and `problem` for something wrong in the policy (`_number_flaw`, `meta_number_flaws` and `_from_path_flaws` are problems).
 
+## example
+
+One input in a policy's `tests` field, with the outcome its report must have, so a policy can be tested. `REFERENCE.md` says "A policy can carry examples". It is experimental, and `ergo test` runs them.
+
+- Rust: the `tests` field is read in `policy.rs`, and `ergo test` in the `ergo` command runs each example.
+- Rego: `ergo.rego` doesn't run examples. `ergo test --engine rego` builds each example's report with it.
+
+## outcome
+
+What an example says its report must have: a list of outcome lines. `REFERENCE.md` writes "the outcome", and `ergo report --format outcome` prints one for a report.
+
+- Rust: the code in the `ergo` command that prints and compares outcomes.
+- Rego: none.
+
+## outcome line
+
+One line of an outcome, in the words the report uses, like `deployment d2 fails not_self_approved` or `approved is not met:` with its lines under it. A line a report has no row for doesn't agree with it, and a report row that no line names is fine.
+
+- Rust: the same code as for an outcome.
+- Rego: none.
+
 ## Places that don't match yet
 
 These feed the renames later. Nothing here has changed.
