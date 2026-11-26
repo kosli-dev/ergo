@@ -563,6 +563,37 @@ fn a_check_line_reads_each_in_after_the_id_with_the_longest_subject_name_that_fi
     }
 }
 
+#[test]
+fn a_line_is_taken_for_a_check_ergo_adds_by_where_its_check_name_goes_not_by_its_message() {
+    let subjects = ["artifact", "deployment"];
+    let checks = ["c"];
+    let read = |text: &str| outcome::read_check_line(text, "r", &subjects, &checks);
+    for (text, reason) in [
+        (
+            "artifact w in deploymnt d1 fails c because a fails $p",
+            "it has no subject of the policy after in",
+        ),
+        (
+            "artefact w fails c because a passes $p",
+            "it doesn't start with a subject of the policy",
+        ),
+        (
+            "artifact w in deployment d1 fail c because a fails $p",
+            "it needs passes or fails after the id",
+        ),
+        (
+            "artifact w in deploymnt d1 fails $min_subjects because a fails $p",
+            "lines for checks Ergo adds aren't supported yet",
+        ),
+        (
+            "fails $min_subjects because in-scope artifact count is 0",
+            "lines for checks Ergo adds aren't supported yet",
+        ),
+    ] {
+        assert_eq!(read(text), Err(reason.to_string()), "{text}");
+    }
+}
+
 fn shadowed() -> Value {
     json!({
         "subjects": {
