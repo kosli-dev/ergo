@@ -72,7 +72,7 @@ impl Failure {
 pub const USAGE: &str =
     "Usage: ergo <command> --policy <file> --input <file> [--params <file>] [--compact] [--fail]
        ergo report --format outcome --policy <file> --input <file> [--params <file>] [--fail]
-       ergo test <policy file> [--strict]
+       ergo test <policy file> [--strict] [--engine rust|rego] [--ergo-rego <file>]
 
 Commands:
   report       print the report as JSON
@@ -88,6 +88,10 @@ The output is pretty-printed with sorted keys; --compact prints one line.
 Experimental: --format outcome prints the report as outcome lines in YAML,
 ready to paste into an example. test --strict also fails when no example
 shows a check failing, or none shows it passing.
+
+test --engine rego builds each report with ergo.rego through opa, in place
+of the Rust engine. The path of ergo.rego is --ergo-rego, or ERGO_REGO when
+that flag isn't given. opa is the one on the PATH, or ERGO_OPA when it's set.
 
 Exit codes:
   0  the output was printed: the policy is met, or --fail isn't given
