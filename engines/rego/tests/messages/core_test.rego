@@ -169,6 +169,12 @@ test_a_walked_part_list_after_is_in_ignoring_case_is_said_after_the_field_so_its
 	ergo._m_list_names(object.remove(leaf, ["ignoring"])) == set()
 }
 
+test_a_ref_after_is_in_ignoring_case_that_walks_the_input_names_each_list_along_it if {
+	c := {"op": "in", "path": ["v"], "values": {"ref": ["$$input[]", "id"]}, "ignoring": "case"}
+	ergo._m_list_names(c) == {"$input", "$input[].id"} with data.ergo_document as [{"id": "a"}]
+	ergo._m_list_names(c) == {"$input.id"} with data.ergo_document as {"id": ["a"]}
+}
+
 test_a_row_says_the_items_of_a_list_after_is_in_ignoring_case_read_from_each_item_of_a_subject_that_is_a_list_after_the_field_and_in_list_order if {
 	c := {"op": "compare", "cmp": "in", "left": ["$$params", "v"], "right": [`${"alias":"thing","n":0,"of":null,"old":false}`, "states"], "ignoring": "case"}
 	subj := [{"states": ["A"]}, {"states": [null, 4]}]
