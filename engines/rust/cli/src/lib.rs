@@ -3,6 +3,7 @@
 pub mod args;
 pub mod files;
 pub mod number;
+pub mod outcome;
 pub mod output;
 pub mod yaml;
 
