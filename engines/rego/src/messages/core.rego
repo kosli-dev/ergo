@@ -160,7 +160,7 @@ _m_text_item(name, null) := concat("", [name, " is null"])
 
 _m_text_item(name, x) := concat("", [name, " is ", _m_print_at(x, name, null), ", which isn't text"]) if x != null
 
-_m_text_list_said(subj, check, cause) := [_m_text_items(s.name, s.value)] if {
+_m_text_list_said(subj, check, cause) := [_m_clause("list", s.name, _text_items_state(s.value), _m_text_items(s.name, s.value))] if {
 	check.ignoring
 	s := _m_shown(subj, _m_text_list_side(check))
 	s.state == "value"
@@ -480,7 +480,7 @@ _m_unusable_before_faults(subj, check, kf) := array.concat(array.concat(array.co
 
 _m_unusable_after_faults(subj, check) := array.concat(array.concat(array.concat(array.concat(_m_blocked_late(subj, check), _m_walk_ref_faults(subj, check)), _m_tally_lists(subj, check, "unusable")), _m_params_beside_input(check)), _m_text_list_said(subj, check, "null"))
 
-_m_params_beside_input(check) := array.concat([_m_isnt("$input", data.ergo_document, "an object")], sort({c | walk(check, [_, v]); some c in _m_params_break(v)})) if {
+_m_params_beside_input(check) := array.concat([_m_isnt_piece("$input", data.ergo_document, "an object", "unusable")], [x[1] | some x in sort({[c.text, c] | walk(check, [_, v]); some c in _m_params_break_pieces(v)})]) if {
 	_reads_input_key(check)
 	_m_params_unread(check)
 } else := []
@@ -528,7 +528,7 @@ _m_message_pieces(check, subj, "unusable") := clauses if {
 	clauses := _m_ref_blocked(check)
 	count(clauses) > 0
 } else := clauses if {
-	clauses := [concat("", [side.text, " needs more than 15 digits"]) |
+	clauses := [_m_clause("root", side.text, "unusable", concat("", [side.text, " needs more than 15 digits"])) |
 		some side in _m_sides(check)
 		_side_form(side) in {"add", "sum_of"}
 		_side_eval(subj, side).v == []

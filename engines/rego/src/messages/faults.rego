@@ -8,7 +8,9 @@ _m_reads_params(check) if {
 	v[0] in _params_starts
 }
 
-_m_params_break(path) := [c |
+_m_params_break(path) := [c.text | some c in _m_params_break_pieces(path)]
+
+_m_params_break_pieces(path) := [c |
 	is_array(path)
 	count(path) > 1
 	path[0] in _params_starts
@@ -27,7 +29,7 @@ _m_params_holds(path, j) if {
 	_can_hold(v, k)
 }
 
-_m_params_isnt(path, i) := _m_isnt(_ref_name(array.slice(path, 0, i)), v, _m_holder(k)) if {
+_m_params_isnt(path, i) := _m_isnt_piece(_ref_name(array.slice(path, 0, i)), v, _m_holder(k), "unusable") if {
 	keys := [_m_step_key(null, step) | some step in array.slice(path, 1, i)]
 	count(keys) == i - 1
 	v := _read_from(data.ergo_params, keys)
@@ -311,10 +313,12 @@ _m_ref_blocked(check) := [m |
 	some r in sort(_check_refs(check))
 	_ref_state(r) in {"unusable", "not_an_object"}
 	not _ref_walks(r)
-	some m in _m_ref_breaks(r)
+	some m in _m_ref_break_pieces(r)
 ]
 
-_m_ref_breaks(r) := [_m_isnt(_ref_name(prefix), v, _m_holder(k)) |
+_m_ref_breaks(r) := [c.text | some c in _m_ref_break_pieces(r)]
+
+_m_ref_break_pieces(r) := [_m_isnt_piece(_ref_name(prefix), v, _m_holder(k), "unusable") |
 	some i in numbers.range(count(r) - 1, 1)
 	prefix := array.slice(r, 0, i)
 	v := _m_prefix_read(prefix)
@@ -334,13 +338,13 @@ _m_walk_ref_faults(subj, check) := [] if {
 
 _m_walk_ref_faults_of(subj, check) := array.concat(array.concat(array.concat(array.concat(_m_ref_blocked(check), _m_unusable_ref_walks(check)), _m_unusable_side_walks(subj, check)), _m_text_ref_walks(check)), _m_text_side_walks(subj, check))
 
-_m_text_ref_walks(check) := [_m_text_walk_text(null, r)] if {
+_m_text_ref_walks(check) := [_m_clause("list", _ref_label(r), _text_ref_state(r), _m_text_walk_text(null, r))] if {
 	r := check.values.ref
 	_text_walked_ref(check, r)
 	_text_ref_state(r)
 } else := []
 
-_m_text_side_walks(subj, check) := [_m_text_walk_text(subj, p)] if {
+_m_text_side_walks(subj, check) := [_m_clause("list", _input_name(p), _text_walk_state(subj, p), _m_text_walk_text(subj, p))] if {
 	check.ignoring
 	_list_cmp(check)
 	check.cmp in _membership_ops
@@ -361,9 +365,9 @@ _m_text_item_fails(e, roots) := [{"path": e.c, "item": e.i, "cause": "unusable",
 	not is_string(e.v)
 } else := _rwalk_item_fails(e, roots)
 
-_m_unusable_ref_walks(check) := [_ref_walk_text(r) | some r in sort(_check_refs(check)); _ref_failed_walk(r); _ref_state(r) == "unusable"; not _text_walked_ref(check, r)]
+_m_unusable_ref_walks(check) := [_m_clause("list", _ref_label(r), "unusable", _ref_walk_text(r)) | some r in sort(_check_refs(check)); _ref_failed_walk(r); _ref_state(r) == "unusable"; not _text_walked_ref(check, r)]
 
-_m_unusable_side_walks(subj, check) := [t | some side in _m_sides(check); _walked_side(side); s := _m_shown(subj, side); s.state == "unusable"; t := s.text]
+_m_unusable_side_walks(subj, check) := [_m_clause("list", s.name, "unusable", s.text) | some side in _m_sides(check); _walked_side(side); s := _m_shown(subj, side); s.state == "unusable"]
 
 _m_ref_list_fault(check) := [[check.values, k]] if {
 	check.ignoring
