@@ -295,6 +295,29 @@ ergo: lines for an $applies row that failed with absent, not value, aren't suppo
 
 `--format outcome` also refuses a report with a row whose id is an object or a list, a policy written wrong, two rows of one check and one subject that say different things, like two deployments `d1` where one passes and one fails, and a report whose heading could name two requirements, like `x is met:` for `x` when the policy also has a requirement called `x is met`, because `ergo test` would refuse that heading or no line would agree with both rows. An example whose lines cover a row that can't be written fails and says it can't check it yet. It also refuses a `$min_subjects` row with only some of its parents in `in`, like a test run inside an artifact inside a deployment that has no `artifacts` field, a row of a check Ergo adds whose subject name a longer one of the policy starts the same way as, like subjects `sign` and `sign in`, and two out-of-scope rows for one id with different `because` messages, though `deployment d3 is out of scope` with no `because` passes in `ergo test`.
 
+### Run the examples on `ergo.rego`
+
+**Experimental, from 0.5.0.** `ergo test` builds each example's report with the Rust engine. A policy that runs on `ergo.rego` can be tested on it instead, with `--engine rego`, so a difference between the two engines shows up as a failing example. It needs [`opa`](https://www.openpolicyagent.org/docs/#1-download-opa) and a copy of `ergo.rego`, like the one you use in production. Only where the reports come from changes: the lines, the warnings and the exit codes stay the same. With `ergo.rego` and `policy.yaml`, the policy with two examples above, in the current folder, `ergo test --engine rego --ergo-rego ergo.rego policy.yaml` prints:
+
+```
+engine: ergo-rego 0.7.0-dev
+passed: a deployment needs an approver
+passed: nobody approves their own deployment
+2 examples: 2 passed, 0 failed
+```
+
+The first line names the engine the reports came from, as their `engine` field gives it, so the run can't be taken for one on the Rust engine. `ergo` runs `opa eval` once for all the examples: it compiles the policy once with `ergo.compile` and builds each report with `ergo.report`. It gives `opa` the policy and the inputs in a file in a new temporary folder, which it removes after.
+
+- `--ergo-rego` is the path of `ergo.rego`. Without it, `ergo` reads the path from the `ERGO_REGO` environment variable. It never looks for `ergo.rego` on its own, so a stray copy in the folder can't test another version than the one you meant. `--ergo-rego` and `ERGO_REGO` are refused without `--engine rego`, so a run on the Rust engine can't be taken for one on `ergo.rego`.
+- `opa` is the one on your `PATH`, or the command in the `ERGO_OPA` environment variable when it's set.
+- `ergo` reads the policy file and passes what it read to `opa`, so a YAML policy is read the way the Rust engine reads it. That is the way OPA 1.21 and later read YAML, apart from the differences listed above.
+
+`ergo test --engine rego` exits 2, and never falls back to the Rust engine, when it can't read `ergo.rego`, can't run `opa`, `opa` fails, or `opa` prints something that isn't one report per example. It also exits 2 when `ergo.rego` doesn't support the policy's `ergo_spec`, with the problem `ergo.rego` gives. For `policy.yaml` with `ergo_spec: v0.6` saved as `old.yaml`, `ergo test --engine rego --ergo-rego ergo.rego old.yaml` exits 2 with:
+
+```
+ergo: the ergo.rego at ergo.rego refuses the policy file old.yaml: policy ergo_spec: unsupported version v0.6, expected v0.7-dev
+```
+
 ## Updating
 
 Run `cargo install --locked ergo-policy-cli` again, or download the newest release of the CLI. [`engines/rust/CHANGELOG.md`](engines/rust/CHANGELOG.md) says what each release changed, and which spec version it follows.
