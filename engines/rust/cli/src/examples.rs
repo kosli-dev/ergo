@@ -88,64 +88,20 @@ struct Line {
     because: Option<String>,
 }
 
-fn names(map: &Value) -> Vec<&str> {
-    let mut names: Vec<&str> = map
-        .as_object()
-        .into_iter()
-        .flat_map(|m| m.keys().map(String::as_str))
-        .filter(|name| !name.starts_with('$'))
-        .collect();
-    names.sort_by_key(|name| std::cmp::Reverse(name.len()));
-    names
-}
-
 fn read_line(text: &str, requirement: &str, report: &Value) -> Result<Line, String> {
-    let not_yet = |what: &str| Err(format!("lines for {what} aren't supported yet"));
-    let Some(subject) = names(&report["subjects"])
-        .into_iter()
-        .find(|name| text.starts_with(&format!("{name} ")))
-    else {
-        if text.starts_with("fails ") || text.starts_with("passes ") {
-            return not_yet("checks Ergo adds");
-        }
-        return Err("it doesn't start with a subject of the policy".to_string());
-    };
-    let Some((id, rest)) = outcome::read_id(&text[subject.len() + 1..]) else {
-        return Err(format!("it has no id after {subject}"));
-    };
-    let (passes, rest) = if let Some(rest) = rest.strip_prefix(" passes ") {
-        (true, rest)
-    } else if let Some(rest) = rest.strip_prefix(" fails ") {
-        (false, rest)
-    } else if rest.starts_with(" in ") {
-        return not_yet("child subjects");
-    } else if rest.starts_with(" is out of scope") || rest.starts_with(" is in scope") {
-        return not_yet("subjects in or out of scope");
-    } else {
-        return Err("it needs passes or fails after the id".to_string());
-    };
-    let checks = &report["requirements"][requirement]["checks"];
-    let found = names(checks).into_iter().find_map(|check| {
-        if rest == check {
-            Some((check, None))
-        } else {
-            let because = rest.strip_prefix(check)?.strip_prefix(" because ")?;
-            (!passes).then(|| (check, Some(because.to_string())))
-        }
-    });
-    let Some((check, because)) = found else {
-        if rest.starts_with('$') {
-            return not_yet("checks Ergo adds");
-        }
-        return Err(format!("it names no check of {requirement}"));
-    };
+    let line = outcome::read_check_line(
+        text,
+        requirement,
+        &outcome::names(&report["subjects"]),
+        &outcome::names(&report["requirements"][requirement]["checks"]),
+    )?;
     Ok(Line {
         requirement: requirement.to_string(),
-        subject: subject.to_string(),
-        id,
-        passes,
-        check: check.to_string(),
-        because,
+        subject: line.subject,
+        id: line.id,
+        passes: line.passes,
+        check: line.check,
+        because: line.because,
     })
 }
 
@@ -302,7 +258,7 @@ pub fn check(outcome: &Value, report: &Value) -> Checked {
                     .because
                     .as_ref()
                     .is_none_or(|because| row["message"] == because.as_str());
-            if !agrees && let Ok(Some(actual)) = outcome::row_line(row) {
+            if !agrees && let Ok(Some(actual)) = outcome::line_for(row, report) {
                 problems.push(format!("the report says {actual}"));
             }
         }
@@ -319,7 +275,7 @@ pub fn check(outcome: &Value, report: &Value) -> Checked {
         if row["passed"] == true || out_of_scope || !covered {
             continue;
         }
-        match outcome::row_line(row) {
+        match outcome::line_for(row, report) {
             Err(reason) => problems.push(format!("can't check this yet: {reason}")),
             Ok(Some(line)) if !lines.iter().any(|l| !l.passes && same_row(row, l)) => {
                 problems.push(format!("no line says {line}"))

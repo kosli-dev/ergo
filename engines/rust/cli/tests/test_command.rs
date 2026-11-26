@@ -307,7 +307,13 @@ fn what_format_outcome_prints_pasted_under_outcome_passes_ergo_test() {
     let policy = file("round-trip", "policy.yaml", ODD_POLICY);
     let input_file = file("round-trip", "input.json", &ascii_json(&input));
     let Ok(Outcome::Print(printed)) = run(&args(&[
-        "report", "--policy", &policy, "--input", &input_file, "--format", "outcome",
+        "report",
+        "--policy",
+        &policy,
+        "--input",
+        &input_file,
+        "--format",
+        "outcome",
     ])) else {
         panic!("--format outcome failed");
     };

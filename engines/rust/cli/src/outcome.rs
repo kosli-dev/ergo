@@ -58,8 +58,90 @@ pub fn read_id(text: &str) -> Option<(Value, &str)> {
     (end > 0).then(|| (word_value(&text[..end]), &text[end..]))
 }
 
-/// The line for a report row, `None` for a passed row of a check Ergo adds, or why the line can't be written yet.
-pub fn row_line(row: &Value) -> Result<Option<String>, String> {
+/// A check line, read: `<subject> <id> passes <check>`, or `fails <check>` with an optional `because <message>`.
+#[derive(Debug, PartialEq, Eq, Clone)]
+pub struct CheckLine {
+    /// The subject's name, as the policy writes it.
+    pub subject: String,
+    /// The subject's id.
+    pub id: Value,
+    /// Whether the line says `passes`.
+    pub passes: bool,
+    /// The check's name.
+    pub check: String,
+    /// The message after `because`, if the line has one.
+    pub because: Option<String>,
+}
+
+/// The names of a report's `subjects` or of a requirement's `checks`, leaving out Ergo's own.
+pub fn names(map: &Value) -> Vec<&str> {
+    map.as_object()
+        .into_iter()
+        .flat_map(|m| m.keys().map(String::as_str))
+        .filter(|name| !name.starts_with('$'))
+        .collect()
+}
+
+/// Reads a check line under `requirement`, with the longest of `subjects` it starts with, then an id, `passes` or `fails`, and the longest of `checks` that the rest is or that is followed by ` because `. Gives why it can't be read otherwise.
+pub fn read_check_line(
+    text: &str,
+    requirement: &str,
+    subjects: &[&str],
+    checks: &[&str],
+) -> Result<CheckLine, String> {
+    fn longest_first<'a>(names: &[&'a str]) -> Vec<&'a str> {
+        let mut names = names.to_vec();
+        names.sort_by_key(|name| std::cmp::Reverse(name.len()));
+        names
+    }
+    let not_yet = |what: &str| Err(format!("lines for {what} aren't supported yet"));
+    let Some(subject) = longest_first(subjects)
+        .into_iter()
+        .find(|name| text.starts_with(&format!("{name} ")))
+    else {
+        if text.starts_with("fails ") || text.starts_with("passes ") {
+            return not_yet("checks Ergo adds");
+        }
+        return Err("it doesn't start with a subject of the policy".to_string());
+    };
+    let Some((id, rest)) = read_id(&text[subject.len() + 1..]) else {
+        return Err(format!("it has no id after {subject}"));
+    };
+    let (passes, rest) = if let Some(rest) = rest.strip_prefix(" passes ") {
+        (true, rest)
+    } else if let Some(rest) = rest.strip_prefix(" fails ") {
+        (false, rest)
+    } else if rest.starts_with(" in ") {
+        return not_yet("child subjects");
+    } else if rest.starts_with(" is out of scope") || rest.starts_with(" is in scope") {
+        return not_yet("subjects in or out of scope");
+    } else {
+        return Err("it needs passes or fails after the id".to_string());
+    };
+    let found = longest_first(checks).into_iter().find_map(|check| {
+        if rest == check {
+            Some((check, None))
+        } else {
+            let because = rest.strip_prefix(check)?.strip_prefix(" because ")?;
+            (!passes).then(|| (check, Some(because.to_string())))
+        }
+    });
+    let Some((check, because)) = found else {
+        if rest.starts_with('$') {
+            return not_yet("checks Ergo adds");
+        }
+        return Err(format!("it names no check of {requirement}"));
+    };
+    Ok(CheckLine {
+        subject: subject.to_string(),
+        id,
+        passes,
+        check: check.to_string(),
+        because,
+    })
+}
+
+fn row_parts(row: &Value) -> Result<Option<CheckLine>, String> {
     let check = row["check"].as_str().unwrap_or_default();
     let passed = row["passed"] == true;
     let not_yet = |what: &str| {
@@ -80,23 +162,108 @@ pub fn row_line(row: &Value) -> Result<Option<String>, String> {
     if row["subject"].get("in").is_some() {
         return not_yet("child subjects");
     }
-    let Some(id) = id_text(&row["subject"]["id"]) else {
+    if id_text(&row["subject"]["id"]).is_none() {
         return not_yet("ids that are objects or lists");
+    }
+    Ok(Some(CheckLine {
+        subject: row["subject"]["type"]
+            .as_str()
+            .unwrap_or_default()
+            .to_string(),
+        id: row["subject"]["id"].clone(),
+        passes: passed,
+        check: check.to_string(),
+        because: row["message"]
+            .as_str()
+            .filter(|message| !passed && !message.is_empty())
+            .map(str::to_string),
+    }))
+}
+
+fn write(line: &CheckLine, quoted: bool) -> String {
+    let id = match &line.id {
+        Value::String(_) if quoted => line.id.to_string(),
+        id => id_text(id).unwrap_or_default(),
     };
-    let subject = row["subject"]["type"].as_str().unwrap_or_default();
-    let line = match (passed, row["message"].as_str()) {
+    let CheckLine { subject, check, .. } = line;
+    match (line.passes, &line.because) {
         (true, _) => format!("{subject} {id} passes {check}"),
-        (false, Some(message)) if !message.is_empty() => {
-            format!("{subject} {id} fails {check} because {message}")
-        }
-        (false, _) => format!("{subject} {id} fails {check}"),
+        (false, Some(message)) => format!("{subject} {id} fails {check} because {message}"),
+        (false, None) => format!("{subject} {id} fails {check}"),
+    }
+}
+
+/// The line for a report row as it is, `None` for a passed row of a check Ergo adds, or why the line can't be written yet.
+pub fn row_line(row: &Value) -> Result<Option<String>, String> {
+    Ok(row_parts(row)?.map(|line| write(&line, false)))
+}
+
+/// The line for a report row that reads back as that row against the names in `report`: it quotes an id that would read as part of a longer subject name, and leaves out a `because` that would read as part of a longer check name. `None` for a passed row of a check Ergo adds, or why no such line can be written.
+pub fn line_for(row: &Value, report: &Value) -> Result<Option<String>, String> {
+    let Some(line) = row_parts(row)? else {
+        return Ok(None);
     };
-    Ok(Some(line))
+    let requirement = row["requirement"].as_str().unwrap_or_default();
+    let subjects = names(&report["subjects"]);
+    let checks = names(&report["requirements"][requirement]["checks"]);
+    let without_because = CheckLine {
+        because: None,
+        ..line.clone()
+    };
+    for (want, quoted) in [
+        (&line, false),
+        (&line, true),
+        (&without_because, false),
+        (&without_because, true),
+    ] {
+        let text = write(want, quoted);
+        let read = read_check_line(&text, requirement, &subjects, &checks);
+        if read.is_ok_and(|read| {
+            same_id(&read.id, &want.id)
+                && CheckLine {
+                    id: want.id.clone(),
+                    ..read
+                } == *want
+        }) {
+            return Ok(Some(text));
+        }
+    }
+    Err(format!(
+        "no line for {} {} and {} in {requirement} reads back as its row, because a longer subject or check name starts the same way",
+        line.subject,
+        id_text(&line.id).unwrap_or_default(),
+        line.check
+    ))
+}
+
+fn escaped(c: char) -> bool {
+    c.is_control()
+        || matches!(
+            c,
+            '\u{2028}' | '\u{2029}' | '\u{feff}' | '\u{fffe}' | '\u{ffff}'
+        )
+}
+
+fn double_quoted(text: &str) -> String {
+    let mut out = String::from("\"");
+    for c in text.chars() {
+        match c {
+            '"' => out.push_str("\\\""),
+            '\\' => out.push_str("\\\\"),
+            '\t' => out.push_str("\\t"),
+            '\n' => out.push_str("\\n"),
+            c if escaped(c) => out.push_str(&format!("\\u{:04X}", c as u32)),
+            c => out.push(c),
+        }
+    }
+    out.push('"');
+    out
 }
 
 fn scalar(text: &str) -> String {
     let reads_back = |source: String, want: Value| crate::yaml::parse(&source).ok() == Some(want);
-    let plain = !text.chars().any(char::is_control)
+    let needs_escapes = text.chars().any(escaped);
+    let plain = !needs_escapes
         && reads_back(format!("- {text}\n"), Value::from(vec![text]))
         && reads_back(
             format!("{text}: 0\n"),
@@ -104,8 +271,8 @@ fn scalar(text: &str) -> String {
         );
     if plain {
         text.to_string()
-    } else if text.chars().any(char::is_control) {
-        Value::from(text).to_string()
+    } else if needs_escapes {
+        double_quoted(text)
     } else {
         format!("'{}'", text.replace('\'', "''"))
     }
@@ -210,7 +377,7 @@ fn items(report: &Value, region: &Region, strict: bool) -> Result<Vec<Item>, Str
             {
                 continue;
             }
-            match row_line(row) {
+            match line_for(row, report) {
                 Ok(Some(line)) => lines.push(line),
                 Ok(None) => {}
                 Err(problem) if strict => return Err(problem),

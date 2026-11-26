@@ -296,8 +296,14 @@ fn a_check_line_names_the_longest_subject_and_the_longest_check_that_fit() {
             because: because.map(str::to_string),
         })
     };
-    assert_eq!(read("t x 1 passes c"), line("t x", json!(1), true, "c", None));
-    assert_eq!(read("t \"x\" passes c"), line("t", json!("x"), true, "c", None));
+    assert_eq!(
+        read("t x 1 passes c"),
+        line("t x", json!(1), true, "c", None)
+    );
+    assert_eq!(
+        read("t \"x\" passes c"),
+        line("t", json!("x"), true, "c", None)
+    );
     assert_eq!(
         read("t 1 fails c because d"),
         line("t", json!(1), false, "c because d", None)
@@ -373,6 +379,8 @@ fn a_line_for_a_row_leaves_out_a_because_that_would_read_as_part_of_a_longer_che
     );
     assert_eq!(
         line_of(&report, "checked", "z"),
-        Ok(Some("t z fails c because ok is 3".to_string()))
+        Ok(Some(
+            "t z fails c because ok is 3, which isn't true or false".to_string()
+        ))
     );
 }
