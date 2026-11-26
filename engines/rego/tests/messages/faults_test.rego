@@ -65,12 +65,12 @@ test_a_ref_a_message_cant_read_is_blamed_with_a_clause if {
 	ergo._m_ref_breaks(["$$params[]", "p", "q"]) == ["$params.p is 3, which isn't an object"] with data.ergo_params as {"p": 3}
 }
 
-test_the_walks_a_message_blames_are_list_clauses if {
+test_the_items_after_ignoring_case_a_message_blames_are_list_clauses_and_a_walk_on_the_right_is_a_root if {
 	rc := {"op": "in", "path": ["v"], "values": {"ref": ["$$params[]", "objs", "x"]}, "ignoring": "case"}
 	text := "item 1 of $params.objs: x is 3, which isn't text; item 2 of $params.objs: x is missing"
 	ergo._m_text_ref_walks(rc) == [ergo._m_clause("list", "$params.objs[].x", "unusable", text)] with data.ergo_params as {"objs": [{"x": 3}, {}]}
 	plain := object.remove(rc, ["ignoring"])
-	ergo._m_unusable_ref_walks(plain) == [ergo._m_clause("list", "$params.objs[].x", "unusable", "item 2 of $params.objs is 4, which isn't an object")] with data.ergo_params as {"objs": [{"x": "a"}, 4]}
+	ergo._m_unusable_ref_walks(plain) == [ergo._m_clause("root", "$params.objs[].x", "unusable", "item 2 of $params.objs is 4, which isn't an object")] with data.ergo_params as {"objs": [{"x": "a"}, 4]}
 	part := [`${"alias":"pl","n":1,"of":null,"old":true}`, "p", "name"]
 	broken := {"v": "a", "p": [{"name": 3}, {}]}
 	c := ergo._m_with_sides(ergo._m_walked({"op": "compare", "cmp": "in", "left": ["v"], "right": part, "ignoring": "case"}, broken))

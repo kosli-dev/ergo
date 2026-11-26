@@ -1743,8 +1743,8 @@ test_a_ref_that_starts_at_a_list_input_walks_its_items if {
 test_a_ref_that_starts_at_a_list_input_fails_when_an_item_cant_be_read if {
 	policy := {"ergo_spec": ergo._spec, "subjects": {"t": {"from": "$input", "identified_by": "id"}}, "requirements": {"r": {"description": "d", "subject": "t", "checks": {"c": {"description": "d", "assert": "id is in $input.id"}}}}}
 	every doc, want in {
-		`[{"id": "a"}, {}]`: [[false, "absent", "item 2 of $input: id is missing"], [false, "absent", "id is missing, and item 2 of $input: id is missing"]],
-		`[{"id": null}]`: [[false, "null", "id is null, and item 1 of $input: id is null"]],
+		`[{"id": "a"}, {}]`: [[false, "absent", "item 2 of $input: id is missing"], [false, "absent", "item 2 of $input: id is missing, and id is missing"]],
+		`[{"id": null}]`: [[false, "null", "item 1 of $input: id is null, and id is null"]],
 		`[1]`: [[false, "unusable", "item 1 of $input is 1, which isn't an object"]],
 		`[[{"id": "a"}]]`: [[false, "unusable", "item 1 of $input is [{\"id\": \"a\"}], which isn't an object"]],
 	} {
