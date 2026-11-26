@@ -928,7 +928,12 @@ _for_whose_undecided(check, f, walked) if {
 	_for_whose(check.items[0], walked.items[f.path], _for_names).undecided != []
 }
 
-_for_item_kept(check, f, walked) := _m_clause("item", f.said, f.cause, concat("; ", _m_for_fail(_m_with_why(f)))) if {
+_for_item_kept(check, f, walked) := _m_clause("item", f.said, f.cause, concat("; ", array.slice(f.msg, count(roots), count(f.msg)))) if {
+	roots := f["ergo/why_roots"]
+	_ = [check, walked]
+}
+
+else := _m_clause("item", f.said, f.cause, concat("; ", _m_for_fail(_m_with_why(f)))) if {
 	_for_said_why(f)
 	_ = [check, walked]
 }
@@ -1084,7 +1089,7 @@ _for_row_clauses(check, subj, r) := array.concat(array.concat(array.concat(p.roo
 
 _for_row_parts(check, subj, r) := {"roots": roots, "free": free, "items": items, "lists": array.concat(listed, line), "line": line, "said": ssaid, "own": {k: c.cause | some [k, c] in failed}} if {
 	ssaid := _for_row_said(check, subj, r)
-	roots := [_for_root_item(c) | some c in _for_row_roots(check, subj, r, ssaid); not _for_subject_root(c, subj, r)]
+	roots := [_for_root_item(c) | some c in array.concat(_for_row_roots(check, subj, r, ssaid), _for_why_roots(check, r)); not _for_subject_root(c, subj, r)]
 	rooted := {c.text | some c in roots}
 	sroots := {i: {x[1] | some x in xs} | some i, xs in ssaid}
 	free := [x | some c in _for_free_clauses(check, subj, r, sroots); x := _for_free_unrooted(c, rooted)]
@@ -1095,6 +1100,10 @@ _for_row_parts(check, subj, r) := {"roots": roots, "free": free, "items": items,
 	items := [object.union(x, {"group": after}) | some [k, c] in failed; r.failed[k].path != name; x := _for_unrooted(c, said)]
 	listed := [object.union(c, {"kind": "list", "group": after}) | some [k, c] in failed; r.failed[k].path == name]
 	line := [object.union(_m_clause("list", t, r.cause, t), {"group": after}) | some t in _for_list_texts(check, subj, r)]
+}
+
+_for_why_roots(check, r) := [c | some i, c in cs; not c.text in {d.text | some d in array.slice(cs, 0, i)}] if {
+	cs := [_m_root_in(_m_clause_name(x[1]), x[0], x[1], count(check.checks)) | some f in r.failed; some x in object.get(f, "ergo/why_roots", [])]
 }
 
 _for_failed_clauses(check, r, roots) := [] if {
