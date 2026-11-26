@@ -36,7 +36,10 @@ fn the_ancestors_follow_the_in_of_the_rows_of_the_report() {
         .iter()
         .find(|row| row["check"] == "c")
         .unwrap();
-    assert_eq!(row["subject"]["in"], json!({"commit": "a1", "pull request": 7}));
+    assert_eq!(
+        row["subject"]["in"],
+        json!({"commit": "a1", "pull request": 7})
+    );
     let parents = ergo_policy_engine::ancestors(&policy, "big file");
     let keys: Vec<&String> = row["subject"]["in"].as_object().unwrap().keys().collect();
     assert_eq!(keys.len(), parents.len());

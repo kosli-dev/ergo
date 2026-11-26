@@ -84,7 +84,10 @@ pub fn ancestors(report: &Value, subject: &str) -> Vec<String> {
         .map(|(name, entry)| {
             (
                 name.clone(),
-                Value::Object(Map::from_iter([("from".to_string(), entry["from"].clone())])),
+                Value::Object(Map::from_iter([(
+                    "from".to_string(),
+                    entry["from"].clone(),
+                )])),
             )
         })
         .collect();
@@ -149,7 +152,8 @@ pub fn read_check_line(
             }
             return Err("it has no subject of the policy after in".to_string());
         };
-        let Some((parent_id, after)) = read_id(after.get(parent.len() + 1..).unwrap_or_default()) else {
+        let Some((parent_id, after)) = read_id(after.get(parent.len() + 1..).unwrap_or_default())
+        else {
             return Err(format!("it has no id after in {parent}"));
         };
         parents.push((parent.to_string(), parent_id));
