@@ -1363,13 +1363,27 @@ pub fn with_all_items(check: &Tally, ctx: &Ctx, cause: Cause, mut said: Said) ->
 
 /// What a `count of` or `sum of` row says: the check's own pieces, with the
 /// roots its whose reads first when a walked root can't be read, or else
-/// with every item it can't read.
+/// with every item it can't read. A piece said beside several items is a
+/// group of its own, so it is joined to them with `; `.
 pub fn row_said(check: &Tally, ctx: &Ctx, cause: Cause, said: Said) -> Said {
     let rooted = with_walked_roots(check, ctx, said.clone());
-    if super::message::said_text(&rooted) == super::message::said_text(&said) {
+    let said = if super::message::said_text(&rooted) == super::message::said_text(&said) {
         with_all_items(check, ctx, cause, said)
     } else {
         rooted
+    };
+    said.into_iter().flat_map(apart_from_items).collect()
+}
+
+fn apart_from_items(group: Vec<Piece>) -> Said {
+    let several = |piece: &Piece| match piece {
+        Piece::Counted(clauses) => clause::piece_count(&clause::shown(clauses)) > 1,
+        Piece::Said(_) => false,
+    };
+    if group.iter().any(several) {
+        group.into_iter().map(|piece| vec![piece]).collect()
+    } else {
+        vec![group]
     }
 }
 

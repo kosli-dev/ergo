@@ -200,6 +200,15 @@ fn says_alike(a: &Clause, b: &Clause) -> bool {
 }
 
 pub fn text(clauses: &[Clause]) -> String {
+    text_pieces(clauses).join("; ")
+}
+
+/// How many pieces, joined with `; `, the clauses make.
+pub fn piece_count(clauses: &[Clause]) -> usize {
+    text_pieces(clauses).len()
+}
+
+fn text_pieces(clauses: &[Clause]) -> Vec<String> {
     clauses
         .iter()
         .flat_map(|clause| match clause.kind {
@@ -207,8 +216,7 @@ pub fn text(clauses: &[Clause]) -> String {
             Kind::Item => pieces(clause),
             Kind::Root | Kind::List => vec![clause.text.clone()],
         })
-        .collect::<Vec<_>>()
-        .join("; ")
+        .collect()
 }
 
 /// The text each clause gives on its own, the way it reads in a row.

@@ -468,6 +468,49 @@ test_a_failed_row_carries_the_clauses_its_message_is_printed_from if {
 	ergo._m_row_said(c, {"v": 1, "w": 2}, "value")["ergo/clauses"] == [ergo._m_clause("root", "v", "value", "v is 1"), ergo._m_clause("root", "w", "value", "w is 2")]
 }
 
+test_a_root_before_several_items_of_a_count_is_cut_from_them_like_the_items if {
+	c := ergo._s_written_check("count of xs whose v is 1 is $params.n")
+	ergo._m_row_text(c, {"xs": [{}, {}]}, "absent") == "$params.n is missing; item 1 of xs: v is missing; item 2 of xs: v is missing" with data.ergo_params as {}
+	ergo._m_row_text(c, {"xs": [{}]}, "absent") == "$params.n is missing, and item 1 of xs: v is missing" with data.ergo_params as {}
+}
+
+test_a_row_that_says_two_lists_of_two_items_says_all_four if {
+	c := ergo._s_written_check("sum of xs.v plus sum of ys.v is 0")
+	ergo._m_row_text(c, {"xs": [{}, {}], "ys": [{}, {}]}, "absent") == "item 1 of xs: v is missing; item 2 of xs: v is missing; item 1 of ys: v is missing; item 2 of ys: v is missing"
+}
+
+test_a_row_says_a_second_list_after_a_first_list_of_three_items if {
+	c := ergo._s_written_check("sum of xs.v is at most sum of ys.v")
+	ergo._m_row_text(c, {"xs": [{}, {}, {}], "ys": [{}]}, "absent") == "item 1 of xs: v is missing; item 2 of xs: v is missing; item 3 of xs: v is missing; item 1 of ys: v is missing"
+}
+
+test_a_row_says_three_items_of_each_list_and_how_many_more_after_each if {
+	c := ergo._s_written_check("sum of xs.v plus sum of ys.v is 0")
+	ergo._m_row_text(c, {"xs": [{}, {}, {}, {}], "ys": [{}, {}, {}, {}]}, "absent") == "item 1 of xs: v is missing; item 2 of xs: v is missing; item 3 of xs: v is missing; and 1 more; item 1 of ys: v is missing; item 2 of ys: v is missing; item 3 of ys: v is missing; and 1 more"
+}
+
+test_the_roots_of_a_count_and_of_its_whose_are_sorted_together_by_name if {
+	c := ergo._s_written_check("count of es whose zz is m named by $params.k is $params.n")
+	ergo._m_row_text(c, {"es": [{"zz": 2}, {"zz": 2}]}, "absent") == "$params.k is missing; $params.n is missing; item 1 of es: m is missing; item 2 of es: m is missing" with data.ergo_params as {}
+}
+
+test_a_list_after_is_in_ignoring_case_that_isnt_a_list_is_a_root_sorted_by_its_cause if {
+	c := ergo._s_written_check("x is in ls ignoring case")
+	ergo._m_row_text(c, {"x": null, "ls": "a"}, "unusable") == `ls is "a", which isn't a list, and x is null`
+}
+
+test_an_item_of_the_input_read_on_the_right_is_a_root_sorted_by_the_name_of_its_path if {
+	c := ergo._s_written_check("id is in $input.id")
+	ergo._m_row_text(c, {}, "absent") == "item 2 of $input: id is missing, and id is missing" with data.ergo_document as [{"id": "a"}, {}]
+}
+
+test_a_list_on_the_right_that_cant_be_walked_is_a_root_sorted_by_its_name if {
+	ref := ergo._s_written_check("x contains all of $input.sbom.components.name")
+	ergo._m_row_text(ref, {"x": "click"}, "unusable") == `item 1 of $input.sbom.components is "click", which isn't an object, and x is "click", which isn't a list` with data.ergo_document as {"sbom": {"components": ["click"]}}
+	field := ergo._s_written_check("z contains all of ys.v")
+	ergo._m_row_text(field, {"z": "click", "ys": ["a"]}, "unusable") == `item 1 of ys is "a", which isn't an object, and z is "click", which isn't a list`
+}
+
 test_a_row_keeps_the_items_of_a_list_after_is_in_ignoring_case_in_list_order if {
 	ref := {"op": "in", "path": ["x"], "values": {"ref": ["$$params[]", "l"]}, "ignoring": "case"}
 	ergo._m_row_text(ref, {"x": "a"}, "unusable") == "item 2 of $params.l is null; item 3 of $params.l is 3, which isn't text" with data.ergo_params as {"l": ["a", null, 3]}

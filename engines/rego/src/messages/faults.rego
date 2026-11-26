@@ -367,9 +367,9 @@ _m_text_item_fails(e, roots) := [{"path": e.c, "item": e.i, "cause": "unusable",
 	not is_string(e.v)
 } else := _rwalk_item_fails(e, roots)
 
-_m_unusable_ref_walks(check) := [_m_clause("list", _ref_label(r), "unusable", _ref_walk_text(r)) | some r in sort(_check_refs(check)); _ref_failed_walk(r); _ref_state(r) == "unusable"; not _text_walked_ref(check, r)]
+_m_unusable_ref_walks(check) := [_m_clause("root", _ref_label(r), "unusable", _ref_walk_text(r)) | some r in sort(_check_refs(check)); _ref_failed_walk(r); _ref_state(r) == "unusable"; not _text_walked_ref(check, r)]
 
-_m_unusable_side_walks(subj, check) := [_m_clause("list", s.name, "unusable", s.text) | some side in _m_sides(check); _walked_side(side); s := _m_shown(subj, side); s.state == "unusable"]
+_m_unusable_side_walks(subj, check) := [_m_clause("root", s.name, "unusable", s.text) | some side in _m_sides(check); _walked_side(side); s := _m_shown(subj, side); s.state == "unusable"]
 
 _m_ref_list_fault(check) := [[check.values, k]] if {
 	check.ignoring

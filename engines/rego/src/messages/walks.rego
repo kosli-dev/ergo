@@ -141,14 +141,28 @@ _m_row_said(check, subj, cause) := _m_said_row(concat("; ", _roots_then_lists([_
 	cause in _value_fault_causes
 	ps := _m_null_key_parts(subj, check)
 	ps != []
-} else := _m_said_row(_m_top_sorted(_m_pieces_text(ps), _m_list_names(check)), ps) if {
+} else := _m_ordered_row(ps) if {
 	cause != "value"
 	ps := _m_row_pieces(check, subj, cause)
 } else := _m_said_row(_m_pieces_text(ps), ps) if ps := _m_row_pieces(check, subj, cause)
 
 _m_row_pieces(check, subj, cause) := _m_message_pieces(object.union(_m_with_sides(_m_walked(check, subj)), {"ergo/row": true}), subj, cause)
 
-_m_said_row(message, pieces) := {"message": message, "ergo/clauses": [c | some p in pieces; some c in _m_piece_clauses(p)]}
+_m_said_row(message, pieces) := {"message": message, "ergo/clauses": _m_pieces_clauses(pieces)}
+
+_m_pieces_clauses(pieces) := [c | some p in pieces; some c in _m_piece_clauses(p)]
+
+_m_ordered_row(pieces) := {"message": concat(_m_row_joint(pieces), _m_clause_texts(_m_clauses_order([c | some p in pieces; some c in _m_piece_shown(p)]))), "ergo/clauses": _m_pieces_clauses(pieces)}
+
+_m_piece_shown(p) := _m_clauses_shown(p) if is_array(p)
+
+else := [p]
+
+_m_row_joint(pieces) := "; " if {
+	some p in pieces
+	is_array(p)
+	count(_m_clause_texts(_m_clauses_shown(p))) > 1
+} else := ", and "
 
 _m_piece_clauses(p) := p if is_array(p)
 

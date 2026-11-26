@@ -2511,6 +2511,15 @@ fn an_inner_list_a_count_cant_read_is_said_with_its_item_in_list_order() {
 }
 
 fn row_message(sentence: &str, items: Value, params: Value) -> String {
+    row_message_by(sentence, items, params, with_all_items)
+}
+
+fn row_message_by(
+    sentence: &str,
+    items: Value,
+    params: Value,
+    said_by: fn(&Tally, &Ctx, Cause, Said) -> Said,
+) -> String {
     let check = lowered(sentence);
     let Check::Tally(tally) = &check else {
         panic!("{sentence} is not a count or a sum");
@@ -2528,12 +2537,34 @@ fn row_message(sentence: &str, items: Value, params: Value) -> String {
         aliases: BTreeMap::new(),
     };
     let verdict = crate::ops::run(&check, &ctx);
-    super::super::message::said_text(&with_all_items(
+    super::super::message::said_text(&said_by(
         tally,
         &ctx,
         verdict.cause,
         super::super::message::said(&check, &ctx, &verdict),
     ))
+}
+
+#[test]
+fn a_root_before_several_items_of_a_count_is_cut_from_them_like_the_items() {
+    assert_eq!(
+        row_message_by(
+            "count of items whose v is 1 is $params.n",
+            json!([{}, {}]),
+            json!({}),
+            row_said,
+        ),
+        "$params.n is missing; item 1 of items: v is missing; item 2 of items: v is missing"
+    );
+    assert_eq!(
+        row_message_by(
+            "count of items whose v is 1 is $params.n",
+            json!([{}]),
+            json!({}),
+            row_said,
+        ),
+        "$params.n is missing, and item 1 of items: v is missing"
+    );
 }
 
 #[test]
