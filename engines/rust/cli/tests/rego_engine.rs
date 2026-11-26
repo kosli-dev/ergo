@@ -130,6 +130,7 @@ tests:
         - approved:
             - deployment d1 fails approver_set because approver is missing
             - deployment d2 passes approver_set
+            - deployment d1 fails allowed because approver is missing
             - deployment d2 passes allowed
     - name: each example can have its own params
       input: {deployments: [{id: d1, author: ann, approver: bob}]}

@@ -9,7 +9,8 @@ pub mod outcome;
 pub mod output;
 pub mod yaml;
 
-use args::{Command, Format, Parsed};
+use args::{Command, Engine, Format, Parsed};
+use std::ffi::{OsStr, OsString};
 
 /// Why a run failed. The message is one line and names the problem and the file.
 #[derive(Debug, PartialEq, Eq)]
@@ -22,6 +23,28 @@ pub enum Failure {
     Unsupported(String),
     /// With `--fail`, the policy is written wrong and the output asked for can't show the report.
     WrittenWrong(String),
+    /// Experimental: `ergo test --engine rego` can't read `ergo.rego` or run `opa`, `opa` failed or printed something that isn't a report, or `ergo.rego` doesn't support the policy's `ergo_spec`.
+    Engine(String),
+}
+
+/// The environment variables `ergo` reads. An empty one counts as not set.
+#[derive(Debug, Default, Clone, PartialEq, Eq)]
+pub struct Environment {
+    /// `ERGO_REGO`: the path of `ergo.rego` for `ergo test --engine rego` when `--ergo-rego` isn't given.
+    pub ergo_rego: Option<String>,
+    /// `ERGO_OPA`: the `opa` command to run, in place of the `opa` on the PATH.
+    pub opa: Option<OsString>,
+}
+
+impl Environment {
+    /// Reads `ERGO_REGO` and `ERGO_OPA` from the process's environment.
+    pub fn read() -> Environment {
+        let read = |name| std::env::var_os(name).filter(|v| !v.is_empty());
+        Environment {
+            ergo_rego: read("ERGO_REGO").map(|v| v.to_string_lossy().into_owned()),
+            opa: read("ERGO_OPA"),
+        }
+    }
 }
 
 impl Failure {
@@ -31,7 +54,8 @@ impl Failure {
             Failure::Usage(m)
             | Failure::File(m)
             | Failure::Unsupported(m)
-            | Failure::WrittenWrong(m) => m,
+            | Failure::WrittenWrong(m)
+            | Failure::Engine(m) => m,
         }
     }
 
@@ -98,8 +122,68 @@ pub fn fail_code(report: &serde_json::Value) -> u8 {
     }
 }
 
-/// Runs the tool for the given arguments, without the program name.
+/// Runs the tool for the given arguments, without the program name, as if no environment variable were set.
 pub fn run(arguments: &[String]) -> Result<Outcome, Failure> {
+    run_in(arguments, &Environment::default())
+}
+
+fn test(options: args::TestOptions, environment: &Environment) -> Result<Outcome, Failure> {
+    let ergo_rego = match (options.engine, options.ergo_rego, &environment.ergo_rego) {
+        (Engine::Rust, _, None) => None,
+        (Engine::Rust, _, Some(_)) => {
+            return Err(Failure::Usage(
+                "ERGO_REGO is set, and it only goes with --engine rego".to_string(),
+            ));
+        }
+        (Engine::Rego, Some(path), _) => Some(path),
+        (Engine::Rego, None, Some(path)) => Some(path.clone()),
+        (Engine::Rego, None, None) => {
+            return Err(Failure::Usage(
+                "--engine rego needs the path of ergo.rego, in --ergo-rego or ERGO_REGO"
+                    .to_string(),
+            ));
+        }
+    };
+    let policy = files::load("policy", &options.policy)?;
+    let written_wrong = |problem| {
+        Failure::File(format!(
+            "the examples in the policy file {} are written wrong: {problem}",
+            options.policy
+        ))
+    };
+    examples::repeated(&files::repeated_keys(&options.policy)).map_err(written_wrong)?;
+    let examples = examples::read(&policy).map_err(written_wrong)?;
+    let (engine, reports) = match ergo_rego {
+        None => (
+            String::new(),
+            examples
+                .iter()
+                .map(|e| ergo_policy_engine::report(&e.input, &policy, &e.params))
+                .collect(),
+        ),
+        Some(ergo_rego) => {
+            let opa = environment.opa.as_deref().unwrap_or(OsStr::new("opa"));
+            let reports =
+                opa::run(opa, &ergo_rego, &policy, &examples).map_err(Failure::Engine)?;
+            if let Some(problem) = reports.iter().find_map(opa::unsupported_spec) {
+                return Err(Failure::Engine(format!(
+                    "the ergo.rego at {ergo_rego} refuses the policy file {}: {problem}",
+                    options.policy
+                )));
+            }
+            (opa::engine_line(&reports[0]), reports)
+        }
+    };
+    let (text, code) = examples::results(&policy, &examples, &reports, options.strict);
+    let text = format!("{engine}{text}");
+    Ok(match code {
+        0 => Outcome::Print(text),
+        code => Outcome::PrintAndFail(text, code),
+    })
+}
+
+/// Runs the tool for the given arguments, without the program name, with the environment variables in `environment`.
+pub fn run_in(arguments: &[String], environment: &Environment) -> Result<Outcome, Failure> {
     let options = match args::parse(arguments)? {
         Parsed::Help => return Ok(Outcome::Print(USAGE.to_string())),
         Parsed::Version => {
@@ -110,21 +194,7 @@ pub fn run(arguments: &[String]) -> Result<Outcome, Failure> {
             )));
         }
         Parsed::Run(options) => options,
-        Parsed::Test(options) => {
-            let policy = files::load("policy", &options.policy)?;
-            let written_wrong = |problem| {
-                Failure::File(format!(
-                    "the examples in the policy file {} are written wrong: {problem}",
-                    options.policy
-                ))
-            };
-            examples::repeated(&files::repeated_keys(&options.policy)).map_err(written_wrong)?;
-            let (text, code) = examples::run(&policy, options.strict).map_err(written_wrong)?;
-            return Ok(match code {
-                0 => Outcome::Print(text),
-                code => Outcome::PrintAndFail(text, code),
-            });
-        }
+        Parsed::Test(options) => return test(options, environment),
     };
     let policy = files::load("policy", &options.policy)?;
     let input = files::load("input", &options.input)?;

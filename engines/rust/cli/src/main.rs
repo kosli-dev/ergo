@@ -7,7 +7,7 @@ fn main() -> ExitCode {
         eprint!("{}", ergo_policy_cli::USAGE);
         return ExitCode::from(2);
     }
-    let (text, code) = match ergo_policy_cli::run(&arguments) {
+    let (text, code) = match ergo_policy_cli::run_in(&arguments, &ergo_policy_cli::Environment::read()) {
         Ok(ergo_policy_cli::Outcome::Print(text)) => (text, 0),
         Ok(ergo_policy_cli::Outcome::PrintAndFail(text, code)) => (text, code),
         Err(failure) => {

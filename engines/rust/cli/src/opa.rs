@@ -2,6 +2,75 @@
 
 use crate::examples::Example;
 use serde_json::{Value, json};
+use std::ffi::OsStr;
+use std::fs;
+use std::path::PathBuf;
+use std::process::Command;
+use std::sync::atomic::{AtomicUsize, Ordering};
+
+struct Folder(PathBuf);
+
+impl Folder {
+    fn new() -> Result<Folder, String> {
+        static MADE: AtomicUsize = AtomicUsize::new(0);
+        let path = std::env::temp_dir().join(format!(
+            "ergo-test-{}-{}",
+            std::process::id(),
+            MADE.fetch_add(1, Ordering::Relaxed)
+        ));
+        fs::create_dir(&path)
+            .map(|()| Folder(path))
+            .map_err(|e| format!("can't make a folder for opa's data: {e}"))
+    }
+}
+
+impl Drop for Folder {
+    fn drop(&mut self) {
+        let _ = fs::remove_dir_all(&self.0);
+    }
+}
+
+/// Builds one report per example with the `ergo.rego` at `ergo_rego`, by running `opa` once on [QUERY] with [data] in a file of a new folder that it removes after, or says why it can't.
+pub fn run(
+    opa: &OsStr,
+    ergo_rego: &str,
+    policy: &Value,
+    examples: &[Example],
+) -> Result<Vec<Value>, String> {
+    let unreadable = |problem: String| format!("can't read ergo.rego at {ergo_rego}: {problem}");
+    let metadata = fs::metadata(ergo_rego).map_err(|e| unreadable(e.to_string()))?;
+    if !metadata.is_file() {
+        return Err(unreadable("it isn't a file".to_string()));
+    }
+    fs::File::open(ergo_rego).map_err(|e| unreadable(e.to_string()))?;
+    let folder = Folder::new()?;
+    let file = folder.0.join("data.json");
+    fs::write(&file, data(policy, examples).to_string())
+        .map_err(|e| format!("can't write opa's data in {}: {e}", file.display()))?;
+    let output = Command::new(opa)
+        .args(["eval", "--format", "raw", "-d", ergo_rego, "-d"])
+        .arg(&file)
+        .arg(QUERY)
+        .output()
+        .map_err(|e| {
+            format!(
+                "can't run {}: {e}; put opa on the PATH or set ERGO_OPA",
+                opa.to_string_lossy()
+            )
+        })?;
+    drop(folder);
+    if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        let first = stderr.lines().map(str::trim).find(|l| !l.is_empty());
+        return Err(format!(
+            "opa failed on ergo.rego at {ergo_rego}: {}",
+            first.map_or_else(|| output.status.to_string(), str::to_string)
+        ));
+    }
+    let printed = String::from_utf8(output.stdout).unwrap_or_default();
+    reports(&printed, examples.len())
+        .map_err(|problem| format!("{problem}, with ergo.rego at {ergo_rego}"))
+}
 
 /// The query `opa eval` runs: it compiles the policy once with `ergo.compile` and builds one report per example with `ergo.report`.
 pub const QUERY: &str = "[reports | compiled := data.ergo.compile(data.ergo_cli_test.policy); reports := [data.ergo.report(e.input, compiled, e.params) | e := data.ergo_cli_test.examples[_]]][0]";
