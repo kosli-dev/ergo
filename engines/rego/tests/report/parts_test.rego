@@ -133,6 +133,32 @@ test_a_walk_in_an_option_or_among_several_assertions_tags_the_parts_it_reads_and
 	[i.name | some i in line.inputs; not i.part] == ["xs[].k"]
 }
 
+test_a_count_item_is_said_when_a_clause_of_the_message_is_its_text_not_when_a_quoted_value_holds_it if {
+	check := ergo._s_written_check("count of es whose v is 1 is 0")
+	subj := {"es": [{}, {}]}
+	said := {
+		"message": `item 1 of es: v is missing; z is "item 2 of es: v is missing", which isn't a number`,
+		"ergo/clauses": [
+			ergo._m_clause("item", "item 1 of es", "absent", "item 1 of es: v is missing"),
+			ergo._m_clause("root", "z", "unusable", `z is "item 2 of es: v is missing", which isn't a number`),
+		],
+		"ergo/joint": "; ",
+	}
+	ergo._tally_item_texts(check, subj, "absent", said) == {"item 1 of es: v is missing"}
+	[p.name | some p in ergo._tally_item_parts(check, subj, "absent", "/things/0", said)] == ["item 1 of es"]
+}
+
+test_a_count_item_left_out_of_a_message_cut_short_is_said_by_the_clause_that_counts_the_rest if {
+	check := ergo._s_written_check("count of es whose v is 1 is 0")
+	subj := {"es": [{}, {}]}
+	said := {
+		"message": "item 1 of es: v is missing; and 1 more",
+		"ergo/clauses": [ergo._m_clause("item", "item 1 of es", "absent", "item 1 of es: v is missing"), ergo._m_clause_more(1)],
+		"ergo/joint": "; ",
+	}
+	ergo._tally_item_texts(check, subj, "absent", said) == {"item 1 of es: v is missing", "item 2 of es: v is missing"}
+}
+
 test_a_counted_list_written_with_a_dot_is_never_an_input_of_an_assertion_in_an_option_or_among_several if {
 	c := {"cmp": "eq", "left": {"count_of": [{"literal": "lock"}, "pkgs"], "text": "count of .lock.pkgs", "whose": []}, "op": "compare", "right": {"literal": 1}}
 	e := {"kind": "assertion", "name": "count of .lock.pkgs is 1", "cause": "value", "inputs": [{"name": "count of .lock.pkgs", "value": 2}, {"name": ".lock.pkgs[]", "outcome": "usable", "value": [{"n": 1}, {"n": 2}]}], "failures": [], "message": "count of .lock.pkgs is 2"}
