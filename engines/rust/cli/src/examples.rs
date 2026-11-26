@@ -69,6 +69,8 @@ pub fn read(policy: &Value) -> Result<Vec<Example>, String> {
         if !names.insert(name.clone()) {
             return Err(format!("two examples are called {name}"));
         }
+        written(outcome, &policy["requirements"])
+            .map_err(|problem| format!("example {name}: {problem}"))?;
         examples.push(Example {
             name,
             input: input.clone(),
@@ -105,13 +107,25 @@ fn read_line(text: &str, requirement: &str, report: &Value) -> Result<Line, Stri
     })
 }
 
-fn requirement_line<'a>(text: &'a str, report: &Value) -> Option<(&'a str, &'static str)> {
+fn requirement_line<'a>(text: &'a str, requirements: &Value) -> Option<(&'a str, &'static str)> {
     ["is met", "is not met", "is not applicable"]
         .into_iter()
         .find_map(|words| {
             let name = text.strip_suffix(words)?.strip_suffix(' ')?;
-            report["requirements"].get(name).map(|_| (name, words))
+            requirements.get(name).map(|_| (name, words))
         })
+}
+
+fn written(outcome: &Value, requirements: &Value) -> Result<(), String> {
+    for item in shape(outcome)? {
+        if let Item::Group(heading, lines) = item
+            && lines.is_empty()
+            && requirement_line(&heading, requirements).is_none()
+        {
+            return Err(format!("the heading {heading} lists no lines"));
+        }
+    }
+    Ok(())
 }
 
 fn shape(outcome: &Value) -> Result<Vec<Item>, String> {
@@ -204,14 +218,14 @@ pub fn check(outcome: &Value, report: &Value) -> Checked {
                     problems.push(format!("the report says {actual}"));
                 }
             }
-            Item::Line(text) => match requirement_line(text, report) {
+            Item::Line(text) => match requirement_line(text, &report["requirements"]) {
                 Some((name, words)) => status(name, words, &mut problems),
                 None => problems.push(format!(
                     "can't read the line '{text}': it isn't compliant, not compliant or a requirement of the policy followed by is met, is not met or is not applicable"
                 )),
             },
             Item::Group(heading, group) => {
-                let name = match requirement_line(heading, report) {
+                let name = match requirement_line(heading, &report["requirements"]) {
                     Some((name, words)) => {
                         status(name, words, &mut problems);
                         name

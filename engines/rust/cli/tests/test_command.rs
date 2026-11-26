@@ -209,7 +209,10 @@ fn test_refuses_an_outcome_written_wrong_as_it_refuses_a_missing_one() {
     for (n, (outcome, problem)) in [
         ("    outcome:\n", "example e: the outcome isn't a list"),
         ("    outcome: []\n", "example e: the outcome is empty"),
-        ("    outcome: compliant\n", "example e: the outcome isn't a list"),
+        (
+            "    outcome: compliant\n",
+            "example e: the outcome isn't a list",
+        ),
         (
             "    outcome:\n      - approved:\n",
             "example e: the heading approved lists no lines",
