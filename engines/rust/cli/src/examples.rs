@@ -144,13 +144,29 @@ fn requirement_line<'a>(text: &'a str, requirements: &Value) -> Option<(&'a str,
         })
 }
 
+type Heading<'a> = Option<(&'a str, Option<&'static str>)>;
+
+fn heading<'a>(text: &'a str, requirements: &Value) -> Result<Heading<'a>, String> {
+    match (
+        requirement_line(text, requirements),
+        requirements.get(text).is_some(),
+    ) {
+        (Some((name, _)), true) => Err(format!(
+            "the heading {text} could name the requirement {text} or the status of {name}: write the requirement's whole name and a status, like {text} is met, or for {name} write the line {text} and the heading {name}"
+        )),
+        (Some((name, words)), false) => Ok(Some((name, Some(words)))),
+        (None, true) => Ok(Some((text, None))),
+        (None, false) => Ok(None),
+    }
+}
+
 fn written(outcome: &Value, requirements: &Value) -> Result<(), String> {
     for item in shape(outcome)? {
-        if let Item::Group(heading, lines) = item
+        if let Item::Group(text, lines) = item
+            && !matches!(heading(&text, requirements)?, Some((_, Some(_))))
             && lines.is_empty()
-            && requirement_line(&heading, requirements).is_none()
         {
-            return Err(format!("the heading {heading} lists no lines"));
+            return Err(format!("the heading {text} lists no lines"));
         }
     }
     Ok(())
@@ -260,21 +276,25 @@ pub fn check(outcome: &Value, report: &Value) -> Checked {
                     "can't read the line '{text}': it isn't compliant, not compliant or a requirement of the policy followed by is met, is not met or is not applicable"
                 )),
             },
-            Item::Group(heading, group) => {
-                let name = match requirement_line(heading, &report["requirements"]) {
-                    Some((name, words)) => {
+            Item::Group(text, group) => {
+                let name = match heading(text, &report["requirements"]) {
+                    Err(problem) => {
+                        problems.push(problem);
+                        continue;
+                    }
+                    Ok(Some((name, Some(words)))) => {
                         status(name, words, &mut problems);
                         name
                     }
-                    None if report["requirements"].get(heading.as_str()).is_none() => {
-                        problems.push(format!("no requirement is called {heading}"));
+                    Ok(None) => {
+                        problems.push(format!("no requirement is called {text}"));
                         continue;
                     }
-                    None if group.is_empty() => {
-                        problems.push(format!("the heading {heading} lists no lines"));
+                    Ok(Some(_)) if group.is_empty() => {
+                        problems.push(format!("the heading {text} lists no lines"));
                         continue;
                     }
-                    None => heading.as_str(),
+                    Ok(Some((name, None))) => name,
                 };
                 for text in group {
                     match read_line(text, name, report) {
