@@ -505,7 +505,10 @@ pub fn results_styled(
     match style {
         None => text.push_str(&format!("{summary}\n")),
         Some(style) => {
-            text.push_str(&format!("\n{}\n", style.line(Mark::Therefore, &summary)));
+            if !text.is_empty() {
+                text.push('\n');
+            }
+            text.push_str(&format!("{}\n", style.line(Mark::Therefore, &summary)));
         }
     }
     let code = if failed > 0 || (strict && warnings > 0) {

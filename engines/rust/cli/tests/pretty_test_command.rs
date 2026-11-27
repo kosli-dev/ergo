@@ -94,6 +94,27 @@ fn on_a_terminal_failed_examples_and_warnings_get_marks_and_the_summary_has_the_
 }
 
 #[test]
+fn nothing_but_the_summary_has_no_empty_line_before_it() {
+    let policy = file("quiet");
+    let text = std::fs::read_to_string(&policy).unwrap();
+    let passing = format!(
+        "{}    - name: a different approver passes\n      input: {{deployments: [{{id: d1, author: ann, approver: bob}}]}}\n      outcome:\n        - approved:\n            - deployment d1 passes not_self_approved\n",
+        text.split("    - name: this one").next().unwrap()
+    );
+    let path = std::path::Path::new(&policy).with_file_name("quiet.yaml");
+    std::fs::write(&path, passing).unwrap();
+    let arguments = args(&["test", path.to_str().unwrap(), "--color", "never"]);
+    let Ok(Outcome::Print(out)) = run_with(
+        &arguments,
+        &Environment::default(),
+        &terminal(true, "en_US.UTF-8"),
+    ) else {
+        panic!("not printed")
+    };
+    assert_eq!(out, "∴ 3 examples: 3 passed, 0 failed\n");
+}
+
+#[test]
 fn show_all_lists_every_example_on_a_terminal() {
     let (out, _) = text(
         &["--show", "all", "--color", "never"],
