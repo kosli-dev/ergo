@@ -113539,6 +113539,8 @@
           "for.named_by",
           "for.roots",
           "for.shared_failures",
+          "for.failed_items",
+          "for.failure_inputs",
           "for.inputs",
           "row.parts",
           "problems.where_said",
@@ -113562,13 +113564,26 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/xs/1"
+                    ],
+                    "message": "x is 3, which isn't text",
+                    "name": "item 2 of xs",
+                    "value": 3
+                  }
+                ],
                 "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/every/assert"
                 ],
-                "message": "item 2 of xs: x is 3, which isn't text",
+                "message": "",
                 "name": "e.v is 1"
               },
               {
@@ -113623,13 +113638,26 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/xs/1"
+                    ],
+                    "message": "x is 3, which isn't text",
+                    "name": "item 2 of xs",
+                    "value": 3
+                  }
+                ],
                 "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/some/assert"
                 ],
-                "message": "item 2 of xs: x is 3, which isn't text",
+                "message": "",
                 "name": "e.v is 1"
               },
               {
@@ -113687,6 +113715,8 @@
           "for.named_by",
           "for.roots",
           "for.shared_failures",
+          "for.failed_items",
+          "for.failure_inputs",
           "for.inputs",
           "row.parts",
           "problems.where_said",
@@ -113711,13 +113741,26 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/xs/1"
+                    ],
+                    "message": "x is 3, which isn't text",
+                    "name": "item 2 of xs",
+                    "value": 3
+                  }
+                ],
                 "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/every/assert"
                 ],
-                "message": "item 2 of xs: x is 3, which isn't text",
+                "message": "",
                 "name": "e.v is 1"
               },
               {
@@ -113772,13 +113815,26 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/xs/1"
+                    ],
+                    "message": "x is 3, which isn't text",
+                    "name": "item 2 of xs",
+                    "value": 3
+                  }
+                ],
                 "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/some/assert"
                 ],
-                "message": "item 2 of xs: x is 3, which isn't text",
+                "message": "",
                 "name": "e.v is 1"
               },
               {
@@ -113836,6 +113892,8 @@
           "for.named_by",
           "for.roots",
           "for.shared_failures",
+          "for.failed_items",
+          "for.failure_inputs",
           "for.inputs",
           "row.parts",
           "problems.where_said",
@@ -113860,13 +113918,26 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/xs/1"
+                    ],
+                    "message": "x is 3, which isn't text",
+                    "name": "item 2 of xs",
+                    "value": 3
+                  }
+                ],
                 "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/every/assert"
                 ],
-                "message": "item 2 of xs: x is 3, which isn't text",
+                "message": "",
                 "name": "e.v is 1"
               },
               {
@@ -113921,13 +113992,26 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/xs/1"
+                    ],
+                    "message": "x is 3, which isn't text",
+                    "name": "item 2 of xs",
+                    "value": 3
+                  }
+                ],
                 "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/some/assert"
                 ],
-                "message": "item 2 of xs: x is 3, which isn't text",
+                "message": "",
                 "name": "e.v is 1"
               },
               {
@@ -113978,6 +114062,133 @@
           }
         ],
         "compliant": false
+      }
+    ]
+  },
+  {
+    "description": "a sorted by on the second for line that reads the first line's alias as a named by key reads the key that alias holds for each item of the first list",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "t": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "t",
+          "checks": {
+            "every": {
+              "for": "every xs as x, first of es sorted by m named by x as e",
+              "assert": "e.v is 1"
+            },
+            "some": {
+              "for": "some xs as x, first of es sorted by m named by x as e",
+              "assert": "e.v is 1"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "passes with every and with some when x holds q, so m.q orders es and the item it picks has v 1",
+        "rules": [
+          "for.pick",
+          "for.named_by",
+          "for.roots",
+          "for.try",
+          "for.pass",
+          "for.inputs"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "xs": [
+                "q"
+              ],
+              "es": [
+                {
+                  "v": 1,
+                  "m": {
+                    "q": 1
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "every",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/es/0"
+                ],
+                "name": "item 1 of es",
+                "value": {
+                  "m": {
+                    "q": 1
+                  },
+                  "v": 1
+                }
+              },
+              {
+                "locations": [
+                  "/things/0/xs/0"
+                ],
+                "name": "xs[]",
+                "value": [
+                  "q"
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "some",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/es/0"
+                ],
+                "name": "item 1 of es",
+                "value": {
+                  "m": {
+                    "q": 1
+                  },
+                  "v": 1
+                }
+              },
+              {
+                "locations": [
+                  "/things/0/xs/0"
+                ],
+                "name": "xs[]",
+                "value": [
+                  "q"
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "t"
+            }
+          }
+        ],
+        "compliant": true
       }
     ]
   }
