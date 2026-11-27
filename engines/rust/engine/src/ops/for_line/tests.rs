@@ -5239,7 +5239,8 @@ fn a_clause_two_sentences_give_one_item_is_said_once_whoever_owns_it() {
 }
 
 #[test]
-fn a_sort_key_named_by_the_first_alias_is_picked_for_each_item_of_the_first_list_as_a_whose_that_reads_it_is() {
+fn a_sort_key_named_by_the_first_alias_is_picked_for_each_item_of_the_first_list_as_a_whose_that_reads_it_is()
+ {
     let es = json!([{"v": 1, "m": {"q": 1}}]);
     for (first, xs, cause, said) in [
         ("every xs as x", json!([]), "value", "xs is []"),

@@ -451,6 +451,8 @@ _for_needs_first(check) if _for_from_first(check)
 
 _for_needs_first(check) if _for_whose_reads(object.get(check.items[1], "whose", []), check.items[0].as)
 
+_for_needs_first(check) if _for_sorts_by_first(check)
+
 _for_after_first(check) := object.union(_for_without(check, check.items[0].as), {"items": [check.items[1]]})
 
 _for_unaliased(check) := object.union(check, {
@@ -820,7 +822,9 @@ _for_pick_reads_first(check) if {
 	_for_whose_reads(check.items[1].whose, check.items[0].as)
 }
 
-_for_pick_reads_first(check) if _reads_name(object.get(check.items[1], ["pick", "by"], []), check.items[0].as)
+_for_pick_reads_first(check) if _for_sorts_by_first(check)
+
+_for_sorts_by_first(check) if _reads_name(object.get(check.items[1], ["pick", "by"], []), check.items[0].as)
 
 _for_from_first(check) if check.items[1].path[0] == concat("", ["$", check.items[0].as])
 
