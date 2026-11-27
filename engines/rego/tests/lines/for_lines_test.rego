@@ -136,7 +136,7 @@ _on_tree(line, sentences, subj, params) if {
 	check := ergo._s_written_check({"for": line, "assert": sentences})
 	names := {"ergo/subject": subj, "$at": {"names": {}}}
 	r := ergo._for_freed(check, subj, ergo._for_row_raw(check, subj)) with input as {"ergo/names": names} with data.ergo_params as params
-	ergo._for_on_tree(check, r) with input as {"ergo/names": names} with data.ergo_params as params
+	ergo._for_on_tree(check, subj, r) with input as {"ergo/names": names} with data.ergo_params as params
 }
 
 test_a_one_list_for_row_with_nothing_read_outside_it_that_fails_takes_its_message_from_the_tree if {
@@ -164,8 +164,15 @@ test_a_for_row_run_again_to_read_its_walked_roots_takes_its_message_from_the_tre
 	subj := {"xs": [{"v": 0}]}
 	names := {"ergo/subject": subj, "$at": {"names": {}}}
 	r := ergo._for_freed(check, subj, ergo._for_row_raw(check, subj)) with input as {"ergo/names": names} with ergo._walk_roots_on as true
-	ergo._for_on_tree(check, r) with input as {"ergo/names": names} with ergo._walk_roots_on as true
+	ergo._for_on_tree(check, subj, r) with input as {"ergo/names": names} with ergo._walk_roots_on as true
 	_on_tree("every xs as x", ["x.v is 1"], {"xs": [{"v": 0}]}, {}) with ergo._walk_roots_on as true
+}
+
+test_a_for_row_whose_named_by_key_is_its_alias_keeps_its_message_off_the_tree_while_its_whose_reads_a_list_outside_the_item if {
+	not _on_tree("every xs whose v is in $params.os.name, if any, as x", ["x.v named by x.k is 1"], {"xs": [null]}, {})
+	not _on_tree("every xs whose v is in $params.os.name as x", ["count of x.v named by x.k is 1"], {"xs": ["s", {"v": 1}]}, {})
+	_on_tree("every xs whose v is in $params.os.name as x", ["x.w is 1"], {"xs": [null]}, {})
+	_on_tree("every xs whose v is at least $params.min as x", ["x.v named by x.k is 1"], {"xs": [null]}, {})
 }
 
 test_a_for_row_whose_list_or_sort_key_has_a_step_from_params_takes_its_message_from_the_tree if {
