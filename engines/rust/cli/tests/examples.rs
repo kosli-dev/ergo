@@ -35,6 +35,25 @@ fn problems(outcome: Value) -> Vec<String> {
 }
 
 #[test]
+fn a_requirement_status_this_ergo_does_not_know_is_named_in_the_problem() {
+    let mut report = ergo_policy_engine::report(&input(), &policy(), &json!({}));
+    report["requirements"]["reviewed"]["status"] = json!("failing");
+    report["requirements"]["pulled"]["status"] = json!(3);
+    let checked = examples::check(
+        &json!(["reviewed is met", "pulled is met"]),
+        &report,
+        &policy(),
+    );
+    assert_eq!(
+        checked.problems[..2],
+        [
+            "the report says reviewed: status \"failing\" is not one this ergo knows".to_string(),
+            "the report says pulled has no status".to_string()
+        ]
+    );
+}
+
+#[test]
 fn an_outcome_that_says_what_the_report_says_has_no_problem() {
     assert_eq!(
         problems(json!([

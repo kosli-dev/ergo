@@ -114,11 +114,11 @@ fn opa_reads_one_policy_input_and_params_from_one_data_file_and_runs_one_query()
     );
     assert_eq!(
         opa::REPORT_QUERY,
-        "[x | compiled := data.ergo.compile(data.ergo_cli.policy); x := {\"report\": data.ergo.report(data.ergo_cli.input, compiled, data.ergo_cli.params)}][0]"
+        "{\"report\": data.ergo.report(data.ergo_cli.input, data.ergo_cli.policy, data.ergo_cli.params)}"
     );
     assert_eq!(
         opa::VIOLATIONS_QUERY,
-        "[x | compiled := data.ergo.compile(data.ergo_cli.policy); report := data.ergo.report(data.ergo_cli.input, compiled, data.ergo_cli.params); x := {\"report\": report, \"violations\": data.ergo.violations(report)}][0]"
+        "[x | report := data.ergo.report(data.ergo_cli.input, data.ergo_cli.policy, data.ergo_cli.params); x := {\"report\": report, \"violations\": data.ergo.violations(report)}][0]"
     );
 }
 
@@ -221,6 +221,87 @@ fn report_with_engine_rego_fails_closed_when_ergo_rego_cannot_be_read_or_has_a_c
     }
 }
 
+#[test]
+fn opa_output_that_is_not_one_report_says_what_is_wrong_with_it() {
+    let engine = r#""engine": {"name": "ergo-rego", "version": "1"}"#;
+    let good = format!(r#"{{{engine}, "results": []}}"#);
+    let cases = [
+        (
+            r#"{"report": {"results": []}}"#.to_string(),
+            false,
+            "report: engine.name isn't text",
+        ),
+        (
+            r#"{"report": {"engine": {"name": "x", "version": 1}, "results": []}}"#.to_string(),
+            false,
+            "report: engine.version isn't text",
+        ),
+        (
+            format!(r#"{{"report": {{{engine}, "results": {{}}}}}}"#),
+            false,
+            "report: results isn't a list",
+        ),
+        (r#"{}"#.to_string(), false, "report is missing"),
+        (
+            format!(r#"{{"report": {good}}}"#),
+            true,
+            "violations is missing",
+        ),
+        (
+            format!(r#"{{"report": {good}, "violations": null}}"#),
+            true,
+            "violations isn't a list",
+        ),
+        (
+            format!(r#"{{"report": {good}, "violations": {{}}}}"#),
+            true,
+            "violations isn't a list",
+        ),
+    ];
+    for (printed, violations, reason) in cases {
+        assert_eq!(
+            opa::one_report(&printed, violations),
+            Err(format!("opa printed something that isn't a report: {reason}")),
+            "{printed}"
+        );
+    }
+    assert_eq!(
+        opa::one_report(&format!(r#"{{"report": {good}, "violations": []}}"#), true),
+        Ok((serde_json::from_str(&good).unwrap(), Some(json!([]))))
+    );
+}
+
+#[cfg(unix)]
+#[test]
+fn violations_with_engine_rego_refuses_violations_that_are_not_a_list_and_exits_2() {
+    let policy = file("opa-null", "policy.yaml", POLICY);
+    let input = file("opa-null", "input.json", INPUT);
+    let ergo_rego = file("opa-null", "ergo.rego", "package ergo\n");
+    let report =
+        r#"{"compliant": true, "engine": {"name": "fake", "version": "9"}, "results": []}"#;
+    let opa = fake_opa(
+        "opa-null",
+        &format!("echo '{{\"report\": {report}, \"violations\": null}}'\n"),
+    );
+    let environment = Environment {
+        ergo_rego: Some(ergo_rego.clone()),
+        opa: Some(opa),
+    };
+    let got = run_in(
+        &args(&[
+            "violations", "--policy", &policy, "--input", &input, "--engine", "rego", "--fail",
+        ]),
+        &environment,
+    );
+    assert_eq!(
+        got,
+        Err(Failure::Engine(format!(
+            "opa printed something that isn't a report: violations isn't a list, with ergo.rego at {ergo_rego}"
+        )))
+    );
+    assert_eq!(got.unwrap_err().code(), 2);
+}
+
 #[cfg(unix)]
 fn fake_opa(name: &str, script: &str) -> std::ffi::OsString {
     use std::os::unix::fs::PermissionsExt;
@@ -250,7 +331,12 @@ fn report_with_engine_rego_fails_closed_when_opa_is_missing_fails_or_prints_no_r
             format!("opa failed on ergo.rego at {ergo_rego}: first line"),
         ),
         (fake_opa("opa-silent", "exit 0\n"), not_report.clone()),
-        (fake_opa("opa-junk", "echo '{\"report\": 1}'\n"), not_report),
+        (
+            fake_opa("opa-junk", "echo '{\"report\": 1}'\n"),
+            format!(
+                "opa printed something that isn't a report: report isn't an object, with ergo.rego at {ergo_rego}"
+            ),
+        ),
     ];
     for command in ["report", "violations"] {
         for (opa, message) in &cases {

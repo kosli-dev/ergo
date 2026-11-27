@@ -434,6 +434,22 @@ fn the_outcome_of_a_report_has_compliant_then_each_requirement_with_its_status_a
 }
 
 #[test]
+fn a_requirement_status_this_ergo_does_not_know_is_named_in_the_error() {
+    let policy = two_requirements();
+    let mut report = report(policy.clone(), two_requirements_input());
+    report["requirements"]["reviewed"]["status"] = json!("failing");
+    assert_eq!(
+        outcome::of(&report, &policy),
+        Err("requirement reviewed: status \"failing\" is not one this ergo knows".to_string())
+    );
+    report["requirements"]["reviewed"]["status"] = json!(3);
+    assert_eq!(
+        outcome::of(&report, &policy),
+        Err("requirement reviewed has no status".to_string())
+    );
+}
+
+#[test]
 fn the_outcome_of_a_report_with_a_row_it_cannot_show_yet_is_an_error() {
     let mut policy = two_requirements();
     policy["subjects"]["pull request"]
