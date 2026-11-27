@@ -686,6 +686,14 @@ test_a_for_row_whose_whose_key_isnt_text_says_the_key_on_an_empty_list_it_tolera
 	_row_tree_text("every es whose zz is m named by $input.k, if any, as e", ["e.v is 2"], {"es": []}, {}) == "$input.k is 3, which isn't text" with data.ergo_document as {"k": 3, "m": {"a": 2}}
 }
 
+test_a_sentence_whose_message_has_parts_apart_keeps_them_apart_under_its_item_as_its_entry_does if {
+	_row_tree_text("every xs as m", ["m.k named by m.k is 1"], {"xs": [{"k": null}, {}]}, {}) == `item 1 of xs: m is {"k": null}, which isn't text; m.k is null; item 2 of xs: m is {}, which isn't text`
+}
+
+test_a_count_whose_entry_says_its_parts_under_one_item_joins_them_under_that_item if {
+	_row_tree_text("every xs as m", ["count of m.v named by m.k is 1"], {"xs": [{"v": null}]}, {}) == `item 1 of xs: m is {"v": null}, which isn't text, and m.v is null`
+}
+
 test_an_item_two_sentences_say_the_same_of_says_it_once_whether_or_not_it_reads_the_alias_as_written if {
 	_row_tree_text("every xs as m", ["m is $params.l", "m.v named by m.v is 1"], {"xs": [null]}, {"l": 1}) == "item 1 of xs: m is null"
 }
