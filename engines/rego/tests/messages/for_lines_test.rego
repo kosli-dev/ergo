@@ -620,6 +620,18 @@ test_a_for_rows_roots_keep_the_order_of_their_sentences if {
 	_row_tree_text("every xs as x", ["x.v is $params.b", "x.v is $params.a"], {"xs": [{"v": 1}]}, {}) == "$params.b is missing; $params.a is missing"
 }
 
+test_the_outside_lists_two_sentences_read_are_said_in_the_order_the_sentences_are_written if {
+	doc := {"os": [{"name": "a"}, {"name": null}], "ps": [{"name": "a"}, {}]}
+	subj := {"xs": [{"v": "a", "w": "a"}]}
+	_row_tree_text("every xs as x", ["x.v is in $input.os.name", "x.w is in $input.ps.name"], subj, {}) == "item 2 of $input.os: name is null; item 2 of $input.ps: name is missing" with data.ergo_document as doc
+	_row_tree_text("every xs as x", ["x.w is in $input.ps.name", "x.v is in $input.os.name"], subj, {}) == "item 2 of $input.ps: name is missing; item 2 of $input.os: name is null" with data.ergo_document as doc
+}
+
+test_an_outside_list_the_lines_whose_reads_comes_before_one_a_sentence_reads if {
+	doc := {"os": [{"name": "a"}, {"name": null}], "ps": [{"name": "a"}, {}]}
+	_row_tree_text("every xs whose v is in $input.os.name, if any, as x", ["x.w is in $input.ps.name", "z is 1"], {"xs": [], "z": 2}, {}) == "z is 2; item 2 of $input.os: name is null; item 2 of $input.ps: name is missing" with data.ergo_document as doc
+}
+
 test_the_roots_of_the_lines_own_whose_come_before_the_sentences_roots if {
 	_row_tree_text("every xs whose v is at least $params.min as x", ["x.w is at least $params.a"], {"xs": [{"v": 1, "w": 1}]}, {"a": "s"}) == `$params.min is missing; $params.a is "s", which isn't a number`
 }
