@@ -285,3 +285,148 @@ fn the_first_locale_variable_that_is_set_decides() {
     );
     assert_eq!(said(&[]), None);
 }
+
+fn applies_report(cause: Option<&str>) -> Value {
+    let mut failed = row(
+        "approved",
+        "$applies",
+        json!("d2"),
+        false,
+        Some("environment is missing"),
+    );
+    if let Some(cause) = cause {
+        failed["cause"] = json!(cause);
+    }
+    json!({
+        "compliant": false,
+        "requirements": {"approved": {"status": "not_met"}},
+        "results": [failed]
+    })
+}
+
+#[test]
+fn a_subject_is_out_of_scope_only_when_its_applies_row_fails_with_value() {
+    assert_eq!(
+        render(&applies_report(Some("value")), &json!({}), &GLYPHS).unwrap(),
+        "✗ approved is not met\n\n  1 row: 0 passed, 0 failed, 1 out of scope\n\n∴ not compliant\n"
+    );
+}
+
+#[test]
+fn an_applies_row_that_fails_with_any_other_cause_is_a_failed_row_not_an_out_of_scope_subject() {
+    for cause in [
+        Some("absent"),
+        Some("null"),
+        Some("unusable"),
+        Some("not_an_object"),
+        Some("ambiguous"),
+        Some("something_new"),
+        None,
+    ] {
+        assert_eq!(
+            render(&applies_report(cause), &json!({}), &GLYPHS).unwrap(),
+            "✗ approved is not met\n    ✗ deployment d2 fails $applies\n      because environment is missing\n\n  1 row: 0 passed, 1 failed, 0 out of scope\n\n∴ not compliant\n",
+            "{cause:?}"
+        );
+    }
+}
+
+#[test]
+fn an_applies_row_with_a_cause_other_than_value_is_listed_with_show_all_as_a_failure() {
+    let style = Style {
+        show: Show::All,
+        ..GLYPHS
+    };
+    assert_eq!(
+        render(&applies_report(Some("absent")), &json!({}), &style).unwrap(),
+        "✗ approved is not met\n    ✗ deployment d2 fails $applies\n      because environment is missing\n\n  1 row: 0 passed, 1 failed, 0 out of scope\n\n∴ not compliant\n"
+    );
+}
+
+fn artifacts_policy() -> Value {
+    json!({
+        "subjects": {
+            "deployment": {"from": "deployments", "identified_by": "id"},
+            "artifact": {"from": "every deployment.artifacts", "identified_by": "name"}
+        }
+    })
+}
+
+fn artifact_row(check: &str, deployment: &str, passed: bool) -> Value {
+    json!({
+        "requirement": "tested",
+        "check": check,
+        "passed": passed,
+        "message": "tests is \"failed\"",
+        "subject": {"type": "artifact", "id": "web", "in": {"deployment": deployment}}
+    })
+}
+
+#[test]
+fn a_row_names_its_parent_subjects_like_the_outcome_lines_do() {
+    let report = json!({
+        "compliant": false,
+        "requirements": {"tested": {"status": "not_met"}},
+        "results": [
+            artifact_row("tests_passed", "d1", false),
+            artifact_row("tests_passed", "d2", false),
+            artifact_row("$min_subjects", "d4", false)
+        ]
+    });
+    let text = render(&report, &artifacts_policy(), &GLYPHS).unwrap();
+    assert!(
+        text.contains("    ✗ artifact web in deployment d1 fails tests_passed\n"),
+        "{text}"
+    );
+    assert!(
+        text.contains("    ✗ artifact web in deployment d2 fails tests_passed\n"),
+        "{text}"
+    );
+    assert!(
+        text.contains("    ✗ artifact web in deployment d4 fails $min_subjects\n"),
+        "{text}"
+    );
+}
+
+#[test]
+fn a_row_whose_parents_the_policy_cannot_place_still_names_the_ones_the_report_gives() {
+    let report = json!({
+        "compliant": false,
+        "requirements": {"tested": {"status": "not_met"}},
+        "results": [artifact_row("tests_passed", "d1", false)]
+    });
+    let text = render(&report, &json!({}), &GLYPHS).unwrap();
+    assert!(
+        text.contains("    ✗ artifact web in deployment d1 fails tests_passed\n"),
+        "{text}"
+    );
+}
+
+#[test]
+fn the_row_of_a_check_ergo_adds_for_the_policy_names_the_subject_once() {
+    let report = json!({
+        "compliant": false,
+        "requirements": {"$policy": {"status": "not_met"}},
+        "results": [{
+            "requirement": "$policy",
+            "check": "$well_formed",
+            "passed": false,
+            "message": "policy ergo_spec: missing",
+            "subject": {"type": "$policy", "id": "$policy"}
+        }]
+    });
+    let text = render(&report, &json!({}), &GLYPHS).unwrap();
+    assert!(
+        text.contains("    ✗ $policy fails $well_formed\n"),
+        "{text}"
+    );
+}
+
+#[test]
+fn a_report_with_no_requirements_and_no_rows_starts_with_its_count_and_not_an_empty_line() {
+    let report = json!({"compliant": true, "requirements": {}, "results": []});
+    assert_eq!(
+        render(&report, &json!({}), &GLYPHS).unwrap(),
+        "  0 rows: 0 passed, 0 failed, 0 out of scope\n\n∴ compliant\n"
+    );
+}
