@@ -381,9 +381,20 @@ _for_item_parts(check, subj, r, once) := [] if {
 	r.failed == []
 } else := _for_message_parts(check, subj, r) if {
 	r.failed == []
-} else := _for_message_parts(check, subj, object.union(r, {"failed": [object.union(f, {"skip": skip}) | some f in r.failed]})) if {
+} else := _for_message_parts(check, subj, object.union(r, {"failed": [_for_second_skipping(check, f, skip, hoisted) | some f in r.failed]})) if {
 	skip := array.concat(once, [m | some x in _for_second_roots(check, subj); some m in x.raw])
+	hoisted := _for_hoisted_texts(check, r)
 }
+
+_for_second_skipping(check, f, skip, hoisted) := object.union(f, {"skip": skip, "failed_assertions": [_for_line_skipping(check, l, skip, hoisted) | some l in f.failed_assertions]}) if f.failed_assertions != []
+
+else := object.union(f, {"skip": skip})
+
+_for_line_skipping(check, l, skip, hoisted) := object.union(l, {"skip": [s | some s in skip; not s in hoisted]}) if {
+	some i, c in check.checks
+	check.assertions[i] == l.assertion
+	_for_reads_an_alias(check, c)
+} else := l
 
 _for_free_texts(check, r) := array.concat(
 	[p |
