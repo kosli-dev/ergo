@@ -600,6 +600,11 @@ test_a_sort_key_root_is_said_once_before_the_items if {
 	_row_tree_text("first of rows sorted by m named by $params.km as r", ["r.v is 1"], {"rows": [{"m": [5, 1]}, {"m": {"a": 1}}, {"v": 1}]}, {}) == "$params.km is missing; item 1 of rows: m is [5, 1], which isn't an object; item 3 of rows: m is missing"
 }
 
+test_a_sort_key_root_that_is_null_is_said_once_before_the_items if {
+	_row_tree_text("first of rows sorted by m named by $params.km as r", ["r.v is 1"], {"rows": [{"m": [5, 1]}, {"m": {"a": 1}}, {"v": 1}]}, {"km": null}) == "$params.km is null; item 1 of rows: m is [5, 1], which isn't an object; item 3 of rows: m is missing"
+	_row_tree_text("last of rows sorted by m named by $params.km as r", ["r.v is 1"], {"rows": [{"m": {"a": 1}}, {"v": 1}]}, {"km": null}) == "$params.km is null; item 2 of rows: m is missing"
+}
+
 test_an_item_that_says_only_the_roots_its_sentence_joins_is_left_out if {
 	_row_tree_text("every rows as row", ["row.v is zz.x named by p"], {"zz": "str", "rows": [{"v": 1}], "p": 3}, {}) == `p is 3, which isn't text, and zz is "str", which isn't an object`
 }
