@@ -301,7 +301,7 @@ _keys_by(c, p) if {
 }
 
 _key_root_texts(c) := array.concat(
-	[_m_isnt(named[0], v, "text") |
+	[_key_isnt_text(named[0], v) |
 		some named in sort({[_ref_name(step.ref), step.ref] |
 			walk(c, [_, x])
 			is_array(x)
@@ -315,13 +315,19 @@ _key_root_texts(c) := array.concat(
 		v := _ref_read(p)
 		not is_string(v)
 	],
-	[_m_isnt(x[0], x[1], "text") | some x in _alias_or_parent_keys_unread(c); x[1] != null],
+	[_key_isnt_text(x[0], x[1]) | some x in _alias_or_parent_keys_unread(c); x[1] != null],
 )
+
+_key_isnt_text(name, v) := _m_isnt(name, v, "text")
 
 _key_root_said(c) := array.concat(
 	[["unusable", t] | some t in _key_root_texts(c)],
-	[["null", concat("", [x[0], " is null"])] | some x in _alias_or_parent_keys_unread(c); x[1] == null],
+	[_name_key_said(x) | some x in _alias_or_parent_keys_unread(c); x[1] == null],
 )
+
+_name_key_said([n, null]) := ["null", concat("", [n, " is null"])]
+
+_name_key_said([n, v]) := ["unusable", _key_isnt_text(n, v)] if v != null
 
 _walk_key_texts(check, r) := _once([m |
 	some c in _key_conds(check, r)

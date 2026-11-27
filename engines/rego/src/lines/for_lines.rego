@@ -89,7 +89,9 @@ _for_key_unread(check) if {
 
 _for_reads_a_list(c) if _walks(c)
 
-_for_reads_a_list(c) if {
+_for_reads_a_list(c) if _for_reads_a_tally(c)
+
+_for_reads_a_tally(c) if {
 	walk(c, [_, y])
 	is_object(y)
 	some f in _tally_forms
@@ -291,20 +293,41 @@ _for_second_roots(check, subj) := [{"i": e.i, "fl": fl, "ms": ms, "raw": [_m_ali
 	item := check.items[0]
 	w := _for_walk(item, subj, _for_names)
 	outer := _walk_root_msgs(check, subj)
-	conds := array.concat(object.get(check.items[1], "whose", []), _for_sentence_conds(check))
+	whose := object.get(check.items[1], "whose", [])
+	conds := array.concat(whose, _for_sentence_conds(check))
 	some e in w.items
 	wh := _for_whose(item, e, _for_names)
 	wh.undecided == []
 	wh.kept
 	names := _bound(_for_names, item.as, e.v, _walk_at(w, e))
-	some c in conds
-	fl := _root_read_flaw(subj, c) with input as {"ergo/names": names}
+	some j, c in conds
+	keys := _for_second_keys_said(check, subj, c, j < count(whose)) with input as {"ergo/names": names}
+	root := _root_read_flaw(subj, c) with input as {"ergo/names": names}
+	fl := _second_flaw(root, keys)
 	not fl in _tolerated_root_flaws
 	_second_root_counts(fl)
-	said := array.concat(_m_cond_root_texts(subj, c), _m_walked_root_texts(c)) with input as {"ergo/names": names}
+	said := array.concat([k[1] | some k in keys], _second_root_texts(subj, c, root)) with input as {"ergo/names": names}
 	ms := [_m_under(_m_for_item_name(check, e.i), _m_aliased(m)) | some m in said; not m in outer]
 	ms != []
 ]
+
+_for_second_keys_said(check, subj, c, true) := [_name_key_said(k) |
+	some k in _alias_or_parent_keys_unread(c)
+	k[0] == check.items[0].as
+	not _for_second_has_items(check, subj)
+]
+
+_for_second_keys_said(_, _, _, false) := []
+
+_for_second_has_items(check, subj) if _for_walk(object.remove(check.items[1], ["whose", "pick"]), subj, _for_names).items != []
+
+_second_flaw(root, keys) := _worst_of({k[0] | some k in keys} | ({root} - _tolerated_root_flaws)) if keys != []
+
+else := root
+
+_second_root_texts(subj, c, root) := [] if root in _tolerated_root_flaws
+
+else := array.concat(_m_cond_root_texts(subj, c), _m_walked_root_texts(c))
 
 _second_root_counts(fl) if fl != "value"
 
@@ -360,9 +383,21 @@ _for_item_parts(check, subj, r, once) := [] if {
 	r.failed == []
 } else := _for_message_parts(check, subj, r) if {
 	r.failed == []
-} else := _for_message_parts(check, subj, object.union(r, {"failed": [object.union(f, {"skip": skip}) | some f in r.failed]})) if {
+} else := _for_message_parts(check, subj, object.union(r, {"failed": [_for_second_skipping(check, f, skip, hoisted) | some f in r.failed]})) if {
 	skip := array.concat(once, [m | some x in _for_second_roots(check, subj); some m in x.raw])
+	hoisted := _for_hoisted_texts(check, r)
 }
+
+_for_second_skipping(check, f, skip, hoisted) := object.union(f, {"skip": skip, "failed_assertions": [_for_line_skipping(check, l, skip, hoisted) | some l in f.failed_assertions]}) if f.failed_assertions != []
+
+else := object.union(f, {"skip": skip})
+
+_for_line_skipping(check, l, skip, hoisted) := object.union(l, {"skip": [s | some s in skip; not s in hoisted]}) if {
+	some i, c in check.checks
+	check.assertions[i] == l.assertion
+	_for_reads_an_alias(check, c)
+	not _for_reads_a_tally(c)
+} else := l
 
 _for_free_texts(check, r) := array.concat(
 	[p |
