@@ -37,13 +37,13 @@ _for_row_of(check, subj, r) := r if {
 	m := _m_fallback_text(check)
 } else := object.union(object.remove(r, _row_extra_keys), {"failed": [_m_strip(f) | some f in r.failed], "message": "", "ergo/for_raw": {"check": check, "subj": subj, "r": r, "tree": true}}) if {
 	r.cause != "satisfied"
-	_for_on_tree(check, subj, r)
+	_for_on_tree(check, r)
 } else := object.union(object.remove(r, _row_extra_keys), {"failed": [_m_strip(f) | some f in r.failed], "message": said.message, "ergo/for_raw": {"check": check, "subj": subj, "r": r, "once": said.once, "line": object.get(said, "line", [])}}) if {
 	r.cause != "satisfied"
 	said := _for_row_text(check, subj, r)
 }
 
-_for_on_tree(check, subj, r) if {
+_for_on_tree(check, r) if {
 	count(check.items) == 1
 	object.get(r, "natural", null) != "satisfied"
 	not _walk_flawed(check)
