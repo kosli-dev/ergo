@@ -5239,8 +5239,7 @@ fn a_clause_two_sentences_give_one_item_is_said_once_whoever_owns_it() {
 }
 
 #[test]
-fn a_sort_key_named_by_the_first_alias_is_picked_for_each_item_of_the_first_list_as_a_whose_that_reads_it_is()
- {
+fn a_sort_key_named_by_the_first_alias_is_picked_per_item_of_the_first_list_as_a_whose_is() {
     let es = json!([{"v": 1, "m": {"q": 1}}]);
     for (first, xs, cause, said) in [
         ("every xs as x", json!([]), "value", "xs is []"),
@@ -5263,4 +5262,20 @@ fn a_sort_key_named_by_the_first_alias_is_picked_for_each_item_of_the_first_list
             );
         }
     }
+}
+
+#[test]
+fn a_tie_on_a_sort_key_named_by_the_first_alias_is_said_under_the_item_of_the_first_list() {
+    assert_eq!(
+        for_row(
+            "every xs as x, first of es sorted by m named by x as e",
+            &["e.v is 1"],
+            json!({"xs": ["q", "r"], "es": [{"v": 1, "m": {"q": 1, "r": 1}}, {"v": 2, "m": {"q": 1, "r": 2}}]}),
+            json!({})
+        ),
+        (
+            "ambiguous".to_string(),
+            "item 1 of xs: item 1 and item 2 of es tie on m named by x".to_string()
+        )
+    );
 }
