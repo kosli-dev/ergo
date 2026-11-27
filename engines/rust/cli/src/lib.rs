@@ -104,14 +104,16 @@ impl Failure {
 
 /// The usage text.
 pub const USAGE: &str =
-    "Usage: ergo <command> --policy <file> --input <file> [--params <file>] [--compact] [--fail]
-       ergo report --format outcome --policy <file> --input <file> [--params <file>] [--fail]
-       ergo test <policy file> [--strict] [--engine rust|rego] [--ergo-rego <file>]
+    "∴ ergo: what follows from the evidence
+
+Usage: ergo <command> --policy <file> --input <file> [--params <file>] [--compact] [--fail]
+       ergo report --format outcome|pretty --policy <file> --input <file> [--params <file>] [--fail]
+       ergo report --format pretty ... [--show failed|all] [--color auto|always|never]
+       ergo test <policy file> [--strict] [--show failed|all] [--color auto|always|never] [--engine rust|rego] [--ergo-rego <file>]
        ergo report|violations ... [--engine rust|rego] [--ergo-rego <file>]
 
 Commands:
-  report       print the report as JSON
-  violations   print what failed in the report as JSON
+  report       print the report as JSON  violations   print what failed in the report as JSON
   test         experimental: run the examples in a policy
   help         print this text
 
@@ -123,6 +125,16 @@ The output is pretty-printed with sorted keys; --compact prints one line.
 Experimental: --format outcome prints the report as outcome lines in YAML,
 ready to paste into an example. test --strict also fails when no example
 shows a check failing, or none shows it passing.
+
+Experimental: --format pretty prints the failed requirements first, with their
+failed rows and the report's own messages, then the requirements that are met,
+a count of the rows, and a last line that says compliant or not compliant.
+--show failed (the default) lists the failed rows, --show all every row. On a
+terminal, test marks each line the same way. Colour is on only for a terminal,
+and NO_COLOR turns it off; --color auto|always|never overrides both. Glyphs
+(✓ ✗ ⚠ – ∴) are written when LC_ALL, LC_CTYPE or LANG names UTF-8, and ok, FAIL,
+warn, - and -> otherwise. Piped, test prints the plain lines it always did. No
+flag changes an exit code.
 
 --engine rego builds the report with ergo.rego through opa, in place of the
 Rust engine, for report, violations and test. The path of ergo.rego is
