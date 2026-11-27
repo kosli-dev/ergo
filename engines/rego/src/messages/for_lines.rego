@@ -868,7 +868,7 @@ _for_rooted_clauses(check, c, subj, cause, roots) := _once(_for_said_groups(c, s
 	whole := _for_says_whole(check, c)
 }
 
-_for_said_groups(c, said, roots, cause, whole) := [_m_clause("root", t, cause, t) | ts := [p | some g in said; some p in g; not p in roots]; ts != []; t := concat("; ", ts)] if {
+_for_said_groups(c, said, roots, cause, whole) := [_for_parts_clause(ts, cause) | ts := [p | some g in said; some p in g; not p in roots]; ts != []] if {
 	count(said) > 1
 	_ = whole
 	not _for_tallies(c)
@@ -882,6 +882,13 @@ _for_said_groups(c, said, roots, cause, whole) := [_m_clause("root", t, cause, t
 _for_tallies(c) if {
 	some side in _m_sides(c)
 	_m_tally_side(side)
+}
+
+_for_parts_clause([t], cause) := _m_clause("root", t, cause, t)
+
+_for_parts_clause(ts, cause) := object.union(_m_clause("root", t, cause, t), {"parts": ts}) if {
+	count(ts) > 1
+	t := concat("; ", ts)
 }
 
 _for_says_whole(check, c) := false if _for_reads_an_alias(check, c)
@@ -1055,7 +1062,7 @@ _for_walked_items(check) := {"w": w, "items": {_failed_name(e.i, d): e | some e 
 
 _for_item_bound(check, f, walked) := _bound(_for_names, check.items[0].as, e.v, _walk_at(walked.w, e)) if e := walked.items[f.path]
 
-_for_item_sentences(check, f, names, roots) := _for_in_list_order([x | some i, x in said; not _for_said_earlier(x, array.slice(said, 0, i))]) if {
+_for_item_sentences(check, f, names, roots) := _for_in_list_order([y | some i, x in said; y := _for_new_parts(x, array.slice(said, 0, i))]) if {
 	said := _once([_for_whole_list(x) |
 		some i, c in check.checks
 		_for_reads_an_alias(check, c)
@@ -1072,12 +1079,22 @@ _for_whole_list(x) := object.union(x, {"kind": "list"}) if {
 	_walk_kind(x.name) == "list"
 } else := x
 
-_for_said_earlier(x, earlier) if {
+_for_new_parts(x, _) := x if x.kind == "item"
+
+_for_new_parts(x, earlier) := x if {
 	x.kind != "item"
-	some e in earlier
-	e.kind != "item"
-	_m_aliased(e.text) == _m_aliased(x.text)
+	not "parts" in object.keys(x)
+	not _m_aliased(x.text) in _for_texts_said(earlier)
 }
+
+_for_new_parts(x, earlier) := _for_parts_clause(ts, x.cause) if {
+	x.kind != "item"
+	"parts" in object.keys(x)
+	ts := [t | some t in x.parts; not _m_aliased(t) in _for_texts_said(earlier)]
+	ts != []
+}
+
+_for_texts_said(earlier) := {_m_aliased(t) | some e in earlier; e.kind != "item"; some t in array.concat([e.text], object.get(e, "parts", []))}
 
 _for_in_list_order(said) := [_for_slot(said, sorted, i) | some i, _ in said] if {
 	items := [c | some c in said; c.kind == "item"]
