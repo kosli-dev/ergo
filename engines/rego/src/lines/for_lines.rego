@@ -64,9 +64,19 @@ _for_alias_key_beside_a_list_outside(check) if {
 	some c in object.get(item, "whose", [])
 	walk(c, [_, x])
 	is_object(x)
-	_list_phrase(x)
-	some r in _m_root_paths(x)
-	_walk_outside(r)
+	_for_reads_a_list_outside(x)
+}
+
+_for_reads_a_list_outside(x) if {
+	_list_cmp(x)
+	_walk_outside(x.right)
+}
+
+_for_reads_a_list_outside(x) if {
+	x.op in (_list_phrase_ops | _single_contain_ops)
+	some f in ["values", "value", "patterns"]
+	_is_ref(object.get(x, f, null))
+	_walk_outside(x[f].ref)
 }
 
 _for_key_unread(check) if {
