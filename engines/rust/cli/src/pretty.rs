@@ -68,8 +68,12 @@ pub enum Mark {
     Warn,
     /// Something that isn't judged, like a subject out of scope, dim.
     Skip,
-    /// The verdict line, in bold.
+    /// The last line of `ergo test`, in bold.
     Therefore,
+    /// The verdict line of a compliant report, in bold green.
+    Compliant,
+    /// The verdict line of a report that isn't compliant, in bold red.
+    NotCompliant,
 }
 
 fn unsafe_char(c: char) -> bool {
@@ -120,8 +124,8 @@ impl Style {
             (Mark::Warn, false) => "warn",
             (Mark::Skip, true) => "–",
             (Mark::Skip, false) => "-",
-            (Mark::Therefore, true) => "∴",
-            (Mark::Therefore, false) => "->",
+            (Mark::Therefore | Mark::Compliant | Mark::NotCompliant, true) => "∴",
+            (Mark::Therefore | Mark::Compliant | Mark::NotCompliant, false) => "->",
         }
     }
 
@@ -136,6 +140,8 @@ impl Style {
             Mark::Warn => whole("33"),
             Mark::Skip => whole("2"),
             Mark::Therefore => whole("1"),
+            Mark::Compliant => whole("1;32"),
+            Mark::NotCompliant => whole("1;31"),
         }
     }
 }
@@ -280,12 +286,12 @@ pub fn render(report: &Value, policy: &Value, style: &Style) -> Result<String, S
         rows.len(),
         plural(rows.len())
     ));
-    let verdict = if compliant {
-        "compliant"
+    let (mark, verdict) = if compliant {
+        (Mark::Compliant, "compliant")
     } else {
-        "not compliant"
+        (Mark::NotCompliant, "not compliant")
     };
-    out.push_str(&style.line(Mark::Therefore, verdict));
+    out.push_str(&style.line(mark, verdict));
     out.push('\n');
     Ok(out)
 }

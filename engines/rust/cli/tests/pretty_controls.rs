@@ -64,7 +64,10 @@ fn only_colour_codes(text: &str) -> bool {
         let Some(code) = after.strip_prefix('[') else {
             return false;
         };
-        let digits: String = code.chars().take_while(char::is_ascii_digit).collect();
+        let digits: String = code
+            .chars()
+            .take_while(|c| c.is_ascii_digit() || *c == ';')
+            .collect();
         !digits.is_empty() && code[digits.len()..].starts_with('m')
     })
 }
