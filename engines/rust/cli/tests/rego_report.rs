@@ -417,3 +417,24 @@ fn the_ergo_command_says_how_to_get_ergo_rego_and_exits_2() {
     );
     assert!(output.stdout.is_empty());
 }
+
+#[test]
+fn report_and_violations_need_only_ergo_report_and_ergo_violations_from_ergo_rego() {
+    let Some(ergo_rego) = built_ergo_rego() else {
+        return;
+    };
+    let renamed = std::fs::read_to_string(&ergo_rego)
+        .unwrap()
+        .replace("\ncompile(", "\ncompile_v2(");
+    let renamed = file("no-compile", "ergo.rego", &renamed);
+    let policy = file("no-compile", "policy.yaml", POLICY);
+    let input = file("no-compile", "input.json", INPUT);
+    for command in ["report", "violations"] {
+        let all = args(&[
+            command, "--policy", &policy, "--input", &input, "--engine", "rego",
+        ]);
+        let same = text(run_in(&all, &with_rego(&ergo_rego)));
+        let got = text(run_in(&all, &with_rego(&renamed)));
+        assert_eq!(got, same, "{command}");
+    }
+}
