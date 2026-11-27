@@ -146,7 +146,7 @@ _for_whose_owns(check) := [_for_cond_own_of(c, subj) | some c in object.get(chec
 
 _for_cond_own_of(c, subj) := {"check": _for_own_check(c, subj), "first": _for_is_base_first(c, subj)}
 
-_for_is_base_first(c, subj) := true if _for_base_first(c, subj)
+_for_is_base_first(c, subj) if _for_base_first(c, subj)
 
 else := false
 
