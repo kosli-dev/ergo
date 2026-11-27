@@ -309,13 +309,9 @@ _for_second_roots(check, subj) := [{"i": e.i, "fl": fl, "ms": ms, "raw": [_m_ali
 	ms != []
 ]
 
-_for_second_keys_said(alias, c, true) := [_second_key_said(k) | some k in _alias_or_parent_keys_unread(c); k[0] == alias]
+_for_second_keys_said(alias, c, true) := [_name_key_said(k) | some k in _alias_or_parent_keys_unread(c); k[0] == alias]
 
 _for_second_keys_said(_, _, false) := []
-
-_second_key_said([n, null]) := ["null", concat("", [n, " is null"])]
-
-_second_key_said([n, v]) := ["unusable", _m_isnt(n, v, "text")] if v != null
 
 _second_flaw(root, keys) := _worst_of({k[0] | some k in keys} | ({root} - _tolerated_root_flaws)) if keys != []
 
