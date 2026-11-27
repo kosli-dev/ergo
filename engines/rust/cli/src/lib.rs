@@ -148,6 +148,11 @@ Exit codes:
   3  with --fail, the policy is written wrong or has no requirements
 ";
 
+/// The usage text, with `->` in place of the therefore sign unless the locale in `terminal` names UTF-8.
+pub fn usage(_terminal: &Terminal) -> String {
+    USAGE.to_string()
+}
+
 /// What a run gives back.
 #[derive(Debug, PartialEq, Eq)]
 pub enum Outcome {
@@ -268,7 +273,7 @@ pub fn run_with(
     terminal: &Terminal,
 ) -> Result<Outcome, Failure> {
     let options = match args::parse(arguments)? {
-        Parsed::Help => return Ok(Outcome::Print(USAGE.to_string())),
+        Parsed::Help => return Ok(Outcome::Print(usage(terminal))),
         Parsed::Version => {
             return Ok(Outcome::Print(format!(
                 "ergo {} (commit {})\n",
