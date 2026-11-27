@@ -96,6 +96,47 @@ A policy written for a newer spec than the `ergo.rego` you pass is refused. For 
 ergo: the ergo.rego at ../rel/ergo.rego refuses the policy file ok.yaml: policy ergo_spec: unsupported version v0.7-dev, expected v0.6
 ```
 
+### Read from standard input
+
+A value of `-` for `--policy`, `--input` or `--params`, or for the policy of `ergo test`, reads standard input, so the output of another tool can be piped in. Standard input has no file extension, so `--stdin-format json` or `--stdin-format yaml` says how it is written. `ergo` never guesses, because JSON is also valid YAML but the two read some values differently: `010` is 8 in YAML and a syntax error in JSON. With the policy of the [README](README.md#a-first-policy) in `policy.yaml` and this `input.yaml`, whose second document `ergo` reads but doesn't check (see the warning under [Run a policy](#run-a-policy)):
+
+```yaml
+deployments:
+  - id: d1
+    approver: bob
+  - id: d2
+---
+kind: Other
+```
+
+```sh
+cat input.yaml | ergo report --format pretty --color never --policy policy.yaml --input - --stdin-format yaml
+```
+
+```
+✗ approved is not met
+    ✗ deployment d2 fails has_approver
+      because approver is missing
+
+  5 rows: 4 passed, 1 failed, 0 out of scope
+
+∴ not compliant
+```
+
+Standard input is read once, so only one of `--policy`, `--input` and `--params` can be `-`. The rules for a file are the rules for standard input: the same reader, only the first YAML document counts and the others must still be valid YAML, the same errors and the same exit codes, and the messages say `standard input` where they say a file. It works with `--engine rego` too. Nothing changes for a path that is a file. Each of these exits 2, prints no report and says why on one line of stderr:
+
+| What                                             | Message                                                                       |
+| ------------------------------------------------ | ----------------------------------------------------------------------------- |
+| A `-` with no `--stdin-format`                   | `--stdin-format json or yaml is needed when a value is -`                     |
+| A `--stdin-format` other than `json` and `yaml`  | `--stdin-format must be json or yaml`                                         |
+| A `--stdin-format` with no value of `-`          | `--stdin-format only goes with a value of -`                                  |
+| Two or more values of `-`                        | `only one of --policy, --input and --params can be read from standard input`  |
+| Standard input that is a terminal                | `standard input is a terminal; pipe the input in`                             |
+| Standard input that isn't UTF-8                  | `can't read the input on standard input: ...`                                 |
+| Standard input that isn't valid JSON or YAML     | `the input on standard input isn't valid JSON: EOF while parsing a value at line 1 column 0` |
+
+Empty standard input is read as an empty file is: it is an error for `json`, and `null` for `yaml`.
+
 ### A view for a terminal
 
 **Experimental, from 0.5.0.** `ergo report --format pretty` prints the report for a person to read, and the default stays JSON. With the policy of the [next section](#test-a-policy-with-examples-experimental) in `policy.yaml`, and the `deployments.json` of that section, which holds two deployments, `d1` approved by `bob` for `ann`, and `d2` approved by `cat` for `cat`, `ergo report --format pretty --policy policy.yaml --input deployments.json` prints:
