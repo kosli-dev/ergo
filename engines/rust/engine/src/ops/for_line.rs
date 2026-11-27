@@ -739,7 +739,13 @@ impl For {
                         .any(|path| super::key_base::of_path(path, false, &at).is_some())
                 });
                 let own = told.as_ref().filter(|_| keyed).map(|clause| clause.cause);
-                dead.push(dead_item(own.unwrap_or(cause)));
+                let off_focus = !focus.subject.value.is_object()
+                    && undecided_whose().any(|(check, _)| reads_a_focus_field(check));
+                dead.push(dead_item(if off_focus {
+                    Cause::NotAnObject
+                } else {
+                    own.unwrap_or(cause)
+                }));
                 continue;
             }
             if causes.contains(&Cause::Value) {
@@ -4430,6 +4436,13 @@ fn nested_whose(check: &Check, counts_only: bool) -> Vec<&Check> {
         Check::Walk(walk) if !counts_only => walk.whose.iter().collect(),
         _ => Vec::new(),
     }
+}
+
+fn reads_a_focus_field(check: &Check) -> bool {
+    check
+        .paths()
+        .iter()
+        .any(|path| matches!(path.start, Start::Subject | Start::Own) && !path.steps.is_empty())
 }
 
 fn starts_at_alias(name: &str, aliases: &[&str]) -> bool {
