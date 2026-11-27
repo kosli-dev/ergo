@@ -698,13 +698,14 @@ test_a_root_the_lines_whose_reads_is_said_after_the_sentences_that_read_no_alias
 	_row_tree_text("every xs whose v is in $input.os.name, if any, as x", ["x.w is 1", "z is 1"], {"xs": [], "z": 2}, {}) == "z is 2; item 2 of $input.os: name is missing" with data.ergo_document as {"os": [{"name": 1}, {}]}
 }
 
-test_a_root_the_lines_whose_reads_has_a_list_entry_when_the_row_read_no_root if {
-	check := ergo._s_written_check({"for": "every xs whose v is in $input.os.name, if any, as x", "assert": ["x.w is 1", "z is 1"]})
+test_a_root_read_through_a_list_outside_the_item_is_one_of_the_rows_roots_once if {
 	outside := [ergo._m_root_in("item 2 of $input.os: name", "absent", "item 2 of $input.os: name is missing", 2)]
 	r := {"cause": "value", "failed": []}
-	names := {"ergo/names": {"ergo/subject": {"xs": []}, "$at": {"names": {}}}}
-	ergo._for_line_rooted(check, {"xs": []}, r, outside).other_roots == ["item 2 of $input.os: name is missing"] with input as names with data.ergo_document as {"os": [{"name": 1}, {}]}
-	ergo._for_line_rooted(check, {"xs": []}, object.union(r, {"root_msgs": []}), outside) == object.union(r, {"root_msgs": []}) with input as names with data.ergo_document as {"os": [{"name": 1}, {}]}
+	ergo._for_line_rooted(r, outside).other_roots == ["item 2 of $input.os: name is missing"]
+	ergo._for_line_rooted(object.union(r, {"root_msgs": []}), outside).root_msgs == ["item 2 of $input.os: name is missing"]
+	ergo._for_line_rooted(object.union(r, {"other_roots": ["z is 2"]}), outside).other_roots == ["z is 2", "item 2 of $input.os: name is missing"]
+	ergo._for_line_rooted(object.union(r, {"root_msgs": ["item 2 of $input.os: name is missing"]}), outside) == object.union(r, {"root_msgs": ["item 2 of $input.os: name is missing"]})
+	ergo._for_line_rooted(r, []) == r
 }
 
 test_a_root_a_sentence_reads_through_a_list_outside_the_item_is_in_that_sentences_entry if {

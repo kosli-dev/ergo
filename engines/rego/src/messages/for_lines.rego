@@ -1620,8 +1620,8 @@ _for_said(raw) := object.union(object.remove(raw, ["ergo/for_raw"]), {
 	p := _for_row_parts(s.check, s.subj, s.r)
 	tree := _for_parts_tree(p)
 	cause := _worst_or_value({raw.cause} | {v.cause | walk(tree, [_, v]); is_object(v); "cause" in object.keys(v)})
-	rr := _for_line_rooted(s.check, s.subj, s.r, p.outside)
-	own := _for_own_causes(object.union(s, {"r": rr}), object.union(p, {"roots": array.concat(p.roots, [c | some c in p.outside; c.text in {t | some t in rr.other_roots}])}), raw.cause, cause)
+	rr := _for_line_rooted(s.r, p.outside)
+	own := _for_own_causes(object.union(s, {"r": rr}), object.union(p, {"roots": array.concat(p.roots, [c | some c in p.outside; c.text in _for_rooted_texts(rr)])}), raw.cause, cause)
 } else := object.union(object.remove(raw, ["ergo/for_raw"]), {"message": said.message, "ergo/for_texts": _for_texts(s.check, s.subj, s.r, said.once, said.line)}) if {
 	s := raw["ergo/for_raw"]
 	s.tree == true
@@ -1662,13 +1662,17 @@ _for_texts_cause(causes, ts) := _worst_or_value({causes[t] | some t in ts}) if {
 	}
 } else := null
 
-_for_line_rooted(check, subj, r, outside) := object.union(r, {"other_roots": ts}) if {
-	outside != []
-	not _for_row_rooted(r, subj)
-	line := {x[1] | some x in _m_for_said_pairs(object.union(check, {"checks": [], "assertions": []}))}
-	ts := [c.text | some c in outside; c.text in line]
+_for_line_rooted(r, outside) := object.union(r, {k: array.concat(object.get(r, k, []), ts)}) if {
+	k := _for_rooted_key(r)
+	ts := [c.text | some c in outside; not c.text in _for_rooted_texts(r)]
 	ts != []
 } else := r
+
+_for_rooted_key(r) := "root_msgs" if "root_msgs" in object.keys(r)
+
+else := "other_roots"
+
+_for_rooted_texts(r) := {t | some k in ["root_msgs", "other_roots"]; some t in object.get(r, k, [])}
 
 _for_own_causes(s, p, was, now) := {"texts": {c.text: _worst_or_value({d.cause | some d in cs; d.text == c.text}) | some c in cs}, "items": p.own} if {
 	now != was
