@@ -70,8 +70,8 @@ pub fn check_path(ergo_rego: &str) -> Result<(), PathProblem> {
     Ok(())
 }
 
-/// The entry point of `names` that `opa` said is undefined in `stderr`, or all of them joined with `or` when `opa` printed nothing at all, or `None` when neither happened. Blank output with a message on `stderr` is another failure.
-pub fn missing_entry_point(names: &[&str], stdout: &str, stderr: &str) -> Option<String> {
+/// The entry point of `names` that `opa` said is undefined in `stderr`, or `None`. Blank output names none, because an `ergo.report` that is undefined for the input prints nothing too.
+pub fn missing_entry_point(names: &[&str], stderr: &str) -> Option<String> {
     let undefined = |name: &str| {
         let wanted = format!("data.{name}");
         stderr.lines().any(|line| {
@@ -80,14 +80,14 @@ pub fn missing_entry_point(names: &[&str], stdout: &str, stderr: &str) -> Option
                     !line[at + wanted.len()..]
                         .chars()
                         .next()
-                        .is_some_and(|c| c.is_alphanumeric() || c == '_')
+                        .is_some_and(|c| c.is_alphanumeric() || matches!(c, '_' | '.' | '['))
                 })
         })
     };
-    if let Some(name) = names.iter().find(|name| undefined(name)) {
-        return Some((*name).to_string());
-    }
-    (stdout.trim().is_empty() && stderr.trim().is_empty()).then(|| names.join(" or "))
+    names
+        .iter()
+        .find(|name| undefined(name))
+        .map(|name| (*name).to_string())
 }
 
 /// The message for an `ergo.rego` at `ergo_rego` that has no `entry_point`, which says what `ergo test` needs when the entry point is `ergo.compile`.
@@ -132,8 +132,7 @@ fn eval(
         })?;
     drop(folder);
     let stderr = String::from_utf8_lossy(&output.stderr);
-    let stdout = String::from_utf8_lossy(&output.stdout);
-    if let Some(missing) = missing_entry_point(names, &stdout, &stderr) {
+    if let Some(missing) = missing_entry_point(names, &stderr) {
         return Err(no_entry_point(ergo_rego, &missing));
     }
     if !output.status.success() {

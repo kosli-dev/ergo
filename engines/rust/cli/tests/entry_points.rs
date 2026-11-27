@@ -13,11 +13,7 @@ fn opa_saying_a_function_is_undefined_names_that_entry_point() {
         let stderr =
             format!("1 error occurred: 1:12: rego_type_error: undefined function data.{name}\n");
         assert_eq!(
-            opa::missing_entry_point(
-                &["ergo.compile", "ergo.report", "ergo.violations"],
-                "",
-                &stderr
-            ),
+            opa::missing_entry_point(&["ergo.compile", "ergo.report", "ergo.violations"], &stderr),
             Some(name.to_string()),
             "{name}"
         );
@@ -29,7 +25,6 @@ fn opa_saying_a_ref_is_undefined_names_that_entry_point() {
     assert_eq!(
         opa::missing_entry_point(
             &["ergo.report"],
-            "",
             "rego_type_error: undefined ref: data.ergo.report"
         ),
         Some("ergo.report".to_string())
@@ -39,11 +34,7 @@ fn opa_saying_a_ref_is_undefined_names_that_entry_point() {
 #[test]
 fn an_undefined_entry_point_that_merely_starts_like_a_name_is_not_that_name() {
     assert_eq!(
-        opa::missing_entry_point(
-            &["ergo.report"],
-            "",
-            "undefined function data.ergo.report_v2"
-        ),
+        opa::missing_entry_point(&["ergo.report"], "undefined function data.ergo.report_v2"),
         None
     );
 }
@@ -51,26 +42,29 @@ fn an_undefined_entry_point_that_merely_starts_like_a_name_is_not_that_name() {
 #[test]
 fn an_error_about_something_else_names_no_entry_point() {
     assert_eq!(
-        opa::missing_entry_point(&["ergo.report"], "", "rego_parse_error: unexpected token"),
+        opa::missing_entry_point(&["ergo.report"], "rego_parse_error: unexpected token"),
         None
     );
 }
 
 #[test]
-fn blank_output_names_every_entry_point_the_query_needs() {
-    assert_eq!(
-        opa::missing_entry_point(&["ergo.report"], "\n", ""),
-        Some("ergo.report".to_string())
-    );
-    assert_eq!(
-        opa::missing_entry_point(&["ergo.report", "ergo.violations"], "", ""),
-        Some("ergo.report or ergo.violations".to_string())
-    );
+fn an_undefined_longer_ref_is_not_the_entry_point() {
+    for stderr in [
+        "rego_type_error: undefined ref: data.ergo.report.foo",
+        "rego_type_error: undefined function data.ergo.report.foo",
+        "rego_type_error: undefined ref: data.ergo.report[x]",
+    ] {
+        assert_eq!(
+            opa::missing_entry_point(&["ergo.report"], stderr),
+            None,
+            "{stderr}"
+        );
+    }
 }
 
 #[test]
-fn output_that_is_not_blank_names_no_entry_point() {
-    assert_eq!(opa::missing_entry_point(&["ergo.report"], "{}", ""), None);
+fn no_message_from_opa_names_no_entry_point() {
+    assert_eq!(opa::missing_entry_point(&["ergo.report"], ""), None);
 }
 
 #[test]
@@ -183,4 +177,39 @@ fn real_opa_on_an_ergo_rego_without_ergo_compile_says_ergo_test_needs_it() {
             "the ergo.rego at {ergo_rego} has no ergo.compile; ergo test needs it, and OPA.md calls it experimental"
         )))
     );
+}
+
+#[test]
+fn real_opa_on_an_ergo_report_that_is_undefined_for_the_input_is_not_a_missing_entry_point() {
+    let Some(built) = built_ergo_rego() else {
+        return;
+    };
+    let text = std::fs::read_to_string(&built).unwrap();
+    let dir = Dir::new("undefined-report");
+    let policy = dir.write("policy.yaml", POLICY);
+    let input = dir.write("input.json", "{\"ds\": [{\"id\": 1, \"ok\": true}]}");
+    let ergo_rego = dir.write(
+        "undefined-report.rego",
+        &format!(
+            "{}\nreport(doc, params, query) := {{\"x\": 1}} if {{ false }}\n",
+            text.replace("\nreport(doc", "\nreport_v2(doc")
+        ),
+    );
+    let environment = Environment {
+        ergo_rego: Some(ergo_rego.clone()),
+        opa: None,
+    };
+    let got = run_in(
+        &args(&[
+            "report", "--policy", &policy, "--input", &input, "--engine", "rego",
+        ]),
+        &environment,
+    );
+    assert_eq!(
+        got,
+        Err(Failure::Engine(format!(
+            "opa printed something that isn't a report, with ergo.rego at {ergo_rego}"
+        )))
+    );
+    assert_eq!(got.unwrap_err().code(), 2);
 }

@@ -325,6 +325,8 @@ fn report_with_engine_rego_fails_closed_when_opa_is_missing_fails_or_prints_no_r
     let input = file("opa-wrong", "input.json", INPUT);
     let ergo_rego = file("opa-wrong", "ergo.rego", "package ergo\n");
     let missing = ergo_rego.replace("ergo.rego", "no-opa");
+    let not_report =
+        format!("opa printed something that isn't a report, with ergo.rego at {ergo_rego}");
     let cases = [
         (
             std::ffi::OsString::from(&missing),
@@ -336,10 +338,7 @@ fn report_with_engine_rego_fails_closed_when_opa_is_missing_fails_or_prints_no_r
             fake_opa("opa-fails", "echo 'first line' >&2\nexit 3\n"),
             format!("opa failed on ergo.rego at {ergo_rego}: first line"),
         ),
-        (
-            fake_opa("opa-silent", "exit 0\n"),
-            format!("the ergo.rego at {ergo_rego} has no ENTRY"),
-        ),
+        (fake_opa("opa-silent", "exit 0\n"), not_report.clone()),
         (
             fake_opa("opa-junk", "echo '{\"report\": 1}'\n"),
             format!(
@@ -359,12 +358,6 @@ fn report_with_engine_rego_fails_closed_when_opa_is_missing_fails_or_prints_no_r
                 ]),
                 &environment,
             );
-            let entry = if command == "report" {
-                "ergo.report"
-            } else {
-                "ergo.report or ergo.violations"
-            };
-            let message = message.replace("ENTRY", entry);
             assert_eq!(got, Err(Failure::Engine(message.clone())), "{message}");
             assert_eq!(got.unwrap_err().code(), 2);
         }
