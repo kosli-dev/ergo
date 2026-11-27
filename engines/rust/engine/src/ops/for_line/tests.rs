@@ -5237,3 +5237,29 @@ fn a_clause_two_sentences_give_one_item_is_said_once_whoever_owns_it() {
         ]
     );
 }
+
+#[test]
+fn a_sort_key_named_by_the_first_alias_is_picked_for_each_item_of_the_first_list_as_a_whose_that_reads_it_is() {
+    let es = json!([{"v": 1, "m": {"q": 1}}]);
+    for (first, xs, cause, said) in [
+        ("every xs as x", json!([]), "value", "xs is []"),
+        ("some xs as x", json!([]), "value", "xs is []"),
+        ("every xs as x", json!(null), "null", "xs is null"),
+        ("some xs as x", json!(null), "null", "xs is null"),
+        ("every xs, if any, as x", json!([]), "satisfied", ""),
+    ] {
+        for pick in ["first of", "last of"] {
+            let line = format!("{first}, {pick} es sorted by m named by x as e");
+            assert_eq!(
+                for_row(
+                    &line,
+                    &["e.v is 1"],
+                    json!({"xs": xs.clone(), "es": es.clone()}),
+                    json!({})
+                ),
+                (cause.to_string(), said.to_string()),
+                "{line} on {xs}"
+            );
+        }
+    }
+}
