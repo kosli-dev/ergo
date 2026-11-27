@@ -89,7 +89,9 @@ _for_key_unread(check) if {
 
 _for_reads_a_list(c) if _walks(c)
 
-_for_reads_a_list(c) if {
+_for_reads_a_list(c) if _for_reads_a_tally(c)
+
+_for_reads_a_tally(c) if {
 	walk(c, [_, y])
 	is_object(y)
 	some f in _tally_forms
@@ -394,6 +396,7 @@ _for_line_skipping(check, l, skip, hoisted) := object.union(l, {"skip": [s | som
 	some i, c in check.checks
 	check.assertions[i] == l.assertion
 	_for_reads_an_alias(check, c)
+	not _for_reads_a_tally(c)
 } else := l
 
 _for_free_texts(check, r) := array.concat(
