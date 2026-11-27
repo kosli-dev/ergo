@@ -175,6 +175,14 @@ test_a_for_row_whose_named_by_key_is_its_alias_keeps_its_message_off_the_tree_wh
 	_on_tree("every xs whose v is at least $params.min as x", ["x.v named by x.k is 1"], {"xs": [null]}, {})
 }
 
+test_a_whose_that_compares_with_a_list_read_from_a_parent_subject_reads_a_list_outside_the_item if {
+	whose := {"cmp": "in", "left": ["v"], "op": "compare", "right": ["$commit", "ys"]}
+	ergo._for_reads_a_list_outside(whose)
+	not ergo._for_reads_a_list_outside(object.union(whose, {"right": ["ys"]}))
+	check := {"items": [{"as": "x", "if_any": false, "path": ["xs"], "q": "every", "whose": [whose]}], "checks": [{"op": "equals", "path": ["$x", "v", {"named_by": "x"}, "k"], "value": 1}]}
+	ergo._for_alias_key_beside_a_list_outside(check)
+}
+
 test_a_for_row_whose_list_or_sort_key_has_a_step_from_params_takes_its_message_from_the_tree if {
 	_on_tree("every o named by $params.k as x", ["x is 1"], {"o": {"a": [2]}}, {"k": "a"})
 	_on_tree("first of xs sorted by m named by $params.k as x", ["x.v is 1"], {"xs": [{"m": {"a": 1}, "v": 2}]}, {"k": "a"})
