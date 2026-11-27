@@ -1,6 +1,7 @@
 //! Experimental: reads the examples of a policy and checks each one's outcome against its report.
 
 use crate::outcome::{self, Item, Region, heading, requirement_line};
+use crate::pretty::{Mark, Show, Style, escape};
 use serde_json::{Value, json};
 use std::collections::BTreeSet;
 
@@ -410,6 +411,17 @@ pub fn check(outcome: &Value, report: &Value, policy: &Value) -> Checked {
     checked
 }
 
+fn shown_block(items: &[Item], style: Option<&Style>) -> String {
+    let block = indented(items);
+    match style {
+        None => block,
+        Some(_) => block
+            .lines()
+            .map(|line| format!("{}\n", escape(line)))
+            .collect(),
+    }
+}
+
 fn indented(items: &[Item]) -> String {
     outcome::yaml(items)
         .lines()
@@ -434,6 +446,17 @@ pub fn results(
     reports: &[Value],
     strict: bool,
 ) -> (String, u8) {
+    results_styled(policy, examples, reports, strict, None)
+}
+
+/// Does what [results] does, and when `style` is given writes the lines for a terminal: a mark in place of `passed:`, `failed:` and `warning:`, only the failed examples unless `style.show` is all, and a summary line that starts with the therefore sign, after an empty line.
+pub fn results_styled(
+    policy: &Value,
+    examples: &[Example],
+    reports: &[Value],
+    strict: bool,
+    style: Option<&Style>,
+) -> (String, u8) {
     let mut text = String::new();
     let mut failed = 0;
     let mut shown = BTreeSet::new();
@@ -441,19 +464,31 @@ pub fn results(
         let checked = check(&example.outcome, report, policy);
         if checked.problems.is_empty() {
             shown.extend(checked.shown);
-            text.push_str(&format!("passed: {}\n", example.name));
+            match style {
+                None => text.push_str(&format!("passed: {}\n", example.name)),
+                Some(style) if style.show == Show::All => {
+                    text.push_str(&format!("{}\n", style.line(Mark::Pass, &example.name)));
+                }
+                Some(_) => {}
+            }
             continue;
         }
         failed += 1;
-        text.push_str(&format!("failed: {}\n", example.name));
+        match style {
+            None => text.push_str(&format!("failed: {}\n", example.name)),
+            Some(style) => text.push_str(&format!("{}\n", style.line(Mark::Fail, &example.name))),
+        }
         for problem in &checked.problems {
-            text.push_str(&format!("  {problem}\n"));
+            match style {
+                None => text.push_str(&format!("  {problem}\n")),
+                Some(_) => text.push_str(&format!("  {}\n", escape(problem))),
+            }
         }
         if !checked.expected.is_empty() {
             text.push_str("  expected:\n");
-            text.push_str(&indented(&checked.expected));
+            text.push_str(&shown_block(&checked.expected, style));
             text.push_str("  actual:\n");
-            text.push_str(&indented(&checked.actual));
+            text.push_str(&shown_block(&checked.actual, style));
         }
     }
     let mut warnings = 0;
@@ -464,19 +499,32 @@ pub fn results(
             for (passes, words) in [(false, "failing"), (true, "passing")] {
                 if !shown.contains(&(requirement.clone(), check.clone(), passes)) {
                     warnings += 1;
-                    text.push_str(&format!(
-                        "warning: no example shows {check} of {requirement} {words}\n"
-                    ));
+                    let warning = format!("no example shows {check} of {requirement} {words}");
+                    match style {
+                        None => text.push_str(&format!("warning: {warning}\n")),
+                        Some(style) => {
+                            text.push_str(&format!("{}\n", style.line(Mark::Warn, &warning)));
+                        }
+                    }
                 }
             }
         }
     }
-    text.push_str(&format!(
-        "{} example{}: {} passed, {failed} failed\n",
+    let summary = format!(
+        "{} example{}: {} passed, {failed} failed",
         examples.len(),
         if examples.len() == 1 { "" } else { "s" },
         examples.len() - failed
-    ));
+    );
+    match style {
+        None => text.push_str(&format!("{summary}\n")),
+        Some(style) => {
+            if !text.is_empty() {
+                text.push('\n');
+            }
+            text.push_str(&format!("{}\n", style.line(Mark::Therefore, &summary)));
+        }
+    }
     let code = if failed > 0 || (strict && warnings > 0) {
         1
     } else {

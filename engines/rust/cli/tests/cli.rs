@@ -327,7 +327,7 @@ fn fail_exits_three_rather_than_one_when_a_check_failed_and_a_requirement_is_wri
 #[test]
 fn help_lists_fail_and_every_exit_code() {
     let usage = out(&ergo(&["--help"]));
-    assert!(usage.starts_with("Usage: ergo <command> --policy <file> --input <file> [--params <file>] [--compact] [--fail]\n"));
+    assert!(usage.starts_with("∴ ergo: what follows from the evidence\n\nUsage: ergo <command> --policy <file> --input <file> [--params <file>] [--compact] [--fail]\n"));
     assert!(usage.ends_with(
         "Exit codes:
   0  the output was printed: the policy is met, or --fail isn't given
@@ -709,7 +709,7 @@ fn help_prints_usage_and_exits_zero() {
     for args in [&["--help"][..], &["help"][..], &["report", "--help"][..]] {
         let output = ergo(args);
         assert_eq!(output.status.code(), Some(0));
-        assert!(out(&output).starts_with("Usage: ergo"));
+        assert!(out(&output).starts_with("∴ ergo: what follows from the evidence\n\nUsage: ergo"));
     }
 }
 

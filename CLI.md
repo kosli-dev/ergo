@@ -1,6 +1,6 @@
 # Ergo CLI
 
-**Experimental.** The `ergo` command runs the Rust engine of Ergo. It reads a policy, an input and params from files and prints the report or the violations as JSON. It gives the same report as [`ergo.rego`](OPA.md), apart from `engine`, which says which one made it. What a policy can say, and what a report holds, is the same for both engines, so it is in the [README](README.md) and the [reference](REFERENCE.md).
+**Experimental.** The `ergo` command runs the Rust engine of Ergo. It reads a policy, an input and params from files, or from standard input, and prints the report or the violations as JSON. It gives the same report as [`ergo.rego`](OPA.md), apart from `engine`, which says which one made it. What a policy can say, and what a report holds, is the same for both engines, so it is in the [README](README.md) and the [reference](REFERENCE.md).
 
 This page follows the latest release of the CLI.
 
@@ -25,7 +25,7 @@ To build it from this repo with Docker instead, see [`engines/rust/README.md`](e
 
 ## Run a policy
 
-Write the policy of the [README](README.md#a-first-policy) in `policy.yaml`, and its input in `deployments.json`. `ergo` reads the policy, the input and the params from files, each one `.json`, `.yaml` or `.yml`. Ask for the report, or only for what went wrong:
+Write the policy of the [README](README.md#a-first-policy) in `policy.yaml`, and its input in `deployments.json`. `ergo` reads the policy, the input and the params from files, each one `.json`, `.yaml` or `.yml`, or from standard input with `-` (see [Read from standard input](#read-from-standard-input)). Ask for the report, or only for what went wrong:
 
 ```sh
 ergo report --policy policy.yaml --input deployments.json
@@ -95,6 +95,141 @@ A policy written for a newer spec than the `ergo.rego` you pass is refused. For 
 ```
 ergo: the ergo.rego at ../rel/ergo.rego refuses the policy file ok.yaml: policy ergo_spec: unsupported version v0.7-dev, expected v0.6
 ```
+
+### Read from standard input
+
+A value of `-` for `--policy`, `--input` or `--params`, or for the policy of `ergo test`, reads standard input, so the output of another tool can be piped in. Standard input has no file extension, so `--stdin-format json` or `--stdin-format yaml` says how it is written. `ergo` never guesses, because JSON is also valid YAML but the two read some values differently: `010` is 8 in YAML and a syntax error in JSON.
+
+Take this `policy.yaml`:
+
+```yaml
+ergo_spec: v0.7-dev
+subjects:
+  deployment:
+    from: deployments whose environment is "prod"
+    identified_by: id
+requirements:
+  prod_deploy:
+    description: Every production deployment is approved
+    subject: deployment
+    checks:
+      approved:
+        description: Someone approved the deployment
+        assert: approved_by is a non-empty string
+```
+
+and this `input.yaml`, whose second document `ergo` reads but doesn't check (see the warning under [Run a policy](#run-a-policy)):
+
+```yaml
+deployments:
+  - id: d1
+    environment: prod
+    approved_by: bob
+  - id: d2
+    environment: prod
+  - id: d3
+    environment: staging
+---
+kind: Other
+```
+
+```sh
+cat input.yaml | ergo report --format pretty --color never --policy policy.yaml --input - --stdin-format yaml
+```
+
+```
+✗ prod_deploy is not met
+    ✗ deployment d2 fails approved
+      because approved_by is missing
+
+  8 rows: 6 passed, 1 failed, 1 out of scope
+
+∴ not compliant
+```
+
+Standard input is read once, so only one of `--policy`, `--input` and `--params` can be `-`. The rules for a file are the rules for standard input: the same reader, only the first YAML document counts and the others must still be valid YAML, the same errors and the same exit codes, and the messages say `standard input` where they say a file. It works with `--engine rego` too. Nothing changes for a path that is a file. `ergo` reads standard input last, after it has checked the command line and read every file, so a mistake that needs no input is reported at once, even when the tool that feeds standard input hasn't finished. Each of these exits 2, prints no report and says why on one line of stderr:
+
+| What                                            | Message                                                                                        |
+| ----------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| A `-` with no `--stdin-format`                  | `--stdin-format json or yaml is needed when a value is -`                                      |
+| A `--stdin-format` other than `json` and `yaml` | `--stdin-format must be json or yaml`                                                          |
+| A `--stdin-format` with no value of `-`         | `--stdin-format only goes with a value of -`                                                   |
+| Two or more values of `-`                       | `only one of --policy, --input and --params can be read from standard input`                   |
+| Standard input that is a terminal               | `standard input is a terminal; pipe the input in`                                              |
+| Standard input that isn't UTF-8                 | `can't read the input on standard input: stream did not contain valid UTF-8`                   |
+| Standard input that isn't valid JSON or YAML    | `the input on standard input isn't valid JSON: EOF while parsing an object at line 2 column 0` |
+
+Empty standard input is read as an empty file is: it is an error for `json`, and `null` for `yaml`.
+
+### A view for a terminal
+
+**Experimental, from 0.5.0.** `ergo report --format pretty` prints the report for a person to read, and the default stays JSON. With the policy of the [next section](#test-a-policy-with-examples-experimental) in `policy.yaml`, and the `deployments.json` of that section, which holds two deployments, `d1` approved by `bob` for `ann`, and `d2` approved by `cat` for `cat`, `ergo report --format pretty --policy policy.yaml --input deployments.json` prints:
+
+```
+✗ approved is not met
+    ✗ deployment d2 fails not_self_approved
+      because approver is "cat", and author is "cat"
+
+  7 rows: 6 passed, 1 failed, 0 out of scope
+
+∴ not compliant
+```
+
+It works on a report from either engine, so `--engine rego --ergo-rego ergo.rego` gives the same text. The requirements that are not met come first, each with its failed rows and the report's own `message` after `because`, then the requirements that are met or not applicable, one line each. The rows that passed and the subjects out of scope are only counted. The last line says `compliant` or `not compliant`, from the report's `compliant`, after the therefore sign (∴, U+2234), which Ergo uses for what follows from the evidence. A row names its subject by type and id, like `deployment d2`, and by type alone for a row with no id, like `deployment fails $min_subjects`. A requirement whose `status` this version doesn't know is listed among the ones that are not met, as `has status "x"`.
+
+`--show all` lists every row under its requirement, in the order of the report. For the same policy and input it prints:
+
+```
+✗ approved is not met
+    ✓ deployment passes $well_formed
+    ✓ deployment passes $min_subjects
+    ✓ deployment passes $unique_ids
+    ✓ deployment d1 passes approver_set
+    ✓ deployment d1 passes not_self_approved
+    ✓ deployment d2 passes approver_set
+    ✗ deployment d2 fails not_self_approved
+      because approver is "cat", and author is "cat"
+
+  7 rows: 6 passed, 1 failed, 0 out of scope
+
+∴ not compliant
+```
+
+A row for a child subject names its parents, like `✗ artifact web in deployment d1 fails tests_passed`, the way [`--format outcome`](#test-a-policy-with-examples-experimental) writes its lines. `--show failed` is the default. `--format pretty` can't go with `--compact`, or with `violations`, and `--show` and `--color` only go with `--format pretty` and `ergo test`.
+
+**Scope.** A policy with a `whose` filter has an `$applies` row for each subject. A subject in scope is `✓ deployment d1 is in scope`, shown with `--show all`. Only a subject whose `$applies` row fails with the cause `value` is out of scope: it is dim, `– deployment d3 is out of scope (environment is "staging")`, shown only with `--show all` and counted as out of scope. A `$applies` row that fails with any other cause, like `absent` for a deployment with no `environment`, means Ergo can't tell whether the subject is in scope, so the requirement is not met and the row is a failed row like any other, listed and counted as failed. With `from: deployments whose environment is "prod"`, `approver_set: approver is a non-empty string` and `{"deployments": [{"id": "d1", "environment": "prod", "approver": "bob"}, {"id": "d2", "approver": ""}]}`, the view is:
+
+```
+✗ approved is not met
+    ✗ deployment d2 fails $applies
+      because environment is missing
+
+  6 rows: 5 passed, 1 failed, 0 out of scope
+
+∴ not compliant
+```
+
+**Control characters.** A name, an id or a message that comes from the policy, the input or the engine can hold control characters, like an escape code that clears the screen. The view writes every control character (U+0000 to U+001F, U+007F and U+0080 to U+009F, so a newline too), the line and paragraph separators (U+2028, U+2029) and the characters that change the direction of text (U+061C, U+200E, U+200F, U+202A to U+202E and U+2066 to U+2069) as a visible `\u{1b}`, with the code in hexadecimal, and only then adds its own colour codes. `ergo test` on a terminal does the same, and so does the engine line of `ergo test` when it is piped. Error messages on stderr are escaped the same way, except that their own line breaks stay.
+
+**Colour.** Colour is written only when stdout is a terminal. It is off when the `NO_COLOR` environment variable is set and not empty, and `--color auto|always|never` overrides both: `always` writes the codes even into a pipe or a file, and `never` writes none. The colours are plain ANSI codes: red for a failed requirement or row, whole line, green for the `✓` of a requirement or row that passed, dim for `–` lines, which are out of scope or not applicable, and bold for the last line. `⚠` is yellow.
+
+**Glyphs.** The marks `✓`, `✗`, `⚠`, `–` and `∴` are written when the first of `LC_ALL`, `LC_CTYPE` and `LANG` that is set and not empty contains `UTF-8` or `utf8`, in any case. Without one, or with no variable set, the plain words stand in for them: `ok`, `FAIL`, `warn`, `-` and `->`. With `LC_ALL=C`, the same report prints:
+
+```
+FAIL approved is not met
+    FAIL deployment d2 fails not_self_approved
+      because approver is "cat", and author is "cat"
+
+  7 rows: 6 passed, 1 failed, 0 out of scope
+
+-> not compliant
+```
+
+The glyphs don't depend on colour, and colour doesn't depend on them. Nothing here changes an exit code: `--fail` gives the codes in the table above for `--format pretty` too, and the view is printed before the command exits.
+
+`--format pretty` shows only the fields it needs: `compliant`, each requirement's `status`, and each row's `requirement`, `check`, `passed`, `subject` and `message`, and the `cause` of a row of `$applies` that failed. When it can't read one of them, like a report with no `results`, a row that names a requirement that isn't in `requirements`, or a `compliant` that isn't `true` or `false`, it exits 2 and names what it couldn't read, and prints no verdict. It never checks the version of `ergo.rego` that made the report.
+
+The first line of `ergo --help` and of the usage printed for a call with no arguments has the therefore sign, or `->` when the locale isn't UTF-8. `--version`, the JSON and the outcome lines and the violations never do, and have no colour.
 
 ## Test a policy with examples (experimental)
 
@@ -167,6 +302,17 @@ passed: a deployment needs an approver
 passed: nobody approves their own deployment
 2 examples: 2 passed, 0 failed
 ```
+
+On a terminal, or with `--color always`, `ergo test` marks its lines as [`--format pretty`](#a-view-for-a-terminal) does, with the same colour and glyph rules. It lists the failed examples and the warnings, then an empty line and a summary that starts with the therefore sign, and `--show all` lists every example. With `--show all`, `ergo test policy.yaml` on a terminal prints:
+
+```
+✓ a deployment needs an approver
+✓ nobody approves their own deployment
+
+∴ 2 examples: 2 passed, 0 failed
+```
+
+`--color always` gives the marked form even when stdout isn't a terminal. On a terminal, `--color never` keeps the glyph marks and only drops the colour, since the glyphs depend on the locale and the colour on `--color` and `NO_COLOR`. When stdout isn't a terminal and `--color always` isn't given, which is a pipe, a file or a CI log, the output is the plain lines above, `passed:`, `failed:`, `warning:` and `2 examples: 2 passed, 0 failed`, word for word, whatever `--show` says. The exit codes don't change.
 
 A line covers its check, so every failure of that check must be listed. If the first example's `d2` had `approver: ""` and the example listed only `d1`, it would fail, and `ergo test` shows its lines next to the report's:
 
