@@ -686,6 +686,10 @@ test_a_for_row_whose_whose_key_isnt_text_says_the_key_on_an_empty_list_it_tolera
 	_row_tree_text("every es whose zz is m named by $input.k, if any, as e", ["e.v is 2"], {"es": []}, {}) == "$input.k is 3, which isn't text" with data.ergo_document as {"k": 3, "m": {"a": 2}}
 }
 
+test_an_item_two_sentences_say_the_same_of_says_it_once_whether_or_not_it_reads_the_alias_as_written if {
+	_row_tree_text("every xs as m", ["m is $params.l", "m.v named by m.v is 1"], {"xs": [null]}, {"l": 1}) == "item 1 of xs: m is null"
+}
+
 test_a_row_on_the_tree_takes_the_worst_cause_of_what_it_says if {
 	_tree_said("every xs as x", ["x.v is 1"], {"xs": [{}]}, {}, "value").cause == "absent"
 	_tree_said("every xs as x", ["x.v is 1"], {"xs": [{}]}, {}, "not_an_object").cause == "not_an_object"
