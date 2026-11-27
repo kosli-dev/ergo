@@ -690,6 +690,11 @@ test_a_sentence_whose_message_has_parts_apart_keeps_them_apart_under_its_item_as
 	_row_tree_text("every xs as m", ["m.k named by m.k is 1"], {"xs": [{"k": null}, {}]}, {}) == `item 1 of xs: m is {"k": null}, which isn't text; m.k is null; item 2 of xs: m is {}, which isn't text`
 }
 
+test_a_part_another_sentence_of_the_item_already_said_is_said_once_whichever_sentence_comes_first if {
+	_row_tree_text("every xs as m", ["m.ys named by m.k is 1", "every m.ys.v is at least 1"], {"xs": [{"k": "ys", "ys": null}]}, {}) == `item 1 of xs: m is {"k": "ys", "ys": null}, which isn't text; m.ys is null`
+	_row_tree_text("every xs as m", ["m.ys exists", "m.ys named by m.k is 1"], {"xs": [{"k": "ys", "ys": null}]}, {}) == `item 1 of xs: m.ys is null, and m is {"k": "ys", "ys": null}, which isn't text`
+}
+
 test_a_count_whose_entry_says_its_parts_under_one_item_joins_them_under_that_item if {
 	_row_tree_text("every xs as m", ["count of m.v named by m.k is 1"], {"xs": [{"v": null}]}, {}) == `item 1 of xs: m is {"v": null}, which isn't text, and m.v is null`
 }
