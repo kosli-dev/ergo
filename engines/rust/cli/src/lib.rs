@@ -111,7 +111,7 @@ Usage: ergo <command> --policy <file> --input <file> [--params <file>] [--compac
        ergo report|violations ... --policy|--input|--params - --stdin-format json|yaml
        ergo report --format outcome|pretty --policy <file> --input <file> [--params <file>] [--fail]
        ergo report --format pretty ... [--show failed|all] [--color auto|always|never]
-       ergo test <policy file> [--strict] [--show failed|all] [--color auto|always|never] [--engine rust|rego] [--ergo-rego <file>]
+       ergo test <policy file> [--strict] [--show failed|all] [--color auto|always|never] [--engine rust|rego] [--ergo-rego <file>] [--stdin-format json|yaml]
        ergo report|violations ... [--engine rust|rego] [--ergo-rego <file>]
 
 Commands:
@@ -230,26 +230,10 @@ fn resolve_ergo_rego(
     }
 }
 
-fn read_value(
-    what: &str,
-    path: &str,
-    format: Option<StdinFormat>,
-) -> Result<serde_json::Value, Failure> {
-    let Some(format) = format.filter(|_| path == "-") else {
-        return files::load(what, path);
-    };
-    let text = read_stdin(what)?;
-    files::parse_stdin(what, &text, format)
-}
-
 fn read_stdin(what: &str) -> Result<String, Failure> {
     let stdin = std::io::stdin();
-    if stdin.is_terminal() {
-        return Err(Failure::File(
-            "standard input is a terminal; pipe the input in".to_string(),
-        ));
-    }
-    files::read_stdin(what, &mut stdin.lock())
+    let is_terminal = stdin.is_terminal();
+    files::read_stdin_from(what, is_terminal, &mut stdin.lock())
 }
 
 fn test(
@@ -340,11 +324,15 @@ pub fn run_with(
         Parsed::Test(options) => return test(options, environment, terminal),
     };
     let format = options.stdin_format;
-    let policy = read_value("policy", &options.policy, format)?;
-    let input = read_value("input", &options.input, format)?;
+    let file_or_later = |what: &str, path: &str| match path {
+        "-" => Ok(None),
+        path => files::load(what, path).map(Some),
+    };
+    let policy = file_or_later("policy", &options.policy)?;
+    let input = file_or_later("input", &options.input)?;
     let params = match &options.params {
-        Some(path) => read_value("params", path, format)?,
-        None => serde_json::json!({}),
+        Some(path) => file_or_later("params", path)?,
+        None => Some(serde_json::json!({})),
     };
     let command_name = match options.command {
         Command::Report => "report",
@@ -352,6 +340,16 @@ pub fn run_with(
     };
     let ergo_rego =
         resolve_ergo_rego(options.engine, options.ergo_rego, environment, command_name)?;
+    let from_stdin = |what: &str, value: Option<serde_json::Value>| match (value, format) {
+        (Some(value), _) => Ok(value),
+        (None, Some(format)) => files::parse_stdin(what, &read_stdin(what)?, format),
+        (None, None) => Err(Failure::Usage(
+            "--stdin-format json or yaml is needed when a value is -".to_string(),
+        )),
+    };
+    let policy = from_stdin("policy", policy)?;
+    let input = from_stdin("input", input)?;
+    let params = from_stdin("params", params)?;
     let (report, rego_violations) = match ergo_rego {
         None => (ergo_policy_engine::report(&input, &policy, &params), None),
         Some(ergo_rego) => {

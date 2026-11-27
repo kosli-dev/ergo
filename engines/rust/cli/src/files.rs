@@ -9,7 +9,9 @@ use std::path::Path;
 
 /// How a message names where `what` was read from: `the policy file policy.yaml`, or `the policy on standard input` for the path `-`.
 pub fn name(what: &str, path: &str) -> String {
-    if path == "-" {
+    if path == "-" && what == "params" {
+        "standard input as params".to_string()
+    } else if path == "-" {
         format!("the {what} on standard input")
     } else {
         format!("the {what} file {path}")
@@ -21,18 +23,17 @@ pub fn repeated_keys_in(text: &str) -> Vec<Vec<String>> {
     yaml::repeated_keys(text).unwrap_or_default()
 }
 
-/// Reads standard input as [read_stdin] does, and refuses it when `is_terminal` says nobody is piping anything in.
+/// Reads all of standard input, from `reader`, as text, and refuses it when `is_terminal` says nobody is piping anything in. `what` is `policy`, `input` or `params` and goes into the error message.
 pub fn read_stdin_from(
     what: &str,
     is_terminal: bool,
     reader: &mut dyn Read,
 ) -> Result<String, Failure> {
-    let _ = is_terminal;
-    read_stdin(what, reader)
-}
-
-/// Reads all of standard input, from `reader`, as text. `what` is `policy`, `input` or `params` and goes into the error message.
-pub fn read_stdin(what: &str, reader: &mut dyn Read) -> Result<String, Failure> {
+    if is_terminal {
+        return Err(Failure::File(
+            "standard input is a terminal; pipe the input in".to_string(),
+        ));
+    }
     let mut text = String::new();
     reader
         .read_to_string(&mut text)
