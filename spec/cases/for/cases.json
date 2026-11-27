@@ -112544,7 +112544,7 @@
     "cases": [
       {
         "compliant": false,
-        "description": "fails as unusable when the key x isn't text, with es empty, and the path .k after it is not read from x",
+        "description": "fails as unusable when the key x isn't text, even with es empty, because the key is read before any item and before .k is looked at",
         "input": {
           "things": [
             {
@@ -112574,6 +112574,20 @@
                         "locations": [],
                         "name": "count of es whose zz equals m named by x.k",
                         "value": null
+                      },
+                      {
+                        "locations": [],
+                        "name": "es[]",
+                        "outcome": "usable",
+                        "value": []
+                      },
+                      {
+                        "locations": [
+                          "/things/0"
+                        ],
+                        "name": "m named by x.k",
+                        "outcome": "unusable",
+                        "value": null
                       }
                     ],
                     "kind": "item",
@@ -112587,14 +112601,7 @@
                     }
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/c/assert"
@@ -112609,6 +112616,14 @@
                 "name": "es[]",
                 "outcome": "usable",
                 "value": []
+              },
+              {
+                "locations": [
+                  "/things/0"
+                ],
+                "name": "m",
+                "outcome": "absent",
+                "value": null
               },
               {
                 "locations": [
@@ -112637,7 +112652,11 @@
           "for.roots",
           "for.try",
           "for.pass",
-          "tally.whose"
+          "tally.whose",
+          "tally.inputs",
+          "for.failure_inputs",
+          "for.inputs",
+          "row.parts"
         ]
       }
     ],
