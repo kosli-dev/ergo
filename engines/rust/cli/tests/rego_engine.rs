@@ -254,9 +254,7 @@ fn engine_rego_needs_the_path_of_ergo_rego_and_the_rust_engine_refuses_it() {
             &args(&["test", "--engine", "rego", &policy]),
             &Environment::default()
         ),
-        Err(Failure::Usage(
-            "--engine rego needs the path of ergo.rego, in --ergo-rego or ERGO_REGO".to_string()
-        ))
+        Err(Failure::Usage(ergo_policy_cli::get::missing("test")))
     );
     for engine in [vec![], vec!["--engine", "rust"]] {
         let all = [vec!["test", policy.as_str()], engine].concat();
@@ -288,8 +286,9 @@ fn engine_rego_fails_closed_when_ergo_rego_cannot_be_read() {
                 &args(&["test", "--engine", "rego", &policy]),
                 &with_rego(&path)
             ),
-            Err(Failure::Engine(format!(
-                "can't read ergo.rego at {path}: {problem}"
+            Err(Failure::Engine(ergo_policy_cli::get::unreadable(
+                &format!("can't read ergo.rego at {path}: {problem}"),
+                "test"
             ))),
         );
     }
@@ -298,8 +297,9 @@ fn engine_rego_fails_closed_when_ergo_rego_cannot_be_read() {
             &args(&["test", "--engine", "rego", "--ergo-rego", &missing, &policy]),
             &with_rego(&folder),
         ),
-        Err(Failure::Engine(format!(
-            "can't read ergo.rego at {missing}: No such file or directory (os error 2)"
+        Err(Failure::Engine(ergo_policy_cli::get::unreadable(
+            &format!("can't read ergo.rego at {missing}: No such file or directory (os error 2)"),
+            "test"
         )))
     );
 }
@@ -505,21 +505,21 @@ fn engine_and_ergo_rego_are_refused_where_they_do_not_go() {
         ),
         (
             vec![
-                "report", "--policy", "p.yaml", "--input", "i.json", "--engine", "rego",
+                "report", "--policy", "p.yaml", "--input", "i.json", "--ergo-rego", "e.rego",
             ],
-            "--engine only goes with test",
+            "--ergo-rego only goes with --engine rego",
         ),
         (
             vec![
-                "violations",
-                "--policy",
-                "p.yaml",
-                "--input",
-                "i.json",
-                "--ergo-rego",
-                "e.rego",
+                "violations", "--policy", "p.yaml", "--input", "i.json", "--engine", "opa",
             ],
-            "--ergo-rego only goes with test",
+            "--engine must be rust or rego",
+        ),
+        (
+            vec![
+                "report", "--policy", "p.yaml", "--input", "i.json", "--strict",
+            ],
+            "--strict only goes with test",
         ),
     ];
     for (all, message) in cases {
