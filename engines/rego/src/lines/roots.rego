@@ -300,29 +300,42 @@ _keys_by(c, p) if {
 	step == {"ref": p}
 }
 
-_key_root_texts(c) := [_m_isnt(named[0], v, "text") |
-	some named in sort({[_ref_name(step.ref), step.ref] |
-		walk(c, [_, x])
-		is_array(x)
-		some step in x
-		_is_ref(step)
-		_builtin(step.ref)
-	})
-	p := named[1]
-	not _ref_walks(p)
-	_ref_state(p) == "value"
-	v := _ref_read(p)
-	not is_string(v)
-]
+_key_root_texts(c) := array.concat(
+	[_m_isnt(named[0], v, "text") |
+		some named in sort({[_ref_name(step.ref), step.ref] |
+			walk(c, [_, x])
+			is_array(x)
+			some step in x
+			_is_ref(step)
+			_builtin(step.ref)
+		})
+		p := named[1]
+		not _ref_walks(p)
+		_ref_state(p) == "value"
+		v := _ref_read(p)
+		not is_string(v)
+	],
+	[_m_isnt(x[0], x[1], "text") | some x in _alias_or_parent_keys_unread(c); x[1] != null],
+)
+
+_key_root_said(c) := array.concat(
+	[["unusable", t] | some t in _key_root_texts(c)],
+	[["null", concat("", [x[0], " is null"])] | some x in _alias_or_parent_keys_unread(c); x[1] == null],
+)
 
 _walk_key_texts(check, r) := _once([m |
 	some c in _key_conds(check, r)
 	some m in _key_root_texts(c)
 ])
 
+_walk_key_said(check, r) := _once([x |
+	some c in _key_conds(check, r)
+	some x in _key_root_said(c)
+])
+
 _walk_key_msgs(check, subj, r) := _m_root_sorted(_once(array.concat(_walk_key_texts(check, r), _walk_root_msgs(check, subj))))
 
-_walk_key_root_clauses(check, subj, r) := _m_said_clauses(_m_said_sorted(array.concat([["unusable", t] | some t in _walk_key_texts(check, r)], _walk_root_said(check, subj))))
+_walk_key_root_clauses(check, subj, r) := _m_said_clauses(_m_said_sorted(array.concat(_walk_key_said(check, r), _walk_root_said(check, subj))))
 
 _key_beats_roots(check, subj) if {
 	not _walk_root_flaw(check, subj) in _root_read_flaws
@@ -695,9 +708,10 @@ _unrooted_text(c, ms) := object.union(c, {"text": ""}) if c.text in {m.text | so
 
 else := c
 
-_rooted_main(check, subj, r) := object.union(r, {"cause": "unusable", "failed": [], "root_msgs": _walk_key_root_clauses(check, subj, r)}) if {
+_rooted_main(check, subj, r) := object.union(r, {"cause": _worst_of({x[0] | some x in said}), "failed": [], "root_msgs": _walk_key_root_clauses(check, subj, r)}) if {
 	r.cause in _not_failing_causes
-	_walk_key_texts(check, r) != []
+	said := _walk_key_said(check, r)
+	said != []
 	_key_beats_roots(check, subj)
 } else := object.union(r, object.union(object.union({"cause": flaw, "failed": _rooted_kept(check, subj, r)}, {"root_msgs": ms | ms := _m_said_clauses(_m_said_sorted(said.all)); ms != []}), said.kept)) if {
 	flaw := _walk_root_flaw(check, subj)

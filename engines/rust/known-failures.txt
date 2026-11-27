@@ -145,6 +145,8 @@ for / a name read from outside the item and walked on the right of is in on a fo
 for / a name whose path goes on past its list / a missing title fails its pull request as absent, without checking the sentence
 for / a named by key read from $params on a for line over a null item, with the second list missing / names $params.k once and then the missing list
 for / a named by key that is an alias of the for line is read before any item of the counted list, so it fails on an empty list too / fails as unusable when the key x isn't text, even with es empty, because the key is read before any item and before .k is looked at
+for / a named by key that is an alias of the for line is read before any item of the list an every with if any walks, so it fails on an empty list too / fails as unusable when the key x isn't text and as null when it's null, with es empty, and passes when it's text
+for / a named by key that is an alias of the for line, in the whose of its second list, is read before any item of that list, so it fails on an empty list too / fails the item of xs as unusable when the key x isn't text and as null when it's null, with es empty, and passes when it's text
 for / a parent's part that a for line's sentence walks fails it on an empty list when an item of it can't be read / fails, with an empty rows, when an item of it has no name
 for / a parent's part that a for line's sentence walks fails it on an empty list when an item of it can't be read / fails, with an empty rows, when an item of it is null
 for / a parent's part that a for line's sentence walks fails it on an empty list when an item of it can't be read / fails, with an empty rows, when it holds names of more than one kind

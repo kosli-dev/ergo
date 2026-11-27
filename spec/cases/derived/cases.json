@@ -41018,5 +41018,239 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a parent's name used as the named by key of a count's whose, with no for line, is read before any item, so it fails on an empty list too",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"pr": {"from": "prs", "identified_by": "id"}, "cm": {"from": "every pr.cms", "identified_by": "id"}}, "requirements": {"r": {"subject": "cm", "checks": {"c": "count of es whose zz is m named by pr is 0"}}}},
+    "cases": [
+      {
+        "description": "fails as unusable on a parent that isn't text, before any item, whether es is empty, null or missing",
+        "rules": ["tally.whose", "sentence.resolve.root", "path.ref_step", "row.parts", "tally.inputs", "message.value", "message.cause"],
+        "input": {"prs": [{"id": "p1", "cms": [{"id": "c1", "es": []}]}, {"id": "p2", "cms": [{"id": "c2", "es": null}]}, {"id": "p3", "cms": [{"id": "c3"}]}]},
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "count of es whose zz equals m named by pr",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "/prs/0"
+                    ],
+                    "name": "pr",
+                    "outcome": "unusable",
+                    "value": {
+                      "cms": [
+                        {
+                          "es": [],
+                          "id": "c1"
+                        }
+                      ],
+                      "id": "p1"
+                    }
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/c"
+                ],
+                "message": "pr is {\"cms\": [{\"es\": [], \"id\": \"c1\"}], \"id\": \"p1\"}, which isn't text",
+                "name": "count of es whose zz equals m named by pr is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count of es whose zz equals m named by pr",
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "es[]",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "pr is {\"cms\": [{\"es\": [], \"id\": \"c1\"}], \"id\": \"p1\"}, which isn't text",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "in": {
+                "pr": "p1"
+              },
+              "type": "cm"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/1/cms/0/es"
+                        ],
+                        "name": "es",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "es is null",
+                    "name": "es"
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "count of es whose zz equals m named by pr",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "/prs/1"
+                    ],
+                    "name": "pr",
+                    "outcome": "unusable",
+                    "value": {
+                      "cms": [
+                        {
+                          "es": null,
+                          "id": "c2"
+                        }
+                      ],
+                      "id": "p2"
+                    }
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/c"
+                ],
+                "message": "pr is {\"cms\": [{\"es\": null, \"id\": \"c2\"}], \"id\": \"p2\"}, which isn't text",
+                "name": "count of es whose zz equals m named by pr is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count of es whose zz equals m named by pr",
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "es",
+                "outcome": "null",
+                "value": []
+              }
+            ],
+            "message": "pr is {\"cms\": [{\"es\": null, \"id\": \"c2\"}], \"id\": \"p2\"}, which isn't text; es is null",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c2",
+              "in": {
+                "pr": "p2"
+              },
+              "type": "cm"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/2/cms/0"
+                        ],
+                        "name": "es",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "es is missing",
+                    "name": "es"
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "count of es whose zz equals m named by pr",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "/prs/2"
+                    ],
+                    "name": "pr",
+                    "outcome": "unusable",
+                    "value": {
+                      "cms": [
+                        {
+                          "id": "c3"
+                        }
+                      ],
+                      "id": "p3"
+                    }
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/c"
+                ],
+                "message": "pr is {\"cms\": [{\"id\": \"c3\"}], \"id\": \"p3\"}, which isn't text",
+                "name": "count of es whose zz equals m named by pr is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count of es whose zz equals m named by pr",
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "es",
+                "outcome": "absent",
+                "value": []
+              }
+            ],
+            "message": "pr is {\"cms\": [{\"id\": \"c3\"}], \"id\": \"p3\"}, which isn't text; es is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c3",
+              "in": {
+                "pr": "p3"
+              },
+              "type": "cm"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]
