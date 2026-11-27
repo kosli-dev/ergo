@@ -1142,7 +1142,7 @@ _for_row_parts(check, subj, r) := {"roots": roots, "free": free, "items": items,
 	line := [object.union(_m_clause("list", t, r.cause, t), {"group": after}) | some t in _for_list_texts(check, subj, r)]
 }
 
-_for_whose_key_roots(check, r) := [_m_root_in(x.name, x.outcome, t, -1) |
+_for_whose_key_roots(check, r) := [_m_root_in(x.name, x.outcome, t, count(check.checks)) |
 	some x in _once([x | some item in check.items; some c in object.get(item, "whose", []); some [p, _] in _key_base_reads(c); some x in _key_flaw_entries(p)])
 	t := _for_key_text(x, x.outcome)
 	not _for_key_said_by_an_item(r, t)
