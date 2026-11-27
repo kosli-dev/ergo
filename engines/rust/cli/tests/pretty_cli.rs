@@ -109,7 +109,7 @@ fn color_always_writes_ansi_codes_even_when_piped_and_never_does_not() {
         "{always}"
     );
     assert!(
-        always.ends_with("\x1b[1m∴ not compliant\x1b[0m\n"),
+        always.ends_with("\x1b[1;31m∴ not compliant\x1b[0m\n"),
         "{always}"
     );
     let never = out(&ergo(&[&base[..], &["--color", "never"]].concat(), &[]));
@@ -298,4 +298,20 @@ fn engine_rego_colours_like_the_rust_engine() {
         text.contains("\x1b[31m✗ prod_deploy is not met\x1b[0m\n"),
         "{text}"
     );
+}
+
+#[test]
+fn a_compliant_verdict_line_is_bold_green_with_colour_and_plain_without() {
+    let (policy, input) = files("compliant-colour", PASSING);
+    let base = [
+        "report", "--format", "pretty", "--policy", &policy, "--input", &input,
+    ];
+    let always = out(&ergo(&[&base[..], &["--color", "always"]].concat(), &[]));
+    assert!(
+        always.ends_with("\n\x1b[1;32m∴ compliant\x1b[0m\n"),
+        "{always}"
+    );
+    let never = out(&ergo(&[&base[..], &["--color", "never"]].concat(), &[]));
+    assert!(!never.contains('\x1b'), "{never}");
+    assert!(never.ends_with("\n∴ compliant\n"), "{never}");
 }
