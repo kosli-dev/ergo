@@ -96,6 +96,44 @@ A policy written for a newer spec than the `ergo.rego` you pass is refused. For 
 ergo: the ergo.rego at ../rel/ergo.rego refuses the policy file ok.yaml: policy ergo_spec: unsupported version v0.7-dev, expected v0.6
 ```
 
+### A view for a terminal
+
+**Experimental, from 0.5.0.** `ergo report --format pretty` prints the report for a person to read, and the default stays JSON. With the policy of the [README](README.md#a-first-policy) extended with `not_self_approved: approver does not equal author` in `policy.yaml`, and `deployments.json` holding two deployments, `d1` approved by `bob` for `ann`, and `d2` approved by `cat` for `cat`, `ergo report --format pretty --policy policy.yaml --input deployments.json` prints:
+
+```
+✗ approved is not met
+    ✗ deployment d2 fails not_self_approved
+      because approver is "cat", and author is "cat"
+
+  7 rows: 6 passed, 1 failed, 0 out of scope
+
+∴ not compliant
+```
+
+It works on a report from either engine, so `--engine rego --ergo-rego ergo.rego` gives the same text. The requirements that are not met come first, each with its failed rows and the report's own `message` after `because`, then the requirements that are met or not applicable, one line each. The rows that passed and the subjects out of scope are only counted. The last line says `compliant` or `not compliant`, from the report's `compliant`, after the therefore sign (∴, U+2234), which Ergo uses for what follows from the evidence. A row names its subject by type and id, like `deployment d2`, and by type alone for a row with no id, like `deployment fails $min_subjects`. A requirement whose `status` this version doesn't know is listed among the ones that are not met, as `has status "x"`.
+
+`--show all` lists every row under its requirement, in the order of the report: a row that passed as `✓ deployment d1 passes approver_set`, a subject in scope as `✓ deployment d1 is in scope`, and one out of scope as `– deployment d3 is out of scope (environment is "staging")`. `--show failed` is the default. `--format pretty` can't go with `--compact`, or with `violations`, and `--show` and `--color` only go with `--format pretty` and `ergo test`.
+
+**Colour.** Colour is written only when stdout is a terminal. It is off when the `NO_COLOR` environment variable is set and not empty, and `--color auto|always|never` overrides both: `always` writes the codes even into a pipe or a file, and `never` writes none. The colours are plain ANSI codes: red for a failed requirement or row, whole line, green for the `✓` of a requirement or row that passed, dim for `–` lines, which are out of scope or not applicable, and bold for the last line. `⚠` is yellow.
+
+**Glyphs.** The marks `✓`, `✗`, `⚠`, `–` and `∴` are written when the first of `LC_ALL`, `LC_CTYPE` and `LANG` that is set and not empty contains `UTF-8` or `utf8`, in any case. Without one, or with no variable set, the plain words stand in for them: `ok`, `FAIL`, `warn`, `-` and `->`. With `LC_ALL=C`, the same report prints:
+
+```
+FAIL approved is not met
+    FAIL deployment d2 fails not_self_approved
+      because approver is "cat", and author is "cat"
+
+  7 rows: 6 passed, 1 failed, 0 out of scope
+
+-> not compliant
+```
+
+The glyphs don't depend on colour, and colour doesn't depend on them. Nothing here changes an exit code: `--fail` gives the codes in the table above for `--format pretty` too, and the view is printed before the command exits.
+
+`--format pretty` shows only the fields it needs: `compliant`, each requirement's `status`, and each row's `requirement`, `check`, `passed`, `subject` and `message`. When it can't read one of them, like a report with no `results`, a row that names a requirement that isn't in `requirements`, or a `compliant` that isn't `true` or `false`, it exits 2 and names what it couldn't read, and prints no verdict. It never checks the version of `ergo.rego` that made the report.
+
+The first line of `ergo --help` has the therefore sign. `--version`, the JSON and the outcome lines and the violations never do, and have no colour.
+
 ## Test a policy with examples (experimental)
 
 **Experimental, from 0.5.0.** A policy can carry examples: inputs, each with the outcome its report must have, written in the words the report uses. `ergo test` runs them. The form of an outcome, and what it checks, is in the [reference](REFERENCE.md#examples).
@@ -167,6 +205,17 @@ passed: a deployment needs an approver
 passed: nobody approves their own deployment
 2 examples: 2 passed, 0 failed
 ```
+
+On a terminal, or with `--color always`, `ergo test` marks its lines as [`--format pretty`](#a-view-for-a-terminal) does, with the same colour and glyph rules. It lists the failed examples and the warnings, then an empty line and a summary that starts with the therefore sign, and `--show all` lists every example. With `--show all`, `ergo test policy.yaml` on a terminal prints:
+
+```
+✓ a deployment needs an approver
+✓ nobody approves their own deployment
+
+∴ 2 examples: 2 passed, 0 failed
+```
+
+When stdout isn't a terminal and `--color always` isn't given, which is a pipe, a file or a CI log, the output is the plain lines above, `passed:`, `failed:`, `warning:` and `2 examples: 2 passed, 0 failed`, word for word, whatever `--show` says. The exit codes don't change.
 
 A line covers its check, so every failure of that check must be listed. If the first example's `d2` had `approver: ""` and the example listed only `d1`, it would fail, and `ergo test` shows its lines next to the report's:
 
