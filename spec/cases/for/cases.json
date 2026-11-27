@@ -112821,20 +112821,6 @@
                         "locations": [],
                         "name": "count of es whose zz equals m named by x.k",
                         "value": null
-                      },
-                      {
-                        "locations": [],
-                        "name": "es[]",
-                        "outcome": "usable",
-                        "value": []
-                      },
-                      {
-                        "locations": [
-                          "/things/0"
-                        ],
-                        "name": "m named by x.k",
-                        "outcome": "unusable",
-                        "value": null
                       }
                     ],
                     "kind": "item",
@@ -112863,14 +112849,6 @@
                 "name": "es[]",
                 "outcome": "usable",
                 "value": []
-              },
-              {
-                "locations": [
-                  "/things/0"
-                ],
-                "name": "m",
-                "outcome": "absent",
-                "value": null
               },
               {
                 "locations": [
@@ -112903,7 +112881,10 @@
           "tally.inputs",
           "for.failure_inputs",
           "for.inputs",
-          "row.parts"
+          "row.parts",
+          "sentence.resolve.clause",
+          "walk.items",
+          "walk.inputs"
         ]
       }
     ],
