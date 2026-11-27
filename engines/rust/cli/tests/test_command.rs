@@ -197,7 +197,7 @@ fn format_takes_json_or_outcome_and_outcome_only_with_report() {
     let cases = [
         (
             vec!["report", "--format", "xml"],
-            "--format must be json or outcome",
+            "--format must be json, outcome or pretty",
         ),
         (
             vec!["violations", "--format", "outcome"],

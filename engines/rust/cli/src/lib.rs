@@ -49,6 +49,38 @@ impl Environment {
     }
 }
 
+/// What the process knows about where its output goes.
+#[derive(Debug, Default, Clone, PartialEq, Eq)]
+pub struct Terminal {
+    /// Whether stdout is a terminal.
+    pub stdout: bool,
+    /// Whether `NO_COLOR` is set and not empty.
+    pub no_color: bool,
+    /// The first of `LC_ALL`, `LC_CTYPE` and `LANG` that is set and not empty.
+    pub locale: Option<String>,
+}
+
+impl Terminal {
+    /// Reads whether stdout is a terminal, and `NO_COLOR`, `LC_ALL`, `LC_CTYPE` and `LANG`, from the process.
+    pub fn read() -> Terminal {
+        use std::io::IsTerminal;
+        let get = |name: &str| std::env::var_os(name).map(|v| v.to_string_lossy().into_owned());
+        Terminal {
+            stdout: std::io::stdout().is_terminal(),
+            no_color: get("NO_COLOR").is_some_and(|v| !v.is_empty()),
+            locale: pretty::locale(get),
+        }
+    }
+
+    fn style(&self, color: pretty::Color, show: pretty::Show) -> pretty::Style {
+        pretty::Style {
+            color: pretty::color_on(color, self.stdout, self.no_color),
+            glyphs: pretty::utf8(self.locale.as_deref()),
+            show,
+        }
+    }
+}
+
 impl Failure {
     /// The text to print on stderr.
     pub fn message(&self) -> &str {
@@ -161,7 +193,11 @@ fn resolve_ergo_rego(
     }
 }
 
-fn test(options: args::TestOptions, environment: &Environment) -> Result<Outcome, Failure> {
+fn test(
+    options: args::TestOptions,
+    environment: &Environment,
+    terminal: &Terminal,
+) -> Result<Outcome, Failure> {
     let ergo_rego = resolve_ergo_rego(options.engine, options.ergo_rego, environment, "test")?;
     let policy = files::load("policy", &options.policy)?;
     let written_wrong = |problem| {
@@ -192,7 +228,15 @@ fn test(options: args::TestOptions, environment: &Environment) -> Result<Outcome
             (opa::engine_line(&reports[0]), reports)
         }
     };
-    let (text, code) = examples::results(&policy, &examples, &reports, options.strict);
+    let styled = (terminal.stdout || options.color == pretty::Color::Always)
+        .then(|| terminal.style(options.color, options.show));
+    let (text, code) = examples::results_styled(
+        &policy,
+        &examples,
+        &reports,
+        options.strict,
+        styled.as_ref(),
+    );
     let text = format!("{engine}{text}");
     Ok(match code {
         0 => Outcome::Print(text),
@@ -200,8 +244,17 @@ fn test(options: args::TestOptions, environment: &Environment) -> Result<Outcome
     })
 }
 
-/// Runs the tool for the given arguments, without the program name, with the environment variables in `environment`.
+/// Runs the tool for the given arguments, without the program name, with the environment variables in `environment`, and as if stdout were not a terminal, with no `NO_COLOR` and no locale.
 pub fn run_in(arguments: &[String], environment: &Environment) -> Result<Outcome, Failure> {
+    run_with(arguments, environment, &Terminal::default())
+}
+
+/// Runs the tool as `run_in` does, for the stdout, `NO_COLOR` and locale that `terminal` says.
+pub fn run_with(
+    arguments: &[String],
+    environment: &Environment,
+    terminal: &Terminal,
+) -> Result<Outcome, Failure> {
     let options = match args::parse(arguments)? {
         Parsed::Help => return Ok(Outcome::Print(USAGE.to_string())),
         Parsed::Version => {
@@ -212,7 +265,7 @@ pub fn run_in(arguments: &[String], environment: &Environment) -> Result<Outcome
             )));
         }
         Parsed::Run(options) => options,
-        Parsed::Test(options) => return test(options, environment),
+        Parsed::Test(options) => return test(options, environment, terminal),
     };
     let policy = files::load("policy", &options.policy)?;
     let input = files::load("input", &options.input)?;
@@ -253,6 +306,15 @@ pub fn run_in(arguments: &[String], environment: &Environment) -> Result<Outcome
                 )),
                 _ => Failure::Unsupported(problem),
             })?)
+        }
+        (_, Format::Pretty) => {
+            let style = terminal.style(options.color, options.show);
+            pretty::render(&report, &style).map_err(|problem| {
+                Failure::Unsupported(format!(
+                    "--format pretty can't show the report from {}: {problem}",
+                    options.policy
+                ))
+            })?
         }
         (Command::Report, Format::Json) => output::render(&report, options.compact),
         (Command::Violations, Format::Json) => {

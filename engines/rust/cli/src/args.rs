@@ -1,6 +1,7 @@
 //! Reads the command line by hand.
 
 use crate::Failure;
+use crate::pretty::{Color, Show};
 use std::collections::{BTreeMap, BTreeSet};
 
 /// The two commands that print something built from the files.
@@ -19,6 +20,8 @@ pub enum Format {
     Json,
     /// Experimental: as outcome lines in YAML, as a policy's examples write them.
     Outcome,
+    /// Experimental: as text for a person at a terminal.
+    Pretty,
 }
 
 /// What the command line asks for.
@@ -42,6 +45,10 @@ pub struct Options {
     pub engine: Engine,
     /// Path of `ergo.rego`, when `--ergo-rego` is given.
     pub ergo_rego: Option<String>,
+    /// Which rows `--format pretty` lists.
+    pub show: Show,
+    /// Whether to colour `--format pretty`.
+    pub color: Color,
 }
 
 /// Which engine builds the reports.
@@ -64,6 +71,10 @@ pub struct TestOptions {
     pub engine: Engine,
     /// Path of `ergo.rego`, when `--ergo-rego` is given.
     pub ergo_rego: Option<String>,
+    /// Which example lines are listed on a terminal.
+    pub show: Show,
+    /// Whether to colour the lines on a terminal.
+    pub color: Color,
 }
 
 /// The result of reading the command line.
@@ -110,7 +121,8 @@ pub fn parse(arguments: &[String]) -> Result<Parsed, Failure> {
                 }
                 switches.insert(name);
             }
-            "--policy" | "--input" | "--params" | "--format" | "--engine" | "--ergo-rego" => {
+            "--policy" | "--input" | "--params" | "--format" | "--engine" | "--ergo-rego"
+            | "--show" | "--color" => {
                 let value = match attached {
                     Some(value) => Some(value),
                     None => rest.next().filter(|v| !v.starts_with("--")).cloned(),
@@ -133,6 +145,17 @@ pub fn parse(arguments: &[String]) -> Result<Parsed, Failure> {
         Some("rego") => Engine::Rego,
         Some(_) => return Err(usage("--engine must be rust or rego".to_string())),
     };
+    let show = match values.get("--show").map(String::as_str) {
+        None | Some("failed") => Show::Failed,
+        Some("all") => Show::All,
+        Some(_) => return Err(usage("--show must be failed or all".to_string())),
+    };
+    let color = match values.get("--color").map(String::as_str) {
+        None | Some("auto") => Color::Auto,
+        Some("always") => Color::Always,
+        Some("never") => Color::Never,
+        Some(_) => return Err(usage("--color must be auto, always or never".to_string())),
+    };
     let ergo_rego = values.remove("--ergo-rego");
     if ergo_rego.is_some() && engine != Engine::Rego {
         return Err(usage(
@@ -140,7 +163,8 @@ pub fn parse(arguments: &[String]) -> Result<Parsed, Failure> {
         ));
     }
     let Some(command) = command else {
-        let report_only = values.keys().copied().filter(|v| !["--engine"].contains(v));
+        let shared = ["--engine", "--show", "--color"];
+        let report_only = values.keys().copied().filter(|v| !shared.contains(v));
         let report_only = report_only.chain(switches.iter().copied().filter(|s| *s != "--strict"));
         if let Some(flag) = report_only.min() {
             return Err(usage(format!(
@@ -159,6 +183,8 @@ pub fn parse(arguments: &[String]) -> Result<Parsed, Failure> {
             strict: switches.contains("--strict"),
             engine,
             ergo_rego,
+            show,
+            color,
         }));
     };
     if let Some(extra) = positional.first() {
@@ -170,16 +196,28 @@ pub fn parse(arguments: &[String]) -> Result<Parsed, Failure> {
     let format = match values.get("--format").map(String::as_str) {
         None | Some("json") => Format::Json,
         Some("outcome") => Format::Outcome,
-        Some(_) => return Err(usage("--format must be json or outcome".to_string())),
+        Some("pretty") => Format::Pretty,
+        Some(_) => {
+            return Err(usage(
+                "--format must be json, outcome or pretty".to_string(),
+            ));
+        }
     };
     let compact = switches.contains("--compact");
-    if format == Format::Outcome && command == Command::Violations {
-        return Err(usage("--format outcome only goes with report".to_string()));
+    for (name, wanted) in [("outcome", Format::Outcome), ("pretty", Format::Pretty)] {
+        if format == wanted && command == Command::Violations {
+            return Err(usage(format!("--format {name} only goes with report")));
+        }
+        if format == wanted && compact {
+            return Err(usage(format!("--compact can't go with --format {name}")));
+        }
     }
-    if format == Format::Outcome && compact {
-        return Err(usage(
-            "--compact can't go with --format outcome".to_string(),
-        ));
+    for flag in ["--show", "--color"] {
+        if format != Format::Pretty && values.contains_key(flag) {
+            return Err(usage(format!(
+                "{flag} only goes with --format pretty and test"
+            )));
+        }
     }
     Ok(Parsed::Run(Options {
         command,
@@ -195,5 +233,7 @@ pub fn parse(arguments: &[String]) -> Result<Parsed, Failure> {
         format,
         engine,
         ergo_rego,
+        show,
+        color,
     }))
 }
