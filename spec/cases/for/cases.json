@@ -113505,5 +113505,480 @@
         }
       }
     }
+  },
+  {
+    "description": "a named by key that is an alias of the for line, in the whose of its second list, is said for each item of the first list beside a second list that fails",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "t": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "t",
+          "checks": {
+            "every": {
+              "for": "every xs as x, every es whose zz is m named by x as e",
+              "assert": "e.v is 1"
+            },
+            "some": {
+              "for": "every xs as x, some es whose zz is m named by x as e",
+              "assert": "e.v is 1"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails as unusable when es is missing, saying es once and then the key for the item of xs that holds 3",
+        "rules": [
+          "for.named_by",
+          "for.roots",
+          "for.shared_failures",
+          "for.inputs",
+          "row.parts",
+          "problems.where_said",
+          "problems.all_said"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "xs": [
+                "q",
+                3
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "every",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/every/assert"
+                ],
+                "message": "item 2 of xs: x is 3, which isn't text",
+                "name": "e.v is 1"
+              },
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0"
+                    ],
+                    "name": "es",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "list",
+                "message": "es is missing",
+                "name": "es"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es",
+                "outcome": "absent",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/things/0/xs/0",
+                  "/things/0/xs/1"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  "q",
+                  3
+                ]
+              }
+            ],
+            "message": "es is missing; item 2 of xs: x is 3, which isn't text",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "some",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/some/assert"
+                ],
+                "message": "item 2 of xs: x is 3, which isn't text",
+                "name": "e.v is 1"
+              },
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0"
+                    ],
+                    "name": "es",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "list",
+                "message": "es is missing",
+                "name": "es"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es",
+                "outcome": "absent",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/things/0/xs/0",
+                  "/things/0/xs/1"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  "q",
+                  3
+                ]
+              }
+            ],
+            "message": "es is missing; item 2 of xs: x is 3, which isn't text",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "t"
+            }
+          }
+        ],
+        "compliant": false
+      },
+      {
+        "description": "fails as unusable when es is null, saying es once and then the key for the item of xs that holds 3",
+        "rules": [
+          "for.named_by",
+          "for.roots",
+          "for.shared_failures",
+          "for.inputs",
+          "row.parts",
+          "problems.where_said",
+          "problems.all_said"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "xs": [
+                "q",
+                3
+              ],
+              "es": null
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "every",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/every/assert"
+                ],
+                "message": "item 2 of xs: x is 3, which isn't text",
+                "name": "e.v is 1"
+              },
+              {
+                "cause": "null",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/es"
+                    ],
+                    "name": "es",
+                    "outcome": "null",
+                    "value": null
+                  }
+                ],
+                "kind": "list",
+                "message": "es is null",
+                "name": "es"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es",
+                "outcome": "null",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/things/0/xs/0",
+                  "/things/0/xs/1"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  "q",
+                  3
+                ]
+              }
+            ],
+            "message": "es is null; item 2 of xs: x is 3, which isn't text",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "some",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/some/assert"
+                ],
+                "message": "item 2 of xs: x is 3, which isn't text",
+                "name": "e.v is 1"
+              },
+              {
+                "cause": "null",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/es"
+                    ],
+                    "name": "es",
+                    "outcome": "null",
+                    "value": null
+                  }
+                ],
+                "kind": "list",
+                "message": "es is null",
+                "name": "es"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es",
+                "outcome": "null",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/things/0/xs/0",
+                  "/things/0/xs/1"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  "q",
+                  3
+                ]
+              }
+            ],
+            "message": "es is null; item 2 of xs: x is 3, which isn't text",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "t"
+            }
+          }
+        ],
+        "compliant": false
+      },
+      {
+        "description": "fails as unusable when es is empty with no if any, saying es once and then the key for the item of xs that holds 3",
+        "rules": [
+          "for.named_by",
+          "for.roots",
+          "for.shared_failures",
+          "for.inputs",
+          "row.parts",
+          "problems.where_said",
+          "problems.all_said"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "xs": [
+                "q",
+                3
+              ],
+              "es": []
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "every",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/every/assert"
+                ],
+                "message": "item 2 of xs: x is 3, which isn't text",
+                "name": "e.v is 1"
+              },
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/es"
+                    ],
+                    "name": "es",
+                    "outcome": "usable",
+                    "value": []
+                  }
+                ],
+                "kind": "list",
+                "message": "es is []",
+                "name": "es"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es[]",
+                "outcome": "usable",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/things/0/xs/0",
+                  "/things/0/xs/1"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  "q",
+                  3
+                ]
+              }
+            ],
+            "message": "es is []; item 2 of xs: x is 3, which isn't text",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "some",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/some/assert"
+                ],
+                "message": "item 2 of xs: x is 3, which isn't text",
+                "name": "e.v is 1"
+              },
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/es"
+                    ],
+                    "name": "es",
+                    "outcome": "usable",
+                    "value": []
+                  }
+                ],
+                "kind": "list",
+                "message": "es is []",
+                "name": "es"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es[]",
+                "outcome": "usable",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/things/0/xs/0",
+                  "/things/0/xs/1"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  "q",
+                  3
+                ]
+              }
+            ],
+            "message": "es is []; item 2 of xs: x is 3, which isn't text",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "t"
+            }
+          }
+        ],
+        "compliant": false
+      }
+    ]
   }
 ]
