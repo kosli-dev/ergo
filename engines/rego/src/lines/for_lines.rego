@@ -299,7 +299,7 @@ _for_second_roots(check, subj) := [{"i": e.i, "fl": fl, "ms": ms, "raw": [_m_ali
 	wh.kept
 	names := _bound(_for_names, item.as, e.v, _walk_at(w, e))
 	some j, c in conds
-	keys := _for_second_keys_said(item.as, c, j < count(whose)) with input as {"ergo/names": names}
+	keys := _for_second_keys_said(check, subj, c, j < count(whose)) with input as {"ergo/names": names}
 	root := _root_read_flaw(subj, c) with input as {"ergo/names": names}
 	fl := _second_flaw(root, keys)
 	not fl in _tolerated_root_flaws
@@ -309,9 +309,15 @@ _for_second_roots(check, subj) := [{"i": e.i, "fl": fl, "ms": ms, "raw": [_m_ali
 	ms != []
 ]
 
-_for_second_keys_said(alias, c, true) := [_name_key_said(k) | some k in _alias_or_parent_keys_unread(c); k[0] == alias]
+_for_second_keys_said(check, subj, c, true) := [_name_key_said(k) |
+	some k in _alias_or_parent_keys_unread(c)
+	k[0] == check.items[0].as
+	not _for_second_has_items(check, subj)
+]
 
-_for_second_keys_said(_, _, false) := []
+_for_second_keys_said(_, _, _, false) := []
+
+_for_second_has_items(check, subj) if _for_walk(object.remove(check.items[1], ["whose", "pick"]), subj, _for_names).items != []
 
 _second_flaw(root, keys) := _worst_of({k[0] | some k in keys} | ({root} - _tolerated_root_flaws)) if keys != []
 
