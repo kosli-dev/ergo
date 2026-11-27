@@ -726,7 +726,7 @@ test_a_whose_beside_an_outside_list_root_says_only_its_own_read if {
 	subj := {"ws": [{"n": 2}]}
 	names := {"ergo/subject": subj, "$at": {"names": {}}}
 	fe := {"i": ["ws", 0], "iv": {"n": 2}, "r": []}
-	[x.text | some x in ergo._for_own_said(c, fe, subj)] == ["v is missing"] with input as {"ergo/names": names} with data.ergo_document as {"os": [{"name": "bob"}, {}]}
+	[x.text | some x in ergo._for_own_said(ergo._for_own_check(c, subj), fe)] == ["v is missing"] with input as {"ergo/names": names} with data.ergo_document as {"os": [{"name": "bob"}, {}]}
 }
 
 test_a_whose_beside_an_outside_list_of_more_than_one_kind_is_checked_against_an_empty_list if {
@@ -812,4 +812,21 @@ test_an_alias_that_cant_hold_the_next_key_is_a_clause_that_isnt_an_object if {
 	check := {"op": "present", "path": ["$e", "x"]}
 	name := ergo._m_marked_alias("$e")
 	ergo._m_aliases_blocked(check) == [ergo._m_clause("root", name, "not_an_object", concat("", [name, " is 3, which isn't an object"]))] with input as {"ergo/names": {"e": 3}}
+}
+
+test_an_items_whose_causes_come_from_the_walk_and_are_not_worked_out_again if {
+	check := ergo._s_written_check({"for": "every xs whose v is in $input.os.name as x", "assert": ["x.w is 1"]})
+	e := {"i": ["xs", 0], "iv": {}, "v": {}, "r": []}
+	walked := {"items": {"item 1 of xs": e}}
+	ergo._for_item_whose_read(check, {"path": "item 1 of xs", "ergo/whose_causes": ["absent"]}, walked) == {"undecided": [true], "causes": ["absent"], "e": e}
+	ergo._for_item_whose_read(check, {"path": "item 1 of xs"}, walked) == {"undecided": []}
+}
+
+test_the_conditions_of_a_whose_are_read_once_for_the_row_and_not_for_each_item if {
+	check := ergo._s_written_check({"for": "every xs whose v is in $input.os.name as x", "assert": ["x.w is 1"]})
+	subj := {"xs": [{}, {}]}
+	names := {"ergo/subject": subj, "$at": {"names": {}}}
+	owns := ergo._for_whose_owns(check) with input as {"ergo/names": names} with data.ergo_document as {"os": [{"name": "a"}, {}]}
+	[o.first | some o in owns] == [false]
+	owns[0].check.values == []
 }

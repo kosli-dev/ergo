@@ -260,3 +260,12 @@ test_an_empty_list_read_through_an_earlier_alias_fails_the_second_line_when_the_
 		ergo._for_row(check, subj).cause == "value" with input as {"ergo/names": names} with ergo._walk_roots_on as true
 	}
 }
+
+test_an_item_its_whose_cant_decide_keeps_the_causes_of_its_whose_for_its_message if {
+	failure := {"path": ["xs", 0], "cause": "absent"}
+	ergo._for_whose_noted({"undecided": ["absent"], "kept": true, "causes": ["absent"]}, failure) == object.union(failure, {"whose_causes": ["absent"]})
+	ergo._for_whose_noted({"undecided": [], "kept": true, "causes": ["satisfied"]}, failure) == failure
+	ergo._for_whose_noted({"undecided": ["absent"], "kept": true, "causes": ["absent"]}, null) == null
+	ergo._for_failed_flags({"whose_causes": ["absent"]})["ergo/whose_causes"] == ["absent"]
+	"ergo/whose_causes" in ergo._failed_internal_keys
+}

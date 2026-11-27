@@ -569,7 +569,7 @@ _for_picked(item, w, names) := _for_pick_sorted(item, object.union(w, {"items": 
 _for_picked(item, w, names) := object.union(w, {"items": [], "fails": array.concat(w.fails, whose_fails), "input": _for_list_input(item, w)}) if {
 	"pick" in object.keys(item)
 	w.walked != set()
-	whose_fails := [object.union({"path": e.i, "item": e.i, "rest": _for_rest(e), "cause": wh.undecided[0], "value": _walk_value(e.v, e, w), "at": _walk_at(w, e), "pick_of": [e, wh]}, _for_raw(e)) | some e in w.items; wh := _for_whose(item, e, names); wh.undecided != []]
+	whose_fails := [object.union({"path": e.i, "item": e.i, "rest": _for_rest(e), "cause": wh.undecided[0], "value": _walk_value(e.v, e, w), "at": _walk_at(w, e), "pick_of": [e, wh], "whose_causes": wh.causes}, _for_raw(e)) | some e in w.items; wh := _for_whose(item, e, names); wh.undecided != []]
 	not _for_no_fails(w, whose_fails)
 }
 
@@ -769,12 +769,12 @@ _for_from_first(check) if {
 	step.named_by == check.items[0].as
 }
 
-_for_judge_outer(check, subj, names, item, e, pre, w) := {"passed": res.passed, "kept": wh.kept, "failure": _for_why(true, item, e, names, wh, _for_failure(e, wh.undecided, wh.kept, res, w)), "lines": res.lines} if {
+_for_judge_outer(check, subj, names, item, e, pre, w) := {"passed": res.passed, "kept": wh.kept, "failure": _for_why(true, item, e, names, wh, _for_whose_noted(wh, _for_failure(e, wh.undecided, wh.kept, res, w))), "lines": res.lines} if {
 	wh := _for_whose(item, e, names)
 	res := _for_outer_next(check, subj, _bound(names, item.as, e.v, _walk_at(w, e)), wh.undecided, wh.kept, pre)
 }
 
-_for_judge_inner(check, subj, names, item, e, w) := {"passed": res.passed, "kept": wh.kept, "failure": _for_why(false, item, e, names, wh, _for_failure(e, wh.undecided, wh.kept, res, w)), "lines": res.lines} if {
+_for_judge_inner(check, subj, names, item, e, w) := {"passed": res.passed, "kept": wh.kept, "failure": _for_why(false, item, e, names, wh, _for_whose_noted(wh, _for_failure(e, wh.undecided, wh.kept, res, w))), "lines": res.lines} if {
 	wh := _for_whose(item, e, names)
 	res := _for_inner_next(check, subj, _bound(names, item.as, e.v, _walk_at(w, e)), wh.undecided, wh.kept)
 }
@@ -805,7 +805,7 @@ _under_location(l, at) if l == at
 
 _under_location(l, at) if startswith(l, concat("", [at, "/"]))
 
-_for_whose(item, e, names) := {"undecided": _for_undecided(undecided, kept, e), "kept": kept} if {
+_for_whose(item, e, names) := {"undecided": _for_undecided(undecided, kept, e), "kept": kept, "causes": causes} if {
 	causes := [_for_focus_cause(c, e) | some c in item.whose] with input as {"ergo/names": names}
 	undecided := [x | some i, x in causes; _for_cause_undecided(x, item.whose[i])] with input as {"ergo/names": names}
 	kept := count([c | some c in causes; c == "value"]) == 0
@@ -857,6 +857,11 @@ _for_inner_next(_, _, _, undecided, _) := {"passed": false, "cause": undecided[0
 _for_inner_next(_, _, _, [], false) := {"passed": false, "cause": "value", "lines": []}
 
 _for_inner_next(check, subj, bound, [], true) := _for_lines(check, subj, bound)
+
+_for_whose_noted(wh, f) := object.union(f, {"whose_causes": wh.causes}) if {
+	f != null
+	wh.undecided != []
+} else := f
 
 _for_failure(_, [], false, _, _) := null
 
@@ -1069,7 +1074,7 @@ _for_failed_base(check, f) := {
 	"bare": _m_rest_named(_m_for_item_name(check, f.item), f),
 }
 
-_for_failed_flags(f) := object.union(object.union(object.union(object.union({"msg": f.why | "why" in object.keys(f)}, {"raw": f.raw | "raw" in object.keys(f)}), {"hoisted": true | object.get(f, "hoisted", false) == true}), {"whose_of": f.whose_of | "whose_of" in object.keys(f)}), object.union(object.union(_fail_levels(f), {"ergo/sorted": f.sorted | "sorted" in object.keys(f)}), object.union({"wants": f.msg | object.get(f, "msg", "") == "an object"}, {"ergo/why_roots": f.why_roots | "why_roots" in object.keys(f)})))
+_for_failed_flags(f) := object.union(object.union(object.union(object.union({"msg": f.why | "why" in object.keys(f)}, {"raw": f.raw | "raw" in object.keys(f)}), {"hoisted": true | object.get(f, "hoisted", false) == true}), {"whose_of": f.whose_of | "whose_of" in object.keys(f)}), object.union(object.union(_fail_levels(f), {"ergo/sorted": f.sorted | "sorted" in object.keys(f)}), object.union({"wants": f.msg | object.get(f, "msg", "") == "an object"}, object.union({"ergo/why_roots": f.why_roots | "why_roots" in object.keys(f)}, {"ergo/whose_causes": f.whose_causes | "whose_causes" in object.keys(f)}))))
 
 _fail_levels(f) := {"ergo/levels": f.lv} if {
 	"lv" in object.keys(f)

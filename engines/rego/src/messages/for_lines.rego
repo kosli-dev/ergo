@@ -118,24 +118,39 @@ _for_why(first, item, e, names, wh, failure) := object.union(failure, {"why": []
 
 _for_whose_item_clause(item, e, names, wh) := clause if {
 	wh.undecided != []
-	clause := _for_whose_own(item, e) with input as {"ergo/names": names}
+	clause := _for_whose_own(item, e, wh) with input as {"ergo/names": names}
 }
 
-_for_whose_own(_, e) := _m_clause("item", name, "not_an_object", _m_isnt(name, e.iv, "an object")) if {
+_for_whose_own(_, e, _) := _m_clause("item", name, "not_an_object", _m_isnt(name, e.iv, "an object")) if {
 	not is_object(e.iv)
 	name := _m_item_name(e.i, set())
 }
 
-_for_whose_own(item, e) := clauses[0] if {
+_for_whose_own(item, e, wh) := clauses[0] if {
 	is_object(e.iv)
 	clauses := [x |
-		some c in item.whose
-		_for_focus_cause(c, e) != "satisfied"
-		x := _for_cond_clause(c, e)
+		some i, c in item.whose
+		wh.causes[i] != "satisfied"
+		x := _for_cond_clause(c, e, _for_own_at(wh, i, c))
 	]
 }
 
-_for_cond_clause(c, e) := _m_item_clause(_m_item_name(e.i, set()), cause, [_m_clause("root", m, cause, m)]) if {
+_for_own_at(wh, i, c) := wh.owns[i] if {
+	"owns" in object.keys(wh)
+	_ = c
+} else := _for_cond_own_of(c, object.get(_for_names, "ergo/subject", null))
+
+_for_whose_owns(check) := [_for_cond_own_of(c, subj) | some c in object.get(check.items[0], "whose", [])] if {
+	subj := object.get(_for_names, "ergo/subject", null)
+}
+
+_for_cond_own_of(c, subj) := {"check": _for_own_check(c, subj), "first": _for_is_base_first(c, subj)}
+
+_for_is_base_first(c, subj) := true if _for_base_first(c, subj)
+
+else := false
+
+_for_cond_clause(c, e, own) := _m_item_clause(_m_item_name(e.i, set()), cause, [_m_clause("root", m, cause, m)]) if {
 	_focus_lost(e, c)
 	p := {"op": "present", "path": e.r}
 	cause := _row_cause(p, e.iv, "")
@@ -151,7 +166,7 @@ _for_cond_clause(c, e) := _m_item_clause(_m_item_name(e.i, set()), cause, [_m_cl
 	name := _m_item_name(fe.i, set())
 } else := _m_item_clause(_m_item_name(fe.i, set()), cause, said) if {
 	fe := _focus_of(e, c)
-	said := _once(_for_cond_own(c, fe, object.get(_for_names, "ergo/subject", null)))
+	said := _once(_for_cond_own(c, fe, own))
 	cause := _for_said_cause(said)
 	cause != "satisfied"
 }
@@ -160,10 +175,10 @@ _for_said_cause(said) := _worst_or_value({x.cause | some x in said}) if said != 
 
 else := "satisfied"
 
-_for_cond_own(c, fe, subj) := array.concat(bases, _for_own_said(c, fe, subj)) if {
+_for_cond_own(c, fe, own) := array.concat(bases, _for_own_said(own.check, fe)) if {
+	own.first
 	bases := [_m_clause("root", x[1], x[0], x[1]) | some x in _m_cond_base_said(fe.iv, c)]
-	_for_base_first(c, subj)
-} else := array.concat(_for_own_said(c, fe, subj), [_m_clause("root", x[1], x[0], x[1]) | some x in _m_cond_base_said(fe.iv, c)])
+} else := array.concat(_for_own_said(own.check, fe), [_m_clause("root", x[1], x[0], x[1]) | some x in _m_cond_base_said(fe.iv, c)])
 
 _for_base_first(c, subj) if {
 	ps := _condition_paths(c)
@@ -174,8 +189,7 @@ _for_base_first(c, subj) if {
 	}
 }
 
-_for_own_said(c, fe, subj) := [_m_clause("root", m, cause, m) |
-	s := _for_own_check(c, subj)
+_for_own_said(s, fe) := [_m_clause("root", m, cause, m) |
 	cause := _focus_cause(s, fe)
 	not cause in _not_failing_causes
 	m := _message(s, fe.iv, cause)
@@ -929,28 +943,25 @@ _for_item_clause_at(check, failed, k, walked) := c if {
 	c := _for_item_own(check, failed[k], walked)
 }
 
-_for_item_own(check, f, walked) := _for_whose_item_clause(check.items[0], e, _for_names, wh) if {
-	e := walked.items[f.path]
-	wh := _for_whose(check.items[0], e, _for_names)
-	wh.undecided != []
-	object.get(check.items[0], "whose", []) != []
-	not _for_key_flawed(check)
+_for_item_own(check, f, walked) := c if {
+	wh := _for_item_whose_read(check, f, walked)
+	c := _for_whose_or_kept(check, f, walked, wh)
 }
 
-_for_item_own(check, f, walked) := c if {
-	not _for_whose_undecided(check, f, walked)
-	c := _for_item_kept(check, f, walked)
-}
+_for_item_whose_read(check, f, walked) := {"undecided": [true], "causes": causes, "e": e} if {
+	not _for_key_flawed(check)
+	object.get(check.items[0], "whose", []) != []
+	e := walked.items[f.path]
+	causes := f["ergo/whose_causes"]
+} else := {"undecided": []}
+
+_for_whose_or_kept(check, _, walked, wh) := _for_whose_item_clause(check.items[0], wh.e, _for_names, object.union(wh, {"owns": walked.owns})) if wh.undecided != []
+
+_for_whose_or_kept(check, f, walked, wh) := _for_item_kept(check, f, walked) if wh.undecided == []
 
 _for_key_flawed(check) if _for_key_not_text(check)
 
 _for_key_flawed(check) if _for_key_unread(check)
-
-_for_whose_undecided(check, f, walked) if {
-	not _for_key_flawed(check)
-	object.get(check.items[0], "whose", []) != []
-	_for_whose(check.items[0], walked.items[f.path], _for_names).undecided != []
-}
 
 _for_item_kept(check, f, walked) := _m_clause("item", f.said, f.cause, concat("; ", array.slice(f.msg, count(roots), count(f.msg)))) if {
 	roots := f["ergo/why_roots"]
@@ -1048,7 +1059,7 @@ _for_rider_parts(check, f, names) := [[i, cs] |
 
 _for_inner_at(check, w, x) := min({j | some j, e in w.items; _for_item_name(check, e.i) == x.path} | {count(w.items)})
 
-_for_items_walked(check) := object.union(_for_walked_items(check), {"roots": [_for_sentence_roots(check, c, object.get(_for_names, "ergo/subject", null)) | some c in check.checks]})
+_for_items_walked(check) := object.union(_for_walked_items(check), {"roots": [_for_sentence_roots(check, c, object.get(_for_names, "ergo/subject", null)) | some c in check.checks], "owns": _for_whose_owns(check)})
 
 _for_walked_items(check) := {"w": w, "items": {_failed_name(e.i, d): e | some e in w.items}} if {
 	w := _for_walk(check.items[0], object.get(_for_names, "ergo/subject", null), _for_names)
@@ -1201,7 +1212,7 @@ _for_failed_clauses(check, r, roots) := [] if {
 	r.failed == []
 	_ = [check, roots]
 } else := [[k, _for_item_clause_at(check, r.failed, k, walked)] | some k, _ in r.failed] if {
-	walked := object.union(_for_walked_items(check), {"roots": roots})
+	walked := object.union(_for_walked_items(check), {"roots": roots, "owns": _for_whose_owns(check)})
 }
 
 _for_failed_sentences(check, r) := {i |
