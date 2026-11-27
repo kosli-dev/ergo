@@ -47,12 +47,26 @@ _for_on_tree(check, subj, r) if {
 	count(check.items) == 1
 	object.get(r, "natural", null) != "satisfied"
 	not _walk_flawed(check)
+	not _for_alias_key_beside_a_list_outside(check)
 	count([c | some c in check.checks; _for_reads_an_alias(check, c); _for_reads_a_list(c)]) < 2
 	every c in object.get(check.items[0], "whose", []) {
 		every p in _condition_paths(c) {
 			p != []
 		}
 	}
+}
+
+_for_alias_key_beside_a_list_outside(check) if {
+	walk(check.checks, [_, y])
+	is_object(y)
+	some item in check.items
+	object.get(y, "named_by", null) == item.as
+	some c in object.get(item, "whose", [])
+	walk(c, [_, x])
+	is_object(x)
+	_list_phrase(x)
+	some r in _m_root_paths(x)
+	_walk_outside(r)
 }
 
 _for_key_unread(check) if {
