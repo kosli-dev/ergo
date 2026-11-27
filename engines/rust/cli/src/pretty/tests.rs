@@ -14,6 +14,12 @@ fn row(requirement: &str, check: &str, id: Value, passed: bool, message: Option<
     row
 }
 
+fn out_of_scope_row(id: &str, message: &str) -> Value {
+    let mut out = row("approved", "$applies", json!(id), false, Some(message));
+    out["cause"] = json!("value");
+    out
+}
+
 fn report() -> Value {
     json!({
         "compliant": false,
@@ -25,7 +31,7 @@ fn report() -> Value {
             row("approved", "$applies", json!("d1"), true, None),
             row("approved", "allowed", json!("d1"), false, Some("approver is missing")),
             row("approved", "allowed", json!("d2"), true, None),
-            row("approved", "$applies", json!("d3"), false, Some("env is \"dev\"")),
+            out_of_scope_row("d3", "env is \"dev\""),
             row("tested", "has_env", json!("d1"), true, None)
         ]
     })

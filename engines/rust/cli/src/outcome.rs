@@ -386,6 +386,28 @@ fn id_written(id: &Value, quoted: bool) -> String {
     }
 }
 
+/// The subject of a report row as `subject_words` writes it, with the parents in the order the policy reads them in. A row whose parents the policy can't place gets the ones the row gives, in the order of their names, and an id that isn't a scalar is written as JSON.
+pub fn row_subject_words(row: &Value, policy: &Value) -> String {
+    let subject = &row["subject"];
+    let kind = subject["type"].as_str().unwrap_or_default();
+    let plain =
+        |id: &Value| id_text(id).map_or_else(|| Value::String(id.to_string()), |_| id.clone());
+    let id = match &subject["id"] {
+        Value::Null => None,
+        Value::String(own) if own == kind && kind.starts_with('$') => None,
+        id => Some(plain(id)),
+    };
+    let parents = parents_of(row, policy).unwrap_or_else(|_| {
+        subject["in"]
+            .as_object()
+            .into_iter()
+            .flatten()
+            .map(|(name, id)| (name.clone(), plain(id)))
+            .collect()
+    });
+    subject_words(kind, id.as_ref(), &parents)
+}
+
 /// The subject a check line names, with its id, if it has one, and each parent after `in`, like `artifact web in deployment d1`.
 pub fn subject_words(subject: &str, id: Option<&Value>, parents: &[(String, Value)]) -> String {
     written_subject(subject, id, parents, None, false)

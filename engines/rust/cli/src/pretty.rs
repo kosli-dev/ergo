@@ -116,11 +116,17 @@ struct Row {
     requirement: String,
     check: String,
     passed: bool,
+    cause: Option<String>,
     subject: String,
     message: Option<String>,
 }
 
-fn read_row(index: usize, row: &Value, requirements: &Map<String, Value>) -> Result<Row, String> {
+fn read_row(
+    index: usize,
+    row: &Value,
+    policy: &Value,
+    requirements: &Map<String, Value>,
+) -> Result<Row, String> {
     let number = index + 1;
     let text = |field: &str| {
         row[field]
@@ -138,16 +144,10 @@ fn read_row(index: usize, row: &Value, requirements: &Map<String, Value>) -> Res
     let passed = row["passed"]
         .as_bool()
         .ok_or_else(|| format!("the passed of row {number} is missing or isn't true or false"))?;
-    let Some(kind) = row["subject"]["type"].as_str() else {
+    if row["subject"]["type"].as_str().is_none() {
         return Err(format!("the subject of row {number} has no type"));
-    };
-    let subject = match &row["subject"]["id"] {
-        Value::Null => kind.to_string(),
-        id => format!(
-            "{kind} {}",
-            crate::outcome::id_text(id).unwrap_or_else(|| id.to_string())
-        ),
-    };
+    }
+    let subject = crate::outcome::row_subject_words(row, policy);
     let message = match &row["message"] {
         Value::Null => None,
         Value::String(message) => Some(message.clone()),
@@ -157,6 +157,7 @@ fn read_row(index: usize, row: &Value, requirements: &Map<String, Value>) -> Res
         requirement,
         check,
         passed,
+        cause: row["cause"].as_str().map(str::to_string),
         subject,
         message,
     })
@@ -178,7 +179,7 @@ fn plural(n: usize) -> &'static str {
 fn row_line(row: &Row) -> (Mark, String) {
     match (row.check.as_str(), row.passed) {
         ("$applies", true) => (Mark::Pass, format!("{} is in scope", row.subject)),
-        ("$applies", false) => (
+        ("$applies", false) if out_of_scope(row) => (
             Mark::Skip,
             match &row.message {
                 Some(message) => format!("{} is out of scope ({message})", row.subject),
@@ -191,7 +192,7 @@ fn row_line(row: &Row) -> (Mark, String) {
 }
 
 fn out_of_scope(row: &Row) -> bool {
-    row.check == "$applies" && !row.passed
+    row.check == "$applies" && !row.passed && row.cause.as_deref() == Some("value")
 }
 
 /// Shows `report`, made for `policy`, as text, or says what it can't read.
@@ -217,7 +218,7 @@ pub fn render(report: &Value, policy: &Value, style: &Style) -> Result<String, S
     let rows = results
         .iter()
         .enumerate()
-        .map(|(index, row)| read_row(index, row, requirements))
+        .map(|(index, row)| read_row(index, row, policy, requirements))
         .collect::<Result<Vec<_>, _>>()?;
     let mut out = String::new();
     for (name, mark, words) in &statuses {
@@ -243,8 +244,9 @@ pub fn render(report: &Value, policy: &Value, style: &Style) -> Result<String, S
     let skipped = rows.iter().filter(|row| out_of_scope(row)).count();
     let passed = rows.iter().filter(|row| row.passed).count();
     let failed = rows.len() - passed - skipped;
+    let gap = if out.is_empty() { "" } else { "\n" };
     out.push_str(&format!(
-        "\n  {} row{}: {passed} passed, {failed} failed, {skipped} out of scope\n\n",
+        "{gap}  {} row{}: {passed} passed, {failed} failed, {skipped} out of scope\n\n",
         rows.len(),
         plural(rows.len())
     ));
