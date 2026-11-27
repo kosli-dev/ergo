@@ -85,6 +85,17 @@ The report is the one the [README](README.md#the-report) shows, and its `engine`
 }
 ```
 
+> **Multi-document YAML isn't supported.** A YAML file can hold several documents, split by `---`, as the output of `helm template` and many other tools does. OPA, and so `ergo.rego`, reads only the first document, and nothing in the report says there was another. Checks on the later documents give no result, and the report can say `compliant` because of it. With this `input.yaml`:
+>
+> ```yaml
+> kind: ServiceAccount
+> ---
+> kind: Deployment
+> replicas: 0
+> ```
+>
+> Ergo reads `{"kind": "ServiceAccount"}`. The `Deployment` is never checked, so a policy that requires every deployment to have replicas passes. Split the file before Ergo reads it, or put the documents in one list, and write the policy's `from` to match. A host that loads YAML into OPA has the same limit, because `ergo.rego` only gets the parsed `input`.
+
 To get only what went wrong, ask for the violations:
 
 ```sh
