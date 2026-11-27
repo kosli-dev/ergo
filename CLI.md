@@ -34,6 +34,17 @@ ergo violations --policy policy.yaml --input deployments.json
 
 The report is the one the [README](README.md#the-report) shows, apart from `engine`, which says `{"name": "ergo-rust", "version": "0.4.0"}`. The violations are the same too.
 
+> **Multi-document YAML isn't supported.** A YAML file can hold several documents, split by `---`, as the output of `helm template` and many other tools does. `ergo` reads only the first document, and nothing in the report says there was another. Checks on the later documents give no result, and the report can say `compliant` because of it. With this `input.yaml`:
+>
+> ```yaml
+> kind: ServiceAccount
+> ---
+> kind: Deployment
+> replicas: 0
+> ```
+>
+> Ergo reads `{"kind": "ServiceAccount"}`. The `Deployment` is never checked, so a policy that requires every deployment to have replicas passes. Split the file before Ergo reads it, or put the documents in one list, and write the policy's `from` to match.
+
 `--params <file>` gives the policy its params. The file holds the params themselves, like `limit: 9`, without a `params:` key around them, and without `--params` they are `{}`. The output has sorted keys and two-space indents, like `opa eval --format=pretty`, and `--compact` prints one line. From 0.5.0, `ergo --version` prints the version and the commit it was built from, like `ergo 0.5.0-dev (commit ab81076ed80cff04a4c2e395418ca5535c6c3dab)`, and `unknown` for a build made outside a git checkout of this repo. Before that it prints only the version.
 
 Without `--fail`, the command exits 0 whenever it printed the output, even when `compliant` is `false`. With `--fail` it still prints all of it, then exits with a code that says how the policy did, so a CI job can stop on it:
@@ -47,7 +58,7 @@ Without `--fail`, the command exits 0 whenever it printed the output, even when 
 
 When the command line or a file is wrong, the command says why on one line of stderr.
 
-YAML is read the way OPA 1.21 and later read it. OPA 1.20 reads some of it differently, `yes`, `no`, `on` and `off` as booleans for one, so with OPA 1.20 `ergo.rego` can give another report on the same YAML file. Only `true` and `false` are booleans, so `yes`, `no`, `on` and `off` are strings: with `approved: yes`, `approved is true` fails, so write `approved: true`. `010` is 8, `0x10` is 16, dates stay strings, and a date tagged `!!timestamp` is written out in full, like `2001-12-14T00:00:00Z`. `<<` merges, and a key written in the mapping wins over a merged one, wherever the `<<` is. A tag YAML doesn't define, like `!custom 5`, keeps the text, `"5"`, and a bare `!` reads a plain value as if it had no tag, so `! 5` is 5. Only the first document counts, but the others must still be valid YAML. `ergo` also refuses most files OPA refuses, like one with a control character, a directive other than `%YAML 1.1` and `%TAG`, a tag that doesn't fit its value like `!!int 1.5` or `!!bool yes`, the same alias twice as a key of one mapping, more than 10,000 levels of nesting, or too many aliases.
+YAML is read the way OPA 1.21 and later read it. OPA 1.20 reads some of it differently, `yes`, `no`, `on` and `off` as booleans for one, so with OPA 1.20 `ergo.rego` can give another report on the same YAML file. Only `true` and `false` are booleans, so `yes`, `no`, `on` and `off` are strings: with `approved: yes`, `approved is true` fails, so write `approved: true`. `010` is 8, `0x10` is 16, dates stay strings, and a date tagged `!!timestamp` is written out in full, like `2001-12-14T00:00:00Z`. `<<` merges, and a key written in the mapping wins over a merged one, wherever the `<<` is. A tag YAML doesn't define, like `!custom 5`, keeps the text, `"5"`, and a bare `!` reads a plain value as if it had no tag, so `! 5` is 5. Only the first document counts, but the others must still be valid YAML (see the warning under [Run a policy](#run-a-policy)). `ergo` also refuses most files OPA refuses, like one with a control character, a directive other than `%YAML 1.1` and `%TAG`, a tag that doesn't fit its value like `!!int 1.5` or `!!bool yes`, the same alias twice as a key of one mapping, more than 10,000 levels of nesting, or too many aliases.
 
 These differences are known:
 
