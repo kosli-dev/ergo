@@ -1633,10 +1633,6 @@ _for_said(raw) := object.union(object.remove(raw, ["ergo/for_raw"]), {
 	cause := _worst_or_value({raw.cause} | {v.cause | walk(tree, [_, v]); is_object(v); "cause" in object.keys(v)})
 	rr := _for_line_rooted(s.r, p.outside)
 	own := _for_own_causes(object.union(s, {"r": rr}), object.union(p, {"roots": array.concat(p.roots, [c | some c in p.outside; c.text in _for_rooted_texts(rr)])}), raw.cause, cause)
-} else := object.union(object.remove(raw, ["ergo/for_raw"]), {"message": said.message, "ergo/for_texts": _for_texts(s.check, s.subj, s.r, said.once, said.line)}) if {
-	s := raw["ergo/for_raw"]
-	s.tree == true
-	said := _for_row_text(s.check, s.subj, s.r)
 } else := object.union(object.remove(raw, ["ergo/for_raw"]), {"ergo/for_texts": _for_texts(s.check, s.subj, s.r, s.once, s.line)}) if s := raw["ergo/for_raw"]
 
 else := raw

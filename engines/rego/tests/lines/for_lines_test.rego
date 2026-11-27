@@ -261,6 +261,16 @@ test_an_empty_list_read_through_an_earlier_alias_fails_the_second_line_when_the_
 	}
 }
 
+test_a_list_the_whose_leaves_nothing_of_is_said_after_a_sentence_that_reads_no_alias_beside_two_that_walk_the_item if {
+	check := ergo._s_written_check({"for": "every xs whose v is 1 as x", "assert": ["every x.ys.n is 1", "every x.zs.ok is true", "z is 1"]})
+	subj := {"xs": [{"v": 2}], "z": 2}
+	names := {"ergo/subject": subj, "$at": {"names": {}}}
+	r := ergo._for_freed(check, subj, ergo._for_row_raw(check, subj)) with input as {"ergo/names": names}
+	"unfreed" in object.keys(r)
+	ergo._for_item_parts(check, subj, r, ["z is 2"]) == [`xs is [{"v": 2}]`] with input as {"ergo/names": names}
+	ergo._for_row(check, subj).message == `z is 2; xs is [{"v": 2}]` with input as {"ergo/names": names}
+}
+
 test_an_item_its_whose_cant_decide_keeps_the_causes_of_its_whose_for_its_message if {
 	failure := {"path": ["xs", 0], "cause": "absent"}
 	ergo._for_whose_noted({"undecided": ["absent"], "kept": true, "causes": ["absent"]}, failure) == object.union(failure, {"whose_causes": ["absent"]})
