@@ -300,6 +300,19 @@ test_a_named_by_key_that_is_the_first_lines_alias_in_the_second_lines_whose_is_r
 	}
 }
 
+test_a_sentence_that_reads_the_first_alias_still_says_the_missing_second_list_for_each_item_beside_the_key_of_the_second_lines_whose if {
+	line := "every xs as x, every es whose zz is m named by x as e"
+	every c in [
+		["every es whose zz is m named by x, if any, exists", {"xs": [3, "s"]}, "es is missing; item 1 of xs: x is 3, which isn't text; item 1 of xs: es is missing; item 2 of xs: es is missing"],
+		["every es whose zz is m named by x, if any, exists", {"xs": [3, "s"], "es": null}, "es is null; item 1 of xs: x is 3, which isn't text; item 1 of xs: es is null; item 2 of xs: es is null"],
+		["every es, if any, exists", {"xs": [3, "s"]}, "es is missing; item 1 of xs: x is 3, which isn't text"],
+	] {
+		check := ergo._s_written_check({"for": line, "assert": c[0]})
+		names := {"ergo/subject": c[1], "$at": {"names": {}}}
+		ergo._for_row(check, c[1]).message == c[2] with input as {"ergo/names": names}
+	}
+}
+
 test_a_named_by_key_that_is_the_first_lines_alias_in_the_second_lines_whose_is_left_to_the_items_of_the_second_list_when_it_has_some if {
 	every c in [
 		["every xs as x, every es whose zz is m named by x as e", {"xs": ["q", 3], "es": [{"zz": 1, "v": 1, "m": {"q": 1}}]}],
