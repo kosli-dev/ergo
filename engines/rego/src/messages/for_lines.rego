@@ -1120,9 +1120,9 @@ _for_row_parts(check, subj, r) := {"roots": roots, "outside": outside, "shown": 
 	rooted := {c.text | some c in roots}
 	sroots := {i: {x[1] | some x in xs} | some i, xs in ssaid}
 	free := [x | some c in _for_free_clauses(check, subj, r, sroots); x := _for_free_unrooted(c, rooted)]
-	pairs := sort(_m_for_said_pairs(check))
-	tallies := sort(_m_for_tally_pairs(check))
-	outside := _for_outside_roots(check, {t | some c in array.concat(roots, free); some t in _m_clause_lines(c)}, pairs, tallies)
+	pairs := _for_outside_said(check, "said")
+	tallies := _for_outside_said(check, "tally")
+	outside := _for_outside_roots({t | some c in array.concat(roots, free); some t in _m_clause_lines(c)}, pairs, tallies)
 	shown := _for_tally_joined(tallies, array.concat(roots, outside))
 	said := {t | some c in array.concat(array.concat(array.concat(roots, outside), shown), free); some t in _m_clause_lines(c)}
 	name := _input_name(check.items[0].path)
@@ -1133,9 +1133,24 @@ _for_row_parts(check, subj, r) := {"roots": roots, "outside": outside, "shown": 
 	line := [object.union(_m_clause("list", t, r.cause, t), {"group": after}) | some t in _for_list_texts(check, subj, r)]
 }
 
-_for_outside_roots(check, said, pairs, tallies) := [_for_root_item(_m_root_in(_m_clause_name(x[1]), x[0], x[1], count(check.checks))) | some i, x in xs; not x[1] in said; not x[1] in {y[1] | some y in array.slice(xs, 0, i)}] if {
-	xs := array.concat(pairs, [[x[0], t] | some x in tallies; some t in x[1]])
+_for_outside_roots(said, pairs, tallies) := [_for_root_item(_m_root_in(_m_clause_name(x[1]), x[0], x[1], x[2])) | some i, x in xs; not x[1] in said; not x[1] in {y[1] | some y in array.slice(xs, 0, i)}] if {
+	xs := array.concat(pairs, [[x[0], t, x[2]] | some x in tallies; some t in x[1]])
 }
+
+_for_outside_said(check, kind) := [[x[3], x[4], x[0]] | some x in sort([[g, object.get(_m_clause_ranks, p[0], 6), _for_outside_name(p[1]), p[0], p[1]] |
+	some [g, part] in _for_outside_parts(check)
+	some p in _for_outside_pairs(part, kind)
+])]
+
+_for_outside_parts(check) := array.concat([[count(check.checks), object.union(check, {"checks": [], "assertions": []})]], [[_for_sentence_group(check, i), c] | some i, c in check.checks])
+
+_for_outside_pairs(part, "said") := _m_for_said_pairs(part)
+
+_for_outside_pairs(part, "tally") := _m_for_tally_pairs(part)
+
+_for_outside_name(t) := _m_clause_name(t) if is_string(t)
+
+else := _m_clause_name(t[0])
 
 _for_whose_key_roots(check, r) := [_m_root_in(x.name, x.outcome, t, -1) |
 	some x in _once([x | some item in check.items; some c in object.get(item, "whose", []); some [p, _] in _key_base_reads(c); some x in _key_flaw_entries(p)])
