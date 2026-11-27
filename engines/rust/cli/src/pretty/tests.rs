@@ -106,7 +106,7 @@ fn a_compliant_report_says_so() {
     });
     assert_eq!(
         render(&report, &GLYPHS).unwrap(),
-        "✓ tested is met\n– skipped is not applicable\n\n  1 row: 1 passed, 0 failed, 0 out of scope\n\n∴ compliant\n"
+        "– skipped is not applicable\n✓ tested is met\n\n  1 row: 1 passed, 0 failed, 0 out of scope\n\n∴ compliant\n"
     );
 }
 
@@ -224,4 +224,64 @@ fn a_failed_row_of_a_met_requirement_is_still_listed_in_the_count_only() {
         render(&report, &GLYPHS).unwrap(),
         "✓ a is met\n\n  1 row: 0 passed, 1 failed, 0 out of scope\n\n∴ compliant\n"
     );
+}
+
+#[test]
+fn colour_is_on_for_a_terminal_unless_no_color_is_set_and_the_flag_overrides_both() {
+    let cases = [
+        (Color::Auto, true, false, true),
+        (Color::Auto, false, false, false),
+        (Color::Auto, true, true, false),
+        (Color::Always, false, false, true),
+        (Color::Always, false, true, true),
+        (Color::Never, true, false, false),
+    ];
+    for (choice, terminal, no_color, want) in cases {
+        assert_eq!(
+            color_on(choice, terminal, no_color),
+            want,
+            "{choice:?} {terminal} {no_color}"
+        );
+    }
+}
+
+#[test]
+fn glyphs_need_a_utf8_locale() {
+    let cases = [
+        (Some("en_US.UTF-8"), true),
+        (Some("en_US.utf8"), true),
+        (Some("C.UTF-8"), true),
+        (Some("C"), false),
+        (Some("POSIX"), false),
+        (Some(""), false),
+        (None, false),
+    ];
+    for (locale, want) in cases {
+        assert_eq!(utf8(locale), want, "{locale:?}");
+    }
+}
+
+#[test]
+fn the_first_locale_variable_that_is_set_decides() {
+    let get = |set: &'static [(&'static str, &'static str)]| {
+        move |name: &str| {
+            set.iter()
+                .find(|(n, _)| *n == name)
+                .map(|(_, v)| v.to_string())
+        }
+    };
+    let said = |set| locale(get(set));
+    assert_eq!(
+        said(&[("LC_ALL", "C"), ("LANG", "en_US.UTF-8")]),
+        Some("C".to_string())
+    );
+    assert_eq!(
+        said(&[("LC_ALL", ""), ("LC_CTYPE", "en_US.UTF-8"), ("LANG", "C")]),
+        Some("en_US.UTF-8".to_string())
+    );
+    assert_eq!(
+        said(&[("LANG", "de_DE.UTF-8")]),
+        Some("de_DE.UTF-8".to_string())
+    );
+    assert_eq!(said(&[]), None);
 }
