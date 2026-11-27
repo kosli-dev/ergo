@@ -81,7 +81,8 @@ fn print(ergo_rego: &str, policy: &str, input: &str, command: &str, compact: boo
 }
 
 #[test]
-fn the_report_printed_with_engine_rego_keeps_new_fields_digits_and_key_order_that_opa_gave_except_the_sign_of_an_exponent() {
+fn the_report_printed_with_engine_rego_keeps_new_fields_digits_and_key_order_that_opa_gave_except_the_sign_of_an_exponent()
+ {
     if std::env::var_os("ERGO_TEST_NO_OPA").is_some() {
         return;
     }
