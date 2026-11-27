@@ -315,12 +315,12 @@ _key_root_texts(c) := array.concat(
 		v := _ref_read(p)
 		not is_string(v)
 	],
-	[_m_isnt(x[0], x[1], "text") | some x in _alias_keys_unread(c); x[1] != null],
+	[_m_isnt(x[0], x[1], "text") | some x in _alias_or_parent_keys_unread(c); x[1] != null],
 )
 
 _key_root_said(c) := array.concat(
 	[["unusable", t] | some t in _key_root_texts(c)],
-	[["null", concat("", [x[0], " is null"])] | some x in _alias_keys_unread(c); x[1] == null],
+	[["null", concat("", [x[0], " is null"])] | some x in _alias_or_parent_keys_unread(c); x[1] == null],
 )
 
 _walk_key_texts(check, r) := _once([m |
