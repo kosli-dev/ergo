@@ -740,12 +740,17 @@ test_a_for_row_whose_whose_key_isnt_text_says_the_key_on_an_empty_list_it_tolera
 	_row_tree_text("every es whose zz is m named by $input.k, if any, as e", ["e.v is 2"], {"es": []}, {}) == "$input.k is 3, which isn't text" with data.ergo_document as {"k": 3, "m": {"a": 2}}
 }
 
-test_an_item_that_isnt_an_object_takes_the_cause_its_whose_failed_with_only_when_that_cause_says_nothing_was_there if {
-	ergo._for_whose_item_cause("absent") == "absent"
-	ergo._for_whose_item_cause("null") == "null"
-	ergo._for_whose_item_cause("unusable") == "not_an_object"
-	ergo._for_whose_item_cause("value") == "not_an_object"
-	ergo._for_whose_item_cause("not_an_object") == "not_an_object"
+_item_causes(line, sentences, subj, doc) := [c.cause | some c in tree; c.kind == "item"; startswith(c.name, "item 1 of xs")] if {
+	tree := _row_tree(line, sentences, subj, {}) with data.ergo_document as doc
+}
+
+test_an_item_that_isnt_an_object_fails_as_not_an_object_whatever_the_root_of_its_whose_fails_with if {
+	line := "every xs whose v is in $input.os.name, if any, as x"
+	_item_causes(line, ["x.w is 1", "z is 1"], {"xs": [null], "z": 2}, {}) == ["not_an_object"]
+	_item_causes(line, ["x.w is 1", "z is 1"], {"xs": [null], "z": 2}, {"os": null}) == ["not_an_object"]
+	_item_causes(line, ["x.w is 1", "z is 1"], {"xs": [null], "z": 2}, {"os": [null]}) == ["not_an_object"]
+	_item_causes(line, ["x.w is 1", "z is 1"], {"xs": ["s"], "z": 2}, {}) == ["not_an_object"]
+	_item_causes(line, ["x.w is 1"], {"xs": [null]}, {"os": [{"name": "bob"}, {}]}) == ["not_an_object"]
 }
 
 test_a_sentence_whose_message_has_parts_apart_keeps_them_apart_under_its_item if {
