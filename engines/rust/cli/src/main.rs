@@ -18,7 +18,7 @@ fn main() -> ExitCode {
         Ok(ergo_policy_cli::Outcome::Print(text)) => (text, 0),
         Ok(ergo_policy_cli::Outcome::PrintAndFail(text, code)) => (text, code),
         Err(failure) => {
-            eprintln!("ergo: {}", failure.message());
+            eprint!("{}", ergo_policy_cli::error_line(failure.message()));
             return ExitCode::from(failure.code() as u8);
         }
     };

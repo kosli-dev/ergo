@@ -57,5 +57,5 @@ fn outside_a_utf8_locale_the_help_has_no_glyph_at_all() {
         let glyphs: Vec<char> = text.chars().filter(|c| !c.is_ascii()).collect();
         assert!(glyphs.is_empty(), "{locale:?}: {glyphs:?}");
     }
-    assert!(help(Some("en_US.UTF-8")).contains("Glyphs (✓ ✗ ⚠ – ∴)"));
+    assert!(help(Some("en_US.UTF-8")).contains("(✓ ✗ ⚠ – ∴) are written"));
 }

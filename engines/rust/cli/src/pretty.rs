@@ -72,11 +72,25 @@ pub enum Mark {
     Therefore,
 }
 
-/// `text` with every control character written as a visible `\u{..}` escape: C0 (including newline, return and tab), DEL and C1.
+fn unsafe_char(c: char) -> bool {
+    c.is_control()
+        || matches!(
+            c,
+            '\u{61c}' | '\u{200e}' | '\u{200f}' | '\u{2028}' | '\u{2029}'
+                | '\u{202a}'..='\u{202e}' | '\u{2066}'..='\u{2069}'
+        )
+}
+
+/// `text` with every control character written as a visible `\u{..}` escape: C0 (including newline, return and tab), DEL and C1, and the line and paragraph separators and the bidirectional controls (U+061C, U+200E, U+200F, U+2028, U+2029, U+202A to U+202E and U+2066 to U+2069).
 pub fn escape(text: &str) -> String {
+    escape_but(text, |_| false)
+}
+
+/// `escape`, except that a character for which `keep` is true stays as it is.
+pub fn escape_but(text: &str, keep: impl Fn(char) -> bool) -> String {
     text.chars()
         .map(|c| {
-            if c.is_control() {
+            if unsafe_char(c) && !keep(c) {
                 format!("\\u{{{:x}}}", c as u32)
             } else {
                 c.to_string()
@@ -161,7 +175,9 @@ fn read_row(
     if row["subject"]["type"].as_str().is_none() {
         return Err(format!("the subject of row {number} has no type"));
     }
-    let subject = crate::outcome::row_subject_words(row, policy);
+    let subject = crate::outcome::row_subject_words_quoted(row, policy, &|text| {
+        format!("\"{}\"", escape(text))
+    });
     let message = match &row["message"] {
         Value::Null => None,
         Value::String(message) => Some(message.clone()),
@@ -182,7 +198,7 @@ fn describe(status: &str) -> (Mark, String) {
         "met" => (Mark::Pass, "is met".to_string()),
         "not_applicable" => (Mark::Skip, "is not applicable".to_string()),
         "not_met" => (Mark::Fail, "is not met".to_string()),
-        other => (Mark::Fail, format!("has status {other:?}")),
+        other => (Mark::Fail, format!("has status \"{}\"", escape(other))),
     }
 }
 

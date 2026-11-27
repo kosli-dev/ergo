@@ -154,13 +154,19 @@ pub fn usage(terminal: &Terminal) -> String {
     if pretty::utf8(terminal.locale.as_deref()) {
         USAGE.to_string()
     } else {
-        USAGE.replacen('∴', "->", 1)
+        USAGE
+            .replacen(
+                "(✓ ✗ ⚠ – ∴)",
+                "(the check, cross, warning, dash and therefore marks)",
+                1,
+            )
+            .replacen('∴', "->", 1)
     }
 }
 
 /// The line `ergo` writes to stderr for a failure with `message`.
 pub fn error_line(message: &str) -> String {
-    format!("ergo: {message}\n")
+    format!("ergo: {}\n", pretty::escape_but(message, |c| c == '\n'))
 }
 
 /// What a run gives back.

@@ -231,7 +231,11 @@ fn an_example_name_with_escape_codes_reaches_stderr_only_as_visible_escapes() {
 
 #[test]
 fn a_missing_file_name_with_escape_codes_reaches_stderr_only_as_visible_escapes() {
-    let policy = write("stderr-file", "policy.yaml", &POLICY.replace("{{spec}}", SPEC));
+    let policy = write(
+        "stderr-file",
+        "policy.yaml",
+        &POLICY.replace("{{spec}}", SPEC),
+    );
     let output = ergo(
         &[
             "report",
@@ -256,7 +260,11 @@ fn an_unknown_flag_with_escape_codes_reaches_stderr_only_as_visible_escapes() {
 #[test]
 fn what_opa_prints_on_stderr_with_escape_codes_reaches_stderr_only_as_visible_escapes() {
     use std::os::unix::fs::PermissionsExt;
-    let policy = write("stderr-opa", "policy.yaml", &POLICY.replace("{{spec}}", SPEC));
+    let policy = write(
+        "stderr-opa",
+        "policy.yaml",
+        &POLICY.replace("{{spec}}", SPEC),
+    );
     let input = write("stderr-opa", "input.json", INPUT);
     let ergo_rego = write("stderr-opa", "ergo.rego", "package ergo\n");
     let opa = write(
