@@ -1,7 +1,7 @@
 //! Experimental: reads the examples of a policy and checks each one's outcome against its report.
 
 use crate::outcome::{self, Item, Region, heading, requirement_line};
-use crate::pretty::{Mark, Show, Style};
+use crate::pretty::{Mark, Show, Style, escape};
 use serde_json::{Value, json};
 use std::collections::BTreeSet;
 
@@ -411,6 +411,17 @@ pub fn check(outcome: &Value, report: &Value, policy: &Value) -> Checked {
     checked
 }
 
+fn shown_block(items: &[Item], style: Option<&Style>) -> String {
+    let block = indented(items);
+    match style {
+        None => block,
+        Some(_) => block
+            .lines()
+            .map(|line| format!("{}\n", escape(line)))
+            .collect(),
+    }
+}
+
 fn indented(items: &[Item]) -> String {
     outcome::yaml(items)
         .lines()
@@ -468,13 +479,16 @@ pub fn results_styled(
             Some(style) => text.push_str(&format!("{}\n", style.line(Mark::Fail, &example.name))),
         }
         for problem in &checked.problems {
-            text.push_str(&format!("  {problem}\n"));
+            match style {
+                None => text.push_str(&format!("  {problem}\n")),
+                Some(_) => text.push_str(&format!("  {}\n", escape(problem))),
+            }
         }
         if !checked.expected.is_empty() {
             text.push_str("  expected:\n");
-            text.push_str(&indented(&checked.expected));
+            text.push_str(&shown_block(&checked.expected, style));
             text.push_str("  actual:\n");
-            text.push_str(&indented(&checked.actual));
+            text.push_str(&shown_block(&checked.actual, style));
         }
     }
     let mut warnings = 0;

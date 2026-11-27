@@ -503,7 +503,7 @@ fn an_out_of_scope_message_and_a_status_the_report_gives_are_escaped_too() {
     };
     let text = render(&all, &json!({}), &style).unwrap();
     assert!(
-        text.contains("deployment d\\u{1b}3 is out of scope (env is \\u{1b}[2J)"),
+        text.contains("deployment \"d\\u001b3\" is out of scope (env is \\u{1b}[2J)"),
         "{text:?}"
     );
 }

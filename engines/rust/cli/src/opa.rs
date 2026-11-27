@@ -253,8 +253,8 @@ pub fn engine_line(report: &Value) -> String {
     let engine = &report["engine"];
     format!(
         "engine: {} {}\n",
-        engine["name"].as_str().unwrap_or_default(),
-        engine["version"].as_str().unwrap_or_default()
+        crate::pretty::escape(engine["name"].as_str().unwrap_or_default()),
+        crate::pretty::escape(engine["version"].as_str().unwrap_or_default())
     )
 }
 

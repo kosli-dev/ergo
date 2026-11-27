@@ -74,7 +74,15 @@ pub enum Mark {
 
 /// `text` with every control character written as a visible `\u{..}` escape: C0 (including newline, return and tab), DEL and C1.
 pub fn escape(text: &str) -> String {
-    text.to_string()
+    text.chars()
+        .map(|c| {
+            if c.is_control() {
+                format!("\\u{{{:x}}}", c as u32)
+            } else {
+                c.to_string()
+            }
+        })
+        .collect()
 }
 
 const RESET: &str = "\x1b[0m";
@@ -106,6 +114,7 @@ impl Style {
     /// `text` after the mark, dressed in the mark's colour: the whole line for everything but a pass, which only colours its mark.
     pub fn line(&self, mark: Mark, text: &str) -> String {
         let glyph = self.glyph(mark);
+        let text = &escape(text);
         let whole = |code| paint(&format!("{glyph} {text}"), code, self.color);
         match mark {
             Mark::Pass => format!("{} {text}", paint(glyph, "32", self.color)),
@@ -242,7 +251,7 @@ pub fn render(report: &Value, policy: &Value, style: &Style) -> Result<String, S
             if row_mark == Mark::Fail
                 && let Some(message) = &row.message
             {
-                out.push_str(&format!("      because {message}\n"));
+                out.push_str(&format!("      because {}\n", escape(message)));
             }
         }
     }
