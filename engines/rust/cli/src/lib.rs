@@ -113,7 +113,8 @@ Usage: ergo <command> --policy <file> --input <file> [--params <file>] [--compac
        ergo report|violations ... [--engine rust|rego] [--ergo-rego <file>]
 
 Commands:
-  report       print the report as JSON  violations   print what failed in the report as JSON
+  report       print the report as JSON
+  violations   print what failed in the report as JSON
   test         experimental: run the examples in a policy
   help         print this text
 
@@ -149,8 +150,12 @@ Exit codes:
 ";
 
 /// The usage text, with `->` in place of the therefore sign unless the locale in `terminal` names UTF-8.
-pub fn usage(_terminal: &Terminal) -> String {
-    USAGE.to_string()
+pub fn usage(terminal: &Terminal) -> String {
+    if pretty::utf8(terminal.locale.as_deref()) {
+        USAGE.to_string()
+    } else {
+        USAGE.replacen('∴', "->", 1)
+    }
 }
 
 /// What a run gives back.
