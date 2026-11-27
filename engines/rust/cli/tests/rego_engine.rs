@@ -505,13 +505,25 @@ fn engine_and_ergo_rego_are_refused_where_they_do_not_go() {
         ),
         (
             vec![
-                "report", "--policy", "p.yaml", "--input", "i.json", "--ergo-rego", "e.rego",
+                "report",
+                "--policy",
+                "p.yaml",
+                "--input",
+                "i.json",
+                "--ergo-rego",
+                "e.rego",
             ],
             "--ergo-rego only goes with --engine rego",
         ),
         (
             vec![
-                "violations", "--policy", "p.yaml", "--input", "i.json", "--engine", "opa",
+                "violations",
+                "--policy",
+                "p.yaml",
+                "--input",
+                "i.json",
+                "--engine",
+                "opa",
             ],
             "--engine must be rust or rego",
         ),

@@ -292,8 +292,16 @@ fn report_with_engine_rego_gives_opa_one_data_file_it_removes() {
     };
     let (printed, code) = text(run_in(
         &args(&[
-            "report", "--policy", &policy, "--input", &input, "--params", &params, "--engine",
-            "rego", "--compact",
+            "report",
+            "--policy",
+            &policy,
+            "--input",
+            &input,
+            "--params",
+            &params,
+            "--engine",
+            "rego",
+            "--compact",
         ]),
         &environment,
     ));

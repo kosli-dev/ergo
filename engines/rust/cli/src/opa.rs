@@ -34,24 +34,44 @@ impl Drop for Folder {
     }
 }
 
-/// Builds one report per example with the `ergo.rego` at `ergo_rego`, by running `opa` once on [QUERY] with [data] in a file of a new folder that it removes after, or says why it can't.
-pub fn run(
-    opa: &OsStr,
-    ergo_rego: &str,
-    policy: &Value,
-    examples: &[Example],
-) -> Result<Vec<Value>, String> {
-    if ergo_rego.contains(':') {
-        return Err(format!(
-            "the path of ergo.rego ({ergo_rego}) holds a ':', which opa reads as a prefix; move the file"
-        ));
+/// Why the `ergo.rego` that was named can't be given to `opa`.
+#[derive(Debug, PartialEq, Eq)]
+pub enum PathProblem {
+    /// The path holds a `:`, which `opa` reads as a prefix.
+    Colon(String),
+    /// The file can't be read.
+    Unreadable(String),
+}
+
+impl PathProblem {
+    /// The problem in words.
+    pub fn message(self) -> String {
+        match self {
+            PathProblem::Colon(m) | PathProblem::Unreadable(m) => m,
+        }
     }
-    let unreadable = |problem: String| format!("can't read ergo.rego at {ergo_rego}: {problem}");
+}
+
+/// Checks that the `ergo.rego` at `ergo_rego` can be given to `opa`: no `:` in the path, and a file that can be opened.
+pub fn check_path(ergo_rego: &str) -> Result<(), PathProblem> {
+    if ergo_rego.contains(':') {
+        return Err(PathProblem::Colon(format!(
+            "the path of ergo.rego ({ergo_rego}) holds a ':', which opa reads as a prefix; move the file"
+        )));
+    }
+    let unreadable = |problem: String| {
+        PathProblem::Unreadable(format!("can't read ergo.rego at {ergo_rego}: {problem}"))
+    };
     let metadata = fs::metadata(ergo_rego).map_err(|e| unreadable(e.to_string()))?;
     if !metadata.is_file() {
         return Err(unreadable("it isn't a file".to_string()));
     }
     fs::File::open(ergo_rego).map_err(|e| unreadable(e.to_string()))?;
+    Ok(())
+}
+
+fn eval(opa: &OsStr, ergo_rego: &str, data: &Value, query: &str) -> Result<String, String> {
+    check_path(ergo_rego).map_err(PathProblem::message)?;
     let folder = Folder::new()?;
     if folder.0.to_string_lossy().contains(':') {
         return Err(format!(
@@ -60,12 +80,12 @@ pub fn run(
         ));
     }
     let file = folder.0.join("data.json");
-    write_private(&file, &data(policy, examples).to_string())
+    write_private(&file, &data.to_string())
         .map_err(|e| format!("can't write opa's data in {}: {e}", file.display()))?;
     let output = Command::new(opa)
         .args(["eval", "--format", "raw", "-d", ergo_rego, "-d"])
         .arg(&file)
-        .arg(QUERY)
+        .arg(query)
         .output()
         .map_err(|e| {
             format!(
@@ -82,9 +102,67 @@ pub fn run(
             first.map_or_else(|| output.status.to_string(), str::to_string)
         ));
     }
-    let printed = String::from_utf8(output.stdout).unwrap_or_default();
+    Ok(String::from_utf8(output.stdout).unwrap_or_default())
+}
+
+/// Builds one report per example with the `ergo.rego` at `ergo_rego`, by running `opa` once on [QUERY] with [data] in a file of a new folder that it removes after, or says why it can't.
+pub fn run(
+    opa: &OsStr,
+    ergo_rego: &str,
+    policy: &Value,
+    examples: &[Example],
+) -> Result<Vec<Value>, String> {
+    let printed = eval(opa, ergo_rego, &data(policy, examples), QUERY)?;
     reports(&printed, examples.len())
         .map_err(|problem| format!("{problem}, with ergo.rego at {ergo_rego}"))
+}
+
+/// Builds the report of `input` and `params` for `policy`, and its violations when `violations` is set, with the `ergo.rego` at `ergo_rego`, by running `opa` once on [REPORT_QUERY] or [VIOLATIONS_QUERY], or says why it can't.
+pub fn report_of(
+    opa: &OsStr,
+    ergo_rego: &str,
+    policy: &Value,
+    input: &Value,
+    params: &Value,
+    violations: bool,
+) -> Result<(Value, Option<Value>), String> {
+    let query = if violations {
+        VIOLATIONS_QUERY
+    } else {
+        REPORT_QUERY
+    };
+    let printed = eval(opa, ergo_rego, &one_data(policy, input, params), query)?;
+    one_report(&printed, violations)
+        .map_err(|problem| format!("{problem}, with ergo.rego at {ergo_rego}"))
+}
+
+/// The query `opa eval` runs for `ergo report`: it compiles the policy once with `ergo.compile` and builds the report with `ergo.report`.
+pub const REPORT_QUERY: &str = "[x | compiled := data.ergo.compile(data.ergo_cli.policy); x := {\"report\": data.ergo.report(data.ergo_cli.input, compiled, data.ergo_cli.params)}][0]";
+
+/// The query `opa eval` runs for `ergo violations`: [REPORT_QUERY]'s report and `ergo.violations` of it.
+pub const VIOLATIONS_QUERY: &str = "[x | compiled := data.ergo.compile(data.ergo_cli.policy); report := data.ergo.report(data.ergo_cli.input, compiled, data.ergo_cli.params); x := {\"report\": report, \"violations\": data.ergo.violations(report)}][0]";
+
+/// The data `opa` reads for [REPORT_QUERY] and [VIOLATIONS_QUERY]: the policy, the input and the params, under `ergo_cli`.
+pub fn one_data(policy: &Value, input: &Value, params: &Value) -> Value {
+    json!({"ergo_cli": {"policy": policy, "input": input, "params": params}})
+}
+
+/// Reads what `opa eval --format raw` printed for [REPORT_QUERY], or for [VIOLATIONS_QUERY] when `violations` is set, as the report and its violations, or says why it can't.
+pub fn one_report(printed: &str, violations: bool) -> Result<(Value, Option<Value>), String> {
+    let wrong = || "opa printed something that isn't a report".to_string();
+    let Ok(Value::Object(mut printed)) = serde_json::from_str::<Value>(printed) else {
+        return Err(wrong());
+    };
+    let report = printed
+        .remove("report")
+        .filter(is_report)
+        .ok_or_else(wrong)?;
+    let violations = match (violations, printed.remove("violations")) {
+        (false, _) => None,
+        (true, Some(found)) => Some(found),
+        (true, None) => return Err(wrong()),
+    };
+    Ok((report, violations))
 }
 
 fn write_private(path: &std::path::Path, text: &str) -> std::io::Result<()> {
