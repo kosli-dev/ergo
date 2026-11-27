@@ -350,3 +350,21 @@ test_a_sort_key_on_the_second_for_line_named_by_the_first_lines_alias_reads_the_
 		ergo._for_row(check, subj).cause == "satisfied" with input as {"ergo/names": names}
 	}
 }
+
+test_a_sort_key_named_by_the_first_lines_alias_is_picked_for_each_item_of_the_first_list_as_a_whose_that_reads_it_is if {
+	every c in [
+		["every xs as x", [], "value", "xs is []"],
+		["some xs as x", [], "value", "xs is []"],
+		["every xs as x", null, "null", "xs is null"],
+		["some xs as x", null, "null", "xs is null"],
+		["every xs, if any, as x", [], "satisfied", null],
+	] {
+		every pick in ["first of", "last of"] {
+			check := ergo._s_written_check({"for": concat("", [c[0], ", ", pick, " es sorted by m named by x as e"]), "assert": "e.v is 1"})
+			subj := {"xs": c[1], "es": [{"v": 1, "m": {"q": 1}}]}
+			names := {"ergo/subject": subj, "$at": {"names": {}}}
+			r := ergo._for_row(check, subj) with input as {"ergo/names": names}
+			[r.cause, object.get(r, "message", null)] == [c[2], c[3]]
+		}
+	}
+}
