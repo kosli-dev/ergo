@@ -77,18 +77,24 @@ ergo report --policy policy.yaml --input deployments.json --engine rego --ergo-r
 ergo violations --policy policy.yaml --input deployments.json --engine rego --ergo-rego ergo.rego
 ```
 
-It needs [`opa`](https://www.openpolicyagent.org/docs/#1-download-opa) and `ergo.rego`. `ergo` runs `opa eval` once, compiling the policy with `ergo.compile`, and prints what `ergo.rego` built: the `engine` of the report says `ergo-rego` and its version, and `violations` are the ones `ergo.rego` builds. `--compact`, `--fail`, the exit codes, and `--format outcome` for `report` work as they do on the Rust engine. The rules for `--ergo-rego`, `ERGO_REGO`, `ERGO_OPA` and the temporary folder are the ones [for `ergo test --engine rego`](#run-the-examples-on-ergorego), including that `ergo` never looks for `ergo.rego` on its own and never downloads it. It exits 2, and never falls back to the Rust engine, when it can't read `ergo.rego`, can't run `opa`, `opa` fails or prints something that isn't one report, or `ergo.rego` doesn't support the policy's `ergo_spec`. The policy's `ergo_spec` must be one that the `ergo.rego` you pass supports, so a policy written for a newer spec than the release you downloaded is refused.
+It needs [`opa`](https://www.openpolicyagent.org/docs/#1-download-opa) and `ergo.rego`. `ergo` runs `opa eval` once, calling only `ergo.report` and, for `violations`, `ergo.violations`, and prints what `ergo.rego` built: the `engine` of the report says `ergo-rego` and its version, and `violations` are the ones `ergo.rego` builds. `--compact`, `--fail`, the exit codes, and `--format outcome` for `report` work as they do on the Rust engine. The rules for `--ergo-rego`, `ERGO_REGO`, `ERGO_OPA` and the temporary folder are the ones [for `ergo test --engine rego`](#run-the-examples-on-ergorego), including that `ergo` never looks for `ergo.rego` on its own and never downloads it. It exits 2, and never falls back to the Rust engine, when it can't read `ergo.rego`, can't run `opa`, `opa` fails or prints something that isn't one report, or `ergo.rego` doesn't support the policy's `ergo_spec`. The policy's `ergo_spec` must be one that the `ergo.rego` you pass supports, so a policy written for a newer spec than the release you downloaded is refused. It finds that out from the problem `ergo.rego` gives in the `$well_formed` row, which has the words `unsupported version `: an `ergo.rego` that words it another way isn't recognised, and `ergo` then prints its report as it is, with exit 0, or 3 with `--fail`, in place of exiting 2.
 
 When `ergo.rego` can't be found, because there is no `--ergo-rego` and no `ERGO_REGO`, or the path can't be read, `ergo` says how to get the release. Without a path, `ergo report --policy policy.yaml --input deployments.json --engine rego` exits 2 and prints:
 
 ```
-ergo: --engine rego needs ergo.rego, and it was not found.
-Get the release you run in production and pass its path. For the current release:
+ergo: --engine rego needs ergo.rego, and it was not found in --ergo-rego or ERGO_REGO.
+Get the release you run in production and pass its path. For ergo.rego 0.6.0, the latest release when this ergo was built:
   curl -fsSL -o ergo.rego https://github.com/kosli-dev/ergo/releases/download/rego-v0.6.0/ergo.rego
   ergo report --engine rego --ergo-rego ergo.rego ...
 ```
 
 The `curl` line names the latest release of `ergo.rego` when this version of `ergo` was released. If you run an older one in production, change the version in the URL.
+
+A policy written for a newer spec than the `ergo.rego` you pass is refused. For `ok.yaml` with `ergo_spec: v0.7-dev` and the `ergo.rego` of release `rego-v0.6.0` in `../rel`, `ergo report --policy ok.yaml --input input.json --engine rego --ergo-rego ../rel/ergo.rego` exits 2 and prints:
+
+```
+ergo: the ergo.rego at ../rel/ergo.rego refuses the policy file ok.yaml: policy ergo_spec: unsupported version v0.7-dev, expected v0.6
+```
 
 ## Test a policy with examples (experimental)
 
@@ -339,7 +345,7 @@ passed: nobody approves their own deployment
 2 examples: 2 passed, 0 failed
 ```
 
-The first line names the engine the reports came from, as their `engine` field gives it, so the run can't be taken for one on the Rust engine. `ergo` runs `opa eval` once for all the examples: it compiles the policy once with `ergo.compile` and builds each report with `ergo.report`. It gives `opa` the policy and the inputs in a file in a new temporary folder, which it removes after The folder and the file are private to your user (mode 0700 and 0600). If you stop `ergo` with Ctrl-C while `opa` runs, the folder stays behind and you can delete it: it is called `ergo-test-` and a number, in your temporary folder. It needs `ergo.compile`, which [`OPA.md`](OPA.md) says may change, so a change to it can break `--engine rego`.
+The first line names the engine the reports came from, as their `engine` field gives it, so the run can't be taken for one on the Rust engine. `ergo` runs `opa eval` once for all the examples: it compiles the policy once with `ergo.compile` and builds each report with `ergo.report`. It gives `opa` the policy and the inputs in a file in a new temporary folder, which it removes after The folder and the file are private to your user (mode 0700 and 0600). If you stop `ergo` with Ctrl-C while `opa` runs, the folder stays behind and you can delete it: it is called `ergo-test-`, `ergo-report-` or `ergo-violations-`, by the command, and a number, in your temporary folder. It needs `ergo.compile`, which [`OPA.md`](OPA.md) says may change, so a change to it can break `--engine rego`.
 
 - `--ergo-rego` is the path of `ergo.rego`. It can't hold a `:`, which `opa` reads as a prefix, so `ergo` exits 2 and asks you to move the file. Without it, `ergo` reads the path from the `ERGO_REGO` environment variable. It never looks for `ergo.rego` on its own, so a stray copy in the folder can't test another version than the one you meant. `--ergo-rego` and `ERGO_REGO` are refused without `--engine rego`, so a run on the Rust engine can't be taken for one on `ergo.rego`. When there is no path, or it can't be read, `ergo` also says how to get the release, with a `curl` line, as [above](#run-a-policy-on-ergorego).
 - `opa` is the one on your `PATH`, or the command in the `ERGO_OPA` environment variable when it's set.
