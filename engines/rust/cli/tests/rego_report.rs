@@ -257,7 +257,9 @@ fn opa_output_that_is_not_one_report_says_what_is_wrong_with_it() {
     for (printed, violations, reason) in cases {
         assert_eq!(
             opa::one_report(&printed, violations),
-            Err(format!("opa printed something that isn't a report: {reason}")),
+            Err(format!(
+                "opa printed something that isn't a report: {reason}"
+            )),
             "{printed}"
         );
     }
@@ -285,7 +287,14 @@ fn violations_with_engine_rego_refuses_violations_that_are_not_a_list_and_exits_
     };
     let got = run_in(
         &args(&[
-            "violations", "--policy", &policy, "--input", &input, "--engine", "rego", "--fail",
+            "violations",
+            "--policy",
+            &policy,
+            "--input",
+            &input,
+            "--engine",
+            "rego",
+            "--fail",
         ]),
         &environment,
     );
@@ -397,7 +406,16 @@ fn report_with_engine_rego_gives_opa_one_data_file_it_removes() {
     assert_eq!(given[..4], ["eval", "--format", "raw", "-d"]);
     assert_eq!(given[4], ergo_rego);
     assert_eq!(given[7..], [opa::REPORT_QUERY]);
-    assert!(!std::path::Path::new(given[6]).parent().unwrap().exists());
+    let folder = std::path::Path::new(given[6]).parent().unwrap();
+    assert!(!folder.exists());
+    assert!(
+        folder
+            .file_name()
+            .unwrap()
+            .to_string_lossy()
+            .starts_with("ergo-report-"),
+        "{folder:?}"
+    );
     let data: Value =
         serde_json::from_str(&std::fs::read_to_string(format!("{seen}.json")).unwrap()).unwrap();
     assert_eq!(data["ergo_cli"]["params"], json!({"approvers": ["bob"]}));

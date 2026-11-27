@@ -739,7 +739,10 @@ fn items(
             continue;
         }
         let Some(words) = status_words(&entry["status"]) else {
-            return Err(format!("requirement {}", status_problem(name, &entry["status"])));
+            return Err(format!(
+                "requirement {}",
+                status_problem(name, &entry["status"])
+            ));
         };
         let text = format!("{name} {words}");
         if strict && !lines.is_empty() && heading(&text, &report["requirements"]).is_err() {

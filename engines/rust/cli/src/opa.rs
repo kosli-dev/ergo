@@ -11,10 +11,10 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 struct Folder(PathBuf);
 
 impl Folder {
-    fn new() -> Result<Folder, String> {
+    fn new(label: &str) -> Result<Folder, String> {
         static MADE: AtomicUsize = AtomicUsize::new(0);
         let path = std::env::temp_dir().join(format!(
-            "ergo-test-{}-{}",
+            "ergo-{label}-{}-{}",
             std::process::id(),
             MADE.fetch_add(1, Ordering::Relaxed)
         ));
@@ -70,9 +70,15 @@ pub fn check_path(ergo_rego: &str) -> Result<(), PathProblem> {
     Ok(())
 }
 
-fn eval(opa: &OsStr, ergo_rego: &str, data: &Value, query: &str) -> Result<String, String> {
+fn eval(
+    opa: &OsStr,
+    ergo_rego: &str,
+    data: &Value,
+    query: &str,
+    label: &str,
+) -> Result<String, String> {
     check_path(ergo_rego).map_err(PathProblem::message)?;
-    let folder = Folder::new()?;
+    let folder = Folder::new(label)?;
     if folder.0.to_string_lossy().contains(':') {
         return Err(format!(
             "the temp folder ({}) holds a ':', which opa reads as a prefix; move the file",
@@ -113,14 +119,16 @@ pub fn run(
     examples: &[Example],
 ) -> Result<Vec<Value>, String> {
     let printed =
-        eval(opa, ergo_rego, &data(policy, examples), QUERY).map_err(names_compile)?;
+        eval(opa, ergo_rego, &data(policy, examples), QUERY, "test").map_err(names_compile)?;
     reports(&printed, examples.len())
         .map_err(|problem| format!("{problem}, with ergo.rego at {ergo_rego}"))
 }
 
 fn names_compile(problem: String) -> String {
     if problem.starts_with("opa failed on ergo.rego") && problem.contains("ergo.compile") {
-        format!("{problem}; ergo test needs ergo.compile, which OPA.md calls experimental, and this ergo.rego doesn't have it")
+        format!(
+            "{problem}; ergo test needs ergo.compile, which OPA.md calls experimental, and this ergo.rego doesn't have it"
+        )
     } else {
         problem
     }
@@ -135,12 +143,18 @@ pub fn report_of(
     params: &Value,
     violations: bool,
 ) -> Result<(Value, Option<Value>), String> {
-    let query = if violations {
-        VIOLATIONS_QUERY
+    let (query, label) = if violations {
+        (VIOLATIONS_QUERY, "violations")
     } else {
-        REPORT_QUERY
+        (REPORT_QUERY, "report")
     };
-    let printed = eval(opa, ergo_rego, &one_data(policy, input, params), query)?;
+    let printed = eval(
+        opa,
+        ergo_rego,
+        &one_data(policy, input, params),
+        query,
+        label,
+    )?;
     one_report(&printed, violations)
         .map_err(|problem| format!("{problem}, with ergo.rego at {ergo_rego}"))
 }

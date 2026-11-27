@@ -4,7 +4,9 @@
 pub const LATEST_ERGO_REGO: &str = "rego-v0.6.0";
 
 fn how_to_get(command: &str) -> String {
-    let version = LATEST_ERGO_REGO.strip_prefix("rego-v").unwrap_or(LATEST_ERGO_REGO);
+    let version = LATEST_ERGO_REGO
+        .strip_prefix("rego-v")
+        .unwrap_or(LATEST_ERGO_REGO);
     format!(
         "Get the release you run in production and pass its path. For ergo.rego {version}, the latest release when this ergo was built:\n  curl -fsSL -o ergo.rego https://github.com/kosli-dev/ergo/releases/download/{LATEST_ERGO_REGO}/ergo.rego\n  ergo {command} --engine rego --ergo-rego ergo.rego ..."
     )
