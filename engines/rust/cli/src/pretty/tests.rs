@@ -436,3 +436,74 @@ fn a_report_with_no_requirements_and_no_rows_starts_with_its_count_and_not_an_em
         "  0 rows: 0 passed, 0 failed, 0 out of scope\n\n∴ compliant\n"
     );
 }
+
+#[test]
+fn every_control_character_is_written_as_a_visible_escape() {
+    assert_eq!(escape("plain ✓ text"), "plain ✓ text");
+    assert_eq!(
+        escape("a\u{1b}[2Jb\nc\rd\te\u{7f}f\u{85}g\u{9b}h\u{0}i\u{1f}"),
+        "a\\u{1b}[2Jb\\u{a}c\\u{d}d\\u{9}e\\u{7f}f\\u{85}g\\u{9b}h\\u{0}i\\u{1f}"
+    );
+    assert_eq!(escape("\u{1b}]0;title\u{7}"), "\\u{1b}]0;title\\u{7}");
+}
+
+#[test]
+fn control_characters_in_every_field_of_a_row_are_escaped_and_the_colour_codes_are_not() {
+    let report = json!({
+        "compliant": false,
+        "requirements": {"done\u{1b}[2J": {"status": "not_met"}},
+        "results": [{
+            "requirement": "done\u{1b}[2J",
+            "check": "c\u{1b}[2J",
+            "passed": false,
+            "message": "m\u{1b}[2J\nn\r\u{1b}]0;title\u{7}",
+            "subject": {"type": "t\u{1b}[2J", "id": "i\u{1b}[2J", "in": {"p\u{1b}[2J": "q\u{1b}[2J"}}
+        }]
+    });
+    let text = render(&report, &json!({}), &GLYPHS).unwrap();
+    assert!(
+        !text.contains('\u{1b}') && !text.contains('\r') && !text.contains('\u{7}'),
+        "{text:?}"
+    );
+    assert!(text.contains("done\\u{1b}[2J is not met"), "{text:?}");
+    assert!(text.contains("t\\u{1b}[2J "), "{text:?}");
+    assert!(text.contains("c\\u{1b}[2J"), "{text:?}");
+    assert!(text.contains(" in p\\u{1b}[2J \""), "{text:?}");
+    assert!(
+        text.contains("because m\\u{1b}[2J\\u{a}n\\u{d}\\u{1b}]0;title\\u{7}\n"),
+        "{text:?}"
+    );
+    let coloured = render(&report, &json!({}), &COLOURS).unwrap();
+    assert!(
+        coloured.starts_with("\u{1b}[31m✗ done\\u{1b}[2J is not met\u{1b}[0m\n"),
+        "{coloured:?}"
+    );
+    assert!(!coloured.contains("\u{1b}[2J"), "{coloured:?}");
+}
+
+#[test]
+fn an_out_of_scope_message_and_a_status_the_report_gives_are_escaped_too() {
+    let report = json!({
+        "compliant": false,
+        "requirements": {"a": {"status": "x\u{1b}[2J"}},
+        "results": []
+    });
+    let text = render(&report, &json!({}), &GLYPHS).unwrap();
+    assert!(!text.contains('\u{1b}'), "{text:?}");
+    let mut row = out_of_scope_row("d3", "env is \u{1b}[2J");
+    row["subject"]["id"] = json!("d\u{1b}3");
+    let all = json!({
+        "compliant": false,
+        "requirements": {"approved": {"status": "not_met"}},
+        "results": [row]
+    });
+    let style = Style {
+        show: Show::All,
+        ..GLYPHS
+    };
+    let text = render(&all, &json!({}), &style).unwrap();
+    assert!(
+        text.contains("deployment d\\u{1b}3 is out of scope (env is \\u{1b}[2J)"),
+        "{text:?}"
+    );
+}

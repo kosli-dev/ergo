@@ -4,7 +4,10 @@ use std::process::ExitCode;
 fn main() -> ExitCode {
     let arguments: Vec<String> = std::env::args().skip(1).collect();
     if arguments.is_empty() {
-        eprint!("{}", ergo_policy_cli::usage(&ergo_policy_cli::Terminal::read()));
+        eprint!(
+            "{}",
+            ergo_policy_cli::usage(&ergo_policy_cli::Terminal::read())
+        );
         return ExitCode::from(2);
     }
     let (text, code) = match ergo_policy_cli::run_with(

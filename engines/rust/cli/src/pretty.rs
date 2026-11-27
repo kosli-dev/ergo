@@ -72,6 +72,11 @@ pub enum Mark {
     Therefore,
 }
 
+/// `text` with every control character written as a visible `\u{..}` escape: C0 (including newline, return and tab), DEL and C1.
+pub fn escape(text: &str) -> String {
+    text.to_string()
+}
+
 const RESET: &str = "\x1b[0m";
 
 fn paint(text: &str, code: &str, on: bool) -> String {
