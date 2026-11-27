@@ -70,14 +70,34 @@ pub fn check_path(ergo_rego: &str) -> Result<(), PathProblem> {
     Ok(())
 }
 
-/// The entry point of `names` that `opa` found undefined or gave nothing for.
-pub fn missing_entry_point(_names: &[&str], _stdout: &str, _stderr: &str) -> Option<String> {
-    None
+/// The entry point of `names` that `opa` said is undefined in `stderr`, or all of them joined with `or` when `opa` printed nothing at all, or `None` when neither happened. Blank output with a message on `stderr` is another failure.
+pub fn missing_entry_point(names: &[&str], stdout: &str, stderr: &str) -> Option<String> {
+    let undefined = |name: &str| {
+        let wanted = format!("data.{name}");
+        stderr.lines().any(|line| {
+            line.contains("undefined")
+                && line.match_indices(&wanted).any(|(at, _)| {
+                    !line[at + wanted.len()..]
+                        .chars()
+                        .next()
+                        .is_some_and(|c| c.is_alphanumeric() || c == '_')
+                })
+        })
+    };
+    if let Some(name) = names.iter().find(|name| undefined(name)) {
+        return Some((*name).to_string());
+    }
+    (stdout.trim().is_empty() && stderr.trim().is_empty()).then(|| names.join(" or "))
 }
 
-/// The message for an `ergo.rego` at `ergo_rego` that has no `entry_point`.
-pub fn no_entry_point(_ergo_rego: &str, _entry_point: &str) -> String {
-    String::new()
+/// The message for an `ergo.rego` at `ergo_rego` that has no `entry_point`, which says what `ergo test` needs when the entry point is `ergo.compile`.
+pub fn no_entry_point(ergo_rego: &str, entry_point: &str) -> String {
+    let message = format!("the ergo.rego at {ergo_rego} has no {entry_point}");
+    if entry_point == "ergo.compile" {
+        format!("{message}; ergo test needs it, and OPA.md calls it experimental")
+    } else {
+        message
+    }
 }
 
 fn eval(
@@ -86,6 +106,7 @@ fn eval(
     data: &Value,
     query: &str,
     label: &str,
+    names: &[&str],
 ) -> Result<String, String> {
     check_path(ergo_rego).map_err(PathProblem::message)?;
     let folder = Folder::new(label)?;
@@ -110,8 +131,12 @@ fn eval(
             )
         })?;
     drop(folder);
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    if let Some(missing) = missing_entry_point(names, &stdout, &stderr) {
+        return Err(no_entry_point(ergo_rego, &missing));
+    }
     if !output.status.success() {
-        let stderr = String::from_utf8_lossy(&output.stderr);
         let first = stderr.lines().map(str::trim).find(|l| !l.is_empty());
         return Err(format!(
             "opa failed on ergo.rego at {ergo_rego}: {}",
@@ -128,20 +153,16 @@ pub fn run(
     policy: &Value,
     examples: &[Example],
 ) -> Result<Vec<Value>, String> {
-    let printed =
-        eval(opa, ergo_rego, &data(policy, examples), QUERY, "test").map_err(names_compile)?;
+    let printed = eval(
+        opa,
+        ergo_rego,
+        &data(policy, examples),
+        QUERY,
+        "test",
+        &["ergo.compile", "ergo.report"],
+    )?;
     reports(&printed, examples.len())
         .map_err(|problem| format!("{problem}, with ergo.rego at {ergo_rego}"))
-}
-
-fn names_compile(problem: String) -> String {
-    if problem.starts_with("opa failed on ergo.rego") && problem.contains("ergo.compile") {
-        format!(
-            "{problem}; ergo test needs ergo.compile, which OPA.md calls experimental, and this ergo.rego doesn't have it"
-        )
-    } else {
-        problem
-    }
 }
 
 /// Builds the report of `input` and `params` for `policy`, and its violations when `violations` is set, with the `ergo.rego` at `ergo_rego`, by running `opa` once on [REPORT_QUERY] or [VIOLATIONS_QUERY], or says why it can't.
@@ -153,10 +174,14 @@ pub fn report_of(
     params: &Value,
     violations: bool,
 ) -> Result<(Value, Option<Value>), String> {
-    let (query, label) = if violations {
-        (VIOLATIONS_QUERY, "violations")
+    let (query, label, names): (&str, &str, &[&str]) = if violations {
+        (
+            VIOLATIONS_QUERY,
+            "violations",
+            &["ergo.report", "ergo.violations"],
+        )
     } else {
-        (REPORT_QUERY, "report")
+        (REPORT_QUERY, "report", &["ergo.report"])
     };
     let printed = eval(
         opa,
@@ -164,6 +189,7 @@ pub fn report_of(
         &one_data(policy, input, params),
         query,
         label,
+        names,
     )?;
     one_report(&printed, violations)
         .map_err(|problem| format!("{problem}, with ergo.rego at {ergo_rego}"))

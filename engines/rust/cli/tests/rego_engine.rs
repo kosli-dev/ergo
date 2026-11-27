@@ -356,7 +356,7 @@ fn engine_rego_names_ergo_compile_when_opa_cannot_find_it_in_ergo_rego() {
             &with_opa(&ergo_rego, opa)
         ),
         Err(Failure::Engine(format!(
-            "opa failed on ergo.rego at {ergo_rego}: 1 error occurred: 1:18: rego_type_error: undefined function data.ergo.compile; ergo test needs ergo.compile, which OPA.md calls experimental, and this ergo.rego doesn't have it"
+            "the ergo.rego at {ergo_rego} has no ergo.compile; ergo test needs it, and OPA.md calls it experimental"
         )))
     );
 }
@@ -370,6 +370,8 @@ fn engine_rego_fails_closed_when_opa_is_missing_fails_or_prints_no_reports() {
     let not_reports = format!(
         "opa printed something that isn't a report for each of the 2 examples, with ergo.rego at {ergo_rego}"
     );
+    let no_entry_points =
+        format!("the ergo.rego at {ergo_rego} has no ergo.compile or ergo.report");
     let cases = [
         (
             std::ffi::OsString::from(&missing),
@@ -384,7 +386,7 @@ fn engine_rego_fails_closed_when_opa_is_missing_fails_or_prints_no_reports() {
             ),
             format!("opa failed on ergo.rego at {ergo_rego}: first line"),
         ),
-        (fake_opa("opa-silent", "exit 0\n"), not_reports.clone()),
+        (fake_opa("opa-silent", "exit 0\n"), no_entry_points),
         (
             fake_opa("opa-junk", "echo '[1, 2]'\n"),
             not_reports.replace(" examples,", " examples: report 1 isn't an object,"),
