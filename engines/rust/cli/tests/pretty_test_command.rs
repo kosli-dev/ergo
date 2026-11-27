@@ -162,3 +162,8 @@ fn no_color_turns_colour_off_on_a_terminal() {
     assert!(!out.contains('\x1b'), "{out}");
     assert!(out.contains("✗ this one"), "{out}");
 }
+
+#[test]
+fn two_calls_with_the_same_name_get_their_own_folder() {
+    assert_ne!(file("same"), file("same"));
+}
