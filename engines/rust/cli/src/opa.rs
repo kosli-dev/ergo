@@ -70,12 +70,43 @@ pub fn check_path(ergo_rego: &str) -> Result<(), PathProblem> {
     Ok(())
 }
 
+/// The entry point of `names` that `opa` said is undefined in `stderr`, or `None`. Blank output names none, because an `ergo.report` that is undefined for the input prints nothing too.
+pub fn missing_entry_point(names: &[&str], stderr: &str) -> Option<String> {
+    let undefined = |name: &str| {
+        let wanted = format!("data.{name}");
+        stderr.lines().any(|line| {
+            line.contains("undefined")
+                && line.match_indices(&wanted).any(|(at, _)| {
+                    !line[at + wanted.len()..]
+                        .chars()
+                        .next()
+                        .is_some_and(|c| c.is_alphanumeric() || matches!(c, '_' | '.' | '['))
+                })
+        })
+    };
+    names
+        .iter()
+        .find(|name| undefined(name))
+        .map(|name| (*name).to_string())
+}
+
+/// The message for an `ergo.rego` at `ergo_rego` that has no `entry_point`, which says what `ergo test` needs when the entry point is `ergo.compile`.
+pub fn no_entry_point(ergo_rego: &str, entry_point: &str) -> String {
+    let message = format!("the ergo.rego at {ergo_rego} has no {entry_point}");
+    if entry_point == "ergo.compile" {
+        format!("{message}; ergo test needs it, and OPA.md calls it experimental")
+    } else {
+        message
+    }
+}
+
 fn eval(
     opa: &OsStr,
     ergo_rego: &str,
     data: &Value,
     query: &str,
     label: &str,
+    names: &[&str],
 ) -> Result<String, String> {
     check_path(ergo_rego).map_err(PathProblem::message)?;
     let folder = Folder::new(label)?;
@@ -100,8 +131,11 @@ fn eval(
             )
         })?;
     drop(folder);
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    if let Some(missing) = missing_entry_point(names, &stderr) {
+        return Err(no_entry_point(ergo_rego, &missing));
+    }
     if !output.status.success() {
-        let stderr = String::from_utf8_lossy(&output.stderr);
         let first = stderr.lines().map(str::trim).find(|l| !l.is_empty());
         return Err(format!(
             "opa failed on ergo.rego at {ergo_rego}: {}",
@@ -118,20 +152,16 @@ pub fn run(
     policy: &Value,
     examples: &[Example],
 ) -> Result<Vec<Value>, String> {
-    let printed =
-        eval(opa, ergo_rego, &data(policy, examples), QUERY, "test").map_err(names_compile)?;
+    let printed = eval(
+        opa,
+        ergo_rego,
+        &data(policy, examples),
+        QUERY,
+        "test",
+        &["ergo.compile", "ergo.report"],
+    )?;
     reports(&printed, examples.len())
         .map_err(|problem| format!("{problem}, with ergo.rego at {ergo_rego}"))
-}
-
-fn names_compile(problem: String) -> String {
-    if problem.starts_with("opa failed on ergo.rego") && problem.contains("ergo.compile") {
-        format!(
-            "{problem}; ergo test needs ergo.compile, which OPA.md calls experimental, and this ergo.rego doesn't have it"
-        )
-    } else {
-        problem
-    }
 }
 
 /// Builds the report of `input` and `params` for `policy`, and its violations when `violations` is set, with the `ergo.rego` at `ergo_rego`, by running `opa` once on [REPORT_QUERY] or [VIOLATIONS_QUERY], or says why it can't.
@@ -143,10 +173,14 @@ pub fn report_of(
     params: &Value,
     violations: bool,
 ) -> Result<(Value, Option<Value>), String> {
-    let (query, label) = if violations {
-        (VIOLATIONS_QUERY, "violations")
+    let (query, label, names): (&str, &str, &[&str]) = if violations {
+        (
+            VIOLATIONS_QUERY,
+            "violations",
+            &["ergo.report", "ergo.violations"],
+        )
     } else {
-        (REPORT_QUERY, "report")
+        (REPORT_QUERY, "report", &["ergo.report"])
     };
     let printed = eval(
         opa,
@@ -154,6 +188,7 @@ pub fn report_of(
         &one_data(policy, input, params),
         query,
         label,
+        names,
     )?;
     one_report(&printed, violations)
         .map_err(|problem| format!("{problem}, with ergo.rego at {ergo_rego}"))

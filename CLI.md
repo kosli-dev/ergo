@@ -77,7 +77,7 @@ ergo report --policy policy.yaml --input deployments.json --engine rego --ergo-r
 ergo violations --policy policy.yaml --input deployments.json --engine rego --ergo-rego ergo.rego
 ```
 
-It needs [`opa`](https://www.openpolicyagent.org/docs/#1-download-opa) and `ergo.rego`. `ergo` runs `opa eval` once, calling only `ergo.report` and, for `violations`, `ergo.violations`, and prints what `ergo.rego` built: the `engine` of the report says `ergo-rego` and its version, and `violations` are the ones `ergo.rego` builds. `--compact`, `--fail`, the exit codes, and `--format outcome` for `report` work as they do on the Rust engine. The rules for `--ergo-rego`, `ERGO_REGO`, `ERGO_OPA` and the temporary folder are the ones [for `ergo test --engine rego`](#run-the-examples-on-ergorego), including that `ergo` never looks for `ergo.rego` on its own and never downloads it. It exits 2, and never falls back to the Rust engine, when it can't read `ergo.rego`, can't run `opa`, `opa` fails or prints something that isn't one report, or `ergo.rego` doesn't support the policy's `ergo_spec`. The policy's `ergo_spec` must be one that the `ergo.rego` you pass supports, so a policy written for a newer spec than the release you downloaded is refused. It finds that out from the problem `ergo.rego` gives in the `$well_formed` row, which has the words `unsupported version `: an `ergo.rego` that words it another way isn't recognised, and `ergo` then prints its report as it is, with exit 0, or 3 with `--fail`, in place of exiting 2.
+It needs [`opa`](https://www.openpolicyagent.org/docs/#1-download-opa) and `ergo.rego`. `ergo` runs `opa eval` once, calling only `ergo.report` and, for `violations`, `ergo.violations`, and prints what `ergo.rego` built: the `engine` of the report says `ergo-rego` and its version, and `violations` are the ones `ergo.rego` builds. `--compact`, `--fail`, the exit codes, and `--format outcome` for `report` work as they do on the Rust engine. The rules for `--ergo-rego`, `ERGO_REGO`, `ERGO_OPA` and the temporary folder are the ones [for `ergo test --engine rego`](#run-the-examples-on-ergorego), including that `ergo` never looks for `ergo.rego` on its own and never downloads it. It exits 2, and never falls back to the Rust engine, when it can't read `ergo.rego`, can't run `opa`, `opa` fails or prints something that isn't one report, `ergo.rego` has no entry point that `ergo` calls, or `ergo.rego` doesn't support the policy's `ergo_spec`. The policy's `ergo_spec` must be one that the `ergo.rego` you pass supports, so a policy written for a newer spec than the release you downloaded is refused. It finds that out from the problem `ergo.rego` gives in the `$well_formed` row, which has the words `unsupported version `: an `ergo.rego` that words it another way isn't recognised, and `ergo` then prints its report as it is, with exit 0, or 3 with `--fail`, in place of exiting 2.
 
 When `ergo.rego` can't be found, because there is no `--ergo-rego` and no `ERGO_REGO`, or the path can't be read, `ergo` says how to get the release. Without a path, `ergo report --policy policy.yaml --input deployments.json --engine rego` exits 2 and prints:
 
@@ -97,6 +97,14 @@ A policy written for a newer spec than the `ergo.rego` you pass is refused. For 
 ```
 ergo: the ergo.rego at ../rel/ergo.rego refuses the policy file ok.yaml: policy ergo_spec: unsupported version v0.7-dev, expected v0.6
 ```
+
+An `ergo.rego` that has no `ergo.report`, or for `violations` no `ergo.violations`, is refused with the name of the entry point that is missing, and `ergo test` does the same for `ergo.compile`. With the release's `ergo.rego` copied to `ergo.rego` and its `report` renamed, `ergo report --policy policy.yaml --input input.json --engine rego --ergo-rego ergo.rego` exits 2 and prints:
+
+```
+ergo: the ergo.rego at ergo.rego has no ergo.report
+```
+
+The report that `ergo` prints with `--engine rego` is the one `opa` gave, with any field a newer `ergo.rego` adds, and the keys sorted, as `opa eval` prints them. Numbers keep their digits, with one change: an exponent is printed with a lowercase `e` and a sign, so `1e400` and `1E5` are printed `1e+400` and `1e+5`, which are the same numbers.
 
 ### Read from standard input
 

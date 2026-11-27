@@ -24,6 +24,8 @@ Each release names the version of the spec it follows. The spec's own changes ar
 
 ### Changed
 
+- `ergo report`, `ergo violations` and `ergo test` with `--engine rego` exit 2 with `the ergo.rego at PATH has no ergo.report` (or `ergo.violations`, or `ergo.compile` for `ergo test`) when `opa` says the entry point is undefined. They said `opa failed on ergo.rego at PATH: ...` or `opa printed something that isn't a report` before. The report printed keeps what `opa` gave, apart from an exponent, which is printed with a lowercase `e` and a sign, so `1e400` and `1E5` are printed `1e+400` and `1e+5`.
+
 - `ergo --version` also prints the commit the binary was built from, like `ergo 0.5.0-dev (commit ab81076ed80cff04a4c2e395418ca5535c6c3dab)`, and `unknown` when the build isn't in a git checkout of this repo. It no longer prints only `ergo 0.5.0-dev`. A script that reads the version line must read the first word after `ergo`.
 
 - `ergo-policy-sentences` reads `member of` after `every`, `some`, `count of` and `sum of` and on `for` lines into new public fields, `ListOptions::member`, `Derived::member` and `ForItem::Walk`'s `member`, so a struct literal of them outside the crate no longer compiles until it sets the field.

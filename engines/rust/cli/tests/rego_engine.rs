@@ -356,7 +356,7 @@ fn engine_rego_names_ergo_compile_when_opa_cannot_find_it_in_ergo_rego() {
             &with_opa(&ergo_rego, opa)
         ),
         Err(Failure::Engine(format!(
-            "opa failed on ergo.rego at {ergo_rego}: 1 error occurred: 1:18: rego_type_error: undefined function data.ergo.compile; ergo test needs ergo.compile, which OPA.md calls experimental, and this ergo.rego doesn't have it"
+            "the ergo.rego at {ergo_rego} has no ergo.compile; ergo test needs it, and OPA.md calls it experimental"
         )))
     );
 }
