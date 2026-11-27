@@ -82,11 +82,11 @@ fn show_all_lists_every_row_with_its_requirement() {
 }
 
 #[test]
-fn failures_are_red_passes_have_a_green_mark_and_the_verdict_is_bold() {
+fn failures_are_red_passes_have_a_green_mark_and_the_verdict_is_bold_in_its_colour() {
     let text = render(&report(), &json!({}), &COLOURS).unwrap();
     assert_eq!(
         text,
-        "\x1b[31m✗ approved is not met\x1b[0m\n    \x1b[31m✗ deployment d1 fails allowed\x1b[0m\n      because approver is missing\n\x1b[32m✓\x1b[0m tested is met\n\n  5 rows: 3 passed, 1 failed, 1 out of scope\n\n\x1b[1m∴ not compliant\x1b[0m\n"
+        "\x1b[31m✗ approved is not met\x1b[0m\n    \x1b[31m✗ deployment d1 fails allowed\x1b[0m\n      because approver is missing\n\x1b[32m✓\x1b[0m tested is met\n\n  5 rows: 3 passed, 1 failed, 1 out of scope\n\n\x1b[1;31m∴ not compliant\x1b[0m\n"
     );
 }
 
