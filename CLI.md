@@ -90,6 +90,8 @@ Get the release you run in production and pass its path. For ergo.rego 0.6.0, th
 
 The `curl` line names the latest release of `ergo.rego` when this version of `ergo` was released. If you run an older one in production, change the version in the URL.
 
+A newer `ergo.rego` works with an older `ergo`. `ergo` never decides which versions of `ergo.rego` are allowed, and it passes on the fields of the report that it doesn't read, so a field a newer release adds is printed as it is. When `ergo` can't use what `opa` printed, it exits 2 and says so, and it never guesses.
+
 A policy written for a newer spec than the `ergo.rego` you pass is refused. For `ok.yaml` with `ergo_spec: v0.7-dev` and the `ergo.rego` of release `rego-v0.6.0` in `../rel`, `ergo report --policy ok.yaml --input input.json --engine rego --ergo-rego ../rel/ergo.rego` exits 2 and prints:
 
 ```
