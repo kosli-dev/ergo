@@ -112928,5 +112928,601 @@
         }
       }
     }
+  },
+  {
+    "cases": [
+      {
+        "compliant": false,
+        "description": "fails as unusable when the key x isn't text and as null when it's null, with es empty, and passes when it's text",
+        "input": {
+          "things": [
+            {
+              "es": [],
+              "id": "a",
+              "xs": [
+                3
+              ]
+            },
+            {
+              "es": [],
+              "id": "b",
+              "xs": [
+                null
+              ]
+            },
+            {
+              "es": [],
+              "id": "c",
+              "xs": [
+                "q"
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/xs/0"
+                    ],
+                    "message": "x is 3, which isn't text",
+                    "name": "item 1 of xs",
+                    "value": 3
+                  }
+                ],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/c/assert"
+                ],
+                "message": "",
+                "name": "every es whose zz equals m named by x, if any, exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es[]",
+                "outcome": "usable",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/things/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  3
+                ]
+              }
+            ],
+            "message": "item 1 of xs: x is 3, which isn't text",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/things/1/xs/0"
+                    ],
+                    "message": "x is null",
+                    "name": "item 1 of xs",
+                    "value": null
+                  }
+                ],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/c/assert"
+                ],
+                "message": "",
+                "name": "every es whose zz equals m named by x, if any, exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es[]",
+                "outcome": "usable",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/things/1/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  null
+                ]
+              }
+            ],
+            "message": "item 1 of xs: x is null",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "b",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es[]",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/things/2/xs/0"
+                ],
+                "name": "xs[]",
+                "value": [
+                  "q"
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "c",
+              "type": "t"
+            }
+          }
+        ],
+        "rules": [
+          "for.named_by",
+          "for.roots",
+          "for.if_any",
+          "for.failed_items",
+          "for.failure_inputs",
+          "for.inputs",
+          "row.parts"
+        ]
+      }
+    ],
+    "description": "a named by key that is an alias of the for line is read before any item of the list an every with if any walks, so it fails on an empty list too",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "requirements": {
+        "r": {
+          "checks": {
+            "c": {
+              "assert": "every es whose zz is m named by x, if any, exists",
+              "for": "every xs as x"
+            }
+          },
+          "subject": "t"
+        }
+      },
+      "subjects": {
+        "t": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      }
+    }
+  },
+  {
+    "cases": [
+      {
+        "compliant": false,
+        "description": "fails as unusable when es is missing and the key x isn't text, and as null when es is null and the key is null, naming es first and then the item",
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "xs": [
+                3
+              ]
+            },
+            {
+              "es": null,
+              "id": "b",
+              "xs": [
+                null
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "count of es whose zz equals m named by x",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/xs/0"
+                    ],
+                    "message": "x is 3, which isn't text",
+                    "name": "item 1 of xs",
+                    "value": 3
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "es",
+                    "outcome": "absent",
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/c/assert"
+                ],
+                "message": "es is missing",
+                "name": "count of es whose zz equals m named by x is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es",
+                "outcome": "usable",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/things/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  3
+                ]
+              }
+            ],
+            "message": "es is missing; item 1 of xs: x is 3, which isn't text",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "count of es whose zz equals m named by x",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/1/xs/0"
+                    ],
+                    "message": "x is null",
+                    "name": "item 1 of xs",
+                    "value": null
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "es",
+                    "outcome": "null",
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/c/assert"
+                ],
+                "message": "es is null",
+                "name": "count of es whose zz equals m named by x is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es",
+                "outcome": "usable",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/things/1/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  null
+                ]
+              }
+            ],
+            "message": "es is null; item 1 of xs: x is null",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "b",
+              "type": "t"
+            }
+          }
+        ],
+        "rules": [
+          "tally.whose",
+          "for.roots",
+          "problems.where_said",
+          "for.failed_items",
+          "for.failure_inputs",
+          "for.inputs",
+          "row.parts"
+        ]
+      }
+    ],
+    "description": "a named by key that is an alias of the for line is read before any item of the counted list, and said after the list when the list can't be read",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "requirements": {
+        "r": {
+          "checks": {
+            "c": {
+              "assert": "count of es whose zz is m named by x is 0",
+              "for": "every xs as x"
+            }
+          },
+          "subject": "t"
+        }
+      },
+      "subjects": {
+        "t": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      }
+    }
+  },
+  {
+    "cases": [
+      {
+        "compliant": false,
+        "description": "fails the item of xs as unusable when the key x isn't text and as null when it's null, with es empty, and passes when it's text",
+        "input": {
+          "things": [
+            {
+              "es": [],
+              "id": "a",
+              "xs": [
+                3
+              ]
+            },
+            {
+              "es": [],
+              "id": "b",
+              "xs": [
+                null
+              ]
+            },
+            {
+              "es": [],
+              "id": "c",
+              "xs": [
+                "q"
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/xs/0"
+                    ],
+                    "message": "x is 3, which isn't text",
+                    "name": "item 1 of xs",
+                    "value": 3
+                  }
+                ],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/c/assert"
+                ],
+                "message": "",
+                "name": "e.v is 1"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es[]",
+                "outcome": "usable",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/things/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  3
+                ]
+              }
+            ],
+            "message": "item 1 of xs: x is 3, which isn't text",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/things/1/xs/0"
+                    ],
+                    "message": "x is null",
+                    "name": "item 1 of xs",
+                    "value": null
+                  }
+                ],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/c/assert"
+                ],
+                "message": "",
+                "name": "e.v is 1"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es[]",
+                "outcome": "usable",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/things/1/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  null
+                ]
+              }
+            ],
+            "message": "item 1 of xs: x is null",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "b",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es[]",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/things/2/xs/0"
+                ],
+                "name": "xs[]",
+                "value": [
+                  "q"
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "c",
+              "type": "t"
+            }
+          }
+        ],
+        "rules": [
+          "for.named_by",
+          "for.roots",
+          "for.if_any",
+          "for.failed_items",
+          "for.failure_inputs",
+          "for.inputs",
+          "row.parts",
+          "problems.where_said"
+        ]
+      }
+    ],
+    "description": "a named by key that is an alias of the for line, in the whose of its second list, is read before any item of that list, so it fails on an empty list too",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "requirements": {
+        "r": {
+          "checks": {
+            "c": {
+              "assert": "e.v is 1",
+              "for": "every xs as x, every es whose zz is m named by x, if any, as e"
+            }
+          },
+          "subject": "t"
+        }
+      },
+      "subjects": {
+        "t": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      }
+    }
   }
 ]

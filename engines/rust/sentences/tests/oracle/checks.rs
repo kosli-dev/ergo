@@ -292,6 +292,18 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
+        "count of es whose zz is m named by x is 0",
+        "count of es whose zz equals m named by x is 0",
+        &[],
+        &[],
+    ),
+    (
+        "every es whose zz is m named by x, if any, exists",
+        "every es whose zz equals m named by x, if any, exists",
+        &[],
+        &[],
+    ),
+    (
         "count of es whose v is in $params.z is 0 plus $params.q",
         "count of es whose v is in $params.z equals 0 plus $params.q",
         &[],
@@ -14924,6 +14936,12 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "every xs named by x as x",
         "every xs named by x as x",
+        &[],
+        &[],
+    ),
+    (
+        "every xs as x, every es whose zz is m named by x, if any, as e",
+        "every xs as x, every es whose zz equals m named by x, if any, as e",
         &[],
         &[],
     ),
