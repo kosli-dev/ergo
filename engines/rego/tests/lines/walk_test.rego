@@ -124,6 +124,25 @@ test_a_named_by_key_after_the_phrase_that_cant_be_read_leaves_the_items_to_say_t
 	not "root_msgs" in object.keys(r)
 }
 
+test_an_every_or_some_reads_an_alias_key_of_its_whose_before_any_item_so_an_empty_list_fails_on_it if {
+	whose := [{"op": "compare", "cmp": "eq", "left": ["zz"], "right": ["m", {"named_by": "x"}]}]
+	subj := {"es": []}
+	every c in [
+		[3, "unusable", "x is 3, which isn't text"],
+		[{"k": 3}, "unusable", "x is {\"k\": 3}, which isn't text"],
+		[null, "null", "x is null"],
+	] {
+		every check in [
+			{"op": "every", "path": ["es"], "if_any": true, "whose": whose, "check": {"op": "present", "path": ["x"]}},
+			{"op": "some", "path": ["es"], "if_any": false, "whose": whose, "check": {"op": "present", "path": ["x"]}},
+		] {
+			r := ergo._walk_row(check, subj) with input as {"ergo/names": {"ergo/subject": subj, "x": c[0]}}
+			r.cause == c[1]
+			[m.text | some m in r.root_msgs] == [c[2]]
+		}
+	}
+}
+
 test_a_walk_lists_its_failed_items_in_list_order_even_when_a_later_item_failed_on_a_read_outside_it if {
 	fails := [
 		{"path": ["$$input", "m"], "item": ["xs", 2], "cause": "absent", "value": null, "at": "~~/m"},
