@@ -70,6 +70,16 @@ pub fn check_path(ergo_rego: &str) -> Result<(), PathProblem> {
     Ok(())
 }
 
+/// The entry point of `names` that `opa` found undefined or gave nothing for.
+pub fn missing_entry_point(_names: &[&str], _stdout: &str, _stderr: &str) -> Option<String> {
+    None
+}
+
+/// The message for an `ergo.rego` at `ergo_rego` that has no `entry_point`.
+pub fn no_entry_point(_ergo_rego: &str, _entry_point: &str) -> String {
+    String::new()
+}
+
 fn eval(
     opa: &OsStr,
     ergo_rego: &str,
