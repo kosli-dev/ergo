@@ -1128,7 +1128,7 @@ _for_row_clauses(check, subj, r) := array.concat(array.concat(array.concat(p.roo
 
 _for_row_parts(check, subj, r) := {"roots": roots, "free": free, "items": items, "lists": array.concat(listed, line), "line": line, "said": ssaid, "own": {k: c.cause | some [k, c] in failed}} if {
 	ssaid := _for_row_said(check, subj, r)
-	keys := _for_whose_key_roots(check, r)
+	keys := _for_whose_key_roots(check, r, ssaid)
 	roots := array.concat(keys, [_for_root_item(c) | some c in array.concat(_for_row_roots(check, subj, r, ssaid), _for_why_roots(check, r)); not _for_subject_root(c, subj, r); not c.text in {k.text | some k in keys}])
 	rooted := {c.text | some c in roots}
 	sroots := {i: {x[1] | some x in xs} | some i, xs in ssaid}
@@ -1142,10 +1142,18 @@ _for_row_parts(check, subj, r) := {"roots": roots, "free": free, "items": items,
 	line := [object.union(_m_clause("list", t, r.cause, t), {"group": after}) | some t in _for_list_texts(check, subj, r)]
 }
 
-_for_whose_key_roots(check, r) := [_m_root_in(x.name, x.outcome, t, count(check.checks)) |
+_for_whose_key_roots(check, r, said) := [_m_root_in(x.name, x.outcome, t, count(check.checks)) |
 	some [x, t] in _for_whose_key_texts(check)
 	not _for_key_said_by_an_item(r, t)
+	not _for_key_said_by_a_sentence(check, said, t)
 ]
+
+_for_key_said_by_a_sentence(check, said, t) if {
+	some i, xs in said
+	not _for_reads_an_alias(check, check.checks[i])
+	some x in xs
+	x[1] == t
+}
 
 _for_whose_key_texts(check) := [[x, _for_key_text(x, x.outcome)] |
 	some x in _once([x | some item in check.items; some c in object.get(item, "whose", []); some [p, _] in _key_base_reads(c); some x in _key_flaw_entries(p)])
