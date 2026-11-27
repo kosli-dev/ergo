@@ -118,19 +118,24 @@ _for_why(first, item, e, names, wh, failure) := object.union(failure, {"why": []
 
 _for_whose_item_clause(item, e, names, wh) := clause if {
 	wh.undecided != []
-	clause := _for_whose_own(item, e, wh.undecided[0]) with input as {"ergo/names": names}
+	clause := _for_whose_own(item, e) with input as {"ergo/names": names}
 }
 
-_for_whose_own(_, e, cause) := _m_clause("item", name, _for_whose_item_cause(cause), _m_isnt(name, e.iv, "an object")) if {
+_for_whose_own(_, e) := _m_clause("item", name, "not_an_object", _m_isnt(name, e.iv, "an object")) if {
 	not is_object(e.iv)
 	name := _m_item_name(e.i, set())
 }
 
-_for_whose_item_cause(cause) := "not_an_object" if cause in _not_failing_causes
+_for_bare_item_cause(c, e, cause) := object.union(c, {"cause": _for_whose_item_cause(cause)}) if {
+	c.said == []
+	not is_object(e.iv)
+} else := c
 
-else := cause
+_for_whose_item_cause(cause) := cause if cause in _no_value_states
 
-_for_whose_own(item, e, _) := clauses[0] if {
+else := "not_an_object"
+
+_for_whose_own(item, e) := clauses[0] if {
 	is_object(e.iv)
 	clauses := [x |
 		some c in item.whose
@@ -923,7 +928,7 @@ _for_item_clause_at(check, failed, k, walked) := c if {
 	c := _for_item_own(check, failed[k], walked)
 }
 
-_for_item_own(check, f, walked) := _for_whose_item_clause(check.items[0], e, _for_names, wh) if {
+_for_item_own(check, f, walked) := _for_bare_item_cause(_for_whose_item_clause(check.items[0], e, _for_names, wh), e, f.cause) if {
 	e := walked.items[f.path]
 	wh := _for_whose(check.items[0], e, _for_names)
 	wh.undecided != []
@@ -1072,7 +1077,7 @@ _for_said_earlier(x, earlier) if {
 	x.kind != "item"
 	some e in earlier
 	e.kind != "item"
-	e.text == x.text
+	_m_aliased(e.text) == _m_aliased(x.text)
 }
 
 _for_in_list_order(said) := [_for_slot(said, sorted, i) | some i, _ in said] if {
