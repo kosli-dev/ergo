@@ -516,6 +516,7 @@ fn test_takes_an_engine_and_the_path_of_ergo_rego() {
             Ok(Parsed::Test(TestOptions {
                 policy: "p.yaml".to_string(),
                 strict: false,
+                stdin_format: None,
                 engine,
                 ergo_rego,
                 show: ergo_policy_cli::pretty::Show::Failed,
