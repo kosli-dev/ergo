@@ -50,7 +50,7 @@ const COLOURS: Style = Style {
 #[test]
 fn failed_rows_of_failing_requirements_come_first_and_the_rest_is_counted() {
     assert_eq!(
-        render(&report(), &GLYPHS).unwrap(),
+        render(&report(), &json!({}), &GLYPHS).unwrap(),
         "✗ approved is not met\n    ✗ deployment d1 fails allowed\n      because approver is missing\n✓ tested is met\n\n  5 rows: 3 passed, 1 failed, 1 out of scope\n\n∴ not compliant\n"
     );
 }
@@ -58,7 +58,7 @@ fn failed_rows_of_failing_requirements_come_first_and_the_rest_is_counted() {
 #[test]
 fn plain_words_stand_in_for_the_glyphs() {
     assert_eq!(
-        render(&report(), &PLAIN).unwrap(),
+        render(&report(), &json!({}), &PLAIN).unwrap(),
         "FAIL approved is not met\n    FAIL deployment d1 fails allowed\n      because approver is missing\nok tested is met\n\n  5 rows: 3 passed, 1 failed, 1 out of scope\n\n-> not compliant\n"
     );
 }
@@ -70,14 +70,14 @@ fn show_all_lists_every_row_with_its_requirement() {
         ..GLYPHS
     };
     assert_eq!(
-        render(&report(), &style).unwrap(),
+        render(&report(), &json!({}), &style).unwrap(),
         "✗ approved is not met\n    ✓ deployment d1 is in scope\n    ✗ deployment d1 fails allowed\n      because approver is missing\n    ✓ deployment d2 passes allowed\n    – deployment d3 is out of scope (env is \"dev\")\n✓ tested is met\n    ✓ deployment d1 passes has_env\n\n  5 rows: 3 passed, 1 failed, 1 out of scope\n\n∴ not compliant\n"
     );
 }
 
 #[test]
 fn failures_are_red_passes_have_a_green_mark_and_the_verdict_is_bold() {
-    let text = render(&report(), &COLOURS).unwrap();
+    let text = render(&report(), &json!({}), &COLOURS).unwrap();
     assert_eq!(
         text,
         "\x1b[31m✗ approved is not met\x1b[0m\n    \x1b[31m✗ deployment d1 fails allowed\x1b[0m\n      because approver is missing\n\x1b[32m✓\x1b[0m tested is met\n\n  5 rows: 3 passed, 1 failed, 1 out of scope\n\n\x1b[1m∴ not compliant\x1b[0m\n"
@@ -90,7 +90,7 @@ fn out_of_scope_rows_are_dim() {
         show: Show::All,
         ..COLOURS
     };
-    let text = render(&report(), &style).unwrap();
+    let text = render(&report(), &json!({}), &style).unwrap();
     assert!(
         text.contains("    \x1b[2m– deployment d3 is out of scope (env is \"dev\")\x1b[0m\n"),
         "{text}"
@@ -105,7 +105,7 @@ fn a_compliant_report_says_so() {
         "results": [row("tested", "has_env", json!("d1"), true, None)]
     });
     assert_eq!(
-        render(&report, &GLYPHS).unwrap(),
+        render(&report, &json!({}), &GLYPHS).unwrap(),
         "– skipped is not applicable\n✓ tested is met\n\n  1 row: 1 passed, 0 failed, 0 out of scope\n\n∴ compliant\n"
     );
 }
@@ -118,7 +118,7 @@ fn a_row_with_no_id_names_only_its_subject_type() {
         "results": [row("tested", "$min_subjects", json!(null), false, Some("in-scope deployment count is 0"))]
     });
     assert_eq!(
-        render(&report, &GLYPHS).unwrap(),
+        render(&report, &json!({}), &GLYPHS).unwrap(),
         "✗ tested is not met\n    ✗ deployment fails $min_subjects\n      because in-scope deployment count is 0\n\n  1 row: 0 passed, 1 failed, 0 out of scope\n\n∴ not compliant\n"
     );
 }
@@ -131,7 +131,7 @@ fn an_id_with_a_space_is_quoted() {
         "results": [row("tested", "c", json!("a b"), false, None)]
     });
     assert!(
-        render(&report, &GLYPHS)
+        render(&report, &json!({}), &GLYPHS)
             .unwrap()
             .contains("    ✗ deployment \"a b\" fails c\n")
     );
@@ -145,7 +145,7 @@ fn a_status_this_ergo_does_not_know_is_shown_as_the_report_gives_it_among_the_fa
         "results": []
     });
     assert_eq!(
-        render(&report, &GLYPHS).unwrap(),
+        render(&report, &json!({}), &GLYPHS).unwrap(),
         "✗ b has status \"weird\"\n✓ a is met\n\n  0 rows: 0 passed, 0 failed, 0 out of scope\n\n∴ not compliant\n"
     );
 }
@@ -194,7 +194,7 @@ fn a_report_it_cannot_read_is_refused_naming_what_is_missing() {
         ),
     ];
     for (report, named) in cases {
-        let problem = render(&report, &GLYPHS).unwrap_err();
+        let problem = render(&report, &json!({}), &GLYPHS).unwrap_err();
         assert!(problem.contains(named), "{report}: {problem}");
     }
 }
@@ -207,7 +207,7 @@ fn a_row_with_a_subject_id_that_is_not_a_scalar_is_printed_as_json() {
         "results": [row("a", "c", json!({"k": 1}), false, None)]
     });
     assert!(
-        render(&report, &GLYPHS)
+        render(&report, &json!({}), &GLYPHS)
             .unwrap()
             .contains("    ✗ deployment {\"k\":1} fails c\n")
     );
@@ -221,7 +221,7 @@ fn a_failed_row_of_a_met_requirement_is_still_listed_in_the_count_only() {
         "results": [row("a", "c", json!(1), false, None)]
     });
     assert_eq!(
-        render(&report, &GLYPHS).unwrap(),
+        render(&report, &json!({}), &GLYPHS).unwrap(),
         "✓ a is met\n\n  1 row: 0 passed, 1 failed, 0 out of scope\n\n∴ compliant\n"
     );
 }

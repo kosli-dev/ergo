@@ -194,8 +194,8 @@ fn out_of_scope(row: &Row) -> bool {
     row.check == "$applies" && !row.passed
 }
 
-/// Shows `report` as text, or says what it can't read.
-pub fn render(report: &Value, style: &Style) -> Result<String, String> {
+/// Shows `report`, made for `policy`, as text, or says what it can't read.
+pub fn render(report: &Value, policy: &Value, style: &Style) -> Result<String, String> {
     let compliant = report["compliant"]
         .as_bool()
         .ok_or("the report's compliant is missing or isn't true or false")?;

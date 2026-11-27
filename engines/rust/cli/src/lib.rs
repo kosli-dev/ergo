@@ -321,7 +321,7 @@ pub fn run_with(
         }
         (_, Format::Pretty) => {
             let style = terminal.style(options.color, options.show);
-            pretty::render(&report, &style).map_err(|problem| {
+            pretty::render(&report, &policy, &style).map_err(|problem| {
                 Failure::Unsupported(format!(
                     "--format pretty can't show the report from {}: {problem}",
                     options.policy
