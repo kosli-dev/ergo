@@ -1,6 +1,9 @@
 use ergo_policy_cli::{Environment, Outcome, Terminal, run_with};
 use ergo_policy_engine::SPEC;
 use std::fs;
+use std::sync::atomic::{AtomicUsize, Ordering};
+
+static NEXT: AtomicUsize = AtomicUsize::new(0);
 
 const POLICY: &str = r#"ergo_spec: {{spec}}
 subjects:
@@ -35,8 +38,9 @@ tests:
 
 fn file(name: &str) -> String {
     let dir = std::env::temp_dir().join(format!(
-        "ergo-policy-cli-pretty-test-{}-{name}",
-        std::process::id()
+        "ergo-policy-cli-pretty-test-{}-{}-{name}",
+        std::process::id(),
+        NEXT.fetch_add(1, Ordering::SeqCst)
     ));
     fs::create_dir_all(&dir).unwrap();
     let path = dir.join("policy.yaml");
@@ -60,7 +64,9 @@ fn text(extra: &[&str], terminal: &Terminal) -> (String, u8) {
     let policy = file("t");
     let mut all = vec!["test", policy.as_str()];
     all.extend(extra);
-    match run_with(&args(&all), &Environment::default(), terminal) {
+    let result = run_with(&args(&all), &Environment::default(), terminal);
+    let _ = fs::remove_dir_all(std::path::Path::new(&policy).parent().unwrap());
+    match result {
         Ok(Outcome::Print(text)) => (text, 0),
         Ok(Outcome::PrintAndFail(text, code)) => (text, code),
         Err(failure) => panic!("{failure:?}"),
