@@ -906,7 +906,7 @@ _s_for_item_model(item, names) := {
 	"whose": [_s_named(_s_leaf_model(c), names) | some c in object.get(item, "where", [])],
 	"if_any": false,
 	"as": item.as,
-	"pick": object.union({"at": _s_pick_at(item.pick.position), "from_last": _s_picks_from_last(item.pick)}, object.union({"by": _s_model_path(item.sorted_by) | "sorted_by" in object.keys(item)}, {"alphabetically": true | object.get(item, "alphabetically", false) == true})),
+	"pick": object.union({"at": _s_pick_at(item.pick.position), "from_last": _s_picks_from_last(item.pick)}, object.union({"by": _s_named_key_path(_s_model_path(item.sorted_by), names) | "sorted_by" in object.keys(item)}, {"alphabetically": true | object.get(item, "alphabetically", false) == true})),
 } if "pick" in object.keys(item)
 
 _s_pick_at(n) := n if is_number(n)
@@ -960,6 +960,8 @@ _s_named_cond(c, names) := object.union(object.union(c, {f: _s_named_path(c[f], 
 _s_named_right(side, names) := object.union(side, {f: _s_named_path(side[f], names) | some f in _tally_path_keys; is_array(object.get(side, f, null))})
 
 _s_named_path(p, names) := [_s_named_step(i, step, names) | some i, step in p]
+
+_s_named_key_path(p, names) := [_s_named_step(1, step, names) | some step in p]
 
 _s_named_step(i, step, names) := concat("", ["$", step]) if {
 	i == 0
