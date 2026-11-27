@@ -877,13 +877,23 @@ _for_rooted_clauses(_, c, subj, cause, roots) := [x | some x in _m_walk_clauses(
 	_walks(c)
 }
 
-_for_rooted_clauses(check, c, subj, cause, roots) := _once([x | some g in said; some x in _for_group_clauses(g, roots, cause, whole)]) if {
+_for_rooted_clauses(check, c, subj, cause, roots) := _once(_for_said_groups(said, roots, cause, whole)) if {
 	cause != "satisfied"
 	not _m_params_unread(c)
 	not _walks(c)
 	said := [[_m_piece_string(p) | some p in g] | some g in _message_said(c, subj, cause)]
 	whole := _for_says_whole(check, c)
 }
+
+_for_said_groups(said, roots, cause, whole) := [_m_clause("root", t, cause, t) | ts := [p | some g in said; some p in g; not p in roots]; ts != []; t := concat("; ", ts)] if {
+	count(said) > 1
+	_ = whole
+	every g in said {
+		every p in g {
+			is_string(p)
+		}
+	}
+} else := [x | some g in said; some x in _for_group_clauses(g, roots, cause, whole)]
 
 _for_says_whole(check, c) := false if _for_reads_an_alias(check, c)
 
