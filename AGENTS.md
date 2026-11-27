@@ -70,19 +70,7 @@ python3 -m venv /tmp/ergo-venv && /tmp/ergo-venv/bin/pip install --quiet jsonsch
 /tmp/ergo-venv/bin/python spec/check_grammar.py --rust 'docker run --rm -i -v "$PWD":/src -v ergo-rust-target:/target -v ergo-cargo-registry:/usr/local/cargo/registry ergo-rust cargo run --locked -q --release -p ergo-policy-sentences --example read'
 ```
 
-Run them from the repo root. The last three lines use a virtual environment that holds `jsonschema` and `abnf`, and the last one the Docker image that [`engines/rust/README.md`](engines/rust/README.md) builds; it's outside the repo, because some Pythons, like Homebrew's, refuse `pip install` outside one.
-
-`.github/dump-diff_test.sh` tests `.github/dump-diff.sh`, which lists the files that differ between two folders.
-
-`.github/pr-facts_test.sh` tests `.github/pr-facts.sh`, which prints how many Rust case reports a change moved, which known failures it added or removed, and whether a case that passed now fails or is gone; put its output in the body of a pull request that changes Rust reports.
-
-`.github/pairs-facts_test.sh` tests `.github/pairs-facts.sh`, which runs the pairs in `.github/sweep-pairs.json` through both engines and prints how many the engines differ on, how many say their `want`, and which pairs the Rust output of a change moved, first and in capitals any that moved away from Rego or from their `want`; it only informs, and the `pairs-facts` job writes it in the summary of a pull request.
-
-`.github/mutants-facts_test.sh` tests `.github/mutants-facts.sh`, which runs `cargo-mutants` on the lines of Rust source a change touches, stops at a time limit (`MUTANTS_FACTS_TIMEOUT`, 900 seconds by default) and prints how many mutants were caught, missed, unviable or timed out, and the missed ones; it only informs, and the `mutants-facts` job writes it in the summary of a pull request.
-
-`.github/body-facts_test.sh` tests `.github/body-facts.sh`, which reads the output of `pr-facts.sh` and `pairs-facts.sh` and the pull request body, prints the counts of reports and pairs a change moved in a line to paste after `Changes the report:`, and warns when something moved and the body has no line starting with that, or notes the line when nothing moved; it also fails, and lists each one, when the body repeats a sentence of those facts with other numbers (`N case reports changed`, `Rust output changed on N pairs`, `known-failures.txt had X lines and has Y now`, `N of M pairs differ between Rego and Rust`, `Pairs that say their want message: Rego N of M, Rust N of M`), and when the facts for such a line can't be read, while other prose is never checked, and it checks every such sentence when a line holds more than one; a fenced code block is the way to write prose that looks like one of those sentences without it being checked; the `body-facts` job writes it in the summary of a pull request, and its last step is the one that goes red, so a job that fails on the numbers means the body is wrong. The job reads the body when it runs on a push, so after editing the body push or re-run the job. When `cargo test` failed, it says the report count is unknown and warns.
-
-`.github/matrix-facts_test.sh` tests `.github/matrix-facts.sh`, which runs one of the generators in `.github/matrix` (`matrix-a` by default) on a base and on the working tree and prints the pairs that got worse than the base and the Rust causes that are lower than `ergo.rego`'s; it only informs, and the `matrix-facts` job writes it in the summary of a pull request. `.github/matrix/README.md` says what each generator makes and how to run one by hand.
+Run them from the repo root. The scripts behind the `_test.sh` lines, and the ones that only inform (`pr-facts.sh`, `pairs-facts.sh`, `matrix-facts.sh`, `mutants-facts.sh`, `body-facts.sh`, `sync-facts.sh`, `diff-types.py`, `property-check.py`), are described in [`.github/README.md`](.github/README.md). A pull request that changes Rust reports puts the output of `.github/pr-facts.sh` in its body. Run `.github/setup-merge-drivers.sh` once per clone so `engines/rust/known-failures.txt` merges without conflicts. The last three lines use a virtual environment that holds `jsonschema` and `abnf`, and the last one the Docker image that [`engines/rust/README.md`](engines/rust/README.md) builds; it's outside the repo, because some Pythons, like Homebrew's, refuse `pip install` outside one.
 
 `opa fmt --list` should print nothing. If it prints file names, run `opa fmt -w` on them.
 
@@ -143,16 +131,6 @@ CI also fails when a line of Rego isn't reached by any test. It runs the tests o
 ```
 
 When a change touches how a message or a cause is worked out, run `python3 spec/sweep.py` too, as `spec/README.md` says, on `main` and on your branch, and compare the cells that differ. It isn't a required check, and it never fails on a difference, but review has found message differences in odd shapes that nobody had probed.
-
-`.github/property-check.py` is the second probe for the same changes. It builds one random policy, input and params from a fixed seed, runs about 600 rows through `ergo.rego` and through the Rust CLI built from `main` and from your branch, and prints how many rows raise each flag, like a pass where `ergo.rego` fails, a cause that got milder, a problem said twice or dropped, or problems in a different order. Build `dist/ergo.rego` and both CLIs natively first, and run it under `nice -n 19`, one run at a time: `nice -n 19 python3 .github/property-check.py run --main-bin <main target>/release/ergo --main-tree <main worktree> --branch-bin <target>/release/ergo`. It refuses a binary built from another commit than its tree, and it never fails on a flag. `property-check.py --help` explains each flag and the `show`, `new`, `cover` and `order` commands that read what a run left in `dist/property-check`. `.github/property-check_test.sh` tests it on a fake engine.
-
-`.github/sync-facts.sh [BASE]` prints how far the engines are from the spec, one block for your branch and one for `BASE` (default `origin/main`, read with `git show`), then the change: the lines in `engines/rust/known-failures.txt` by case folder, the `known_differences` rows in `engines/rego/tests/spec_test.rego`, the entries in each "differ" section of `spec/OPEN.md`, and the number of spec cases with the failing share. It never fails on what it finds, and only a bad argument or an unknown base exits non-zero. CI runs it in the `rust-report-facts` job summary. `.github/sync-facts_test.sh` tests it.
-
-`.github/diff-types.py` sorts every case in `engines/rust/known-failures.txt` and every `known_differences` row by what differs from the case's expected report: type 1 when a verdict differs (a row passes in one and fails in the other, `compliant` or a requirement's `status` differs, or a row is missing or extra), type 2 when only a row's `cause` differs, and type 3 for anything else, a cause inside a nested entry included. It reads the Rust reports that the cases test writes when `ERGO_DUMP=<folder>` is set (`--dump <folder>` to reuse them, or it runs the test itself) and runs `opa eval` once for the `known_differences` names with `--rego`, after `.github/build-ergo.sh`. It prints the counts by type and by family, then the case names of types 1 and 2, or only the counts with `--summary`. The dump has no `violations`, so a case that differs only there counts as type 3. It exits non-zero on a bad argument, and with `--require-no-type-1` when a type 1 is left. CI runs only its test, because the classification needs a Rust test run of its own; run it on demand. `.github/diff-types_test.sh` tests it.
-
-`.github/workflows/nightly.yml` runs once a day on `main` (and by hand): it builds both engines, runs the whole grid of `spec/sweep.py` and its pairs, and `.github/diff-types.py --rego`, each with `--require-no-type-1`, so the run fails when a verdict differs between the engines or from a spec case. Its `status` job, the only one that may write to issues, puts `.github/status-intro.md` and the block that `.github/status-block.sh` prints (the date in UTC, the run's result and the counts by type) in the body of issue #573, replacing the whole body each time. `.github/status-block_test.sh` tests the script.
-
-`engines/rust/known-failures.txt` merges with its own driver, so two branches that add or delete lines in it merge without a conflict (the result is the base minus every deleted line plus every added line, sorted). Git's own `merge=union` would bring deleted lines back. The driver is set once per clone (its worktrees share it) with `.github/setup-merge-drivers.sh`; CI doesn't need it, because it never merges, and without it git reports the conflict as usual. The changelogs have no driver, because two entries under the same heading need a person to order them.
 
 ### Differences between the engines
 
@@ -263,42 +241,27 @@ The report must stay byte-identical for the same policy and input, whatever orde
 
 When behaviour changes, update its rule in `spec/` and add or change cases for it, so `spec_test.rego` fails when one no longer matches. When a policy or a report changes shape, update `spec/policy/schema.json` or `spec/report/schema.json` too. Update `REFERENCE.md` in the same change. When it affects the first policy or its report, update `README.md` too, when it changes how `ergo.rego` runs, `OPA.md`, and when it changes the `ergo` command, `CLI.md`.
 
-Every output shown in the docs must come from actually running it, not from memory.
-
-To have CI run an example, put a line like `<!-- ergo-run: NAME role=file path=policy.yaml -->` right before the code block (readers don't see it). The roles are `file` (written to `path`; `normalise=ergo_spec` swaps its `ergo_spec:` line for the version of `dist/ergo.rego`), `command` (the `opa` command, run in that folder with `dist/ergo.rego` copied to `ergo.rego`, or to `ergo=PATH`) and `output` (what it prints, compared word for word). Blocks with the same NAME are one group, and may be in different files. Run `.github/docs-run.sh [FILE...]` after `.github/build-ergo.sh`; it lists every group that differs, with a diff. `README.md` follows the latest release, so CI checks its example against the `ergo.rego` of the latest `rego-v*` release, with `.github/docs-run-release.sh`. To mark such a group, add `use=release` to its `command` marker, and when the group has no command block that readers see, put the command in the marker as ``run=`COMMAND` ``, which runs in that folder and is allowed only when the group has no command block. A `run=` command, like any command block marked this way, runs as shell in CI, like any script in a pull request, and `run=` cannot contain a backtick. While a release is being prepared (`_spec` or `version` in `basics.rego` has no `-dev`), `docs-run-release.sh` checks against `dist/ergo.rego` and not the latest release, because `README.md` has already moved. Without `DOCS_RUN_RELEASE_ERGO_REGO` set, `docs-run.sh` prints `skip` for these groups, and `DOCS_RUN_REQUIRE_RELEASE=1` makes a skip fail.
+Every output shown in the docs must come from actually running it, not from memory. To have CI run an example, put an `<!-- ergo-run: ... -->` marker before its code block and run `.github/docs-run.sh` after `.github/build-ergo.sh`. [`.github/README.md`](.github/README.md) has the markers.
 
 ## Writing
 
-This applies to everything you write: docs, test names, commit messages, pull requests, issues, and your replies to the people you're working with.
+This applies to everything you write: docs, test names, commits, pull requests, issues and replies.
 
-Write in plain English that anyone can follow:
-
-- Say things simply. No jargon, no buzzwords, no filler, and no pet words like "load-bearing".
-- Explain what the reader needs at that point, and no more. Leave the theory out.
-- Don't sound robotic either. Vary sentence length, and join related ideas with "and", "but", "so" and "because" rather than stacking short sentences.
-- Show real examples. Show the input next to every policy or report example.
-- No idioms or figures of speech, and no names of your own for things. Not everyone reading is a native English speaker.
-- Write "Ergo" in prose. Code names like `ergo.rego` and `ergo.report` stay lowercase.
-- Say "Rego engine" and "Rust engine", never "Rust port".
+- Plain English that a non-native speaker can follow. No jargon, buzzwords, filler, idioms or names of your own for things.
+- Say what the reader needs to act, and no more. Short list, one example, and the input next to every policy or report example.
+- Vary sentence length and join related ideas with "and", "but", "so" and "because".
+- Write "Ergo" in prose. Code names like `ergo.rego` and `ergo.report` stay lowercase. Say "Rego engine" and "Rust engine", never "Rust port".
 - Pad markdown tables so the columns line up in the source.
-- Keep it brief: what the reader needs to act, a short list, one example.
 - Words in the check sentences are plain English, like `it`. Don't add `$` names or code-looking words. A field that clashes with one is written with a leading dot, like `.empty`.
 
-When talking to people:
-
-- No flattery and no ceremony. Don't praise the question, don't thank people for feedback, and don't announce what you're about to do at length. Just answer or do it.
-- Be direct. If something is wrong, say so and say why. If you disagree, say that too.
-- Be honest about what you did. Say what you ran and what it showed. If you didn't check something, or a check failed, say so plainly.
-- Keep it short. Lead with the answer, then give what's needed to act on it.
+When talking to people: lead with the answer, no flattery or ceremony, say it plainly when something is wrong, and say what you ran, what it showed and what you didn't check.
 
 ## Commits
 
-The first line says what the change does, in the imperative and in lowercase, like `fail compare when either side is missing`.
+The first line says what the change does, in the imperative and in lowercase, like `fail compare when either side is missing`. An area prefix (`rego:`, `rust:`, `docs:`, `site:`, `ci:`, `examples:`, `spec:`, `playground:`) is optional: add one when a single area clearly fits.
 
-An area prefix is optional. Add one when a single area clearly fits, and leave it out when the change spans several. People have used `rego:`, `rust:`, `docs:`, `site:`, `ci:`, `examples:`, `spec:` and `playground:`, and commits from before the Rust engine say `core:` for `rego:`, and commits from before the playground say `markdown:` for `playground:`. Nothing in CI checks the prefix.
+One pull request carries a fix for both engines, with the spec cases, `REFERENCE.md` and the changelogs. A case Rust can't pass yet goes in `engines/rust/known-failures.txt`, and the pull request that makes it pass deletes the line. Two or three small related fixes can share one pull request.
 
-One pull request carries a fix for both engines, Rego and Rust, with the spec cases, `REFERENCE.md` and the changelogs. Don't open a separate Rust pull request for it. A case Rust can't pass yet goes in `engines/rust/known-failures.txt`, and the pull request that makes it pass deletes the line. Two or three small related fixes can share one pull request.
+When a change alters the report for an existing policy, say so in the body, on a line starting with `Changes the report:`.
 
-When a change to `ergo.rego` or to the Rust engine alters the report for an existing policy, say so in the body, on a line starting with `Changes the report:`.
-
-Add a body when the reason isn't obvious from the first line. A pull request is squashed into one commit, so its title is what lands on `main` and follows the same rules. Issue titles do too, so an issue reads like the change that will fix it. CI only checks that a PR title isn't empty.
+Add a body when the reason isn't obvious from the first line. A pull request is squashed into one commit, so its title is what lands on `main`, and issue titles follow the same rules. CI only checks that a PR title isn't empty.
