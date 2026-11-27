@@ -818,7 +818,8 @@ impl For {
             if depth > 0 {
                 let first = &self.items[0].alias;
                 let shared = !reads_path(&item.path, first)
-                    && !item.whose.iter().any(|check| reads_alias(check, first));
+                    && !item.whose.iter().any(|check| reads_alias(check, first))
+                    && !sorts_by_alias(item, first);
                 for entry in cands.dead.iter_mut().skip(from_list) {
                     entry.shared = shared;
                 }
@@ -3407,10 +3408,11 @@ impl For {
             return false;
         };
         matches!(second.how, How::Pick { .. })
-            && second
+            && (second
                 .whose
                 .iter()
                 .any(|check| reads_alias(check, &first.alias))
+                || sorts_by_alias(second, &first.alias))
     }
 }
 
