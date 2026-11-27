@@ -679,6 +679,13 @@ test_a_whose_key_that_cant_be_read_comes_after_the_sentences_that_read_no_alias_
 	_row_tree_text("some xs whose zz is m named by $params.k as x", ["x.v is 1", "z is 1"], {"xs": "s"}, {"k": null}) == `z is missing; $params.k is null; xs is "s", which isn't a list or an object`
 }
 
+test_a_whose_key_a_sentence_that_reads_no_alias_also_reads_is_said_in_that_sentences_place if {
+	_row_tree_text("every xs whose zz is m named by $params.k as x", ["count of ys whose zz is m named by $params.k is 1"], {"xs": []}, {}) == "$params.k is missing; ys is missing; xs is []"
+	_row_tree_text("every xs whose zz is m named by $params.k as x", ["x.v is 1", "w.a named by $params.k is 1"], {"w": null, "xs": []}, {}) == "$params.k is missing; w is null; xs is []"
+	_row_tree_text("every xs whose zz is m named by $params.k as x", ["count of xs whose zz is m named by $params.k is 1"], {"z": 2}, {}) == "$params.k is missing; xs is missing"
+	_row_tree_text("every xs whose zz is m named by $params.k as x", ["y named by $params.k is 1", "x.v exists"], {}, {"k": 3}) == "$params.k is 3, which isn't text; y is missing; xs is missing"
+}
+
 test_a_whose_key_that_isnt_text_is_said_once_before_a_list_that_cant_be_walked if {
 	_row_tree_text("every es whose zz is m named by $params.k as e", ["e.v exists"], {}, {"k": 3}) == "$params.k is 3, which isn't text; es is missing"
 	_row_tree_text("every es whose zz is m named by $params.k as e", ["e.v exists", "z is 1"], {"z": 2, "es": ["s"]}, {"k": 3}) == `z is 2; $params.k is 3, which isn't text; item 1 of es is "s", which isn't an object`
