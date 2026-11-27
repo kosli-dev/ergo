@@ -96,6 +96,14 @@ A policy written for a newer spec than the `ergo.rego` you pass is refused. For 
 ergo: the ergo.rego at ../rel/ergo.rego refuses the policy file ok.yaml: policy ergo_spec: unsupported version v0.7-dev, expected v0.6
 ```
 
+An `ergo.rego` that has no `ergo.report`, or for `violations` no `ergo.violations`, is refused with the name of the entry point that is missing, and `ergo test` does the same for `ergo.compile`. With the release's `ergo.rego` copied to `ergo.rego` and its `report` renamed, `ergo report --policy policy.yaml --input input.json --engine rego --ergo-rego ergo.rego` exits 2 and prints:
+
+```
+ergo: the ergo.rego at ergo.rego has no ergo.report
+```
+
+The report that `ergo` prints with `--engine rego` is the one `opa` gave, with any field a newer `ergo.rego` adds, and the keys sorted, as `opa eval` prints them. Numbers keep their digits, with one change: a number written with an exponent and no sign, like `1e400`, is printed `1e+400`, which is the same number.
+
 ### Read from standard input
 
 A value of `-` for `--policy`, `--input` or `--params`, or for the policy of `ergo test`, reads standard input, so the output of another tool can be piped in. Standard input has no file extension, so `--stdin-format json` or `--stdin-format yaml` says how it is written. `ergo` never guesses, because JSON is also valid YAML but the two read some values differently: `010` is 8 in YAML and a syntax error in JSON.
