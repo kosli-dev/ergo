@@ -37,29 +37,46 @@ _for_row_of(check, subj, r) := r if {
 	m := _m_fallback_text(check)
 } else := object.union(object.remove(r, _row_extra_keys), {"failed": [_m_strip(f) | some f in r.failed], "message": "", "ergo/for_raw": {"check": check, "subj": subj, "r": r, "tree": true}}) if {
 	r.cause != "satisfied"
-	_for_on_tree(check, subj, r)
+	_for_on_tree(check, r)
 } else := object.union(object.remove(r, _row_extra_keys), {"failed": [_m_strip(f) | some f in r.failed], "message": said.message, "ergo/for_raw": {"check": check, "subj": subj, "r": r, "once": said.once, "line": object.get(said, "line", [])}}) if {
 	r.cause != "satisfied"
 	said := _for_row_text(check, subj, r)
 }
 
-_for_on_tree(check, subj, r) if {
+_for_on_tree(check, r) if {
 	count(check.items) == 1
 	object.get(r, "natural", null) != "satisfied"
 	not _walk_flawed(check)
-	not _for_walked_root_fails(check, subj)
-	not _for_key_not_text(check)
-	not _for_key_unread(check)
-	not _for_key_is_alias(check)
+	not _for_alias_key_beside_a_list_outside(check)
 	count([c | some c in check.checks; _for_reads_an_alias(check, c); _for_reads_a_list(c)]) < 2
 	every c in object.get(check.items[0], "whose", []) {
 		every p in _condition_paths(c) {
 			p != []
 		}
 	}
-	every step in array.concat(check.items[0].path, object.get(object.get(check.items[0], "pick", {}), "by", [])) {
-		_for_plain_step(step)
-	}
+}
+
+_for_alias_key_beside_a_list_outside(check) if {
+	walk(check.checks, [_, y])
+	is_object(y)
+	some item in check.items
+	object.get(y, "named_by", null) == item.as
+	some c in object.get(item, "whose", [])
+	walk(c, [_, x])
+	is_object(x)
+	_for_reads_a_list_outside(x)
+}
+
+_for_reads_a_list_outside(x) if {
+	_list_cmp(x)
+	_walk_outside(x.right)
+}
+
+_for_reads_a_list_outside(x) if {
+	x.op in (_list_phrase_ops | _single_contain_ops)
+	some f in ["values", "value", "patterns"]
+	_is_ref(object.get(x, f, null))
+	_walk_outside(x[f].ref)
 }
 
 _for_key_unread(check) if {
@@ -70,18 +87,6 @@ _for_key_unread(check) if {
 	_ref_step_flaw(seg) in {"absent", "null"}
 }
 
-_for_walked_root_fails(check, subj) if {
-	_walk_roots_on
-	_walk_root_flaw(check, subj) != ""
-}
-
-_for_key_is_alias(check) if {
-	walk(check.checks, [_, y])
-	is_object(y)
-	some item in check.items
-	object.get(y, "named_by", null) == item.as
-}
-
 _for_reads_a_list(c) if _walks(c)
 
 _for_reads_a_list(c) if {
@@ -90,10 +95,6 @@ _for_reads_a_list(c) if {
 	some f in _tally_forms
 	is_array(object.get(y, f, null))
 }
-
-_for_plain_step(step) if is_string(step)
-
-_for_plain_step(step) if is_number(step)
 
 _for_row_raw(check, subj) := object.union(r, {"cause": _for_shape_cause(r), "natural": r.cause}) if {
 	_params_shape_only_unreadable(check)
@@ -661,13 +662,14 @@ _for_unsortable(item, w, names) := array.concat(unread, mixed) if {
 	]
 }
 
-_m_sort_why(item, e, names) := {"why": array.concat(array.slice(ps, 0, n), [_m_leaf(e.i, concat("; ", array.slice(ps, n, count(ps))))])} if {
+_m_sort_why(item, e, names) := {"why": array.concat(array.slice(ps, 0, n), [_m_leaf(e.i, concat("; ", array.slice(ps, n, count(ps))))]), "why_roots": [[f, ps[i]] | some i, f in fs]} if {
 	is_object(e.iv)
 	_key_base_flaws(e.iv, item.pick.by, "object") != [] with input as {"ergo/names": names}
-	n := count([seg | some seg in item.pick.by; _ref_step_flaw(seg)]) with input as {"ergo/names": names}
+	fs := [f | some seg in item.pick.by; f := _ref_step_flaw(seg)] with input as {"ergo/names": names}
+	n := count(fs)
 	ps := split(_m_sort_text(item, e, "absent"), "; ") with input as {"ergo/names": names}
 	count(ps) > n
-} else := {"why": [m]} if {
+} else := {"why": [m], "why_roots": [[state, m]]} if {
 	is_object(e.iv)
 	state := _for_sort_state(item, e, names)
 	m := _m_sort_text(item, e, state) with input as {"ergo/names": names}
@@ -1091,7 +1093,7 @@ _for_failed_base(check, f) := {
 	"bare": _m_rest_named(_m_for_item_name(check, f.item), f),
 }
 
-_for_failed_flags(f) := object.union(object.union(object.union(object.union({"msg": f.why | "why" in object.keys(f)}, {"raw": f.raw | "raw" in object.keys(f)}), {"hoisted": true | object.get(f, "hoisted", false) == true}), {"whose_of": f.whose_of | "whose_of" in object.keys(f)}), object.union(object.union(_fail_levels(f), {"ergo/sorted": f.sorted | "sorted" in object.keys(f)}), {"wants": f.msg | object.get(f, "msg", "") == "an object"}))
+_for_failed_flags(f) := object.union(object.union(object.union(object.union({"msg": f.why | "why" in object.keys(f)}, {"raw": f.raw | "raw" in object.keys(f)}), {"hoisted": true | object.get(f, "hoisted", false) == true}), {"whose_of": f.whose_of | "whose_of" in object.keys(f)}), object.union(object.union(_fail_levels(f), {"ergo/sorted": f.sorted | "sorted" in object.keys(f)}), object.union({"wants": f.msg | object.get(f, "msg", "") == "an object"}, {"ergo/why_roots": f.why_roots | "why_roots" in object.keys(f)})))
 
 _fail_levels(f) := {"ergo/levels": f.lv} if {
 	"lv" in object.keys(f)

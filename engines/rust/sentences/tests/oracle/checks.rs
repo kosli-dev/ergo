@@ -15057,6 +15057,24 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
+        "first of xs sorted by m named by $params.k as x",
+        "first of xs sorted by m named by $params.k as x",
+        &[],
+        &[],
+    ),
+    (
+        "first of es whose zz is m named by $params.k as e",
+        "first of es whose zz equals m named by $params.k as e",
+        &[],
+        &[],
+    ),
+    (
+        "last of es whose zz is m named by $params.k as e",
+        "last of es whose zz equals m named by $params.k as e",
+        &[],
+        &[],
+    ),
+    (
         "every commits as commit, every commit.reviews as review",
         "every commits as commit, every commit.reviews as review",
         &[],

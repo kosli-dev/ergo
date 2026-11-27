@@ -596,6 +596,15 @@ test_a_sentences_roots_for_its_entries_come_from_what_the_tree_read_or_are_read_
 	ergo._for_sentence_root_texts(check, {"xs": [{"v": 1}]}, 0, {0: [["absent", "$params.b is missing"]]}) == ["$params.b is missing"]
 }
 
+test_a_sort_key_root_is_said_once_before_the_items if {
+	_row_tree_text("first of rows sorted by m named by $params.km as r", ["r.v is 1"], {"rows": [{"m": [5, 1]}, {"m": {"a": 1}}, {"v": 1}]}, {}) == "$params.km is missing; item 1 of rows: m is [5, 1], which isn't an object; item 3 of rows: m is missing"
+}
+
+test_a_sort_key_root_that_is_null_is_said_once_before_the_items if {
+	_row_tree_text("first of rows sorted by m named by $params.km as r", ["r.v is 1"], {"rows": [{"m": [5, 1]}, {"m": {"a": 1}}, {"v": 1}]}, {"km": null}) == "$params.km is null; item 1 of rows: m is [5, 1], which isn't an object; item 3 of rows: m is missing"
+	_row_tree_text("last of rows sorted by m named by $params.km as r", ["r.v is 1"], {"rows": [{"m": {"a": 1}}, {"v": 1}]}, {"km": null}) == "$params.km is null; item 2 of rows: m is missing"
+}
+
 test_an_item_that_says_only_the_roots_its_sentence_joins_is_left_out if {
 	_row_tree_text("every rows as row", ["row.v is zz.x named by p"], {"zz": "str", "rows": [{"v": 1}], "p": 3}, {}) == `p is 3, which isn't text, and zz is "str", which isn't an object`
 }
@@ -658,6 +667,69 @@ test_a_row_whose_sentence_reads_a_list_outside_its_item_keeps_the_text_the_tree_
 	raw := {"passed": false, "cause": r.cause, "message": "", "ergo/for_raw": {"check": check, "subj": subj, "r": r, "tree": true}}
 	said := ergo._for_said(raw) with input as {"ergo/names": names} with data.ergo_document as doc
 	said.message == "item 2 of $input.os: name is missing"
+}
+
+test_a_whose_key_that_isnt_text_is_said_in_each_member if {
+	_row_tree_text("every member of ev whose kind is m named by $params.k as e", ["e.v is 1"], {"ev": {"a": {"kind": "a", "m": {}, "v": 1}, "b": {"m": {}, "v": 1}}}, {"k": 3}) == "member a of ev: $params.k is 3, which isn't text; member b of ev: $params.k is 3, which isn't text"
+}
+
+test_a_whose_key_that_cant_be_read_comes_after_the_sentences_that_read_no_alias_and_before_the_items if {
+	_row_tree_text("every es whose zz is m named by $params.k as e", ["e.v exists", "z is 1"], {"z": 2, "es": []}, {}) == "z is 2; $params.k is missing; es is []"
+	_row_tree_text("every es whose zz is m named by $params.k as e", ["e.v exists", "z is 1"], {"z": 2, "es": ["s"]}, {"k": null}) == `z is 2; $params.k is null; item 1 of es is "s", which isn't an object`
+	_row_tree_text("some xs whose zz is m named by $params.k as x", ["x.v is 1", "z is 1"], {"xs": "s"}, {"k": null}) == `z is missing; $params.k is null; xs is "s", which isn't a list or an object`
+}
+
+test_a_whose_key_a_sentence_that_reads_no_alias_also_reads_is_said_in_that_sentences_place if {
+	_row_tree_text("every xs whose zz is m named by $params.k as x", ["count of ys whose zz is m named by $params.k is 1"], {"xs": []}, {}) == "$params.k is missing; ys is missing; xs is []"
+	_row_tree_text("every xs whose zz is m named by $params.k as x", ["x.v is 1", "w.a named by $params.k is 1"], {"w": null, "xs": []}, {}) == "$params.k is missing; w is null; xs is []"
+	_row_tree_text("every xs whose zz is m named by $params.k as x", ["count of xs whose zz is m named by $params.k is 1"], {"z": 2}, {}) == "$params.k is missing; xs is missing"
+	_row_tree_text("every xs whose zz is m named by $params.k as x", ["y named by $params.k is 1", "x.v exists"], {}, {"k": 3}) == "$params.k is 3, which isn't text; y is missing; xs is missing"
+}
+
+test_a_whose_key_that_isnt_text_is_said_once_before_a_list_that_cant_be_walked if {
+	_row_tree_text("every es whose zz is m named by $params.k as e", ["e.v exists"], {}, {"k": 3}) == "$params.k is 3, which isn't text; es is missing"
+	_row_tree_text("every es whose zz is m named by $params.k as e", ["e.v exists", "z is 1"], {"z": 2, "es": ["s"]}, {"k": 3}) == `z is 2; $params.k is 3, which isn't text; item 1 of es is "s", which isn't an object`
+}
+
+test_a_whose_key_a_sentence_also_reads_is_said_once_before_the_items if {
+	_row_tree_text("every xs whose zz is m named by $params.k as x", ["x.v named by $params.k is 1"], {"xs": [{"m": {}}, {"m": null}]}, {"k": 3}) == "$params.k is 3, which isn't text; item 2 of xs: m is null"
+	_row_tree_text("some xs whose zz is m named by $params.k as x", ["x.v named by $params.k is 1"], {"xs": [{"m": {}}, {"m": null}]}, {"k": 3}) == "$params.k is 3, which isn't text; item 2 of xs: m is null"
+	_row_tree_text("every xs whose zz is m named by $params.k as x", ["x.v named by $params.k is 1"], {"xs": [{"zz": 1, "m": null}]}, {"k": 3}) == "$params.k is 3, which isn't text; item 1 of xs: m is null"
+	_row_tree_text("every xs whose zz is m named by $params.k as x", ["x.v named by $params.k is 1"], {"xs": [null, {"zz": 1, "m": {}}]}, {"k": 3}) == "$params.k is 3, which isn't text; item 1 of xs is null, which isn't an object"
+	_row_tree_text("every xs whose zz is m named by $params.k as x", ["x.v named by $params.k is 1"], {"xs": [{"m": {}}, {"m": null}, {}, {}, {}]}, {"k": 3}) == "$params.k is 3, which isn't text; item 2 of xs: m is null"
+	_row_tree_text("every xs whose zz is m named by $params.k as x", ["y named by $params.k is 1"], {"xs": [{"m": {}}, {"m": null}]}, {"k": 3}) == "$params.k is 3, which isn't text; y is missing; item 2 of xs: m is null"
+}
+
+test_an_item_beside_a_whose_key_that_is_null_says_only_what_its_whose_said if {
+	_row_tree_text("every es whose zz is m named by $params.k as e", ["e.v exists"], {"es": [{"v": 2}, {"zz": 2, "m": null}]}, {"k": null}) == "$params.k is null; item 1 of es: zz is missing; item 2 of es: m is null"
+}
+
+test_a_for_row_whose_whose_key_isnt_text_says_the_key_on_an_empty_list_it_tolerates if {
+	_row_tree_text("every es whose zz is m named by $input.k, if any, as e", ["e.v is 2"], {"es": []}, {}) == "$input.k is 3, which isn't text" with data.ergo_document as {"k": 3, "m": {"a": 2}}
+}
+
+test_a_sentence_whose_message_has_parts_apart_keeps_them_apart_under_its_item_as_its_entry_does if {
+	_row_tree_text("every xs as m", ["m.k named by m.k is 1"], {"xs": [{"k": null}, {}]}, {}) == `item 1 of xs: m is {"k": null}, which isn't text; m.k is null; item 2 of xs: m is {}, which isn't text`
+}
+
+test_a_part_another_sentence_of_the_item_already_said_is_said_once_whichever_sentence_comes_first if {
+	_row_tree_text("every xs as m", ["m.ys named by m.k is 1", "every m.ys.v is at least 1"], {"xs": [{"k": "ys", "ys": null}]}, {}) == `item 1 of xs: m is {"k": "ys", "ys": null}, which isn't text; m.ys is null`
+	_row_tree_text("every xs as m", ["m.ys exists", "m.ys named by m.k is 1"], {"xs": [{"k": "ys", "ys": null}]}, {}) == `item 1 of xs: m.ys is null, and m is {"k": "ys", "ys": null}, which isn't text`
+}
+
+test_an_alias_key_row_beside_a_root_it_cant_read_counts_only_items_after_the_third_in_and_more if {
+	xs := [{"ys": [{"v": 1}], "k": "ys"}, {"ys": [null, {"v": 0}], "k": null}, {"ys": [], "k": null}]
+	tree := _row_tree("every xs as m", ["m.ys named by m.k is 1", "every m.ys.v is at least $params.min"], {"xs": xs}, {"min": "s"})
+	not contains(ergo._m_clauses_text(ergo._m_clauses_shown(tree)), "more")
+	contains(ergo._m_clauses_text(ergo._m_clauses_shown(tree)), `item 3 of xs: m is {"k": null, "ys": []}, which isn't text`)
+}
+
+test_a_count_whose_entry_says_its_parts_under_one_item_joins_them_under_that_item if {
+	_row_tree_text("every xs as m", ["count of m.v named by m.k is 1"], {"xs": [{"v": null}]}, {}) == `item 1 of xs: m is {"v": null}, which isn't text, and m.v is null`
+}
+
+test_an_item_two_sentences_say_the_same_of_says_it_once_whether_or_not_it_reads_the_alias_as_written if {
+	_row_tree_text("every xs as m", ["m is $params.l", "m.v named by m.v is 1"], {"xs": [null]}, {"l": 1}) == "item 1 of xs: m is null"
 }
 
 test_a_row_on_the_tree_takes_the_worst_cause_of_what_it_says if {
