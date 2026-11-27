@@ -29,6 +29,10 @@ pub fn same_id(a: &Value, b: &Value) -> bool {
 
 /// The shortest text that reads back as `id`, or `None` for an object or a list.
 pub fn id_text(id: &Value) -> Option<String> {
+    id_text_quoted(id, &|text| Value::String(text.to_string()).to_string())
+}
+
+fn id_text_quoted(id: &Value, quote: &dyn Fn(&str) -> String) -> Option<String> {
     match id {
         Value::String(s) => {
             let word = !s.is_empty()
@@ -37,7 +41,7 @@ pub fn id_text(id: &Value) -> Option<String> {
             Some(if word && word_value(s) == *id {
                 s.clone()
             } else {
-                Value::String(s.clone()).to_string()
+                quote(s)
             })
         }
         Value::Number(_) | Value::Bool(_) | Value::Null => Some(id.to_string()),
@@ -379,16 +383,51 @@ fn left_out(row: &Value) -> bool {
     row["passed"] == true && row["check"].as_str().is_some_and(|c| c.starts_with('$'))
 }
 
-fn id_written(id: &Value, quoted: bool) -> String {
+fn id_written(id: &Value, quoted: bool, quote: &dyn Fn(&str) -> String) -> String {
     match id {
         Value::String(_) if quoted => id.to_string(),
-        id => id_text(id).unwrap_or_default(),
+        id => id_text_quoted(id, quote).unwrap_or_default(),
     }
+}
+
+/// The subject of a report row as `subject_words` writes it, with the parents in the order the policy reads them in. A row whose parents the policy can't place gets the ones the row gives, in the order of their names, and an id that isn't a scalar is written as JSON.
+pub fn row_subject_words(row: &Value, policy: &Value) -> String {
+    row_subject_words_quoted(row, policy, &|text| {
+        Value::String(text.to_string()).to_string()
+    })
+}
+
+/// `row_subject_words`, with an id that needs quotes written by `quote` in place of JSON.
+pub fn row_subject_words_quoted(
+    row: &Value,
+    policy: &Value,
+    quote: &dyn Fn(&str) -> String,
+) -> String {
+    let subject = &row["subject"];
+    let kind = subject["type"].as_str().unwrap_or_default();
+    let plain =
+        |id: &Value| id_text(id).map_or_else(|| Value::String(id.to_string()), |_| id.clone());
+    let id = match &subject["id"] {
+        Value::Null => None,
+        Value::String(own) if own == kind && kind.starts_with('$') => None,
+        id => Some(plain(id)),
+    };
+    let parents = parents_of(row, policy).unwrap_or_else(|_| {
+        subject["in"]
+            .as_object()
+            .into_iter()
+            .flatten()
+            .map(|(name, id)| (name.clone(), plain(id)))
+            .collect()
+    });
+    written_subject(kind, id.as_ref(), &parents, None, false, quote)
 }
 
 /// The subject a check line names, with its id, if it has one, and each parent after `in`, like `artifact web in deployment d1`.
 pub fn subject_words(subject: &str, id: Option<&Value>, parents: &[(String, Value)]) -> String {
-    written_subject(subject, id, parents, None, false)
+    written_subject(subject, id, parents, None, false, &|text| {
+        Value::String(text.to_string()).to_string()
+    })
 }
 
 fn written_subject(
@@ -397,14 +436,18 @@ fn written_subject(
     parents: &[(String, Value)],
     own: Option<&str>,
     quoted: bool,
+    quote: &dyn Fn(&str) -> String,
 ) -> String {
     let mut text = match id {
-        Some(id) => format!("{subject} {}", id_written(id, quoted)),
+        Some(id) => format!("{subject} {}", id_written(id, quoted, quote)),
         None if parents.is_empty() && own == Some(subject) => String::new(),
         None => subject.to_string(),
     };
     for (parent, parent_id) in parents {
-        text.push_str(&format!(" in {parent} {}", id_written(parent_id, quoted)));
+        text.push_str(&format!(
+            " in {parent} {}",
+            id_written(parent_id, quoted, quote)
+        ));
     }
     text
 }
@@ -416,6 +459,7 @@ fn write(line: &CheckLine, own: &str, quoted: bool) -> String {
         &line.parents,
         Some(own),
         quoted,
+        &|text| Value::String(text.to_string()).to_string(),
     );
     let check = &line.check;
     let said = match (check == APPLIES, line.passes, &line.because) {

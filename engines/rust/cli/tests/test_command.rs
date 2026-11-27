@@ -50,7 +50,7 @@ fn args(args: &[&str]) -> Vec<String> {
 fn help_lists_test_format_outcome_and_strict_as_experimental() {
     let usage = ergo_policy_cli::USAGE;
     for needle in [
-        "\n       ergo report --format outcome --policy <file> --input <file> [--params <file>] [--fail]\n       ergo test <policy file> [--strict] [--engine rust|rego] [--ergo-rego <file>]\n       ergo report|violations ... [--engine rust|rego] [--ergo-rego <file>]\n",
+        "\n       ergo report --format outcome|pretty --policy <file> --input <file> [--params <file>] [--fail]\n       ergo report --format pretty ... [--show failed|all] [--color auto|always|never]\n       ergo test <policy file> [--strict] [--show failed|all] [--color auto|always|never] [--engine rust|rego] [--ergo-rego <file>]\n       ergo report|violations ... [--engine rust|rego] [--ergo-rego <file>]\n",
         "\n  test         experimental: run the examples in a policy\n",
         "\n--engine rego builds the report with ergo.rego through opa, in place of the\nRust engine, for report, violations and test. The path of ergo.rego is\n--ergo-rego, or ERGO_REGO when that flag isn't given, and it is never looked\nfor on its own. opa is the one on the PATH, or ERGO_OPA when it's set.\n",
         "\n  1  with --fail, a check failed; with test, an example failed, or --strict and a warning\n",
@@ -197,7 +197,7 @@ fn format_takes_json_or_outcome_and_outcome_only_with_report() {
     let cases = [
         (
             vec!["report", "--format", "xml"],
-            "--format must be json or outcome",
+            "--format must be json, outcome or pretty",
         ),
         (
             vec!["violations", "--format", "outcome"],
