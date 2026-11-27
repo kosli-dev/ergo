@@ -299,3 +299,16 @@ test_a_named_by_key_that_is_the_first_lines_alias_in_the_second_lines_whose_is_r
 		[[x.fl, x.ms] | some x in ergo._for_second_roots(check, subj)] == c[1] with input as {"ergo/names": names}
 	}
 }
+
+test_a_named_by_key_that_is_the_first_lines_alias_in_the_second_lines_whose_is_left_to_the_items_of_the_second_list_when_it_has_some if {
+	every c in [
+		["every xs as x, every es whose zz is m named by x as e", {"xs": ["q", 3], "es": [{"zz": 1, "v": 1, "m": {"q": 1}}]}],
+		["every xs as x, some es whose zz is m named by x as e", {"xs": ["q", 3], "es": [{"zz": 1, "v": 1, "m": {"q": 1}}]}],
+		["every xs, if any, as x, first of es whose zz is m named by x sorted by v as e", {"xs": [3], "es": [3]}],
+		["every xs as x, every es whose zz is m named by x, if any, as e", {"xs": [null], "es": [{"zz": 1, "v": 1}]}],
+	] {
+		check := ergo._s_written_check({"for": c[0], "assert": "e.v is 1"})
+		names := {"ergo/subject": c[1], "$at": {"names": {}}}
+		ergo._for_second_roots(check, c[1]) == [] with input as {"ergo/names": names}
+	}
+}
