@@ -98,13 +98,13 @@ fn a_policy_name_with_escape_codes_reaches_the_terminal_only_as_visible_escapes(
     let never = ergo(&[&args[..], &["--color", "never"]].concat(), &[]);
     let text = out(&never);
     assert!(!never.stdout.contains(&0x1b), "{text:?}");
-    assert!(text.contains("done\\u{1b}[2J is met"), "{text:?}");
+    assert!(text.contains("done\\u{1b}[2J is not met"), "{text:?}");
     let always = out(&ergo(&[&args[..], &["--color", "always"]].concat(), &[]));
     assert!(
         always.contains('\x1b') && only_colour_codes(&always),
         "{always:?}"
     );
-    assert!(always.contains("done\\u{1b}[2J is met"), "{always:?}");
+    assert!(always.contains("done\\u{1b}[2J is not met"), "{always:?}");
 }
 
 #[test]
@@ -112,7 +112,7 @@ fn a_message_from_an_engine_with_escape_codes_reaches_the_terminal_only_as_visib
     let policy = write("engine", "policy.yaml", &POLICY.replace("{{spec}}", SPEC));
     let input = write("engine", "input.json", INPUT);
     let ergo_rego = write("engine", "ergo.rego", "package ergo\n");
-    let opa = fake_opa("engine", &hostile_report());
+    let opa = fake_opa("engine", &format!("{{\"report\": {}}}", hostile_report()));
     let args = [
         "report",
         "--format",
@@ -145,40 +145,62 @@ fn a_message_from_an_engine_with_escape_codes_reaches_the_terminal_only_as_visib
 }
 
 #[test]
-fn the_terminal_form_of_test_escapes_names_and_the_engine_line() {
+fn the_terminal_form_of_test_escapes_names_problems_warnings_and_the_engine_line() {
     let policy = write("test", "policy.yaml", &POLICY.replace("{{spec}}", SPEC));
     let ergo_rego = write("test", "ergo.rego", "package ergo\n");
     let opa = fake_opa("test", &format!("[{}]", hostile_report()));
-    for (extra, engine) in [
-        (vec!["--color", "never", "--show", "all"], false),
-        (vec!["--color", "always", "--show", "all"], false),
-        (
-            vec![
-                "--color",
-                "never",
-                "--show",
-                "all",
-                "--engine",
-                "rego",
-                "--ergo-rego",
-                &ergo_rego,
-            ],
-            true,
-        ),
+    for extra in [
+        vec!["--color", "always", "--show", "all"],
+        vec![
+            "--color",
+            "always",
+            "--show",
+            "all",
+            "--engine",
+            "rego",
+            "--ergo-rego",
+            &ergo_rego,
+        ],
     ] {
         let mut args = vec!["test", policy.as_str()];
         args.extend(extra.iter().copied());
-        let run = ergo(&args, &[("ERGO_OPA", &opa)]);
-        let text = out(&run);
-        if extra.contains(&"never") {
-            assert!(!run.stdout.contains(&0x1b), "{text:?}");
-        } else {
-            assert!(only_colour_codes(&text), "{text:?}");
-        }
+        let text = out(&ergo(&args, &[("ERGO_OPA", &opa)]));
+        assert!(only_colour_codes(&text), "{text:?}");
         assert!(!text.contains('\r') && !text.contains('\u{7}'), "{text:?}");
         assert!(text.contains("an example\\u{1b}[2J"), "{text:?}");
-        if engine {
+        assert!(
+            text.contains(
+                "no example shows approved\\u{1b}]0;title\\u{7} of done\\u{1b}[2J failing"
+            ),
+            "{text:?}"
+        );
+        if extra.contains(&"--engine") {
             assert!(text.starts_with("engine: e\\u{1b}[2J 1\n"), "{text:?}");
         }
     }
+}
+
+#[test]
+fn test_on_a_terminal_without_colour_writes_no_escape_byte_at_all() {
+    use ergo_policy_cli::{Environment, Outcome, Terminal, run_with};
+    let policy = write("terminal", "policy.yaml", &POLICY.replace("{{spec}}", SPEC));
+    let terminal = Terminal {
+        stdout: true,
+        no_color: false,
+        locale: Some("en_US.UTF-8".to_string()),
+    };
+    let arguments: Vec<String> = ["test", &policy, "--color", "never", "--show", "all"]
+        .iter()
+        .map(|a| a.to_string())
+        .collect();
+    let Ok(Outcome::PrintAndFail(text, 1)) =
+        run_with(&arguments, &Environment::default(), &terminal)
+    else {
+        panic!("not a failed run")
+    };
+    assert!(
+        !text.contains('\x1b') && !text.contains('\u{7}'),
+        "{text:?}"
+    );
+    assert!(text.starts_with("✗ an example\\u{1b}[2J\n"), "{text:?}");
 }
