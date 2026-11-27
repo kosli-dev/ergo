@@ -19,7 +19,6 @@ known_differences := {
 	"for / a named by key that is an alias of the for line, in the whose of its second list, is said for each item of the first list beside a second list that fails / fails as unusable when es is null, saying es once and then the key for the item of xs that holds 3",
 	"for / a part that holds a list is walked by a whose in `count of m.ys whose v is in pl.z is 0` / the part holds an empty list and the list has an item",
 	"for / a part that holds a list is walked in the whose of a for line and in a whose under it / an empty part fails as value",
-	"for / a sorted by on the second for line that reads the first line's alias as a named by key reads the key that alias holds for each item of the first list / passes with every and with some when x holds q, so m.q orders es and the item it picks has v 1",
 	"for / a walk through a for line's alias leaves a root after the phrase to the assertion, and each item keeps its own cause and the items of its list / an item whose list holds five items without v",
 	"for / the roots of the line's own whose come before the roots of its sentences, whatever their causes / $params.min is missing and says first, though $params.a has the worse cause",
 	"messages / nothing hides a problem / the roots come first and then each item, and the row takes the worst cause",

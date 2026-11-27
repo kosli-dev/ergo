@@ -14976,6 +14976,12 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
+        "every xs, if any, as x, first of es sorted by m named by x as e",
+        "every xs, if any, as x, first of es sorted by m named by x as e",
+        &[],
+        &[],
+    ),
+    (
         "every xs as p, first of ys whose k is p.k sorted by n as q",
         "every xs as p, first of ys whose k equals p.k sorted by n as q",
         &[],

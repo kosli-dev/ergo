@@ -114191,5 +114191,205 @@
         "compliant": true
       }
     ]
+  },
+  {
+    "description": "a sorted by on the second for line that reads the first line's alias as a named by key picks again for each item of the first list, as a whose that reads that alias does",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "t": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "t",
+          "checks": {
+            "every": {
+              "for": "every xs as x, first of es sorted by m named by x as e",
+              "assert": "e.v is 1"
+            },
+            "if_any": {
+              "for": "every xs, if any, as x, first of es sorted by m named by x as e",
+              "assert": "e.v is 1"
+            },
+            "some": {
+              "for": "some xs as x, first of es sorted by m named by x as e",
+              "assert": "e.v is 1"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "an empty xs fails every and some as value with xs is [], and passes with if any, since no item of xs picks from es",
+        "rules": [
+          "for.pick",
+          "for.named_by",
+          "for.walk",
+          "for.if_any",
+          "for.inputs",
+          "row.parts"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "xs": [],
+              "es": [
+                {
+                  "v": 1,
+                  "m": {
+                    "q": 1
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "every",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/xs"
+                    ],
+                    "name": "xs",
+                    "outcome": "usable",
+                    "value": []
+                  }
+                ],
+                "kind": "list",
+                "message": "xs is []",
+                "name": "xs"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/es/0"
+                ],
+                "name": "es[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "v": 1,
+                    "m": {
+                      "q": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "xs is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "if_any",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/es/0"
+                ],
+                "name": "es[]",
+                "value": [
+                  {
+                    "v": 1,
+                    "m": {
+                      "q": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "xs[]",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "t"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "some",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/xs"
+                    ],
+                    "name": "xs",
+                    "outcome": "usable",
+                    "value": []
+                  }
+                ],
+                "kind": "list",
+                "message": "xs is []",
+                "name": "xs"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/es/0"
+                ],
+                "name": "es[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "v": 1,
+                    "m": {
+                      "q": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "xs is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "t"
+            }
+          }
+        ],
+        "compliant": false
+      }
+    ]
   }
 ]
