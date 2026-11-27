@@ -8,6 +8,7 @@ pub mod number;
 pub mod opa;
 pub mod outcome;
 pub mod output;
+pub mod pretty;
 pub mod yaml;
 
 use args::{Command, Engine, Format, Parsed};
