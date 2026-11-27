@@ -205,6 +205,10 @@ fn reads_alias_whole(check: &Check, alias: &str) -> bool {
     })
 }
 
+fn sorts_by_alias(item: &Item, alias: &str) -> bool {
+    matches!(&item.how, How::Pick { sorted: Some(sorted), .. } if reads_path(&sorted.path, alias))
+}
+
 fn reads_path(path: &Path, alias: &str) -> bool {
     matches!(&path.start, Start::Alias(name) if name == alias)
         || path.steps.iter().any(|step| match step {
@@ -814,7 +818,8 @@ impl For {
             if depth > 0 {
                 let first = &self.items[0].alias;
                 let shared = !reads_path(&item.path, first)
-                    && !item.whose.iter().any(|check| reads_alias(check, first));
+                    && !item.whose.iter().any(|check| reads_alias(check, first))
+                    && !sorts_by_alias(item, first);
                 for entry in cands.dead.iter_mut().skip(from_list) {
                     entry.shared = shared;
                 }
@@ -2304,6 +2309,7 @@ impl For {
                 .whose
                 .iter()
                 .any(|check| reads_alias(check, &first.alias))
+            || sorts_by_alias(second, &first.alias)
         {
             return None;
         }
@@ -2542,7 +2548,8 @@ impl For {
             || second
                 .whose
                 .iter()
-                .any(|check| reads_alias(check, &first.alias));
+                .any(|check| reads_alias(check, &first.alias))
+            || sorts_by_alias(second, &first.alias);
         if !matches!(second.how, How::Pick { .. })
             || matches!(first.how, How::Pick { .. })
             || depends
@@ -3401,10 +3408,11 @@ impl For {
             return false;
         };
         matches!(second.how, How::Pick { .. })
-            && second
+            && (second
                 .whose
                 .iter()
                 .any(|check| reads_alias(check, &first.alias))
+                || sorts_by_alias(second, &first.alias))
     }
 }
 

@@ -336,3 +336,56 @@ test_a_named_by_key_that_is_the_first_lines_alias_in_the_second_lines_whose_is_l
 		ergo._for_second_roots(check, c[1]) == [] with input as {"ergo/names": names}
 	}
 }
+
+test_a_sort_key_on_the_second_for_line_named_by_the_first_lines_alias_reads_the_key_that_alias_holds_for_each_item_of_the_first_list if {
+	every c in [
+		["every xs as x, first of es sorted by m named by x as e", ["q"]],
+		["some xs as x, first of es sorted by m named by x as e", ["q"]],
+		["some xs as x, first of es sorted by m named by x as e", [3, "q"]],
+		["every xs as x, last of es sorted by m named by x as e", ["q"]],
+	] {
+		check := ergo._s_written_check({"for": c[0], "assert": "e.v is 1"})
+		subj := {"xs": c[1], "es": [{"v": 1, "m": {"q": 1}}]}
+		names := {"ergo/subject": subj, "$at": {"names": {}}}
+		ergo._for_row(check, subj).cause == "satisfied" with input as {"ergo/names": names}
+	}
+}
+
+test_a_sort_key_named_by_the_first_lines_alias_is_picked_for_each_item_of_the_first_list_as_a_whose_that_reads_it_is if {
+	every c in [
+		["every xs as x", [], "value", "xs is []"],
+		["some xs as x", [], "value", "xs is []"],
+		["every xs as x", null, "null", "xs is null"],
+		["some xs as x", null, "null", "xs is null"],
+		["every xs, if any, as x", [], "satisfied", null],
+	] {
+		every pick in ["first of", "last of"] {
+			check := ergo._s_written_check({"for": concat("", [c[0], ", ", pick, " es sorted by m named by x as e"]), "assert": "e.v is 1"})
+			subj := {"xs": c[1], "es": [{"v": 1, "m": {"q": 1}}]}
+			names := {"ergo/subject": subj, "$at": {"names": {}}}
+			r := ergo._for_row(check, subj) with input as {"ergo/names": names}
+			[r.cause, object.get(r, "message", null)] == [c[2], c[3]]
+		}
+	}
+}
+
+test_a_sort_key_named_by_the_first_lines_alias_that_cannot_be_read_is_said_under_its_item_of_the_first_list if {
+	every c in [
+		[[3], "unusable", "item 1 of xs: item 1 of es: x is 3, which isn't text"],
+		[[null], "null", "item 1 of xs: item 1 of es: x is null"],
+	] {
+		check := ergo._s_written_check({"for": "every xs as x, first of es sorted by m named by x as e", "assert": "e.v is 1"})
+		subj := {"xs": c[0], "es": [{"v": 1, "m": {"q": 1}}]}
+		names := {"ergo/subject": subj, "$at": {"names": {}}}
+		r := ergo._for_row(check, subj) with input as {"ergo/names": names}
+		[r.cause, r.message] == [c[1], c[2]]
+	}
+}
+
+test_a_tie_on_a_sort_key_named_by_the_first_lines_alias_is_said_under_its_item_of_the_first_list if {
+	check := ergo._s_written_check({"for": "every xs as x, first of es sorted by m named by x as e", "assert": "e.v is 1"})
+	subj := {"xs": ["q", "r"], "es": [{"v": 1, "m": {"q": 1, "r": 1}}, {"v": 2, "m": {"q": 1, "r": 2}}]}
+	names := {"ergo/subject": subj, "$at": {"names": {}}}
+	r := ergo._for_row(check, subj) with input as {"ergo/names": names}
+	[r.cause, r.message] == ["ambiguous", "item 1 of xs: item 1 and item 2 of es tie on m named by x"]
+}

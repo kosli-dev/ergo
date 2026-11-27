@@ -5237,3 +5237,62 @@ fn a_clause_two_sentences_give_one_item_is_said_once_whoever_owns_it() {
         ]
     );
 }
+
+#[test]
+fn a_sort_key_named_by_the_first_alias_is_picked_per_item_of_the_first_list_as_a_whose_is() {
+    let es = json!([{"v": 1, "m": {"q": 1}}]);
+    for (first, xs, cause, said) in [
+        ("every xs as x", json!([]), "value", "xs is []"),
+        ("some xs as x", json!([]), "value", "xs is []"),
+        ("every xs as x", json!(null), "null", "xs is null"),
+        ("some xs as x", json!(null), "null", "xs is null"),
+        ("every xs, if any, as x", json!([]), "satisfied", ""),
+    ] {
+        for pick in ["first of", "last of"] {
+            let line = format!("{first}, {pick} es sorted by m named by x as e");
+            assert_eq!(
+                for_row(
+                    &line,
+                    &["e.v is 1"],
+                    json!({"xs": xs.clone(), "es": es.clone()}),
+                    json!({})
+                ),
+                (cause.to_string(), said.to_string()),
+                "{line} on {xs}"
+            );
+        }
+    }
+}
+
+#[test]
+fn a_sort_key_named_by_the_first_alias_that_cannot_be_read_is_said_under_its_item_of_the_first_list()
+ {
+    let found = row(
+        "every xs as x, first of es sorted by m named by x as e",
+        json!(["e.v is 1"]),
+        json!({"xs": [3], "es": [{"v": 1, "m": {"q": 1}}]}),
+    );
+    assert_eq!(
+        entries(&found["failures"]),
+        [
+            "item item 1 of xs unusable: ",
+            "  item item 1 of es unusable: x is 3, which isn't text"
+        ]
+    );
+}
+
+#[test]
+fn a_tie_on_a_sort_key_named_by_the_first_alias_is_said_under_the_item_of_the_first_list() {
+    assert_eq!(
+        for_row(
+            "every xs as x, first of es sorted by m named by x as e",
+            &["e.v is 1"],
+            json!({"xs": ["q", "r"], "es": [{"v": 1, "m": {"q": 1, "r": 1}}, {"v": 2, "m": {"q": 1, "r": 2}}]}),
+            json!({})
+        ),
+        (
+            "ambiguous".to_string(),
+            "item 1 of xs: item 1 and item 2 of es tie on m named by x".to_string()
+        )
+    );
+}
