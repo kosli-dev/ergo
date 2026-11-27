@@ -707,6 +707,12 @@ test_a_root_the_lines_whose_reads_has_a_list_entry_when_the_row_read_no_root if 
 	ergo._for_line_rooted(check, {"xs": []}, object.union(r, {"root_msgs": []}), outside) == object.union(r, {"root_msgs": []}) with input as names with data.ergo_document as {"os": [{"name": 1}, {}]}
 }
 
+test_a_root_a_sentence_reads_through_a_list_outside_the_item_is_in_that_sentences_entry if {
+	doc := {"os": [{"name": "a"}, {"name": null}], "ps": [{"name": "a"}, {}]}
+	said := _tree_said("every xs whose v is in $input.os.name as x", ["x.w is in $input.ps.name"], {"xs": [{"v": "a", "w": "a"}]}, {}, "null") with data.ergo_document as doc
+	said["ergo/for_texts"].said == ["item 2 of $input.ps: name is missing"]
+}
+
 test_an_item_whose_lines_a_root_already_says_is_left_out if {
 	item := ergo._m_item_clause("item 2 of $input.lst", "absent", [ergo._m_clause("root", "z", "absent", "z is missing")])
 	not ergo._for_unrooted(item, {"item 2 of $input.lst: z is missing"})
