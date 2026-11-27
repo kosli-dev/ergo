@@ -5265,6 +5265,23 @@ fn a_sort_key_named_by_the_first_alias_is_picked_per_item_of_the_first_list_as_a
 }
 
 #[test]
+fn a_sort_key_named_by_the_first_alias_that_cannot_be_read_is_said_under_its_item_of_the_first_list()
+ {
+    let found = row(
+        "every xs as x, first of es sorted by m named by x as e",
+        json!(["e.v is 1"]),
+        json!({"xs": [3], "es": [{"v": 1, "m": {"q": 1}}]}),
+    );
+    assert_eq!(
+        entries(&found["failures"]),
+        [
+            "item item 1 of xs unusable: ",
+            "  item item 1 of es unusable: x is 3, which isn't text"
+        ]
+    );
+}
+
+#[test]
 fn a_tie_on_a_sort_key_named_by_the_first_alias_is_said_under_the_item_of_the_first_list() {
     assert_eq!(
         for_row(
