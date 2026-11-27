@@ -141,7 +141,8 @@ fn an_item_whose_path_goes_on_into_a_value_that_is_not_an_object_fails_as_not_an
 }
 
 #[test]
-fn an_item_that_is_not_an_object_fails_as_not_an_object_whatever_the_root_of_its_whose_fails_with() {
+fn an_item_that_is_not_an_object_fails_as_not_an_object_whatever_the_root_of_its_whose_fails_with()
+{
     let line = "every xs whose v is in $params.os.name, if any, as x";
     for (item, params) in [
         (json!(null), json!({})),
@@ -159,6 +160,17 @@ fn an_item_that_is_not_an_object_fails_as_not_an_object_whatever_the_root_of_its
             .unwrap();
         assert_eq!(entry["cause"], "not_an_object", "{row}");
     }
+}
+
+#[test]
+fn a_second_list_item_not_an_object_keeps_its_whose_roots_cause_as_ergo_rego_does() {
+    let row = row_with(
+        "every ms as m, every m.ws whose v is in $params.os.name as w",
+        json!(["w.n is 2"]),
+        json!({"ms": [{"ws": [{"v": "bob", "n": 2}, null]}]}),
+        json!({"os": [{"name": "bob"}, {}]}),
+    );
+    assert_eq!(row["cause"], "absent", "{row}");
 }
 
 #[test]

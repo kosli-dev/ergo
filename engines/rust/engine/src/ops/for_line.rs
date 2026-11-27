@@ -739,7 +739,8 @@ impl For {
                         .any(|path| super::key_base::of_path(path, false, &at).is_some())
                 });
                 let own = told.as_ref().filter(|_| keyed).map(|clause| clause.cause);
-                let off_focus = !focus.subject.value.is_object()
+                let off_focus = self.items.len() == 1
+                    && !focus.subject.value.is_object()
                     && undecided_whose().any(|(check, _)| reads_a_focus_field(check));
                 dead.push(dead_item(if off_focus {
                     Cause::NotAnObject
