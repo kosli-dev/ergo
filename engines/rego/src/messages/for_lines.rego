@@ -1137,16 +1137,25 @@ _for_row_parts(check, subj, r) := {"roots": roots, "free": free, "items": items,
 	name := _input_name(check.items[0].path)
 	after := (3 * count(check.checks)) + 2
 	failed := _for_failed_clauses(check, r, sroots)
-	items := [object.union(x, {"group": after}) | some [k, c] in failed; r.failed[k].path != name; x := _for_unrooted(c, said)]
+	items := [object.union(x, {"group": after}) | some [k, c] in failed; r.failed[k].path != name; x := _for_unrooted(_for_key_unsaid(check, c, rooted), said)]
 	listed := [object.union(c, {"kind": "list", "group": after}) | some [k, c] in failed; r.failed[k].path == name]
 	line := [object.union(_m_clause("list", t, r.cause, t), {"group": after}) | some t in _for_list_texts(check, subj, r)]
 }
 
 _for_whose_key_roots(check, r) := [_m_root_in(x.name, x.outcome, t, count(check.checks)) |
-	some x in _once([x | some item in check.items; some c in object.get(item, "whose", []); some [p, _] in _key_base_reads(c); some x in _key_flaw_entries(p)])
-	t := _for_key_text(x, x.outcome)
+	some [x, t] in _for_whose_key_texts(check)
 	not _for_key_said_by_an_item(r, t)
 ]
+
+_for_whose_key_texts(check) := [[x, _for_key_text(x, x.outcome)] |
+	some x in _once([x | some item in check.items; some c in object.get(item, "whose", []); some [p, _] in _key_base_reads(c); some x in _key_flaw_entries(p)])
+]
+
+_for_key_unsaid(check, c, rooted) := object.union(c, {"text": _m_unskipped(c.text, ks)}) if {
+	c.said == []
+	ks := [t | some [_, t] in _for_whose_key_texts(check); t in rooted]
+	ks != []
+} else := c
 
 _for_key_said_by_an_item(r, t) if {
 	some f in r.failed
