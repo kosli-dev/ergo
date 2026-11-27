@@ -285,3 +285,17 @@ test_a_list_the_whose_leaves_nothing_of_is_said_after_a_sentence_that_reads_no_a
 	ergo._for_item_parts(check, subj, r, ["z is 2"]) == [`xs is [{"v": 2}]`] with input as {"ergo/names": names}
 	ergo._for_row(check, subj).message == `z is 2; xs is [{"v": 2}]` with input as {"ergo/names": names}
 }
+
+test_a_named_by_key_that_is_the_first_lines_alias_in_the_second_lines_whose_is_read_for_each_item_of_the_first_list_even_when_the_second_list_is_empty if {
+	check := ergo._s_written_check({"for": "every xs as x, every es whose zz is m named by x, if any, as e", "assert": "e.v is 1"})
+	every c in [
+		[["q", 3], [["unusable", ["item 2 of xs: x is 3, which isn't text"]]]],
+		[[{"k": 3}], [["unusable", [`item 1 of xs: x is {"k": 3}, which isn't text`]]]],
+		[[null], [["null", ["item 1 of xs: x is null"]]]],
+		[["q"], []],
+	] {
+		subj := {"xs": c[0], "es": []}
+		names := {"ergo/subject": subj, "$at": {"names": {}}}
+		[[x.fl, x.ms] | some x in ergo._for_second_roots(check, subj)] == c[1] with input as {"ergo/names": names}
+	}
+}
