@@ -49,3 +49,13 @@ fn the_usage_for_a_call_with_no_arguments_has_the_plain_arrow_without_a_utf8_loc
         "{text}"
     );
 }
+
+#[test]
+fn outside_a_utf8_locale_the_help_has_no_glyph_at_all() {
+    for locale in [Some("C"), Some("POSIX"), None] {
+        let text = help(locale);
+        let glyphs: Vec<char> = text.chars().filter(|c| !c.is_ascii()).collect();
+        assert!(glyphs.is_empty(), "{locale:?}: {glyphs:?}");
+    }
+    assert!(help(Some("en_US.UTF-8")).contains("Glyphs (✓ ✗ ⚠ – ∴)"));
+}

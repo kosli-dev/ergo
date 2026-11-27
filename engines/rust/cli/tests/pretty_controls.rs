@@ -204,3 +204,89 @@ fn test_on_a_terminal_without_colour_writes_no_escape_byte_at_all() {
     );
     assert!(text.starts_with("✗ an example\\u{1b}[2J\n"), "{text:?}");
 }
+
+fn no_raw_control_on(output: &Output) -> String {
+    let stderr = String::from_utf8(output.stderr.clone()).unwrap();
+    assert!(!stderr.is_empty());
+    assert!(
+        stderr
+            .chars()
+            .all(|c| c == '\n' || !(c.is_control() || c == '\u{2028}' || c == '\u{202e}')),
+        "{stderr:?}"
+    );
+    stderr
+}
+
+#[test]
+fn an_example_name_with_escape_codes_reaches_stderr_only_as_visible_escapes() {
+    let wrong = POLICY
+        .replace("{{spec}}", SPEC)
+        .replace("an example\\e[2J", "x\\e]0;PWNED\\a")
+        .replace("      input:", "      bogus: 1\n      input:");
+    let policy = write("stderr-example", "policy.yaml", &wrong);
+    let output = ergo(&["test", &policy], &[]);
+    let stderr = no_raw_control_on(&output);
+    assert!(stderr.contains("x\\u{1b}]0;PWNED\\u{7}"), "{stderr:?}");
+}
+
+#[test]
+fn a_missing_file_name_with_escape_codes_reaches_stderr_only_as_visible_escapes() {
+    let policy = write("stderr-file", "policy.yaml", &POLICY.replace("{{spec}}", SPEC));
+    let output = ergo(
+        &[
+            "report",
+            "--policy",
+            &policy,
+            "--input",
+            "/no/such/in\u{1b}[2J.json",
+        ],
+        &[],
+    );
+    let stderr = no_raw_control_on(&output);
+    assert!(stderr.contains("in\\u{1b}[2J.json"), "{stderr:?}");
+}
+
+#[test]
+fn an_unknown_flag_with_escape_codes_reaches_stderr_only_as_visible_escapes() {
+    let output = ergo(&["report", "--x\u{1b}[2J"], &[]);
+    let stderr = no_raw_control_on(&output);
+    assert!(stderr.contains("--x\\u{1b}[2J"), "{stderr:?}");
+}
+
+#[test]
+fn what_opa_prints_on_stderr_with_escape_codes_reaches_stderr_only_as_visible_escapes() {
+    use std::os::unix::fs::PermissionsExt;
+    let policy = write("stderr-opa", "policy.yaml", &POLICY.replace("{{spec}}", SPEC));
+    let input = write("stderr-opa", "input.json", INPUT);
+    let ergo_rego = write("stderr-opa", "ergo.rego", "package ergo\n");
+    let opa = write(
+        "stderr-opa",
+        "opa",
+        "#!/bin/sh\nprintf 'boom\\033]0;PWNED\\007\\033[2J\\n' >&2\nexit 1\n",
+    );
+    fs::set_permissions(&opa, fs::Permissions::from_mode(0o755)).unwrap();
+    let output = ergo(
+        &[
+            "report",
+            "--policy",
+            &policy,
+            "--input",
+            &input,
+            "--engine",
+            "rego",
+            "--ergo-rego",
+            &ergo_rego,
+        ],
+        &[("ERGO_OPA", &opa)],
+    );
+    let stderr = no_raw_control_on(&output);
+    assert!(stderr.contains("boom\\u{1b}]0;PWNED\\u{7}"), "{stderr:?}");
+}
+
+#[test]
+fn error_line_escapes_everything_but_the_newlines_it_is_given() {
+    assert_eq!(
+        ergo_policy_cli::error_line("a\u{1b}[2J\r\u{202e}b\nc"),
+        "ergo: a\\u{1b}[2J\\u{d}\\u{202e}b\nc\n"
+    );
+}

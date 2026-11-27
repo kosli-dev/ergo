@@ -158,6 +158,11 @@ pub fn usage(terminal: &Terminal) -> String {
     }
 }
 
+/// The line `ergo` writes to stderr for a failure with `message`.
+pub fn error_line(message: &str) -> String {
+    format!("ergo: {message}\n")
+}
+
 /// What a run gives back.
 #[derive(Debug, PartialEq, Eq)]
 pub enum Outcome {

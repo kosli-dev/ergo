@@ -503,7 +503,30 @@ fn an_out_of_scope_message_and_a_status_the_report_gives_are_escaped_too() {
     };
     let text = render(&all, &json!({}), &style).unwrap();
     assert!(
-        text.contains("deployment \"d\\u001b3\" is out of scope (env is \\u{1b}[2J)"),
+        text.contains("deployment \"d\\u{1b}3\" is out of scope (env is \\u{1b}[2J)"),
+        "{text:?}"
+    );
+}
+
+#[test]
+fn line_separators_and_bidi_controls_are_written_as_visible_escapes() {
+    assert_eq!(
+        escape("a\u{2028}b\u{2029}c\u{200e}d\u{200f}e\u{202a}f\u{202e}g\u{2066}h\u{2069}i\u{61c}j"),
+        "a\\u{2028}b\\u{2029}c\\u{200e}d\\u{200f}e\\u{202a}f\\u{202e}g\\u{2066}h\\u{2069}i\\u{61c}j"
+    );
+    assert_eq!(escape("é ✓ \u{200d}"), "é ✓ \u{200d}");
+}
+
+#[test]
+fn a_status_this_ergo_does_not_know_is_escaped_inside_plain_quotes() {
+    let report = json!({
+        "compliant": false,
+        "requirements": {"b": {"status": "we\u{1b}ird\u{202e}"}},
+        "results": []
+    });
+    let text = render(&report, &json!({}), &GLYPHS).unwrap();
+    assert!(
+        text.starts_with("✗ b has status \"we\\u{1b}ird\\u{202e}\"\n"),
         "{text:?}"
     );
 }
