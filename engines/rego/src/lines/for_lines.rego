@@ -291,20 +291,39 @@ _for_second_roots(check, subj) := [{"i": e.i, "fl": fl, "ms": ms, "raw": [_m_ali
 	item := check.items[0]
 	w := _for_walk(item, subj, _for_names)
 	outer := _walk_root_msgs(check, subj)
-	conds := array.concat(object.get(check.items[1], "whose", []), _for_sentence_conds(check))
+	whose := object.get(check.items[1], "whose", [])
+	conds := array.concat(whose, _for_sentence_conds(check))
 	some e in w.items
 	wh := _for_whose(item, e, _for_names)
 	wh.undecided == []
 	wh.kept
 	names := _bound(_for_names, item.as, e.v, _walk_at(w, e))
-	some c in conds
-	fl := _root_read_flaw(subj, c) with input as {"ergo/names": names}
+	some j, c in conds
+	keys := _for_second_keys_said(item.as, c, j < count(whose)) with input as {"ergo/names": names}
+	root := _root_read_flaw(subj, c) with input as {"ergo/names": names}
+	fl := _second_flaw(root, keys)
 	not fl in _tolerated_root_flaws
 	_second_root_counts(fl)
-	said := array.concat(_m_cond_root_texts(subj, c), _m_walked_root_texts(c)) with input as {"ergo/names": names}
+	said := array.concat([k[1] | some k in keys], _second_root_texts(subj, c, root)) with input as {"ergo/names": names}
 	ms := [_m_under(_m_for_item_name(check, e.i), _m_aliased(m)) | some m in said; not m in outer]
 	ms != []
 ]
+
+_for_second_keys_said(alias, c, true) := [_second_key_said(k) | some k in _alias_or_parent_keys_unread(c); k[0] == alias]
+
+_for_second_keys_said(_, _, false) := []
+
+_second_key_said([n, null]) := ["null", concat("", [n, " is null"])]
+
+_second_key_said([n, v]) := ["unusable", _m_isnt(n, v, "text")] if v != null
+
+_second_flaw(root, keys) := _worst_of({k[0] | some k in keys} | ({root} - _tolerated_root_flaws)) if keys != []
+
+else := root
+
+_second_root_texts(subj, c, root) := [] if root in _tolerated_root_flaws
+
+else := array.concat(_m_cond_root_texts(subj, c), _m_walked_root_texts(c))
 
 _second_root_counts(fl) if fl != "value"
 
