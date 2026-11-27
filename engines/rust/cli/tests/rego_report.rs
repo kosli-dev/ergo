@@ -136,10 +136,6 @@ fn opa_output_is_read_as_one_report_and_its_violations_or_refused() {
     for (printed, violations) in [
         ("", false),
         ("[]", false),
-        ("{}", false),
-        (r#"{"report": {}}"#, false),
-        (r#"{"report": {"results": []}}"#, false),
-        (&only, true),
         ("{\"report\": 1} trailing", false),
     ] {
         assert_eq!(

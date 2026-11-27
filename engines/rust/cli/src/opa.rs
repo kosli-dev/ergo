@@ -112,9 +112,18 @@ pub fn run(
     policy: &Value,
     examples: &[Example],
 ) -> Result<Vec<Value>, String> {
-    let printed = eval(opa, ergo_rego, &data(policy, examples), QUERY)?;
+    let printed =
+        eval(opa, ergo_rego, &data(policy, examples), QUERY).map_err(names_compile)?;
     reports(&printed, examples.len())
         .map_err(|problem| format!("{problem}, with ergo.rego at {ergo_rego}"))
+}
+
+fn names_compile(problem: String) -> String {
+    if problem.starts_with("opa failed on ergo.rego") && problem.contains("ergo.compile") {
+        format!("{problem}; ergo test needs ergo.compile, which OPA.md calls experimental, and this ergo.rego doesn't have it")
+    } else {
+        problem
+    }
 }
 
 /// Builds the report of `input` and `params` for `policy`, and its violations when `violations` is set, with the `ergo.rego` at `ergo_rego`, by running `opa` once on [REPORT_QUERY] or [VIOLATIONS_QUERY], or says why it can't.
@@ -136,11 +145,11 @@ pub fn report_of(
         .map_err(|problem| format!("{problem}, with ergo.rego at {ergo_rego}"))
 }
 
-/// The query `opa eval` runs for `ergo report`: it compiles the policy once with `ergo.compile` and builds the report with `ergo.report`.
-pub const REPORT_QUERY: &str = "[x | compiled := data.ergo.compile(data.ergo_cli.policy); x := {\"report\": data.ergo.report(data.ergo_cli.input, compiled, data.ergo_cli.params)}][0]";
+/// The query `opa eval` runs for `ergo report`: the report `ergo.report` builds from the policy, the input and the params.
+pub const REPORT_QUERY: &str = "{\"report\": data.ergo.report(data.ergo_cli.input, data.ergo_cli.policy, data.ergo_cli.params)}";
 
 /// The query `opa eval` runs for `ergo violations`: [REPORT_QUERY]'s report and `ergo.violations` of it.
-pub const VIOLATIONS_QUERY: &str = "[x | compiled := data.ergo.compile(data.ergo_cli.policy); report := data.ergo.report(data.ergo_cli.input, compiled, data.ergo_cli.params); x := {\"report\": report, \"violations\": data.ergo.violations(report)}][0]";
+pub const VIOLATIONS_QUERY: &str = "[x | report := data.ergo.report(data.ergo_cli.input, data.ergo_cli.policy, data.ergo_cli.params); x := {\"report\": report, \"violations\": data.ergo.violations(report)}][0]";
 
 /// The data `opa` reads for [REPORT_QUERY] and [VIOLATIONS_QUERY]: the policy, the input and the params, under `ergo_cli`.
 pub fn one_data(policy: &Value, input: &Value, params: &Value) -> Value {
@@ -149,18 +158,21 @@ pub fn one_data(policy: &Value, input: &Value, params: &Value) -> Value {
 
 /// Reads what `opa eval --format raw` printed for [REPORT_QUERY], or for [VIOLATIONS_QUERY] when `violations` is set, as the report and its violations, or says why it can't.
 pub fn one_report(printed: &str, violations: bool) -> Result<(Value, Option<Value>), String> {
-    let wrong = || "opa printed something that isn't a report".to_string();
+    let wrong = |reason: &str| format!("opa printed something that isn't a report: {reason}");
     let Ok(Value::Object(mut printed)) = serde_json::from_str::<Value>(printed) else {
-        return Err(wrong());
+        return Err("opa printed something that isn't a report".to_string());
     };
     let report = printed
         .remove("report")
-        .filter(is_report)
-        .ok_or_else(wrong)?;
+        .ok_or_else(|| wrong("report is missing"))?;
+    if let Some(problem) = report_problem(&report, "report", "report: ") {
+        return Err(wrong(&problem));
+    }
     let violations = match (violations, printed.remove("violations")) {
         (false, _) => None,
-        (true, Some(found)) => Some(found),
-        (true, None) => return Err(wrong()),
+        (true, Some(found)) if found.is_array() => Some(found),
+        (true, Some(_)) => return Err(wrong("violations isn't a list")),
+        (true, None) => return Err(wrong("violations is missing")),
     };
     Ok((report, violations))
 }
@@ -174,7 +186,7 @@ fn write_private(path: &std::path::Path, text: &str) -> std::io::Result<()> {
     options.open(path)?.write_all(text.as_bytes())
 }
 
-/// The query `opa eval` runs: it compiles the policy once with `ergo.compile` and builds one report per example with `ergo.report`.
+/// The query `opa eval` runs for `ergo test`: it compiles the policy once with `ergo.compile`, an entry point that OPA.md calls experimental, and builds one report per example with `ergo.report`. It is the only place the CLI uses `ergo.compile`.
 pub const QUERY: &str = "[reports | compiled := data.ergo.compile(data.ergo_cli_test.policy); reports := [data.ergo.report(e.input, compiled, e.params) | e := data.ergo_cli_test.examples[_]]][0]";
 
 /// The data `opa` reads for [QUERY]: the policy, and each example's input and params in order, under `ergo_cli_test`.
@@ -186,9 +198,21 @@ pub fn data(policy: &Value, examples: &[Example]) -> Value {
     json!({"ergo_cli_test": {"policy": policy, "examples": examples}})
 }
 
-fn is_report(value: &Value) -> bool {
+fn report_problem(value: &Value, subject: &str, prefix: &str) -> Option<String> {
+    if !value.is_object() {
+        return Some(format!("{subject} isn't an object"));
+    }
     let engine = &value["engine"];
-    value["results"].is_array() && engine["name"].is_string() && engine["version"].is_string()
+    let problem = if !value["results"].is_array() {
+        "results isn't a list"
+    } else if !engine["name"].is_string() {
+        "engine.name isn't text"
+    } else if !engine["version"].is_string() {
+        "engine.version isn't text"
+    } else {
+        return None;
+    };
+    Some(format!("{prefix}{problem}"))
 }
 
 /// Reads what `opa eval --format raw` printed for [QUERY] as `count` reports, or says why it can't: each must be an object with a `results` list and an `engine` that has a `name` and a `version`.
@@ -198,8 +222,14 @@ pub fn reports(printed: &str, count: usize) -> Result<Vec<Value>, String> {
     let Ok(Value::Array(reports)) = serde_json::from_str::<Value>(printed) else {
         return Err(wrong());
     };
-    if reports.len() != count || !reports.iter().all(is_report) {
+    if reports.len() != count {
         return Err(wrong());
+    }
+    for (i, report) in reports.iter().enumerate() {
+        let subject = format!("report {}", i + 1);
+        if let Some(problem) = report_problem(report, &subject, &format!("{subject}: ")) {
+            return Err(format!("{}: {problem}", wrong()));
+        }
     }
     Ok(reports)
 }

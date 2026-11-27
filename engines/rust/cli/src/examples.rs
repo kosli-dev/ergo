@@ -304,10 +304,13 @@ pub fn check(outcome: &Value, report: &Value, policy: &Value) -> Checked {
         region.requirements.insert(name.to_string());
         let actual = outcome::status_words(&report["requirements"][name]["status"]);
         if actual != Some(words) {
-            problems.push(format!(
-                "the report says {name} {}",
-                actual.unwrap_or("has no status")
-            ));
+            problems.push(match actual {
+                Some(actual) => format!("the report says {name} {actual}"),
+                None => format!(
+                    "the report says {}",
+                    outcome::status_problem(name, &report["requirements"][name]["status"])
+                ),
+            });
         }
     };
     for item in &checked.expected {
