@@ -695,6 +695,13 @@ test_a_part_another_sentence_of_the_item_already_said_is_said_once_whichever_sen
 	_row_tree_text("every xs as m", ["m.ys exists", "m.ys named by m.k is 1"], {"xs": [{"k": "ys", "ys": null}]}, {}) == `item 1 of xs: m.ys is null, and m is {"k": "ys", "ys": null}, which isn't text`
 }
 
+test_an_alias_key_row_beside_a_root_it_cant_read_counts_only_items_after_the_third_in_and_more if {
+	xs := [{"ys": [{"v": 1}], "k": "ys"}, {"ys": [null, {"v": 0}], "k": null}, {"ys": [], "k": null}]
+	tree := _row_tree("every xs as m", ["m.ys named by m.k is 1", "every m.ys.v is at least $params.min"], {"xs": xs}, {"min": "s"})
+	not contains(ergo._m_clauses_text(ergo._m_clauses_shown(tree)), "more")
+	contains(ergo._m_clauses_text(ergo._m_clauses_shown(tree)), `item 3 of xs: m is {"k": null, "ys": []}, which isn't text`)
+}
+
 test_a_count_whose_entry_says_its_parts_under_one_item_joins_them_under_that_item if {
 	_row_tree_text("every xs as m", ["count of m.v named by m.k is 1"], {"xs": [{"v": null}]}, {}) == `item 1 of xs: m is {"v": null}, which isn't text, and m.v is null`
 }

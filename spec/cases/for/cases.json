@@ -108280,6 +108280,143 @@
     ]
   },
   {
+    "description": "first of and last of an empty list whose whose reads a key from $params that isn't text say the key, then the empty list",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "thing",
+          "checks": {
+            "first": {
+              "for": "first of es whose zz is m named by $params.k as e",
+              "assert": "e.v is 1"
+            },
+            "last": {
+              "for": "last of es whose zz is m named by $params.k as e",
+              "assert": "e.v is 1"
+            }
+          }
+        }
+      }
+    },
+    "params": {
+      "k": 3
+    },
+    "cases": [
+      {
+        "description": "fails as unusable, with the key before the list",
+        "rules": [
+          "problems.all_said",
+          "for.pick"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t",
+              "es": []
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "first",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "es[]",
+                    "outcome": "usable",
+                    "value": []
+                  }
+                ],
+                "kind": "list",
+                "message": "es is []",
+                "name": "es"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es[]",
+                "outcome": "usable",
+                "value": []
+              },
+              {
+                "locations": [
+                  "$params:/k"
+                ],
+                "name": "$params.k",
+                "outcome": "unusable",
+                "value": 3
+              }
+            ],
+            "message": "$params.k is 3, which isn't text; es is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "last",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "es[]",
+                    "outcome": "usable",
+                    "value": []
+                  }
+                ],
+                "kind": "list",
+                "message": "es is []",
+                "name": "es"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es[]",
+                "outcome": "usable",
+                "value": []
+              },
+              {
+                "locations": [
+                  "$params:/k"
+                ],
+                "name": "$params.k",
+                "outcome": "unusable",
+                "value": 3
+              }
+            ],
+            "message": "$params.k is 3, which isn't text; es is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
       "description": "a for line whose list fails, with a sentence that reads no alias",
       "policy": {
         "ergo_spec": "{{spec}}",
@@ -110352,6 +110489,116 @@
         }
       ]
     },
+  {
+    "description": "a for line sorted by a key from $params that isn't text says the key before an item that isn't an object",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "for": "first of xs sorted by m named by $params.k as x",
+              "assert": "x.v is 1"
+            }
+          }
+        }
+      }
+    },
+    "params": {
+      "k": 3
+    },
+    "cases": [
+      {
+        "description": "fails as not_an_object, with the key first and then the item",
+        "rules": [
+          "problems.where_said",
+          "problems.all_said"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t",
+              "xs": [
+                "s",
+                {
+                  "m": {},
+                  "v": 2
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "not_an_object",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "not_an_object",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/xs/0"
+                    ],
+                    "name": "xs[0].m",
+                    "outcome": "not_an_object",
+                    "value": null
+                  }
+                ],
+                "kind": "item",
+                "locations": [
+                  "/things/0/xs/0"
+                ],
+                "message": "item 1 of xs is \"s\", which isn't an object",
+                "name": "item 1 of xs",
+                "value": "s"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/xs/0",
+                  "/things/0/xs/1"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  "s",
+                  {
+                    "m": {},
+                    "v": 2
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "$params:/k"
+                ],
+                "name": "$params.k",
+                "outcome": "unusable",
+                "value": 3
+              }
+            ],
+            "message": "$params.k is 3, which isn't text; item 1 of xs is \"s\", which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
     {
       "description": "a for line's sentence reads a field it can't use",
       "policy": {
