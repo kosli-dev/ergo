@@ -112539,5 +112539,128 @@
         ]
       }
     ]
+  },
+  {
+    "cases": [
+      {
+        "compliant": false,
+        "description": "fails as unusable when the key x isn't text, with es empty, and the path .k after it is not read from x",
+        "input": {
+          "things": [
+            {
+              "es": [],
+              "id": "a",
+              "xs": [
+                {
+                  "k": 3
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "count of es whose zz equals m named by x.k",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/xs/0"
+                    ],
+                    "message": "x is {\"k\": 3}, which isn't text",
+                    "name": "item 1 of xs",
+                    "value": {
+                      "k": 3
+                    }
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "es[]",
+                    "outcome": "usable",
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/c/assert"
+                ],
+                "message": "",
+                "name": "count of es whose zz equals m named by x.k is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es[]",
+                "outcome": "usable",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/things/0/xs/0"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "k": 3
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of xs: x is {\"k\": 3}, which isn't text",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "t"
+            }
+          }
+        ],
+        "rules": [
+          "for.named_by",
+          "for.roots",
+          "for.try",
+          "for.pass",
+          "tally.whose"
+        ]
+      }
+    ],
+    "description": "a named by key that is an alias of the for line is read before any item of the counted list, so it fails on an empty list too",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "requirements": {
+        "r": {
+          "checks": {
+            "c": {
+              "assert": "count of es whose zz is m named by x.k is 0",
+              "for": "every xs as x"
+            }
+          },
+          "subject": "t"
+        }
+      },
+      "subjects": {
+        "t": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      }
+    }
   }
 ]
