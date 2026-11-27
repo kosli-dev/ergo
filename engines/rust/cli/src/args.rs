@@ -24,17 +24,28 @@ pub enum Format {
     Pretty,
 }
 
+/// How a file read from standard input is written, from `--stdin-format`.
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+pub enum StdinFormat {
+    /// `--stdin-format json`
+    Json,
+    /// `--stdin-format yaml`
+    Yaml,
+}
+
 /// What the command line asks for.
 #[derive(Debug, PartialEq, Eq)]
 pub struct Options {
     /// The command to run.
     pub command: Command,
-    /// Path of the policy file.
+    /// Path of the policy file, or `-` for standard input.
     pub policy: String,
-    /// Path of the input file.
+    /// Path of the input file, or `-` for standard input.
     pub input: String,
-    /// Path of the params file, when given.
+    /// Path of the params file, when given, or `-` for standard input.
     pub params: Option<String>,
+    /// How standard input is written, when one of the paths is `-`.
+    pub stdin_format: Option<StdinFormat>,
     /// Whether to print one line.
     pub compact: bool,
     /// Whether to exit non-zero when the report isn't compliant.
@@ -63,8 +74,10 @@ pub enum Engine {
 /// What `ergo test` is asked to run.
 #[derive(Debug, PartialEq, Eq)]
 pub struct TestOptions {
-    /// Path of the policy file that holds the examples.
+    /// Path of the policy file that holds the examples, or `-` for standard input.
     pub policy: String,
+    /// How standard input is written, when the policy is `-`.
+    pub stdin_format: Option<StdinFormat>,
     /// Whether a warning fails the run.
     pub strict: bool,
     /// The engine that builds each example's report.
@@ -122,7 +135,7 @@ pub fn parse(arguments: &[String]) -> Result<Parsed, Failure> {
                 switches.insert(name);
             }
             "--policy" | "--input" | "--params" | "--format" | "--engine" | "--ergo-rego"
-            | "--show" | "--color" => {
+            | "--show" | "--color" | "--stdin-format" => {
                 let value = match attached {
                     Some(value) => Some(value),
                     None => rest.next().filter(|v| !v.starts_with("--")).cloned(),
@@ -156,6 +169,12 @@ pub fn parse(arguments: &[String]) -> Result<Parsed, Failure> {
         Some("never") => Color::Never,
         Some(_) => return Err(usage("--color must be auto, always or never".to_string())),
     };
+    let stdin_format = match values.get("--stdin-format").map(String::as_str) {
+        None => None,
+        Some("json") => Some(StdinFormat::Json),
+        Some("yaml") => Some(StdinFormat::Yaml),
+        Some(_) => return Err(usage("--stdin-format must be json or yaml".to_string())),
+    };
     let ergo_rego = values.remove("--ergo-rego");
     if ergo_rego.is_some() && engine != Engine::Rego {
         return Err(usage(
@@ -163,7 +182,7 @@ pub fn parse(arguments: &[String]) -> Result<Parsed, Failure> {
         ));
     }
     let Some(command) = command else {
-        let shared = ["--engine", "--show", "--color"];
+        let shared = ["--engine", "--show", "--color", "--stdin-format"];
         let report_only = values.keys().copied().filter(|v| !shared.contains(v));
         let report_only = report_only.chain(switches.iter().copied().filter(|s| *s != "--strict"));
         if let Some(flag) = report_only.min() {
@@ -178,8 +197,10 @@ pub fn parse(arguments: &[String]) -> Result<Parsed, Failure> {
         if let Some(extra) = positional.next() {
             return Err(usage(format!("unexpected argument '{extra}'")));
         }
+        check_stdin(usize::from(policy == "-"), stdin_format)?;
         return Ok(Parsed::Test(TestOptions {
             policy,
+            stdin_format,
             strict: switches.contains("--strict"),
             engine,
             ergo_rego,
@@ -219,15 +240,25 @@ pub fn parse(arguments: &[String]) -> Result<Parsed, Failure> {
             )));
         }
     }
+    let policy = values
+        .remove("--policy")
+        .ok_or_else(|| usage("--policy is missing".to_string()))?;
+    let input = values
+        .remove("--input")
+        .ok_or_else(|| usage("--input is missing".to_string()))?;
+    let params = values.remove("--params");
+    let dashes = [Some(&policy), Some(&input), params.as_ref()]
+        .into_iter()
+        .flatten()
+        .filter(|v| *v == "-")
+        .count();
+    check_stdin(dashes, stdin_format)?;
     Ok(Parsed::Run(Options {
         command,
-        policy: values
-            .remove("--policy")
-            .ok_or_else(|| usage("--policy is missing".to_string()))?,
-        input: values
-            .remove("--input")
-            .ok_or_else(|| usage("--input is missing".to_string()))?,
-        params: values.remove("--params"),
+        policy,
+        input,
+        params,
+        stdin_format,
         compact,
         fail: switches.contains("--fail"),
         format,
@@ -236,4 +267,14 @@ pub fn parse(arguments: &[String]) -> Result<Parsed, Failure> {
         show,
         color,
     }))
+}
+
+fn check_stdin(dashes: usize, format: Option<StdinFormat>) -> Result<(), Failure> {
+    let usage = |m: &str| Err(Failure::Usage(m.to_string()));
+    match (dashes, format) {
+        (0, None) | (1, Some(_)) => Ok(()),
+        (0, Some(_)) => usage("--stdin-format only goes with a value of -"),
+        (1, None) => usage("--stdin-format json or yaml is needed when a value is -"),
+        _ => usage("only one of --policy, --input and --params can be read from standard input"),
+    }
 }

@@ -1,6 +1,6 @@
 # Ergo CLI
 
-**Experimental.** The `ergo` command runs the Rust engine of Ergo. It reads a policy, an input and params from files and prints the report or the violations as JSON. It gives the same report as [`ergo.rego`](OPA.md), apart from `engine`, which says which one made it. What a policy can say, and what a report holds, is the same for both engines, so it is in the [README](README.md) and the [reference](REFERENCE.md).
+**Experimental.** The `ergo` command runs the Rust engine of Ergo. It reads a policy, an input and params from files, or from standard input, and prints the report or the violations as JSON. It gives the same report as [`ergo.rego`](OPA.md), apart from `engine`, which says which one made it. What a policy can say, and what a report holds, is the same for both engines, so it is in the [README](README.md) and the [reference](REFERENCE.md).
 
 This page follows the latest release of the CLI.
 
@@ -25,7 +25,7 @@ To build it from this repo with Docker instead, see [`engines/rust/README.md`](e
 
 ## Run a policy
 
-Write the policy of the [README](README.md#a-first-policy) in `policy.yaml`, and its input in `deployments.json`. `ergo` reads the policy, the input and the params from files, each one `.json`, `.yaml` or `.yml`. Ask for the report, or only for what went wrong:
+Write the policy of the [README](README.md#a-first-policy) in `policy.yaml`, and its input in `deployments.json`. `ergo` reads the policy, the input and the params from files, each one `.json`, `.yaml` or `.yml`, or from standard input with `-` (see [Read from standard input](#read-from-standard-input)). Ask for the report, or only for what went wrong:
 
 ```sh
 ergo report --policy policy.yaml --input deployments.json
@@ -95,6 +95,71 @@ A policy written for a newer spec than the `ergo.rego` you pass is refused. For 
 ```
 ergo: the ergo.rego at ../rel/ergo.rego refuses the policy file ok.yaml: policy ergo_spec: unsupported version v0.7-dev, expected v0.6
 ```
+
+### Read from standard input
+
+A value of `-` for `--policy`, `--input` or `--params`, or for the policy of `ergo test`, reads standard input, so the output of another tool can be piped in. Standard input has no file extension, so `--stdin-format json` or `--stdin-format yaml` says how it is written. `ergo` never guesses, because JSON is also valid YAML but the two read some values differently: `010` is 8 in YAML and a syntax error in JSON.
+
+Take this `policy.yaml`:
+
+```yaml
+ergo_spec: v0.7-dev
+subjects:
+  deployment:
+    from: deployments whose environment is "prod"
+    identified_by: id
+requirements:
+  prod_deploy:
+    description: Every production deployment is approved
+    subject: deployment
+    checks:
+      approved:
+        description: Someone approved the deployment
+        assert: approved_by is a non-empty string
+```
+
+and this `input.yaml`, whose second document `ergo` reads but doesn't check (see the warning under [Run a policy](#run-a-policy)):
+
+```yaml
+deployments:
+  - id: d1
+    environment: prod
+    approved_by: bob
+  - id: d2
+    environment: prod
+  - id: d3
+    environment: staging
+---
+kind: Other
+```
+
+```sh
+cat input.yaml | ergo report --format pretty --color never --policy policy.yaml --input - --stdin-format yaml
+```
+
+```
+✗ prod_deploy is not met
+    ✗ deployment d2 fails approved
+      because approved_by is missing
+
+  8 rows: 6 passed, 1 failed, 1 out of scope
+
+∴ not compliant
+```
+
+Standard input is read once, so only one of `--policy`, `--input` and `--params` can be `-`. The rules for a file are the rules for standard input: the same reader, only the first YAML document counts and the others must still be valid YAML, the same errors and the same exit codes, and the messages say `standard input` where they say a file. It works with `--engine rego` too. Nothing changes for a path that is a file. `ergo` reads standard input last, after it has checked the command line and read every file, so a mistake that needs no input is reported at once, even when the tool that feeds standard input hasn't finished. Each of these exits 2, prints no report and says why on one line of stderr:
+
+| What                                            | Message                                                                                        |
+| ----------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| A `-` with no `--stdin-format`                  | `--stdin-format json or yaml is needed when a value is -`                                      |
+| A `--stdin-format` other than `json` and `yaml` | `--stdin-format must be json or yaml`                                                          |
+| A `--stdin-format` with no value of `-`         | `--stdin-format only goes with a value of -`                                                   |
+| Two or more values of `-`                       | `only one of --policy, --input and --params can be read from standard input`                   |
+| Standard input that is a terminal               | `standard input is a terminal; pipe the input in`                                              |
+| Standard input that isn't UTF-8                 | `can't read the input on standard input: stream did not contain valid UTF-8`                   |
+| Standard input that isn't valid JSON or YAML    | `the input on standard input isn't valid JSON: EOF while parsing an object at line 2 column 0` |
+
+Empty standard input is read as an empty file is: it is an error for `json`, and `null` for `yaml`.
 
 ### A view for a terminal
 

@@ -11,8 +11,9 @@ pub mod output;
 pub mod pretty;
 pub mod yaml;
 
-use args::{Command, Engine, Format, Parsed};
+use args::{Command, Engine, Format, Parsed, StdinFormat};
 use std::ffi::{OsStr, OsString};
+use std::io::IsTerminal;
 
 /// Why a run failed. The message is one line and names the problem and the file.
 #[derive(Debug, PartialEq, Eq)]
@@ -107,9 +108,10 @@ pub const USAGE: &str =
     "∴ ergo: what follows from the evidence
 
 Usage: ergo <command> --policy <file> --input <file> [--params <file>] [--compact] [--fail]
+       ergo report|violations ... --policy|--input|--params - --stdin-format json|yaml
        ergo report --format outcome|pretty --policy <file> --input <file> [--params <file>] [--fail]
        ergo report --format pretty ... [--show failed|all] [--color auto|always|never]
-       ergo test <policy file> [--strict] [--show failed|all] [--color auto|always|never] [--engine rust|rego] [--ergo-rego <file>]
+       ergo test <policy file> [--strict] [--show failed|all] [--color auto|always|never] [--engine rust|rego] [--ergo-rego <file>] [--stdin-format json|yaml]
        ergo report|violations ... [--engine rust|rego] [--ergo-rego <file>]
 
 Commands:
@@ -121,6 +123,8 @@ Commands:
 ergo --version prints the version and the commit it was built from.
 
 Files can be .json, .yaml or .yml. Without --params the params are {}.
+A value of - for --policy, --input or --params (or the policy of test) reads
+standard input, once, and --stdin-format json|yaml says how it is written.
 The output is pretty-printed with sorted keys; --compact prints one line.
 
 Experimental: --format outcome prints the report as outcome lines in YAML,
@@ -226,20 +230,39 @@ fn resolve_ergo_rego(
     }
 }
 
+fn read_stdin(what: &str) -> Result<String, Failure> {
+    let stdin = std::io::stdin();
+    let is_terminal = stdin.is_terminal();
+    files::read_stdin_from(what, is_terminal, &mut stdin.lock())
+}
+
 fn test(
     options: args::TestOptions,
     environment: &Environment,
     terminal: &Terminal,
 ) -> Result<Outcome, Failure> {
     let ergo_rego = resolve_ergo_rego(options.engine, options.ergo_rego, environment, "test")?;
-    let policy = files::load("policy", &options.policy)?;
+    let (policy, repeated) = match options.stdin_format.filter(|_| options.policy == "-") {
+        Some(format) => {
+            let text = read_stdin("policy")?;
+            let repeated = match format {
+                StdinFormat::Yaml => files::repeated_keys_in(&text),
+                StdinFormat::Json => Vec::new(),
+            };
+            (files::parse_stdin("policy", &text, format)?, repeated)
+        }
+        None => (
+            files::load("policy", &options.policy)?,
+            files::repeated_keys(&options.policy),
+        ),
+    };
     let written_wrong = |problem| {
         Failure::File(format!(
-            "the examples in the policy file {} are written wrong: {problem}",
-            options.policy
+            "the examples in {} are written wrong: {problem}",
+            files::name("policy", &options.policy)
         ))
     };
-    examples::repeated(&files::repeated_keys(&options.policy)).map_err(written_wrong)?;
+    examples::repeated(&repeated).map_err(written_wrong)?;
     let examples = examples::read(&policy).map_err(written_wrong)?;
     let (engine, reports) = match ergo_rego {
         None => (
@@ -254,8 +277,8 @@ fn test(
             let reports = opa::run(opa, &ergo_rego, &policy, &examples).map_err(Failure::Engine)?;
             if let Some(problem) = reports.iter().find_map(opa::unsupported_spec) {
                 return Err(Failure::Engine(format!(
-                    "the ergo.rego at {ergo_rego} refuses the policy file {}: {problem}",
-                    options.policy
+                    "the ergo.rego at {ergo_rego} refuses {}: {problem}",
+                    files::name("policy", &options.policy)
                 )));
             }
             (opa::engine_line(&reports[0]), reports)
@@ -300,11 +323,16 @@ pub fn run_with(
         Parsed::Run(options) => options,
         Parsed::Test(options) => return test(options, environment, terminal),
     };
-    let policy = files::load("policy", &options.policy)?;
-    let input = files::load("input", &options.input)?;
+    let format = options.stdin_format;
+    let file_or_later = |what: &str, path: &str| match path {
+        "-" => Ok(None),
+        path => files::load(what, path).map(Some),
+    };
+    let policy = file_or_later("policy", &options.policy)?;
+    let input = file_or_later("input", &options.input)?;
     let params = match &options.params {
-        Some(path) => files::load("params", path)?,
-        None => serde_json::json!({}),
+        Some(path) => file_or_later("params", path)?,
+        None => Some(serde_json::json!({})),
     };
     let command_name = match options.command {
         Command::Report => "report",
@@ -312,6 +340,16 @@ pub fn run_with(
     };
     let ergo_rego =
         resolve_ergo_rego(options.engine, options.ergo_rego, environment, command_name)?;
+    let from_stdin = |what: &str, value: Option<serde_json::Value>| match (value, format) {
+        (Some(value), _) => Ok(value),
+        (None, Some(format)) => files::parse_stdin(what, &read_stdin(what)?, format),
+        (None, None) => Err(Failure::Usage(
+            "--stdin-format json or yaml is needed when a value is -".to_string(),
+        )),
+    };
+    let policy = from_stdin("policy", policy)?;
+    let input = from_stdin("input", input)?;
+    let params = from_stdin("params", params)?;
     let (report, rego_violations) = match ergo_rego {
         None => (ergo_policy_engine::report(&input, &policy, &params), None),
         Some(ergo_rego) => {
@@ -322,8 +360,8 @@ pub fn run_with(
                     .map_err(Failure::Engine)?;
             if let Some(problem) = opa::unsupported_spec(&report) {
                 return Err(Failure::Engine(format!(
-                    "the ergo.rego at {ergo_rego} refuses the policy file {}: {problem}",
-                    options.policy
+                    "the ergo.rego at {ergo_rego} refuses {}: {problem}",
+                    files::name("policy", &options.policy)
                 )));
             }
             (report, found)
@@ -331,21 +369,25 @@ pub fn run_with(
     };
     let code = if options.fail { fail_code(&report) } else { 0 };
     let text = match (options.command, options.format) {
-        (_, Format::Outcome) => {
-            outcome::yaml(&outcome::of(&report, &policy).map_err(|problem| match code {
+        (_, Format::Outcome) => outcome::yaml(&outcome::of(&report, &policy).map_err(
+            |problem| match code {
                 3 => Failure::WrittenWrong(format!(
-                    "the policy file {} is written wrong, so the report can't be shown as an outcome: {problem}",
-                    options.policy
+                    "{} is written wrong, so the report can't be shown as an outcome: {problem}",
+                    files::name("policy", &options.policy)
                 )),
                 _ => Failure::Unsupported(problem),
-            })?)
-        }
+            },
+        )?),
         (_, Format::Pretty) => {
             let style = terminal.style(options.color, options.show);
             pretty::render(&report, &policy, &style).map_err(|problem| {
+                let from = if options.policy == "-" {
+                    "standard input"
+                } else {
+                    &options.policy
+                };
                 Failure::Unsupported(format!(
-                    "--format pretty can't show the report from {}: {problem}",
-                    options.policy
+                    "--format pretty can't show the report from {from}: {problem}"
                 ))
             })?
         }
