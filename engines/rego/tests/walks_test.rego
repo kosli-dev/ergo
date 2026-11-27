@@ -2187,17 +2187,17 @@ test_a_whose_key_that_cant_be_read_is_said_when_its_walk_sits_beside_another_sen
 	_key_rows(checks, {"z": 2}, {}) == {
 		"assert": ["absent", "$params.k is missing; es is missing; ys is missing"],
 		"option": ["absent", "a: $params.k is missing; es is missing; b: ys is missing"],
-		"for": ["absent", "$params.k is missing; z is 2; es is missing"],
+		"for": ["absent", "z is 2; $params.k is missing; es is missing"],
 	}
 	_key_rows(checks, {"z": 2, "es": []}, {"k": 3}) == {
 		"assert": ["unusable", "$params.k is 3, which isn't text; es is []; ys is missing"],
 		"option": ["unusable", "a: $params.k is 3, which isn't text; es is []; b: ys is missing"],
-		"for": ["unusable", "$params.k is 3, which isn't text; z is 2; es is []"],
+		"for": ["unusable", "z is 2; $params.k is 3, which isn't text; es is []"],
 	}
 	_key_rows(checks, {"z": 2, "es": [{"zz": 2, "m": {"a": 1}, "v": 1}]}, {"k": 3}) == {
 		"assert": ["unusable", "$params.k is 3, which isn't text; ys is missing"],
 		"option": ["unusable", "a: $params.k is 3, which isn't text; b: ys is missing"],
-		"for": ["unusable", "$params.k is 3, which isn't text; z is 2"],
+		"for": ["unusable", "z is 2; $params.k is 3, which isn't text"],
 	}
 }
 
