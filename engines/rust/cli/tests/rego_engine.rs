@@ -53,15 +53,6 @@ fn opa_output_is_read_as_one_report_per_example_or_refused() {
         ("[] trailing", 0),
         (&two, 1),
         (&two, 3),
-        ("[{}]", 1),
-        ("[1]", 1),
-        (
-            r#"[{"engine": {"name": "ergo-rego", "version": "1"}, "results": {}}]"#,
-            1,
-        ),
-        (r#"[{"engine": {"name": "ergo-rego"}, "results": []}]"#, 1),
-        (r#"[{"engine": "ergo-rego 1", "results": []}]"#, 1),
-        (r#"[{"results": []}]"#, 1),
     ];
     for (printed, count) in refused {
         assert_eq!(
@@ -70,6 +61,36 @@ fn opa_output_is_read_as_one_report_per_example_or_refused() {
                 "opa printed something that isn't a report for each of the {count} examples"
             )),
             "{printed} {count}"
+        );
+    }
+}
+
+#[test]
+fn opa_output_that_is_not_a_report_says_what_is_wrong_with_it() {
+    let reasons = [
+        ("[1]", "report 1 isn't an object"),
+        ("[{}]", "report 1: results isn't a list"),
+        (
+            r#"[{"engine": {"name": "ergo-rego", "version": "1"}, "results": {}}]"#,
+            "report 1: results isn't a list",
+        ),
+        (
+            r#"[{"engine": {"name": "ergo-rego"}, "results": []}]"#,
+            "report 1: engine.version isn't text",
+        ),
+        (
+            r#"[{"engine": "ergo-rego 1", "results": []}]"#,
+            "report 1: engine.name isn't text",
+        ),
+        (r#"[{"results": []}]"#, "report 1: engine.name isn't text"),
+    ];
+    for (printed, reason) in reasons {
+        assert_eq!(
+            opa::reports(printed, 1),
+            Err(format!(
+                "opa printed something that isn't a report for each of the 1 examples: {reason}"
+            )),
+            "{printed}"
         );
     }
 }
@@ -254,9 +275,7 @@ fn engine_rego_needs_the_path_of_ergo_rego_and_the_rust_engine_refuses_it() {
             &args(&["test", "--engine", "rego", &policy]),
             &Environment::default()
         ),
-        Err(Failure::Usage(
-            "--engine rego needs the path of ergo.rego, in --ergo-rego or ERGO_REGO".to_string()
-        ))
+        Err(Failure::Usage(ergo_policy_cli::get::missing("test")))
     );
     for engine in [vec![], vec!["--engine", "rust"]] {
         let all = [vec!["test", policy.as_str()], engine].concat();
@@ -288,8 +307,9 @@ fn engine_rego_fails_closed_when_ergo_rego_cannot_be_read() {
                 &args(&["test", "--engine", "rego", &policy]),
                 &with_rego(&path)
             ),
-            Err(Failure::Engine(format!(
-                "can't read ergo.rego at {path}: {problem}"
+            Err(Failure::Engine(ergo_policy_cli::get::unreadable(
+                &format!("can't read ergo.rego at {path}: {problem}"),
+                "test"
             ))),
         );
     }
@@ -298,8 +318,9 @@ fn engine_rego_fails_closed_when_ergo_rego_cannot_be_read() {
             &args(&["test", "--engine", "rego", "--ergo-rego", &missing, &policy]),
             &with_rego(&folder),
         ),
-        Err(Failure::Engine(format!(
-            "can't read ergo.rego at {missing}: No such file or directory (os error 2)"
+        Err(Failure::Engine(ergo_policy_cli::get::unreadable(
+            &format!("can't read ergo.rego at {missing}: No such file or directory (os error 2)"),
+            "test"
         )))
     );
 }
@@ -318,6 +339,26 @@ fn with_opa(ergo_rego: &str, opa: std::ffi::OsString) -> Environment {
         ergo_rego: Some(ergo_rego.to_string()),
         opa: Some(opa),
     }
+}
+
+#[cfg(unix)]
+#[test]
+fn engine_rego_names_ergo_compile_when_opa_cannot_find_it_in_ergo_rego() {
+    let policy = file("no-compile", "policy.yaml", POLICY);
+    let ergo_rego = file("no-compile", "ergo.rego", "package ergo\n");
+    let opa = fake_opa(
+        "no-compile",
+        "echo '1 error occurred: 1:18: rego_type_error: undefined function data.ergo.compile' >&2\nexit 2\n",
+    );
+    assert_eq!(
+        run_in(
+            &args(&["test", "--engine", "rego", &policy]),
+            &with_opa(&ergo_rego, opa)
+        ),
+        Err(Failure::Engine(format!(
+            "opa failed on ergo.rego at {ergo_rego}: 1 error occurred: 1:18: rego_type_error: undefined function data.ergo.compile; ergo test needs ergo.compile, which OPA.md calls experimental, and this ergo.rego doesn't have it"
+        )))
+    );
 }
 
 #[cfg(unix)]
@@ -344,7 +385,10 @@ fn engine_rego_fails_closed_when_opa_is_missing_fails_or_prints_no_reports() {
             format!("opa failed on ergo.rego at {ergo_rego}: first line"),
         ),
         (fake_opa("opa-silent", "exit 0\n"), not_reports.clone()),
-        (fake_opa("opa-junk", "echo '[1, 2]'\n"), not_reports),
+        (
+            fake_opa("opa-junk", "echo '[1, 2]'\n"),
+            not_reports.replace(" examples,", " examples: report 1 isn't an object,"),
+        ),
     ];
     for (opa, message) in cases {
         let got = run_in(
@@ -505,9 +549,15 @@ fn engine_and_ergo_rego_are_refused_where_they_do_not_go() {
         ),
         (
             vec![
-                "report", "--policy", "p.yaml", "--input", "i.json", "--engine", "rego",
+                "report",
+                "--policy",
+                "p.yaml",
+                "--input",
+                "i.json",
+                "--ergo-rego",
+                "e.rego",
             ],
-            "--engine only goes with test",
+            "--ergo-rego only goes with --engine rego",
         ),
         (
             vec![
@@ -516,10 +566,16 @@ fn engine_and_ergo_rego_are_refused_where_they_do_not_go() {
                 "p.yaml",
                 "--input",
                 "i.json",
-                "--ergo-rego",
-                "e.rego",
+                "--engine",
+                "opa",
             ],
-            "--ergo-rego only goes with test",
+            "--engine must be rust or rego",
+        ),
+        (
+            vec![
+                "report", "--policy", "p.yaml", "--input", "i.json", "--strict",
+            ],
+            "--strict only goes with test",
         ),
     ];
     for (all, message) in cases {

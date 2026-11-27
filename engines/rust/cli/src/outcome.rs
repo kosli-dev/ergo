@@ -624,6 +624,14 @@ pub fn status_words(status: &Value) -> Option<&'static str> {
     }
 }
 
+/// What is wrong with the `status` of requirement `name`: it has none, or it isn't one this ergo knows.
+pub fn status_problem(name: &str, status: &Value) -> String {
+    match status.as_str() {
+        Some(text) => format!("{name}: status {text:?} is not one this ergo knows"),
+        None => format!("{name} has no status"),
+    }
+}
+
 /// Reads a requirement line, like `released is met`, against the `requirements` of a policy or a report, and gives the requirement's name and the status words.
 pub fn requirement_line<'a>(
     text: &'a str,
@@ -731,7 +739,10 @@ fn items(
             continue;
         }
         let Some(words) = status_words(&entry["status"]) else {
-            return Err(format!("requirement {name} has no status"));
+            return Err(format!(
+                "requirement {}",
+                status_problem(name, &entry["status"])
+            ));
         };
         let text = format!("{name} {words}");
         if strict && !lines.is_empty() && heading(&text, &report["requirements"]).is_err() {

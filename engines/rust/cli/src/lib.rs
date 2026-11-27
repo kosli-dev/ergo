@@ -3,6 +3,7 @@
 pub mod args;
 pub mod examples;
 pub mod files;
+pub mod get;
 pub mod number;
 pub mod opa;
 pub mod outcome;
@@ -23,14 +24,14 @@ pub enum Failure {
     Unsupported(String),
     /// With `--fail`, the policy is written wrong and the output asked for can't show the report.
     WrittenWrong(String),
-    /// Experimental: `ergo test --engine rego` can't read `ergo.rego` or run `opa`, `opa` failed or printed something that isn't a report, or `ergo.rego` doesn't support the policy's `ergo_spec`.
+    /// `--engine rego` can't read `ergo.rego` or run `opa`, `opa` failed or printed something that isn't a report, or `ergo.rego` doesn't support the policy's `ergo_spec`.
     Engine(String),
 }
 
 /// The environment variables `ergo` reads. An empty one counts as not set.
 #[derive(Debug, Default, Clone, PartialEq, Eq)]
 pub struct Environment {
-    /// `ERGO_REGO`: the path of `ergo.rego` for `ergo test --engine rego` when `--ergo-rego` isn't given.
+    /// `ERGO_REGO`: the path of `ergo.rego` for `--engine rego` when `--ergo-rego` isn't given.
     pub ergo_rego: Option<String>,
     /// `ERGO_OPA`: the `opa` command to run, in place of the `opa` on the PATH.
     pub opa: Option<OsString>,
@@ -73,6 +74,7 @@ pub const USAGE: &str =
     "Usage: ergo <command> --policy <file> --input <file> [--params <file>] [--compact] [--fail]
        ergo report --format outcome --policy <file> --input <file> [--params <file>] [--fail]
        ergo test <policy file> [--strict] [--engine rust|rego] [--ergo-rego <file>]
+       ergo report|violations ... [--engine rust|rego] [--ergo-rego <file>]
 
 Commands:
   report       print the report as JSON
@@ -89,9 +91,10 @@ Experimental: --format outcome prints the report as outcome lines in YAML,
 ready to paste into an example. test --strict also fails when no example
 shows a check failing, or none shows it passing.
 
-test --engine rego builds each report with ergo.rego through opa, in place
-of the Rust engine. The path of ergo.rego is --ergo-rego, or ERGO_REGO when
-that flag isn't given. opa is the one on the PATH, or ERGO_OPA when it's set.
+--engine rego builds the report with ergo.rego through opa, in place of the
+Rust engine, for report, violations and test. The path of ergo.rego is
+--ergo-rego, or ERGO_REGO when that flag isn't given, and it is never looked
+for on its own. opa is the one on the PATH, or ERGO_OPA when it's set.
 
 Exit codes:
   0  the output was printed: the policy is met, or --fail isn't given
@@ -131,23 +134,34 @@ pub fn run(arguments: &[String]) -> Result<Outcome, Failure> {
     run_in(arguments, &Environment::default())
 }
 
-fn test(options: args::TestOptions, environment: &Environment) -> Result<Outcome, Failure> {
-    let ergo_rego = match (options.engine, options.ergo_rego, &environment.ergo_rego) {
-        (Engine::Rust, _, None) => None,
+fn resolve_ergo_rego(
+    engine: Engine,
+    option: Option<String>,
+    environment: &Environment,
+    command: &str,
+) -> Result<Option<String>, Failure> {
+    let path = match (engine, option, &environment.ergo_rego) {
+        (Engine::Rust, _, None) => return Ok(None),
         (Engine::Rust, _, Some(_)) => {
             return Err(Failure::Usage(
                 "ERGO_REGO is set, and it only goes with --engine rego".to_string(),
             ));
         }
-        (Engine::Rego, Some(path), _) => Some(path),
-        (Engine::Rego, None, Some(path)) => Some(path.clone()),
-        (Engine::Rego, None, None) => {
-            return Err(Failure::Usage(
-                "--engine rego needs the path of ergo.rego, in --ergo-rego or ERGO_REGO"
-                    .to_string(),
-            ));
-        }
+        (Engine::Rego, Some(path), _) => path,
+        (Engine::Rego, None, Some(path)) => path.clone(),
+        (Engine::Rego, None, None) => return Err(Failure::Usage(get::missing(command))),
     };
+    match opa::check_path(&path) {
+        Ok(()) => Ok(Some(path)),
+        Err(opa::PathProblem::Colon(problem)) => Err(Failure::Engine(problem)),
+        Err(opa::PathProblem::Unreadable(problem)) => {
+            Err(Failure::Engine(get::unreadable(&problem, command)))
+        }
+    }
+}
+
+fn test(options: args::TestOptions, environment: &Environment) -> Result<Outcome, Failure> {
+    let ergo_rego = resolve_ergo_rego(options.engine, options.ergo_rego, environment, "test")?;
     let policy = files::load("policy", &options.policy)?;
     let written_wrong = |problem| {
         Failure::File(format!(
@@ -205,7 +219,29 @@ pub fn run_in(arguments: &[String], environment: &Environment) -> Result<Outcome
         Some(path) => files::load("params", path)?,
         None => serde_json::json!({}),
     };
-    let report = ergo_policy_engine::report(&input, &policy, &params);
+    let command_name = match options.command {
+        Command::Report => "report",
+        Command::Violations => "violations",
+    };
+    let ergo_rego =
+        resolve_ergo_rego(options.engine, options.ergo_rego, environment, command_name)?;
+    let (report, rego_violations) = match ergo_rego {
+        None => (ergo_policy_engine::report(&input, &policy, &params), None),
+        Some(ergo_rego) => {
+            let opa = environment.opa.as_deref().unwrap_or(OsStr::new("opa"));
+            let violations = options.command == Command::Violations;
+            let (report, found) =
+                opa::report_of(opa, &ergo_rego, &policy, &input, &params, violations)
+                    .map_err(Failure::Engine)?;
+            if let Some(problem) = opa::unsupported_spec(&report) {
+                return Err(Failure::Engine(format!(
+                    "the ergo.rego at {ergo_rego} refuses the policy file {}: {problem}",
+                    options.policy
+                )));
+            }
+            (report, found)
+        }
+    };
     let code = if options.fail { fail_code(&report) } else { 0 };
     let text = match (options.command, options.format) {
         (_, Format::Outcome) => {
@@ -219,7 +255,9 @@ pub fn run_in(arguments: &[String], environment: &Environment) -> Result<Outcome
         }
         (Command::Report, Format::Json) => output::render(&report, options.compact),
         (Command::Violations, Format::Json) => {
-            output::render(&ergo_policy_engine::violations(&report), options.compact)
+            let violations =
+                rego_violations.unwrap_or_else(|| ergo_policy_engine::violations(&report));
+            output::render(&violations, options.compact)
         }
     };
     Ok(match code {
