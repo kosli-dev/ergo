@@ -748,6 +748,10 @@ test_an_item_that_isnt_an_object_takes_the_cause_its_whose_failed_with_only_when
 	ergo._for_whose_item_cause("not_an_object") == "not_an_object"
 }
 
+test_a_sentence_whose_message_has_parts_apart_keeps_them_apart_under_its_item if {
+	_row_tree_text("every xs as m", ["m.k named by m.k is 1"], {"xs": [{"k": null}, {}]}, {}) == `item 1 of xs: m is {"k": null}, which isn't text; m.k is null; item 2 of xs: m is {}, which isn't text`
+}
+
 test_an_item_two_sentences_say_the_same_of_says_it_once_whether_or_not_it_reads_the_alias_as_written if {
 	_row_tree_text("every xs as m", ["m is $params.l", "m.v named by m.v is 1"], {"xs": [null]}, {"l": 1}) == "item 1 of xs: m is null"
 }
