@@ -12,6 +12,7 @@ known_differences := {
 	"derived / an every or some whose whose reads a root from $input through a key the item holds fails on the root, said once, when each item reads fine / the root is null",
 	"derived / an every or some whose whose reads a root from $params through a key the item holds fails on the root, said once, when each item reads fine / the root is null",
 	"for / a for line whose second list has a named by key from $params that is missing / says the key once and then each item's list that fails whatever the key",
+	"for / a named by key that is an alias of the for line is read before any item of the counted list, so it fails on an empty list too / fails as unusable when the key x isn't text, even with es empty, because the key is read before any item and before .k is looked at",
 	"for / a part that holds a list is walked by a whose in `count of m.ys whose v is in pl.z is 0` / the part holds an empty list and the list has an item",
 	"for / a part that holds a list is walked in the whose of a for line and in a whose under it / an empty part fails as value",
 	"for / a walk through a for line's alias leaves a root after the phrase to the assertion, and each item keeps its own cause and the items of its list / an item whose list holds five items without v",
