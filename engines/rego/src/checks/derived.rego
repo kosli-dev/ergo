@@ -306,9 +306,17 @@ _tally(subj, side) := {"states": {"not_an_object"}, "list": _path_name(path), "v
 	judged_states := {c | some j in judged; some c in j.states}
 	flaw_states := {fl | some fl in flaws; fl != ""}
 	root_flaw_states := {fl | some c in side.whose; fl := _root_read_flaw(subj, c); fl != ""}
-	states := (((((walk_states | judged_states) | _tally_number_states(f, _tally_distinct(side, read, subj, "read"))) | flaw_states) | root_flaw_states) | _tally_alone_states(subj, side, w)) | _tally_keyed_root_states(subj, side, w.items)
+	states := ((((((walk_states | judged_states) | _tally_number_states(f, _tally_distinct(side, read, subj, "read"))) | flaw_states) | root_flaw_states) | _tally_alone_states(subj, side, w)) | _tally_keyed_root_states(subj, side, w.items)) | _whose_alias_key_states(side)
 	r := object.union(object.union({"states": states, "list": _walk_name(side[f], w.walked), "values": [_walk_value(e.v, e, w) | some e in w.items], "locations": _walk_locations(w)}, _tally_value(f, _tally_distinct(side, kept, subj, "kept"), states)), _tally_stop_outcome(subj, side[f], stop))
 }
+
+_whose_alias_key_states(side) := {_key_state(x[1]) | some c in side.whose; some x in _alias_keys_unread(c)}
+
+_alias_keys_unread(c) := [[name, v] |
+	some name in sort({step.named_by | walk(c, [_, step]); _name_step(step)})
+	v := input["ergo/names"][name]
+	not is_string(v)
+]
 
 _tally_alone_states(subj, side, w) := {s |
 	alone := _whose_alone(subj, side)

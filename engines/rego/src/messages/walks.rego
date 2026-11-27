@@ -703,8 +703,17 @@ _m_said_once(xs) := [x | some i, x in xs; not x[1] in {y[1] | some y in array.sl
 _m_tally_heads(said, side, w) := said if {
 	w.items != []
 } else := said if {
-	[t | some c in side.whose; some t in _key_root_texts(c)] == []
-} else := _m_said_once(array.concat(said, [["root unusable", t] | some c in side.whose; some t in _key_root_texts(c)]))
+	_m_tally_key_heads(side) == []
+} else := _m_said_once(array.concat(said, _m_tally_key_heads(side)))
+
+_m_tally_key_heads(side) := array.concat(
+	[["root unusable", t] | some c in side.whose; some t in _key_root_texts(c)],
+	_once([[concat("", ["root ", _key_state(x[1])]), _m_alias_key_text(x[0], x[1])] | some c in side.whose; some x in _alias_keys_unread(c)]),
+)
+
+_m_alias_key_text(name, null) := concat("", [name, " is null"])
+
+_m_alias_key_text(name, v) := _m_isnt(name, v, "text") if v != null
 
 _m_tally_list_said(side, said, x) if {
 	said != []
