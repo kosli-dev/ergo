@@ -1060,7 +1060,7 @@ _for_said_earlier(x, earlier) if {
 	x.kind != "item"
 	some e in earlier
 	e.kind != "item"
-	e.text == x.text
+	_m_aliased(e.text) == _m_aliased(x.text)
 }
 
 _for_in_list_order(said) := [_for_slot(said, sorted, i) | some i, _ in said] if {
