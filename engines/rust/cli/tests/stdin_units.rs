@@ -151,7 +151,8 @@ fn a_flag_value_of_dash_alone_is_a_value_and_not_a_flag() {
 
 #[test]
 fn stdin_is_read_whole_and_parsed_as_the_format_says() {
-    let text = files::read_stdin("input", &mut Cursor::new(b"a: 1\n".to_vec())).unwrap();
+    let text =
+        files::read_stdin_from("input", false, &mut Cursor::new(b"a: 1\n".to_vec())).unwrap();
     assert_eq!(text, "a: 1\n");
     let value = files::parse_stdin("input", &text, StdinFormat::Yaml).unwrap();
     assert_eq!(value, serde_json::json!({"a": 1}));
@@ -185,7 +186,8 @@ fn empty_standard_input_reads_as_an_empty_file_does() {
 
 #[test]
 fn standard_input_that_is_not_utf8_is_an_error() {
-    let failure = files::read_stdin("input", &mut Cursor::new(vec![0xff, 0xfe, 0x00])).unwrap_err();
+    let failure = files::read_stdin_from("input", false, &mut Cursor::new(vec![0xff, 0xfe, 0x00]))
+        .unwrap_err();
     assert!(
         failure
             .message()
@@ -199,4 +201,45 @@ fn standard_input_that_is_not_utf8_is_an_error() {
 fn names_say_standard_input_for_a_dash_and_the_file_otherwise() {
     assert_eq!(files::name("policy", "-"), "the policy on standard input");
     assert_eq!(files::name("policy", "a.yaml"), "the policy file a.yaml");
+}
+
+#[test]
+fn standard_input_that_is_a_terminal_is_refused_without_reading() {
+    let failure =
+        files::read_stdin_from("input", true, &mut Cursor::new(b"a: 1\n".to_vec())).unwrap_err();
+    assert_eq!(
+        failure.message(),
+        "standard input is a terminal; pipe the input in"
+    );
+}
+
+#[test]
+fn params_on_standard_input_are_named_in_the_plural() {
+    let failure = files::parse_stdin("params", "{", StdinFormat::Json).unwrap_err();
+    assert!(
+        failure
+            .message()
+            .starts_with("standard input as params isn't valid JSON: "),
+        "{}",
+        failure.message()
+    );
+}
+
+#[test]
+fn repeated_keys_in_yaml_text_are_listed_and_other_text_has_none() {
+    assert_eq!(
+        files::repeated_keys_in("a: 1\nb:\n  c: 1\n  c: 2\n"),
+        vec![vec!["b".to_string(), "c".to_string()]]
+    );
+    assert!(files::repeated_keys_in("a: [").is_empty());
+    assert!(files::repeated_keys_in("a: 1\n").is_empty());
+}
+
+#[test]
+fn the_test_usage_line_names_stdin_format() {
+    let line = ergo_policy_cli::USAGE
+        .lines()
+        .find(|l| l.trim_start().starts_with("ergo test <policy file>"))
+        .unwrap();
+    assert!(line.contains("[--stdin-format json|yaml]"), "{line}");
 }

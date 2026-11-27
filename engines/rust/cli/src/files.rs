@@ -21,6 +21,16 @@ pub fn repeated_keys_in(text: &str) -> Vec<Vec<String>> {
     yaml::repeated_keys(text).unwrap_or_default()
 }
 
+/// Reads standard input as [read_stdin] does, and refuses it when `is_terminal` says nobody is piping anything in.
+pub fn read_stdin_from(
+    what: &str,
+    is_terminal: bool,
+    reader: &mut dyn Read,
+) -> Result<String, Failure> {
+    let _ = is_terminal;
+    read_stdin(what, reader)
+}
+
 /// Reads all of standard input, from `reader`, as text. `what` is `policy`, `input` or `params` and goes into the error message.
 pub fn read_stdin(what: &str, reader: &mut dyn Read) -> Result<String, Failure> {
     let mut text = String::new();

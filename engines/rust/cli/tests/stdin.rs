@@ -35,6 +35,21 @@ const EXAMPLES: &str = r#"tests:
 
 static COUNTER: AtomicUsize = AtomicUsize::new(0);
 
+#[derive(Default)]
+struct Folders(Vec<std::path::PathBuf>);
+
+impl Drop for Folders {
+    fn drop(&mut self) {
+        for folder in &self.0 {
+            let _ = std::fs::remove_dir_all(folder);
+        }
+    }
+}
+
+thread_local! {
+    static FOLDERS: std::cell::RefCell<Folders> = std::cell::RefCell::new(Folders::default());
+}
+
 fn policy() -> String {
     POLICY.replace("{{spec}}", SPEC)
 }
@@ -46,6 +61,7 @@ fn file(name: &str, file: &str, text: &str) -> String {
         COUNTER.fetch_add(1, Ordering::SeqCst)
     ));
     std::fs::create_dir_all(&dir).unwrap();
+    FOLDERS.with(|f| f.borrow_mut().0.push(dir.clone()));
     let path = dir.join(file);
     std::fs::write(&path, text).unwrap();
     path.to_string_lossy().into_owned()
@@ -607,4 +623,275 @@ fn engine_rego_works_with_standard_input_for_each_flag_and_for_test() {
         &format!("{}{}", policy(), EXAMPLES),
     );
     assert_eq!(t.code, 0, "{}{}", t.stdout, t.stderr);
+}
+
+fn exits_while_stdin_stays_open(args: &[&str], environment: &[(&str, &str)]) -> Run {
+    let mut command = Command::new(env!("CARGO_BIN_EXE_ergo"));
+    command
+        .args(args)
+        .envs(environment.iter().copied())
+        .env_remove("ERGO_REGO")
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped());
+    let mut child = command.spawn().unwrap();
+    let held = child.stdin.take().unwrap();
+    let deadline = std::time::Instant::now() + std::time::Duration::from_secs(4);
+    let status = loop {
+        if let Some(status) = child.try_wait().unwrap() {
+            break Some(status);
+        }
+        if std::time::Instant::now() >= deadline {
+            break None;
+        }
+        std::thread::sleep(std::time::Duration::from_millis(20));
+    };
+    if status.is_none() {
+        let _ = child.kill();
+    }
+    let output = child.wait_with_output().unwrap();
+    drop(held);
+    assert!(
+        status.is_some(),
+        "{args:?} was still waiting for standard input after 4 seconds"
+    );
+    Run {
+        code: output.status.code().unwrap(),
+        stdout: String::from_utf8(output.stdout).unwrap(),
+        stderr: String::from_utf8(output.stderr).unwrap(),
+    }
+}
+
+#[test]
+fn a_missing_input_file_is_reported_while_the_policy_on_standard_input_is_still_open() {
+    let r = exits_while_stdin_stays_open(
+        &[
+            "report",
+            "--policy",
+            "-",
+            "--input",
+            "/no/such/input.json",
+            "--stdin-format",
+            "yaml",
+        ],
+        &[],
+    );
+    assert_eq!((r.code, r.stdout.as_str()), (2, ""));
+    assert!(
+        r.stderr
+            .contains("can't read the input file /no/such/input.json"),
+        "{}",
+        r.stderr
+    );
+}
+
+#[test]
+fn a_bad_ergo_rego_path_is_reported_while_standard_input_is_still_open() {
+    let i = file("i", "i.json", INPUT_JSON);
+    let r = exits_while_stdin_stays_open(
+        &[
+            "report",
+            "--policy",
+            "-",
+            "--input",
+            &i,
+            "--stdin-format",
+            "yaml",
+            "--engine",
+            "rego",
+            "--ergo-rego",
+            "/no/such/ergo.rego",
+        ],
+        &[],
+    );
+    assert_eq!((r.code, r.stdout.as_str()), (2, ""));
+    assert!(r.stderr.contains("/no/such/ergo.rego"), "{}", r.stderr);
+}
+
+#[test]
+fn a_missing_ergo_rego_is_reported_while_standard_input_is_still_open() {
+    let i = file("i", "i.json", INPUT_JSON);
+    let r = exits_while_stdin_stays_open(
+        &[
+            "report",
+            "--policy",
+            "-",
+            "--input",
+            &i,
+            "--stdin-format",
+            "yaml",
+            "--engine",
+            "rego",
+        ],
+        &[],
+    );
+    assert_eq!((r.code, r.stdout.as_str()), (2, ""));
+    assert!(r.stderr.contains("ergo.rego"), "{}", r.stderr);
+}
+
+#[test]
+fn a_missing_policy_file_is_reported_while_the_input_on_standard_input_is_still_open() {
+    let r = exits_while_stdin_stays_open(
+        &[
+            "report",
+            "--policy",
+            "/no/such/policy.yaml",
+            "--input",
+            "-",
+            "--stdin-format",
+            "json",
+        ],
+        &[],
+    );
+    assert_eq!((r.code, r.stdout.as_str()), (2, ""));
+    assert!(
+        r.stderr
+            .contains("can't read the policy file /no/such/policy.yaml"),
+        "{}",
+        r.stderr
+    );
+}
+
+#[test]
+fn test_with_a_bad_ergo_rego_path_reports_it_while_the_policy_on_standard_input_is_still_open() {
+    let r = exits_while_stdin_stays_open(
+        &[
+            "test",
+            "-",
+            "--stdin-format",
+            "yaml",
+            "--engine",
+            "rego",
+            "--ergo-rego",
+            "/no/such/ergo.rego",
+        ],
+        &[],
+    );
+    assert_eq!((r.code, r.stdout.as_str()), (2, ""));
+    assert!(r.stderr.contains("/no/such/ergo.rego"), "{}", r.stderr);
+}
+
+#[test]
+fn test_refuses_a_repeated_key_in_the_examples_on_standard_input_like_a_file() {
+    let text = format!(
+        "{}tests:\n  examples:\n    - name: one\n      name: two\n      input: {{}}\n      outcome: []\n",
+        policy()
+    );
+    let on_stdin = run(&["test", "-", "--stdin-format", "yaml"], &text);
+    let f = file("t", "t.yaml", &text);
+    let on_file = run(&["test", &f], "");
+    assert_eq!((on_stdin.code, on_file.code), (2, 2));
+    assert!(
+        on_stdin
+            .stderr
+            .contains("the examples in the policy on standard input are written wrong"),
+        "{}",
+        on_stdin.stderr
+    );
+    assert_eq!(
+        on_stdin.stderr.replace("the policy on standard input", "X"),
+        on_file.stderr.replace(&format!("the policy file {f}"), "X")
+    );
+}
+
+#[test]
+fn engine_rego_refuses_a_policy_on_standard_input_whose_spec_it_does_not_support() {
+    let Some(rego) = built_ergo_rego() else {
+        return;
+    };
+    let i = file("i", "i.json", INPUT_JSON);
+    let old = policy().replace(SPEC, "v0.1");
+    let r = run(
+        &[
+            "report",
+            "--policy",
+            "-",
+            "--input",
+            &i,
+            "--stdin-format",
+            "yaml",
+            "--engine",
+            "rego",
+            "--ergo-rego",
+            &rego,
+        ],
+        &old,
+    );
+    assert_eq!((r.code, r.stdout.as_str()), (2, ""));
+    assert!(
+        r.stderr.contains(&format!(
+            "refuses the policy on standard input: policy ergo_spec: unsupported version v0.1, expected {SPEC}"
+        )),
+        "{}",
+        r.stderr
+    );
+}
+
+#[test]
+fn format_outcome_says_the_policy_on_standard_input_is_written_wrong() {
+    let i = file("i", "i.json", INPUT_JSON);
+    let bad = policy().replace("approver is a non-empty string", "approver is");
+    let r = run(
+        &[
+            "report",
+            "--policy",
+            "-",
+            "--input",
+            &i,
+            "--stdin-format",
+            "yaml",
+            "--format",
+            "outcome",
+            "--fail",
+        ],
+        &bad,
+    );
+    assert_eq!((r.code, r.stdout.as_str()), (3, ""));
+    assert!(
+        r.stderr.contains(
+            "the policy on standard input is written wrong, so the report can't be shown as an outcome"
+        ),
+        "{}",
+        r.stderr
+    );
+}
+
+#[test]
+fn format_pretty_says_standard_input_when_it_cannot_show_the_report() {
+    use std::os::unix::fs::PermissionsExt;
+    let i = file("i", "i.json", INPUT_JSON);
+    let rego = file("e", "ergo.rego", "package ergo\n");
+    let report = r#"{"report": {"compliant": false, "engine": {"name": "e", "version": "1"}, "requirements": {"r": {"status": "not_met"}}, "results": [{"requirement": "r", "passed": false}]}}"#;
+    let opa = file(
+        "o",
+        "opa",
+        &format!("#!/bin/sh\nprintf '%s\\n' '{report}'\n"),
+    );
+    std::fs::set_permissions(&opa, std::fs::Permissions::from_mode(0o755)).unwrap();
+    let r = run_with(
+        &[
+            "report",
+            "--policy",
+            "-",
+            "--input",
+            &i,
+            "--stdin-format",
+            "yaml",
+            "--format",
+            "pretty",
+            "--engine",
+            "rego",
+            "--ergo-rego",
+            &rego,
+        ],
+        policy().as_bytes(),
+        &[("ERGO_OPA", &opa)],
+    );
+    assert_eq!((r.code, r.stdout.as_str()), (2, ""), "{}", r.stderr);
+    assert!(
+        r.stderr
+            .contains("--format pretty can't show the report from standard input:"),
+        "{}",
+        r.stderr
+    );
 }
