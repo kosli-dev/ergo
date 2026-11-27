@@ -126,15 +126,6 @@ _for_whose_own(_, e) := _m_clause("item", name, "not_an_object", _m_isnt(name, e
 	name := _m_item_name(e.i, set())
 }
 
-_for_bare_item_cause(c, e, cause) := object.union(c, {"cause": _for_whose_item_cause(cause)}) if {
-	c.said == []
-	not is_object(e.iv)
-} else := c
-
-_for_whose_item_cause(cause) := cause if cause in _no_value_states
-
-else := "not_an_object"
-
 _for_whose_own(item, e) := clauses[0] if {
 	is_object(e.iv)
 	clauses := [x |
@@ -938,7 +929,7 @@ _for_item_clause_at(check, failed, k, walked) := c if {
 	c := _for_item_own(check, failed[k], walked)
 }
 
-_for_item_own(check, f, walked) := _for_bare_item_cause(_for_whose_item_clause(check.items[0], e, _for_names, wh), e, f.cause) if {
+_for_item_own(check, f, walked) := _for_whose_item_clause(check.items[0], e, _for_names, wh) if {
 	e := walked.items[f.path]
 	wh := _for_whose(check.items[0], e, _for_names)
 	wh.undecided != []
