@@ -141,6 +141,27 @@ fn an_item_whose_path_goes_on_into_a_value_that_is_not_an_object_fails_as_not_an
 }
 
 #[test]
+fn an_item_that_is_not_an_object_fails_as_not_an_object_whatever_the_root_of_its_whose_fails_with() {
+    let line = "every xs whose v is in $params.os.name, if any, as x";
+    for (item, params) in [
+        (json!(null), json!({})),
+        (json!(null), json!({"os": null})),
+        (json!(null), json!({"os": [null]})),
+        (json!("s"), json!({"os": [{"name": "a"}, {}]})),
+    ] {
+        let row = row_with(line, json!(["x.w is 1"]), json!({"xs": [item]}), params);
+        assert_eq!(row["cause"], "not_an_object", "{row}");
+        let entry = row["failures"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|entry| entry["name"] == "item 1 of xs")
+            .unwrap();
+        assert_eq!(entry["cause"], "not_an_object", "{row}");
+    }
+}
+
+#[test]
 fn an_object_item_whose_path_goes_on_into_a_text_still_fails_as_unusable() {
     let subject = json!({"xs": [{"meta": "text"}]});
     assert_eq!(
