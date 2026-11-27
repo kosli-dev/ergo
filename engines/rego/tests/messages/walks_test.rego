@@ -110,6 +110,13 @@ test_a_count_on_an_empty_list_says_only_the_root_a_key_from_the_item_is_read_in_
 	}
 }
 
+test_a_count_on_an_empty_list_says_an_alias_key_of_its_whose_that_isnt_text if {
+	side := {"count_of": ["es"], "text": "count of es whose zz equals m named by x.k", "whose": [{"op": "compare", "cmp": "eq", "left": ["zz"], "right": ["m", {"named_by": "x"}, "k"]}]}
+	ergo._m_tally({"es": []}, side) == [["root unusable", "x is {\"k\": 3}, which isn't text"]] with input as {"ergo/names": {"x": {"k": 3}}}
+	ergo._m_tally({"es": []}, side) == [["root null", "x is null"]] with input as {"ergo/names": {"x": null}}
+	ergo._m_tally({"es": []}, side) == [] with input as {"ergo/names": {"x": "q"}}
+}
+
 test_a_count_on_an_empty_list_says_a_root_further_back_than_the_key_that_isnt_an_object if {
 	side := _keyed_count_side("count of xs whose v is $input.m.a named by key is 0")
 	said := [x[1] | some x in ergo._m_tally({"xs": []}, side)] with data.ergo_document as {"m": 3}

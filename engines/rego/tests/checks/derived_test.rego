@@ -61,6 +61,17 @@ test_a_count_fails_on_the_root_a_key_from_the_item_is_read_in_even_when_the_list
 	ergo._tally({"xs": []}, _count_keyed_by_item("$input.m")).states == {"absent"} with data.ergo_document as {}
 }
 
+_count_keyed_by_alias(right) := {"count_of": ["es"], "text": "count of es whose zz equals m named by x", "whose": [{"op": "compare", "cmp": "eq", "left": ["zz"], "right": right}]}
+
+test_a_count_fails_on_an_alias_key_of_its_whose_that_isnt_text_even_when_the_list_is_empty if {
+	every right in [["m", {"named_by": "x"}], ["m", {"named_by": "x"}, "k"]] {
+		ergo._tally({"es": []}, _count_keyed_by_alias(right)).states == {"unusable"} with input as {"ergo/names": {"x": {"k": 3}}}
+		ergo._tally({"es": []}, _count_keyed_by_alias(right)).states == {"unusable"} with input as {"ergo/names": {"x": 3}}
+		ergo._tally({"es": []}, _count_keyed_by_alias(right)).states == {"null"} with input as {"ergo/names": {"x": null}}
+		ergo._tally({"es": []}, _count_keyed_by_alias(right)).states == set() with input as {"ergo/names": {"x": "q"}}
+	}
+}
+
 test_a_count_fails_as_value_on_an_empty_list_on_the_right_of_its_whose_whatever_the_items if {
 	every sentence in [
 		"count of xs whose v is in $params.cs.name is 0",
