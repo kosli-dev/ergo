@@ -358,6 +358,12 @@ jobs:
       - uses: actions/checkout@v7
         with:
           ref: ${{ inputs.tag || github.ref }}
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          path: workflow-scripts
+          persist-credentials: false
+          sparse-checkout: .github
       - name: Install the Rust version in rust-toolchain.toml
         working-directory: engines/rust
         run: rustup toolchain install
@@ -367,11 +373,7 @@ jobs:
       - name: Check that ergo runs and says this version
         shell: bash
         run: |
-          says=$("engines/rust/target/release/ergo${{ matrix.exe }}" --version | tr -d '\r')
-          if [ "$says" != "ergo ${TAG#rust-v}" ]; then
-            echo "ergo --version says \"$says\", and should say \"ergo ${TAG#rust-v}\""
-            exit 1
-          fi
+          "engines/rust/target/release/ergo${{ matrix.exe }}" --version | bash workflow-scripts/.github/release-version-check.sh "${TAG#rust-v}"
       - name: Pack ergo
         shell: bash
         run: |
