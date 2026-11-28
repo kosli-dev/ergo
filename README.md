@@ -157,12 +157,35 @@ The report holds every row, passed or failed. To tell someone only what went wro
     "check": "approved",
     "description": "Someone approved the deployment",
     "expression": "approved_by is a non-empty string",
+    "failures": [
+      {
+        "cause": "absent",
+        "failures": [],
+        "inputs": [
+          {
+            "locations": [
+              "/deployments/1"
+            ],
+            "name": "approved_by",
+            "outcome": "absent",
+            "value": null
+          }
+        ],
+        "kind": "assertion",
+        "locations": [
+          "$policy:/requirements/prod_deploy/checks/approved/assert"
+        ],
+        "message": "approved_by is missing",
+        "name": "approved_by is a non-empty string"
+      }
+    ],
     "inputs": [
       {
         "locations": [
           "/deployments/1"
         ],
         "name": "approved_by",
+        "outcome": "absent",
         "value": null
       }
     ],
@@ -176,7 +199,7 @@ The report holds every row, passed or failed. To tell someone only what went wro
 ]
 ```
 
-`violations` is built from the report. It keeps only the failed rows that are real problems and adds each check's `description` and `expression`, so you have what you need to write a message. `d-3` isn't listed: it failed `$applies`, but being out of scope isn't a problem.
+`violations` is built from the report. It keeps only the failed rows that are real problems and adds each check's `description` and `expression`, so you have what you need to write a message. Each violation also has `failures`, the parts the message is made of, and an input's `outcome` says whether it was read, here `absent`. `d-3` isn't listed: it failed `$applies`, but being out of scope isn't a problem.
 
 ## Test a policy with examples (experimental)
 
