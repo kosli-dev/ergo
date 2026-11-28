@@ -78,9 +78,9 @@ The report is the one the [README](README.md#the-report) shows, and its `engine`
   "compliant": false,
   "engine": {
     "name": "ergo-rego",
-    "version": "0.6.0"
+    "version": "0.7.0"
   },
-  "ergo": "v0.7-dev",
+  "ergo": "v0.7",
   ...
 }
 ```
@@ -161,7 +161,7 @@ Params are the third argument to `ergo.report`. Ergo doesn't look for them anywh
 `ergo.rego` compares numbers in the input and the params on every digit, however many they have. OPA on its own treats some decimals as the same when they only differ after the 15th significant digit, like `1234567890.1209567890` and `1234567890.1209567990`, so Ergo checks the digits itself whenever OPA says two numbers are equal. With this policy and these params:
 
 ```yaml
-ergo_spec: v0.7-dev
+ergo_spec: v0.7
 subjects:
   row:
     from: rows
@@ -222,7 +222,7 @@ or `["missing"]` when the compiled policy has no `engine`. That only tells relea
 A `make` rule keeps it fresh, since it runs again when either file changes. With this `policy.yaml`:
 
 ```yaml
-ergo_spec: v0.7-dev
+ergo_spec: v0.7
 subjects:
   deployment:
     from: deployments
@@ -291,7 +291,7 @@ The [reference](REFERENCE.md#policies-written-before-01) says what spec 0.1 stop
 
 ### Moving a policy to sentences
 
-`ergo.as_sentences(policy)` rewrites a policy written the old way into sentences, wherever a sentence reads back as exactly what was written. It always sets `ergo_spec: v0.7-dev` on what it returns. Anything it can't rewrite stays as it was, and under 0.1 that is written wrong, so you rewrite those parts by hand. With this `policy.yaml`:
+`ergo.as_sentences(policy)` rewrites a policy written the old way into sentences, wherever a sentence reads back as exactly what was written. It always sets `ergo_spec: v0.7` on what it returns. Anything it can't rewrite stays as it was, and under 0.1 that is written wrong, so you rewrite those parts by hand. With this `policy.yaml`:
 
 <!-- ergo-run: as-sentences role=file path=policy.yaml -->
 ```yaml
@@ -325,7 +325,7 @@ prints:
 
 <!-- ergo-run: as-sentences role=output -->
 ```yaml
-ergo_spec: v0.7-dev
+ergo_spec: v0.7
 requirements:
   approved:
     checks:

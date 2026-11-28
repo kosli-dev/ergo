@@ -48,7 +48,7 @@ Here is a policy that says "_every production deployment must have an approver_"
 <!-- ergo-run: first-policy role=file path=policy.yaml -->
 
 ```yaml
-ergo_spec: v0.6
+ergo_spec: v0.7
 subjects:
   deployment:
     from: deployments whose environment is "prod"
@@ -101,7 +101,7 @@ The report records every check Ergo ran, including the ones that passed. It come
   "compliant": false,
   "description": "",
   "engine": { ... },
-  "ergo": "v0.6",
+  "ergo": "v0.7",
   "meta": {},
   "requirements": { ... },
   "results": [ ... ],
@@ -180,10 +180,10 @@ The report holds every row, passed or failed. To tell someone only what went wro
 
 ## Test a policy with examples (experimental)
 
-This is experimental, and it is in the `ergo` command from 0.5.0. The releases before that don't have it, so if `ergo test` isn't a command you have, your release is older. A policy can carry examples under a top-level `tests` field. An example is an input and the outcome its report must have, written in the words the report uses. `ergo test policy.yaml` runs them, and `ergo report --format outcome` prints the outcome of a report, so you can paste it into an example. Here is a policy with one example. The `ergo_spec` is the one in development, which is the one that reads `tests`:
+This is experimental, and it is in the `ergo` command from 0.5.0. The releases before that don't have it, so if `ergo test` isn't a command you have, your release is older. A policy can carry examples under a top-level `tests` field. An example is an input and the outcome its report must have, written in the words the report uses. `ergo test policy.yaml` runs them, and `ergo report --format outcome` prints the outcome of a report, so you can paste it into an example. Here is a policy with one example. The `ergo_spec` is `v0.7`, the first one that reads `tests`:
 
 ```yaml
-ergo_spec: v0.7-dev
+ergo_spec: v0.7
 subjects:
   deployment:
     from: deployments
