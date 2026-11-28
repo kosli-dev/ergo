@@ -73,7 +73,7 @@ Promise.all([budgetsOnly ? null : load(runtimeDir, { initial: 32 }), load(ergoDi
 
   const document = { deployments: Array.from({ length: 100 }, (_, i) => ({ id: `d-${i}`, environment: i % 3 ? "prod" : "staging", ...(i % 2 ? { approved_by: "a" } : {}), tests: [{ ok: i % 5 > 0 }, { ok: true }] })) };
   const budgetPolicy = {
-    ergo_spec: "v0.7-dev",
+    ergo_spec: "v0.7",
     subjects: { deployment: { from: 'deployments whose environment is "prod"', identified_by: "id" } },
     requirements: {
       approved: { subject: "deployment", checks: { approved: "approved_by is a non-empty string" } },
@@ -81,7 +81,7 @@ Promise.all([budgetsOnly ? null : load(runtimeDir, { initial: 32 }), load(ergoDi
     },
   };
   const sentencePolicy = {
-    ergo_spec: "v0.7-dev",
+    ergo_spec: "v0.7",
     subjects: budgetPolicy.subjects,
     requirements: {
       approved: {
@@ -95,7 +95,7 @@ Promise.all([budgetsOnly ? null : load(runtimeDir, { initial: 32 }), load(ergoDi
     },
   };
   const chainPolicy = {
-    ergo_spec: "v0.7-dev",
+    ergo_spec: "v0.7",
     subjects: {
       deployment: { from: 'deployments whose environment is "prod"', identified_by: "id" },
       test: { from: "every deployment.tests" },
@@ -103,7 +103,7 @@ Promise.all([budgetsOnly ? null : load(runtimeDir, { initial: 32 }), load(ergoDi
     requirements: { approved: { subject: "test", checks: { ok: "ok is true and deployment.approved_by exists" } } },
   };
   const forPolicy = {
-    ergo_spec: "v0.7-dev",
+    ergo_spec: "v0.7",
     subjects: budgetPolicy.subjects,
     requirements: {
       approved: {
@@ -117,7 +117,7 @@ Promise.all([budgetsOnly ? null : load(runtimeDir, { initial: 32 }), load(ergoDi
   };
   const numbers = { rows: Array.from({ length: 100 }, (_, i) => ({ id: `r-${i}`, n: 1000 + i, m: 1000 + i, f: 0.5 + i / 1000 })) };
   const numbersPolicy = {
-    ergo_spec: "v0.7-dev",
+    ergo_spec: "v0.7",
     subjects: { row: { from: "rows", identified_by: "id" } },
     requirements: {
       approved: {

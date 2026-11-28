@@ -1,7 +1,7 @@
 //! Says how to get `ergo.rego` when `--engine rego` can't find it.
 
 /// The tag of the latest release of `ergo.rego`. Move it to the new tag after each `rego-v*` release.
-pub const LATEST_ERGO_REGO: &str = "rego-v0.6.0";
+pub const LATEST_ERGO_REGO: &str = "rego-v0.7.0";
 
 fn how_to_get(command: &str) -> String {
     let version = LATEST_ERGO_REGO

@@ -15,11 +15,11 @@ cargo install --locked ergo-policy-cli
 Or download it, without Rust, for Linux (x86_64) or macOS (arm64) from the [latest release of the CLI](https://github.com/kosli-dev/ergo/releases?q=rust&expanded=true), unpack it and put `ergo` on your `PATH`:
 
 ```sh
-curl -L https://github.com/kosli-dev/ergo/releases/download/rust-v0.4.0/ergo-0.4.0-macos-arm64.tar.gz | tar xz
+curl -L https://github.com/kosli-dev/ergo/releases/download/rust-v0.5.0/ergo-0.5.0-macos-arm64.tar.gz | tar xz
 ./ergo --version
 ```
 
-On Linux, the file is `ergo-0.4.0-linux-x86_64.tar.gz`.
+On Linux, the file is `ergo-0.5.0-linux-x86_64.tar.gz`.
 
 To build it from this repo with Docker instead, see [`engines/rust/README.md`](engines/rust/README.md#building-the-cli).
 
@@ -32,7 +32,7 @@ ergo report --policy policy.yaml --input deployments.json
 ergo violations --policy policy.yaml --input deployments.json
 ```
 
-The report is the one the [README](README.md#the-report) shows, apart from `engine`, which says `{"name": "ergo-rust", "version": "0.4.0"}`. The violations are the same too.
+The report is the one the [README](README.md#the-report) shows, apart from `engine`, which says `{"name": "ergo-rust", "version": "0.5.0"}`. The violations are the same too.
 
 > **Multi-document YAML isn't supported.** A YAML file can hold several documents, split by `---`, as the output of `helm template` and many other tools does. `ergo` reads only the first document, and nothing in the report says there was another. Checks on the later documents give no result, and the report can say `compliant` because of it. With this `input.yaml`:
 >
@@ -45,7 +45,7 @@ The report is the one the [README](README.md#the-report) shows, apart from `engi
 >
 > Ergo reads `{"kind": "ServiceAccount"}`. The `Deployment` is never checked, so a policy that requires every deployment to have replicas passes. Split the file before Ergo reads it, or put the documents in one list, and write the policy's `from` to match.
 
-`--params <file>` gives the policy its params. The file holds the params themselves, like `limit: 9`, without a `params:` key around them, and without `--params` they are `{}`. The output has sorted keys and two-space indents, like `opa eval --format=pretty`, and `--compact` prints one line. From 0.5.0, `ergo --version` prints the version and the commit it was built from, like `ergo 0.5.0-dev (commit ab81076ed80cff04a4c2e395418ca5535c6c3dab)`, and `unknown` for a build made outside a git checkout of this repo. Before that it prints only the version.
+`--params <file>` gives the policy its params. The file holds the params themselves, like `limit: 9`, without a `params:` key around them, and without `--params` they are `{}`. The output has sorted keys and two-space indents, like `opa eval --format=pretty`, and `--compact` prints one line. From 0.5.0, `ergo --version` prints the version and the commit it was built from, like `ergo 0.5.0 (commit 7b39b221e1aa1561de19403eee85f19e8e87161b)`, and `unknown` for a build made outside a git checkout of this repo. Before that it prints only the version.
 
 Without `--fail`, the command exits 0 whenever it printed the output, even when `compliant` is `false`. With `--fail` it still prints all of it, then exits with a code that says how the policy did, so a CI job can stop on it:
 
@@ -83,8 +83,8 @@ When `ergo.rego` can't be found, because there is no `--ergo-rego` and no `ERGO_
 
 ```
 ergo: --engine rego needs ergo.rego, and it was not found in --ergo-rego or ERGO_REGO.
-Get the release you run in production and pass its path. For ergo.rego 0.6.0, the latest release when this ergo was built:
-  curl -fsSL -o ergo.rego https://github.com/kosli-dev/ergo/releases/download/rego-v0.6.0/ergo.rego
+Get the release you run in production and pass its path. For ergo.rego 0.7.0, the latest release when this ergo was built:
+  curl -fsSL -o ergo.rego https://github.com/kosli-dev/ergo/releases/download/rego-v0.7.0/ergo.rego
   ergo report --engine rego --ergo-rego ergo.rego ...
 ```
 
@@ -92,10 +92,10 @@ The `curl` line names the latest release of `ergo.rego` when this version of `er
 
 A newer `ergo.rego` works with an older `ergo`. `ergo` never decides which versions of `ergo.rego` are allowed, and it passes on the fields of the report that it doesn't read, so a field a newer release adds is printed as it is. When `ergo` can't use what `opa` printed, it exits 2 and says so, and it never guesses.
 
-A policy written for a newer spec than the `ergo.rego` you pass is refused. For `ok.yaml` with `ergo_spec: v0.7-dev` and the `ergo.rego` of release `rego-v0.6.0` in `../rel`, `ergo report --policy ok.yaml --input input.json --engine rego --ergo-rego ../rel/ergo.rego` exits 2 and prints:
+A policy written for a newer spec than the `ergo.rego` you pass is refused. For `ok.yaml` with `ergo_spec: v0.7` and the `ergo.rego` of release `rego-v0.6.0` in `../rel`, `ergo report --policy ok.yaml --input input.json --engine rego --ergo-rego ../rel/ergo.rego` exits 2 and prints:
 
 ```
-ergo: the ergo.rego at ../rel/ergo.rego refuses the policy file ok.yaml: policy ergo_spec: unsupported version v0.7-dev, expected v0.6
+ergo: the ergo.rego at ../rel/ergo.rego refuses the policy file ok.yaml: policy ergo_spec: unsupported version v0.7, expected v0.6
 ```
 
 An `ergo.rego` that has no `ergo.report`, or for `violations` no `ergo.violations`, is refused with the name of the entry point that is missing, and `ergo test` does the same for `ergo.compile`. With the release's `ergo.rego` copied to `ergo.rego` and its `report` renamed, `ergo report --policy policy.yaml --input input.json --engine rego --ergo-rego ergo.rego` exits 2 and prints:
@@ -113,7 +113,7 @@ A value of `-` for `--policy`, `--input` or `--params`, or for the policy of `er
 Take this `policy.yaml`:
 
 ```yaml
-ergo_spec: v0.7-dev
+ergo_spec: v0.7
 subjects:
   deployment:
     from: deployments whose environment is "prod"
@@ -270,7 +270,7 @@ The first line of `ergo --help` and of the usage printed for a call with no argu
 Each example keeps only the lines it is about. Here is the policy with two examples:
 
 ```yaml
-ergo_spec: v0.7-dev
+ergo_spec: v0.7
 subjects:
   deployment:
     from: deployments
@@ -347,7 +347,7 @@ The last lines warn about each check that no example shows failing, or none show
 A child subject's line names its parent after its id, with `in`, every time, and a grandchild's names its grandparent after that. With this policy in `artifacts.yaml`:
 
 ```yaml
-ergo_spec: v0.7-dev
+ergo_spec: v0.7
 subjects:
   deployment:
     from: deployments
@@ -407,7 +407,7 @@ A line for a child subject that leaves out its `in`, like `artifact web passes t
 The checks Ergo adds, `$min_subjects`, `$unique_ids`, `$unique_ancestor_ids` and `$well_formed`, have lines too, under their own names. Their rows have no id, so their lines have none. A row for the requirement's own subject names no subject at all, like `fails $min_subjects because in-scope deployment count is 0`, and a row with an `in` names the subject and its parents, like `artifact in deployment d4 fails $min_subjects because in-scope artifact count is 0`. A subject out of scope isn't a failure, so its line says `is out of scope`, like `deployment d3 is out of scope because environment is "dev"`, and `is in scope` says the opposite. With this policy in `production.yaml`:
 
 ```yaml
-ergo_spec: v0.7-dev
+ergo_spec: v0.7
 subjects:
   deployment:
     from: deployments whose environment is "prod"
@@ -495,7 +495,7 @@ ergo: lines for an $applies row that failed with absent, not value, aren't suppo
 **Experimental, from 0.5.0.** `ergo test` builds each example's report with the Rust engine. A policy that runs on `ergo.rego` can be tested on it instead, with `--engine rego`, so a difference between the two engines shows up as a failing example. It needs [`opa`](https://www.openpolicyagent.org/docs/#1-download-opa) and a copy of `ergo.rego`, like the one you use in production. Only where the reports come from changes: the lines, the warnings and the exit codes stay the same. With `ergo.rego` and `policy.yaml`, the policy with two examples above, in the current folder, `ergo test --engine rego --ergo-rego ergo.rego policy.yaml` prints:
 
 ```
-engine: ergo-rego 0.7.0-dev
+engine: ergo-rego 0.7.0
 passed: a deployment needs an approver
 passed: nobody approves their own deployment
 2 examples: 2 passed, 0 failed
@@ -510,7 +510,7 @@ The first line names the engine the reports came from, as their `engine` field g
 `ergo test --engine rego` exits 2, and never falls back to the Rust engine, when it can't read `ergo.rego`, can't run `opa`, `opa` fails, or `opa` prints something that isn't one report per example. It also exits 2 when `ergo.rego` doesn't support the policy's `ergo_spec`, with the problem `ergo.rego` gives. For `policy.yaml` with `ergo_spec: v0.6` saved as `old.yaml`, `ergo test --engine rego --ergo-rego ergo.rego old.yaml` exits 2 with:
 
 ```
-ergo: the ergo.rego at ergo.rego refuses the policy file old.yaml: policy ergo_spec: unsupported version v0.6, expected v0.7-dev
+ergo: the ergo.rego at ergo.rego refuses the policy file old.yaml: policy ergo_spec: unsupported version v0.6, expected v0.7
 ```
 
 ## Updating

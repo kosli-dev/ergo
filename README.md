@@ -48,7 +48,7 @@ Here is a policy that says "_every production deployment must have an approver_"
 <!-- ergo-run: first-policy role=file path=policy.yaml -->
 
 ```yaml
-ergo_spec: v0.6
+ergo_spec: v0.7
 subjects:
   deployment:
     from: deployments whose environment is "prod"
@@ -101,7 +101,7 @@ The report records every check Ergo ran, including the ones that passed. It come
   "compliant": false,
   "description": "",
   "engine": { ... },
-  "ergo": "v0.6",
+  "ergo": "v0.7",
   "meta": {},
   "requirements": { ... },
   "results": [ ... ],
@@ -157,12 +157,35 @@ The report holds every row, passed or failed. To tell someone only what went wro
     "check": "approved",
     "description": "Someone approved the deployment",
     "expression": "approved_by is a non-empty string",
+    "failures": [
+      {
+        "cause": "absent",
+        "failures": [],
+        "inputs": [
+          {
+            "locations": [
+              "/deployments/1"
+            ],
+            "name": "approved_by",
+            "outcome": "absent",
+            "value": null
+          }
+        ],
+        "kind": "assertion",
+        "locations": [
+          "$policy:/requirements/prod_deploy/checks/approved/assert"
+        ],
+        "message": "approved_by is missing",
+        "name": "approved_by is a non-empty string"
+      }
+    ],
     "inputs": [
       {
         "locations": [
           "/deployments/1"
         ],
         "name": "approved_by",
+        "outcome": "absent",
         "value": null
       }
     ],
@@ -176,14 +199,14 @@ The report holds every row, passed or failed. To tell someone only what went wro
 ]
 ```
 
-`violations` is built from the report. It keeps only the failed rows that are real problems and adds each check's `description` and `expression`, so you have what you need to write a message. `d-3` isn't listed: it failed `$applies`, but being out of scope isn't a problem.
+`violations` is built from the report. It keeps only the failed rows that are real problems and adds each check's `description` and `expression`, so you have what you need to write a message. Each violation also has `failures`, the parts the message is made of, and an input's `outcome` says whether it was read, here `absent`. `d-3` isn't listed: it failed `$applies`, but being out of scope isn't a problem.
 
 ## Test a policy with examples (experimental)
 
-This is experimental, and it is in the `ergo` command from 0.5.0. The releases before that don't have it, so if `ergo test` isn't a command you have, your release is older. A policy can carry examples under a top-level `tests` field. An example is an input and the outcome its report must have, written in the words the report uses. `ergo test policy.yaml` runs them, and `ergo report --format outcome` prints the outcome of a report, so you can paste it into an example. Here is a policy with one example. The `ergo_spec` is the one in development, which is the one that reads `tests`:
+This is experimental, and it is in the `ergo` command from 0.5.0. The releases before that don't have it, so if `ergo test` isn't a command you have, your release is older. A policy can carry examples under a top-level `tests` field. An example is an input and the outcome its report must have, written in the words the report uses. `ergo test policy.yaml` runs them, and `ergo report --format outcome` prints the outcome of a report, so you can paste it into an example. Here is a policy with one example. The `ergo_spec` is `v0.7`, the first one that reads `tests`:
 
 ```yaml
-ergo_spec: v0.7-dev
+ergo_spec: v0.7
 subjects:
   deployment:
     from: deployments
