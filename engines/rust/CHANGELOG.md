@@ -24,7 +24,7 @@ Each release names the version of the spec it follows. The spec's own changes ar
 
 ### Changed
 
-- `ergo --version` also prints the commit the binary was built from, like `ergo 0.5.0-dev (commit ab81076ed80cff04a4c2e395418ca5535c6c3dab)`, and `unknown` when the build isn't in a git checkout of this repo. It no longer prints only `ergo 0.5.0-dev`. A script that reads the version line must read the first word after `ergo`.
+- `ergo --version` also prints the commit the binary was built from, like `ergo 0.5.0 (commit 7b39b221e1aa1561de19403eee85f19e8e87161b)`, and `unknown` when the build isn't in a git checkout of this repo. It no longer prints only the version, like `ergo 0.4.0`. A script that reads the version line must read the first word after `ergo`.
 
 - `ergo-policy-sentences` reads `member of` after `every`, `some`, `count of` and `sum of` and on `for` lines into new public fields, `ListOptions::member`, `Derived::member` and `ForItem::Walk`'s `member`, so a struct literal of them outside the crate no longer compiles until it sets the field.
 

@@ -45,7 +45,7 @@ The report is the one the [README](README.md#the-report) shows, apart from `engi
 >
 > Ergo reads `{"kind": "ServiceAccount"}`. The `Deployment` is never checked, so a policy that requires every deployment to have replicas passes. Split the file before Ergo reads it, or put the documents in one list, and write the policy's `from` to match.
 
-`--params <file>` gives the policy its params. The file holds the params themselves, like `limit: 9`, without a `params:` key around them, and without `--params` they are `{}`. The output has sorted keys and two-space indents, like `opa eval --format=pretty`, and `--compact` prints one line. From 0.5.0, `ergo --version` prints the version and the commit it was built from, like `ergo 0.5.0-dev (commit ab81076ed80cff04a4c2e395418ca5535c6c3dab)`, and `unknown` for a build made outside a git checkout of this repo. Before that it prints only the version.
+`--params <file>` gives the policy its params. The file holds the params themselves, like `limit: 9`, without a `params:` key around them, and without `--params` they are `{}`. The output has sorted keys and two-space indents, like `opa eval --format=pretty`, and `--compact` prints one line. From 0.5.0, `ergo --version` prints the version and the commit it was built from, like `ergo 0.5.0 (commit 7b39b221e1aa1561de19403eee85f19e8e87161b)`, and `unknown` for a build made outside a git checkout of this repo. Before that it prints only the version.
 
 Without `--fail`, the command exits 0 whenever it printed the output, even when `compliant` is `false`. With `--fail` it still prints all of it, then exits with a code that says how the policy did, so a CI job can stop on it:
 
