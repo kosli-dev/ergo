@@ -1,1 +1,2 @@
 engines/rust/known-failures.txt merge=sorted-set
+*.sh text eol=lf

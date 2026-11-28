@@ -17,6 +17,13 @@ case $check_attr in
   *) echo "git check-attr says: $check_attr" >&2; exit 1 ;;
 esac
 
+echo ".gitattributes keeps shell scripts on LF line ends, so a Windows checkout can run them"
+check_attr=$(git -C "$repo_root" check-attr eol .github/release-version-check.sh)
+case $check_attr in
+  *"eol: lf") ;;
+  *) echo "git check-attr says: $check_attr" >&2; exit 1 ;;
+esac
+
 repo=$dir/repo
 mkdir -p "$repo/.github" "$repo/engines/rust"
 cp "$repo_root/.gitattributes" "$repo/.gitattributes"

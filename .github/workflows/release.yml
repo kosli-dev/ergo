@@ -362,6 +362,7 @@ jobs:
         with:
           ref: ${{ github.sha }}
           path: workflow-scripts
+          persist-credentials: false
           sparse-checkout: .github
       - name: Install the Rust version in rust-toolchain.toml
         working-directory: engines/rust
@@ -372,7 +373,7 @@ jobs:
       - name: Check that ergo runs and says this version
         shell: bash
         run: |
-          "engines/rust/target/release/ergo${{ matrix.exe }}" --version | workflow-scripts/.github/release-version-check.sh "${TAG#rust-v}"
+          "engines/rust/target/release/ergo${{ matrix.exe }}" --version | bash workflow-scripts/.github/release-version-check.sh "${TAG#rust-v}"
       - name: Pack ergo
         shell: bash
         run: |
