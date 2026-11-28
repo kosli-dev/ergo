@@ -61,6 +61,7 @@ python3 .github/rego-layers.py
 .github/docs-run.sh
 .github/docs-run_test.sh
 .github/docs-run-release_test.sh
+.github/release-version-check_test.sh
 .github/mutants-facts_test.sh
 python3 spec/check_rules.py
 python3 spec/sweep_test.py

@@ -112,6 +112,7 @@ jobs:
           .github/release-notes_test.sh
           .github/release_test.sh
           .github/changelog-version_test.sh
+          .github/release-version-check_test.sh
       - name: Check the compiled-policy tests run in batches
         run: .github/compiled-tests_test.sh
       - name: Check the property check
